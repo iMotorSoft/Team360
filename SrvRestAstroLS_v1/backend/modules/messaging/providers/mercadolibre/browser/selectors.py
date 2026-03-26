@@ -1,4 +1,4 @@
-"""Conservative selector sets for login smoke checks."""
+"""Conservative selector sets for Mercado Libre smoke checks."""
 
 # These are intentionally broad. The smoke only needs a reasonable signal.
 LOGIN_ENTRY_SELECTORS: list[str] = [
@@ -34,3 +34,45 @@ SESSION_COOKIE_NAMES: tuple[str, ...] = (
     "orguseridp",
     "ssid",
 )
+
+INBOX_URL_HINTS: tuple[str, ...] = (
+    "/messages",
+    "/inbox",
+    "/preguntas",
+)
+
+# Inbox DOM changes often, so these stay broad on purpose.
+INBOX_CONTAINER_SELECTORS: list[str] = [
+    "[data-testid='conversation-list']",
+    "[data-testid*='conversation']",
+    "[class*='conversation-list']",
+    "[class*='messages']",
+    "[class*='inbox']",
+]
+
+INBOX_THREAD_SELECTORS: list[str] = [
+    "[data-testid*='conversation-item']",
+    "[data-testid*='thread']",
+    "[class*='conversation-item']",
+    "[class*='thread-item']",
+    "a[href*='/messages/']",
+]
+
+INBOX_DENIED_HINT_SELECTORS: list[str] = [
+    "text=/inicia sesion|inicia sesión|ingresa|ingresar/i",
+    "text=/no tienes permiso|no tenes permiso|acceso denegado|inicia sesion para ver tus mensajes/i",
+    "a[href*='login']",
+    "button[data-link-id='login']",
+]
+
+INBOX_EMPTY_STATE_SELECTORS: list[str] = [
+    "text=/no hay mensajes|no tienes mensajes|no tenes mensajes|sin mensajes|sin conversaciones/i",
+    "text=/aun no tienes conversaciones|aún no tienes conversaciones/i",
+]
+
+INBOX_SELECTOR_GROUPS: dict[str, list[str]] = {
+    "inbox_container": INBOX_CONTAINER_SELECTORS,
+    "thread_items": INBOX_THREAD_SELECTORS,
+    "empty_state": INBOX_EMPTY_STATE_SELECTORS,
+    "login_or_denied": INBOX_DENIED_HINT_SELECTORS,
+}

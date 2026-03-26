@@ -5,8 +5,13 @@ Helpers minimos para abrir un browser persistente con Playwright y reutilizar se
 El alcance actual cubre solo:
 
 - home de Mercado Libre
+- summary de cuenta como ruta real de inspeccion
 - login manual
 - deteccion conservadora de sesion
-- screenshot y storage state en `runtime/`
+- inspeccion de home autenticada para descubrir affordances reales
+- inspeccion de summary de cuenta para descubrir affordances reales
+- acceso basico a inbox con heuristicas simples
+- inspeccion puntual del DOM del inbox para ajustar selectores
+- screenshot, storage state y reportes de debug en `runtime/`
 
-No incluye inbox, lectura de hilos ni respuestas.
+No incluye lectura detallada de hilos ni respuestas.
