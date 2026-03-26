@@ -1,0 +1,35 @@
+[project]
+name = "team360-backend"
+version = "0.1.0"
+description = "Backend service for Team360 built with Litestar."
+requires-python = ">=3.12"
+dependencies = [
+    "litestar",
+    "pydantic",
+    "jsonschema",
+    "httpx",
+    "playwright",
+    "pytest",
+    "uvicorn",
+    "openai>=1.14.0",
+    "langgraph>=1.0.6",
+    "langchain-core>=1.2.7",
+    "langchain>=1.2.6",
+    "langchain-openai>=1.1.7",
+    "psycopg[binary]>=3.2.0",
+    "psycopg-pool>=3.2.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = []
+
+[tool.hatch.build.targets.wheel]
+packages = ["modules", "routes", "models", "services", "middleware", "db"]
+include = ["globalVar.py", "ls_iMotorSoft_Srv01.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
