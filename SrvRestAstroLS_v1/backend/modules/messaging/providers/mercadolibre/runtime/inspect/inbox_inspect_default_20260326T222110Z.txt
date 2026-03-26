@@ -1,0 +1,59 @@
+profile: default
+timestamp: 2026-03-26T22:21:19.168690+00:00
+final url: https://www.mercadolibre.com.ar/inbox
+page title: 
+ready_state: complete
+logged_in heuristic: True
+inbox_accessible heuristic: True
+visible_threads heuristic: 0
+empty_state heuristic: False
+iframe_count: 0
+anchor_count: 2
+button_count: 0
+body_text_length: 106
+body_html_length: 4550
+
+[root_selector_counts]
+  0 | #root
+  0 | #__next
+  1 | main
+  0 | section
+  0 | article
+  0 | div[role]
+  1 | [role='main']
+  0 | iframe
+
+[root_nodes]
+
+[global_text_samples]
+
+[inbox_container]
+  0 | [data-testid='conversation-list']
+  0 | [data-testid*='conversation']
+  0 | [class*='conversation-list']
+  0 | [class*='messages']
+  0 | [class*='inbox']
+
+[thread_items]
+  0 | [data-testid*='conversation-item']
+  0 | [data-testid*='thread']
+  0 | [class*='conversation-item']
+  0 | [class*='thread-item']
+  0 | a[href*='/messages/']
+
+[empty_state]
+  0 | text=/no hay mensajes|no tienes mensajes|no tenes mensajes|sin mensajes|sin conversaciones/i
+  0 | text=/aun no tienes conversaciones|aún no tienes conversaciones/i
+
+[login_or_denied]
+  0 | text=/inicia sesion|inicia sesión|ingresa|ingresar/i
+  0 | text=/no tienes permiso|no tenes permiso|acceso denegado|inicia sesion para ver tus mensajes/i
+  0 | a[href*='login']
+  0 | button[data-link-id='login']
+
+warnings:
+- no selector matched in group inbox_container
+- no selector matched in group thread_items
+- no selector matched in group empty_state
+- no selector matched in group login_or_denied
+- no visible global text chunks found

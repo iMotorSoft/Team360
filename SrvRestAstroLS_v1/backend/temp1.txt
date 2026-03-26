@@ -1,0 +1,55 @@
+BSD
+nano ~/.bashrc
+source ~/.bashrc
+source .venv/bin/activate
+
+sftp://administrator@imotorsoft.com/home/administrator/project/iMotorSoft/ai/Vertice360
+
+lsof -i :7062
+
+kill -9 1777624
+
+echo $VERTICE360_ENV
+
+Por favor tenes que usar en lo componente svelte la variable URL_REST
+/src/components/global.js
+import { URL_REST } from '../global';
+
+en todas las llamadas a los endpoint esta es la convencion a tomar
+
+Usé “LangGraph” como etiqueta conceptual, pero la implementación es directa
+  con OpenAI (gpt-4o-mini) sin orquestador externo. Flujo actual:
+
+  - Endpoint: POST /api/demo/codex/chat (backend/routes/demo_codex_chat.py).
+    Recibe { prompt, history } (roles user/assistant).
+  - Servicio: backend/services/demo_codex_chat.py. Arma mensajes:
+      - 2 mensajes system: uno con las reglas (“LainGraph, responde breve en
+        español…”) y otro con el contexto del mock (proyectos, inversores,
+        operaciones de db/demo_vertice360_data.py).
+      - El historial (si viene) y el prompt del usuario.
+  - Llama a OpenAI().chat.completions.create(model=gpt-4o-mini, temperature=0.2)
+    y devuelve reply, model, usage, meta.
+  - Front: astro/src/components/demo/codex/CodexDemoChat.svelte usa ese endpoint
+    y muestra el chat en la página astro/src/pages/demo/codex/dashboard-
+    chat.astro.
+
+  Para usar “LangGraph” real:
+
+  1. Definir un gráfico (p. ej. nodes: “context builder” → “model call” →
+     “guardrails”).
+  2. Exponer un handler HTTP que ejecute ese gráfico; el payload podría ser
+     igual { prompt, history }.
+  3. Sustituir en run_demo_chat la llamada directa a OpenAI por la ejecución del
+     gráfico, y conservar el contrato de respuesta (reply/model/usage/meta) para
+     no romper el front.
+
+  Si querés, implemento un LangGraph sencillo con un nodo de contexto + nodo de
+  LLM y lo conectamos al mismo endpoint.
+
+
+rsync -avz \
+    /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Vertice360/SrvRestAstroLS_v1/clientA/dist/ \
+    administrator@imotorsoft.com:/home/administrator/project/iMotorSoft/ai/Vertice360/SrvRestAstroLS_v1/clientA/dist/
+    
+rsync -avz --exclude '__pycache__' --exclude '.git' --exclude '*.pyc' --exclude '_uploads' --exclude 'storage' --exclude 'clientA/' --exclude '.env' --exclude '.venv/' /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Vertice360/SrvRestAstroLS_v1/ administrator@imotorsoft.com:/home/administrator/project/iMotorSoft/ai/Pozo360/SrvRestAstroLS_v1/ 
+
