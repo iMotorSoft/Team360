@@ -4,7 +4,7 @@ import time
 
 from playwright.sync_api import Error, Page
 
-from .config import ACCOUNT_SUMMARY_URL, HOME_URL, INBOX_CANDIDATE_URLS, INBOX_URL, NAVIGATION_TIMEOUT_MS
+from .config import ACCOUNT_SUMMARY_URL, HOME_URL, INBOX_CANDIDATE_URLS, INBOX_URL, NAVIGATION_TIMEOUT_MS, QUESTIONS_URL
 from .selectors import (
     INBOX_CONTAINER_SELECTORS,
     INBOX_DENIED_HINT_SELECTORS,
@@ -72,6 +72,16 @@ def open_account_summary(page: Page) -> None:
 
 def stabilize_summary(page: Page, settle_ms: int = 3_000) -> None:
     """Wait a bit for account summary widgets and affordances to appear."""
+    _stabilize_page(page, settle_ms=settle_ms)
+
+
+def open_questions(page: Page) -> None:
+    """Open the Mercado Libre seller questions page."""
+    page.goto(QUESTIONS_URL, wait_until="domcontentloaded", timeout=NAVIGATION_TIMEOUT_MS)
+
+
+def stabilize_questions(page: Page, settle_ms: int = 3_000) -> None:
+    """Wait a bit for seller questions lists, tabs and overlays to appear."""
     _stabilize_page(page, settle_ms=settle_ms)
 
 

@@ -5,6 +5,7 @@ from pathlib import Path
 BASE_URL = "https://www.mercadolibre.com.ar/"
 HOME_URL = BASE_URL
 ACCOUNT_SUMMARY_URL = "https://myaccount.mercadolibre.com.ar/summary"
+QUESTIONS_URL = "https://www.mercadolibre.com.ar/preguntas/vendedor"
 INBOX_URL = f"{BASE_URL}messages"
 INBOX_CANDIDATE_URLS: tuple[str, ...] = (
     INBOX_URL,
@@ -72,6 +73,55 @@ SUMMARY_DISCOVERY_KEYWORDS: tuple[str, ...] = (
     "profile",
     "help",
     "myml",
+)
+
+QUESTIONS_DISCOVERY_KEYWORDS: tuple[str, ...] = (
+    "pregunta",
+    "preguntas",
+    "responder",
+    "respuesta",
+    "comprador",
+    "cliente",
+    "mensaje",
+    "mensajes",
+    "producto",
+    "publicacion",
+    "publicaciones",
+    "venta",
+    "ventas",
+    "filtro",
+    "pendientes",
+    "respondidas",
+    "sin responder",
+    "question",
+    "questions",
+    "answer",
+    "buyer",
+    "customer",
+    "product",
+    "listing",
+    "sale",
+    "sales",
+)
+WIZARD_KEYWORDS: tuple[str, ...] = (
+    "entendido",
+    "siguiente",
+    "omitir",
+    "finalizar",
+    "bienvenido",
+    "guia",
+    "tutorial",
+    "recorrido",
+    "primera publicacion",
+    "empeza a vender",
+    "empezá a vender",
+    "completa tu perfil",
+    "onboarding",
+    "wizard",
+    "tour",
+    "guide",
+    "welcome",
+    "start selling",
 )
 
 HEADLESS = False

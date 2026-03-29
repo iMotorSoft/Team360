@@ -7,7 +7,7 @@ from pathlib import Path
 
 from playwright.sync_api import BrowserContext, Error, Page
 
-from .config import LOGIN_POLL_INTERVAL_SEC
+from .config import LOGIN_POLL_INTERVAL_SEC, WIZARD_KEYWORDS
 from .selectors import (
     ACCOUNT_MENU_SELECTORS,
     ACCOUNT_URL_HINTS,
@@ -32,6 +32,45 @@ ROOT_CANDIDATE_SELECTORS: list[str] = [
     "[role='main']",
     "iframe",
 ]
+
+MODAL_OVERLAY_SELECTORS: list[str] = [
+    "[role='dialog']",
+    "[aria-modal='true']",
+    "[class*='modal']",
+    "[class*='dialog']",
+    "[class*='overlay']",
+    "[class*='backdrop']",
+    "[data-testid*='modal']",
+    "[data-testid*='dialog']",
+]
+
+BANNER_LIKE_SELECTORS: list[str] = [
+    "[role='banner']",
+    "[class*='banner']",
+    "[class*='onboarding']",
+    "[class*='coachmark']",
+    "[class*='tour']",
+    "[class*='wizard']",
+    "[data-testid*='banner']",
+]
+
+WIZARD_ACTION_KEYWORDS: tuple[str, ...] = (
+    "entendido",
+    "siguiente",
+    "cerrar",
+    "omitir",
+    "finalizar",
+    "guia",
+    "guía",
+    "tutorial",
+    "bienvenido",
+    "continuar",
+    "start",
+    "skip",
+    "next",
+    "close",
+    "finish",
+)
 
 
 def _is_selector_visible(page: Page, selector: str) -> bool:
@@ -157,6 +196,103 @@ def _filter_candidate_items(items: list[dict[str, str]], keywords: tuple[str, ..
     return matches
 
 
+def _collect_keyword_hits(values: list[str], keywords: tuple[str, ...], limit: int = 8) -> list[str]:
+    """Return a few keywords that appear in the provided text values."""
+    normalized_values = [_normalize_for_match(value) for value in values if value]
+    hits: list[str] = []
+    for keyword in keywords:
+        normalized_keyword = _normalize_for_match(keyword)
+        if not normalized_keyword:
+            continue
+        if any(normalized_keyword in value for value in normalized_values) and keyword not in hits:
+            hits.append(keyword)
+        if len(hits) >= limit:
+            break
+    return hits
+
+
+def _collect_special_layer_elements(page: Page, selectors: list[str], limit: int = 6) -> list[dict[str, object]]:
+    """Collect a few visible overlay/banner candidates from the rendered DOM."""
+    script = r"""
+    ([selectors, limit]) => {
+      const results = [];
+      const seen = new Set();
+      const isVisible = (node) => {
+        const style = window.getComputedStyle(node);
+        const rect = node.getBoundingClientRect();
+        if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || '1') === 0) {
+          return false;
+        }
+        return rect.width > 0 && rect.height > 0;
+      };
+
+      for (const selector of selectors) {
+        let nodes = [];
+        try {
+          nodes = Array.from(document.querySelectorAll(selector));
+        } catch (_error) {
+          nodes = [];
+        }
+        for (const node of nodes) {
+          if (results.length >= limit) break;
+          if (!isVisible(node)) continue;
+          const rect = node.getBoundingClientRect();
+          const style = window.getComputedStyle(node);
+          const text = (node.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+          const closeButtons = Array.from(node.querySelectorAll('button, [role="button"], a'))
+            .map((child) => (child.innerText || child.getAttribute('aria-label') || child.getAttribute('title') || '').replace(/\s+/g, ' ').trim())
+            .filter(Boolean)
+            .slice(0, 4);
+          const key = [selector, node.tagName, node.className, text].join('|');
+          if (seen.has(key)) continue;
+          seen.add(key);
+          results.push({
+            selector,
+            tag: (node.tagName || '').toLowerCase(),
+            role: node.getAttribute('role') || '',
+            aria_modal: node.getAttribute('aria-modal') || '',
+            class_name: (node.className || '').toString().trim().replace(/\s+/g, ' ').slice(0, 160),
+            text,
+            position: style.position || '',
+            z_index: style.zIndex || '',
+            viewport_ratio: Number(((rect.width * rect.height) / Math.max(window.innerWidth * window.innerHeight, 1)).toFixed(3)),
+            close_affordances: closeButtons,
+          });
+        }
+        if (results.length >= limit) break;
+      }
+      return results;
+    }
+    """
+    result = _eval_with_arg_or(page, script, [selectors, limit], [])
+    if not isinstance(result, list):
+        return []
+
+    items: list[dict[str, object]] = []
+    for item in result:
+        if not isinstance(item, dict):
+            continue
+        items.append(
+            {
+                "selector": str(item.get("selector", "")),
+                "tag": str(item.get("tag", "")),
+                "role": str(item.get("role", "")),
+                "aria_modal": str(item.get("aria_modal", "")),
+                "class_name": str(item.get("class_name", "")),
+                "text": _clean_text(str(item.get("text", ""))),
+                "position": str(item.get("position", "")),
+                "z_index": str(item.get("z_index", "")),
+                "viewport_ratio": float(item.get("viewport_ratio", 0) or 0),
+                "close_affordances": [
+                    _clean_text(str(value))
+                    for value in item.get("close_affordances", [])
+                    if str(value).strip()
+                ],
+            }
+        )
+    return items
+
+
 def _collect_navigation_discovery(page: Page, keywords: tuple[str, ...]) -> dict[str, object]:
     """Collect visible affordances and filtered candidates on one page."""
     metrics = collect_page_document_metrics(page)
@@ -217,10 +353,10 @@ def wait_for_manual_login(page: Page, timeout_sec: int = 180) -> bool:
     return is_logged_in(page)
 
 
-def save_debug_screenshot(page: Page, path: Path) -> None:
+def save_debug_screenshot(page: Page, path: Path, full_page: bool = False) -> None:
     """Save a basic screenshot for manual inspection."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    page.screenshot(path=str(path), full_page=False)
+    page.screenshot(path=str(path), full_page=full_page)
 
 
 def maybe_save_storage_state(context: BrowserContext, path: Path) -> None:
@@ -478,6 +614,79 @@ def collect_home_inspection(page: Page, keywords: tuple[str, ...]) -> dict[str, 
 def collect_summary_inspection(page: Page, keywords: tuple[str, ...]) -> dict[str, object]:
     """Collect a compact inspection payload for account summary discovery."""
     return _collect_navigation_discovery(page, keywords)
+
+
+def detect_wizard_or_onboarding(page: Page, keywords: tuple[str, ...] = WIZARD_KEYWORDS) -> dict[str, object]:
+    """Detect visible onboarding-like copy and actions conservatively."""
+    visible_buttons = find_visible_buttons(page, limit=20)
+    visible_texts = first_visible_text_chunks(page, limit=30, max_len=160)
+    button_texts = [
+        " ".join(item.get(field, "") for field in ("text", "aria_label", "title"))
+        for item in visible_buttons
+    ]
+    matched_keywords = _collect_keyword_hits(visible_texts + button_texts, keywords)
+    matched_buttons = _filter_candidate_items(visible_buttons, WIZARD_ACTION_KEYWORDS)[:6]
+    banner_like = detect_banner_like_elements(page)
+    modal_overlay = detect_modal_overlay(page)
+    detected = bool(matched_keywords and (matched_buttons or banner_like or modal_overlay.get("detected")))
+
+    return {
+        "detected": detected,
+        "matched_keywords": matched_keywords,
+        "matched_buttons": matched_buttons,
+        "matching_text_samples": [
+            text
+            for text in visible_texts
+            if any(_normalize_for_match(keyword) in _normalize_for_match(text) for keyword in matched_keywords)
+        ][:6],
+    }
+
+
+def detect_modal_overlay(page: Page) -> dict[str, object]:
+    """Detect a visible modal or blocking overlay with lightweight heuristics."""
+    elements = _collect_special_layer_elements(page, MODAL_OVERLAY_SELECTORS)
+    blocking = [
+        item
+        for item in elements
+        if item.get("aria_modal")
+        or item.get("position") == "fixed"
+        or float(item.get("viewport_ratio", 0) or 0) >= 0.2
+    ]
+    return {
+        "detected": bool(blocking),
+        "count": len(elements),
+        "blocking_count": len(blocking),
+        "elements": elements,
+    }
+
+
+def detect_banner_like_elements(page: Page) -> list[dict[str, object]]:
+    """Detect visible banner-like UI blocks that may affect what the page communicates."""
+    return _collect_special_layer_elements(page, BANNER_LIKE_SELECTORS)
+
+
+def collect_questions_inspection(page: Page, keywords: tuple[str, ...]) -> dict[str, object]:
+    """Collect a compact inspection payload for seller questions discovery."""
+    inspection = _collect_navigation_discovery(page, keywords)
+    wizard_or_onboarding = detect_wizard_or_onboarding(page)
+    modal_overlay = detect_modal_overlay(page)
+    banner_like_elements = detect_banner_like_elements(page)
+    warnings = list(inspection.get("warnings", []))
+
+    if wizard_or_onboarding.get("detected"):
+        warnings.append("wizard or onboarding hints detected; validate screenshot before trusting visible affordances")
+    if modal_overlay.get("detected"):
+        warnings.append("modal or overlay detected; page content may be partially blocked")
+    if banner_like_elements:
+        warnings.append("banner-like UI detected; some visible copy may be promotional or onboarding-related")
+    if not inspection.get("candidate_links") and not inspection.get("candidate_buttons"):
+        warnings.append("questions-related affordances were not clearly visible on this pass")
+
+    inspection["wizard_or_onboarding"] = wizard_or_onboarding
+    inspection["modal_overlay"] = modal_overlay
+    inspection["banner_like_elements"] = banner_like_elements
+    inspection["warnings"] = warnings
+    return inspection
 
 
 def collect_inbox_inspection(page: Page) -> dict[str, object]:

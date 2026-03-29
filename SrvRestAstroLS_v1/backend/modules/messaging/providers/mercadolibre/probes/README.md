@@ -10,6 +10,8 @@ Smoke disponible ahora:
 
 `python -m modules.messaging.providers.mercadolibre.probes.smoke_summary_inspect --profile default --timeout 90`
 
+`python -m modules.messaging.providers.mercadolibre.probes.smoke_questions_inspect --profile default --timeout 90`
+
 `python -m modules.messaging.providers.mercadolibre.probes.smoke_inbox --profile default --timeout 90`
 
 `python -m modules.messaging.providers.mercadolibre.probes.smoke_inbox_inspect --profile default --timeout 90`
@@ -35,6 +37,15 @@ Objetivo del smoke summary inspect:
 - abrir el summary de cuenta autenticado
 - listar links y botones visibles
 - filtrar affordances candidatas por keywords de mensajes, preguntas, ventas, publicaciones, cuenta y ayuda
+- guardar screenshot, storage state y reporte de inspeccion
+
+Objetivo del smoke questions inspect:
+
+- reutilizar sesion existente
+- abrir la pagina real de preguntas del vendedor
+- listar links y botones visibles
+- filtrar affordances candidatas por keywords de preguntas, respuestas, compradores, publicaciones, ventas y filtros
+- detectar wizard, onboarding, modal blocking y banner-like overlays de forma heuristica
 - guardar screenshot, storage state y reporte de inspeccion
 
 Objetivo del smoke inbox:
