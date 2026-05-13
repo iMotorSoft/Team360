@@ -1,0 +1,34 @@
+# Status actual - data/reports
+
+Objetivo: `reportes-y-evidencias`
+
+Ultima actualizacion: 2026-05-13
+
+## Estado general
+
+`data/reports/` contiene reportes, evidencias, muestras, snapshots y entregables generados fuera del codigo fuente.
+
+## Acciones realizadas
+
+### 2026-05-13 - Status locales para reportes
+
+- Se agrego esta bitacora local para registrar el ultimo estado relevante de `data/reports/`.
+- Se mantuvo la estructura:
+  - `mercadolibre/` para reportes vinculados a Mercado Libre.
+  - `snapshots/` para snapshots historicos.
+- Se agrego `README.md` como indice de reportes.
+
+### 2026-05-13 - Agrupacion de reportes Mercado Libre y snapshots
+
+- Se agruparon reportes de NETZAJ RACING en `mercadolibre/netzaj-racing/`.
+- Se movio el snapshot historico a `snapshots/`.
+
+## Validacion
+
+- Se verifico la estructura de reportes y evidencias.
+- No se mezclaron reportes generados con documentacion tecnica de desarrollo.
+
+## Pendientes recomendados
+
+- Crear subdirectorios por fuente, cliente o dominio cuando haya nuevos reportes.
+- Actualizar el status local del subdirectorio afectado en cada nuevo relevamiento.
