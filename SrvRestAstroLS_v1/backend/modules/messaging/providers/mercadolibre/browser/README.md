@@ -12,6 +12,7 @@ El alcance actual cubre solo:
 - inspeccion de home autenticada para descubrir affordances reales
 - inspeccion de summary de cuenta para descubrir affordances reales
 - inspeccion de preguntas del vendedor para descubrir affordances reales
+- inspeccion superficial de la lista visible de preguntas del vendedor
 - deteccion heuristica de wizard, onboarding, modal blocking y banner-like overlays
 - acceso basico a inbox con heuristicas simples
 - inspeccion puntual del DOM del inbox para ajustar selectores

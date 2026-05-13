@@ -103,6 +103,34 @@ QUESTIONS_DISCOVERY_KEYWORDS: tuple[str, ...] = (
     "sale",
     "sales",
 )
+QUESTIONS_LIST_KEYWORDS: tuple[str, ...] = (
+    "pregunta",
+    "preguntas",
+    "pregunto",
+    "pregunto por",
+    "pregunto si",
+    "respondida",
+    "responder",
+    "sin responder",
+    "por responder",
+    "producto",
+    "publicacion",
+    "publicaciones",
+    "comprador",
+    "cliente",
+)
+QUESTIONS_FILTER_KEYWORDS: tuple[str, ...] = (
+    "por responder",
+    "respondidas",
+    "sin responder",
+    "todas",
+    "ultimos 15 dias",
+    "ultimos 30 dias",
+    "mas recientes",
+    "menos recientes",
+    "ultimos",
+    "recientes",
+)
 WIZARD_KEYWORDS: tuple[str, ...] = (
     "entendido",
     "siguiente",

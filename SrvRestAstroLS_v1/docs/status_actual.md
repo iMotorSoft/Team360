@@ -14,6 +14,23 @@ Se dejo preparada una base inicial de arquitectura y persistencia para Team360, 
 
 ## Acciones realizadas
 
+### 2026-05-13 - Probes Mercado Libre para lista de preguntas y borrador de respuesta
+
+- Se incorporo inspeccion superficial de la lista visible de preguntas del vendedor.
+- Se agrego `smoke_questions_list_inspect.py` para:
+  - reutilizar sesion persistente;
+  - abrir preguntas del vendedor;
+  - detectar lista, filtros, empty state y muestra superficial de items;
+  - guardar screenshot, storage state y reporte de inspeccion.
+- Se amplio `smoke_reply_draft.py` para validar borradores de respuesta sin publicar:
+  - localizar un item con accion de responder;
+  - completar textarea;
+  - validar estado del boton;
+  - limpiar el borrador por defecto salvo `--keep-draft`.
+- Se actualizaron helpers/selectores/configuracion del browser lab para soportar inspeccion de preguntas.
+- Se actualizaron README y `login-flow.md` con los probes disponibles.
+- No se integraron estos probes con `team360_orquestador`, AG-UI ni frontend.
+
 ### 2026-05-13 - Documento de factibilidad SAP Business One Desktop Client
 
 - Se creo `sap_b1_desktop_automation_factibilidad.md`.
@@ -169,6 +186,8 @@ Incluye estructura inicial para:
 
 ## Validacion
 
+- Se ejecuto `python3 -m py_compile` sobre los modulos Python tocados del browser lab Mercado Libre.
+- `git diff --check` paso sin errores para el commit de probes Mercado Libre.
 - Se verifico que `sap_b1_desktop_automation_factibilidad.md` existe en `SrvRestAstroLS_v1/docs/`.
 - `git diff --check` paso sin errores para el documento SAP B1.
 - Se verifico la estructura de directorios documentales activos antes de crear status locales.

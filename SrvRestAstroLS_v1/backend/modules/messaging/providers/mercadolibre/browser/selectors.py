@@ -76,3 +76,64 @@ INBOX_SELECTOR_GROUPS: dict[str, list[str]] = {
     "empty_state": INBOX_EMPTY_STATE_SELECTORS,
     "login_or_denied": INBOX_DENIED_HINT_SELECTORS,
 }
+
+# Questions page signals are intentionally broad and should be tuned with reports.
+QUESTIONS_LIST_CONTAINER_SELECTORS: list[str] = [
+    "[data-testid*='question-list']",
+    "[data-testid*='questions-list']",
+    "[class*='question-list']",
+    "[class*='questions-list']",
+    "[class*='questions__list']",
+    "[class*='question-results']",
+    "main [role='list']",
+    "main ul",
+    "main table",
+]
+
+QUESTIONS_ITEM_SELECTORS: list[str] = [
+    ".sc-item",
+    ".sc-item__active",
+    ".andes-card.sc-item",
+    ".sc-question-container",
+    ".andes-list__item-content",
+    "[data-testid*='question-item']",
+    "[data-testid*='question-row']",
+    "[data-testid*='question-card']",
+    "[class*='question-item']",
+    "[class*='question-row']",
+    "[class*='question-card']",
+    "[class*='questions-list'] li",
+    "[class*='question-list'] li",
+    "main tbody tr",
+    "main article",
+    "main li",
+]
+
+QUESTIONS_EMPTY_STATE_SELECTORS: list[str] = [
+    "text=/no tienes preguntas|no tenes preguntas|sin preguntas/i",
+    "text=/aun no tienes preguntas|aún no tienes preguntas/i",
+    "text=/todavia no recibiste preguntas|todavía no recibiste preguntas/i",
+    "text=/cuando recibas preguntas|cuando tengas preguntas/i",
+]
+
+QUESTIONS_FILTER_SELECTORS: list[str] = [
+    "button",
+    "[role='button']",
+    "[role='tab']",
+    "a",
+]
+
+QUESTIONS_STATUS_HINT_SELECTORS: list[str] = [
+    "[data-testid*='status']",
+    "[data-testid*='badge']",
+    "[class*='status']",
+    "[class*='badge']",
+    "span",
+    "small",
+]
+
+QUESTIONS_CTA_SELECTORS: list[str] = [
+    "button",
+    "[role='button']",
+    "a",
+]

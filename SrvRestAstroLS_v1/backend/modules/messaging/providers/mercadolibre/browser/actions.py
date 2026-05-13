@@ -1,13 +1,14 @@
 """Minimal actions for the Mercado Libre browser lab."""
 
+import re
 import time
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
-from playwright.sync_api import BrowserContext, Error, Page
+from playwright.sync_api import BrowserContext, Error, Locator, Page
 
-from .config import LOGIN_POLL_INTERVAL_SEC, WIZARD_KEYWORDS
+from .config import LOGIN_POLL_INTERVAL_SEC, QUESTIONS_FILTER_KEYWORDS, QUESTIONS_LIST_KEYWORDS, WIZARD_KEYWORDS
 from .selectors import (
     ACCOUNT_MENU_SELECTORS,
     ACCOUNT_URL_HINTS,
@@ -19,6 +20,12 @@ from .selectors import (
     INBOX_URL_HINTS,
     LOGIN_ENTRY_SELECTORS,
     LOGIN_URL_HINTS,
+    QUESTIONS_CTA_SELECTORS,
+    QUESTIONS_EMPTY_STATE_SELECTORS,
+    QUESTIONS_FILTER_SELECTORS,
+    QUESTIONS_ITEM_SELECTORS,
+    QUESTIONS_LIST_CONTAINER_SELECTORS,
+    QUESTIONS_STATUS_HINT_SELECTORS,
     SESSION_COOKIE_NAMES,
 )
 
@@ -70,6 +77,81 @@ WIZARD_ACTION_KEYWORDS: tuple[str, ...] = (
     "next",
     "close",
     "finish",
+)
+
+QUESTION_STATUS_KEYWORDS: tuple[str, ...] = (
+    "por responder",
+    "sin responder",
+    "respondida",
+    "respondidas",
+    "pendiente",
+    "cerrada",
+)
+
+QUESTION_CTA_KEYWORDS: tuple[str, ...] = (
+    "responder",
+    "reply",
+    "answer",
+)
+
+QUESTION_PRODUCT_KEYWORDS: tuple[str, ...] = (
+    "producto",
+    "publicacion",
+    "publicación",
+    "articulo",
+    "artículo",
+    "item",
+    "venta",
+)
+
+QUESTION_BUYER_KEYWORDS: tuple[str, ...] = (
+    "comprador",
+    "cliente",
+    "usuario",
+    "pregunto",
+    "preguntó",
+    "buyer",
+    "customer",
+)
+
+QUESTION_TIME_KEYWORDS: tuple[str, ...] = (
+    "hoy",
+    "ayer",
+    "min",
+    "mins",
+    "hora",
+    "horas",
+    "dia",
+    "dias",
+    "día",
+    "días",
+    "semana",
+    "semanas",
+)
+
+QUESTION_SUMMARY_NOISE_KEYWORDS: tuple[str, ...] = (
+    "respuestas rapidas",
+    "respuestas rápidas",
+    "crear respuesta rapida",
+    "crear respuesta rápida",
+    "caracteres restantes",
+    "no hay resultados",
+    "afecta tu tiempo de respuesta",
+    "aceptar cookies",
+    "configurar cookies",
+    "ofreces precios mayoristas",
+    "ofrecés precios mayoristas",
+    "envio gratis",
+    "envío gratis",
+)
+
+QUESTION_METRICS_CARD_KEYWORDS: tuple[str, ...] = (
+    "tiempo de respuesta",
+    "calculamos estos valores",
+    "primera pregunta de los compradores",
+    "ultimos 14 dias",
+    "últimos 14 días",
+    "no tenemos en cuenta",
 )
 
 
@@ -182,6 +264,58 @@ def _collect_visible_elements(page: Page, selector: str, limit: int) -> list[dic
     return items
 
 
+def _collect_visible_locator_elements(locator: Locator, selector: str, limit: int) -> list[dict[str, str]]:
+    """Collect a few visible descendant elements inside a locator scope."""
+    items: list[dict[str, str]] = []
+    seen: set[tuple[str, str, str, str]] = set()
+    try:
+        descendants = locator.locator(selector)
+        total = min(descendants.count(), max(limit * 4, limit))
+    except Error:
+        return items
+
+    for index in range(total):
+        if len(items) >= limit:
+            break
+        try:
+            item = descendants.nth(index)
+            if not item.is_visible():
+                continue
+        except Error:
+            continue
+        try:
+            text = _clean_text(item.inner_text(timeout=500))
+        except Error:
+            try:
+                text = _clean_text(item.text_content() or "")
+            except Error:
+                text = ""
+        try:
+            href = item.get_attribute("href") or ""
+        except Error:
+            href = ""
+        try:
+            aria_label = item.get_attribute("aria-label") or ""
+        except Error:
+            aria_label = ""
+        try:
+            title = item.get_attribute("title") or ""
+        except Error:
+            title = ""
+        payload = {
+            "text": text,
+            "href": href,
+            "aria_label": aria_label,
+            "title": title,
+        }
+        key = (payload["text"], payload["href"], payload["aria_label"], payload["title"])
+        if not any(key) or key in seen:
+            continue
+        seen.add(key)
+        items.append(payload)
+    return items
+
+
 def _filter_candidate_items(items: list[dict[str, str]], keywords: tuple[str, ...]) -> list[dict[str, str]]:
     """Keep only visible items that match any discovery keyword."""
     normalized_keywords = tuple(_normalize_for_match(keyword) for keyword in keywords)
@@ -209,6 +343,53 @@ def _collect_keyword_hits(values: list[str], keywords: tuple[str, ...], limit: i
         if len(hits) >= limit:
             break
     return hits
+
+
+def _first_text_match(values: list[str], keywords: tuple[str, ...]) -> str:
+    """Return the first text value that contains one of the provided keywords."""
+    normalized_keywords = tuple(_normalize_for_match(keyword) for keyword in keywords)
+    for value in values:
+        normalized_value = _normalize_for_match(value)
+        if not normalized_value:
+            continue
+        if any(keyword and keyword in normalized_value for keyword in normalized_keywords):
+            return _clean_text(value)
+    return ""
+
+
+def _first_nonempty_text(values: list[str], min_len: int = 3) -> str:
+    """Return the first non-empty text value with a small minimum length."""
+    for value in values:
+        cleaned = _clean_text(value)
+        if len(cleaned) >= min_len:
+            return cleaned
+    return ""
+
+
+def _is_noise_question_line(value: str) -> bool:
+    """Return True when a visible text line looks like UI chrome, not question content."""
+    normalized = _normalize_for_match(value)
+    if not normalized:
+        return True
+    if any(_normalize_for_match(keyword) in normalized for keyword in QUESTION_SUMMARY_NOISE_KEYWORDS):
+        return True
+    if re.match(r"^\d+\s*/\s*\d+", normalized):
+        return True
+    return False
+
+
+def _first_time_hint(values: list[str]) -> str:
+    """Return the first visible text that looks like a timestamp or relative time."""
+    for value in values:
+        cleaned = _clean_text(value)
+        normalized = _normalize_for_match(cleaned)
+        if any(keyword in normalized for keyword in QUESTION_TIME_KEYWORDS):
+            return cleaned
+        if re.search(r"\b\d{1,2}:\d{2}\b", cleaned):
+            return cleaned
+        if re.search(r"\b\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b", cleaned):
+            return cleaned
+    return ""
 
 
 def _collect_special_layer_elements(page: Page, selectors: list[str], limit: int = 6) -> list[dict[str, object]]:
@@ -437,6 +618,14 @@ def count_matches(page: Page, selectors: list[str]) -> dict[str, int]:
     return counts
 
 
+def first_matching_selector(page: Page, selectors: list[str]) -> str | None:
+    """Return the first selector that has at least one visible match."""
+    for selector in selectors:
+        if _count_visible(page, selector) > 0:
+            return selector
+    return None
+
+
 def find_visible_links(page: Page, limit: int = 50) -> list[dict[str, str]]:
     """Collect a sample of visible links from the current page."""
     return _collect_visible_elements(page, "a", limit=limit)
@@ -578,6 +767,299 @@ def _count_visible(page: Page, selector: str, limit: int = 50) -> int:
         except Error:
             continue
     return visible
+
+
+def _visible_text_lines(text: str) -> list[str]:
+    """Split multiline inner text into compact non-empty lines."""
+    lines = [_clean_text(line) for line in text.splitlines()]
+    return [line for line in lines if line]
+
+
+def extract_question_item_summary(item: Locator) -> dict[str, str]:
+    """Extract a shallow question-list summary without opening the item."""
+    try:
+        raw_text = item.inner_text(timeout=800)
+    except Error:
+        try:
+            raw_text = item.text_content() or ""
+        except Error:
+            raw_text = ""
+
+    lines = _visible_text_lines(raw_text)
+    content_lines = [line for line in lines if not _is_noise_question_line(line)]
+    descendant_links = _collect_visible_locator_elements(item, "a", limit=6)
+    descendant_cta_candidates: list[dict[str, str]] = []
+    for selector in QUESTIONS_CTA_SELECTORS:
+        descendant_cta_candidates.extend(_collect_visible_locator_elements(item, selector, limit=4))
+    descendant_status = []
+    for selector in QUESTIONS_STATUS_HINT_SELECTORS:
+        descendant_status.extend(_collect_visible_locator_elements(item, selector, limit=3))
+        if descendant_status:
+            break
+
+    link_texts = [entry.get("text", "") for entry in descendant_links if entry.get("text")]
+    button_texts = [entry.get("text", "") for entry in descendant_cta_candidates if entry.get("text")]
+    status_texts = [entry.get("text", "") for entry in descendant_status if entry.get("text")]
+
+    cta_hint = _first_text_match(button_texts + link_texts, QUESTION_CTA_KEYWORDS)
+    status_hint = _first_text_match(status_texts + lines, QUESTION_STATUS_KEYWORDS)
+    product_hint = _first_text_match(link_texts + lines, QUESTION_PRODUCT_KEYWORDS)
+    buyer_hint = _first_text_match(lines, QUESTION_BUYER_KEYWORDS)
+    time_hint = _first_time_hint(lines)
+    product_href = next(
+        (entry.get("href", "") for entry in descendant_links if "articulo.mercadolibre.com" in (entry.get("href", ""))),
+        "",
+    )
+
+    if not buyer_hint:
+        buyer_hint = _first_nonempty_text(
+            [
+                line
+                for line in content_lines
+                if "(" in line and ")" in line and len(line) <= 80
+            ],
+            min_len=6,
+        )
+
+    normalized_buyer_hint = _normalize_for_match(buyer_hint)
+    normalized_product_hint = _normalize_for_match(product_hint)
+    normalized_status_hint = _normalize_for_match(status_hint)
+    normalized_cta_hint = _normalize_for_match(cta_hint)
+
+    contextual_question_lines: list[str] = []
+    if normalized_buyer_hint:
+        for index, line in enumerate(content_lines):
+            if _normalize_for_match(line) != normalized_buyer_hint:
+                continue
+            for next_line in content_lines[index + 1 :]:
+                normalized_next = _normalize_for_match(next_line)
+                if normalized_next in {
+                    normalized_buyer_hint,
+                    normalized_product_hint,
+                    normalized_status_hint,
+                    normalized_cta_hint,
+                }:
+                    continue
+                if not time_hint or _normalize_for_match(next_line) != _normalize_for_match(time_hint):
+                    contextual_question_lines.append(next_line)
+                    break
+            if contextual_question_lines:
+                break
+
+    question_like_lines = [
+        line
+        for line in content_lines
+        if "?" in line and _normalize_for_match(line) != _normalize_for_match(buyer_hint)
+    ]
+
+    text_snippet = _first_nonempty_text(
+        contextual_question_lines,
+        min_len=12,
+    )
+    if not text_snippet:
+        text_snippet = _first_nonempty_text(
+        question_like_lines,
+        min_len=12,
+    )
+    if not text_snippet:
+        text_snippet = _first_nonempty_text(
+                [
+                    line
+                    for line in content_lines
+                    if _normalize_for_match(line) not in {
+                        normalized_cta_hint,
+                        normalized_status_hint,
+                        normalized_buyer_hint,
+                        normalized_product_hint,
+                }
+        ],
+        min_len=12,
+    )
+    if not text_snippet:
+        text_snippet = _first_nonempty_text(content_lines or lines, min_len=6)
+
+    if not product_hint:
+        product_hint = _first_nonempty_text(
+            [
+                text
+                for text in link_texts
+                if _normalize_for_match(text) != _normalize_for_match(cta_hint)
+                and "sku " not in _normalize_for_match(text)
+            ],
+            min_len=8,
+        )
+
+    return {
+        "text_snippet": text_snippet[:220],
+        "product_hint": product_hint[:160],
+        "product_href": product_href[:220],
+        "buyer_hint": buyer_hint[:120],
+        "time_hint": time_hint[:80],
+        "status_hint": status_hint[:80],
+        "cta_hint": cta_hint[:80],
+        "raw_text": _clean_text(raw_text)[:260],
+    }
+
+
+def _looks_like_question_summary(item: dict[str, str]) -> bool:
+    """Keep only summaries that look like seller-question entries."""
+    haystack = " ".join(
+        item.get(field, "")
+        for field in ("text_snippet", "product_hint", "product_href", "buyer_hint", "time_hint", "status_hint", "cta_hint", "raw_text")
+    )
+    normalized = _normalize_for_match(haystack)
+    has_question_mark = "?" in item.get("text_snippet", "") or "?" in item.get("raw_text", "")
+    has_product_context = bool(item.get("product_hint") or item.get("product_href"))
+    has_response_ui = bool(item.get("cta_hint") or item.get("status_hint"))
+
+    if any(_normalize_for_match(keyword) in normalized for keyword in QUESTION_METRICS_CARD_KEYWORDS):
+        if not (has_question_mark or (has_product_context and has_response_ui)):
+            return False
+
+    if has_product_context and (has_response_ui or has_question_mark):
+        return True
+    if any(_normalize_for_match(keyword) in normalized for keyword in QUESTIONS_LIST_KEYWORDS):
+        return True
+    if has_response_ui and has_question_mark:
+        return True
+    return len(item.get("text_snippet", "")) >= 20 and bool(item.get("time_hint") or has_product_context)
+
+
+def collect_visible_question_items(
+    page: Page,
+    item_selectors: list[str],
+    limit: int = 10,
+) -> dict[str, object]:
+    """Collect a small sample of visible question items using conservative fallbacks."""
+    best_selector: str | None = None
+    best_visible_count = 0
+    best_items: list[dict[str, str]] = []
+    fallback_selector: str | None = None
+    fallback_visible_count = 0
+    fallback_items: list[dict[str, str]] = []
+
+    for selector in item_selectors:
+        visible_count = _count_visible(page, selector, limit=max(limit * 3, 30))
+        if visible_count <= 0:
+            continue
+
+        extracted: list[dict[str, str]] = []
+        seen: set[str] = set()
+        try:
+            locator = page.locator(selector)
+            total = min(locator.count(), max(limit * 3, limit))
+        except Error:
+            continue
+
+        for index in range(total):
+            if len(extracted) >= limit:
+                break
+            try:
+                item = locator.nth(index)
+                if not item.is_visible():
+                    continue
+            except Error:
+                continue
+
+            summary = extract_question_item_summary(item)
+            summary_key = "|".join(
+                summary.get(field, "")
+                for field in ("text_snippet", "product_hint", "buyer_hint", "time_hint", "status_hint", "cta_hint")
+            )
+            if not summary_key.strip() or summary_key in seen:
+                continue
+            seen.add(summary_key)
+            if _looks_like_question_summary(summary):
+                extracted.append(summary)
+            elif not fallback_items:
+                fallback_items.append(summary)
+
+        if extracted:
+            best_selector = selector
+            best_visible_count = visible_count
+            best_items = extracted
+            break
+
+        if not fallback_selector:
+            fallback_selector = selector
+            fallback_visible_count = visible_count
+
+    if best_selector:
+        return {
+            "selector": best_selector,
+            "visible_count": best_visible_count,
+            "items": best_items[:limit],
+        }
+
+    return {
+        "selector": fallback_selector,
+        "visible_count": fallback_visible_count,
+        "items": fallback_items[:limit],
+    }
+
+
+def detect_questions_empty_state(page: Page) -> bool:
+    """Return True when the questions page exposes a clear empty-state hint."""
+    return _any_visible(page, QUESTIONS_EMPTY_STATE_SELECTORS)
+
+
+def detect_questions_filters(page: Page) -> list[dict[str, str]]:
+    """Collect visible filter or tab affordances without interacting with them."""
+    matches: list[dict[str, str]] = []
+    seen: set[tuple[str, str, str, str]] = set()
+
+    for selector in QUESTIONS_FILTER_SELECTORS:
+        items = _collect_visible_elements(page, selector, limit=25)
+        filtered = _filter_candidate_items(items, QUESTIONS_FILTER_KEYWORDS)
+        for item in filtered:
+            key = (
+                item.get("text", ""),
+                item.get("href", ""),
+                item.get("aria_label", ""),
+                item.get("title", ""),
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            matches.append(item)
+    return matches[:12]
+
+
+def collect_questions_list_inspection(page: Page) -> dict[str, object]:
+    """Collect a shallow inspection payload for the visible seller-question list."""
+    metrics = collect_page_document_metrics(page)
+    global_text_samples = first_visible_text_chunks(page, limit=24, max_len=140)
+    list_container_selector = first_matching_selector(page, QUESTIONS_LIST_CONTAINER_SELECTORS)
+    items_payload = collect_visible_question_items(page, QUESTIONS_ITEM_SELECTORS, limit=10)
+    empty_state = detect_questions_empty_state(page)
+    visible_filters = detect_questions_filters(page)
+    warnings: list[str] = []
+
+    if not list_container_selector:
+        warnings.append("no obvious questions list container selector matched on this pass")
+    if not items_payload.get("selector"):
+        warnings.append("no question item selector produced a useful sample")
+    if not items_payload.get("items") and not empty_state:
+        warnings.append("no visible question items found and no clear empty state detected")
+    if not visible_filters:
+        warnings.append("no visible filter or tab affordance matched the current filter keywords")
+
+    return {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "final_url": get_current_url(page),
+        "page_title": get_page_title(page),
+        "logged_in_heuristic": is_logged_in(page),
+        "document_metrics": metrics,
+        "global_text_samples": global_text_samples,
+        "list_container_selector": list_container_selector or "",
+        "list_container_detected": bool(list_container_selector),
+        "item_selector": str(items_payload.get("selector") or ""),
+        "item_count_heuristic": int(items_payload.get("visible_count", 0) or 0),
+        "item_samples": list(items_payload.get("items", [])),
+        "empty_state_heuristic": empty_state,
+        "visible_filters": visible_filters,
+        "warnings": warnings,
+    }
 
 
 def count_visible_threads(page: Page) -> int:

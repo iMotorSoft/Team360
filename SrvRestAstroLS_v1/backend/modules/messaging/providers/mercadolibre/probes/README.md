@@ -12,6 +12,8 @@ Smoke disponible ahora:
 
 `python -m modules.messaging.providers.mercadolibre.probes.smoke_questions_inspect --profile default --timeout 90`
 
+`python -m modules.messaging.providers.mercadolibre.probes.smoke_questions_list_inspect --profile default --timeout 90`
+
 `python -m modules.messaging.providers.mercadolibre.probes.smoke_inbox --profile default --timeout 90`
 
 `python -m modules.messaging.providers.mercadolibre.probes.smoke_inbox_inspect --profile default --timeout 90`
@@ -46,6 +48,16 @@ Objetivo del smoke questions inspect:
 - listar links y botones visibles
 - filtrar affordances candidatas por keywords de preguntas, respuestas, compradores, publicaciones, ventas y filtros
 - detectar wizard, onboarding, modal blocking y banner-like overlays de forma heuristica
+- guardar screenshot, storage state y reporte de inspeccion
+
+Objetivo del smoke questions list inspect:
+
+- reutilizar sesion existente
+- abrir la pagina real de preguntas del vendedor
+- detectar si hay una lista visible de preguntas o listado equivalente
+- estimar cantidad visible de items
+- extraer una muestra superficial de items visibles sin abrir detalle
+- detectar filtros o tabs visibles y empty state
 - guardar screenshot, storage state y reporte de inspeccion
 
 Objetivo del smoke inbox:
