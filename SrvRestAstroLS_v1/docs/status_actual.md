@@ -14,6 +14,17 @@ Se dejo preparada una base inicial de arquitectura y persistencia para Team360, 
 
 ## Acciones realizadas
 
+### 2026-05-13 - Reubicacion del documento SAP Business One fuera de docs tecnicos de runtime
+
+- Se movio `sap_b1_desktop_automation_factibilidad.md` desde `SrvRestAstroLS_v1/docs/` hacia `docs/analisis-tecnico/`.
+- Motivo:
+  - el documento es de factibilidad tecnico-comercial interna;
+  - no documenta runtime, backend, Astro, migraciones ni implementacion productiva actual;
+  - corresponde a la zona de analisis tecnico no operativo.
+- Se actualizaron los status locales de `docs/` y `docs/analisis-tecnico/`.
+- Se limpio una entrada duplicada previa sobre la ampliacion del documento SAP.
+- No se tocaron archivos funcionales.
+
 ### 2026-05-13 - Probes Mercado Libre para lista de preguntas y borrador de respuesta
 
 - Se incorporo inspeccion superficial de la lista visible de preguntas del vendedor.
@@ -33,7 +44,7 @@ Se dejo preparada una base inicial de arquitectura y persistencia para Team360, 
 
 ### 2026-05-13 - Documento de factibilidad SAP Business One Desktop Client
 
-- Se creo `sap_b1_desktop_automation_factibilidad.md`.
+- Se creo inicialmente `sap_b1_desktop_automation_factibilidad.md`.
 - El documento analiza la factibilidad tecnica y comercial de automatizar SAP Business One v10 Desktop Client sin depender inicialmente de:
   - certificacion SAP;
   - marketplace SAP;
@@ -120,6 +131,17 @@ Se dejo preparada una base inicial de arquitectura y persistencia para Team360, 
   - el fallo anterior fue operativo del flujo de browser automation contra una UI dinamica de GitHub;
   - el intento final funciono porque se uso el formulario real ya cargado por GitHub y se disparo el submit desde el contexto de la pagina, preservando las validaciones de sesion.
 
+### 2026-05-13 - Ampliacion del documento SAP con licenciamiento, checklist, costos, monitoreo y rollback
+
+- Se agregaron 5 secciones nuevas al documento `docs/analisis-tecnico/sap_b1_desktop_automation_factibilidad.md`:
+  - **Seccion 11 - Licenciamiento SAP**: tipos de licencia SAP B1 (Professional, Limited, Indirect Access, Partner) y recomendaciones por fase, con regla practica para evitar riesgos de licenciamiento.
+  - **Seccion 12 - Checklist de relevamiento**: checklist estructurada para evaluar prospectos en primera conversacion, cubriendo entorno, procesos, infraestructura y aceptacion comercial, con criterio de aptitud rapida para Fase 1.
+  - **Seccion 13 - Estimaciones de esfuerzo y costo**: tablas por fase con tiempos, costos Team360 e infraestructura (cliente), mas estructura de costos sugerida (one-time, por flujo, soporte mensual).
+  - **Seccion 14 - Monitoreo remoto**: heartbeat, logs estructurados JSON, evidencias visuales, alertas automaticas, canales (dashboard/webhook/email) y consideraciones de seguridad con modo offline.
+  - **Seccion 15 - Rollback operativo**: principios, tabla por tipo de operacion (pre-carga, maestro, actualizacion), operaciones excluidas de rollback automatico, procedimiento general, checklist pre y post ejecucion.
+- El documento paso de 600 a 868 lineas.
+- No se toco codigo funcional, backend, Astro, `team360_orquestador`, AG-UI ni laboratorio browser.
+
 ### 2026-05-01 - Base documental y migration inicial de Team360
 
 - Se creo `docs/team360_multi_whatsapp_multi_llm_architecture.md`.
@@ -186,9 +208,10 @@ Incluye estructura inicial para:
 
 ## Validacion
 
+- Se verifico que `sap_b1_desktop_automation_factibilidad.md` existe en `docs/analisis-tecnico/`.
+- Se verifico que ya no queda ubicado en `SrvRestAstroLS_v1/docs/`.
 - Se ejecuto `python3 -m py_compile` sobre los modulos Python tocados del browser lab Mercado Libre.
 - `git diff --check` paso sin errores para el commit de probes Mercado Libre.
-- Se verifico que `sap_b1_desktop_automation_factibilidad.md` existe en `SrvRestAstroLS_v1/docs/`.
 - `git diff --check` paso sin errores para el documento SAP B1.
 - Se verifico la estructura de directorios documentales activos antes de crear status locales.
 - `git diff --check` paso sin errores para los cambios documentales.

@@ -10,6 +10,12 @@ Ultima actualizacion: 2026-05-13
 
 ## Acciones realizadas
 
+### 2026-05-13 - Reubicacion de factibilidad SAP Business One
+
+- Se movio `sap_b1_desktop_automation_factibilidad.md` a `docs/analisis-tecnico/`.
+- La decision corrige la ubicacion previa en `SrvRestAstroLS_v1/docs/`, porque el documento es de factibilidad tecnico-comercial y no de runtime.
+- Se actualizo el status local de `docs/analisis-tecnico/`.
+
 ### 2026-05-13 - Status locales por directorio documental
 
 - Se agrego esta bitacora local para registrar el ultimo estado relevante de `docs/`.

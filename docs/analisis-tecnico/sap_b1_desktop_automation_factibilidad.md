@@ -591,6 +591,274 @@ Decisiones explicitas:
 - No automatizar procesos criticos irreversibles sin supervision humana.
 - Validar primero valor comercial con automatizacion asistida.
 
+## 11. Licenciamiento SAP Business One en el modelo propuesto
+
+### Tipos de licencia SAP B1 relevantes
+
+| Tipo | Perfil tipico | Aplica a BOT? |
+|---|---|---|
+| Professional | Acceso completo a todas las pantallas y objetos de negocio | Si, si el BOT necesita operar sin restricciones |
+| Limited | Acceso a funcionalidades especificas definidas en la licencia | Si, si las operaciones del BOT estan acotadas |
+| Indirect Access | Acceso indirecto via API (Service Layer) desde sistemas externos | Depende del contrato; consultar con SAP/partner |
+| Partner | Licencias para desarrollo y pruebas internas de partners | Si, para entornos de desarrollo y test internos |
+
+### Recomendaciones por fase
+
+**Fase 1** (RPA sobre usuario existente): No requiere licencia SAP adicional. Se usa la sesion y permisos del usuario autorizado del cliente. Es la ruta de menor friccion legal y comercial.
+
+**Fase 2** (VM dedicada): Si la VM usa el mismo usuario Windows pero sesion independiente, revisar si el contrato SAP del cliente permite multiples sesiones del mismo usuario. Algunas licencias SAP B1 limitan sesiones concurrentes.
+
+**Fase 3** (Usuario SAP BOT): Se recomienda una licencia Limited con los roles estrictamente necesarios para las operaciones automatizadas. Gestionar la creacion con el partner SAP o administrador del cliente.
+
+**Fase 4** (DI API / Service Layer): Evaluar si el acceso por API califica como "Indirect Access" segun el contrato SAP vigente. En SAP B1 10.0 Service Layer esta incluido en la instalacion base, pero el licenciamiento por consumo o acceso indirecto puede aplicar segun el acuerdo con SAP.
+
+### Regla practica
+
+> Si el robot opera con el mismo usuario, licencia y pantalla que el operador humano, no agrega riesgo de licenciamiento nuevo. En cuanto el robot tenga identidad propia (usuario BOT, sesion dedicada, API directa), revisar licencia con el partner SAP del cliente antes de implementar.
+
+## 12. Checklist de relevamiento tecnico-comercial para prospectos
+
+Usar esta checklist en la primera conversacion con un cliente potencial para determinar si es apto para Fase 1 y que preparacion requiere.
+
+### Datos basicos del entorno
+
+- [ ] Version de SAP Business One: _____ (v9.x / v10.x / otro)
+- [ ] Base de datos: HANA / SQL Server / No sabe
+- [ ] Service Layer instalado? Si / No / No sabe
+- [ ] Service Layer configurado y accesible desde red interna? Si / No / No sabe
+- [ ] Tienen entorno de test o QA? Si / No
+- [ ] Partner SAP activo: _____
+- [ ] Cantidad de usuarios SAP: _____
+- [ ] Add-ons instalados: _____
+
+### Procesos de interes para automatizar
+
+- [ ] Consulta de stock
+- [ ] Consulta de clientes / saldo / deuda
+- [ ] Estado de pedidos
+- [ ] Descarga de reportes
+- [ ] Carga de pedidos desde Excel / WhatsApp / formulario web
+- [ ] Validacion de datos antes de ingreso al ERP
+- [ ] Pre-carga de borradores (ordenes de venta, compras)
+- [ ] Otro: _____
+
+### Infraestructura del operador
+
+- [ ] Tienen Windows Server o PC dedicada para automatizacion? Si / No
+- [ ] Permiten acceso por RDP / escritorio remoto? Si / No
+- [ ] El operador SAP trabaja remoto o local? Remoto / Local
+- [ ] Resolucion de pantalla del operador: _____
+- [ ] Bloqueo de pantalla por inactividad: Si / No / Tiempo: _____ min
+- [ ] El usuario SAP tiene permisos para las pantallas a automatizar? Si / No / No sabe
+- [ ] El usuario SAP tiene acceso a los modulos necesarios? Si / No / No sabe
+
+### Aceptacion comercial
+
+- [ ] El cliente entiende que NO es un add-on SAP certificado ni integracion homologada? Si / No
+- [ ] El cliente acepta que el robot use su usuario y sesion existente en Fase 1? Si / No
+- [ ] El cliente acepta que Team360 genere logs y screenshots como evidencia de ejecucion? Si / No
+- [ ] El cliente esta dispuesto a dedicar tiempo para relevamiento inicial y pruebas? Si / No
+- [ ] Presupuesto estimado disponible: USD _____
+- [ 】Ventana de tiempo esperada para implementacion: _____ semanas
+
+### Criterio de aptitud rapida para Fase 1
+
+Cliente apto si cumple TODOS estos:
+1. SAP B1 v10 sobre Windows.
+2. Procesos operativos repetitivos identificados concretamente.
+3. Acepta modelo de automatizacion asistida (no certificada, no autonoma).
+4. Permite RDP o sesion compartida para el worker.
+5. Tiene al menos 1 usuario con permisos suficientes en las pantallas objetivo.
+6. Entiende y acepta las limitaciones del modelo RPA Desktop.
+
+## 13. Estimaciones de esfuerzo, costo y duracion por fase
+
+### Fase 1 - RPA Desktop asistido
+
+| Concepto | Estimacion |
+|---|---|
+| Desarrollo del primer flujo (stock, cliente, deuda) | 2-3 semanas |
+| Setup del worker + configuracion RDP + pruebas con cliente | 1 semana |
+| Documentacion operativa y logs | 3-5 dias |
+| Total Fase 1 | 3-5 semanas |
+| Costo estimado Team360 (desarrollo + setup) | USD 3,000 - 6,000 |
+| Infraestructura (cargo del cliente) | Ninguna; usa PC/sesion existente del operador |
+
+### Fase 2 - VM dedicada
+
+| Concepto | Estimacion |
+|---|---|
+| Configuracion de VM Windows + sesion persistente + RDP | 1 semana |
+| Migracion de flujos existentes a la VM | 1-2 semanas |
+| Pruebas de estabilidad y recuperacion | 3-5 dias |
+| Total Fase 2 | 2-3 semanas |
+| Costo estimado Team360 (configuracion + migracion) | USD 1,500 - 3,000 |
+| Infraestructura (cargo del cliente) | VM Windows ~USD 30-80/mes segun proveedor |
+
+### Fase 3 - Usuario SAP BOT
+
+| Concepto | Estimacion |
+|---|---|
+| Creacion de usuario SAP BOT y asignacion de roles | 3-5 dias (depende del cliente y partner SAP) |
+| Separacion de flujos por identidad BOT vs operador humano | 1-2 semanas |
+| Pruebas con permisos minimos | 1 semana |
+| Total Fase 3 | 2-3 semanas |
+| Costo estimado Team360 | USD 2,000 - 4,000 |
+| Licencia SAP (cargo del cliente) | Segun acuerdo SAP vigente; recomendar Limited |
+
+### Fase 4 - DI API / Service Layer
+
+| Concepto | Estimacion |
+|---|---|
+| Desarrollo de helper C#/.NET para DI API | 4-6 semanas |
+| Integracion con Service Layer si aplica | 2-4 semanas |
+| Migracion de flujos RPA a API (por flujo) | 2-4 semanas cada uno |
+| Pruebas de regresion y corte | 2 semanas |
+| Total Fase 4 | 6-12 semanas |
+| Costo estimado Team360 | USD 8,000 - 15,000 |
+| Infraestructura (cargo del cliente) | Helper local + potenciales costos de licenciamiento por acceso indirecto |
+
+### Estructura de costos sugerida para el cliente
+
+| Item | Modalidad |
+|---|---|
+| Relevamiento inicial + propuesta | Sin cargo |
+| Implementacion Fase 1 (setup + primer flujo funcional) | USD 3,000 - 6,000 one-time |
+| Flujo adicional (stock, clientes, pedidos, reportes, etc.) | USD 1,000 - 2,500 por flujo |
+| Mantenimiento / soporte mensual (monitoreo + actualizaciones) | USD 200 - 500/mes |
+| VM dedicada Fase 2 (gestionada por Team360 o por el cliente) | Costo directo del cliente + fee de gestion mensual |
+
+## 14. Plan de monitoreo remoto de workers
+
+### Componentes del monitoreo
+
+**Worker heartbeat:**
+- El worker envia un ping periodico al backend Team360 (ej: cada 30 segundos).
+- Si el worker no responde en N intervalos consecutivos, se genera una alerta.
+- El heartbeat incluye: worker_id, timestamp, estado actual (idle/running/error), ultima tarea completada.
+
+**Logs estructurados:**
+- Cada tarea genera un log con: task_id, timestamp de inicio/fin, cada paso ejecutado, resultado final y error si aplica.
+- Logs almacenados localmente en `logs/` y sincronizados al backend al finalizar cada tarea o batch.
+- Formato recomendado: JSON estructurado con campos estandar (nivel, mensaje, contexto, timestamp).
+
+**Evidencia visual:**
+- Screenshot al iniciar la tarea (estado inicial de la pantalla SAP).
+- Screenshot al finalizar cada paso critico.
+- Screenshot adicional ante cualquier error o estado inesperado.
+- Screenshots referenciados por task_id y almacenados en `runtime/screenshots/`.
+
+**Alertas automaticas:**
+- Worker caido o sin heartbeat por mas de N segundos.
+- Tarea fallida con error no recuperable (timeout, popup desconocido, SAP bloqueado).
+- Tarea ejecutandose por mas tiempo del maximo esperado (timeout por tarea configurable).
+- Sesion SAP bloqueada, cerrada o deslogueada.
+- Umbral de errores consecutivos superado (ej: 3 errores seguidos detienen el worker).
+
+**Canales de alerta:**
+- Dashboard interno Team360 con estado en tiempo real.
+- Webhook a Slack, Teams o WhatsApp segun acuerdo con el cliente.
+- Email de respaldo si el webhook principal falla.
+
+**Dashboard de estado (propuesto):**
+- Workers activos / inactivos.
+- Tareas completadas, fallidas y en ejecucion (ultimas 24h).
+- Historial de errores con screenshot y log asociado.
+- Acceso restringido al equipo Team360; el cliente puede acceder a un dashboard resumido si se acuerda.
+
+### Consideraciones de seguridad en monitoreo
+
+- Los logs y screenshots pueden contener datos del cliente (clientes, precios, movimientos). Asegurar cifrado en reposo (disco local) y en transito (HTTPS hacia backend).
+- El canal de heartbeat solo debe exponer estado y contadores, no datos de negocio.
+- El dashboard debe requerir autenticacion (usuario y contrasena o SSO).
+- Politica de retencion sugerida: 30 dias para logs, 7 dias para screenshots. Ajustar con el cliente segun su politica interna.
+- El worker debe poder operar sin conectividad a Internet si el cliente lo exige (modo offline con sincronizacion diferida de logs y resultados cuando la conexion se restablezca).
+
+## 15. Plan de rollback operativo detallado
+
+### Principios
+
+1. Toda operacion de escritura sobre SAP debe tener un procedimiento de rollback definido antes de ejecutarse por primera vez.
+2. El rollback puede ser automatico (operaciones reversibles) o manual (operaciones que requieren intervencion de un operador SAP del cliente).
+3. Modo dry-run obligatorio para toda operacion de escritura nueva antes de pasar a produccion.
+4. Sin excepcion: si no hay rollback definido, la operacion no se ejecuta.
+
+### Operaciones de consulta (solo lectura)
+
+No requieren rollback. Si la consulta falla, se registra el error estructurado y se notifica al solicitante. No hay efecto secundario en SAP.
+
+### Operaciones de escritura asistida
+
+#### Pre-carga de pedido (borrador)
+
+| Aspecto | Detalle |
+|---|---|
+| Riesgo | Datos incorrectos cargados en un borrador de orden de venta, compra o produccion |
+| Rollback automatico | Identificar el documento SAP creado, marcarlo como "Pendiente de revision" (no enviar a contabilizacion), registrar en log |
+| Rollback manual | Si el cliente rechaza el borrador, eliminarlo desde SAP o marcarlo como cancelado |
+| Verificacion | Confirmar que el documento paso a estado "Cancelado" o "Borrador" segun lo acordado |
+
+#### Carga de datos maestro (cliente, proveedor, articulo)
+
+| Aspecto | Detalle |
+|---|---|
+| Riesgo | Creacion de maestros con datos erroneos (RFC duplicado, denominacion incorrecta, condiciones de pago equivocadas) |
+| Rollback automatico | Bloquear el maestro creado (no eliminar) para evitar su uso operativo |
+| Rollback manual | Notificar al administrador SAP del cliente para correccion de datos o baja definitiva |
+| Restriccion | Nunca eliminar maestros de forma automatica. Requiere intervencion humana siempre |
+
+#### Actualizacion de datos existentes
+
+| Aspecto | Detalle |
+|---|---|
+| Riesgo | Modificacion de un campo incorrecto (ej: limite de credito, condicion de pago, direccion) |
+| Rollback automatico | Antes de modificar, tomar snapshot del valor actual (log + screenshot). Si la modificacion es erronea o rechazada, restaurar el valor original |
+| Rollback manual | Si no se puede restaurar automaticamente, notificar al usuario con el valor anterior para que lo corrija manualmente |
+| Aprobacion | Toda actualizacion debe ser aprobada por un humano antes de ejecutarse en Fase 1 |
+
+### Operaciones NO sujetas a rollback automatico
+
+Estas operaciones no deben automatizarse en Fase 1 ni Fase 2. Solo considerar en Fase 4 con validacion legal, contable y operativa del cliente, y siempre con aprobacion humana explicita:
+
+- Facturas ya contabilizadas.
+- Pagos ejecutados.
+- Asientos contables.
+- Cambios de precio en maestros.
+- Eliminacion fisica de documentos.
+- Reversiones de documentos contabilizados.
+
+### Procedimiento general de rollback
+
+```text
+1. Detectar error o recibir solicitud explicita de rollback.
+2. Identificar el tipo de operacion y el documento/recurso afectado.
+3. Ejecutar el paso de rollback segun el tipo (tablas anteriores).
+4. Verificar el resultado del rollback (consulta de confirmacion en SAP).
+5. Si el rollback automatico falla: escalar a operador humano con datos del error, logs y screenshots.
+6. Registrar todo el proceso en log estructurado.
+7. Notificar el resultado al solicitante (Team360 y/o cliente).
+```
+
+### Checklist pre-ejecucion para operaciones de escritura
+
+Antes de cada operacion de escritura, verificar:
+
+- [ ] Modo dry-run ejecutado sin errores para esta operacion?
+- [ ] Datos de entrada validados contra el esquema esperado?
+- [ ] Procedimiento de rollback definido y documentado para esta operacion?
+- [ ] Usuario humano disponible para aprobar la ejecucion?
+- [ ] Limite de tiempo maximo definido para esta operacion?
+- [ ] Screenshot del estado inicial tomado y registrado?
+
+### Checklist post-ejecucion
+
+- [ ] Screenshot del estado final tomado y almacenado?
+- [ ] Resultado registrado en log estructurado (task_id, timestamp, resultado, error si aplica)?
+- [ ] Si la operacion era de escritura: notificacion enviada al usuario solicitante?
+- [ ] Si la operacion fallo: rollback ejecutado exitosamente o escalado a operador humano?
+- [ ] Datos sensibles redactados en logs y screenshots segun politica acordada?
+- [ ] Worker listo para recibir la siguiente tarea? (check de estado post-ejecucion)
+
 ## Referencias consultadas
 
 - SAP Help Portal - SAP Business One Service Layer: `https://help.sap.com/docs/SAP_BUSINESS_ONE/f110a154dd0f4c20bf7f3ebca9eeb794/60c7a0b745bd486589f05a1da77041f3.html`
