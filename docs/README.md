@@ -7,6 +7,8 @@ Documentacion raiz del proyecto Team360 para material no tecnico de runtime.
 - `negocio/`: contexto comercial, tesis de negocio, analisis de clientes o mercados.
 - `estrategia/`: decisiones de producto/plataforma, continuidad, inventarios y estrategia tecnica-negocio.
 - `analisis-tecnico/`: analisis tecnico no operativo, sin reemplazar la documentacion de desarrollo.
+- `clients/`: insumos documentales provistos por clientes para analisis y relevamiento.
+- `presentaciones/`: recursos visuales para presentaciones comerciales o de producto.
 - `templates/`: plantillas documentales reutilizables.
 
 ## Reportes y evidencias
