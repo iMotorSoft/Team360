@@ -8,6 +8,7 @@ Antes de cambios relevantes, leer:
 
 - `.agents/skills/team360-project/SKILL.md`
 - `SrvRestAstroLS_v1/docs/status_actual.md`
+- `lat.md/lat.md` cuando el cambio afecte arquitectura, dominio, IA, workers, knowledge, seguridad, paquetes o reglas transversales.
 
 Separacion documental:
 
@@ -16,6 +17,7 @@ Separacion documental:
 
 Estructura documental vigente:
 
+- `lat.md/`: arquitectura viva, invariantes estables, reglas de dominio y referencias anclables desde codigo.
 - `docs/README.md`: indice raiz de documentacion no tecnica de runtime.
 - `docs/negocio/`: contexto comercial, tesis de negocio, analisis de clientes, mercados y oportunidades.
 - `docs/estrategia/`: decisiones de producto/plataforma, continuidad, inventarios y estrategia tecnico-negocio.
@@ -31,7 +33,18 @@ Regla de ubicacion:
 - Un documento narrativo de negocio/producto/estrategia va en `docs/`.
 - Una evidencia generada, muestra, reporte exportable o snapshot va en `data/reports/`.
 - Una nota tecnica ligada a codigo, backend, Astro, migraciones, runtime o validacion de desarrollo va en `SrvRestAstroLS_v1/docs/`.
-- No duplicar el mismo contenido entre `docs/`, `data/reports/` y `SrvRestAstroLS_v1/docs/`; mover o enlazar, segun corresponda.
+- Un invariante estable de arquitectura, dominio, IA, workers, paquetes, knowledge o seguridad va en `lat.md/`.
+- No duplicar el mismo contenido entre `lat.md/`, `docs/`, `data/reports/` y `SrvRestAstroLS_v1/docs/`; mover o enlazar, segun corresponda.
+
+Convencion para `lat.md`:
+
+- `lat.md/lat.md` es el indice raiz de arquitectura viva.
+- `lat.md/` guarda reglas estables e invariantes de Team360, no bitacoras diarias, evidencias ni status de implementacion.
+- Usar documentos `kebab-case.md` por concepto, por ejemplo `multi-package-workers.md` o `knowledge-rag-graphrag.md`.
+- Usar referencias `[[concepto]]` entre documentos y comentarios `# @lat: [[concepto#Seccion]]` en codigo solo cuando una funcion, clase o modulo implemente una regla no trivial.
+- No llenar el codigo de anchors triviales; anclar cerca del punto decisivo donde se aplica la regla.
+- Al crear o modificar documentos dentro de `lat.md/`, actualizar `lat.md/status_actual.md`.
+- `SrvRestAstroLS_v1/docs/status_actual.md` sigue siendo la bitacora tecnica principal de desarrollo; `lat.md/` no reemplaza esa bitacora.
 
 Convencion para `status_actual.md`:
 

@@ -23,6 +23,8 @@ Usar esta copia del skill dentro del repo:
 Asumir como raíz el directorio actual del repositorio Team360.
 
 ## Estructura relevante
+- `lat.md/lat.md`
+- `lat.md/`
 - `SrvRestAstroLS_v1/backend/modules/team360_orquestador/`
 - `SrvRestAstroLS_v1/backend/modules/agui_stream/`
 - `SrvRestAstroLS_v1/backend/modules/messaging/providers/gupshup/`
@@ -32,6 +34,26 @@ Asumir como raíz el directorio actual del repositorio Team360.
 - `SrvRestAstroLS_v1/astro/src/lib/team360_orquestador/`
 - `SrvRestAstroLS_v1/astro/src/components/demo/team360-orquestador/`
 - `SrvRestAstroLS_v1/astro/src/pages/demo/team360-orquestador/`
+
+## Convenciones para lat.md
+`lat.md/` es la capa de arquitectura viva de Team360. Usarla para reglas estables, invariantes de dominio y decisiones transversales que deben sobrevivir a una tarea puntual.
+
+Leer `lat.md/lat.md` antes de cambios que afecten:
+- arquitectura general o limites de modulos
+- IA, LiteLLM, providers o scoring
+- workers, `package_worker`, paquetes o automatizaciones
+- knowledge, RAG, GraphRAG o scopes
+- seguridad, MFA, HITL, credenciales o acciones bloqueadas
+- contratos que puedan quedar anclados desde codigo
+
+Reglas de uso:
+1. Crear documentos por concepto estable con nombre `kebab-case.md`.
+2. Usar referencias tipo `[[concepto]]` entre documentos.
+3. Usar anchors de codigo tipo `# @lat: [[concepto#Seccion]]` solo cerca de clases, funciones o decisiones donde se implementa una regla no trivial.
+4. No anclar cada linea ni comentarios obvios.
+5. No usar `lat.md/` para bitacoras diarias, evidencias, snapshots, instrucciones efimeras o estado de implementacion.
+6. Al crear o modificar documentos de `lat.md/`, actualizar `lat.md/status_actual.md`.
+7. Mantener `SrvRestAstroLS_v1/docs/status_actual.md` como bitacora tecnica principal; `lat.md/` solo registra invariantes y conceptos estables.
 
 ## Reglas de trabajo
 1. No inventar una estructura nueva fuera del patrón actual.

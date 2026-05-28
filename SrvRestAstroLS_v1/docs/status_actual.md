@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-05-13
+Ultima actualizacion: 2026-05-28
 
 ## Directorio de trabajo
 
@@ -10,9 +10,58 @@ Ultima actualizacion: 2026-05-13
 
 ## Estado general
 
-Se dejo preparada una base inicial de arquitectura y persistencia para Team360, sin integrar todavia un backend Litestar productivo ni runtime funcional nuevo.
+Se agrego una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. El backend Litestar productivo sigue pendiente de integracion.
 
 ## Acciones realizadas
+
+### 2026-05-28 - automation_diagnosis Fase 1 con LiteLLM, RAG simple y classifier deterministico
+
+- Se creo el modulo aislado `backend/modules/automation_diagnosis/`.
+- El modulo implementa una experiencia guiada de diagnostico de automatizacion, no un chatbot abierto.
+- Se agrego adapter de IA con `LiteLLMAIInterpreter` como camino real inicial y `MockAIInterpreter`/`NoopAIInterpreter` para tests o fallback.
+- Se creo el knowledge scope interno `ks_team360_automation_diagnosis`.
+- Se agrego carga de documentos Markdown, chunking y retrieval keyword simple para Fase 1.
+- Se dejaron campos y nombres preparados para GraphRAG futuro: `retrieval_mode`, `graph_enabled`, `entity_extraction_status` y `relation_extraction_status`.
+- Se implementaron scoring y classifier deterministico para `standard_package`, `operational_automation`, `consulting_required` y `not_recommended`.
+- El resultado interno produce paquete recomendado, workers sugeridos, config requerida de `package_worker`, refs de credenciales, scope de conocimiento, modo de automatizacion, riesgos, acciones bloqueadas y aprobacion humana.
+- Se agregaron fixtures de knowledge y sesiones para las cuatro clasificaciones.
+- Se agregaron funciones de ruta en `backend/routes/automation_diagnosis.py`, preparadas para montarse luego en Litestar.
+- Se documento la fase en `docs/automation_diagnosis_fase1.md`.
+- No se tocaron `team360_orquestador`, AG-UI/SSE, Mercado Libre browser lab, messaging providers ni archivos sensibles.
+- No se guardaron secretos planos.
+- Se creo `lat.md/` en la raiz del repo como capa de arquitectura viva para Team360, siguiendo el patron usado en JudaismoenVivo.
+- Se agregaron anchors `@lat` en puntos clave del modulo `automation_diagnosis`.
+- Se formalizo el uso de `lat.md/` en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md` para proximos agentes y cambios de arquitectura.
+
+
+### 2026-05-20 - Evidencia manual Kommo para arquitectura RPA
+
+- Se incorporo evidencia manual de Kommo Dashboard, Inbox/Chats y `Analitica > Registro de actividades` dentro de `automation_mario_castro/docs/`.
+- Hallazgo principal: `Registro de actividades` expone una tabla estructurada de eventos con fecha, usuario, objeto, nombre, actividad, valor previo y valor posterior.
+- Se confirmaron eventos utiles para KPIs: nuevo lead, mensaje entrante/saliente, conversacion comenzada/cerrada, cambio de etapa, fuente lead, emprendimiento/proyecto y lead eliminado.
+- Se agrego `automation_mario_castro/src/kommo/inspect_activity_log.py` para validar filtro, export o captura estructurada de filas.
+- Decision tecnica: usar Registro de actividades Kommo como fuente candidata primaria para eventos historicos; Dashboard queda como control agregado e Inbox como evidencia secundaria de canal/respuesta.
+- No se guardaron screenshots reales ni credenciales en el repo.
+
+### 2026-05-20 - Laboratorio RPA exploratorio para Kommo, Facebook y Meta Ads de Mario Castro
+
+- Se creo `automation_mario_castro/` como laboratorio aislado de browser automation para auditoria tecnica previa a una automatizacion productiva.
+- Objetivo del laboratorio:
+  - analizar el Excel `KPIs_CEO_Proyectos_Inmobiliarios_COMPLETO.xlsx`;
+  - mapear KPIs contra fuentes probables;
+  - preparar probes Playwright para Kommo, Facebook Page/Inbox y Meta Ads Manager;
+  - documentar factibilidad y flujo MVP sin usar APIs.
+- Se agregaron scripts Python para:
+  - analizar el workbook desde `docs/clients/mario_castro/KPIs_CEO_Proyectos_Inmobiliarios_COMPLETO.xlsx`;
+  - iniciar login exploratorio en Kommo y Facebook leyendo credenciales desde `.env` o variables de entorno;
+  - inspeccionar dashboard, leads, pipeline y modulo WhatsApp/conversaciones en Kommo;
+  - inspeccionar paginas Facebook, Inbox/Meta Business Suite y Ads Manager;
+  - generar `runtime/inspect/data_inventory.json`.
+- Se agrego helper reutilizable de Playwright con `storage_state`, screenshots, timeouts largos y pausa HITL/manual ante 2FA, captcha o verificacion.
+- Se documento analisis de Excel, matriz KPI -> fuente probable, mapa de fuentes, factibilidad Playwright y flujo MVP recomendado.
+- No se guardaron credenciales reales en archivos del repo.
+- No se ejecuto login real contra Kommo/Facebook en esta etapa.
+- No se integro este laboratorio con `team360_orquestador`, AG-UI, backend productivo ni frontend.
 
 ### 2026-05-13 - Reubicacion del documento SAP Business One fuera de docs tecnicos de runtime
 
@@ -208,6 +257,13 @@ Incluye estructura inicial para:
 
 ## Validacion
 
+- Se ejecuto `python3 -m py_compile` sobre los scripts del laboratorio `automation_mario_castro/`.
+- Se ejecuto `python3 src/excel/analyze_workbook.py` y genero `automation_mario_castro/runtime/inspect/excel_inventory.json`.
+- Se ejecuto `python3 src/reports/build_data_inventory.py` y genero `automation_mario_castro/runtime/inspect/data_inventory.json`.
+- Se verifico que `.env.example` no contiene credenciales reales.
+- No se probaron los logins contra Kommo/Facebook porque requieren configuracion local de `.env` e intervencion humana si aparece 2FA.
+- Se agrego pero no se ejecuto `kommo.inspect_activity_log`; requiere sesion Kommo local.
+- Se verifico que Playwright no esta instalado en el entorno Python actual; los probes quedan preparados pero requieren instalar dependencias antes de ejecutarse.
 - Se verifico que `sap_b1_desktop_automation_factibilidad.md` existe en `docs/analisis-tecnico/`.
 - Se verifico que ya no queda ubicado en `SrvRestAstroLS_v1/docs/`.
 - Se ejecuto `python3 -m py_compile` sobre los modulos Python tocados del browser lab Mercado Libre.

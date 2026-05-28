@@ -2,13 +2,19 @@
 
 Objetivo: `reportes-y-evidencias`
 
-Ultima actualizacion: 2026-05-13
+Ultima actualizacion: 2026-05-28
 
 ## Estado general
 
 `data/reports/` contiene reportes, evidencias, muestras, snapshots y entregables generados fuera del codigo fuente.
 
 ## Acciones realizadas
+
+### 2026-05-28 - Snapshot tecnico automation_diagnosis
+
+- Se agrego un snapshot historico en `snapshots/team360_automation_diagnosis_fase1_20260528.md`.
+- Se actualizo el status local de `data/reports/snapshots/`.
+- No se mezclo el snapshot con la documentacion tecnica viva, que permanece en `SrvRestAstroLS_v1/docs/`.
 
 ### 2026-05-13 - Status locales para reportes
 

@@ -2,13 +2,19 @@
 
 Objetivo: `snapshots-historicos`
 
-Ultima actualizacion: 2026-05-13
+Ultima actualizacion: 2026-05-28
 
 ## Estado general
 
 `data/reports/snapshots/` contiene snapshots historicos de estado del repo o de tareas puntuales.
 
 ## Acciones realizadas
+
+### 2026-05-28 - Snapshot automation_diagnosis Fase 1
+
+- Se agrego `team360_automation_diagnosis_fase1_20260528.md` como evidencia historica de la implementacion tecnica realizada.
+- El snapshot referencia la documentacion viva en `SrvRestAstroLS_v1/docs/automation_diagnosis_fase1.md`.
+- Se mantuvo la separacion documental: evidencia historica en `data/reports/snapshots/`, documentacion tecnica de runtime en `SrvRestAstroLS_v1/docs/`.
 
 ### 2026-05-13 - Separacion de snapshots historicos
 
