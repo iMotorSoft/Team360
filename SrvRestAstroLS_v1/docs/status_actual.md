@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-05-28
+Ultima actualizacion: 2026-05-29
 
 ## Directorio de trabajo
 
@@ -10,9 +10,69 @@ Ultima actualizacion: 2026-05-28
 
 ## Estado general
 
-Se agrego una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. El backend Litestar productivo sigue pendiente de integracion.
+Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql` y `002_team360_rbac_packages_workers_knowledge.sql`. Tambien existe una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. El backend Litestar productivo sigue pendiente de integracion.
 
 ## Acciones realizadas
+
+### 2026-05-29 - Aplicacion migracion 002 sobre team360
+
+- Se verifico preflight antes de aplicar:
+  - conexion sanitizada apunta a `team360`;
+  - migracion 001 seguia aplicada (`core_workspaces`, `core_users`, `core_events`, `task_runs` presentes);
+  - migracion 002 todavia no estaba aplicada (`0/6` tablas sonda de 002 presentes);
+  - `python3 -m py_compile` sobre `backend/scripts/audit_team360_schema.py` OK;
+  - `git diff --check` sobre archivos relevantes OK.
+- `psql` no estaba disponible en el entorno, por lo que se aplico 002 con `psycopg` en transaccion explicita sobre `team360`, con rollback automatico ante error.
+- Resultado de aplicacion: `migration_002_applied=ok`.
+- Se ejecuto auditoria post-002 con `backend.scripts.audit_team360_schema` usando conexion sanitizada.
+- Resultado de auditoria:
+  - checks pasados: 74;
+  - checks fallidos: 0;
+  - tablas esperadas 001+002: 46/46;
+  - columnas nuevas de `task_runs` presentes: `automation_package_id`, `package_worker_id`, `area_id`, `assigned_user_id`, `required_permission`, `approval_status`;
+  - `chk_task_runs_approval_status` OK sin `bypassed`;
+  - indices unicos parciales criticos OK, incluidos `uq_ksb_default_internal`, `uq_ksb_default_workspace` y `uq_ksb_default_per_entity`;
+  - FKs esperadas encontradas: 5/5;
+  - `chk_ksb_convention` OK;
+  - no se detectaron defaults ambiguos en `knowledge_scope_bindings`;
+  - `credential_references.metadata_jsonb` sin claves sospechosas;
+  - consistencia multi-tenant basica sin datos operativos que verificar.
+- Tablas principales creadas por 002: RBAC, planes/features, subscriptions, assistant instances, automation packages, workers, credential references, knowledge scopes/bindings/documents/chunks.
+- Datos cargados por seeds: 20 permisos, 4 planes, 17 features, 49 asignaciones plan-feature y 8 worker definitions.
+- No se cargaron datos reales de clientes; las tablas operativas de 002 quedaron en 0 filas.
+- No se tocaron `v360`, `litellm`, `postgres`, `.codex` ni `temp1.txt`.
+
+### 2026-05-29 - Decision arquitectonica PostgreSQL 18, pgvector y LangGraph — SOLO DOCUMENTACION
+
+- Se agrego `lat.md/postgres-ai-persistence.md` para documentar PostgreSQL 18 como nucleo transaccional unico de Team360.
+- Se definio que el modelo core de Team360 vive en tablas propias (`core_workspaces`, `core_users`, `core_events`, `task_runs`, `automation_packages`, `package_workers`, `knowledge_scopes`, `knowledge_documents`, `knowledge_chunks`).
+- Se documento que pgvector queda para una fase posterior sugerida `003_team360_pgvector_knowledge_embeddings.sql`.
+- Se documento que LangGraph PostgresSaver queda para una fase posterior sugerida `004_team360_langgraph_checkpointing.sql`, idealmente en schema `langgraph`.
+- Se fijo que LangGraph checkpoints no reemplazan `task_runs` ni `core_events`; solo guardan estado interno/reanudable de workflows/agentes.
+- Se agrego precaucion sobre `pg_checkpointer`: no asumir existencia ni depender de esa extension sin verificar `pg_available_extensions`.
+- Se actualizo `lat.md/lat.md`, `lat.md/status_actual.md` y `docs/postgresql_live_team360_setup.md`.
+- No se toco la DB, no se aplicaron migraciones y no se modifico la migracion 002.
+
+### 2026-05-29 - Auditor 002 v3 con predicates semanticos — NO APLICADA
+
+- Se corrigio `backend/scripts/audit_team360_schema.py` para dejar de comparar predicates de indices parciales por substring literal contra `pg_indexes.indexdef`.
+- El auditor ahora consulta `pg_index`, `pg_get_indexdef(pg_index.indexrelid)` y `pg_get_expr(pg_index.indpred, pg_index.indrelid)`.
+- Para `uq_ksb_default_internal`, `uq_ksb_default_workspace` y `uq_ksb_default_per_entity`, valida que los indices existan sobre `knowledge_scope_bindings`, sean `UNIQUE`, sean parciales y cumplan semanticamente los tipos esperados junto con `is_default = true`.
+- Se mantuvo la regex/lista de claves sospechosas para `credential_references.metadata_jsonb`: password, passwd, token, api_key, apikey, secret, private_key, credential.
+- Se corrigieron textos stale en `docs/postgresql_002_rbac_packages_workers_knowledge_design.md` y la frase de defaults para indicar "a lo sumo una" fila default.
+- **002 v3 sigue NO aplicada sobre team360.** No se toco DB team360, v360, litellm ni temp1.txt.
+
+### 2026-05-28 - Inicializacion DB viva Team360 con migracion 001
+
+- Se elimino la DB temporal `team360_dev` creada durante la preparacion inicial, por pedido explicito de usar `team360` como DB viva.
+- Se creo la DB PostgreSQL `team360` en el servidor local activo en puerto `5432`.
+- No se modificaron las DB `v360`, `litellm` ni `postgres`.
+- Se aplico `backend/db/migrations/001_team360_core_schema.sql` sobre `team360`.
+- La migracion quedo aplicada completa: 24 tablas versionadas, 51 indices versionados, 58 foreign keys, 24 primary keys, 9 unique constraints y `pgcrypto 1.4` instalado.
+- La migracion usa `gen_random_uuid()` y no usa `uuidv7()`.
+- Todas las tablas quedaron con `0` filas; no se cargaron seeds ni datos reales.
+- Se documento el setup y audit en `docs/postgresql_live_team360_setup.md`.
+- No se diseno ni aplico migracion `002`; queda como siguiente fase sobre la DB viva ya inicializada.
 
 ### 2026-05-28 - automation_diagnosis Fase 1 con LiteLLM, RAG simple y classifier deterministico
 
@@ -257,6 +317,7 @@ Incluye estructura inicial para:
 
 ## Validacion
 
+- Se audito `team360` contra `001_team360_core_schema.sql`: no hay tablas, indices ni extensiones versionadas faltantes.
 - Se ejecuto `python3 -m py_compile` sobre los scripts del laboratorio `automation_mario_castro/`.
 - Se ejecuto `python3 src/excel/analyze_workbook.py` y genero `automation_mario_castro/runtime/inspect/excel_inventory.json`.
 - Se ejecuto `python3 src/reports/build_data_inventory.py` y genero `automation_mario_castro/runtime/inspect/data_inventory.json`.
@@ -288,6 +349,56 @@ Incluye estructura inicial para:
 4. Crear seed dev sin secretos reales.
 5. Integrar `TEAM360_DB_URL` al backend cuando exista runtime Litestar productivo.
 6. Crear repositorios Python en una fase posterior.
+
+### 2026-05-29 - Correccion migracion 002 v3 — bloqueante knowledge_scope_bindings resuelto — NO APLICADA
+
+- GPT-5.5 reviso v2 y encontro bloqueante: `knowledge_scope_bindings` permitia defaults ambiguos con `bound_entity_id IS NULL`.
+- Correcciones aplicadas en v3:
+  - **CHECK constraint `chk_ksb_convention`**: reemplaza al viejo `chk_knowledge_scope_bindings_type`. Valida nulabilidad segun `binding_type`:
+    - `internal` -> workspace_id NULL, bound_entity_id NULL
+    - `workspace` -> workspace_id NOT NULL, bound_entity_id NOT NULL, bound_entity_id = workspace_id
+    - `assistant_instance`/`automation_package`/`package_worker` -> workspace_id NOT NULL, bound_entity_id NOT NULL
+  - **Indices unicos parciales** reestructurados:
+    - `uq_ksb_default_internal`: `WHERE binding_type = 'internal' AND is_default = true`
+    - `uq_ksb_default_workspace`: `UNIQUE(workspace_id) WHERE binding_type = 'workspace' AND is_default = true` (NUEVO)
+    - `uq_ksb_default_per_entity`: `UNIQUE(binding_type, bound_entity_id) WHERE binding_type IN ('assistant_instance','automation_package','package_worker') AND is_default = true` (mas preciso)
+  - **DO blocks**: filtros `conrelid` en pg_constraint y `table_schema = 'public'` en information_schema para evitar falsos positivos.
+  - **audit_team360_schema.py**: nueva seccion 7 de validacion de knowledge_scope_bindings; validacion de predicate en indices; claves sospechosas ampliadas (passwd, apikey); mensaje final cambiado.
+  - **Design doc**: seccion knowledge_scope_bindings reescrita con convencion fuerte, tabla de nulabilidad, defaults por tipo, y separacion DB vs app.
+- Archivos modificados:
+  - `backend/db/migrations/002_team360_rbac_packages_workers_knowledge.sql` (v3)
+  - `backend/scripts/audit_team360_schema.py` (v3)
+  - `docs/postgresql_002_rbac_packages_workers_knowledge_design.md` (v3)
+  - `docs/status_actual.md` (esta entrada)
+- **002 v3 NO fue aplicada sobre team360.** No se toco DB team360, v360, litellm ni temp1.txt.
+- Validacion: `python3 -m py_compile` sobre audit script OK; `git diff --check` sin errores.
+
+### 2026-05-28 - Correccion migracion 002 v2 (RBAC, packages, workers, knowledge) — NO APLICADA
+
+- Se aplicaron las 15 correcciones recomendadas por GPT-5.5 sobre el borrador 002 v1:
+  - **core_roles**: workspace_id nullable, is_system_role, indices unicos parciales.
+  - **core_permission_profiles**: indices unicos parciales para nullable workspace_id.
+  - **core_user_profiles**: area_id + indices unicos parciales (mismo perfil en areas distintas).
+  - **automation_packages**: package_code scoped a workspace (no global) + FK a package_plans.
+  - **knowledge_scope_bindings**: nueva tabla, binding movido desde knowledge_scopes.
+  - **knowledge_scopes**: eliminados binding_type/binding_id.
+  - **assistant_instances**: default_knowledge_scope_id sin FK (evita circular).
+  - **package_workers**: agregado package_worker_code + UNIQUE.
+  - **workspace_plan_subscriptions**: UNIQUE parcial para active only + ended_at_utc.
+  - **approval_status**: eliminado 'bypassed', valores seguros (not_required, pending, approved, rejected, expired, cancelled).
+  - **worker_definitions seeds**: 8 workers alineados con lat.md.
+  - **credential_references**: documentacion de seguridad + audit de metadata_jsonb.
+  - **Indices unicos parciales**: 11 criticales para integridad con workspace_id nullable.
+- Archivos corregidos:
+  - `backend/db/migrations/002_team360_rbac_packages_workers_knowledge.sql` (reescrito)
+  - `docs/postgresql_002_rbac_packages_workers_knowledge_design.md` (reescrito)
+  - `backend/scripts/audit_team360_schema.py` (reescrito con 8 checkpoints)
+- La migracion 002 v2 propone **22 tablas nuevas** (+1: knowledge_scope_bindings).
+- **11 indices unicos parciales** para restricciones UNIQUE con workspace_id nullable.
+- **ALTER TABLE**: task_runs +6 columnas + check constraint + 4 FKs; package_workers FK a knowledge_scopes.
+- **Seeds**: 20 permisos, 4 planes, 17 features, 8 worker_definitions.
+- Pendiente: validar v2 con GPT-5.5 antes de ejecutar.
+- No se modificaron `v360`, `litellm`, `postgres`, `.codex` ni `temp1.txt`.
 
 ## Notas de seguridad
 

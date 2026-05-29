@@ -10,3 +10,4 @@ It is managed as a `lat.md` documentation layer: source code can anchor to these
 - [[ai-litellm]] — LiteLLM as OpenAI-compatible AI gateway, adapter boundary, model aliases, usage metadata and fallback rules.
 - [[security-hitl-mfa]] — MFA, HITL, remote mirroring, hardware proximity, blocked actions and no-bypass security rules.
 - [[automation-diagnosis]] — Guided automation diagnosis assistant, deterministic classification and Phase 1 implementation invariants.
+- [[postgres-ai-persistence]] - PostgreSQL 18 as transactional core, pgvector and LangGraph persistence roadmap, checkpoint boundaries.

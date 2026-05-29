@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-05-28
+Ultima actualizacion: 2026-05-29
 
 ## Estado general
 
@@ -11,6 +11,15 @@ Ultima actualizacion: 2026-05-28
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-05-29 - Decision Postgres AI persistence
+
+- Se agrego `postgres-ai-persistence.md` como decision estable de arquitectura viva.
+- Se documento PostgreSQL 18 como nucleo transaccional unico de Team360.
+- Se separo explicitamente el modelo core Team360 de futuras capas pgvector y LangGraph PostgresSaver.
+- Se fijo que LangGraph checkpoints no reemplazan `task_runs` ni `core_events`.
+- Se documento la precaucion de no depender de `pg_checkpointer` sin verificar disponibilidad real.
+- Se actualizo `lat.md/lat.md` con la referencia `[[postgres-ai-persistence]]`.
 
 ### 2026-05-28 - Reglas operativas de lat.md para agentes
 
