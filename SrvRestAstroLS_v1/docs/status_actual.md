@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-05-31
+Ultima actualizacion: 2026-06-01
 
 ## Directorio de trabajo
 
@@ -13,6 +13,23 @@ Ultima actualizacion: 2026-05-31
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql` y `003_team360_pgvector_knowledge_embeddings.sql`. Tambien existe una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar). El backend Litestar productivo sigue pendiente de integracion.
 
 ## Acciones realizadas
+
+### 2026-06-01 - Analisis de alineacion UX Console con backend PostgreSQL
+
+- Se revisaron la home publica, layouts, App Shell, rutas Astro, bootstrap mock, store de contexto, navegacion derivada, servicios, workers y runs de Team360 Console.
+- Se contrasto la UX actual con las migraciones aplicadas `001`, `002` y `003`, sin ejecutar migraciones ni tocar DB.
+- Se creo `docs/ux_console_backend_alignment.md` con estado UX, modelo backend disponible, mapeo UX-DB, rutas recomendadas, separacion publico/privado, visibilidad, fases y riesgos.
+- Se recomendo implementar primero un `ConsoleBootstrap` backend read-only con repositories y `psycopg 3 async`, antes de sustituir fixtures o agregar cambios grandes.
+- Se registro como brecha futura explicita el modelo de organizaciones, membresias multi-workspace, scope delegado y servicios visibles separados de paquetes/workers.
+- Se detectaron ajustes visuales posteriores en `ux/team360-console-design-handoff` todavia no integrados; no se mezclaron ramas en esta tarea.
+- No se tocaron frontend, backend, DB, migraciones, `temp1.txt`, `.codex`, `v360`, `litellm` ni labs de cliente.
+
+### 2026-06-01 - Aclaracion de rama para contexto de desarrollo
+
+- Se documento en `AGENTS.md` que `main` es la rama estable, `ux/team360-console-design-handoff` es la rama de diseno UX y `feature/console-backend-core` es la rama de desarrollo e integracion general.
+- Se reforzo en `.agents/skills/team360-project/SKILL.md` que una instruccion con `desarrollo`, `dev` o `backend` selecciona `feature/console-backend-core`.
+- Se aclaro que `Objetivo: desarrollo` en esta bitacora identifica documentacion tecnica y no implica crear una rama Git llamada `desarrollo`.
+- No se tocaron frontend, backend, DB, migraciones, `temp1.txt`, `.codex`, `v360`, `litellm` ni labs de cliente.
 
 ### 2026-05-31 - Revisión UX, consistencia visual y preparación para diseño de Team360 Console
 

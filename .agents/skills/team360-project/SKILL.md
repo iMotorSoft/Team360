@@ -25,6 +25,8 @@ Asumir como raíz el directorio actual del repositorio Team360.
 ## Atajos de workflow de ramas
 Interpretar frases claras del usuario como atajos de contexto de rama:
 
+Cuando una instruccion mencione `desarrollo`, usar `feature/console-backend-core`. No crear una rama local llamada `desarrollo`. El valor `Objetivo: desarrollo` de `SrvRestAstroLS_v1/docs/status_actual.md` identifica el tipo de bitacora tecnica y no modifica esta convencion Git.
+
 - Diseño / UX / `design` / `ux`:
   - Rama destino: `ux/team360-console-design-handoff`
   - Usar para diseño visual, copy, responsive, revisión de pantallas, mock UX y handoff.

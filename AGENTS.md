@@ -10,6 +10,15 @@ Antes de cambios relevantes, leer:
 - `SrvRestAstroLS_v1/docs/status_actual.md`
 - `lat.md/lat.md` cuando el cambio afecte arquitectura, dominio, IA, workers, knowledge, seguridad, paquetes o reglas transversales.
 
+Convencion operativa de ramas:
+
+- `main`: estado estable validado.
+- `feature/console-backend-core`: rama de desarrollo e integracion general de plataforma, backend, DB, documentacion tecnica y alineacion UX-backend.
+- `ux/team360-console-design-handoff`: rama de diseno visual, frontend mock y handoff UX antes de integrar.
+- Cuando una instruccion de trabajo mencione `desarrollo`, `dev` o `backend`, interpretar que la rama destino es `feature/console-backend-core`.
+- `Objetivo: desarrollo` dentro de `SrvRestAstroLS_v1/docs/status_actual.md` describe el tipo de bitacora tecnica; para trabajo Git corresponde usar `feature/console-backend-core`.
+- No crear una rama local llamada `desarrollo`.
+
 Separacion documental:
 
 - Comercial / negocio / producto / reportes no tecnicos: `docs/` y `data/reports/`
