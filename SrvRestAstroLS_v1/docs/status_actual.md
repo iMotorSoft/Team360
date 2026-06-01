@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-05-31
+Ultima actualizacion: 2026-06-01
 
 ## Directorio de trabajo
 
@@ -13,6 +13,17 @@ Ultima actualizacion: 2026-05-31
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql` y `003_team360_pgvector_knowledge_embeddings.sql`. Tambien existe una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar). El backend Litestar productivo sigue pendiente de integracion.
 
 ## Acciones realizadas
+
+### 2026-06-01 - Handoff reproducible para diseño de home y consola mock
+
+- Se ajustó el acceso público de `team360.live` para que `Acceso clientes` navegue localmente a `/login` y quede visible también en mobile.
+- Se corrigió overflow horizontal del header público en `390px` compactando únicamente el label mobile del CTA comercial.
+- Se agregó `astro/scripts/design-smoke.mjs`, smoke CDP sin dependencias nuevas que usa Chromium local y valida rutas, CTA, tabs, drawer, guardas visuales de cliente final y overflow responsive.
+- Se creó `docs/design-review/team360_design_handoff.md` con rama, ejecución local, rutas mock reales, perfiles, limitaciones y checklist para diseño.
+- Se generaron `16` capturas desktop/mobile en `docs/design-review/screenshots/`.
+- Se validó con `corepack pnpm check`, `corepack pnpm build` y `corepack pnpm design:smoke`.
+- Resultado: `0 errors`, `0 warnings`, `0 hints`; build estático OK con `111` páginas; smoke OK sobre `18` rutas nombradas y `5` viewports.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones ni AG-UI funcional.
 
 ### 2026-05-31 - Revisión UX, consistencia visual y preparación para diseño de Team360 Console
 

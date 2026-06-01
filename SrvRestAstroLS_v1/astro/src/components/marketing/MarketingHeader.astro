@@ -16,12 +16,17 @@ import BrandMark from "./BrandMark.astro";
 
     <div class="flex items-center gap-2 sm:gap-3">
       <a
-        class="hidden text-sm font-semibold text-[#39536b] transition hover:text-[#102d4f] sm:inline"
-        href="https://console.team360.live/login"
+        aria-label="Acceso clientes: entrar a Team360 Console"
+        class="text-xs font-semibold text-[#39536b] transition hover:text-[#102d4f] sm:text-sm"
+        href="/login"
       >
-        Acceso clientes
+        <span class="sm:hidden">Consola</span>
+        <span class="hidden sm:inline">Acceso clientes</span>
       </a>
-      <LinkButton href="#contacto" class="min-h-10 px-4 text-sm sm:px-5">Solicitar diagnóstico</LinkButton>
+      <LinkButton href="#contacto" class="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
+        <span class="sm:hidden">Diagnóstico</span>
+        <span class="hidden sm:inline">Solicitar diagnóstico</span>
+      </LinkButton>
     </div>
   </div>
 </header>
