@@ -1,0 +1,38 @@
+---
+import MarketingFooter from "../components/marketing/MarketingFooter.astro";
+import MarketingHeader from "../components/marketing/MarketingHeader.astro";
+import "../styles/global.css";
+import "../styles/marketing.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Team360 | Automatización con IA para procesos reales",
+  description = "Team360 ayuda a empresas a diagnosticar, implementar y medir automatizaciones con IA aplicadas a procesos reales de negocio.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" data-theme="team360">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#102d4f" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-[#fbfcfa] text-[#203c55] antialiased">
+    <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#102d4f] focus:shadow-lg" href="#contenido">
+      Saltar al contenido
+    </a>
+    <MarketingHeader />
+    <slot />
+    <MarketingFooter />
+  </body>
+</html>

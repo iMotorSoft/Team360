@@ -1,0 +1,13 @@
+---
+import ConsoleAppLayout from "../../../../layouts/ConsoleAppLayout.astro";
+import { getServiceStaticPaths } from "../../../../lib/mock";
+
+export function getStaticPaths() {
+  return getServiceStaticPaths();
+}
+
+const workspaceId = Astro.params.workspaceId!;
+const serviceId = Astro.params.serviceId!;
+---
+
+<ConsoleAppLayout title="Detalle de servicio | Team360 Console" view="services" {workspaceId} {serviceId} />

@@ -247,18 +247,18 @@ Resultado observado:
 - sin datos reales de clientes;
 - tablas operativas de 002 en 0 filas.
 
-Siguiente fase recomendada: disenar `003_team360_pgvector_knowledge_embeddings.sql` segun `lat.md/postgres-ai-persistence.md`.
+Siguiente fase recomendada: disenar `004_team360_langgraph_checkpointing.sql` despues de validar uso real de embeddings y retrieval.
 
 ## Roadmap Posterior A 002
 
-Despues de aplicar y auditar la migracion 002, las siguientes fases de persistencia AI deben mantenerse separadas del modelo core:
+Despues de aplicar y auditar la migracion 002, las fases de persistencia AI se mantienen separadas del modelo core:
 
-1. `003_team360_pgvector_knowledge_embeddings.sql`
-   - incorporar pgvector/`vector` solo cuando se disene el almacenamiento de embeddings;
-   - mantener `knowledge_scopes`, `knowledge_documents` y `knowledge_chunks` como modelo de dominio;
-   - decidir si embeddings viven en `public` o en un schema dedicado futuro.
+1. `003_team360_pgvector_knowledge_embeddings.sql` - aplicada
+   - incorporo pgvector/`vector`;
+   - mantuvo `knowledge_scopes`, `knowledge_documents` y `knowledge_chunks` como modelo de dominio;
+   - ubico embeddings en `public` mediante tabla separada `knowledge_chunk_embeddings`.
 
-2. `004_team360_langgraph_checkpointing.sql`
+2. `004_team360_langgraph_checkpointing.sql` - pendiente
    - incorporar LangGraph PostgresSaver en schema separado, sugerido `langgraph`;
    - vincular con Team360 por referencia (`task_runs.langgraph_thread_id`, `task_runs.langgraph_checkpoint_ns` o tabla futura `task_run_langgraph_refs`);
    - no reemplazar `task_runs` ni `core_events`.
@@ -277,22 +277,52 @@ WHERE name = 'pg_checkpointer';
 
 No depender de `pg_checkpointer` hasta confirmar existencia y utilidad.
 
-## Proximos Pasos Recomendados
+## Resultado De Migracion 003
 
-No disenar ni aplicar `002` hasta usar esta DB viva como base del siguiente inventario.
+Fecha de aplicacion: 2026-05-29.
+
+Resultado: aplicada correctamente sobre `team360` despues de la migracion 002.
+
+La migracion:
+
+- instala `vector`/pgvector en `team360`;
+- crea `knowledge_embedding_models`;
+- crea `knowledge_chunk_embeddings`;
+- crea la view `knowledge_ready_chunks`;
+- agrega indices operativos B-tree;
+- agrega indice vectorial `idx_kce_embedding_hnsw_cosine` con HNSW + cosine para embeddings `ready`;
+- carga solo el seed tecnico `default_1536` para `openai/text-embedding-3-small`;
+- no genera embeddings reales y no guarda secretos.
+
+Extension observada en auditoria:
+
+- `vector 0.8.2`.
+
+Auditoria post-003:
+
+```bash
+cd SrvRestAstroLS_v1
+uv run --project backend python -m backend.scripts.audit_team360_schema
+```
+
+Resultado observado:
+
+- checks pasados: 88;
+- checks fallidos: 0;
+- tablas base esperadas 001+002+003: 48/48;
+- view `knowledge_ready_chunks`: OK;
+- indice HNSW cosine: OK;
+- seed `knowledge_embedding_models.default_1536`: OK;
+- sin embeddings `ready` con vector NULL;
+- sin datos reales de clientes ni embeddings cargados.
+
+
+## Proximos Pasos Recomendados
 
 Proxima fase recomendada:
 
-- seed minimo sin secretos para `team360`;
-- RBAC: areas, roles, perfiles y permisos;
-- planes/features;
-- `automation_packages`;
-- `worker_definitions`;
-- `package_workers`;
-- `package_worker_configs`;
-- `credential_references`;
-- `knowledge_scopes`;
-- `knowledge_documents`;
-- `knowledge_chunks`;
-- dashboards/task views;
-- decidir si `uuidv7()` reemplaza `gen_random_uuid()` en migraciones nuevas, sin reescribir `001`.
+- disenar `004_team360_langgraph_checkpointing.sql` solo cuando haya un workflow/agente concreto que requiera checkpointing;
+- mantener LangGraph en schema separado, sugerido `langgraph`;
+- implementar generacion/carga de embeddings desde backend o worker en una fase de runtime, sin guardar secretos planos;
+- definir consultas de retrieval RAG sobre `knowledge_chunk_embeddings`;
+- evaluar GraphRAG solo cuando los dominios requieran relaciones explicitas.

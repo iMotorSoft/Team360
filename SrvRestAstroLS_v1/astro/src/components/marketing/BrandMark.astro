@@ -1,0 +1,27 @@
+---
+interface Props {
+  compact?: boolean;
+  inverted?: boolean;
+}
+
+const { compact = false, inverted = false } = Astro.props;
+---
+
+<a href="/" class="inline-flex items-center gap-3" aria-label="Team360, inicio" translate="no">
+  <span
+    class:list={[
+      "relative grid size-10 place-items-center overflow-hidden rounded-2xl shadow-sm",
+      inverted ? "bg-white/12 ring-1 ring-white/20" : "bg-[#102d4f]",
+    ]}
+    aria-hidden="true"
+  >
+    <span class="absolute inset-[7px] rounded-full border border-[#6ed7cb]/80"></span>
+    <span class="absolute left-[12px] top-[12px] size-2 rounded-full bg-[#6ed7cb]"></span>
+    <span class="absolute bottom-[10px] right-[10px] size-2.5 rounded-full bg-white"></span>
+    <span class="absolute h-px w-4 rotate-45 bg-white/70"></span>
+  </span>
+  <span class:list={["font-semibold tracking-[-0.04em]", inverted ? "text-white" : "text-[#102d4f]"]}>
+    <span class="text-xl">Team</span><span class="text-xl text-[#168b88]">360</span>
+    {!compact && <span class:list={["ml-2 hidden text-xs font-medium tracking-[0.12em] sm:inline", inverted ? "text-white/60" : "text-[#62758a]"]}>OPERACIONES INTELIGENTES</span>}
+  </span>
+</a>

@@ -21,7 +21,7 @@ It stores:
 - audit trails;
 - knowledge scopes;
 - knowledge documents and chunks;
-- future embeddings through pgvector;
+- embeddings through pgvector;
 - future LangGraph checkpoints through PostgresSaver.
 
 Rule:
@@ -52,9 +52,9 @@ These tables are the operational and audit model. They must remain understandabl
 
 ## pgvector Phase
 
-pgvector must be introduced only in a later migration if embeddings are needed by the production model.
+pgvector is introduced by the dedicated embeddings migration when embeddings are needed by the production model.
 
-Suggested phase:
+Implemented phase:
 
 ```text
 003_team360_pgvector_knowledge_embeddings.sql
@@ -63,11 +63,11 @@ Suggested phase:
 Expected scope:
 
 - install/validate `vector` extension;
-- add embedding storage for knowledge chunks or dedicated embedding rows;
+- add dedicated embedding rows for knowledge chunks;
 - preserve `knowledge_scopes`, `knowledge_documents` and `knowledge_chunks` as the domain model;
 - keep retrieval mode per `knowledge_scope`, as defined in [[knowledge-rag-graphrag]].
 
-Embeddings can live in `public` beside the knowledge tables or in a future dedicated schema if operational ownership becomes clearer. That decision belongs to migration 003, not to migration 002.
+Migration 003 materializes embeddings in `public.knowledge_chunk_embeddings`. It prepares persistence and retrieval indexes only; it does not generate embeddings or implement GraphRAG.
 
 ## LangGraph Phase
 
@@ -119,7 +119,7 @@ The final shape belongs to migration 004.
 Recommended schema split:
 
 ```text
-public      -> Team360 core tables and migrations 001/002
+public      -> Team360 core tables and migrations 001/002/003
 langgraph   -> LangGraph PostgresSaver checkpoint tables
 public or future embeddings schema -> pgvector-backed embedding storage
 ```
@@ -147,7 +147,7 @@ Do not depend on `pg_checkpointer` until availability and usefulness are confirm
 Safe decision:
 
 - PostgreSQL 18 as the transactional core;
-- pgvector for embeddings in a future migration;
+- pgvector for embeddings through migration 003;
 - LangGraph PostgresSaver for checkpoints in a future migration;
 - `pg_checkpointer` only if verified and justified.
 
@@ -157,9 +157,9 @@ Current known sequence:
 
 ```text
 001_team360_core_schema.sql                      -> applied to team360
-002_team360_rbac_packages_workers_knowledge.sql  -> prepared, not applied
-003_team360_pgvector_knowledge_embeddings.sql    -> future
+002_team360_rbac_packages_workers_knowledge.sql  -> applied to team360
+003_team360_pgvector_knowledge_embeddings.sql    -> applied to team360
 004_team360_langgraph_checkpointing.sql          -> future
 ```
 
-Migration 002 must not include pgvector or LangGraph unless a future review explicitly changes the scope.
+Migration 002 did not include pgvector or LangGraph. Migration 003 covers pgvector embeddings only. Migration 004 remains the boundary for LangGraph checkpointing.

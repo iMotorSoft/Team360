@@ -1,0 +1,38 @@
+---
+import AppShell from "../components/console/AppShell.svelte";
+import type { ConsoleView } from "../lib/navigation/registry";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  view: ConsoleView;
+  workspaceId: string;
+  serviceId?: string;
+}
+
+const {
+  title = "Team360 Console",
+  description = "Centro operativo privado de Team360",
+  view,
+  workspaceId,
+  serviceId,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" data-theme="team360">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#102d4f" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-[#f3f7f7] antialiased">
+    <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#102d4f] focus:shadow-lg" href="#contenido-consola">
+      Saltar al contenido
+    </a>
+    <AppShell client:load initialWorkspaceId={workspaceId} {view} {serviceId} />
+  </body>
+</html>

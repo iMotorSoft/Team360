@@ -1,0 +1,43 @@
+---
+interface Props {
+  href: string;
+  variant?: "primary" | "secondary" | "ghost" | "neutral";
+  size?: "default" | "large";
+  class?: string;
+  external?: boolean;
+}
+
+const {
+  href,
+  variant = "primary",
+  size = "default",
+  class: className = "",
+  external = false,
+} = Astro.props;
+
+const variantClasses = {
+  primary: "btn-primary",
+  secondary: "btn-secondary",
+  ghost: "btn-ghost",
+  neutral: "btn-neutral",
+};
+
+const sizeClasses = {
+  default: "",
+  large: "btn-lg",
+};
+---
+
+<a
+  href={href}
+  class:list={[
+    "btn rounded-full px-6 font-semibold shadow-none transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]",
+    variantClasses[variant],
+    sizeClasses[size],
+    className,
+  ]}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noreferrer" : undefined}
+>
+  <slot />
+</a>

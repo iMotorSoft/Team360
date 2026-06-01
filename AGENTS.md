@@ -87,6 +87,7 @@ Reglas rapidas:
 - No mezclar browser lab de Mercado Libre con AG-UI o frontend salvo que el objetivo lo pida.
 - Preferir cambios chicos, claros y reversibles.
 - Actualizar `SrvRestAstroLS_v1/docs/status_actual.md` al cerrar tareas tecnicas importantes.
+- Para Team360, la politica DB runtime se define en `lat.md/postgres-driver-policy.md`.
 
 Formato recomendado para `status_actual.md`:
 

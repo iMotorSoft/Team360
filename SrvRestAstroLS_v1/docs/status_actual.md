@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-05-29
+Ultima actualizacion: 2026-05-31
 
 ## Directorio de trabajo
 
@@ -10,9 +10,165 @@ Ultima actualizacion: 2026-05-29
 
 ## Estado general
 
-Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql` y `002_team360_rbac_packages_workers_knowledge.sql`. Tambien existe una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. El backend Litestar productivo sigue pendiente de integracion.
+Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql` y `003_team360_pgvector_knowledge_embeddings.sql`. Tambien existe una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar). El backend Litestar productivo sigue pendiente de integracion.
 
 ## Acciones realizadas
+
+### 2026-05-31 - Revisión UX, consistencia visual y preparación para diseño de Team360 Console
+
+- Se auditó la consola mock en desktop, laptop, tablet, mobile y preview RTL.
+- Se corrigió uso inválido de `class:list` dentro de componentes Svelte que impedía aplicar clases condicionales en drawer, navegación, banner y tabs.
+- Se agregaron `/login` y `/select-workspace` como entradas explícitamente mock sin formularios, credenciales ni auth real.
+- Se separó la audiencia visual `team360_operator` para conservar navegación técnica resumida sin exponer red global.
+- Se agregaron cards mobile para reportes y clientes, labels operativos para estados, formato `Intl` para fechas/duraciones y estados vacíos reutilizables.
+- Se pulieron foco visible, navegación por teclado en tabs, reduced motion, interacción táctil y overscroll del drawer.
+- Se crearon `docs/console_design_review_inventory.md` y `docs/console_ux_visual_review_phase.md`.
+- Se validó con `corepack pnpm check`, `corepack pnpm build`, smoke HTTP/DOM, capturas locales y medición CDP de overflow.
+- Resultado: `0 errors`, `0 warnings`, `0 hints`; build estático OK con `111` páginas y sin overflow horizontal en rutas críticas.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones ni AG-UI funcional.
+
+### 2026-05-31 - Team360 Console servicios y pantallas mock concretas
+
+- Se implementaron listas concretas de servicios, reportes, alertas, tareas y equipo usando fixtures sintéticos realistas.
+- Se agregó detalle de servicio con tabs adaptadas por audiencia: cliente, partner y Team360 mock.
+- Se agregaron settings de workspace solo lectura e integraciones placeholder sin conexiones reales.
+- Se agregaron vistas técnicas mock de workers y runs con resúmenes seguros, ocultas en navegación y con guarda visual ante URL directa fuera del perfil Team360.
+- Se ampliaron fixtures tipados con Automatización de Leads y CRM, Reporte Ejecutivo Semanal, Control de Stock y Publicaciones, Conciliación Bancaria Asistida y Agente de Atención Inicial.
+- Se agregaron wrappers UI `SectionHeader`, `StatCard`, `StatusBadge` y `Tabs`, manteniendo DaisyUI encapsulado.
+- El detalle operativo queda en `docs/console_services_reports_alerts_mock_phase.md`.
+- Se validó con `corepack pnpm check`, `corepack pnpm build`, smoke HTTP local, smoke DOM local con Chrome headless y auditorías acotadas.
+- Resultado: `0 errors`, `0 warnings`, `0 hints`; build estático OK con `109` páginas.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones, descargas reales ni AG-UI funcional.
+
+### 2026-05-31 - Team360 Console App Shell navegable con mock data
+
+- Se creó `astro/src/layouts/ConsoleAppLayout.astro`, separado del layout público de marketing.
+- Se creó `astro/src/components/console/` con App Shell Svelte, sidebar, topbar, switchers mock, breadcrumbs, banner de contexto, notificaciones, dashboard adaptativo y vistas de sección.
+- Se agregó navegación declarativa en `astro/src/lib/navigation/`, derivada desde capacidades, módulos, workspace, organización activa y servicios contratados.
+- Se crearon rutas mock estáticas bajo `/w/[workspaceId]/` para dashboard, red, servicios, resultados, operación técnica, reportes, alertas, tareas, equipo, soporte y configuración.
+- Se materializaron tres experiencias de diseño: Team360 Admin, Partner Admin y Cliente Final.
+- El selector de perfil queda rotulado como herramienta mock de diseño; no representa auth ni impersonation productivo.
+- Se mantuvo `Mamá Mía 360` únicamente como fixture configurable de partner regional, sin branching arquitectónico.
+- Se validó con `corepack pnpm check`, `corepack pnpm build`, smoke HTTP local, smoke Chrome headless local y auditorías acotadas.
+- Resultado: `0 errors`, `0 warnings`, `0 hints`; build estático OK con `97` páginas.
+- No se implementaron backend, DB, migraciones, auth real ni AG-UI funcional.
+
+### 2026-05-31 - Team360 Console mock context e i18n base
+
+- Se creó `astro/src/components/global.js` para centralizar URLs públicas, rutas, flags visibles, branding, locale default y perfil mock inicial; `global.d.ts` conserva tipado estricto.
+- Se agregó `astro/src/lib/mock/` con organizaciones, workspaces, usuarios, servicios, reportes, alertas, tareas, runs, cards de dashboard y bootstrap tipado.
+- Se agregaron perfiles mock `team360_admin`, `team360_operator`, `team360_support`, `partner_admin` y `client_admin`.
+- Se modeló `Mamá Mía 360` únicamente como dato mock configurable del primer partner regional para Israel, sin branching de producto por nombre o región.
+- Se agregó `astro/src/lib/i18n/` con base simple propia para español, inglés y hebreo, incluyendo resolución `ltr` / `rtl`.
+- Se agregó `astro/src/stores/consoleContext.svelte.ts` con Runes para perfil, bootstrap, locale, direction, organización, workspace, permisos, servicios y notificaciones.
+- El cambio de workspace reconstruye el bootstrap y valida scope para descartar contexto anterior.
+- Se validó con `corepack pnpm check`, `corepack pnpm build`, `git diff --check` acotado, búsqueda de whitespace, revisión de lockfiles incompatibles y búsqueda de términos sensibles en runtime.
+- No se implementaron App Shell visual, dashboards renderizados, auth real, backend, DB, migraciones ni AG-UI funcional.
+
+### 2026-05-31 - Home comercial publica `team360.live` Fase 1
+
+- Se reemplazo el smoke visual de `/` por la primera home comercial publica de Team360.
+- Se creo `PublicMarketingLayout.astro`, separado de layouts futuros de autenticacion y consola.
+- Se agregaron componentes Astro de marketing para marca, header, footer, encabezados de seccion y panel conceptual del hero.
+- Se agrego `LinkButton.astro` como wrapper UI minimo para CTAs enlazables con DaisyUI encapsulado.
+- La home presenta diagnostico, implementacion gradual, medicion, casos de uso, partners y contacto por email sin promesas excesivas.
+- Se valido con `corepack pnpm check`, `corepack pnpm build`, smoke local desktop y mobile, busqueda de referencias prohibidas y `git diff --check`.
+- No se implementaron backend, autenticacion real, consola, App Shell, AG-UI funcional, DB ni migraciones.
+
+### 2026-05-31 - Frontend Team360 Fase 1 Astro, Svelte, Tailwind y DaisyUI
+
+- Se completo el scaffold real en `SrvRestAstroLS_v1/astro/`.
+- Se fijo `packageManager: pnpm.5.0` y se genero `pnpm-lock.yaml` exclusivamente con pnpm.
+- Se agrego `pnpm-workspace.yaml` con `allowBuilds` restrictivo para `esbuild` y `sharp`, segun politica pnpm 11.
+- Se configuro Astro 6 con Svelte 5, TypeScript strict, Tailwind CSS 4 via `/vite` y DaisyUI 5 CSS-first.
+- Se creo el tema neutral `team360` y wrappers UI iniciales: Alert, Badge, Button, Card y Loading.
+- Se reservo `src/lib/agui/` sin transporte ni integracion funcional.
+- Se movio un README placeholder fuera de `src/pages/` para evitar una ruta accidental.
+- No se implementaron pantallas finales, App Shell, autenticacion, navegacion contextual, backend, DB ni migraciones.
+
+### 2026-05-31 - Politica frontend pnpm, DaisyUI 5 y wrappers Team360 — SOLO DOCUMENTACION
+
+- Se agrego `docs/frontend/team360-package-manager-and-ui-policy.md`.
+- Se agrego `docs/adr/ADR-005-team360-pnpm-tailwind4-daisyui5-ui-policy.md`.
+- Se fijo pnpm como package manager frontend obligatorio.
+- Se fijo Tailwind CSS 4 + DaisyUI 5 CSS-first como stack UI inicial obligatorio.
+- Se fijo el encapsulamiento DaisyUI detras de wrappers Team360 en `src/components/ui/`.
+- No se implemento codigo, `package.json`, dependencias, componentes, rutas, build, migraciones ni cambios en DB.
+
+### 2026-05-31 - Correccion documental frontend DaisyUI 5 + Tailwind 4 — SOLO DOCUMENTACION
+
+- Se corrigio la premisa incorrecta de incompatibilidad entre DaisyUI 5 y Tailwind 4.
+- Se documento Tailwind CSS 4 + DaisyUI 5 como combinacion valida con integracion CSS-first y wrappers Team360.
+- Se mantuvo la restriccion de no reutilizar `tailwind.config.cjs`, `postcss.config.cjs` legacy ni tema `vertice360`.
+- No se implemento codigo, paquetes, componentes, rutas, build, migraciones ni cambios en DB.
+
+### 2026-05-31 - App Shell y layouts base de Team360 Console — SOLO DOCUMENTACION
+
+- Se agrego `docs/ux/team360-console-app-shell-and-layout-system.md`.
+- Se agrego `docs/adr/ADR-003-team360-console-app-shell-and-layout-system.md`.
+- Se documentaron App Shell, sidebar, topbar, switchers, breadcrumbs, layouts reutilizables, estados de UI, responsive y bootstrap esperado.
+- Se amplio `lat.md/console-multi-organization.md` con el invariante estable de shell reutilizable y descarte de estado obsoleto.
+- No se implementaron pantallas, componentes, rutas, build, migraciones ni cambios en DB.
+
+### 2026-05-31 - Modelo de navegacion contextual para Team360 Console — SOLO DOCUMENTACION
+
+- Se agrego `docs/ux/team360-console-navigation-model.md`.
+- Se agrego `docs/adr/ADR-002-team360-console-navigation-by-role.md`.
+- Se documento navegacion por tipo de organizacion, rol, permisos efectivos, workspace activo, servicios contratados y modulos habilitados.
+- Se definieron App Shell adaptable, selector de contexto, tabs por servicio, wireframes textuales e implicancias para Astro, Svelte 5 con Runes y backend.
+- Se amplio `lat.md/console-multi-organization.md` con el invariante estable de navegacion contextual.
+- No se implementaron pantallas, componentes, rutas, navegacion funcional, migraciones ni cambios en DB.
+
+### 2026-05-31 - Decision UX y arquitectura base para Team360 Console — SOLO DOCUMENTACION
+
+- Se documento la separacion entre `team360.live` como sitio comercial publico y `console.team360.live` como plataforma privada operativa.
+- Se definio Team360 Console como plataforma multi-organizacion para Team360, partners regionales y clientes finales.
+- Se registro a `Mamá Mía 360` como primera instancia configurable de Partner / Distribuidor Regional para Israel, sin reglas hardcodeadas.
+- Se documento la diferencia entre `organization` y `workspace`, el alcance delegado de partners y la brecha del schema actual.
+- Se agregaron guia extensa en `docs/ux/`, ADR en `docs/adr/` e invariante estable en `lat.md/console-multi-organization.md`.
+- No se implementaron pantallas, componentes, rutas, migraciones ni cambios en DB.
+
+### 2026-05-29 - Documentacion de politica DB driver psycopg 3 async
+
+- Se creo `lat.md/postgres-driver-policy.md` como regla estable de arquitectura.
+- Define `psycopg 3 async` como driver runtime estandar de Team360, con `psycopg_pool.AsyncConnectionPool`.
+- Prohibe SQLAlchemy/SQLModel como fuente de verdad del core; solo evaluables para herramientas perifericas.
+- Prohibe asyncpg como driver base salvo workers especializados con metrica de cuello de botella.
+- Define patron de repositorios, unit-of-work, estructura de modulos `backend/modules/db/`.
+- Establece relacion con pgvector (mismo psycopg layer) y LangGraph PostgresSaver (schema `langgraph` separado, mismo driver, pool independiente).
+- Se actualizaron `lat.md/lat.md`, `lat.md/status_actual.md`, `.agents/skills/team360-project/SKILL.md` (reglas 11-14) y `AGENTS.md` (referencia breve).
+- No se toco DB, no se aplicaron migraciones, no se modificaron migraciones 001/002/003, no se toco v360, litellm ni temp1.txt.
+- Proximo paso recomendado: disenar `backend/modules/db/` con pool, transaccion y repositorios base.
+
+### 2026-05-29 - Aplicacion migracion 003 pgvector knowledge embeddings sobre team360
+
+- Se verifico preflight antes de aplicar:
+  - conexion sanitizada apunta a `team360`;
+  - migracion 002 seguia aplicada (`knowledge_scopes`, `knowledge_documents`, `knowledge_chunks`, `package_workers`, `credential_references` presentes);
+  - `vector` esta disponible en el servidor como `0.8.2`;
+  - tablas objetivo de 003 no existian previamente;
+  - `python3 -m py_compile` sobre `backend/scripts/audit_team360_schema.py` OK;
+  - `git diff --check` sobre archivos 003/auditor/doc OK.
+- Se creo `backend/db/migrations/003_team360_pgvector_knowledge_embeddings.sql`.
+- `psql` no se uso; la aplicacion se ejecuto con `psycopg` en transaccion explicita sobre `team360`, con rollback automatico ante error.
+- Resultado de aplicacion: `migration_003_applied=ok`.
+- Se instalo `vector` en `team360` y quedo en version `0.8.2`.
+- Se crearon `knowledge_embedding_models`, `knowledge_chunk_embeddings` y la view `knowledge_ready_chunks`.
+- Se creo el indice vectorial `idx_kce_embedding_hnsw_cosine` con HNSW + `vector_cosine_ops`, parcial para `embedding_status = 'ready'`.
+- Se cargo solo el seed tecnico `knowledge_embedding_models.default_1536` para `openai/text-embedding-3-small`; no se llamo a OpenAI ni se guardaron API keys.
+- Se actualizo `backend/scripts/audit_team360_schema.py` para validar la 003: extension `vector`, tablas, view, constraints, indices, seed, duplicados chunk/modelo, status invalidos, embeddings `ready` con vector NULL y consistencia basica de `knowledge_scope_id`.
+- Auditoria post-003:
+  - checks pasados: 88;
+  - checks fallidos: 0;
+  - tablas base esperadas 001+002+003: 48/48;
+  - view `knowledge_ready_chunks`: OK;
+  - seed `default_1536`: OK;
+  - indice HNSW cosine: OK;
+  - sin embeddings `ready` con vector NULL;
+  - sin duplicados chunk/modelo;
+  - sin datos reales de clientes ni embeddings cargados.
+- No se tocaron `v360`, `litellm`, `postgres`, `.codex` ni `temp1.txt`.
+- Proximo paso recomendado: disenar la fase de runtime para generar/cargar embeddings o, si hay un workflow concreto, disenar `004_team360_langgraph_checkpointing.sql` separado del modelo core.
 
 ### 2026-05-29 - Aplicacion migracion 002 sobre team360
 
