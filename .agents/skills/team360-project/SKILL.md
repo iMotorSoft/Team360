@@ -68,6 +68,10 @@ Reglas de uso:
 8. Si la validación requiere intervención humana, dejarlo explícito.
 9. No instalar dependencias ni ejecutar comandos destructivos salvo pedido explícito.
 10. Respetar la estrategia de environment parity del backend con Vertice360, más extras necesarios como Playwright.
+11. Antes de crear acceso DB runtime, usar `psycopg 3 async` directo como estándar (ver `lat.md/postgres-driver-policy.md`).
+12. No introducir SQLAlchemy/SQLModel/asyncpg como dependencia base sin decisión explícita documentada en `lat.md/postgres-driver-policy.md`.
+13. Mantener SQL en repositories; no escribir SQL en endpoints ni rutas.
+14. No mezclar pools de conexión: Team360 usa `psycopg_pool.AsyncConnectionPool` para `public.*`; LangGraph PostgresSaver usa su pool interno para `langgraph.*`.
 
 ## Convenciones para Mercado Libre browser lab
 - `browser/` contiene helpers reutilizables

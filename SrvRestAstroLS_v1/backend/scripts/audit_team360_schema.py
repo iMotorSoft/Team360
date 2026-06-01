@@ -1,7 +1,7 @@
 """Audit script for Team360 PostgreSQL schema.
 
 Compares the live database `team360` against expected tables, columns,
-indexes, constraints and seeds from migrations 001 and 002 v3.
+indexes, constraints and seeds from migrations 001, 002 v3 and 003.
 
 Also checks:
   - No 'bypassed' in approval_status check constraints
@@ -9,6 +9,7 @@ Also checks:
   - Cross-workspace consistency (basic)
   - Partial unique indexes existence and KSB semantic predicates via pg_index
   - knowledge_scope_bindings convention (nulabilidad, defaults)
+  - pgvector extension and knowledge embedding persistence
   - Seed presence for catalogs
 
 Read-only. Never modifies the database.
@@ -326,6 +327,28 @@ MIGRATION_002_TABLES: dict[str, list[str]] = {
     ],
 }
 
+MIGRATION_003_TABLES: dict[str, list[str]] = {
+    "knowledge_embedding_models": [
+        "embedding_model_id", "provider_code", "model_code", "model_alias",
+        "dimension", "distance_metric", "status", "metadata_jsonb",
+        "created_at_utc", "updated_at_utc",
+    ],
+    "knowledge_chunk_embeddings": [
+        "chunk_embedding_id", "knowledge_chunk_id", "knowledge_scope_id",
+        "embedding_model_id", "embedding", "embedding_status",
+        "content_hash", "metadata_jsonb", "embedded_at_utc",
+        "created_at_utc", "updated_at_utc",
+    ],
+}
+
+MIGRATION_003_VIEWS: dict[str, list[str]] = {
+    "knowledge_ready_chunks": [
+        "knowledge_scope_id", "knowledge_document_id", "knowledge_chunk_id",
+        "chunk_index", "title", "content", "embedding_model_id",
+        "model_alias", "embedding_status", "embedded_at_utc",
+    ],
+}
+
 TASK_RUNS_NEW_COLUMNS = [
     "automation_package_id",
     "package_worker_id",
@@ -372,7 +395,34 @@ REQUIRED_SEEDS: list[tuple[str, str, str]] = [
     ("package_features", "feature_code", "diagnosis.basic"),
     ("worker_definitions", "worker_code", "diagnosis_ai_interpreter"),
     ("worker_definitions", "worker_code", "rag_retriever_worker"),
+    ("knowledge_embedding_models", "model_alias", "default_1536"),
 ]
+
+REQUIRED_003_CONSTRAINTS = {
+    "knowledge_embedding_models": {
+        "chk_kem_dimension",
+        "chk_kem_distance_metric",
+        "chk_kem_status",
+        "uq_kem_provider_model_dimension",
+        "uq_kem_model_alias",
+    },
+    "knowledge_chunk_embeddings": {
+        "chk_kce_embedding_status",
+        "chk_kce_ready_requires_embedding",
+        "uq_kce_chunk_model",
+    },
+}
+
+REQUIRED_003_INDEXES = {
+    "idx_kce_knowledge_scope",
+    "idx_kce_knowledge_chunk",
+    "idx_kce_embedding_model",
+    "idx_kce_embedding_status",
+    "idx_kce_ready_scope_model",
+    "idx_kce_embedding_hnsw_cosine",
+}
+
+KCE_ALLOWED_STATUSES = {"pending", "ready", "failed", "stale"}
 
 SUSPICIOUS_METADATA_KEYS = [
     "password", "passwd", "token", "api_key", "apikey", "secret", "private_key", "credential",
@@ -398,6 +448,7 @@ def audit_schema(cursor: Any, result: AuditResult) -> None:
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'public'
+          AND table_type = 'BASE TABLE'
         ORDER BY table_name
     """)
     db_tables = {row[0] for row in cursor.fetchall()}
@@ -405,9 +456,10 @@ def audit_schema(cursor: Any, result: AuditResult) -> None:
     all_expected: dict[str, list[str]] = {}
     all_expected.update(MIGRATION_001_TABLES)
     all_expected.update(MIGRATION_002_TABLES)
+    all_expected.update(MIGRATION_003_TABLES)
 
     result.details.append(f"Tablas en DB: {len(db_tables)}")
-    result.details.append(f"Tablas esperadas (001+002): {len(all_expected)}")
+    result.details.append(f"Tablas esperadas (001+002+003): {len(all_expected)}")
 
     for table_name, expected_cols in sorted(all_expected.items()):
         if table_name not in db_tables:
@@ -455,6 +507,65 @@ def audit_schema(cursor: Any, result: AuditResult) -> None:
             result.details.append(
                 f"  task_runs: columnas 002 FALTAN: {', '.join(missing)}"
             )
+
+
+def audit_views(cursor: Any, result: AuditResult) -> None:
+    """Verify expected migration 003 views and their public columns."""
+    for view_name, expected_cols in sorted(MIGRATION_003_VIEWS.items()):
+        cursor.execute(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = %s
+            ORDER BY ordinal_position
+            """,
+            (view_name,),
+        )
+        db_cols = [row[0] for row in cursor.fetchall()]
+        if not db_cols:
+            result.failed += 1
+            result.details.append(f"  FALTA view: {view_name}")
+            continue
+
+        missing = [c for c in expected_cols if c not in set(db_cols)]
+        if missing:
+            result.failed += 1
+            result.details.append(
+                f"  FALTAN columnas en view {view_name}: {', '.join(missing)}"
+            )
+        else:
+            result.passed += 1
+            result.details.append(f"  view {view_name}: OK")
+
+
+def audit_vector_extension(cursor: Any, result: AuditResult) -> None:
+    """Verify pgvector is installed in team360."""
+    cursor.execute(
+        """
+        SELECT default_version, installed_version
+        FROM pg_available_extensions
+        WHERE name = 'vector'
+        """
+    )
+    row = cursor.fetchone()
+    if not row:
+        result.failed += 1
+        result.details.append("  Extension vector: no disponible en el servidor")
+        return
+
+    default_version, installed_version = row
+    if not installed_version:
+        result.failed += 1
+        result.details.append(
+            f"  Extension vector: disponible {default_version}, no instalada"
+        )
+        return
+
+    result.passed += 1
+    result.details.append(
+        f"  Extension vector: OK instalada {installed_version} "
+        f"(default disponible {default_version})"
+    )
 
 
 def audit_check_constraints(cursor: Any, result: AuditResult) -> None:
@@ -774,6 +885,147 @@ def audit_knowledge_scope_bindings(cursor: Any, result: AuditResult) -> None:
         )
 
 
+def audit_knowledge_embeddings(cursor: Any, result: AuditResult) -> None:
+    """Validate pgvector-backed knowledge embedding persistence from migration 003."""
+    cursor.execute("""
+        SELECT count(*) FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'knowledge_chunk_embeddings'
+    """)
+    if cursor.fetchone()[0] == 0:
+        result.details.append(
+            "knowledge_chunk_embeddings: table does not exist, skipping validation"
+        )
+        return
+
+    for table_name, expected_constraints in sorted(REQUIRED_003_CONSTRAINTS.items()):
+        cursor.execute(
+            """
+            SELECT conname
+            FROM pg_constraint
+            WHERE conrelid = %s::regclass
+            """,
+            (table_name,),
+        )
+        existing = {row[0] for row in cursor.fetchall()}
+        missing = sorted(expected_constraints - existing)
+        if missing:
+            result.failed += 1
+            result.details.append(
+                f"  FALTAN constraints en {table_name}: {', '.join(missing)}"
+            )
+        else:
+            result.passed += 1
+            result.details.append(f"  constraints {table_name}: OK")
+
+    cursor.execute(
+        """
+        SELECT indexname, indexdef
+        FROM pg_indexes
+        WHERE schemaname = 'public'
+          AND tablename = 'knowledge_chunk_embeddings'
+        """
+    )
+    indexes = {row[0]: row[1] for row in cursor.fetchall()}
+    missing_indexes = sorted(REQUIRED_003_INDEXES - set(indexes))
+    if missing_indexes:
+        result.failed += 1
+        result.details.append(
+            f"  FALTAN indexes knowledge_chunk_embeddings: {', '.join(missing_indexes)}"
+        )
+    else:
+        result.passed += 1
+        result.details.append("  indexes knowledge_chunk_embeddings: OK")
+
+    hnsw_def = indexes.get("idx_kce_embedding_hnsw_cosine", "").lower()
+    if hnsw_def and "using hnsw" in hnsw_def and "vector_cosine_ops" in hnsw_def:
+        result.passed += 1
+        result.details.append("  idx_kce_embedding_hnsw_cosine: OK HNSW cosine")
+    else:
+        result.failed += 1
+        result.details.append("  ERROR idx_kce_embedding_hnsw_cosine: no es HNSW cosine")
+
+    cursor.execute(
+        """
+        SELECT provider_code, model_code, dimension, distance_metric, status
+        FROM knowledge_embedding_models
+        WHERE model_alias = 'default_1536'
+        """
+    )
+    seed = cursor.fetchone()
+    if seed == ("openai", "text-embedding-3-small", 1536, "cosine", "active"):
+        result.passed += 1
+        result.details.append("  Seed knowledge_embedding_models.default_1536: OK")
+    else:
+        result.failed += 1
+        result.details.append("  FALTA o difiere seed knowledge_embedding_models.default_1536")
+
+    cursor.execute("""
+        SELECT count(*) FROM knowledge_chunk_embeddings
+        WHERE embedding_status = 'ready' AND embedding IS NULL
+    """)
+    ready_null = int(cursor.fetchone()[0])
+    if ready_null > 0:
+        result.failed += 1
+        result.details.append(
+            f"  ERROR: {ready_null} embeddings ready tienen embedding NULL"
+        )
+    else:
+        result.passed += 1
+        result.details.append("  No ready embeddings with NULL vector: OK")
+
+    cursor.execute(
+        """
+        SELECT count(*) FROM knowledge_chunk_embeddings
+        WHERE embedding_status <> ALL(%s)
+        """,
+        (list(KCE_ALLOWED_STATUSES),),
+    )
+    invalid_status = int(cursor.fetchone()[0])
+    if invalid_status > 0:
+        result.failed += 1
+        result.details.append(
+            f"  ERROR: {invalid_status} embeddings con status invalido"
+        )
+    else:
+        result.passed += 1
+        result.details.append("  No invalid embedding_status values: OK")
+
+    cursor.execute("""
+        SELECT count(*) FROM (
+            SELECT knowledge_chunk_id, embedding_model_id, count(*)
+            FROM knowledge_chunk_embeddings
+            GROUP BY knowledge_chunk_id, embedding_model_id
+            HAVING count(*) > 1
+        ) duplicates
+    """)
+    duplicates = int(cursor.fetchone()[0])
+    if duplicates > 0:
+        result.failed += 1
+        result.details.append(
+            f"  ERROR: {duplicates} duplicados knowledge_chunk_id + embedding_model_id"
+        )
+    else:
+        result.passed += 1
+        result.details.append("  No duplicate chunk/model embeddings: OK")
+
+    cursor.execute("""
+        SELECT count(*)
+        FROM knowledge_chunk_embeddings kce
+        JOIN knowledge_chunks kc ON kc.id = kce.knowledge_chunk_id
+        JOIN knowledge_documents kd ON kd.id = kc.knowledge_document_id
+        WHERE kce.knowledge_scope_id <> kd.knowledge_scope_id
+    """)
+    mismatches = int(cursor.fetchone()[0])
+    if mismatches > 0:
+        result.failed += 1
+        result.details.append(
+            f"  ERROR: {mismatches} embeddings con knowledge_scope_id inconsistente"
+        )
+    else:
+        result.passed += 1
+        result.details.append("  knowledge_scope_id consistency for embeddings: OK")
+
+
 def audit_row_counts(cursor: Any, result: AuditResult) -> None:
     cursor.execute("""
         SELECT relname, reltuples::bigint
@@ -842,28 +1094,37 @@ def main() -> None:
             print("\n=== 1. Tablas y columnas ===\n")
             audit_schema(cursor, result)
 
-            print("\n=== 2. Check constraints (approval_status) ===\n")
+            print("\n=== 2. Views 003 ===\n")
+            audit_views(cursor, result)
+
+            print("\n=== 3. Extension vector ===\n")
+            audit_vector_extension(cursor, result)
+
+            print("\n=== 4. Check constraints (approval_status) ===\n")
             audit_check_constraints(cursor, result)
 
-            print("\n=== 3. Indices unicos parciales ===\n")
+            print("\n=== 5. Indices unicos parciales ===\n")
             audit_partial_unique_indexes(cursor, result)
 
-            print("\n=== 4. Foreign keys ===\n")
+            print("\n=== 6. Foreign keys ===\n")
             audit_fks(cursor, result)
 
-            print("\n=== 5. Seeds ===\n")
+            print("\n=== 7. Seeds ===\n")
             audit_seeds(cursor, result)
 
-            print("\n=== 6. Secretos en metadata_jsonb ===\n")
+            print("\n=== 8. Secretos en metadata_jsonb ===\n")
             audit_secrets_in_jsonb(cursor, result)
 
-            print("\n=== 7. Knowledge scope bindings convention ===\n")
+            print("\n=== 9. Knowledge scope bindings convention ===\n")
             audit_knowledge_scope_bindings(cursor, result)
 
-            print("\n=== 8. Multi-tenant consistency ===\n")
+            print("\n=== 10. Multi-tenant consistency ===\n")
             audit_multi_tenant_consistency(cursor, result)
 
-            print("\n=== 9. Conteo de filas ===\n")
+            print("\n=== 11. Knowledge embeddings 003 ===\n")
+            audit_knowledge_embeddings(cursor, result)
+
+            print("\n=== 12. Conteo de filas ===\n")
             audit_row_counts(cursor, result)
     finally:
         conn.close()
