@@ -22,6 +22,32 @@ Usar esta copia del skill dentro del repo:
 ## Raíz del proyecto
 Asumir como raíz el directorio actual del repositorio Team360.
 
+## Atajos de workflow de ramas
+Interpretar frases claras del usuario como atajos de contexto de rama:
+
+- Diseño / UX / `design` / `ux`:
+  - Rama destino: `ux/team360-console-design-handoff`
+  - Usar para diseño visual, copy, responsive, revisión de pantallas, mock UX y handoff.
+  - No incorporar backend real, DB, auth real ni integración AG-UI funcional.
+- Desarrollo / `dev` / `backend`:
+  - Rama destino: `feature/console-backend-core`
+  - Usar para backend real, bootstrap de consola, auth, permisos, DB, migraciones controladas, APIs, AG-UI e integración real frontend/backend.
+- Producción / `main` / `stable` / rama estable:
+  - Rama destino: `main`
+  - Usar como base estable e integrable.
+  - En este contexto, "producción" significa contexto de rama; no implica deploy real.
+
+Frases equivalentes incluyen `trabajamos con ...`, `vamos a ...` y `pasemos a ...`.
+
+### Protocolo seguro para cambiar de rama
+1. Ejecutar `git status --short` y `git branch --show-current`.
+2. Si hay cualquier cambio pendiente (`M`, `A`, `D`, `??`, `UU` u otro), detenerse. Reportar rama actual, cambios pendientes, rama destino solicitada y recomendación. No ejecutar checkout.
+3. Si el worktree está limpio y la rama destino existe localmente, ejecutar `git checkout <rama>`.
+4. Si la rama no existe localmente, verificar `git branch -r`. Si existe `origin/<rama>`, crear tracking branch con `git checkout -t origin/<rama>`.
+5. Si la rama tampoco existe en `origin`, detenerse y pedir instrucción.
+
+No hacer automáticamente `stash`, `reset`, `commit`, `merge`, `rebase`, force checkout, force push, creación o borrado de ramas. No propagar cambios entre diseño, desarrollo y `main` sin instrucción explícita.
+
 ## Estructura relevante
 - `lat.md/lat.md`
 - `lat.md/`

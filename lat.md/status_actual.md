@@ -12,6 +12,12 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
+### 2026-06-01 - Atajos seguros de workflow de ramas
+
+- Se agrego al skill de Team360 una regla para interpretar diseño / UX, desarrollo / dev / backend y producción / main como atajos de rama.
+- Se fijo el protocolo seguro: verificar rama y worktree antes del checkout, detenerse ante cualquier cambio pendiente y no hacer stash, reset, commit, merge, rebase ni force push automáticamente.
+- Se aclaro que producción significa contexto de rama `main`, no deploy real.
+
 ### 2026-05-31 - Politica estable frontend pnpm y wrappers UI
 
 - Se agrego referencia `[[team360-frontend-ui-policy]]` en `lat.md/lat.md`.
