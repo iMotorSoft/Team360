@@ -12,6 +12,13 @@ La implementacion operativa vive en `SrvRestAstroLS_v1/astro/`; este directorio 
 
 ## Acciones realizadas
 
+### 2026-06-01 - CTA prominente para cambiar workspace en consola mock
+
+- Se reforzó `Cambiar workspace` como CTA soft-outline full-width con borde, fondo suave, icono reutilizado y tamaño táctil cómodo.
+- La acción mantiene destino `/select-workspace`, preservación de `?profile=` y disponibilidad desktop/mobile.
+- El smoke Chromium CDP ahora valida jerarquía visual mínima además de navegación.
+- No se conectaron backend, auth real, permisos productivos, DB ni AG-UI funcional.
+
 ### 2026-06-01 - Salida explícita al selector de workspace en consola mock
 
 - Se agregó `Cambiar workspace` debajo del workspace activo para volver a `/select-workspace` desde cualquier pantalla interna.

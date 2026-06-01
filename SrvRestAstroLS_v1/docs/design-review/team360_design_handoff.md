@@ -90,7 +90,7 @@ Capturas focalizadas del cambio de workspace:
 - `desktop-change-workspace-link.png`
 - `mobile-change-workspace-link.png`
 
-`Cambiar workspace` conserva `?profile=` para perfiles mock no default cuando vuelve al selector. Esta navegación forma parte de la experiencia de diseño y no representa auth, cierre de sesión ni permisos productivos.
+`Cambiar workspace` se presenta como acción soft-outline full-width dentro del bloque de workspace activo, tanto en sidebar desktop como en drawer mobile. Conserva `?profile=` para perfiles mock no default cuando vuelve al selector. Esta navegación forma parte de la experiencia de diseño y no representa auth, cierre de sesión ni permisos productivos.
 
 ## Pendientes para diseño
 

@@ -255,11 +255,16 @@ try {
       if (!element) return null;
       const url = new URL(element.href);
       const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
       return {
         text: element.textContent.trim(),
         pathname: url.pathname,
         profile: url.searchParams.get("profile"),
-        visible: rect.width > 0 && rect.height > 0
+        visible: rect.width > 0 && rect.height > 0,
+        width: Math.round(rect.width),
+        height: Math.round(rect.height),
+        borderStyle: style.borderStyle,
+        backgroundColor: style.backgroundColor
       };
     })()`);
 
@@ -268,6 +273,9 @@ try {
     assert(link.pathname === "/select-workspace", `Unexpected workspace switch destination at ${route}: ${link.pathname}`);
     assert(link.profile === expectedProfile, `Unexpected workspace switch profile at ${route}: ${link.profile}`);
     assert(link.visible, `Cambiar workspace link is not visible at ${route}`);
+    assert(link.width >= 220 && link.height >= 40, `Cambiar workspace action is too small at ${route}: ${JSON.stringify(link)}`);
+    assert(link.borderStyle !== "none", `Cambiar workspace action is missing a visible border at ${route}`);
+    assert(link.backgroundColor !== "rgba(0, 0, 0, 0)", `Cambiar workspace action is missing a soft background at ${route}`);
 
     await evaluate(`document.querySelector('[data-design-action="change-workspace"]').click()`);
     await waitFor(() => evaluate(`location.pathname === "/select-workspace"`), `Workspace switch link did not navigate from ${route}`);
@@ -382,9 +390,13 @@ try {
   );
   assert(
     await evaluate(
-      `document.querySelector('[data-design-action="change-workspace"]').textContent.trim() === "Cambiar workspace"`,
+      `(() => {
+        const element = document.querySelector('[data-design-action="change-workspace"]');
+        const rect = element?.getBoundingClientRect();
+        return element?.textContent.trim() === "Cambiar workspace" && rect.width >= 220 && rect.height >= 40;
+      })()`,
     ),
-    "Mobile drawer is missing Cambiar workspace",
+    "Mobile drawer is missing a prominent Cambiar workspace action",
   );
   await screenshot("mobile-change-workspace-link.png", { fullPage: false });
   await screenshot("mobile-drawer.png", { fullPage: false });

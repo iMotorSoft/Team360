@@ -3,6 +3,7 @@
   import { buildConsoleRoute } from "../../lib/navigation/derive";
   import type { ConsoleView } from "../../lib/navigation/registry";
   import { consoleContext } from "../../stores/consoleContext.svelte";
+  import ConsoleIcon from "./ConsoleIcon.svelte";
 
   let { view }: { view: ConsoleView } = $props();
   const selectWorkspaceHref = $derived(
@@ -32,10 +33,11 @@
     </select>
   </label>
   <a
-    class="mt-2 inline-flex rounded-lg px-1 py-1 text-xs font-bold text-[#168b88] transition hover:text-[#102d4f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
+    class="mt-2.5 flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#bcdedb] bg-[#eef9f7] px-3 py-2 text-xs font-bold text-[#147d79] shadow-[0_8px_18px_-16px_rgba(16,45,79,0.85)] transition hover:border-[#8fcfc9] hover:bg-white hover:text-[#102d4f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
     data-design-action="change-workspace"
     href={selectWorkspaceHref}
   >
+    <ConsoleIcon class="size-4" name="workspace" />
     Cambiar workspace
   </a>
 </div>

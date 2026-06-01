@@ -45,6 +45,8 @@ Las pantallas internas no exponían una forma explícita de volver a `/select-wo
 
 Se agregó `Cambiar workspace` debajo del selector de workspace activo. La acción queda visible en el sidebar desktop y en la parte alta del drawer mobile. Para perfiles mock no default conserva `?profile=` al volver al selector. Este acceso es navegación de diseño, no logout, auth ni autorización productiva.
 
+En la revisión posterior se reforzó su jerarquía visual: ahora es una acción soft-outline full-width, con fondo suave, borde visible, icono de workspace y altura táctil cómoda. Conserva el tono operativo sin confundirse con texto secundario.
+
 ### Perfil Operador Team360
 
 `team360_operator` se derivaba visualmente como cliente final.

@@ -14,6 +14,14 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-01 - CTA prominente para cambiar workspace en consola mock
+
+- Se convirtió `Cambiar workspace` de link secundario a acción soft-outline full-width dentro del bloque de workspace activo.
+- El CTA usa fondo suave, borde visible, icono de workspace existente, foco claro y altura táctil cómoda en desktop y drawer mobile.
+- Se reforzó el smoke CDP para validar dimensiones mínimas, borde y fondo además de navegación y preservación de `?profile=`.
+- Se regeneraron capturas focalizadas desktop/mobile y se actualizó el handoff.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones ni AG-UI funcional.
+
 ### 2026-06-01 - Salida explícita al selector de workspace en consola mock
 
 - Se agregó `Cambiar workspace` debajo del selector activo del sidebar para volver a `/select-workspace` desde cualquier pantalla interna.

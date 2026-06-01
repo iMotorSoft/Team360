@@ -20,6 +20,11 @@ Ultima actualizacion: 2026-06-01
 - Se documentó la acción interna `Cambiar workspace` hacia `/select-workspace`.
 - Se agregaron capturas focalizadas desktop y mobile para revisión visual.
 
+### 2026-06-01 - Prominencia visual del cambio de workspace
+
+- Se reforzó `Cambiar workspace` como CTA soft-outline full-width con borde, fondo suave, icono y altura táctil cómoda.
+- Se regeneraron capturas focalizadas desktop/mobile.
+
 ## Validacion
 
 - `corepack pnpm design:smoke` ejecutado correctamente con Chromium local.
