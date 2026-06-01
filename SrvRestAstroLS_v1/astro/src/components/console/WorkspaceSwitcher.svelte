@@ -1,9 +1,15 @@
 <script lang="ts">
+  import { ROUTES } from "../global.js";
   import { buildConsoleRoute } from "../../lib/navigation/derive";
   import type { ConsoleView } from "../../lib/navigation/registry";
   import { consoleContext } from "../../stores/consoleContext.svelte";
 
   let { view }: { view: ConsoleView } = $props();
+  const selectWorkspaceHref = $derived(
+    consoleContext.activeProfile === "team360_admin"
+      ? ROUTES.selectWorkspace
+      : `${ROUTES.selectWorkspace}?profile=${consoleContext.activeProfile}`,
+  );
 
   function changeWorkspace(event: Event) {
     const workspaceId = (event.currentTarget as HTMLSelectElement).value;
@@ -11,16 +17,25 @@
   }
 </script>
 
-<label class="block">
-  <span class="mb-1.5 block text-[0.63rem] font-bold uppercase tracking-[0.18em] text-[#78909f]">Workspace activo</span>
-  <select
-    aria-label="Cambiar workspace activo"
-    class="w-full rounded-xl border border-[#dbe5e7] bg-white px-3 py-2 text-xs font-semibold text-[#21415e] transition focus-visible:border-[#71cfc6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
-    onchange={changeWorkspace}
-    value={consoleContext.activeWorkspace.id}
+<div>
+  <label class="block">
+    <span class="mb-1.5 block text-[0.63rem] font-bold uppercase tracking-[0.18em] text-[#78909f]">Workspace activo</span>
+    <select
+      aria-label="Cambiar workspace activo"
+      class="w-full rounded-xl border border-[#dbe5e7] bg-white px-3 py-2 text-xs font-semibold text-[#21415e] transition focus-visible:border-[#71cfc6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
+      onchange={changeWorkspace}
+      value={consoleContext.activeWorkspace.id}
+    >
+      {#each consoleContext.bootstrap.accessibleWorkspaces as workspace}
+        <option value={workspace.id}>{workspace.name}</option>
+      {/each}
+    </select>
+  </label>
+  <a
+    class="mt-2 inline-flex rounded-lg px-1 py-1 text-xs font-bold text-[#168b88] transition hover:text-[#102d4f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
+    data-design-action="change-workspace"
+    href={selectWorkspaceHref}
   >
-    {#each consoleContext.bootstrap.accessibleWorkspaces as workspace}
-      <option value={workspace.id}>{workspace.name}</option>
-    {/each}
-  </select>
-</label>
+    Cambiar workspace
+  </a>
+</div>

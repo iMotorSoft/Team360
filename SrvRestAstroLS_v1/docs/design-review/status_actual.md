@@ -15,11 +15,16 @@ Ultima actualizacion: 2026-06-01
 - Se documentaron rama, ejecución local, rutas mock reales, perfiles y limitaciones.
 - Se reservó `screenshots/` para capturas reproducibles generadas por el smoke Chromium local.
 
+### 2026-06-01 - Acceso explícito para cambiar workspace
+
+- Se documentó la acción interna `Cambiar workspace` hacia `/select-workspace`.
+- Se agregaron capturas focalizadas desktop y mobile para revisión visual.
+
 ## Validacion
 
 - `corepack pnpm design:smoke` ejecutado correctamente con Chromium local.
 - Se validaron `18` rutas nombradas y `5` viewports responsive.
-- Se generaron `16` capturas desktop/mobile bajo `screenshots/`.
+- Se generaron `18` capturas desktop/mobile bajo `screenshots/`.
 
 ## Pendientes recomendados
 

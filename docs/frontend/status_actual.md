@@ -12,6 +12,13 @@ La implementacion operativa vive en `SrvRestAstroLS_v1/astro/`; este directorio 
 
 ## Acciones realizadas
 
+### 2026-06-01 - Salida explícita al selector de workspace en consola mock
+
+- Se agregó `Cambiar workspace` debajo del workspace activo para volver a `/select-workspace` desde cualquier pantalla interna.
+- La acción queda visible en sidebar desktop y drawer mobile, con preservación de `?profile=` para perfiles mock no default.
+- Se extendió el smoke Chromium CDP y se generaron capturas focalizadas desktop/mobile.
+- No se conectaron backend, auth real, permisos productivos, DB ni AG-UI funcional.
+
 ### 2026-06-01 - Handoff reproducible para diseño de home y consola mock
 
 - Se dejó el acceso home -> consola mock funcional en local mediante `/login`, visible en desktop y mobile.

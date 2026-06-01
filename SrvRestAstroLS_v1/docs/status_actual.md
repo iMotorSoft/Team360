@@ -14,6 +14,16 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-01 - Salida explícita al selector de workspace en consola mock
+
+- Se agregó `Cambiar workspace` debajo del selector activo del sidebar para volver a `/select-workspace` desde cualquier pantalla interna.
+- El CTA queda visible en desktop y accesible en la parte alta del drawer mobile.
+- Para perfiles mock no default conserva `?profile=` al volver al selector.
+- Se extendió `astro/scripts/design-smoke.mjs` con regresión desktop sobre dashboard, servicios, detalle cliente y dashboard partner, más click mobile desde detalle.
+- Se generaron capturas focalizadas desktop/mobile y se actualizó el handoff de diseño.
+- Se validó con `corepack pnpm check`, `corepack pnpm build` y `corepack pnpm design:smoke`.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones ni AG-UI funcional.
+
 ### 2026-06-01 - Handoff reproducible para diseño de home y consola mock
 
 - Se ajustó el acceso público de `team360.live` para que `Acceso clientes` navegue localmente a `/login` y quede visible también en mobile.

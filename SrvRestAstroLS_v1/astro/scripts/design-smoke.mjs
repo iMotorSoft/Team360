@@ -210,6 +210,10 @@ try {
   }
 
   async function screenshot(filename, { fullPage = true } = {}) {
+    await waitFor(
+      () => evaluate(`document.documentElement.clientWidth > 0 && document.body.scrollWidth > 0`),
+      `Screenshot viewport is not ready for ${filename}`,
+    );
     const { data } = await cdp.send("Page.captureScreenshot", {
       captureBeyondViewport: fullPage,
       format: "png",
@@ -244,6 +248,35 @@ try {
     );
   }
 
+  async function assertChangeWorkspaceAccess(route, expectedText, expectedProfile = null) {
+    await navigate(route, expectedText);
+    const link = await evaluate(`(() => {
+      const element = document.querySelector('[data-design-action="change-workspace"]');
+      if (!element) return null;
+      const url = new URL(element.href);
+      const rect = element.getBoundingClientRect();
+      return {
+        text: element.textContent.trim(),
+        pathname: url.pathname,
+        profile: url.searchParams.get("profile"),
+        visible: rect.width > 0 && rect.height > 0
+      };
+    })()`);
+
+    assert(link, `Missing Cambiar workspace link at ${route}`);
+    assert(link.text === "Cambiar workspace", `Unexpected workspace switch label at ${route}: ${link.text}`);
+    assert(link.pathname === "/select-workspace", `Unexpected workspace switch destination at ${route}: ${link.pathname}`);
+    assert(link.profile === expectedProfile, `Unexpected workspace switch profile at ${route}: ${link.profile}`);
+    assert(link.visible, `Cambiar workspace link is not visible at ${route}`);
+
+    await evaluate(`document.querySelector('[data-design-action="change-workspace"]').click()`);
+    await waitFor(() => evaluate(`location.pathname === "/select-workspace"`), `Workspace switch link did not navigate from ${route}`);
+    assert(
+      (await evaluate(`new URLSearchParams(location.search).get("profile")`)) === expectedProfile,
+      `Workspace switch navigation lost profile from ${route}`,
+    );
+  }
+
   for (const route of [
     routes.home,
     routes.login,
@@ -273,7 +306,12 @@ try {
 
   await navigate(routes.selectWorkspace, "Elegí una experiencia operativa");
   await screenshot("desktop-select-workspace.png");
+  await assertChangeWorkspaceAccess(routes.ownerDashboard, "Team360 Admin");
+  await assertChangeWorkspaceAccess(routes.ownerServices, "Servicios");
+  await assertChangeWorkspaceAccess(routes.clientDetail, "Gestión de preguntas de marketplace", "client_admin");
+  await assertChangeWorkspaceAccess(routes.partnerDashboard, "Admin Distribuidor", "partner_admin");
   await navigate(routes.ownerDashboard, "Team360 Admin");
+  await screenshot("desktop-change-workspace-link.png");
   await screenshot("desktop-console-dashboard-team360.png");
   await navigate(routes.clientServices, "Servicios contratados");
   await screenshot("desktop-services.png");
@@ -342,6 +380,13 @@ try {
       ),
     "Mobile drawer did not become visible",
   );
+  assert(
+    await evaluate(
+      `document.querySelector('[data-design-action="change-workspace"]').textContent.trim() === "Cambiar workspace"`,
+    ),
+    "Mobile drawer is missing Cambiar workspace",
+  );
+  await screenshot("mobile-change-workspace-link.png", { fullPage: false });
   await screenshot("mobile-drawer.png", { fullPage: false });
   await evaluate(
     `document.querySelector('aside[aria-label="Navegación contextual"] button[aria-label="Cerrar navegación"]').click()`,
@@ -358,6 +403,19 @@ try {
   await screenshot("mobile-services.png");
   await navigate(routes.clientDetail, "Gestión de preguntas");
   await screenshot("mobile-service-detail.png");
+  await evaluate(`document.querySelector('button[aria-label="Abrir navegación"]').click()`);
+  await waitFor(
+    () =>
+      evaluate(
+        `Math.abs(document.querySelector('aside[aria-label="Navegación contextual"]').getBoundingClientRect().left) <= 1`,
+      ),
+    "Mobile detail drawer did not become visible",
+  );
+  await evaluate(`document.querySelector('[data-design-action="change-workspace"]').click()`);
+  await waitFor(
+    () => evaluate(`location.pathname === "/select-workspace" && location.search.includes("profile=client_admin")`),
+    "Mobile detail workspace switch did not navigate to the selector",
+  );
   await navigate(routes.clientAlerts, "Alertas");
   await screenshot("mobile-alerts.png");
 

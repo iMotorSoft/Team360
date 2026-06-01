@@ -50,6 +50,7 @@ corepack pnpm design:smoke
 ## Qué revisar en consola
 
 - Navegación contextual.
+- Salida explícita `Cambiar workspace` hacia `/select-workspace` desde cualquier pantalla interna.
 - Jerarquía visual y densidad.
 - Dashboard.
 - Servicios y detalle.
@@ -83,6 +84,13 @@ No son reales:
 Las capturas regenerables se guardan en:
 
 `SrvRestAstroLS_v1/docs/design-review/screenshots/`
+
+Capturas focalizadas del cambio de workspace:
+
+- `desktop-change-workspace-link.png`
+- `mobile-change-workspace-link.png`
+
+`Cambiar workspace` conserva `?profile=` para perfiles mock no default cuando vuelve al selector. Esta navegación forma parte de la experiencia de diseño y no representa auth, cierre de sesión ni permisos productivos.
 
 ## Pendientes para diseño
 
