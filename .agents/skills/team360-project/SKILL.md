@@ -121,6 +121,19 @@ Al terminar una tarea:
 - luego integración gradual con `team360_orquestador`
 - luego AG-UI/SSE/UI
 
+## Regla de acceso a datos: Pydantic no es obligatorio
+
+Pydantic no es obligatorio en repositories ni en el core de dominio.
+
+- Repositories devuelven `dict`, `dataclass`, `TypedDict` o DTO explícitos.
+- Pydantic solo se usa en bordes HTTP/API cuando aporte validación, serialización JSON, OpenAPI o protección de campos sensibles.
+- Pydantic no es fuente de verdad del dominio.
+- Pydantic no debe duplicar el schema SQL como si fuera ORM.
+- Para contratos internos simples, preferir `dataclass` o `TypedDict`.
+- Para ConsoleBootstrap, documentar JSON/TypedDict primero; Pydantic se evalúa cuando exista endpoint real.
+
+Ver sección `Pydantic Boundary` en `lat.md/postgres-driver-policy.md`.
+
 ## Qué evitar
 - mezclar demasiado pronto dominio y provider
 - sobreautomatizar antes de tener smoke tests sólidos

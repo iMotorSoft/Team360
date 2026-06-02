@@ -14,6 +14,31 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-02 - Contrato ConsoleBootstrap documentado
+
+- Se creo `SrvRestAstroLS_v1/docs/console_bootstrap_contract.md` con el diseno completo del contrato read-only que alimentara la carga inicial de Team360 Console.
+- Se creo `SrvRestAstroLS_v1/backend/modules/console/types.py` con TypedDicts y dataclass internos sin Pydantic, validado con `py_compile`.
+- Se creo `SrvRestAstroLS_v1/backend/modules/console/__init__.py`.
+- El contrato define:
+  - Endpoint recomendado: `GET /api/workspaces/{workspace_id}/console/bootstrap`.
+  - DTO JSON completo con 9 secciones: workspace, current_user, effective_permissions, capabilities, entitlements, navigation, services, tasks_summary, alerts, workspace_context, organization_context, debug.
+  - Mapeo DB a DTO contra las migraciones 001 y 002.
+  - Reglas de seguridad y visibilidad por audiencia.
+  - TypedDicts Python en `types.py` sin Pydantic.
+  - Diseno de 6 repositories futuros y 6 fases de implementacion.
+  - Exclusiones explicitas.
+- No se toco DB, migraciones, codigo runtime existente, `v360`, `litellm`, `temp1.txt`, `.codex` ni archivos no relacionados.
+
+### 2026-06-02 - Pydantic Boundary: Pydantic no es obligatorio en repositorios ni dominio
+
+- Se ajusto la politica de driver DB en `lat.md/postgres-driver-policy.md` para que Pydantic no sea obligatorio en repositories ni core de dominio.
+- Nueva regla: repositories devuelven `dict`, `dataclass`, `TypedDict` o DTO explicitos; Pydantic solo en bordes HTTP/API para validacion, serializacion JSON, OpenAPI o proteccion de campos.
+- Se agrego la seccion `Pydantic Boundary` que lista usos permitidos, no permitidos y guia para contratos internos.
+- Se actualizo el ejemplo de repositorio de Pydantic a dataclass (`dataclasses.dataclass`).
+- Se agrego la regla correspondiente en `.agents/skills/team360-project/SKILL.md`.
+- Se actualizaron `lat.md/status_actual.md`, `lat.md/postgres-driver-policy.md` y esta bitacora.
+- No se toco DB, migraciones, codigo runtime, `v360`, `litellm`, `temp1.txt`, `.codex` ni archivos no relacionados.
+
 ### 2026-06-01 - Analisis de alineacion UX Console con backend PostgreSQL
 
 - Se revisaron la home publica, layouts, App Shell, rutas Astro, bootstrap mock, store de contexto, navegacion derivada, servicios, workers y runs de Team360 Console.

@@ -12,11 +12,18 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
-### 2026-06-01 - Atajos seguros de workflow de ramas
+### 2026-06-02 - Pydantic Boundary: Pydantic no es obligatorio en repositorios ni dominio
 
-- Se agrego al skill de Team360 una regla para interpretar diseño / UX, desarrollo / dev / backend y producción / main como atajos de rama.
-- Se fijo el protocolo seguro: verificar rama y worktree antes del checkout, detenerse ante cualquier cambio pendiente y no hacer stash, reset, commit, merge, rebase ni force push automáticamente.
-- Se aclaro que producción significa contexto de rama `main`, no deploy real.
+- Se agrego la seccion `Pydantic Boundary` en `lat.md/postgres-driver-policy.md` que define:
+  - Pydantic solo en bordes HTTP/API (validacion, serializacion, OpenAPI, proteccion de campos).
+  - Repositorios devuelven `dict`, `dataclass`, `TypedDict` o DTO explicitos; nunca Pydantic como capa de dominio.
+  - Pydantic no es fuente de verdad del dominio ni debe duplicar schema SQL.
+  - ConsoleBootstrap: primero JSON/TypedDict; Pydantic se evalua cuando exista endpoint real.
+  - Contratos internos simples usan `dataclass` o `TypedDict`.
+- Se actualizo el resumen de Decision (linea `Repos:`) y Summary table.
+- Se reemplazo el ejemplo de repositorio de Pydantic a `dataclass`.
+- Se agrego la regla en `.agents/skills/team360-project/SKILL.md`: no asumir Pydantic en repositorios ni core de dominio.
+- No se toco DB, migraciones, codigo runtime, v360, litellm ni temp1.txt.
 
 ### 2026-05-31 - Politica estable frontend pnpm y wrappers UI
 

@@ -11,7 +11,7 @@ Schema:    explicit SQL migrations (001/002/003)
 Runtime:   psycopg 3 async direct
 Pool:      psycopg_pool.AsyncConnectionPool
 Queries:   explicit parameterised SQL
-Repos:     disciplined repository layer returning Pydantic models or typed dicts
+Repos:     disciplined repository layer returning dicts, dataclasses, TypedDicts or explicit DTOs; Pydantic only at HTTP/API borders
 ORM:       not the source of truth; not the core access layer
 ```
 
@@ -135,7 +135,7 @@ backend/modules/knowledge/
 
 1. Every repository is a class or set of functions that receive an `AsyncConnection` as first parameter.
 2. Repositories never manage connections or transactions — they receive them from the caller.
-3. Repositories return Pydantic models or typed dicts, never raw cursor rows.
+3. Repositories return dicts, dataclasses, TypedDicts or explicit DTOs; never raw cursor rows. Pydantic is allowed only at HTTP/API borders for validation, serialization or OpenAPI contracts, not as domain truth or ORM surrogate.
 4. Repository methods are named by operation: `get_by_id`, `find_by_workspace`, `insert`, `update_status`, `delete`.
 5. SQL lives inside repository methods, not in endpoints or service methods.
 6. Parameterised queries use `$1`, `$2`, ... (PostgreSQL native positional) or `%(name)s` (psycopg named).
@@ -168,11 +168,12 @@ async def get_connection():
 ## Example: Repository
 
 ```python
+from dataclasses import dataclass
 from psycopg import AsyncConnection
 from psycopg.rows import dict_row
-from pydantic import BaseModel
 
-class Workspace(BaseModel):
+@dataclass
+class Workspace:
     id: str
     slug: str
     display_name: str
@@ -216,6 +217,39 @@ async def activate_workspace(workspace_id: str) -> None:
         )
 ```
 
+## Pydantic Boundary
+
+Pydantic is **not** the default data layer for Team360. Its use is restricted to HTTP/API borders where it provides concrete value:
+
+### Allowed use cases (HTTP/API borders only)
+
+- JSON request/response validation in endpoint handlers.
+- OpenAPI / Schema generation for public or consumer-facing contracts.
+- Protection of sensitive fields (`SecretStr`, `Field(exclude=True)`).
+- Serialization contracts for external integrations (webhooks, API clients).
+
+### Not allowed
+
+- Using Pydantic models as domain entities or repository return types.
+- Duplicating SQL schema definitions as Pydantic models (anti-ORM pattern).
+- Requiring Pydantic in repository, service or domain layers.
+- Using Pydantic as the source of truth for data shape — that role belongs to SQL migrations and typed Python contracts (dataclasses, TypedDicts).
+
+### Guidance for internal contracts
+
+- Repositories: return `dict` (controlled keys), `dataclass`, `TypedDict` or explicit DTO.
+- Service / domain layer: use `dataclass` or `TypedDict` for internal data flow.
+- ConsoleBootstrap: document JSON shape / TypedDict first. Evaluate Pydantic only when a real endpoint with OpenAPI exists.
+- Cross-worker IPC: document message schema as TypedDict or Protocol; evaluate Pydantic only if strict validation is needed at the wire boundary.
+
+### Why
+
+- Avoid model duplication (SQL migration ↔ Pydantic ↔ service layer).
+- Keep the domain layer free of serialization concerns.
+- Reduce cognitive overhead: a `dataclass` is enough for internal contracts.
+- Pydantic adds import cost, validation overhead and coupling where none is needed.
+- If Pydantic is used at the border, the domain layer does not import it.
+
 ## What Is Discouraged
 
 - Writing raw SQL strings inside endpoint handlers or route functions.
@@ -240,7 +274,7 @@ async def activate_workspace(workspace_id: str) -> None:
 | Row factory | `dict_row` |
 | Query style | Explicit parameterised SQL |
 | Repository pattern | Class with `AsyncConnection` as parameter |
-| Return type | Pydantic models or typed dicts |
+| Return type | dicts, dataclasses, TypedDicts or explicit DTOs; Pydantic only at HTTP/API borders |
 | ORM (SQLAlchemy/SQLModel) | Not for core; only administrative tools if justified |
 | asyncpg | Not for core; only high-throughput workers if metrics justify |
 | pgvector | Same `psycopg` layer, no special adapter needed |
