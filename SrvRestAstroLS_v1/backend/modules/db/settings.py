@@ -18,6 +18,14 @@ def _replace_database_name(url: str, database_name: str) -> str:
     return urlunparse(parsed._replace(path=path))
 
 
+def _normalize_psycopg_dsn(url: str) -> str:
+    """Convert SQLAlchemy-style psycopg URLs into libpq-compatible DSNs."""
+    parsed = urlparse(url)
+    if parsed.scheme.lower().strip() == "postgresql+psycopg":
+        return urlunparse(parsed._replace(scheme="postgresql"))
+    return url
+
+
 def sanitize_dsn(dsn: str) -> str:
     """Remove password from a DSN for safe logging.
 
@@ -66,15 +74,17 @@ def _resolve_dsn() -> str:
     """Resolve the Team360 DSN from environment variables."""
     team360_url = os.environ.get(_TEAM360_DB_URL_ENV, "").strip()
     if team360_url and _is_postgresql_scheme(team360_url):
-        return team360_url
+        return _normalize_psycopg_dsn(team360_url)
 
     team360_url_psql = os.environ.get(_TEAM360_DB_URL_PSQL_ENV, "").strip()
     if team360_url_psql and _is_postgresql_scheme(team360_url_psql):
-        return team360_url_psql
+        return _normalize_psycopg_dsn(team360_url_psql)
 
     v360_url = os.environ.get(_V360_SOURCE_DB_URL_ENV, "").strip()
     if v360_url and _is_postgresql_scheme(v360_url):
-        return _replace_database_name(v360_url, _DEFAULT_TEAM360_DB_NAME)
+        return _normalize_psycopg_dsn(
+            _replace_database_name(v360_url, _DEFAULT_TEAM360_DB_NAME)
+        )
 
     msg = (
         f"Cannot resolve DSN: set {_TEAM360_DB_URL_ENV}, "

@@ -2,7 +2,8 @@
 
 Fecha: 2026-06-02
 
-Estado: diseno de contrato. No implementa endpoint, repositories, DB ni migraciones.
+Estado: Fase C implementada parcialmente. Existen repositories read-only y servicio de
+armado; no implementa endpoint, escrituras DB ni migraciones.
 
 ## 1. Objetivo del contrato
 
@@ -387,20 +388,33 @@ No importan Pydantic.
 No requieren dependencias externas.
 Son la fuente de verdad del contrato para repositories y servicios.
 
-## 7. Repositories futuros (diseno)
+## 7. Repositories read-only implementados (Fase C parcial)
 
-Sin implementar. Nombres y responsabilidades:
+Se implementaron `backend/modules/console/repositories.py`,
+`backend/modules/console/service.py` y `backend/modules/console/errors.py`.
+El servicio arma `ConsoleBootstrap` sin endpoint HTTP y usa solo `SELECT`
+parametrizados.
 
 | Repository | Responsabilidad | Metodos clave |
 |---|---|---|
-| `WorkspaceConsoleRepository` | Datos del workspace activo | `get_by_id(conn, workspace_id) -> WorkspaceDTO` |
-| `PermissionConsoleRepository` | Roles, perfiles y permisos del usuario en el workspace | `get_effective_permissions(conn, user_id, workspace_id) -> list[str]` |
-| `PackageConsoleRepository` | Paquetes activos del workspace con features y workers | `get_services(conn, workspace_id, user_id) -> list[ServiceDTO]` |
-| `TaskConsoleRepository` | Resumen de tareas y alertas del workspace | `get_tasks_summary(conn, workspace_id) -> TasksSummary` / `get_alerts(conn, workspace_id) -> list[AlertDTO]` |
-| `NavigationBuilder` | Construye arbol de navegacion desde capacidades | `build(capabilities, workspace_id, organization_type) -> list[NavGroup]` |
-| `ConsoleBootstrapService` | Orquesta los 5 repos y construye el DTO completo | `get_bootstrap(conn, user_id, workspace_id) -> ConsoleBootstrap` |
+| `WorkspaceConsoleRepository` | Workspace, usuario activo, roles, profiles y areas | `get_workspace`, `get_current_user_context`, `list_workspace_areas` |
+| `PermissionConsoleRepository` | Union de permisos por roles y profiles | `list_effective_permissions`, `list_permission_profiles`, `derive_capabilities` |
+| `PackageConsoleRepository` | Paquetes visibles, plan/features y flags seguros | `list_visible_packages`, `get_package_entitlements`, `package_has_knowledge`, `package_has_visible_workers` |
+| `TaskConsoleRepository` | Resumen de tareas y alertas seguras | `get_workspace_task_summary`, `get_package_task_summary`, `list_workspace_alerts` |
+| `ConsoleBootstrapService` | Orquesta repositories y construye el DTO | `build_bootstrap` |
 
-No crear aun. Se implementaran en Fase C.
+Limitaciones conscientes del schema actual:
+
+- `core_users.workspace_id` se usa como autorizacion workspace-centric hasta que
+  exista membresia multi-workspace.
+- `organization_context` se proyecta provisionalmente desde workspace hasta una
+  migracion futura de organizaciones.
+- Las alertas solo proyectan eventos `console.alert.*`; no exponen
+  `core_events.payload_jsonb`.
+- `automation_packages.settings_jsonb`, `package_worker_configs` y
+  `credential_references` no se consultan ni exponen. Categoria, resumen y
+  visibilidad de servicio usan defaults conservadores hasta modelar campos
+  publicos explicitos.
 
 ## 8. Fases
 
@@ -423,6 +437,10 @@ No crear aun. Se implementaran en Fase C.
 - Implementar `WorkspaceConsoleRepository`, `PermissionConsoleRepository`, `PackageConsoleRepository`, `TaskConsoleRepository`.
 - Cada repository retorna TypedDicts o dataclasses.
 - Sin endpoint. Se prueban con script de integracion.
+
+Estado: implementada parcialmente con servicio de armado, tests unitarios sin DB
+obligatoria y smoke read-only contra schema local. Queda pendiente integrar el
+endpoint autenticado.
 
 ### Fase D — Endpoint Litestar read-only
 

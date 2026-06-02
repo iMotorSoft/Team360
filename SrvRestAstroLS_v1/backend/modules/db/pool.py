@@ -21,7 +21,6 @@ def create_pool(settings: DatabaseSettings) -> AsyncConnectionPool:
         max_size=settings.max_size,
         timeout=settings.connect_timeout,
         open=False,
-        configure=lambda conn: conn,
         kwargs={
             "row_factory": dict_row,
             "application_name": settings.application_name,

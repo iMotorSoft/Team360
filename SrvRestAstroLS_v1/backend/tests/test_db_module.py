@@ -1,4 +1,5 @@
 import os
+import asyncio
 
 import pytest
 
@@ -8,6 +9,7 @@ from modules.db.errors import (
 )
 from modules.db.pool import create_pool, get_pool, reset_pool_for_tests, set_pool
 from modules.db.settings import DatabaseSettings, get_database_settings, sanitize_dsn
+from modules.db.transaction import fetch_all, fetch_one, transaction
 
 
 class TestSanitizeDsn:
@@ -74,6 +76,14 @@ class TestGetDatabaseSettings:
         settings = get_database_settings()
         assert "team360" in settings.dsn
 
+    def test_normalizes_sqlalchemy_style_psycopg_scheme(self, monkeypatch):
+        monkeypatch.setenv(
+            "TEAM360_DB_URL",
+            "postgresql+psycopg://u:p@h:5432/team360",
+        )
+        settings = get_database_settings()
+        assert settings.dsn == "postgresql://u:p@h:5432/team360"
+
     def test_uses_v360_url_fallback(self, monkeypatch):
         monkeypatch.delenv("TEAM360_DB_URL", raising=False)
         monkeypatch.delenv("TEAM360_DB_URL_PSQL", raising=False)
@@ -110,6 +120,7 @@ class TestPoolLifecycle:
         settings = DatabaseSettings(dsn="postgresql://u:p@localhost:5432/db")
         pool = create_pool(settings)
         assert pool is not None
+        assert pool._configure is None
 
     def test_get_pool_without_set_raises(self):
         reset_pool_for_tests()
@@ -138,3 +149,74 @@ class TestImportDoesNotOpenConnection:
         importlib.reload(modules.db)
         with pytest.raises(DatabasePoolNotInitializedError):
             modules.db.get_pool()
+
+
+class _AsyncContextManager:
+    def __init__(self, value):
+        self.value = value
+
+    async def __aenter__(self):
+        return self.value
+
+    async def __aexit__(self, exc_type, exc, traceback):
+        return False
+
+
+class _FakeCursor:
+    def __init__(self, rows):
+        self.rows = rows
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, traceback):
+        return False
+
+    async def execute(self, sql, params):
+        return None
+
+    async def fetchone(self):
+        return self.rows[0] if self.rows else None
+
+    async def fetchall(self):
+        return self.rows
+
+
+class _FakeConnection:
+    def __init__(self, rows=()):
+        self.rows = rows
+
+    def cursor(self):
+        return _FakeCursor(self.rows)
+
+    def transaction(self):
+        return _AsyncContextManager(None)
+
+
+class _FakePool:
+    def __init__(self, conn):
+        self.conn = conn
+
+    def connection(self):
+        return _AsyncContextManager(self.conn)
+
+
+class TestTransactionHelpers:
+    def test_fetch_one_accepts_dict_row(self):
+        result = asyncio.run(fetch_one(_FakeConnection([{"value": 1}]), "SELECT 1"))
+        assert result == {"value": 1}
+
+    def test_fetch_all_accepts_dict_rows(self):
+        result = asyncio.run(
+            fetch_all(_FakeConnection([{"value": 1}, {"value": 2}]), "SELECT 1")
+        )
+        assert result == [{"value": 1}, {"value": 2}]
+
+    def test_transaction_uses_pool_connection_context_manager(self):
+        conn = _FakeConnection()
+
+        async def exercise():
+            async with transaction(_FakePool(conn)) as acquired:
+                assert acquired is conn
+
+        asyncio.run(exercise())

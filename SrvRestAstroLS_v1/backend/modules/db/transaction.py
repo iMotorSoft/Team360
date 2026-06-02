@@ -10,6 +10,12 @@ from psycopg_pool import AsyncConnectionPool
 from modules.db.errors import DatabaseExecutionError
 
 
+def _row_to_dict(row: Any) -> dict[str, Any]:
+    if isinstance(row, Mapping):
+        return dict(row)
+    return dict(row._mapping)
+
+
 async def fetch_one(
     conn: AsyncConnection,
     sql: str,
@@ -22,7 +28,7 @@ async def fetch_one(
             row = await cur.fetchone()
             if row is None:
                 return None
-            return dict(row._mapping)
+            return _row_to_dict(row)
     except Exception as exc:
         raise DatabaseExecutionError(str(exc)) from exc
 
@@ -37,7 +43,7 @@ async def fetch_all(
         async with conn.cursor() as cur:
             await cur.execute(sql, params)
             rows = await cur.fetchall()
-            return [dict(row._mapping) for row in rows]
+            return [_row_to_dict(row) for row in rows]
     except Exception as exc:
         raise DatabaseExecutionError(str(exc)) from exc
 
@@ -62,9 +68,9 @@ async def transaction(pool: AsyncConnectionPool) -> AsyncIterator[AsyncConnectio
 
     Commits on success, rolls back on exception.
     """
-    conn = await pool.connection()
-    async with conn.transaction():
-        try:
-            yield conn
-        except BaseException:
-            raise
+    async with pool.connection() as conn:
+        async with conn.transaction():
+            try:
+                yield conn
+            except BaseException:
+                raise

@@ -14,6 +14,38 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-02 - ConsoleBootstrap Fase C repositories read-only y servicio
+
+- Se crearon `backend/modules/console/repositories.py`, `service.py` y `errors.py`.
+- Se implementaron repositories read-only para workspace, permisos efectivos,
+  paquetes visibles, entitlements, flags seguros de knowledge/workers, resumen de
+  tareas y alertas acotadas a eventos `console.alert.*`.
+- Se implemento `ConsoleBootstrapService.build_bootstrap()` sin endpoint Litestar.
+- Se mantuvo la autorizacion provisional workspace-centric con
+  `core_users.workspace_id`; organizaciones y membresias multi-workspace siguen
+  requiriendo una migracion futura explicita.
+- `organization_context` se proyecta provisionalmente desde workspace.
+- No se consultan ni exponen `credential_references`, `package_worker_configs`,
+  `automation_packages.settings_jsonb`, payloads internos ni secretos.
+- Se corrigio `backend/modules/db/settings.py` para normalizar URLs
+  `postgresql+psycopg://` al formato `postgresql://` aceptado por psycopg/libpq.
+- Se corrigieron helpers existentes de `backend/modules/db/transaction.py` para
+  aceptar `dict_row` y adquirir conexiones del pool mediante context manager.
+- Se elimino un callback `configure` invalido de `backend/modules/db/pool.py`
+  que impedia inicializar `AsyncConnectionPool`.
+- Validacion:
+  - `python3 -m py_compile` sobre modulos Console y helpers DB tocados: OK.
+  - `uv run pytest`: `39 passed`.
+  - smoke real de schema y repositories contra `team360` con
+    `transaction_read_only=on`: OK.
+  - smoke real de pool, context manager y `fetch_one()` contra `team360` con
+    `transaction_read_only=on`: OK.
+  - build real completo omitido porque `team360` no tiene usuarios activos
+    sembrados; el armado se valido con fake repositories.
+  - busqueda de dependencias prohibidas y `git diff --check`: OK.
+- No se tocaron DB en modo escritura, migraciones, endpoints, frontend,
+  `v360`, `litellm`, `temp1.txt`, `.codex` ni labs de cliente.
+
 ### 2026-06-02 - Modulo db base con psycopg 3 async
 
 - Se creo `SrvRestAstroLS_v1/backend/modules/db/` con 5 archivos:
