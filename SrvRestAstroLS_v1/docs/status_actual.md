@@ -14,6 +14,19 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-02 - Modulo db base con psycopg 3 async
+
+- Se creo `SrvRestAstroLS_v1/backend/modules/db/` con 5 archivos:
+  - `errors.py`: `DatabaseError`, `DatabaseConfigurationError`, `DatabasePoolNotInitializedError`, `DatabaseExecutionError`.
+  - `settings.py`: `DatabaseSettings` (dataclass frozen), `get_database_settings()` con resolucion DSN desde `TEAM360_DB_URL` / `TEAM360_DB_URL_PSQL` / `DB_PG_V360_URL`, `sanitize_dsn()` para logging seguro.
+  - `pool.py`: `create_pool()`, `set_pool()`, `get_pool()`, `open_pool()`, `close_pool()`, `reset_pool_for_tests()`. Pool se crea con `open=False`, no abre conexiones al importar.
+  - `transaction.py`: `fetch_one()`, `fetch_all()`, `execute()`, `transaction()` context manager async.
+  - `__init__.py`: export publico de todas las funciones y excepciones.
+- Se creo `SrvRestAstroLS_v1/docs/db_runtime_psycopg_async.md` con documentacion del modulo.
+- Se crearon tests `SrvRestAstroLS_v1/backend/tests/test_db_module.py` (14 tests, todos pasan).
+- No se toco DB, migraciones, codigo runtime existente, `v360`, `litellm`, `temp1.txt`, `.codex` ni archivos no relacionados.
+- No se introdujo SQLAlchemy, SQLModel, asyncpg ni Pydantic.
+
 ### 2026-06-02 - Contrato ConsoleBootstrap documentado
 
 - Se creo `SrvRestAstroLS_v1/docs/console_bootstrap_contract.md` con el diseno completo del contrato read-only que alimentara la carga inicial de Team360 Console.
