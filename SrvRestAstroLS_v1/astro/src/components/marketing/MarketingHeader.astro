@@ -1,29 +1,43 @@
 ---
 import LinkButton from "../ui/LinkButton.astro";
-import BrandMark from "./BrandMark.astro";
+import Team360Logo from "./Team360Logo.astro";
 ---
 
-<header class="sticky top-0 z-50 border-b border-[#dce6eb]/75 bg-[#fbfcfa]/90 backdrop-blur-xl">
-  <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-8 lg:px-10">
-    <BrandMark compact />
+<header
+  class="sticky top-0 z-50 border-b border-[#dce6eb]/75 bg-[#fbfcfa]/90 backdrop-blur-xl"
+>
+  <div
+    class="mx-auto flex max-w-8xl items-center justify-around gap-6 px-5 py-4 sm:px-8 lg:px-10"
+  >
+    <Team360Logo compact />
 
-    <nav class="hidden items-center gap-7 text-sm font-medium text-[#526579] lg:flex" aria-label="Navegación principal">
-      <a class="transition hover:text-[#102d4f]" href="#solucion">Qué hacemos</a>
+    <nav
+      class="hidden items-center gap-8 text-lg font-medium text-[#526579] lg:flex"
+      aria-label="Navegación principal"
+    >
+      <a class="transition hover:text-[#102d4f]" href="#solucion">Qué hacemos</a
+      >
       <a class="transition hover:text-[#102d4f]" href="#casos">Casos de uso</a>
-      <a class="transition hover:text-[#102d4f]" href="#metodo">Nuestro método</a>
+      <a class="transition hover:text-[#102d4f]" href="#metodo"
+        >Nuestro método</a
+      >
       <a class="transition hover:text-[#102d4f]" href="#partners">Partners</a>
     </nav>
 
-    <div class="flex items-center gap-2 sm:gap-3">
+    <div class="flex items-center gap-2 sm:gap-5">
       <a
         aria-label="Acceso clientes: entrar a Team360 Console"
-        class="text-xs font-semibold text-[#39536b] transition hover:text-[#102d4f] sm:text-sm"
+        class="text-xs font-semibold text-[#39536b] transition hover:text-[#102d4f] sm:text-lg"
         href="/login"
       >
         <span class="sm:hidden">Consola</span>
         <span class="hidden sm:inline">Acceso clientes</span>
       </a>
-      <LinkButton href="#contacto" class="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
+      <LinkButton
+        href="#contacto"
+        size="large"
+        class="px-3 text-xs sm:px-8 sm:text-lg"
+      >
         <span class="sm:hidden">Diagnóstico</span>
         <span class="hidden sm:inline">Solicitar diagnóstico</span>
       </LinkButton>

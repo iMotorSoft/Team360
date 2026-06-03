@@ -14,6 +14,12 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-03 - Soporte dinámico para logo (imagen y tamaño) y corrección de casing
+
+- Se corrigió la importación de `Team360Logo.astro` en `MarketingHeader.astro` para usar la capitalización exacta `Team360Logo.astro` (con T mayúscula) en lugar de `team360Logo.astro` para resolver discrepancias de casing en sistemas de archivos.
+- Se agregaron las props `logoSrc` (ruta de la imagen) y `size` ("small" | "medium" | "large" | string de Tailwind) al componente `Team360Logo.astro`, permitiendo configurar la imagen del logo y su tamaño dinámicamente.
+- Se eliminaron nodos hermanos inválidos que causaban errores sintácticos de JSX en el renderizado condicional de `!compact`.
+
 ### 2026-06-01 - CTA prominente para cambiar workspace en consola mock
 
 - Se convirtió `Cambiar workspace` de link secundario a acción soft-outline full-width dentro del bloque de workspace activo.
