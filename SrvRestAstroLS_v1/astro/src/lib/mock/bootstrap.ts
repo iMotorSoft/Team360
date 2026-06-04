@@ -146,6 +146,7 @@ const profileDefinitions: Record<MockProfileId, MockProfileDefinition> = {
       "support",
       "audit",
       "settings",
+      "diagnosis",
     ],
     technicalDepth: "full",
   },
@@ -170,7 +171,7 @@ const profileDefinitions: Record<MockProfileId, MockProfileDefinition> = {
       "tasks.manage",
       "support.read",
     ],
-    enabledModules: ["home", "work_queue", "clients", "services", "workers", "runs", "alerts", "tasks", "support"],
+    enabledModules: ["home", "work_queue", "clients", "services", "workers", "runs", "alerts", "tasks", "support", "diagnosis"],
     technicalDepth: "operational",
   },
   team360_support: {

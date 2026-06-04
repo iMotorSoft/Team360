@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-01
+Ultima actualizacion: 2026-06-04
 
 ## Directorio de trabajo
 
@@ -10,9 +10,287 @@ Ultima actualizacion: 2026-06-01
 
 ## Estado general
 
-Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql` y `003_team360_pgvector_knowledge_embeddings.sql`. Tambien existe una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar). El backend Litestar productivo sigue pendiente de integracion.
+Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-04 - Cierre pre-commit del asistente de diagnostico Team360
+
+- Estado de cierre para demo controlada: frontend real + API Litestar + PostgreSQL + LiteLLM real + E2E + smoke real.
+- Playwright E2E previo: verde (`1 passed`, `1 skipped`) para el flujo de diagnostico.
+- Backend pytest de cierre: `72 passed`.
+- Frontend check de cierre: `0 errors`, `0 warnings`, `0 hints`.
+- Smoke LiteLLM real: OK con `provider=litellm`, `model=openrouter_qwen3_30b_a3b_thinking_2507`, `classification=operational_automation`.
+- Smoke LiteLLM + PostgreSQL real: OK; session y lead verificados en PostgreSQL con `status=classified`.
+- No se implementaron ArangoDB, Milvus ni embeddings en runtime.
+- Riesgos pendientes reales: continuidad de sesion postgres desde DB, observabilidad formal de costos/latencia, repeticion de smokes para medir estabilidad, fallback IA controlado y RAG real con ArangoDB/Milvus en fase posterior.
+
+### 2026-06-04 - Smoke real LiteLLM + PostgreSQL para automation_diagnosis
+
+- Se extendio `backend/scripts/smoke_automation_diagnosis_litellm.py` con `--print-sql` para imprimir la query de verificacion PostgreSQL por `session_id`.
+- Se ejecuto el flujo completo contra backend aislado en modo combinado:
+  - `TEAM360_AI_PROVIDER=litellm`
+  - `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres`
+  - `TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1`
+  - `TEAM360_LITELLM_MODEL_ALIAS=openrouter_qwen3_30b_a3b_thinking_2507`
+- Proxy LiteLLM:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/litellm-server
+  ./scripts/run.sh
+  ```
+- Backend LiteLLM + PostgreSQL:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+  TEAM360_AI_PROVIDER=litellm \
+  AUTOMATION_DIAGNOSIS_REPOSITORY=postgres \
+  TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1 \
+  TEAM360_LITELLM_MODEL_ALIAS=openrouter_qwen3_30b_a3b_thinking_2507 \
+  TEAM360_LITELLM_TIMEOUT_SECONDS=45 \
+  TEAM360_LITELLM_FALLBACK_TO_MOCK=0 \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8011
+  ```
+- Comando smoke:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+  uv run python scripts/smoke_automation_diagnosis_litellm.py --backend-url http://127.0.0.1:8011 --timeout 120 --print-sql
+  ```
+- Resultado real:
+  - session_id: `diag_30d865c6-ddf7-4a00-a3e7-6ba2c89da3c8`
+  - classification: `operational_automation`
+  - score_total: `100`
+  - automation_mode: `assisted`
+  - provider: `litellm`
+  - model: `openrouter_qwen3_30b_a3b_thinking_2507`
+  - latency_ms: `17336`
+  - usage total_tokens: `3398`
+  - cost reportado por LiteLLM: `0.00413114`
+- Verificacion PostgreSQL read-only:
+  ```sql
+  SELECT ads.public_session_id, ads.status,
+         adl.classification, adl.score_total,
+         adl.automation_mode, adl.recommended_package_type,
+         ads.updated_at_utc
+  FROM automation_diagnosis_sessions ads
+  LEFT JOIN automation_diagnosis_leads adl ON adl.session_id = ads.id
+  WHERE ads.public_session_id = 'diag_30d865c6-ddf7-4a00-a3e7-6ba2c89da3c8'
+  ORDER BY ads.updated_at_utc DESC
+  LIMIT 10;
+  ```
+- Resultado DB: `status=classified`, `classification=operational_automation`, `score_total=100`, `automation_mode=assisted`, `recommended_package_type=team360_ops_starter`.
+- Validacion de error PostgreSQL: el contrato de ruta sigue cubierto por tests; si persistence falla durante el snapshot, el backend devuelve HTTP 503 y el smoke reporta el cuerpo truncado del error.
+- No se toco frontend, Playwright, ArangoDB, Milvus, embeddings ni migraciones.
+- Riesgos pendientes: falta observar repeticion de smoke en varias corridas para medir latencia/costo, probar fallback IA controlado y agregar telemetria persistente de costos.
+
+### 2026-06-04 - Smoke real LiteLLM para automation_diagnosis
+
+- Se agrego `backend/scripts/smoke_automation_diagnosis_litellm.py` como smoke HTTP controlado de backend.
+- El smoke no arranca servidores, no toca DBs, no usa Playwright y no lee secretos; consume un backend ya levantado.
+- Proxy LiteLLM esperado:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/litellm-server
+  ./scripts/run.sh
+  ```
+- Backend LiteLLM para smoke:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+  TEAM360_AI_PROVIDER=litellm \
+  TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1 \
+  TEAM360_LITELLM_API_KEY=... \
+  TEAM360_LITELLM_MODEL_ALIAS=openrouter_qwen3_30b_a3b_thinking_2507 \
+  TEAM360_LITELLM_TIMEOUT_SECONDS=45 \
+  TEAM360_LITELLM_FALLBACK_TO_MOCK=0 \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8010
+  ```
+- Comando smoke:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+  uv run python scripts/smoke_automation_diagnosis_litellm.py --backend-url http://127.0.0.1:8010 --timeout 120
+  ```
+- Resultado real ejecutado contra LiteLLM local:
+  - session_id: `diag_4923d34f-eee0-4517-bec6-23354ccd0a4d`
+  - classification: `operational_automation`
+  - score_total: `100`
+  - automation_mode: `assisted`
+  - provider: `litellm`
+  - model: `openrouter_qwen3_30b_a3b_thinking_2507`
+  - latency_ms: `30181`
+  - usage total_tokens: `2433`
+  - cost reportado por LiteLLM: `0.00071144`
+- No hubo JSON invalido del modelo en este smoke; la respuesta fue parseada y clasificada correctamente.
+- Riesgos pendientes: falta smoke real en modo postgres, validacion de fallback controlado, logging de errores IA sin exponer datos de cliente y observabilidad formal de costos/latencia.
+
+### 2026-06-04 - Integracion activable de LiteLLM real en automation_diagnosis
+
+- Se mantuvo `mock` como provider default seguro para `automation_diagnosis`.
+- `TEAM360_AI_PROVIDER=litellm` activa el adapter real OpenAI-compatible contra LiteLLM.
+- El alias recomendado inicial es `openrouter_qwen3_30b_a3b_thinking_2507`; el fallback estable documentado es `openai_gpt_4o_mini_2024_07_18`.
+- El modelo se resuelve por `TEAM360_LITELLM_MODEL_ALIAS`, luego `TEAM360_AUTOMATION_DIAGNOSIS_TEXT_MODEL`, y finalmente el alias recomendado.
+- El cliente LiteLLM toma `TEAM360_LITELLM_BASE_URL` y normaliza a `/v1`; la API key se toma de `TEAM360_LITELLM_API_KEY`, `LITELLM_API_KEY` o `LITELLM_MASTER_KEY`.
+- `TEAM360_LITELLM_TIMEOUT_SECONDS` controla timeout; default: `45`.
+- El fallback a mock ante error de LiteLLM queda apagado por default y solo se habilita con `TEAM360_LITELLM_FALLBACK_TO_MOCK=1`.
+- Las rutas HTTP traducen errores de IA a respuesta controlada `502`, sin traceback publico.
+- Se agrega metadata Team360 al payload LiteLLM: organization, workspace, assistant instance, automation package, knowledge scope, session y correlation id.
+- No se toco frontend, Playwright, migraciones, ArangoDB, Milvus ni embeddings.
+- Modo mock:
+  ```bash
+  cd backend
+  TEAM360_AI_PROVIDER=mock uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  ```
+- Modo LiteLLM local:
+  ```bash
+  cd backend
+  TEAM360_AI_PROVIDER=litellm \
+  TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1 \
+  TEAM360_LITELLM_API_KEY=... \
+  TEAM360_LITELLM_MODEL_ALIAS=openrouter_qwen3_30b_a3b_thinking_2507 \
+  TEAM360_LITELLM_TIMEOUT_SECONDS=45 \
+  TEAM360_LITELLM_FALLBACK_TO_MOCK=0 \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  ```
+- ArangoDB y Milvus siguen documentados pero no implementados en runtime; el retrieval sigue usando el repository in-memory actual.
+
+### 2026-06-04 - Endurecimiento de modo PostgreSQL para automation_diagnosis
+
+- Se elimino el silenciamiento de errores en `PostgresAutomationDiagnosisService._persist_session()`: en modo postgres, si falla la persistencia critica de session/answers/lead/events, se levanta `AutomationDiagnosisPersistenceError`.
+- Las rutas HTTP traducen `AutomationDiagnosisPersistenceError` a HTTP 503 con detalle claro, evitando mostrar exito silencioso cuando PostgreSQL no guardo el snapshot.
+- El servicio postgres ahora filtra eventos ya persistidos en el proceso y solo envia eventos nuevos al repository.
+- El repository inserta eventos en `core_events` con `insert ... where not exists` usando workspace, event name, entity, correlation, timestamp y payload para reducir duplicados sin requerir nueva migracion.
+- Se agregaron tests para validar persistencia de session, answers, lead/result, eventos nuevos sin duplicacion y errores de persistencia no silenciados.
+- Memory sigue siendo el default seguro (`AUTOMATION_DIAGNOSIS_REPOSITORY=memory`) y postgres se activa con `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres`.
+- Limitacion vigente: el runtime postgres todavia delega logica a memoria y persiste snapshots; la continuidad de sesion entre reinicios/procesos todavia depende del proceso hasta implementar carga/hidratacion desde DB.
+- Modo postgres:
+  ```bash
+  cd backend
+  AUTOMATION_DIAGNOSIS_REPOSITORY=postgres TEAM360_DB_URL=postgresql://... uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  ```
+- Query demo:
+  ```sql
+  SELECT ads.public_session_id, ads.status,
+         adl.classification, adl.score_total
+  FROM automation_diagnosis_sessions ads
+  LEFT JOIN automation_diagnosis_leads adl ON adl.session_id = ads.id
+  ORDER BY ads.updated_at_utc DESC
+  LIMIT 10;
+  ```
+
+### 2026-06-04 - Documentacion del contrato KnowledgeScope derivado de JudaismoEnVivo
+
+- Se formalizo en `lat.md/knowledge-scope-contract.md` el contrato `KnowledgeScope / KnowledgeDocument / KnowledgeChunk / VectorEmbedding`.
+- Se agrego el analisis no-runtime `docs/analisis-tecnico/team360_knowledge_scope_contract_judaismo_pattern.md`.
+- Se documento la equivalencia JudaismoEnVivo `Catalog/MD/Chunk` hacia Team360 `KnowledgeScope/Document/Chunk`.
+- Se fijo que ArangoDB sera fuente textual/grafo y Milvus indice derivado, con filtros obligatorios multi-tenant por organizacion, workspace, assistant instance, knowledge scope, status y version.
+- Se recomendo persistir `chunk_text` en Team360 y definir fallback Arango-only.
+- Se aclaro que pgvector queda como laboratorio/fallback, que Milvus 2.6 es prueba paralela y que no se debe migrar ArangoDB a PostgreSQL ahora.
+- No se modifico runtime, backend, frontend, API, migraciones, ArangoDB, Milvus ni LiteLLM.
+
+### 2026-06-04 - Conexion de endpoints HTTP a PostgreSQL real via AUTOMATION_DIAGNOSIS_REPOSITORY
+
+- Se creo `backend/modules/automation_diagnosis/postgres_service.py` con `PostgresAutomationDiagnosisService` que envuelve el servicio sync existente y persiste session/answers/lead/events a PostgreSQL via `AutomationDiagnosisPostgresRepository` y pool de conexiones.
+- Se actualizo `backend/routes/automation_diagnosis.py` para leer `AUTOMATION_DIAGNOSIS_REPOSITORY=memory|postgres`. En modo memory usa `_SyncToAsyncAdapter` envolviendo `build_default_service()`. En modo postgres construye `PostgresAutomationDiagnosisService` con pool.
+- Se actualizo `backend/app.py` con hooks `on_startup`/`on_shutdown` que abren/cierran el pool solo cuando `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres`.
+- El pool se crea con `open=False` en el routes module (import time seguro), se abre explicitamente en startup de Litestar.
+- No se abrio pool al importar modulos.
+- No se toco frontend.
+- Se mantuvo AI mock, knowledge in-memory y scoping por assistant_instance_id.
+- Se agregaron 5 tests en `tests/test_automation_diagnosis_postgres_service.py` que validan la delegacion de logica de negocio con pool fake.
+- Validacion: `uv run pytest` = 59 passed (54 anteriores + 5 nuevos).
+- Comandos:
+  - Memory (default): `cd backend && uv run uvicorn app:app --host 127.0.0.1 --port 8000`
+  - PostgreSQL:  `cd backend && AUTOMATION_DIAGNOSIS_REPOSITORY=postgres TEAM360_DB_URL=postgresql://... uv run uvicorn app:app --host 127.0.0.1 --port 8000`
+  - Tests: `cd backend && uv run pytest`
+- Query SQL para verificar sesiones/leads guardados:
+  ```sql
+  SELECT ads.public_session_id, ads.status, adl.classification, adl.score_total
+  FROM automation_diagnosis_sessions ads
+  LEFT JOIN automation_diagnosis_leads adl ON adl.session_id = ads.id
+  ORDER BY ads.updated_at_utc DESC
+  LIMIT 10;
+  ```
+
+### 2026-06-04 - Frontend conectado a endpoints HTTP reales de automation_diagnosis
+
+- Se creo `astro/src/lib/api/diagnosis.ts` con cliente API tipado para startSession, saveAnswer y classifySession, mas definicion de GUIDED_STEPS y OPTION_LABELS desde el backend.
+- Se creo `astro/src/components/console/diagnosis/ConsoleDiagnosis.svelte` con flujo completo: pantalla de bienvenida → preguntas guiadas una por una con progreso → clasificacion → resultado con desglose, riesgos y proximos pasos.
+- Se creo `astro/src/pages/w/[workspaceId]/diagnosis/index.astro` siguiendo el patron de paginas existentes (getStaticPaths + ConsoleAppLayout).
+- Se configuro proxy en `astro.config.mjs` para que `/api` se reenvie a `http://127.0.0.1:8000` en dev.
+- Se registro "diagnosis" en `navigation/registry.ts` como ConsoleView + nav item en grupo "operations" para audiencias owner/operator/partner.
+- Se agrego "diagnosis" a `enabledModules` en perfiles team360_admin y team360_operator.
+- Se agrego ruta `workspaceDiagnosis` en `global.js` y entrada "diagnosis" en `derive.ts`.
+- Se agregaron claves i18n `nav.diagnosis` en es/en/he.
+- Validacion: `pnpm check` = 0 errors, 0 warnings, 0 hints. Backend tests = 54/54 passed.
+- Smoke: backend responde `POST /api/automation-diagnosis/session/start` = 201 con defaults correctos.
+- No se modifico arquitectura RAG, no se toco DB, no se rompio mock UX existente.
+
+Comandos para correr:
+  Backend:  cd backend && uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  Frontend: cd astro && corepack pnpm dev
+
+### 2026-06-04 - Primer endpoint HTTP Litestar para automation_diagnosis
+
+- No existia app Litestar montada. El entrypoint `ls_iMotorSoft_Srv01.py` era placeholder sin Litestar.
+- Los route handlers en `routes/automation_diagnosis.py` eran funciones planas sin decoradores HTTP.
+- Se creo `backend/app.py` con factory `create_app()` que monta Litestar 2.21.1 con route handlers para health, start_session, save_answer y classify.
+- Se reescribio `routes/automation_diagnosis.py` con decoradores `@post()` de Litestar, usando Pydantic solo en boundary HTTP (request validation en `routes/diagnosis_schemas.py`).
+- `StartSessionRequest` expone solo `source_url`, `locale`, `visitor`, `assistant_instance_id`; `knowledge_scope_id` y campos internos no son pasables por API (defense-in-depth).
+- El servicio usa `build_default_service(ai_provider="mock")` porque LiteLLM real no tiene configuracion (alineado con requisito 9).
+- Errores `ValueError` del service se traducen a HTTP 422.
+- Se crearon 9 tests de integracion via `Litestar.testing.TestClient` que cubren: health, start_session default, scope stripping, answer+classify full flow, errores 422 para session inexistente o sin respuestas, payload minimo.
+- Se reservaron los metodos `get_session`, `capture_contact`, `finalize`, `debug`, `search_knowledge` del router anterior sin exponerlos (disponibles para proxima iteracion).
+- Validacion: 54 tests pasan (45 anteriores + 9 nuevos).
+- No se abrio pool DB al importar. No se introdujo SQLAlchemy/SQLModel/asyncpg. No se modifico frontend.
+
+### 2026-06-04 - DB writes: persistencia runtime de automation_diagnosis
+
+- Se creo y aplico `backend/db/migrations/004_team360_automation_diagnosis_runtime.sql` sobre la DB viva `team360`.
+- La migracion agrega `assistant_instances.assistant_code`, crea `automation_diagnosis_sessions`, `automation_diagnosis_answers` y `automation_diagnosis_leads`, y agrega `uq_ksb_binding_scope_entity` para bindings idempotentes.
+- Se agregaron seeds de `worker_definitions` para los package workers del paquete de venta/diagnostico.
+- Se creo `backend/modules/automation_diagnosis/postgres_repository.py` con repository async de escritura usando `psycopg 3`, SQL parametrizado y conexiones recibidas desde el caller.
+- El repository implementa `upsert_package_installation()` y `persist_session_snapshot()` para instalar `team360_sales_diagnosis` y persistir sesion, respuestas, lead y eventos en `core_events`.
+- Se agrego `backend/tests/test_automation_diagnosis_postgres_repository.py`.
+- Smoke real sobre `team360`:
+  - `migration_004_applied=ok`.
+  - package installation: 9 package workers.
+  - persistencia snapshot: 1 sesion, 10 respuestas, 1 lead y 16 eventos.
+- Validacion:
+  - `python3 -m py_compile` sobre modulos/tests tocados: OK.
+  - `uv run pytest tests/test_automation_diagnosis.py tests/test_automation_diagnosis_postgres_repository.py`: `13 passed`.
+  - `uv run pytest`: `45 passed`.
+  - `uv run python -m scripts.audit_team360_schema`: `102` checks pasados, `0` fallidos, tablas esperadas `001+002+003+004`: `51/51`.
+  - `git diff --check`: OK.
+- No se implementaron ArangoDB, Milvus, LiteLLM real, endpoints Litestar nuevos ni frontend.
+
+### 2026-06-04 - Implementacion base: Team360 como cliente del paquete venta/diagnostico
+
+- Se agrego `backend/modules/automation_diagnosis/assistant_instances.py` con contrato in-memory de `AssistantInstanceConfig` y `PackageWorkerBinding`.
+- Se materializo `team360_sales_diagnosis` como primera instalacion cliente real del paquete `pkg_sales_diagnosis` para el workspace `team360_public_site`, con `knowledge_scope_id = ks_team360_sales_diagnosis`.
+- Se conservaron fixtures/lab existentes mediante `automation_diagnosis_default` y `ks_team360_automation_diagnosis` como compatibilidad explicita.
+- `AutomationDiagnosisService.start_session()` ahora resuelve la configuracion por `assistant_instance_id`, aplica locale soportado, rechaza overrides de scope que no coincidan y propaga organizacion, workspace, canal, lead owner, cost attribution y package workers.
+- Eventos y ficha interna de lead ahora incluyen `organization_id`, `site_channel`, `lead_owner`, `locale`, `package_worker_ids` y `cost_attribution`.
+- El repositorio knowledge in-memory carga scopes por assistant instance para evitar mezclar retrieval entre `ks_team360_sales_diagnosis` y el lab legacy.
+- Se actualizaron tests de `automation_diagnosis` para cubrir Team360 como cliente directo, rechazo de scope mismatch y metadata de ArangoDB/Milvus declarada.
+- Validacion:
+  - `python3 -m py_compile` sobre modulos `automation_diagnosis` y test: OK.
+  - `uv run pytest tests/test_automation_diagnosis.py`: `11 passed`.
+  - `uv run pytest`: `43 passed`.
+- En esa etapa no se implementaron DB writes, migraciones, ArangoDB, Milvus, LiteLLM real, endpoints Litestar nuevos ni frontend.
+
+### 2026-06-04 - Decision documental: RAG inicial de diagnostico con ArangoDB + Milvus
+
+- Se documento la direccion inicial para el asistente inteligente de venta y diagnostico de automatizacion.
+- Se documento el alcance inicial de salida: asistente de venta/diagnostico para Team360 directo y asistente de venta/diagnostico para Mamá Mía 360 como distribuidor regional en Israel, con soporte español, ingles y hebreo.
+- Se fijo que ambos casos deben compartir motor tecnico y separarse por `assistant_instance`, organizacion/workspace, canal, knowledge scope, lead owner y atribucion de costos.
+- Se documento que `team360_sales_diagnosis` debe tratarse como primera instalacion cliente real del paquete de venta/diagnostico, con package workers, scope propio y persistencia/auditoria como cualquier cliente.
+- Se documento la decision inicial para ArangoDB/Milvus: scoping logico obligatorio por organizacion/workspace/assistant/scope y no coleccion fisica por cliente como default.
+- Decision: para acelerar la salida de Team360, el runtime RAG/knowledge inicial replica el patron probado en JudaismoenVivo:
+  - ArangoDB para knowledge graph/documentos de diagnostico.
+  - Milvus para retrieval semantico.
+  - LiteLLM como gateway AI y control de aliases/modelos/costos.
+- PostgreSQL 18 sigue siendo la fuente de verdad transaccional para organizaciones, workspaces, permisos, paquetes, package workers, diagnosticos finales, eventos, auditoria, consumo y billing.
+- `003_team360_pgvector_knowledge_embeddings.sql` queda como capacidad instalada/disponible, pero no como RAG principal de la primera salida.
+- Se agrego `lat.md/ai-diagnosis-rag-runtime.md`.
+- Se actualizo `lat.md/knowledge-rag-graphrag.md`, `lat.md/postgres-ai-persistence.md`, `lat.md/lat.md` y `lat.md/status_actual.md`.
+- Se agrego el analisis no operativo `docs/analisis-tecnico/team360_ai_diagnostico_stack_arango_milvus_litellm.md` y se actualizaron indices/status documentales.
+- No se implemento codigo, no se tocaron DBs, migraciones, backend, frontend ni configuracion de LiteLLM.
 
 ### 2026-06-02 - ConsoleBootstrap Fase C repositories read-only y servicio
 

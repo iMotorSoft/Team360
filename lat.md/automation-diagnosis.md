@@ -4,6 +4,38 @@
 
 It is not an open chatbot. It collects structured information, retrieves Team360 knowledge, asks LiteLLM to interpret and summarize, then classifies with deterministic scoring and rules.
 
+## Commercial Entry Points
+
+The first commercial exits for `automation_diagnosis` are:
+
+```text
+team360_sales_diagnosis
+mamamia360_sales_diagnosis
+```
+
+These are assistant instances, not separate engines.
+
+`team360_sales_diagnosis` serves Team360's direct website and routes leads to Team360.
+
+`mamamia360_sales_diagnosis` serves Mamá Mía 360 as a distributor / regional partner in Israel. It must support Spanish, English and Hebrew, adapt visible tone/branding to Mamá Mía 360, and route commercial opportunities through the partner configuration.
+
+The diagnosis engine must stay channel-aware:
+
+- `organization_id`;
+- `workspace_id`;
+- `assistant_instance_id`;
+- `site_channel`;
+- `partner_id` when applicable;
+- `market_country`;
+- `locale`;
+- `lead_owner`;
+- `knowledge_scope_id`;
+- `allowed_package_ids`.
+
+This preserves the same technical core while allowing Team360 direct sales and partner-distributor sales to scale independently.
+
+The Team360 direct assistant is not an internal demo. It is the first customer package installation of the sales and diagnosis package. See [[customer-packaged-assistant-instance]].
+
 ## Required Outputs
 
 The assistant must produce:
@@ -11,6 +43,8 @@ The assistant must produce:
 1. visible user response;
 2. internal Team360 lead card;
 3. measurable events.
+
+For partner channels, the internal lead card must preserve attribution to the partner, site channel, locale and market. Team360 remains the platform authority and audit owner; the configured partner owns the commercial follow-up when the channel says so.
 
 ## Intake Fields
 

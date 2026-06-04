@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-05-31
+Ultima actualizacion: 2026-06-04
 
 ## Estado general
 
@@ -11,6 +11,49 @@ Ultima actualizacion: 2026-05-31
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-04 - Contrato canonico KnowledgeScope / Document / Chunk / VectorEmbedding
+
+- Se agrego `knowledge-scope-contract.md`.
+- Se formalizo el mapeo del patron probado de JudaismoEnVivo `Catalog -> MD -> Chunk -> Milvus vector` hacia Team360 `KnowledgeScope -> KnowledgeDocument -> KnowledgeChunk -> VectorEmbedding`.
+- Se fijo que `knowledge_scope_id` es el equivalente de `catalog_key`, pero siempre con filtros multi-tenant obligatorios por organizacion, workspace, assistant instance, status y version.
+- Se documento ArangoDB como fuente textual/grafo y Milvus como indice vectorial derivado, no fuente de verdad comercial.
+- Se recomendo persistir `chunk_text` en Team360 para mejorar precision, auditoria, fuentes y control de contexto.
+- Se documento fallback Arango-only y se aclaro que Milvus 2.6 es objetivo de validacion paralela, no migracion automatica.
+- Se reforzo que pgvector queda como laboratorio/fallback y que no se debe migrar ArangoDB a PostgreSQL/JSONB/pgvector ahora.
+- Se actualizaron `lat.md/lat.md`, `knowledge-rag-graphrag.md`, `ai-diagnosis-rag-runtime.md` y `customer-packaged-assistant-instance.md`.
+- No se implemento runtime, drivers ArangoDB/Milvus, migraciones ni cambios de API.
+
+### 2026-06-04 - Persistencia PostgreSQL 004 para automation diagnosis runtime
+
+- Se actualizo `postgres-ai-persistence.md` para reflejar que `004_team360_automation_diagnosis_runtime.sql` fue aplicada sobre `team360`.
+- Se aclaro que la migracion 004 persiste sesiones, respuestas, leads y soporte de package installation para el asistente de venta/diagnostico.
+- LangGraph PostgresSaver queda reservado para una migracion futura separada, ahora referida como `005_team360_langgraph_checkpointing.sql`.
+- PostgreSQL sigue siendo verdad operacional; ArangoDB/Milvus siguen como runtime RAG/knowledge inicial, no como fuente de verdad comercial.
+
+### 2026-06-04 - Team360 como primera instalacion cliente del paquete venta/diagnostico
+
+- Se agrego `customer-packaged-assistant-instance.md`.
+- Se fijo que `team360_sales_diagnosis` no es demo interna ni caso hardcodeado: es la primera instalacion cliente del paquete de venta y diagnostico para el workspace publico de Team360.
+- Se documento la forma canonica: organizacion/workspace, `automation_package`, `assistant_instance`, `package_workers`, `knowledge_scope`, lead owner, costos, eventos y auditoria.
+- Se documento la frontera ArangoDB/Milvus: colecciones compartidas por dominio con filtros obligatorios por organizacion, workspace, assistant instance y knowledge scope; no una coleccion fisica por cliente como default.
+- Se reservaron colecciones/base fisicamente aisladas para enterprise, compliance, volumen alto o contrato dedicado.
+- Se actualizo `lat.md/lat.md`, `automation-diagnosis.md` y `ai-diagnosis-rag-runtime.md`.
+- No se implemento codigo, no se tocaron DBs ni migraciones.
+
+### 2026-06-04 - Runtime RAG inicial para diagnostico: ArangoDB + Milvus + LiteLLM
+
+- Se agrego `ai-diagnosis-rag-runtime.md`.
+- Se documento como decision estable que el primer servicio de asistente inteligente de venta y diagnostico de automatizacion debe acelerar salida reutilizando el patron probado en JudaismoenVivo: ArangoDB + Milvus + LiteLLM.
+- Se documento el alcance comercial inicial: asistente `team360_sales_diagnosis` para venta directa Team360 y asistente `mamamia360_sales_diagnosis` para Mamá Mía 360 como distribuidor regional en Israel, con soporte español, ingles y hebreo.
+- Se fijo que ambos asistentes comparten motor tecnico y difieren por configuracion de organizacion, workspace, canal, marca, mercado, locale, paquetes, knowledge scope, lead owner y atribucion de costos.
+- Se fijo que PostgreSQL 18 sigue siendo la fuente de verdad transaccional para organizaciones, workspaces, permisos, paquetes, workers, diagnosticos, eventos, auditoria, costos y billing.
+- Se aclaro que `003_team360_pgvector_knowledge_embeddings.sql` deja pgvector disponible, pero no como RAG principal de la primera salida.
+- Se actualizo `console-multi-organization.md` y `automation-diagnosis.md` con la frontera de canal directo / partner.
+- Se actualizo `knowledge-rag-graphrag.md` con la frontera del runtime inicial.
+- Se actualizo `postgres-ai-persistence.md` para alinear pgvector como capacidad instalada/futura y no como runtime RAG primario inicial.
+- Se actualizo `lat.md/lat.md` con la nueva referencia `[[ai-diagnosis-rag-runtime]]`.
+- No se implemento codigo, no se tocaron DBs ni migraciones.
 
 ### 2026-06-02 - Pydantic Boundary: Pydantic no es obligatorio en repositorios ni dominio
 

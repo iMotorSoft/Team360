@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from .ai_interpreter import AIInterpreterPort, build_ai_interpreter
+from .assistant_instances import resolve_assistant_instance_config
 from .answer_collector import answers_as_text, normalize_answer
 from .classifier import classify_session
 from .events import InMemoryEventRecorder
@@ -15,9 +16,7 @@ from .repository import InMemoryDiagnosisRepository
 from .result_generator import generate_user_result
 from .schemas import (
     DEFAULT_ASSISTANT_INSTANCE_ID,
-    DEFAULT_AUTOMATION_PACKAGE_ID,
     DEFAULT_KNOWLEDGE_SCOPE_ID,
-    DEFAULT_WORKSPACE_ID,
     DiagnosisSession,
     new_id,
     to_dict,
@@ -42,17 +41,47 @@ class AutomationDiagnosisService:
         self.ai_interpreter = ai_interpreter or build_ai_interpreter()
 
     def start_session(self, payload: dict[str, Any]) -> dict[str, Any]:
+        # @lat: [[customer-packaged-assistant-instance#Required Runtime Context]]
+        config = resolve_assistant_instance_config(payload, DEFAULT_ASSISTANT_INSTANCE_ID)
+        locale = config.resolve_locale(payload.get("locale"))
         session = DiagnosisSession(
             id=new_id("diag"),
-            workspace_id=payload.get("workspace_id") or DEFAULT_WORKSPACE_ID,
-            assistant_instance_id=payload.get("assistant_instance_id") or DEFAULT_ASSISTANT_INSTANCE_ID,
-            automation_package_id=payload.get("automation_package_id") or DEFAULT_AUTOMATION_PACKAGE_ID,
-            knowledge_scope_id=payload.get("knowledge_scope_id") or DEFAULT_KNOWLEDGE_SCOPE_ID,
+            organization_id=config.organization_id,
+            workspace_id=config.workspace_id,
+            assistant_instance_id=config.assistant_instance_id,
+            automation_package_id=config.automation_package_id,
+            knowledge_scope_id=config.knowledge_scope_id,
             source_url=payload.get("source_url") or "",
+            site_channel=config.site_channel,
+            lead_owner=config.lead_owner,
+            locale=locale,
+            market=config.market,
             visitor=payload.get("visitor") or {},
+            package_worker_ids=config.package_worker_ids(),
+            cost_attribution={
+                "cost_center": config.cost_center,
+                "lead_owner": config.lead_owner,
+                "market": config.market,
+                "site_channel": config.site_channel,
+            },
+            metadata={
+                "assistant_instance": config.to_session_metadata(),
+                "organization_name": config.organization_name,
+                "workspace_name": config.workspace_name,
+                "automation_package_name": config.automation_package_name,
+            },
         )
         self.repository.save_session(session)
-        self.event_recorder.emit(session, "automation_diagnosis.session_started")
+        self.event_recorder.emit(
+            session,
+            "automation_diagnosis.session_started",
+            {
+                "site_channel": session.site_channel,
+                "lead_owner": session.lead_owner,
+                "locale": session.locale,
+                "package_worker_ids": session.package_worker_ids,
+            },
+        )
         return self.get_session(session.id)
 
     def get_session(self, session_id: str) -> dict[str, Any]:

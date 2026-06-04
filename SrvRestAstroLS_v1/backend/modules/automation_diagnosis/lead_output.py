@@ -14,10 +14,17 @@ def build_internal_card(
     signals = interpretation.signals
     return {
         "lead_type": "automation_opportunity",
+        "organization_id": session.organization_id,
         "workspace_id": session.workspace_id,
         "assistant_instance_id": session.assistant_instance_id,
         "automation_package_id": session.automation_package_id,
         "knowledge_scope_id": session.knowledge_scope_id,
+        "site_channel": session.site_channel,
+        "lead_owner": session.lead_owner,
+        "locale": session.locale,
+        "market": session.market,
+        "package_worker_ids": session.package_worker_ids,
+        "cost_attribution": session.cost_attribution,
         "session_id": session.id,
         "correlation_id": session.correlation_id,
         "process": _answer_text(session, "process_to_automate") or signals.get("process"),

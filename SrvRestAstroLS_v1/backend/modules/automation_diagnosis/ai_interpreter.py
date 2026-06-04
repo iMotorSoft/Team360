@@ -16,7 +16,11 @@ from .retrieval import retrieved_context_as_prompt
 from .schemas import AIInterpretation, DiagnosisSession, RetrievedContext
 
 
-DEFAULT_TEXT_MODEL = "automation_diagnosis_text"
+DEFAULT_TEXT_MODEL = "openrouter_qwen3_30b_a3b_thinking_2507"
+
+
+class AIInterpretationError(RuntimeError):
+    """Raised when the configured AI provider cannot produce a safe interpretation."""
 
 
 class AIInterpreterPort(Protocol):
@@ -77,17 +81,52 @@ def _fallback_systems_from_text(text: str) -> list[str]:
     return [item for item in known if re.search(rf"\b{re.escape(item)}\b", lowered)]
 
 
+def _env_flag(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _resolve_text_model(model: str | None = None) -> str:
+    return (
+        model
+        or os.environ.get("TEAM360_LITELLM_MODEL_ALIAS")
+        or os.environ.get("TEAM360_AUTOMATION_DIAGNOSIS_TEXT_MODEL")
+        or DEFAULT_TEXT_MODEL
+    )
+
+
+def _metadata_for_session(session: DiagnosisSession, model_alias: str) -> dict[str, str]:
+    return {
+        "feature": "automation_diagnosis",
+        "phase": "ai_interpretation",
+        "organization_id": session.organization_id,
+        "workspace_id": session.workspace_id,
+        "assistant_instance_id": session.assistant_instance_id,
+        "automation_package_id": session.automation_package_id,
+        "knowledge_scope_id": session.knowledge_scope_id,
+        "session_id": session.id,
+        "correlation_id": session.correlation_id,
+        "model_alias": model_alias,
+    }
+
+
 class LiteLLMAIInterpreter:
     # @lat: [[ai-litellm#AI LiteLLM#Adapter Rule]]
-    def __init__(self, client: LiteLLMClient | None = None, model: str | None = None) -> None:
+    def __init__(
+        self,
+        client: LiteLLMClient | None = None,
+        model: str | None = None,
+        fallback_interpreter: AIInterpreterPort | None = None,
+    ) -> None:
         self.client = client
-        self.model = model or os.environ.get("TEAM360_AUTOMATION_DIAGNOSIS_TEXT_MODEL", DEFAULT_TEXT_MODEL)
+        self.model = _resolve_text_model(model)
+        self.fallback_interpreter = fallback_interpreter
 
     def interpret(self, session: DiagnosisSession, context: RetrievedContext) -> AIInterpretation:
-        client = self.client or LiteLLMClient()
-        answers_text = answers_as_text(session.answers)
-        context_text = retrieved_context_as_prompt(context)
-        user_prompt = f"""
+        try:
+            client = self.client or LiteLLMClient()
+            answers_text = answers_as_text(session.answers)
+            context_text = retrieved_context_as_prompt(context)
+            user_prompt = f"""
 Contexto RAG:
 {context_text or "(sin contexto recuperado)"}
 
@@ -96,25 +135,36 @@ Respuestas del diagnostico:
 
 Genera interpretacion estructurada para Team360.
 """
-        response = client.chat_completion(
-            self.model,
-            [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt},
-            ],
-            correlation_id=session.correlation_id,
-        )
-        parsed = _extract_first_json_object(response.content)
-        return AIInterpretation(
-            provider="litellm",
-            model=response.model,
-            summary=str(parsed.get("summary") or ""),
-            signals=dict(parsed.get("signals") or {}),
-            risks=[str(item) for item in parsed.get("risks") or []],
-            usage=response.usage,
-            latency_ms=response.latency_ms,
-            raw={"parsed": parsed},
-        )
+            response = client.chat_completion(
+                self.model,
+                [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                correlation_id=session.correlation_id,
+                metadata=_metadata_for_session(session, self.model),
+            )
+            parsed = _extract_first_json_object(response.content)
+            return AIInterpretation(
+                provider="litellm",
+                model=response.model,
+                summary=str(parsed.get("summary") or ""),
+                signals=dict(parsed.get("signals") or {}),
+                risks=[str(item) for item in parsed.get("risks") or []],
+                usage=response.usage,
+                latency_ms=response.latency_ms,
+                raw={"parsed": parsed},
+            )
+        except Exception as exc:
+            if _env_flag("TEAM360_LITELLM_FALLBACK_TO_MOCK"):
+                fallback = (self.fallback_interpreter or MockAIInterpreter()).interpret(session, context)
+                fallback.raw["fallback_from"] = "litellm"
+                fallback.raw["litellm_error"] = str(exc)
+                fallback.raw["model_alias"] = self.model
+                return fallback
+            if isinstance(exc, AIInterpretationError):
+                raise
+            raise AIInterpretationError(f"LiteLLM interpretation failed: {exc}") from exc
 
 
 class MockAIInterpreter:
@@ -148,7 +198,7 @@ class NoopAIInterpreter:
 
 
 def build_ai_interpreter(provider: str | None = None) -> AIInterpreterPort:
-    selected = (provider or os.environ.get("TEAM360_AI_PROVIDER", "litellm")).strip().lower()
+    selected = (provider or os.environ.get("TEAM360_AI_PROVIDER") or "mock").strip().lower()
     if selected == "litellm":
         return LiteLLMAIInterpreter()
     if selected == "mock":

@@ -1,0 +1,41 @@
+import { defineConfig, devices } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "./e2e",
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
+  fullyParallel: false,
+  retries: 0,
+  workers: 1,
+  reporter: [
+    ["list"],
+    ["html", { outputFolder: "playwright-report" }],
+  ],
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+  ],
+  use: {
+    baseURL: "http://localhost:4321",
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
+  },
+  webServer: [
+    {
+      command:
+        "cd ../backend && AUTOMATION_DIAGNOSIS_REPOSITORY=memory uv run uvicorn app:app --host 127.0.0.1 --port 8000",
+      port: 8000,
+      timeout: 30_000,
+      reuseExistingServer: true,
+    },
+    {
+      command: "corepack pnpm dev",
+      port: 4321,
+      timeout: 30_000,
+      reuseExistingServer: true,
+    },
+  ],
+});

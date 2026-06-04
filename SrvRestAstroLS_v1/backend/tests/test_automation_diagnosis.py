@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from modules.automation_diagnosis.ai_interpreter import MockAIInterpreter
+from modules.automation_diagnosis.assistant_instances import get_assistant_instance_config
 from modules.automation_diagnosis.answer_collector import normalize_answer
 from modules.automation_diagnosis.chunker import chunk_document
 from modules.automation_diagnosis.document_loader import default_knowledge_scope
@@ -27,6 +28,82 @@ def run_fixture(name):
     for answer in payload["answers"]:
         service.save_answer(session_id, answer)
     return service.classify(session_id)
+
+
+def direct_sales_payload(fixture_name="standard_package"):
+    payload = json.loads((FIXTURES / f"{fixture_name}.json").read_text())
+    for key in ("workspace_id", "assistant_instance_id", "automation_package_id", "knowledge_scope_id"):
+        payload.pop(key, None)
+    payload["source_url"] = "https://team360.live"
+    payload["locale"] = "es"
+    payload["visitor"] = {"source": "public_site"}
+    return payload
+
+
+def test_default_session_uses_team360_direct_package_installation():
+    service = build_service()
+    started = service.start_session({"source_url": "https://team360.live", "locale": "es"})
+
+    assert started["organization_id"] == "org_team360"
+    assert started["workspace_id"] == "team360_public_site"
+    assert started["assistant_instance_id"] == "team360_sales_diagnosis"
+    assert started["automation_package_id"] == "pkg_sales_diagnosis"
+    assert started["knowledge_scope_id"] == "ks_team360_sales_diagnosis"
+    assert started["site_channel"] == "team360.live"
+    assert started["lead_owner"] == "Team360"
+    assert started["locale"] == "es"
+    assert "pw_team360_lead_qualification" in started["package_worker_ids"]
+    assert started["cost_attribution"]["cost_center"] == "team360_direct_sales"
+
+    event = started["events"][0]
+    assert event["organization_id"] == "org_team360"
+    assert event["site_channel"] == "team360.live"
+    assert event["payload"]["package_worker_ids"] == started["package_worker_ids"]
+
+
+def test_team360_direct_classification_preserves_customer_attribution():
+    payload = direct_sales_payload()
+    service = build_service()
+    started = service.start_session(payload)
+    session_id = started["id"]
+    for answer in payload["answers"]:
+        service.save_answer(session_id, answer)
+
+    result = service.classify(session_id)
+    card = result["internal_card"]
+
+    assert result["retrieved_context"]["knowledge_scope_id"] == "ks_team360_sales_diagnosis"
+    assert card["organization_id"] == "org_team360"
+    assert card["workspace_id"] == "team360_public_site"
+    assert card["assistant_instance_id"] == "team360_sales_diagnosis"
+    assert card["automation_package_id"] == "pkg_sales_diagnosis"
+    assert card["knowledge_scope_id"] == "ks_team360_sales_diagnosis"
+    assert card["site_channel"] == "team360.live"
+    assert card["lead_owner"] == "Team360"
+    assert card["locale"] == "es"
+    assert card["cost_attribution"]["cost_center"] == "team360_direct_sales"
+    assert "pw_team360_package_recommendation" in card["package_worker_ids"]
+
+
+def test_start_session_rejects_scope_override_that_does_not_match_assistant_instance():
+    service = build_service()
+    with pytest.raises(ValueError, match="knowledge_scope_id"):
+        service.start_session(
+            {
+                "assistant_instance_id": "team360_sales_diagnosis",
+                "knowledge_scope_id": "ks_team360_automation_diagnosis",
+            }
+        )
+
+
+def test_team360_direct_config_documents_arangodb_and_milvus_scope_rules():
+    config = get_assistant_instance_config("team360_sales_diagnosis")
+
+    assert config.arangodb_scope["physical_collection_per_customer"] is False
+    assert "diagnosis_vertices" in config.arangodb_scope["collections"]
+    assert "knowledge_scope_id" in config.arangodb_scope["scope_filter_fields"]
+    assert config.milvus_scope["collection"] == "team360_diagnosis_chunks"
+    assert "assistant_instance_id" in config.milvus_scope["required_filter_fields"]
 
 
 def test_normalize_answer_rejects_unknown_step():

@@ -8,10 +8,11 @@ from typing import Any
 from uuid import uuid4
 
 
-DEFAULT_WORKSPACE_ID = "team360_internal"
-DEFAULT_ASSISTANT_INSTANCE_ID = "automation_diagnosis_default"
-DEFAULT_AUTOMATION_PACKAGE_ID = "pkg_team360_automation_diagnosis"
-DEFAULT_KNOWLEDGE_SCOPE_ID = "ks_team360_automation_diagnosis"
+DEFAULT_ORGANIZATION_ID = "org_team360"
+DEFAULT_WORKSPACE_ID = "team360_public_site"
+DEFAULT_ASSISTANT_INSTANCE_ID = "team360_sales_diagnosis"
+DEFAULT_AUTOMATION_PACKAGE_ID = "pkg_sales_diagnosis"
+DEFAULT_KNOWLEDGE_SCOPE_ID = "ks_team360_sales_diagnosis"
 
 RETRIEVAL_MODES = {"none", "rag", "graphrag", "hybrid"}
 CLASSIFICATIONS = {
@@ -89,12 +90,20 @@ class DiagnosisAnswer:
 @dataclass
 class DiagnosisSession:
     id: str
+    organization_id: str
     workspace_id: str
     assistant_instance_id: str
     automation_package_id: str
     knowledge_scope_id: str
     source_url: str = ""
+    site_channel: str = ""
+    lead_owner: str = ""
+    locale: str = "es"
+    market: str = ""
     visitor: dict[str, Any] = field(default_factory=dict)
+    package_worker_ids: list[str] = field(default_factory=list)
+    cost_attribution: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     status: str = "active"
     correlation_id: str = field(default_factory=lambda: new_id("corr"))
     answers: dict[str, DiagnosisAnswer] = field(default_factory=dict)
@@ -149,6 +158,7 @@ class ClassificationResult:
 @dataclass
 class DiagnosisEvent:
     event_name: str
+    organization_id: str
     workspace_id: str
     assistant_instance_id: str
     automation_package_id: str
@@ -156,4 +166,7 @@ class DiagnosisEvent:
     correlation_id: str
     payload: dict[str, Any] = field(default_factory=dict)
     knowledge_scope_id: str | None = None
+    site_channel: str = ""
+    lead_owner: str = ""
+    locale: str = ""
     timestamp_utc: str = field(default_factory=utc_now_iso)

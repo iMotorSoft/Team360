@@ -33,4 +33,5 @@ export const ROUTES = {
   workspace: (workspaceId) => `/w/${workspaceId}`,
   workspaceServices: (workspaceId) => `/w/${workspaceId}/services`,
   workspaceReports: (workspaceId) => `/w/${workspaceId}/reports`,
+  workspaceDiagnosis: (workspaceId) => `/w/${workspaceId}/diagnosis`,
 };

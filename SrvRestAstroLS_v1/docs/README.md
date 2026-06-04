@@ -5,7 +5,8 @@ Documentacion transversal del proyecto Team360.
 ## Documentos tecnicos
 
 - `automation_diagnosis_fase1.md`: modulo de diagnostico de automatizacion con LiteLLM, RAG simple, scoring deterministico y contratos preparados para multi-paquete / multi-worker.
-- `postgresql_live_team360_setup.md`: inicializacion de la DB viva `team360`, aplicacion de la migracion 001 y audit post-migracion.
+- `postgresql_live_team360_setup.md`: inicializacion de la DB viva `team360`, aplicacion de migraciones 001-004 y auditorias post-migracion.
+- `postgresql_004_automation_diagnosis_runtime.md`: persistencia runtime del asistente de venta/diagnostico, sesiones, respuestas, leads, eventos y package installation `team360_sales_diagnosis`.
 - `frontend_phase1_astro_svelte_tailwind_daisyui.md`: scaffold tecnico inicial con pnpm, Astro, Svelte 5, Tailwind CSS 4, DaisyUI 5, wrappers UI y reserva AG-UI.
 - `frontend_home_team360_live_phase.md`: primera home comercial publica de `team360.live`, layout publico, copy, componentes marketing y validacion responsive.
 - `console_mock_context_i18n_phase.md`: base funcional de diseño para Team360 Console con configuración global, mock data multi-organización, bootstrap por perfil, store Svelte 5 con Runes e i18n inicial `es`/`en`/`he`.

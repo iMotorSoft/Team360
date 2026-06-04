@@ -29,4 +29,5 @@ export const messagesHe = {
   "common.noData": "אין עדיין נתונים להצגה",
   "common.retry": "נסה שוב",
   "common.support": "פנייה לתמיכה",
+  "nav.diagnosis": "אבחון",
 } as const;

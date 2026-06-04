@@ -43,6 +43,26 @@ A partner can administer its own organization and its authorized descendants. It
 
 `Mamá Mía 360` is the first concrete `partner` instance for region `Israel`. It must remain configuration data, never hardcoded product logic.
 
+## Sales Channel Invariant
+
+The first intelligent sales and automation diagnosis assistants must validate the multi-organization model with two channels:
+
+```text
+Team360 direct channel
+  -> assistant_instance: team360_sales_diagnosis
+  -> lead owner: Team360
+
+Mamá Mía 360 partner channel
+  -> assistant_instance: mamamia360_sales_diagnosis
+  -> lead owner: Mamá Mía 360
+  -> region: Israel
+  -> supported locales: es, en, he
+```
+
+Both assistants use the same Team360 diagnosis engine. They differ by configuration: organization, workspace, site channel, brand, market, locale policy, services catalog, allowed packages, knowledge scope, lead routing, cost attribution and commercial ownership.
+
+Do not fork product logic for Mamá Mía 360. It is a distributor / regional partner configuration for Israel, serving Spanish-speaking customers and also supporting English and Hebrew.
+
 ## Organization vs Workspace
 
 `organization` is the commercial, contractual and hierarchical entity.

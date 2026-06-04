@@ -25,12 +25,46 @@ backend/modules/automation_diagnosis/
 
 Incluye flujo guiado, adapter LiteLLM/mock/noop, knowledge scope interno, carga de Markdown, chunking, retrieval simple, scoring y classifier deterministico, respuesta visible, ficha interna, eventos in-memory, repositorio in-memory, funciones de ruta y tests.
 
-## Knowledge Scope
+Tambien incluye un contrato in-memory de `assistant_instance` para tratar a `team360_sales_diagnosis` como primera instalacion cliente real del paquete de venta y diagnostico, no como demo interna.
 
-Scope inicial:
+## Instalacion cliente Team360 directo
+
+La salida directa de Team360 se modela como paquete instalado para el propio Team360 como cliente:
 
 ```text
-ks_team360_automation_diagnosis
+organization_id: org_team360
+workspace_id: team360_public_site
+automation_package_id: pkg_sales_diagnosis
+assistant_instance_id: team360_sales_diagnosis
+knowledge_scope_id: ks_team360_sales_diagnosis
+site_channel: team360.live
+lead_owner: Team360
+locale default: es
+```
+
+Workers internos vinculados por package worker:
+
+```text
+guided_intake_worker
+lead_qualification_worker
+knowledge_retrieval_worker
+diagnosis_scoring_worker
+package_recommendation_worker
+proposal_outline_worker
+crm_handoff_worker
+calendar_handoff_worker
+agui_render_worker
+```
+
+La resolucion de sesion rechaza overrides de `workspace_id`, `automation_package_id` o `knowledge_scope_id` que no coincidan con la configuracion del `assistant_instance`, para evitar retrieval o auditoria cruzada entre scopes.
+
+## Knowledge Scope
+
+Scopes iniciales:
+
+```text
+ks_team360_sales_diagnosis
+ks_team360_automation_diagnosis  # compatibilidad de fixtures/lab interno
 ```
 
 Modo:
@@ -81,6 +115,17 @@ Fallback local:
 - `TEAM360_AI_PROVIDER=mock`
 - `TEAM360_AI_PROVIDER=none`
 
+## ArangoDB y Milvus preparados
+
+Fase 1 no conecta todavia ArangoDB ni Milvus reales, pero la configuracion de `team360_sales_diagnosis` ya declara:
+
+- colecciones ArangoDB compartidas por dominio (`diagnosis_vertices`, `diagnosis_edges`, `diagnosis_documents`, `diagnosis_playbooks`);
+- `physical_collection_per_customer = false` como default;
+- filtros obligatorios por `organization_id`, `workspace_id`, `assistant_instance_id` y `knowledge_scope_id`;
+- coleccion Milvus `team360_diagnosis_chunks` con `knowledge_scope_id` como particion/filtro principal.
+
+PostgreSQL sigue siendo la fuente de verdad para sesiones, resultados, leads, eventos, costos y auditoria cuando se implemente persistencia real.
+
 ## Contrato Conceptual Multi-paquete
 
 Fase 1 no implementa workers externos ni colas, pero deja los nombres preparados:
@@ -121,6 +166,36 @@ not_recommended
 
 Tambien produce paquete recomendado, workers sugeridos, config requerida de `package_worker`, referencias de credenciales, scope de conocimiento, modo operativo, riesgos, acciones bloqueadas y si requiere aprobacion humana.
 
+## Persistencia PostgreSQL
+
+Fase 1 ya tiene repository async de escritura:
+
+```text
+backend/modules/automation_diagnosis/postgres_repository.py
+```
+
+Operaciones principales:
+
+- `upsert_package_installation()`: instala/actualiza `team360_sales_diagnosis` como paquete cliente real en PostgreSQL;
+- `persist_session_snapshot()`: persiste sesion, respuestas, lead y eventos en `core_events`;
+- todo SQL queda dentro del repository y recibe una `AsyncConnection` externa.
+
+Migracion aplicada:
+
+```text
+004_team360_automation_diagnosis_runtime.sql
+```
+
+Smoke real sobre `team360`:
+
+```text
+package_workers=9
+sessions=1
+answers=10
+leads=1
+events=16
+```
+
 ## Rutas Preparadas
 
 Archivo:
@@ -160,13 +235,14 @@ uv run pytest tests/test_automation_diagnosis.py
 Resultado observado:
 
 ```text
-7 passed
+11 passed
 ```
 
 ## Limitaciones
 
-- Persistencia in-memory.
-- Eventos in-memory.
+- Persistencia runtime PostgreSQL disponible via repository async; el servicio actual mantiene cache in-memory para la sesion activa.
+- Eventos in-memory en el servicio actual, persistibles a `core_events` via snapshot.
+- Contrato `assistant_instance` in-memory; repository PostgreSQL ya puede instalarlo/persistirlo, pero el servicio sync actual todavia no lo lee desde DB al iniciar.
 - Sin GraphRAG real todavia.
 - Sin embeddings ni pgvector en runtime.
 - Rutas no montadas en app Litestar productiva.
@@ -176,8 +252,8 @@ Resultado observado:
 
 ## Proximos Pasos
 
-1. Montar rutas en Litestar.
-2. Agregar persistencia Postgres para sesiones, respuestas, resultados, eventos y knowledge.
+1. Diseñar migracion/repositories para persistir `assistant_instance`, package workers, sesiones, respuestas, resultados, eventos y knowledge en PostgreSQL.
+2. Montar rutas en Litestar.
 3. Registrar uso LLM en `llm_usage_logs` cuando la DB este activa.
 4. Agregar UI demo aislada en Astro/Svelte.
 5. Migrar retrieval simple a embeddings/pgvector si corresponde.

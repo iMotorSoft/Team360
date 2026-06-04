@@ -21,6 +21,7 @@
   import Topbar from "./Topbar.svelte";
   import WorkersList from "./workers/WorkersList.svelte";
   import ConsoleDashboard from "./dashboard/ConsoleDashboard.svelte";
+  import ConsoleDiagnosis from "./diagnosis/ConsoleDiagnosis.svelte";
 
   let {
     view,
@@ -97,6 +98,8 @@
             <WorkersList />
           {:else if view === "runs"}
             <RunsList />
+          {:else if view === "diagnosis"}
+            <ConsoleDiagnosis />
           {:else}
             <ConsoleSectionPage {view} />
           {/if}

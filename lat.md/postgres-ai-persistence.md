@@ -21,7 +21,7 @@ It stores:
 - audit trails;
 - knowledge scopes;
 - knowledge documents and chunks;
-- embeddings through pgvector;
+- embeddings through pgvector when a PostgreSQL-backed knowledge scope explicitly uses it;
 - future LangGraph checkpoints through PostgresSaver.
 
 Rule:
@@ -69,14 +69,28 @@ Expected scope:
 
 Migration 003 materializes embeddings in `public.knowledge_chunk_embeddings`. It prepares persistence and retrieval indexes only; it does not generate embeddings or implement GraphRAG.
 
+Important runtime boundary:
+
+```text
+pgvector is installed and available, but it is not the primary RAG runtime for the first automation diagnosis release.
+```
+
+The initial diagnosis RAG runtime is defined in [[ai-diagnosis-rag-runtime]] and uses:
+
+```text
+ArangoDB + Milvus + LiteLLM
+```
+
+PostgreSQL remains the operational source of truth. ArangoDB and Milvus are specialized knowledge/retrieval layers for accelerating the first diagnosis service. pgvector remains available for fallback, smaller internal knowledge scopes, experiments or future consolidation.
+
 ## LangGraph Phase
 
 LangGraph PostgresSaver must be introduced only in a later migration, separated from the Team360 core model.
 
-Suggested phase:
+Suggested later phase:
 
 ```text
-004_team360_langgraph_checkpointing.sql
+005_team360_langgraph_checkpointing.sql
 ```
 
 Recommended schema:
@@ -112,14 +126,14 @@ or a dedicated table:
 task_run_langgraph_refs
 ```
 
-The final shape belongs to migration 004.
+The final shape belongs to a later LangGraph migration.
 
 ## Schema Model
 
 Recommended schema split:
 
 ```text
-public      -> Team360 core tables and migrations 001/002/003
+public      -> Team360 core tables and migrations 001/002/003/004
 langgraph   -> LangGraph PostgresSaver checkpoint tables
 public or future embeddings schema -> pgvector-backed embedding storage
 ```
@@ -147,7 +161,8 @@ Do not depend on `pg_checkpointer` until availability and usefulness are confirm
 Safe decision:
 
 - PostgreSQL 18 as the transactional core;
-- pgvector for embeddings through migration 003;
+- pgvector available through migration 003, but not the primary RAG runtime for the first automation diagnosis release;
+- ArangoDB + Milvus as the initial diagnosis knowledge/retrieval runtime, per [[ai-diagnosis-rag-runtime]];
 - LangGraph PostgresSaver for checkpoints in a future migration;
 - `pg_checkpointer` only if verified and justified.
 
@@ -159,7 +174,8 @@ Current known sequence:
 001_team360_core_schema.sql                      -> applied to team360
 002_team360_rbac_packages_workers_knowledge.sql  -> applied to team360
 003_team360_pgvector_knowledge_embeddings.sql    -> applied to team360
-004_team360_langgraph_checkpointing.sql          -> future
+004_team360_automation_diagnosis_runtime.sql     -> applied to team360
+005_team360_langgraph_checkpointing.sql          -> future
 ```
 
-Migration 002 did not include pgvector or LangGraph. Migration 003 covers pgvector embeddings only. Migration 004 remains the boundary for LangGraph checkpointing.
+Migration 002 did not include pgvector or LangGraph. Migration 003 covers pgvector embeddings only. Migration 004 persists automation diagnosis runtime sessions, answers, leads and package-installation support. LangGraph checkpointing remains a future separate boundary.

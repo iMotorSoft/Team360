@@ -12,6 +12,11 @@ from typing import Any
 
 
 DEFAULT_LITELLM_BASE_URL = "http://localhost:4000/v1"
+DEFAULT_LITELLM_TIMEOUT_SECONDS = 45.0
+
+
+class LiteLLMClientError(RuntimeError):
+    """Raised when the LiteLLM proxy returns an unusable response."""
 
 
 @dataclass
@@ -30,40 +35,35 @@ def normalize_base_url(value: str) -> str:
     return base
 
 
-def _read_interactive_shell_env(name: str) -> str:
-    # Keep this as a best-effort fallback for local developer shells where the
-    # LiteLLM key is exported from .bashrc but not inherited by the process.
-    import subprocess
-
-    try:
-        result = subprocess.run(
-            ["bash", "-ic", f'printf %s "${{{name}:-}}"'],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=3,
-        )
-    except Exception:
-        return ""
-    return result.stdout.strip()
-
-
 def get_litellm_api_key() -> str:
     value = (
         os.environ.get("TEAM360_LITELLM_API_KEY")
         or os.environ.get("LITELLM_API_KEY")
         or os.environ.get("LITELLM_MASTER_KEY")
-        or _read_interactive_shell_env("LITELLM_MASTER_KEY")
     )
     if not value:
-        raise RuntimeError("LiteLLM API key not configured")
+        raise LiteLLMClientError("LiteLLM API key not configured")
     return value
 
 
+def get_litellm_timeout_seconds() -> float:
+    raw_value = os.environ.get("TEAM360_LITELLM_TIMEOUT_SECONDS")
+    if raw_value in (None, ""):
+        return DEFAULT_LITELLM_TIMEOUT_SECONDS
+    try:
+        timeout = float(raw_value)
+    except ValueError as exc:
+        raise LiteLLMClientError("TEAM360_LITELLM_TIMEOUT_SECONDS must be numeric") from exc
+    if timeout <= 0:
+        raise LiteLLMClientError("TEAM360_LITELLM_TIMEOUT_SECONDS must be greater than zero")
+    return timeout
+
+
 class LiteLLMClient:
-    def __init__(self, base_url: str | None = None, api_key: str | None = None) -> None:
+    def __init__(self, base_url: str | None = None, api_key: str | None = None, timeout_seconds: float | None = None) -> None:
         self.base_url = normalize_base_url(base_url or os.environ.get("TEAM360_LITELLM_BASE_URL", DEFAULT_LITELLM_BASE_URL))
         self.api_key = api_key or get_litellm_api_key()
+        self.timeout_seconds = timeout_seconds if timeout_seconds is not None else get_litellm_timeout_seconds()
 
     def chat_completion(
         self,
@@ -73,6 +73,7 @@ class LiteLLMClient:
         temperature: float = 0.2,
         max_tokens: int = 1800,
         correlation_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> LiteLLMResponse:
         payload = {
             "model": model,
@@ -80,12 +81,25 @@ class LiteLLMClient:
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
+        if metadata:
+            payload["metadata"] = metadata
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
         if correlation_id:
             headers["X-Correlation-ID"] = correlation_id
+        if metadata:
+            metadata_headers = {
+                "organization_id": "X-Team360-Organization-ID",
+                "workspace_id": "X-Team360-Workspace-ID",
+                "assistant_instance_id": "X-Team360-Assistant-Instance-ID",
+                "knowledge_scope_id": "X-Team360-Knowledge-Scope-ID",
+            }
+            for key, header_name in metadata_headers.items():
+                value = metadata.get(key)
+                if value:
+                    headers[header_name] = str(value)
         request = urllib.request.Request(
             f"{self.base_url}/chat/completions",
             data=json.dumps(payload).encode("utf-8"),
@@ -94,11 +108,17 @@ class LiteLLMClient:
         )
         start = time.perf_counter()
         try:
-            with urllib.request.urlopen(request, timeout=90) as response:
-                response_payload = json.loads(response.read().decode("utf-8"))
+            with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
+                raw_body = response.read().decode("utf-8")
         except urllib.error.HTTPError as exc:
             body = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"LiteLLM HTTP {exc.code}: {body[:500]}") from exc
+            raise LiteLLMClientError(f"LiteLLM HTTP {exc.code}: {body[:500]}") from exc
+        except (TimeoutError, urllib.error.URLError) as exc:
+            raise LiteLLMClientError(f"LiteLLM request failed: {exc}") from exc
+        try:
+            response_payload = json.loads(raw_body)
+        except json.JSONDecodeError as exc:
+            raise LiteLLMClientError("LiteLLM returned invalid JSON") from exc
         latency_ms = int((time.perf_counter() - start) * 1000)
         message = response_payload.get("choices", [{}])[0].get("message", {})
         return LiteLLMResponse(

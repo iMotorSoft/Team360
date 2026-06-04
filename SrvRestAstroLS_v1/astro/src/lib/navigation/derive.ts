@@ -34,6 +34,7 @@ const routeSuffixByView: Record<ConsoleView, string> = {
   team: "/team",
   support: "/support",
   settings: "/settings",
+  diagnosis: "/diagnosis",
 };
 
 export function deriveConsoleAudience(bootstrap: ConsoleBootstrap): ConsoleAudience {

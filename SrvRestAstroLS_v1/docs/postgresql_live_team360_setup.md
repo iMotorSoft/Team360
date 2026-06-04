@@ -247,7 +247,7 @@ Resultado observado:
 - sin datos reales de clientes;
 - tablas operativas de 002 en 0 filas.
 
-Siguiente fase recomendada: disenar `004_team360_langgraph_checkpointing.sql` despues de validar uso real de embeddings y retrieval.
+Siguiente fase recomendada despues de 002 fue aplicar pgvector en 003; LangGraph queda reservado para una fase posterior separada.
 
 ## Roadmap Posterior A 002
 
@@ -258,7 +258,12 @@ Despues de aplicar y auditar la migracion 002, las fases de persistencia AI se m
    - mantuvo `knowledge_scopes`, `knowledge_documents` y `knowledge_chunks` como modelo de dominio;
    - ubico embeddings en `public` mediante tabla separada `knowledge_chunk_embeddings`.
 
-2. `004_team360_langgraph_checkpointing.sql` - pendiente
+2. `004_team360_automation_diagnosis_runtime.sql` - aplicada
+   - persistio sesiones, respuestas y leads del asistente de venta/diagnostico;
+   - agrego `assistant_code` y soporte de instalacion paquetizada para `team360_sales_diagnosis`;
+   - mantiene `core_events` como auditoria.
+
+3. `005_team360_langgraph_checkpointing.sql` - pendiente
    - incorporar LangGraph PostgresSaver en schema separado, sugerido `langgraph`;
    - vincular con Team360 por referencia (`task_runs.langgraph_thread_id`, `task_runs.langgraph_checkpoint_ns` o tabla futura `task_run_langgraph_refs`);
    - no reemplazar `task_runs` ni `core_events`.
@@ -317,11 +322,51 @@ Resultado observado:
 - sin datos reales de clientes ni embeddings cargados.
 
 
+## Resultado De Migracion 004
+
+Fecha de aplicacion: 2026-06-04.
+
+Resultado: aplicada correctamente sobre `team360` despues de la migracion 003.
+
+La migracion:
+
+- agrega `assistant_instances.assistant_code`;
+- crea `automation_diagnosis_sessions`;
+- crea `automation_diagnosis_answers`;
+- crea `automation_diagnosis_leads`;
+- agrega indice unico `uq_ksb_binding_scope_entity` para bindings idempotentes;
+- carga worker definitions del paquete de venta/diagnostico.
+
+Smoke real:
+
+```text
+package_workers=9
+sessions=1
+answers=10
+leads=1
+events=16
+```
+
+Auditoria post-004:
+
+```bash
+cd SrvRestAstroLS_v1/backend
+uv run python -m scripts.audit_team360_schema
+```
+
+Resultado observado:
+
+- checks pasados: 102;
+- checks fallidos: 0;
+- tablas esperadas 001+002+003+004: 51/51;
+- seeds de worker definitions del paquete: OK;
+- indices `uq_assistant_instances_workspace_code` y `uq_ksb_binding_scope_entity`: OK.
+
 ## Proximos Pasos Recomendados
 
 Proxima fase recomendada:
 
-- disenar `004_team360_langgraph_checkpointing.sql` solo cuando haya un workflow/agente concreto que requiera checkpointing;
+- disenar `005_team360_langgraph_checkpointing.sql` solo cuando haya un workflow/agente concreto que requiera checkpointing;
 - mantener LangGraph en schema separado, sugerido `langgraph`;
 - implementar generacion/carga de embeddings desde backend o worker en una fase de runtime, sin guardar secretos planos;
 - definir consultas de retrieval RAG sobre `knowledge_chunk_embeddings`;

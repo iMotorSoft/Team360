@@ -18,7 +18,8 @@ export type ConsoleView =
   | "tasks"
   | "team"
   | "support"
-  | "settings";
+  | "settings"
+  | "diagnosis";
 
 export interface NavigationRegistryItem {
   id: string;
@@ -217,5 +218,15 @@ export const navigationRegistry: NavigationRegistryItem[] = [
     group: "administration",
     module: "settings",
     audiences: ["owner", "operator", "partner", "client"],
+  },
+  {
+    id: "diagnosis",
+    view: "diagnosis",
+    labelKey: "nav.diagnosis",
+    icon: "automation",
+    group: "operations",
+    module: "diagnosis",
+    audiences: ["owner", "operator", "partner"],
+    requiresWorkspace: true,
   },
 ];

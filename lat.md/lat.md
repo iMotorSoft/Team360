@@ -7,7 +7,10 @@ It is managed as a `lat.md` documentation layer: source code can anchor to these
 - [[team360-platform]] — Product thesis, control plane, auditability and ERP AI Workflow Layer positioning.
 - [[multi-package-workers]] — Workspace, automation packages, package workers, worker configs, credentials and customer interaction boundaries.
 - [[knowledge-rag-graphrag]] — Knowledge scopes, RAG/GraphRAG retrieval modes, document/chunk model and future graph model.
+- [[knowledge-scope-contract]] — Canonical KnowledgeScope / KnowledgeDocument / KnowledgeChunk / VectorEmbedding contract derived from JudaismoEnVivo Catalog/MD/Chunk, with multi-tenant filters, ArangoDB text/graph source, Milvus derived index and pgvector laboratory/fallback boundary.
 - [[ai-litellm]] — LiteLLM as OpenAI-compatible AI gateway, adapter boundary, model aliases, usage metadata and fallback rules.
+- [[ai-diagnosis-rag-runtime]] — Initial automation diagnosis RAG runtime: ArangoDB + Milvus + LiteLLM, with PostgreSQL as operational truth and pgvector as available but not primary for first release.
+- [[customer-packaged-assistant-instance]] — Treat Team360's first sales/diagnosis assistant as a real customer package installation with assistant instance, package workers, scoped ArangoDB/Milvus knowledge and PostgreSQL truth.
 - [[security-hitl-mfa]] — MFA, HITL, remote mirroring, hardware proximity, blocked actions and no-bypass security rules.
 - [[automation-diagnosis]] — Guided automation diagnosis assistant, deterministic classification and Phase 1 implementation invariants.
 - [[postgres-ai-persistence]] — PostgreSQL 18 as transactional core, pgvector and LangGraph persistence roadmap, checkpoint boundaries.

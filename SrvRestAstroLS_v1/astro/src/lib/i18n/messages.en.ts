@@ -29,4 +29,5 @@ export const messagesEn = {
   "common.noData": "There is no data to display yet",
   "common.retry": "Retry",
   "common.support": "Contact support",
+  "nav.diagnosis": "Diagnosis",
 } as const;

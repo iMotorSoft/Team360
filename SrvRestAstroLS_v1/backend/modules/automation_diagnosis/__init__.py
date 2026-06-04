@@ -5,6 +5,12 @@ the module can later move to queues, browser workers, desktop workers or
 external services without exposing workers directly to customers.
 """
 
+from .assistant_instances import get_assistant_instance_config, list_assistant_instance_configs
 from .service import AutomationDiagnosisService, build_default_service
 
-__all__ = ["AutomationDiagnosisService", "build_default_service"]
+__all__ = [
+    "AutomationDiagnosisService",
+    "build_default_service",
+    "get_assistant_instance_config",
+    "list_assistant_instance_configs",
+]

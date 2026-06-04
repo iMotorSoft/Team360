@@ -1,7 +1,7 @@
 """Audit script for Team360 PostgreSQL schema.
 
 Compares the live database `team360` against expected tables, columns,
-indexes, constraints and seeds from migrations 001, 002 v3 and 003.
+indexes, constraints and seeds from migrations 001, 002 v3, 003 and 004.
 
 Also checks:
   - No 'bypassed' in approval_status check constraints
@@ -10,6 +10,7 @@ Also checks:
   - Partial unique indexes existence and KSB semantic predicates via pg_index
   - knowledge_scope_bindings convention (nulabilidad, defaults)
   - pgvector extension and knowledge embedding persistence
+  - automation diagnosis runtime persistence from migration 004
   - Seed presence for catalogs
 
 Read-only. Never modifies the database.
@@ -271,7 +272,7 @@ MIGRATION_002_TABLES: dict[str, list[str]] = {
         "metadata_jsonb", "created_at_utc", "updated_at_utc",
     ],
     "assistant_instances": [
-        "id", "workspace_id", "assistant_type", "name", "status",
+        "id", "workspace_id", "assistant_code", "assistant_type", "name", "status",
         "embed_config_jsonb", "public_config_jsonb",
         "default_knowledge_scope_id", "settings_jsonb",
         "created_at_utc", "updated_at_utc",
@@ -341,6 +342,29 @@ MIGRATION_003_TABLES: dict[str, list[str]] = {
     ],
 }
 
+MIGRATION_004_TABLES: dict[str, list[str]] = {
+    "automation_diagnosis_sessions": [
+        "id", "public_session_id", "workspace_id", "assistant_instance_id",
+        "automation_package_id", "knowledge_scope_id", "organization_code",
+        "workspace_slug", "assistant_instance_code", "automation_package_code",
+        "knowledge_scope_code", "source_url", "site_channel", "lead_owner",
+        "locale", "market", "status", "correlation_id", "visitor_jsonb",
+        "package_worker_codes_jsonb", "cost_attribution_jsonb", "metadata_jsonb",
+        "result_jsonb", "contact_jsonb", "created_at_utc", "updated_at_utc",
+    ],
+    "automation_diagnosis_answers": [
+        "id", "session_id", "step_id", "selected_jsonb", "free_text",
+        "normalized_text", "metadata_jsonb", "created_at_utc", "updated_at_utc",
+    ],
+    "automation_diagnosis_leads": [
+        "id", "session_id", "workspace_id", "assistant_instance_id",
+        "automation_package_id", "knowledge_scope_id", "lead_type", "lead_owner",
+        "site_channel", "locale", "status", "classification", "automation_mode",
+        "recommended_package_type", "score_total", "next_step", "internal_card_jsonb",
+        "contact_jsonb", "created_at_utc", "updated_at_utc",
+    ],
+}
+
 MIGRATION_003_VIEWS: dict[str, list[str]] = {
     "knowledge_ready_chunks": [
         "knowledge_scope_id", "knowledge_document_id", "knowledge_chunk_id",
@@ -376,6 +400,8 @@ REQUIRED_UNIQUE_INDEXES: list[dict[str, str]] = [
     {"name": "uq_ksb_default_internal", "table": "knowledge_scope_bindings", "reason": "single default internal"},
     {"name": "uq_ksb_default_workspace", "table": "knowledge_scope_bindings", "reason": "single default per workspace"},
     {"name": "uq_ksb_default_per_entity", "table": "knowledge_scope_bindings", "reason": "single default per entity"},
+    {"name": "uq_assistant_instances_workspace_code", "table": "assistant_instances", "reason": "unique assistant_code per workspace"},
+    {"name": "uq_ksb_binding_scope_entity", "table": "knowledge_scope_bindings", "reason": "idempotent knowledge scope binding per entity"},
 ]
 
 
@@ -396,6 +422,15 @@ REQUIRED_SEEDS: list[tuple[str, str, str]] = [
     ("worker_definitions", "worker_code", "diagnosis_ai_interpreter"),
     ("worker_definitions", "worker_code", "rag_retriever_worker"),
     ("knowledge_embedding_models", "model_alias", "default_1536"),
+    ("worker_definitions", "worker_code", "guided_intake_worker"),
+    ("worker_definitions", "worker_code", "lead_qualification_worker"),
+    ("worker_definitions", "worker_code", "knowledge_retrieval_worker"),
+    ("worker_definitions", "worker_code", "diagnosis_scoring_worker"),
+    ("worker_definitions", "worker_code", "package_recommendation_worker"),
+    ("worker_definitions", "worker_code", "proposal_outline_worker"),
+    ("worker_definitions", "worker_code", "crm_handoff_worker"),
+    ("worker_definitions", "worker_code", "calendar_handoff_worker"),
+    ("worker_definitions", "worker_code", "agui_render_worker"),
 ]
 
 REQUIRED_003_CONSTRAINTS = {
@@ -457,9 +492,10 @@ def audit_schema(cursor: Any, result: AuditResult) -> None:
     all_expected.update(MIGRATION_001_TABLES)
     all_expected.update(MIGRATION_002_TABLES)
     all_expected.update(MIGRATION_003_TABLES)
+    all_expected.update(MIGRATION_004_TABLES)
 
     result.details.append(f"Tablas en DB: {len(db_tables)}")
-    result.details.append(f"Tablas esperadas (001+002+003): {len(all_expected)}")
+    result.details.append(f"Tablas esperadas (001+002+003+004): {len(all_expected)}")
 
     for table_name, expected_cols in sorted(all_expected.items()):
         if table_name not in db_tables:

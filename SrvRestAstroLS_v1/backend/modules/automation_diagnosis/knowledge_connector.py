@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from .document_loader import default_knowledge_scope, load_markdown_documents
+from .assistant_instances import list_assistant_instance_configs
+from .document_loader import load_markdown_documents
 from .retrieval import retrieve_chunks
 from .schemas import KnowledgeChunk, KnowledgeDocument, KnowledgeScope, RetrievedContext
 
@@ -46,8 +47,25 @@ class InMemoryKnowledgeRepository:
 
 def build_default_knowledge_repository() -> InMemoryKnowledgeRepository:
     repository = InMemoryKnowledgeRepository()
-    scope = default_knowledge_scope()
-    documents, chunks = load_markdown_documents(scope.id)
-    repository.add_scope(scope)
-    repository.add_documents(documents, chunks)
+    for config in list_assistant_instance_configs():
+        scope = KnowledgeScope(
+            id=config.knowledge_scope_id,
+            name=f"{config.assistant_instance_name} Knowledge",
+            retrieval_mode="rag",
+            workspace_id=config.workspace_id,
+            assistant_instance_id=config.assistant_instance_id,
+            automation_package_id=config.automation_package_id,
+            graph_enabled=False,
+            metadata={
+                "future_graph_ready": True,
+                "organization_id": config.organization_id,
+                "site_channel": config.site_channel,
+                "lead_owner": config.lead_owner,
+                "arangodb_scope": config.arangodb_scope,
+                "milvus_scope": config.milvus_scope,
+            },
+        )
+        documents, chunks = load_markdown_documents(scope.id)
+        repository.add_scope(scope)
+        repository.add_documents(documents, chunks)
     return repository

@@ -33,4 +33,5 @@ export const messagesEs = {
   "status.active": "Activo",
   "status.attention": "Requiere atención",
   "status.pending": "Pendiente",
+  "nav.diagnosis": "Diagnóstico",
 } as const;

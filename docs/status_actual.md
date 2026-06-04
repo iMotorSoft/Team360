@@ -2,13 +2,24 @@
 
 Objetivo: `documentacion-no-tecnica`
 
-Ultima actualizacion: 2026-05-31
+Ultima actualizacion: 2026-06-04
 
 ## Estado general
 
 `docs/` contiene documentacion no tecnica de runtime: negocio, estrategia, analisis tecnico no operativo, insumos de clientes, presentaciones, decisiones UX, ADRs y plantillas.
 
 ## Acciones realizadas
+
+### 2026-06-04 - Analisis tecnico del stack AI para diagnostico de automatizacion
+
+- Se agrego `docs/analisis-tecnico/team360_ai_diagnostico_stack_arango_milvus_litellm.md`.
+- Se documento la factibilidad de usar ArangoDB + Milvus + LiteLLM para acelerar el asistente inteligente de venta y diagnostico de automatizacion.
+- Se registro que las primeras salidas comerciales son Team360 directo y Mamá Mía 360 como distribuidor regional en Israel, con asistentes configurables y multilenguaje.
+- Se agrego que Team360 directo debe tratarse como primera instalacion cliente del paquete de venta/diagnostico, con workspace, assistant instance, workers, knowledge scope, ArangoDB/Milvus scoping y auditoria real.
+- Se aclaro que PostgreSQL 18 mantiene la verdad transaccional y pgvector queda como capacidad instalada/futura, no como RAG principal inicial.
+- Se actualizo `docs/analisis-tecnico/README.md` y su `status_actual.md`.
+- La decision estable relacionada queda documentada en `lat.md/ai-diagnosis-rag-runtime.md`.
+- No se implemento codigo ni se tocaron DBs.
 
 ### 2026-05-31 - Politica frontend pnpm y capa UI Team360
 
