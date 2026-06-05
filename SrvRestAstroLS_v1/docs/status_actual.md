@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-01
+Ultima actualizacion: 2026-06-04
 
 ## Directorio de trabajo
 
@@ -13,6 +13,11 @@ Ultima actualizacion: 2026-06-01
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql` y `003_team360_pgvector_knowledge_embeddings.sql`. Tambien existe una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar). El backend Litestar productivo sigue pendiente de integracion.
 
 ## Acciones realizadas
+
+### 2026-06-04 - Ajuste del ancho del sidebar en la consola mock
+
+- Se modificó la medida del sidebar de `18.5rem` a `20rem` en `Sidebar.svelte` para hacerlo un poco más ancho.
+- Se adaptó el espaciado izquierdo del shell de la consola de `lg:ps-[18.5rem]` a `lg:ps-[20rem]` en `AppShell.svelte` para evitar solapamientos con el contenido principal.
 
 ### 2026-06-03 - Soporte dinámico para logo (imagen y tamaño) y corrección de casing
 

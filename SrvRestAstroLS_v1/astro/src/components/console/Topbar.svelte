@@ -7,7 +7,9 @@
   let { onMenu = () => undefined }: { onMenu?: () => void } = $props();
 </script>
 
-<header class="sticky top-0 z-30 flex h-[4.75rem] items-center justify-between gap-4 border-b border-[#e1e9eb] bg-[#fbfcfa]/88 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
+<header
+  class="sticky top-0 z-30 flex h-24 items-center justify-between gap-4 border-b border-[#e1e9eb] bg-[#fbfcfa]/88 px-4 backdrop-blur-xl sm:px-6 lg:px-8"
+>
   <div class="flex min-w-0 items-center gap-3">
     <button
       aria-label="Abrir navegación"
@@ -18,8 +20,12 @@
       <ConsoleIcon name="menu" />
     </button>
     <div class="min-w-0">
-      <p class="truncate text-xs font-bold uppercase tracking-[0.17em] text-[#168b88]">{consoleContext.bootstrap.uiHints.profileLabel}</p>
-      <p class="mt-1 truncate text-sm font-semibold text-[#284c67]">
+      <p
+        class="truncate text-some font-bold uppercase tracking-[0.17em] text-[#168b88]"
+      >
+        {consoleContext.bootstrap.uiHints.profileLabel}
+      </p>
+      <p class="mt-1 truncate text-base font-semibold text-[#284c67]">
         {consoleContext.activeOrganization.name}
         <span class="mx-1.5 text-[#a5b3bb]">/</span>
         {consoleContext.activeWorkspace.name}
@@ -32,8 +38,11 @@
       <span class="sr-only">Idioma de interfaz</span>
       <select
         aria-label="Idioma de interfaz"
-        class="rounded-xl border border-[#e0e8eb] bg-white px-2.5 py-2 text-xs font-bold uppercase text-[#587184] transition focus-visible:border-[#71cfc6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
-        onchange={(event) => consoleContext.setLocale((event.currentTarget as HTMLSelectElement).value)}
+        class="rounded-xl border border-[#e0e8eb] bg-white px-2.5 py-2 text-sm font-bold uppercase text-[#587184] transition focus-visible:border-[#71cfc6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
+        onchange={(event) =>
+          consoleContext.setLocale(
+            (event.currentTarget as HTMLSelectElement).value,
+          )}
         value={consoleContext.locale}
       >
         {#each SUPPORTED_LOCALES as locale}
@@ -49,13 +58,21 @@
       <ConsoleIcon name="search" />
     </button>
     <NotificationCenter />
-    <div class="ms-1 hidden items-center gap-2 border-s border-[#e0e8eb] ps-3 sm:flex">
-      <span class="grid size-9 place-items-center rounded-xl bg-[#153b5b] text-xs font-bold text-white">
+    <div
+      class="ms-1 hidden items-center gap-2 border-s border-[#e0e8eb] ps-3 sm:flex"
+    >
+      <span
+        class="grid size-9 place-items-center rounded-xl bg-[#153b5b] text-sm font-bold text-white"
+      >
         {consoleContext.bootstrap.currentUser.avatarInitials}
       </span>
       <div class="hidden xl:block">
-        <p class="text-xs font-bold text-[#31536b]">{consoleContext.bootstrap.currentUser.name}</p>
-        <p class="mt-0.5 text-[0.68rem] text-[#8a9ba6]">{consoleContext.bootstrap.currentUser.role}</p>
+        <p class="text-sm font-bold text-[#31536b]">
+          {consoleContext.bootstrap.currentUser.name}
+        </p>
+        <p class="mt-0.5 text-sm text-[#8a9ba6]">
+          {consoleContext.bootstrap.currentUser.role}
+        </p>
       </div>
     </div>
   </div>
