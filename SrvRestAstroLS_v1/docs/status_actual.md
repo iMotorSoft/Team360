@@ -14,6 +14,47 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-07 - Diseno tecnico Knowledge Ingestion multi-scope / multi-nivel
+
+- Se creo `docs/knowledge_ingestion_multiscope_design_20260607.md` como documento de diseno tecnico para ingesta de conocimiento reusable multi-scope.
+- Se identifico la brecha actual: las tablas existentes (knowledge_scopes, knowledge_documents, knowledge_chunks) son planas y no permiten representar jerarquia organizacional (Empresa > Area > Sector > Proceso > Tema) ni filtrado por rol (CEO > Director > Gerente > Responsable).
+- Se propuso modelo conceptual con entidades nuevas: KnowledgeMap (estructura jerarquica), KnowledgeNode (nodos individuales), KnowledgeIngestionRun (registro de ingesta), KnowledgeAccessPolicy (politicas de acceso por rol), KnowledgeRetrievalPolicy (politicas de retrieval por asistente).
+- Se definieron 8 niveles de scope: global, package, partner, organization, workspace, service, assistant_instance, session.
+- Se diseño worker generico `knowledge_ingestion_worker` con 8 fases: validar metadata, convertir a texto, generar L0/L1, chunk semantico, guardar, generar embeddings, indexar, registrar estado.
+- Se documento la cascada de retrieval por capas y la relacion con ArangoDB/Milvus.
+- Se probo migracion minima futura (tablas KnowledgeMap, KnowledgeNode, KnowledgeIngestionRun, KnowledgeAccessPolicy, KnowledgeRetrievalPolicy) sin implementarla.
+- Se mantuvieron identificadores tecnicos estables: `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis`, `svc_sales_diagnosis`. `Vera` solo como marca comercial visible.
+- No se implemento codigo, no se crearon migraciones, no se tocaron frontend ni backend runtime.
+- Referencias: `lat.md/knowledge-scope-contract.md`, `lat.md/ai-diagnosis-rag-runtime.md`.
+
+### 2026-06-07 - Fase 1 Knowledge Ingestion Platform Service
+
+- Se creo migracion `db/migrations/006_team360_knowledge_ingestion_phase1.sql` (numero 006, siguiente disponible tras 005 seed).
+- Tabla nueva: `knowledge_ingestion_runs` para registrar cada corrida de ingesta con fases, estado, errores y stats.
+- Columnas nuevas en `knowledge_documents`: `node_path` (text) para referencia jerarquica.
+- Columnas nuevas en `knowledge_chunks`: `node_path` (text) + `permission_tags` (text[]) para filtrado por rol.
+- Seed de `worker_definitions.knowledge_ingestion_worker` con `worker_kind=api`, `default_mode=assisted`.
+- NO se agregaron columnas a `knowledge_chunk_embeddings` (decision: difiere a Fase 2 porque metadata_jsonb existente sirve como almacen temporal).
+- Se creo modulo `backend/modules/knowledge_ingestion/` con schemas, repository y worker skeleton:
+  - `schemas.py`: `IngestionMetadata` dataclass con validacion de 15 campos obligatorios.
+  - `repository.py`: `KnowledgeIngestionRepository` con `create_ingestion_run`, `update_ingestion_run_status`, `update_document_node_path`, `update_chunk_node_path_and_tags`.
+  - `worker.py`: `KnowledgeIngestionWorker` con metodo `validate_and_register` que valida metadata y crea run.
+- Se crearon tests `backend/tests/test_knowledge_ingestion.py`: 20 tests que cubren validacion de metadata (campos requeridos, tipos, valores), serializacion a dict, contrato del worker y constantes.
+- Se actualizo `backend/scripts/audit_team360_schema.py` con tablas/columnas esperadas de 006 y seed `knowledge_ingestion_worker`.
+- No se implementaron: upload publico, ArangoDB/Milvus, KnowledgeMap/KnowledgeNode, chunker semantico, embeddings pipeline, endpoints HTTP, cambios en automation_diagnosis.
+- Identificadores tecnicos estables: `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis`, `svc_sales_diagnosis`. Sin `vera_*`.
+
+### 2026-06-07 - Fase 1.1 Hardening de Knowledge Ingestion Platform Service
+
+- Se reviso y endurecio la migracion 006, schemas, repository, worker y tests basado en el analisis de consistencia del diseno original.
+- **Migration 006**: se agrego `updated_at_utc` a `knowledge_ingestion_runs` (columna faltante vs patron del proyecto), se agrego status `running` al CHECK constraint (para separar pending→running→completed|failed), se recreo la constraint de forma idempotente via `drop constraint if exists + add constraint`.
+- **Schemas**: se agrego `SOURCE_TYPES` constant (markdown, pdf, text, html) con validacion en `IngestionMetadata.validate()`. Se elimino `RETRIEVAL_MODES` y `NODE_TYPES` (no usados en Phase 1). Se agrego validacion de `node_path` sin trailing slash (excepto raiz `/`), `area_key`/`topic_key` sin `/`, `access_tags` sin strings vacios. Se agrego `updated_at_utc` a `IngestionRunRecord`. Se removio `register_completion` de `INGESTION_PHASES` (no es fase de procesamiento).
+- **Repository**: se agrego `DatabaseExecutionError` cuando `create_ingestion_run` devuelve None. Se agrego `started_at_utc = coalesce(started_at_utc, now())` en transicion a status `running`. Se agrego `updated_at_utc = now()` en todo status update. Se agrego `updated_at_utc` al SELECT de `get_ingestion_run`.
+- **Worker**: se cambio status inicial de `validating` a `running` (separacion semantica: running indica pipeline activo, los detalles de fase van en phases_jsonb). Se agrego metodo `advance_phase()` como stub estructural con validacion de orden, fase no completada y saltos invalidos.
+- **Tests**: se agregaron 8 tests nuevos (trailing slash en node_path, root `/` permitido, access_tags empty string, area_key/topic_key con `/`, source_type invalido, advance_phase unknown phase, advance_phase incomplete current, advance_phase skip). Se actualizaron tests existentes para reflejar el status `running`. Se elimino import no usado de `IngestionRunRecord`. Se agrego `SOURCE_TYPES` al test de constantes. Total: 30 tests.
+- **Module exports**: se agrego `__init__.py` con export publico de todas las clases y constantes.
+- Validacion: `uv run pytest` = 110/110 passed. `git diff --check` = OK. Sin identificadores `vera_*`.
+
 ### 2026-06-07 - Analisis de estado del adapter publico Vera y proximos pasos
 
 - Se analizaron los 4 archivos funcionales de la entrada publica Vera (PublicVeraEntry.svelte, publicDiagnosis.ts, index.astro, public-vera.spec.ts) mas el backend asociado (routes, schemas, assistant_instances) y el diseno L0/L1/L2 existente.
@@ -24,6 +65,23 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
   - La metadata enviada es completa (13 campos en visitor) y conserva identificadores tecnicos estables.
   - El contrato futuro recomendado (`/api/diagnosis/*`) ya esta documentado en el diseno L0/L1/L2 y no requiere nuevo diseno.
 - No se modifico codigo funcional, backend, home ni se crearon endpoints.
+- No se introdujeron identificadores tecnicos `vera_*`.
+
+### 2026-06-07 - Contrato publico /api/diagnosis/* wrapper sobre automation_diagnosis
+
+- Se creo `backend/routes/diagnosis.py` con 3 endpoints wrapper que reutilizan el mismo servicio `automation_diagnosis` (comparten instancia via `get_service()`).
+- Endpoints creados:
+  - `POST /api/diagnosis/start` — crea sesion, acepta metadata publica (assistant_instance_code, source_channel, locale, etc.), devuelve session_id + technical_metadata.
+  - `POST /api/diagnosis/message` — guarda texto libre como `process_to_automate`, devuelve mensaje preliminar honesto desde backend.
+  - `GET /api/diagnosis/session/{id}` — hidrata estado basico de sesion (answers, result, status).
+- `POST /api/diagnosis/submit-checklist` y `POST /api/diagnosis/lead` quedan como stubs 501 Not Implemented.
+- La respuesta mensaje es backend-real (no sintetica cliente) pero aun es preliminary wrapper.
+- No se modifico service.py, scoring, guided_flow, postgres_repository, migraciones ni frontend.
+- Se agrego `get_service()` exportable a `routes/automation_diagnosis.py` y `get_session` en `_SyncToAsyncAdapter` para que el wrapper pueda leer sesiones.
+- Se extendio `routes/diagnosis_schemas.py` con schemas PublicStartRequest, PublicMessageRequest y stubs.
+- Se registraron las rutas en `app.py`.
+- Tests: `tests/test_diagnosis_public_router.py` — 16 tests que cubren defaults, metadata custom, visitor merge, mensaje, error handling y stubs 501.
+- Validacion: `uv run pytest` = 88/88 passed (16 nuevos + 72 existentes).
 - No se introdujeron identificadores tecnicos `vera_*`.
 
 ### 2026-06-07 - Entrada publica Vera en Home
@@ -926,6 +984,9 @@ Incluye estructura inicial para:
 4. Crear seed dev sin secretos reales.
 5. Integrar `TEAM360_DB_URL` al backend cuando exista runtime Litestar productivo.
 6. Crear repositorios Python en una fase posterior.
+7. Validar diseno de Knowledge Ingestion multi-scope (`docs/knowledge_ingestion_multiscope_design_20260607.md`) con el equipo.
+8. Definir metadata mocks para estructura Empresa/Area/Sector/Proceso/Tema.
+9. Evaluar migracion minima para KnowledgeMap, KnowledgeNode y policies cuando haya decision de implementacion.
 
 ### 2026-05-29 - Correccion migracion 002 v3 — bloqueante knowledge_scope_bindings resuelto — NO APLICADA
 

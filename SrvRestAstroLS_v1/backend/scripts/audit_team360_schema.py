@@ -342,6 +342,21 @@ MIGRATION_003_TABLES: dict[str, list[str]] = {
     ],
 }
 
+MIGRATION_006_TABLES: dict[str, list[str]] = {
+    "knowledge_ingestion_runs": [
+        "id", "knowledge_scope_id", "workspace_id", "document_source",
+        "metadata_snapshot", "status", "phases_jsonb", "chunk_count",
+        "token_count", "error_code", "error_detail",
+        "started_at_utc", "completed_at_utc", "created_at_utc",
+    ],
+}
+
+# Extended columns from migration 006 (added to existing 002 tables)
+MIGRATION_006_EXTENDED_COLUMNS: dict[str, list[str]] = {
+    "knowledge_documents": ["node_path"],
+    "knowledge_chunks": ["node_path", "permission_tags"],
+}
+
 MIGRATION_004_TABLES: dict[str, list[str]] = {
     "automation_diagnosis_sessions": [
         "id", "public_session_id", "workspace_id", "assistant_instance_id",
@@ -431,6 +446,7 @@ REQUIRED_SEEDS: list[tuple[str, str, str]] = [
     ("worker_definitions", "worker_code", "crm_handoff_worker"),
     ("worker_definitions", "worker_code", "calendar_handoff_worker"),
     ("worker_definitions", "worker_code", "agui_render_worker"),
+    ("worker_definitions", "worker_code", "knowledge_ingestion_worker"),
 ]
 
 REQUIRED_003_CONSTRAINTS = {
@@ -493,9 +509,10 @@ def audit_schema(cursor: Any, result: AuditResult) -> None:
     all_expected.update(MIGRATION_002_TABLES)
     all_expected.update(MIGRATION_003_TABLES)
     all_expected.update(MIGRATION_004_TABLES)
+    all_expected.update(MIGRATION_006_TABLES)
 
     result.details.append(f"Tablas en DB: {len(db_tables)}")
-    result.details.append(f"Tablas esperadas (001+002+003+004): {len(all_expected)}")
+    result.details.append(f"Tablas esperadas (001+002+003+004+006): {len(all_expected)}")
 
     for table_name, expected_cols in sorted(all_expected.items()):
         if table_name not in db_tables:
@@ -522,6 +539,30 @@ def audit_schema(cursor: Any, result: AuditResult) -> None:
             )
         else:
             result.passed += 1
+
+    # Check migration 006 extended columns on existing tables
+    for table_name, expected_cols in MIGRATION_006_EXTENDED_COLUMNS.items():
+        if table_name not in db_tables:
+            continue
+        cursor.execute(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = %s
+            """,
+            (table_name,),
+        )
+        existing_cols = {row[0] for row in cursor.fetchall()}
+        present = [c for c in expected_cols if c in existing_cols]
+        missing = [c for c in expected_cols if c not in existing_cols]
+        if present:
+            result.details.append(
+                f"  {table_name}: columnas 006 presentes: {', '.join(present)}"
+            )
+        if missing:
+            result.details.append(
+                f"  {table_name}: columnas 006 FALTAN: {', '.join(missing)}"
+            )
 
     # Check task_runs extensions
     if "task_runs" in db_tables:
@@ -1160,7 +1201,10 @@ def main() -> None:
             print("\n=== 11. Knowledge embeddings 003 ===\n")
             audit_knowledge_embeddings(cursor, result)
 
-            print("\n=== 12. Conteo de filas ===\n")
+            print("\n=== 12. Extensiones columnas 006 ===\n")
+            # Checked inside audit_schema via MIGRATION_006_EXTENDED_COLUMNS
+
+            print("\n=== 13. Conteo de filas ===\n")
             audit_row_counts(cursor, result)
     finally:
         conn.close()

@@ -12,6 +12,53 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
+### 2026-06-07 - Diseno tecnico Knowledge Ingestion multi-scope / multi-nivel
+
+- Se creo `SrvRestAstroLS_v1/docs/knowledge_ingestion_multiscope_design_20260607.md` como documento de diseno tecnico.
+- El diseno referencia y extiende los invariantes existentes en `[[knowledge-scope-contract]]` y `[[ai-diagnosis-rag-runtime]]`.
+- Se propusieron nuevas entidades conceptuales (KnowledgeMap, KnowledgeNode, KnowledgeAccessPolicy, KnowledgeRetrievalPolicy) que complementan el contrato canonico sin reemplazarlo.
+- Se documentaron 8 niveles de scope y cascada de retrieval por capas.
+- El documento es de diseno solamente; no crea nuevos invariantes en `lat.md/` ni modifica contratos existentes.
+- No se implemento codigo, no se tocaron DBs ni migraciones.
+
+### 2026-06-07 - Fase 1 Knowledge Ingestion Platform Service
+
+- Se implemento la Fase 1 minima del servicio de ingesta, basada en el diseno tecnico.
+- Migracion 006: `knowledge_ingestion_runs`, `node_path` en `knowledge_documents`, `node_path` + `permission_tags` en `knowledge_chunks`, seed de `knowledge_ingestion_worker`.
+- Modulo backend `modules/knowledge_ingestion/` con schemas, repository y worker skeleton.
+- 20 tests de validacion de metadata de ingesta.
+- No se agregaron columnas a `knowledge_chunk_embeddings` (difiere a Fase 2).
+- No se tocaron invariantes de arquitectura ni contratos existentes en `lat.md/`.
+
+### 2026-06-07 - Fase 1.1 Hardening de Knowledge Ingestion Platform Service
+
+- Revision sistematica de migracion 006, schemas, repository, worker y tests.
+- Migration 006: se agrego `updated_at_utc`, status `running` al CHECK, manejo de `started_at_utc`.
+- Schemas: validacion de node_path, area_key, topic_key, access_tags depth, source_type. Se removieron constantes no usadas (RETRIEVAL_MODES, NODE_TYPES).
+- Repository: error handling explicito, started_at_utc en transicion a running, updated_at_utc en todos los updates.
+- Worker: pending→running en lugar de pending→validating. Metodo `advance_phase()` stub con validacion de orden.
+- Tests: 8 nuevos. Total: 30 tests. 110/110 suite completa.
+
+### 2026-06-07 - Politica de seleccion de modelos y ruteo (gpt-5-nano, DeepSeek, Gemini)
+
+- Se agrego `model-selection-routing.md` como invariante de arquitectura viva.
+- Se documento la jerarquia de tiers (nano/mini/medium/large) con costos y distribucion objetivo 95/4/1.
+- Se fijo `gpt-5-nano` como modelo economico para OpenAI directo (USD 0.05/0.40) y `google/gemini-2.5-flash-lite` como alternativa para OpenRouter.
+- Se fijo DeepSeek V4 Flash como orquestador textual, no como lector de capturas.
+- Se documentaron reglas de ruteo por tipo de automatizacion: SAP B1 (UI Automation > OCR > vision > humano), browser automation (Playwright > datos estructurados > modelo barato), diagnosis assistant (LiteLLM aliases).
+- Se documento que los modelos deben configurarse mediante aliases LiteLLM, no hardcodearse como slugs.
+- Se actualizo `lat.md/lat.md` con referencia `[[model-selection-routing]]`.
+- Fuentes: `docs/analisis-tecnico/analisis_tecnico_browser_automation_modelos_ai_2026-05-08.md`, `docs/analisis-tecnico/sap_b1_modelos_vision_costos_automatizacion.md`, `docs/analisis-tecnico/team360_ai_diagnostico_stack_arango_milvus_litellm.md` y `lat.md/ai-diagnosis-rag-runtime.md`.
+- No se implemento codigo, no se tocaron DBs, migraciones ni runtime.
+
+### 2026-06-07 - Contrato publico /api/diagnosis/* wrapper backend
+
+- Se creo `SrvRestAstroLS_v1/backend/routes/diagnosis.py` como wrapper sobre `automation_diagnosis`, compartiendo la misma instancia de servicio.
+- Endpoints: `POST /api/diagnosis/start`, `POST /api/diagnosis/message`, `GET /api/diagnosis/session/{id}`.
+- Stubs 501 para `submit-checklist` y `lead` (no implementados).
+- No se creo motor paralelo, no se cambio scoring, service.py ni guided_flow.
+- `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis` y `svc_sales_diagnosis` se mantienen como identificadores estables.
+
 ### 2026-06-07 - Entrada publica de Vera en Home Team360
 
 - La Home publica incorpora una primera entrada de texto libre para `Vera` como marca visible del asistente Team360.
