@@ -14,6 +14,18 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-07 - Analisis de estado del adapter publico Vera y proximos pasos
+
+- Se analizaron los 4 archivos funcionales de la entrada publica Vera (PublicVeraEntry.svelte, publicDiagnosis.ts, index.astro, public-vera.spec.ts) mas el backend asociado (routes, schemas, assistant_instances) y el diseno L0/L1/L2 existente.
+- Se creo `SrvRestAstroLS_v1/docs/public_vera_adapter_next_steps_20260607.md` con diagnostico de 10 puntos.
+- Hallazgos principales:
+  - El componente es single-shot: no hay loop conversacional, no hay mensaje backend (buildPreliminaryMessage es cadenas fijas locales), no hay checklist, no hay classify, no hay lead capture.
+  - El adapter reusa `/api/automation-diagnosis/session/start` y `/answer` pero nunca llama a `/classify`.
+  - La metadata enviada es completa (13 campos en visitor) y conserva identificadores tecnicos estables.
+  - El contrato futuro recomendado (`/api/diagnosis/*`) ya esta documentado en el diseno L0/L1/L2 y no requiere nuevo diseno.
+- No se modifico codigo funcional, backend, home ni se crearon endpoints.
+- No se introdujeron identificadores tecnicos `vera_*`.
+
 ### 2026-06-07 - Entrada publica Vera en Home
 
 - Se agrego una isla publica en la Home para `Hablá con Vera`, con textarea de texto libre, ejemplos breves y CTA `Analizar oportunidad`.
