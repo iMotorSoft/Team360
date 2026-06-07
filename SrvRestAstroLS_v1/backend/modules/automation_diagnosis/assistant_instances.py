@@ -34,6 +34,13 @@ class AssistantInstanceConfig:
     supported_locales: tuple[str, ...]
     cost_center: str
     package_workers: tuple[PackageWorkerBinding, ...]
+    commercial_name: str = ""
+    assistant_display_name: str = ""
+    package_display_name: str = ""
+    service_display_name: str = ""
+    service_code: str = ""
+    template_code: str = ""
+    public_channel_code: str = ""
     arangodb_scope: dict[str, Any] = field(default_factory=dict)
     milvus_scope: dict[str, Any] = field(default_factory=dict)
 
@@ -74,13 +81,13 @@ class AssistantInstanceConfig:
 # @lat: [[customer-packaged-assistant-instance#Team360 Direct Installation]]
 TEAM360_SALES_DIAGNOSIS_CONFIG = AssistantInstanceConfig(
     organization_id="org_team360",
-    organization_name="Team360",
+    organization_name="Team360.live",
     workspace_id="team360_public_site",
-    workspace_name="Team360 Public Website",
+    workspace_name="Team360.live Public Site",
     automation_package_id="pkg_sales_diagnosis",
-    automation_package_name="Asistente de venta y diagnostico",
+    automation_package_name="Asistente Inteligente Vera",
     assistant_instance_id="team360_sales_diagnosis",
-    assistant_instance_name="Team360 Sales Diagnosis Assistant",
+    assistant_instance_name="Asistente Inteligente Vera",
     knowledge_scope_id="ks_team360_sales_diagnosis",
     site_channel="team360.live",
     lead_owner="Team360",
@@ -144,6 +151,13 @@ TEAM360_SALES_DIAGNOSIS_CONFIG = AssistantInstanceConfig(
             role="render_validated_semantic_output",
         ),
     ),
+    commercial_name="Vera",
+    assistant_display_name="Vera",
+    package_display_name="Asistente Inteligente Vera",
+    service_display_name="Asistente Inteligente Vera",
+    service_code="svc_sales_diagnosis",
+    template_code="team360_sales_automation_diagnosis",
+    public_channel_code="team360_live_home",
     arangodb_scope={
         "database": "team360_knowledge",
         "collections": [

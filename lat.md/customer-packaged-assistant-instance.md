@@ -32,6 +32,40 @@ site_channel: team360.live
 
 This is a self-customer installation. Team360 remains the platform/control-plane owner, but the public sales assistant must still be modeled as a customer-facing package instance with the same contracts that future customers and partners use.
 
+## Commercial Naming Boundary
+
+Commercial assistant names are display configuration, not stable technical identifiers.
+
+For the first Team360 direct sales assistant, `Vera` is a visible commercial name. It can appear in:
+
+- `display_name`;
+- `commercial_name`;
+- public website copy;
+- Console labels;
+- service/package visible names;
+- CTA text.
+
+It must not be used as a core identifier for:
+
+- `assistant_instance`;
+- `automation_package`;
+- `knowledge_scope`;
+- `package_worker`;
+- routes;
+- tests;
+- migrations;
+- persisted integration references.
+
+The stable technical identifiers remain:
+
+```text
+assistant_instance: team360_sales_diagnosis
+automation_package: pkg_sales_diagnosis
+knowledge_scope: ks_team360_sales_diagnosis
+```
+
+A future rebrand from `Vera` to another commercial name must require display/config updates only. It must not require data migrations, test rewrites, integration renames or historical session/lead rewrites.
+
 ## Why This Matters
 
 Do not build a disposable Team360 sales assistant.

@@ -19,6 +19,8 @@ These are assistant instances, not separate engines.
 
 `mamamia360_sales_diagnosis` serves Mamá Mía 360 as a distributor / regional partner in Israel. It must support Spanish, English and Hebrew, adapt visible tone/branding to Mamá Mía 360, and route commercial opportunities through the partner configuration.
 
+Assistant instance codes are stable technical identifiers. Visible commercial names, such as `Vera` for the Team360 direct sales assistant, belong in display/configuration fields and must not replace `team360_sales_diagnosis`, `pkg_sales_diagnosis` or `ks_team360_sales_diagnosis`. See [[customer-packaged-assistant-instance]].
+
 The diagnosis engine must stay channel-aware:
 
 - `organization_id`;

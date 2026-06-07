@@ -33,6 +33,15 @@ export const workspaces: Workspace[] = [
     direction: "rtl",
   },
   {
+    id: "ws-team360-live-public-site",
+    name: "Team360.live Public Site",
+    organizationId: "org-team360-live",
+    type: "client_operations",
+    status: "active",
+    locale: "es",
+    direction: "ltr",
+  },
+  {
     id: "ws-mama-mia-israel",
     name: "Red Israel",
     organizationId: "org-mama-mia-360",

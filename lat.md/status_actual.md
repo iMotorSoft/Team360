@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-04
+Ultima actualizacion: 2026-06-07
 
 ## Estado general
 
@@ -11,6 +11,23 @@ Ultima actualizacion: 2026-06-04
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-07 - Materializacion inicial de configuracion productiva Team360.live / Vera
+
+- Se avanzo desde documentacion hacia configuracion inicial mediante seed SQL y mocks, manteniendo los invariantes de arquitectura viva.
+- La configuracion productiva inicial conserva `team360_sales_diagnosis`, `pkg_sales_diagnosis` y `ks_team360_sales_diagnosis` como identificadores tecnicos estables.
+- `Vera` se materializa solo como nombre comercial visible en metadata/display fields, Console label y package/service visible.
+- Se mantiene `automation_diagnosis` como motor base; no se creo motor paralelo ni contrato `/api/diagnosis/*`.
+- No se implemento home publica, L2/RAG ArangoDB/Milvus ni nuevas tablas de organizaciones/servicios.
+
+### 2026-06-07 - Vera como marca comercial, no identificador tecnico
+
+- Se actualizo `customer-packaged-assistant-instance.md` con el invariante de naming comercial/tecnico.
+- Se fijo que `Vera` es nombre visible configurable y no debe usarse como identificador core de assistant instance, paquete, knowledge scope, workers, rutas, tests, migrations ni integraciones.
+- Se mantienen como identificadores tecnicos estables `team360_sales_diagnosis`, `pkg_sales_diagnosis` y `ks_team360_sales_diagnosis`.
+- Se agrego una nota en `automation-diagnosis.md` para aclarar que los commercial entry points son assistant instance codes tecnicos.
+- La regla busca evitar migraciones, rewrites de tests, cambios de integracion o reescritura de sesiones/leads historicos ante un rebranding.
+- No se implemento runtime, no se tocaron DBs, migraciones, frontend ni seeds.
 
 ### 2026-06-04 - Contrato canonico KnowledgeScope / Document / Chunk / VectorEmbedding
 

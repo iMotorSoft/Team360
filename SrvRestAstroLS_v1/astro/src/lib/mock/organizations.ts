@@ -28,6 +28,14 @@ export const organizations: Organization[] = [
     status: "active",
   },
   {
+    id: "org-team360-live",
+    name: "Team360.live",
+    type: "direct_client",
+    region: "Global",
+    parentOrganizationId: "org-team360",
+    status: "active",
+  },
+  {
     // First regional partner fixture. The product architecture never branches on this name.
     id: "org-mama-mia-360",
     name: "Mamá Mía 360",
