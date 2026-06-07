@@ -9,7 +9,7 @@ language: es-AR
 status: draft
 owner: Team360
 description: >
-  Knowledge package for Team360's AI sales and automation diagnosis assistant.
+  Knowledge package for Team360's AI sales, automation diagnosis, and automatable process assessment assistant.
   Contains source documents used to support free-text interpretation, slot extraction,
   contextual diagnosis, feasibility scoring, automation recommendations, safety policies,
   commercial objections, and next-step guidance.
@@ -17,3 +17,149 @@ notes:
   - Vera is a commercial visible name only and must not be used as a technical core identifier.
   - Markdown is the canonical source format.
   - PDF exports are for human reading only and are not the canonical source.
+
+evolution_policy:
+  catalog_type: evolving_knowledge_package
+  is_closed_catalog: false
+  canonical_source_directory: approved
+  draft_directory: drafts
+  archive_directory: archive
+  principle: >
+    This package evolves with real implementations, pilots, commercial tests,
+    validated source evidence, and operational learnings. Unvalidated
+    opportunities must not be treated as production-proven capabilities.
+  evidence_priority:
+    - real_implementations
+    - professional_inventory
+    - pilots
+    - commercial_tests
+    - product_direction
+    - market_language
+  ingestion_policy:
+    drafts: not_ingested
+    approved: ingestable_after_metadata_review
+    archive: not_active
+validation_strategy:
+  first_validation_client: team360_live
+  first_validation_client_type: internal_project
+  public_entrypoint: team360_public_home
+  visible_commercial_name: Vera / Asistente Inteligente Vera
+  diagnosis_scope: any_automatable_process
+  go_to_market_lens: sales_and_automation_diagnosis
+  scope_principle: >
+    Sales is the first commercial angle, but diagnosis must evaluate any
+    process that may be automated. Technical automatable status must be
+    separated from current commercial offer readiness.
+  stage_1_knowledge_operations:
+    source_mode: curated_documents
+    update_mode: controlled_load_update_script
+    admin_ui_required: false
+    principle: >
+      A complete knowledge administration interface is not required for the
+      first validation stage. Curated documents plus a controlled load/update
+      flow are enough until real usage validates the administration needs.
+  learning_loop:
+    - prueba
+    - aprendizaje
+    - curaduria
+    - update
+    - nueva_prueba
+  review_rule: >
+    Public or internal test learnings do not become approved knowledge
+    automatically. They must be curated, classified, validated, and bounded
+    before promotion to approved.
+allowed_offer_decisions:
+  - automatable
+  - sellable_now
+  - pilot
+  - future_opportunity
+  - human_review_required
+allowed_evidence_levels:
+  - hypothesis
+  - validated_by_source
+  - validated_by_pilot
+  - validated_by_production
+  - deprecated
+allowed_commercial_statuses:
+  - exploratory
+  - sellable_pilot
+  - sellable_service
+  - core_offer
+  - future_package
+  - not_offered
+allowed_implementation_statuses:
+  - not_implemented
+  - prototype
+  - pilot_done
+  - production_client
+  - paused
+  - deprecated
+allowed_service_maturity:
+  - CORE_VALIDADO
+  - PILOTO_VALIDADO
+  - OPORTUNIDAD
+  - PAQUETE_FUTURO
+  - NO_OFRECER_AUN
+metadata_requirements:
+  required_for_approved:
+    - evidence_level
+    - evidence_sources
+    - implementation_status
+    - commercial_status
+    - service_maturity
+    - offer_decision
+    - review_cycle
+    - last_validated_at
+    - validated_by
+    - risk_level
+    - approval_notes
+  optional_or_contextual:
+    - related_pilots
+    - related_clients
+  empty_list_when_not_applicable:
+    - related_pilots
+    - related_clients
+initial_offer_decision_examples:
+  sellable_now:
+    - diagnostico_de_automatizacion_comercial
+    - reportes_kpi_comerciales_excel_dashboards
+    - rag_asistentes_sobre_documentos_propios
+  pilot:
+    - crm_whatsapp_leads
+    - browser_automation
+    - integraciones_comerciales
+  future_opportunity:
+    - trading_bot_inteligente
+    - marketplaces_complejos
+    - erp_amplio
+    - conciliaciones_bancarias_avanzadas
+  human_review_required:
+    - procesos_con_credenciales_o_mfa
+    - procesos_con_impacto_financiero
+    - integraciones_criticas_o_datos_sensibles
+  automatable:
+    - procesos_operativos_o_administrativos_a_evaluar
+initial_service_classification:
+  core_validado:
+    - diagnostico_de_automatizacion_comercial
+    - seguimiento_comercial
+    - reportes_kpi_comerciales_excel_dashboards
+    - automatizacion_de_procesos_comerciales
+    - rag_asistentes_sobre_documentos_propios
+    - seguridad_accesos_mfa_hitl
+    - objeciones_comerciales
+  core_or_pilot_validado:
+    - crm_whatsapp_leads
+    - integraciones_comerciales
+    - browser_automation
+    - casos_por_industria
+  oportunidad:
+    - generacion_de_imagenes_video
+    - asistentes_personales_genericos
+    - fidelizacion_generica
+  paquete_futuro:
+    - trading_bot_inteligente
+    - marketplaces_complejos
+    - erp_amplio
+    - conciliaciones_bancarias_avanzadas
+    - sicom_pilaga_fx_como_oferta_general
