@@ -1,6 +1,7 @@
 ---
 import Badge from "../components/ui/Badge.svelte";
 import LinkButton from "../components/ui/LinkButton.astro";
+import PublicVeraEntry from "../components/diagnosis/PublicVeraEntry.svelte";
 import HeroProcessVisual from "../components/marketing/HeroProcessVisual.astro";
 import SectionHeading from "../components/marketing/SectionHeading.astro";
 import PublicMarketingLayout from "../layouts/PublicMarketingLayout.astro";
@@ -78,7 +79,7 @@ const method = [
             por etapas y medir resultados sin transformar la tecnología en una carga para el equipo.
           </p>
           <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-            <LinkButton href="#contacto" size="large" class="px-7">Solicitar diagnóstico</LinkButton>
+            <LinkButton href="#vera" size="large" class="px-7">Hablar con Vera</LinkButton>
             <LinkButton href="#solucion" variant="ghost" size="large" class="border border-[#cfdbdf] bg-white/55 px-7 text-[#244966] hover:bg-white">
               Ver cómo funciona
               <span aria-hidden="true">↓</span>
@@ -269,15 +270,17 @@ const method = [
       </div>
     </section>
 
+    <PublicVeraEntry client:load />
+
     <section id="contacto" class="scroll-mt-24 bg-[#e9f5f3] py-20 sm:py-24">
       <div class="mx-auto max-w-4xl px-5 text-center sm:px-8">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#168b88]">Primer paso</p>
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#168b88]">Contacto alternativo</p>
         <h2 class="mt-4 text-4xl font-semibold leading-tight tracking-[-0.06em] text-[#102d4f] sm:text-5xl">
-          Empezá con un diagnóstico claro.
+          También podés escribirnos directo.
         </h2>
         <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#5b7283] sm:text-lg">
-          Contanos qué proceso querés mejorar. Revisamos el punto de partida y conversamos sobre una primera
-          etapa realista, medible y adecuada para tu equipo.
+          Si preferís no usar el diagnóstico automático, mandanos un resumen por email.
+          Lo revisamos y conversamos sobre una primera etapa realista, medible y adecuada para tu equipo.
         </p>
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <LinkButton
@@ -292,7 +295,7 @@ const method = [
           </LinkButton>
         </div>
         <p class="mt-5 text-xs leading-5 text-[#71878e]">
-          En esta primera versión, el contacto se inicia por email. La integración del formulario se incorporará en una etapa posterior.
+          El email sigue disponible como fallback si el diagnóstico automático no responde o si querés enviar más contexto.
         </p>
       </div>
     </section>

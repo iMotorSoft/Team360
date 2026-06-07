@@ -12,6 +12,14 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
+### 2026-06-07 - Entrada publica de Vera en Home Team360
+
+- La Home publica incorpora una primera entrada de texto libre para `Vera` como marca visible del asistente Team360.
+- La implementacion reutiliza el backend existente `automation_diagnosis` mediante un adapter frontend minimo; no crea motor paralelo ni contrato definitivo `/api/diagnosis/*`.
+- Se mantiene la frontera tecnica/comercial: `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis` y `svc_sales_diagnosis` siguen siendo identificadores estables.
+- El flujo publico todavia no implementa conversacion completa, captura de lead, resultado final ni L2/RAG ArangoDB/Milvus.
+- El mailto queda como fallback controlado si el backend no esta disponible.
+
 ### 2026-06-07 - Representacion Console de Team360.live y Vera
 
 - Se valido y ajusto la Console mock para representar Team360.live como cliente real y el servicio `Asistente Inteligente Vera` como servicio comercial visible.
