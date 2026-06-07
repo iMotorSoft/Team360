@@ -48,7 +48,8 @@ related_pilots:
 related_clients:
   - team360_live
 risk_level: medium
-supports_step_to_action: true
+supports_step_to_action: false
+step_to_action_status: planned_extension
 step_to_action_type: diagnostic_code_whatsapp_handoff
 preferred_backoffice_model: deepseek_4_flash
 preferred_fast_response_model: gpt_5_nano_low
@@ -76,8 +77,8 @@ de límites comerciales y prueba conversacional.
 Este documento define qué datos debe extraer el asistente desde
 texto libre, qué slots son obligatorios, recomendados u opcionales,
 cómo detectar señales en el texto del usuario, qué preguntar
-cuando falta información y cómo activar Step-to-Action cuando
-corresponde.
+cuando falta información y cómo registrar señales para una futura capa
+de Step-to-Action cuando corresponda.
 
 Sirve para que Vera / Asistente Inteligente Vera pueda diagnosticar
 oportunidades de automatización sin depender de formularios rígidos.
@@ -86,7 +87,9 @@ procesos automatizables más amplios: administrativos, operativos,
 documentales, integraciones y flujos con riesgo.
 
 El objetivo es mejorar la calidad del diagnóstico sin abrumar al
-usuario con preguntas innecesarias.
+usuario con preguntas innecesarias. Step-to-Action, lead capture,
+`diagnostic_code` y WhatsApp handoff son capacidades futuras, no parte
+activa del MVP conversacional inicial.
 
 ---
 
@@ -99,7 +102,8 @@ Esta guía define:
 - Preguntas de seguimiento para completar información faltante.
 - Prioridad de extracción según el contexto detectado.
 - Reglas para no sobrepreguntar al usuario.
-- Criterios para activar Step-to-Action (continuidad comercial).
+- Criterios para detectar señales futuras de Step-to-Action sin
+  capturar datos personales en el MVP inicial.
 - Criterios para activar `human_review_required`.
 
 No define implementación técnica ni endpoints. Es una guía
@@ -130,6 +134,9 @@ Reglas que el asistente debe seguir en toda interacción:
     el usuario ya pida continuidad comercial, cotización o contacto.
 11. **Separar diagnóstico de venta.** Diagnosticar un proceso no
     significa que Team360 lo implemente como oferta actual.
+12. **No activar lead capture en el MVP inicial.** Registrar señales
+    de continuidad futura, pero no pedir nombre, apellido, WhatsApp,
+    email ni empresa durante el diagnóstico.
 
 ### Patrones conversacionales
 
@@ -174,16 +181,17 @@ de entrada. Solo si el contexto lo justifica.
 
 ---
 
-## Slots por función
+## Slots por función y fase
 
 Esta separación evita que el asistente mezcle diagnóstico, clasificación
-y captura comercial. Los slots comerciales se piden tarde; los slots
-sensibles se preguntan solo cuando el caso lo justifica.
+y captura comercial. El MVP conversacional solo usa slots de diagnóstico
+y clasificación. Los slots de continuidad comercial quedan como
+capacidad futura.
 
-### A. Slots de diagnóstico
+### A. Slots del MVP conversacional
 
-Estos slots ayudan a entender el proceso antes de vender, presupuestar
-o pedir datos personales.
+Estos slots ayudan a interpretar texto libre, hacer preguntas mínimas,
+diagnosticar y clasificar. No requieren pedir datos personales.
 
 | Slot | Función | Cuándo preguntarlo |
 |------|---------|--------------------|
@@ -200,11 +208,16 @@ o pedir datos personales.
 | `riesgo_datos` | Detecta sensibilidad. | Solo si el proceso menciona datos críticos. |
 | `acceso_disponible` | Verifica acceso autorizado. | Solo si hay integración o plataforma externa. |
 | `mfa` | Detecta doble factor o bloqueo técnico. | Solo si hay login, plataforma externa o RPA. |
+| `tipo_automatizacion` | Sugiere RAG, workflow, integración, RPA o reporte. | Inferir desde proceso, herramienta y fuente de datos. |
+| `offer_decision` | Separa automatizable de vendible hoy. | Inferir con criterio conservador. |
+| `service_maturity` | Declara madurez del servicio. | Inferir sin elevar a core temas futuros o sensibles. |
+| `human_review_required` | Marca necesidad de revisión humana. | Activar por seguridad, datos sensibles, MFA, finanzas o incertidumbre. |
+| `risk_level` | Resume riesgo bajo, medio o alto. | Basar en datos, permisos, criticidad e irreversibilidad. |
 
 ### B. Slots de clasificación
 
-Estos slots son inferidos por el asistente. No se preguntan literalmente
-como formulario.
+Estos slots también pertenecen al MVP conversacional, pero son inferidos
+por el asistente. No se preguntan literalmente como formulario.
 
 | Slot | Función | Regla |
 |------|---------|-------|
@@ -214,24 +227,30 @@ como formulario.
 | `human_review_required` | Marca necesidad de revisión humana. | Activar por seguridad, datos sensibles, MFA, finanzas o incertidumbre. |
 | `risk_level` | Resume riesgo bajo, medio o alto. | Basar en datos, permisos, criticidad e irreversibilidad. |
 
-### C. Slots comerciales y lead capture
+### C. Slots futuros de continuidad comercial
 
-Estos slots habilitan continuidad comercial, no diagnóstico. No deben
-pedirse al inicio salvo intención clara del usuario.
+Estos slots habilitarán continuidad comercial en una capa posterior.
+No deben pedirse en el MVP conversacional inicial, salvo que el usuario
+pida contacto, presupuesto, propuesta o deje voluntariamente sus datos.
 
 | Slot | Función | Cuándo pedirlo |
 |------|---------|----------------|
-| `nombre` | Identificación mínima para handoff. | Después de dar valor y si el usuario quiere avanzar. |
-| `apellido` | Completa identificación mínima. | Junto con nombre cuando hay continuidad. |
-| `whatsapp_contacto` | Canal de handoff comercial. | Solo para continuidad por WhatsApp, no para diagnosticar. |
-| `email_contacto` | Canal alternativo opcional. | Solo si el usuario lo prefiere o lo ofrece. |
-| `empresa` | Contexto comercial opcional. | Solo si aporta al seguimiento. |
-| `diagnostic_code` | Conserva contexto del diagnóstico. | Asociarlo o generarlo cuando hay continuidad. |
-| `interes_en_diagnostico` | Define si busca orientación o propuesta. | Inferir por señales; preguntar suave si hay ambigüedad. |
-| `siguiente_paso` | Recomienda cierre, piloto, handoff o revisión. | Siempre como salida, no siempre como pregunta. |
+| `nombre` | Identificación mínima futura. | No pedir en MVP; aceptar si el usuario lo ofrece o pide contacto. |
+| `apellido` | Completa identificación futura. | No pedir en MVP; usar solo si se habilita handoff. |
+| `whatsapp_contacto` | Canal futuro de handoff comercial. | No pedir en MVP; solo si el usuario pide WhatsApp/contacto/propuesta. |
+| `email_contacto` | Canal alternativo futuro. | No pedir en MVP; aceptar si el usuario lo prefiere u ofrece. |
+| `empresa` | Contexto comercial futuro opcional. | No pedir en MVP salvo pedido explícito de propuesta. |
+| `diagnostic_code` | Conserva contexto en continuidad futura. | Diseño futuro; no es requerimiento del diagnóstico actual. |
+| `interes_en_diagnostico` | Señal de orientación, propuesta o continuidad. | Inferir; no usar para capturar datos automáticamente. |
+| `siguiente_paso` | Recomienda cierre, piloto, orientación o revisión. | Sí como recomendación textual; no como lead capture. |
 
 **Regla comercial:** si el usuario no quiere dejar datos, el asistente
 debe poder seguir orientando de forma general.
+
+**Regla de MVP:** no pedir nombre, apellido, WhatsApp, email, empresa
+ni datos de contacto durante la fase inicial de diagnóstico. Registrar
+la señal de continuidad futura, pero priorizar diagnóstico útil y
+respuesta clara.
 
 ---
 
@@ -242,7 +261,7 @@ debe poder seguir orientando de forma general.
 | `industria` | recomendado | Rubro o sector del usuario | "tengo un comercio", "soy contador", "tengo una inmobiliaria", "trabajo en salud" | El tipo de automatización varía por industria | Diagnóstico genérico o desalineado |
 | `proceso_a_automatizar` | crítico | Descripción del proceso que quiere mejorar | "cargo datos", "saco reportes", "respondo WhatsApp", "cargo leads", "hago facturas" | Base del diagnóstico | No se puede diagnosticar sin proceso |
 | `area_negocio` | recomendado | Área interna donde ocurre el proceso | "en ventas", "en administración", "en backoffice", "en atención al cliente" | Ayuda a clasificar y priorizar la automatización | Diagnóstico sin contexto organizacional |
-| `canal_origen` | opcional | Cómo llegó el usuario | "vi la página", "me mandaron", "busqué en Google", "me contó un conocido" | Sirve para lead capture y atribución | Sin efecto en el diagnóstico |
+| `canal_origen` | opcional | Cómo llegó el usuario | "vi la página", "me mandaron", "busqué en Google", "me contó un conocido" | Sirve para atribución futura | Sin efecto en el diagnóstico |
 | `herramienta_actual` | crítico | Qué usa hoy para el proceso | "Excel", "WhatsApp", "Google Sheets", "un CRM", "una planilla", "papel" | Determina complejidad de integración | No se puede estimar esfuerzo |
 | `crm_actual` | recomendado | CRM en uso | "Kommo", "HubSpot", "Zoho", "Salesforce", "Pipedrive", "una planilla", "ninguno" | Afecta integración y trazabilidad | Diagnóstico incompleto para ventas |
 | `whatsapp_uso` | recomendado | Uso de WhatsApp | "hablo por WhatsApp", "tengo WhatsApp Business", "recibo pedidos por WhatsApp" | Canal prioritario para automatización | Oportunidad de automatización no detectada |
@@ -262,16 +281,16 @@ debe poder seguir orientando de forma general.
 | `offer_decision` | clasificación | Decisión comercial preliminar | señales de factibilidad, riesgo, evidencia e intención | Separa automatizable de vendible hoy | Promesas comerciales excesivas |
 | `service_maturity` | clasificación | Madurez del servicio | patrón core, piloto, oportunidad o paquete futuro | Evita vender como core lo no validado | Recomendación desalineada |
 | `human_review_required` | clasificación | Marca de revisión humana | datos sensibles, MFA, finanzas, credenciales, incertidumbre | Protege seguridad y calidad | Automatización riesgosa |
-| `risk_level` | clasificación | Riesgo bajo, medio o alto | criticidad, datos, acceso, irreversibilidad | Ordena límites y handoff | Diagnóstico demasiado simple |
-| `presupuesto_aproximado` | comercial tardío | Orden de magnitud o tipo de alcance | "cuánto sale", "tengo presupuesto", "depende el precio", "es caro" | Útil para propuesta, no para diagnóstico inicial | Conversación comercial prematura |
-| `interes_en_diagnostico` | comercial tardío | Busca diagnóstico, propuesta o continuidad | "quiero saber si se puede", "necesito un presupuesto" | Define tono y próximo paso | Conversación desalineada |
-| `siguiente_paso` | comercial tardío | Paso recomendado post-diagnóstico | "¿cómo sigo?", "¿con quién hablo?", "mandame información" | Activa Step-to-Action | Oportunidad comercial perdida |
-| `nombre` | comercial tardío | Nombre del usuario | "me llamo Juan", "soy María" | Handoff si quiere avanzar | Sin seguimiento personalizado |
-| `apellido` | comercial tardío | Apellido del usuario | el usuario lo ofrece o acepta handoff | Handoff si quiere avanzar | Seguimiento incompleto |
-| `whatsapp_contacto` | comercial tardío | WhatsApp del usuario | "escribime al 11..." | Continuidad por WhatsApp | No afecta diagnóstico |
-| `email_contacto` | comercial tardío | Email del usuario | "mandame mail a ..." | Canal alternativo opcional | No afecta diagnóstico |
-| `empresa` | comercial tardío | Empresa del usuario | "tengo un negocio", "trabajo en X" | Contexto comercial opcional | No afecta diagnóstico inicial |
-| `diagnostic_code` | comercial tardío | Código único de diagnóstico | se asigna o asocia automáticamente | Continuidad sin perder contexto | Conversación huérfana |
+| `risk_level` | clasificación | Riesgo bajo, medio o alto | criticidad, datos, acceso, irreversibilidad | Ordena límites y revisión humana | Diagnóstico demasiado simple |
+| `presupuesto_aproximado` | continuidad futura | Orden de magnitud o tipo de alcance | "cuánto sale", "tengo presupuesto", "depende el precio", "es caro" | Útil para propuesta futura, no para diagnóstico inicial | Conversación comercial prematura |
+| `interes_en_diagnostico` | continuidad futura | Busca diagnóstico, propuesta o continuidad | "quiero saber si se puede", "necesito un presupuesto" | Define tono y próximo paso | Conversación desalineada |
+| `siguiente_paso` | MVP / futuro | Paso recomendado post-diagnóstico | "¿cómo sigo?", "¿con quién hablo?", "mandame información" | Cierra la respuesta con claridad | Recomendación incompleta |
+| `nombre` | continuidad futura | Nombre del usuario | "me llamo Juan", "soy María" | Handoff futuro si quiere avanzar | No afecta diagnóstico |
+| `apellido` | continuidad futura | Apellido del usuario | el usuario lo ofrece o acepta handoff | Handoff futuro si quiere avanzar | No afecta diagnóstico |
+| `whatsapp_contacto` | continuidad futura | WhatsApp del usuario | "escribime al 11..." | Continuidad futura por WhatsApp | No afecta diagnóstico |
+| `email_contacto` | continuidad futura | Email del usuario | "mandame mail a ..." | Canal alternativo futuro | No afecta diagnóstico |
+| `empresa` | continuidad futura | Empresa del usuario | "tengo un negocio", "trabajo en X" | Contexto comercial futuro opcional | No afecta diagnóstico inicial |
+| `diagnostic_code` | continuidad futura | Código único de diagnóstico | se asignará en capa futura | Continuidad futura sin perder contexto | No afecta diagnóstico inicial |
 
 ---
 
@@ -675,20 +694,22 @@ pública.
 
 ---
 
-## Slots comerciales tardíos
+## Slots de continuidad comercial futura
 
-Estos slots aparecen cuando el usuario pide avanzar, cotizar,
-preparar una propuesta o dejar el diagnóstico asociado a un
-`diagnostic_code`. No son condición para diagnosticar.
+Estos slots son de diseño futuro. En el MVP conversacional inicial no
+se preguntan ni se convierten en formulario. Solo se registran señales
+de continuidad cuando el usuario pide avanzar, cotizar, preparar una
+propuesta o deja voluntariamente sus datos.
 
 ### presupuesto_aproximado
 
 **Definición:** orden de magnitud del presupuesto disponible.
 
-**Regla:** no preguntar de entrada salvo que el usuario pida
-presupuesto o muestre intención clara de contratar.
+**Regla de MVP:** no preguntar presupuesto en el diagnóstico inicial.
+Si el usuario pide precio o cotización, responder con criterio de
+alcance y seguir diagnosticando sin forzar monto.
 
-**Pregunta recomendada suave (solo con intención clara):**
+**Pregunta futura recomendada suave (no activa en MVP inicial):**
 "¿Querés que lo pensemos como una prueba chica o como una
 implementación más completa?"
 
@@ -701,23 +722,29 @@ tomarlo como contexto comercial, no como condición para diagnosticar.
 
 ---
 
-## Slots de lead capture y Step-to-Action
+## Slots futuros de lead capture y Step-to-Action
 
 ### nombre, apellido, whatsapp_contacto, email_contacto, empresa, diagnostic_code
 
 **Reglas:**
-- Se piden solo después de dar valor y cuando hay intención de
-  continuidad comercial.
-- Deben pedirse de forma transparente, explicando para qué se usan.
-- Pedir el mínimo necesario: nombre, apellido y WhatsApp para handoff.
-- Email y empresa son opcionales.
-- WhatsApp se pide para continuidad comercial, no para diagnosticar.
-- Usar `diagnostic_code` para continuar sin perder contexto.
-- Preparar mensaje o URL de WhatsApp hacia Team360 si corresponde.
+- No se piden en el MVP conversacional inicial.
+- Solo se aceptan si el usuario los ofrece espontáneamente o pide
+  explícitamente contacto, presupuesto o propuesta.
+- En la extensión futura, pedirlos de forma transparente, explicando
+  para qué se usan.
+- En la extensión futura, pedir el mínimo necesario: nombre, apellido
+  y WhatsApp para handoff.
+- Email y empresa siguen siendo opcionales.
+- WhatsApp se reserva para continuidad comercial futura, no para
+  diagnosticar.
+- `diagnostic_code` pertenece al diseño futuro de continuidad, no al
+  diagnóstico actual.
+- Preparar mensaje o URL de WhatsApp hacia Team360 corresponde a una
+  fase posterior.
 - Si el usuario no quiere dejar datos, seguir orientando de forma
   general.
 
-**Mensaje sugerido:**
+**Mensaje sugerido futuro, no activo en MVP inicial:**
 
 > "Puedo dejar este diagnóstico asociado a un código para que el
 > equipo de Team360 lo revise sin perder el contexto. Si querés
@@ -727,18 +754,21 @@ tomarlo como contexto comercial, no como condición para diagnosticar.
 
 **Mensaje de handoff con `diagnostic_code`:**
 
+Este mensaje es de uso futuro. No debe usarse como respuesta normal
+del MVP inicial.
+
 > "El código de este diagnóstico es `{diagnostic_code}`. Sirve para
 > retomar la conversación sin que tengas que repetir todo. No hace
 > falta que compartas contraseñas, tokens ni documentos sensibles."
 
-**Cuándo activar Step-to-Action:**
+**Cuándo registrar señales futuras de Step-to-Action:**
 - El usuario pide presupuesto o precio.
 - El usuario muestra intención de contratar.
 - El diagnóstico es positivo y el usuario quiere avanzar.
 - El usuario pide hablar con alguien.
 - El caso requiere `human_review_required` y hay que derivar.
 
-**Cuándo no activar Step-to-Action todavía:**
+**Cuándo no pedir datos personales todavía:**
 - El usuario recién está explorando y no pidió continuidad.
 - Falta entender el proceso mínimo.
 - El usuario quiere orientación general sin compartir datos.
@@ -775,9 +805,9 @@ los accesos están claros; `pilot` si requiere integración nueva.
 aumenta. Si comparten credenciales, activar
 `human_review_required`.
 
-**Cuándo activar Step-to-Action:** cuando el usuario pida avanzar,
-cotización o revisión del caso; no pedir WhatsApp solo porque
-mencionó WhatsApp como canal operativo.
+**Señal futura de Step-to-Action:** si el usuario pide avanzar,
+cotización o revisión del caso. No pedir WhatsApp solo porque mencionó
+WhatsApp como canal operativo.
 
 ---
 
@@ -805,8 +835,9 @@ de validación.
 contiene datos financieros, salud, legales, menores o información
 bancaria.
 
-**Cuándo activar Step-to-Action:** cuando el usuario quiera convertir
-el diagnóstico en prueba o propuesta; no pedir presupuesto de entrada.
+**Señal futura de Step-to-Action:** cuando el usuario quiera convertir
+el diagnóstico en prueba o propuesta. No pedir presupuesto ni contacto
+de entrada.
 
 ---
 
@@ -828,8 +859,9 @@ planillas o dependa mucho de una persona?"
 
 **Riesgo:** desconocido hasta identificar proceso, datos y herramientas.
 
-**Cuándo activar Step-to-Action:** no activar todavía. Primero ayudar
-a detectar uno o dos procesos posibles y dar orientación preliminar.
+**Señal futura de Step-to-Action:** no registrar todavía. Primero
+ayudar a detectar uno o dos procesos posibles y dar orientación
+preliminar.
 
 ---
 
@@ -845,7 +877,8 @@ haber contexto de proceso.
 `herramienta_actual`, `frecuencia` o `volumen`.
 
 **Acción:** dar valor antes de pedir datos personales. Primero entender
-alcance; después, si el usuario quiere avanzar, activar handoff.
+alcance. En el MVP inicial no activar handoff; solo registrar señal
+futura si el usuario insiste en propuesta o contacto.
 
 **Pregunta recomendada:**
 "Puedo orientarte, pero para no inventar precio necesito ubicar el
@@ -856,9 +889,10 @@ alcance. ¿Qué proceso querés automatizar y hoy dónde lo hacen?"
 **Riesgo:** medio por expectativa comercial. Evitar prometer precio,
 plazo o implementación sin diagnóstico.
 
-**Cuándo activar Step-to-Action:** después de explicar el criterio y
-si el usuario quiere propuesta o revisión humana. Recién ahí pedir
-nombre, apellido y WhatsApp, asociando `diagnostic_code`.
+**Señal futura de Step-to-Action:** después de explicar el criterio,
+si el usuario quiere propuesta o revisión humana. En el MVP inicial,
+no pedir nombre, apellido ni WhatsApp; recomendar el próximo paso de
+forma clara.
 
 ---
 
@@ -884,7 +918,7 @@ claro; `pilot` si hay integración con Meta, CRM o varios canales.
 la automatización tiene alto impacto. Revisar permisos de cuentas
 publicitarias antes de prometer integración.
 
-**Cuándo activar Step-to-Action:** cuando el usuario pida ordenar el
+**Señal futura de Step-to-Action:** cuando el usuario pida ordenar el
 flujo, medir pérdida de leads o avanzar con una prueba.
 
 ---
@@ -911,9 +945,9 @@ limpieza o clasificación compleja.
 **Riesgo:** medio. Subir a `human_review_required` si hay contratos,
 salud, menores, datos legales, financieros o información confidencial.
 
-**Cuándo activar Step-to-Action:** cuando el usuario tenga documentos
-identificados y quiera validar alcance. No pedir archivos sensibles
-por la conversación pública.
+**Señal futura de Step-to-Action:** cuando el usuario tenga documentos
+identificados y quiera validar alcance. No pedir archivos sensibles ni
+datos de contacto en el MVP inicial.
 
 ---
 
@@ -940,9 +974,9 @@ conciliaciones bancarias/contables con impacto sensible?"
 datos financieros, bancos, conciliaciones avanzadas, acciones
 irreversibles o acceso no documentado.
 
-**Cuándo activar Step-to-Action:** si el usuario quiere revisión
-humana o hay impacto sensible. Pedir datos mínimos para handoff, no
-datos financieros detallados.
+**Señal futura de Step-to-Action:** si el usuario quiere revisión
+humana o hay impacto sensible. No pedir datos mínimos para handoff en
+el MVP inicial ni datos financieros detallados.
 
 ---
 
@@ -972,9 +1006,9 @@ de terceros sin autorización.
 **Riesgo:** alto por seguridad, cumplimiento y posible bloqueo de
 cuentas.
 
-**Cuándo activar Step-to-Action:** activar handoff si el caso tiene
-valor y requiere revisión humana. No pedir contraseñas, tokens ni
-capturas de sesión.
+**Señal futura de Step-to-Action:** registrar continuidad futura si el
+caso tiene valor y requiere revisión humana. No activar handoff en el
+MVP inicial. No pedir contraseñas, tokens ni capturas de sesión.
 
 ---
 
@@ -1002,9 +1036,9 @@ restricciones de acceso.
 datos personales sensibles, legales, salud, menores o información
 confidencial.
 
-**Cuándo activar Step-to-Action:** cuando el usuario quiera validar
-un corpus o preparar una prueba. No pedir documentos sensibles en la
-conversación pública.
+**Señal futura de Step-to-Action:** cuando el usuario quiera validar
+un corpus o preparar una prueba. No pedir documentos sensibles ni datos
+de contacto en la conversación pública del MVP.
 
 ---
 
@@ -1029,15 +1063,15 @@ conversación pública.
    preguntar por acceso autorizado y tipo de datos.
 
 7. **Si hay intención comercial** (presupuesto, precio,
-   contratar), pedir datos de contacto **solo después**
-   de dar valor en el diagnóstico.
+   contratar), registrar señal futura de continuidad. No pedir datos
+   de contacto en el MVP inicial salvo pedido explícito del usuario.
 
 8. **No pedir presupuesto de entrada.** Si el usuario pide precio,
    cambiar la conversación a alcance: prueba chica o implementación
    más completa.
 
-9. **No pedir WhatsApp de entrada.** WhatsApp de contacto se pide
-   para handoff comercial, no para diagnosticar.
+9. **No pedir WhatsApp de entrada.** WhatsApp de contacto pertenece
+   al handoff comercial futuro, no al diagnóstico.
 
 10. **No preguntar por datos sensibles en detalle.** Detectar la
     categoría de riesgo alcanza para marcar revisión humana.
@@ -1052,10 +1086,10 @@ conversación pública.
 | Hay proceso pero no herramienta | "¿Dónde lo hacen hoy?" | La complejidad depende de la herramienta | "¿Cada cuánto ocurre?" |
 | Hay herramienta pero no volumen | "¿Cuántas veces por {frecuencia} ocurre?" | El volumen determina el impacto | "¿Quién lo hace?" |
 | Hay WhatsApp o CRM | "¿Hoy lo cargan manualmente o está integrado?" | Diferencia entre automatización e integración | "¿Usan planillas además?" |
-| Hay presupuesto / intención | "¿Buscás una prueba chica o una implementación más completa?" | Entender alcance sin forzar monto | Ofrecer handoff con `diagnostic_code` |
+| Hay presupuesto / intención | "¿Buscás una prueba chica o una implementación más completa?" | Entender alcance sin forzar monto | Registrar señal futura de continuidad |
 | Hay credenciales o MFA | "¿El acceso sería con usuario autorizado y permisos definidos?" | Evaluar seguridad | Activar human_review_required |
 | No sabe qué automatizar | "Contame algo de tu día a día que sientas repetitivo" | Explorar sin presionar | Identificar el primer proceso |
-| Quiere dejar datos | "Puedo asociarlo a un código de diagnóstico. ¿Querés avanzar por WhatsApp?" | Pedir consentimiento y explicar uso | Pedir nombre, apellido y WhatsApp |
+| Quiere dejar datos | "Puedo tomarlo como señal de continuidad futura." | No convertir el diagnóstico en formulario | Aceptar datos solo si los ofrece espontáneamente |
 
 ---
 
@@ -1110,8 +1144,8 @@ por aparecer como automatizables.
   base.
 - Si menciona **credenciales**, **MFA** o **cuentas de
   terceros**, marcar `human_review_required`.
-- Si pide **presupuesto**, activar Step-to-Action después
-  de dar valor y sin forzar monto.
+- Si pide **presupuesto**, registrar señal futura de Step-to-Action
+  después de dar valor y sin forzar monto.
 - Si el caso es automatizable pero no vendible hoy, clasificar
   como `future_opportunity` o `human_review_required`.
 - Si el usuario **no sabe qué automatizar**, usar checklist
@@ -1134,7 +1168,7 @@ Sugerencias para la experiencia conversacional del asistente.
 - **Requiere revisión humana** — datos sensibles o MFA
 - **Posible piloto** — caso para prueba controlada
 - **Riesgo por accesos** — credenciales o MFA
-- **Listo para próximo paso** — completar lead capture
+- **Señal de continuidad futura** — no solicitar datos todavía
 
 ### Checklist sugerido
 
@@ -1161,7 +1195,8 @@ Sugerencias para la experiencia conversacional del asistente.
 3. Estimar frecuencia o volumen.
 4. Evaluar riesgo del proceso.
 5. Proponer piloto o solución directa.
-6. Activar Step-to-Action si hay intención comercial.
+6. Sugerir próximo paso recomendado; registrar señal futura de
+   Step-to-Action si hay intención comercial explícita.
 
 ---
 
@@ -1176,7 +1211,8 @@ lo anterior.
 - Mantener secciones autocontenidas: definición, regla, ejemplo y
   excepción deben estar cerca.
 - Usar encabezados descriptivos, no genéricos.
-- Separar slots de diagnóstico, clasificación y lead capture.
+- Separar slots de diagnóstico, clasificación y continuidad comercial
+  futura.
 - Separar reglas de seguridad de ejemplos comerciales.
 - Evitar párrafos largos cuando una tabla o lista simple sea más clara.
 - No duplicar el package manual; referenciarlo cuando el criterio sea

@@ -47,7 +47,8 @@ related_pilots:
 related_clients:
   - team360_live
 risk_level: medium
-supports_step_to_action: true
+supports_step_to_action: false
+step_to_action_status: planned_extension
 step_to_action_type: diagnostic_code_whatsapp_handoff
 preferred_backoffice_model: deepseek_4_flash
 preferred_fast_response_model: gpt_5_nano_low
@@ -102,7 +103,8 @@ asistente de diagnóstico. Se usa para:
 - Sugerir automatizaciones concretas ordenadas por prioridad.
 - Recomendar próximos pasos: piloto, venta directa, exploración
   futura o revisión humana.
-- Activar lead capture cuando corresponda para continuidad comercial.
+- Registrar señales para una futura capa de Step-to-Action y
+  compatibilidad posterior con lead capture.
 - Derivar a revisión humana cuando el diagnóstico lo requiera.
 
 ---
@@ -305,12 +307,18 @@ DiagnosisResult — factibilidad, impacto, complejidad, riesgo,
                   oferta sugerida, madurez, próximo paso
        |
        v
-Step-to-Action — lead capture, continuidad comercial, revisión
-                 humana o cierre informativo
+Recommended Next Step — recomendación clara, límites, hipótesis
+                        y criterio de continuidad
        |
        v
-Console / Human Review — seguimiento en plataforma o derivación
+Optional Human Review — revisión humana cuando el caso lo requiera
 ```
+
+Nota: Step-to-Action, LeadCapture, `diagnostic_code` y WhatsApp handoff
+son extensiones futuras posteriores a la validación del MVP
+conversacional. El flujo MVP termina en diagnóstico útil y recomendación
+clara; la continuidad comercial se habilita después de validar calidad
+de conversación, extracción de slots y clasificación.
 
 ---
 
@@ -451,21 +459,32 @@ Reglas editoriales para facilitar el chunking semántico:
 
 ---
 
-## Step-to-Action
+## Step-to-Action como extensión futura
+
+Step-to-Action no forma parte activa del MVP conversacional inicial.
+En esta etapa, Vera no debe pedir nombre, apellido, WhatsApp, email,
+empresa ni datos de contacto durante el diagnóstico, salvo que el
+usuario los ofrezca espontáneamente o pida explícitamente contacto,
+presupuesto o propuesta.
+
+El MVP debe priorizar conversación natural, interpretación de texto
+libre, extracción de slots, preguntas mínimas, diagnóstico útil,
+clasificación de factibilidad/impacto/complejidad/riesgo y una
+respuesta clara. Step-to-Action queda como `planned_extension`.
 
 ### Trigger
 
-Activar continuidad comercial cuando el usuario muestra
-interés en contratar un servicio, solicita presupuesto,
-pide diagnóstico completo o completa un flujo de scoring
-con resultado positivo.
+Detectar señales futuras de continuidad comercial cuando el usuario
+muestra interés en contratar un servicio, solicita presupuesto,
+pide diagnóstico completo o completa un flujo de scoring con resultado
+positivo.
 
-También activar Step-to-Action cuando el diagnóstico detecta impacto
-alto, riesgo que requiere continuidad humana, oportunidad vendible,
-piloto posible o información suficiente para que Team360 revise el caso
-sin perder contexto.
+También registrar condiciones para una futura continuidad comercial
+cuando el diagnóstico detecta impacto alto, riesgo que requiere
+continuidad humana, oportunidad vendible, piloto posible o información
+suficiente para que Team360 revise el caso sin perder contexto.
 
-### Required Data
+### Future Required Data
 
 - Nombre
 - Apellido
@@ -475,24 +494,28 @@ sin perder contexto.
 - `diagnostic_code` — si existe del diagnóstico actual,
   o debe asociarse uno nuevo.
 
-Regla: pedir solo estos datos mínimos. No solicitar datos sensibles,
-credenciales, documentos internos ni información financiera detallada
-en la conversación pública. Explicar siempre para qué se piden los
-datos y permitir que el usuario continúe sin compartirlos.
+Regla de MVP: no pedir estos datos durante el diagnóstico inicial.
+Solo aceptarlos si el usuario los ofrece espontáneamente o si pide
+explícitamente contacto, presupuesto o propuesta. En una fase futura,
+pedir solo datos mínimos, explicar para qué se usan y permitir que el
+usuario continúe sin compartirlos.
 
-### Diagnostic Code y WhatsApp Handoff
+### Diagnostic Code y WhatsApp Handoff futuro
 
-El handoff debe asociar la conversación a un `diagnostic_code` existente
-o generar uno nuevo cuando el flujo lo permita. Ese código conserva el
-contexto del diagnóstico para que el equipo de Team360 pueda retomarlo
-sin pedir al usuario que repita todo.
+El handoff futuro debe asociar la conversación a un `diagnostic_code`
+existente o generar uno nuevo cuando el flujo lo permita. Ese código
+conservará el contexto del diagnóstico para que el equipo de Team360
+pueda retomarlo sin pedir al usuario que repita todo.
 
-La salida esperada es una URL o mensaje de WhatsApp hacia Team360 que
-incluya el `diagnostic_code`, el resumen breve del caso y el interés
-de continuidad. El asistente no debe prometer contacto inmediato ni
-presupuesto automático; debe preparar la continuidad.
+La salida futura esperada es una URL o mensaje de WhatsApp hacia
+Team360 que incluya el `diagnostic_code`, el resumen breve del caso y
+el interés de continuidad. En el MVP inicial, el asistente no debe
+generar esa continuidad ni pedir contacto como parte normal del flujo.
 
-### Suggested Assistant Message
+### Suggested Assistant Message futuro
+
+Este mensaje no está activo en el MVP inicial. Solo debe usarse cuando
+se habilite la capa futura de continuidad comercial.
 
 > Puedo dejar este diagnóstico preparado para que el equipo de Team360
 > lo revise sin perder el contexto.
@@ -502,10 +525,11 @@ presupuesto automático; debe preparar la continuidad.
 > {service_maturity}, sujeta a revisión si aparecen datos sensibles,
 > accesos, MFA o impacto financiero.
 >
-> Si querés avanzar, pasame tu nombre, apellido y WhatsApp con código
-> de país. Email y empresa son opcionales. Con esos datos asociamos la
-> consulta al código `{diagnostic_code}` y preparamos un mensaje de
-> WhatsApp para continuar con Team360.
+> Si querés avanzar, y esta función ya está habilitada, pasame tu
+> nombre, apellido y WhatsApp con código de país. Email y empresa son
+> opcionales. Con esos datos asociamos la consulta al código
+> `{diagnostic_code}` y preparamos un mensaje de WhatsApp para continuar
+> con Team360.
 >
 > Solo uso esos datos para dar continuidad a este diagnóstico. No hace
 > falta que compartas contraseñas, documentos internos ni información
@@ -523,6 +547,10 @@ Derivar a revisión humana cuando:
 - El asistente no tiene suficiente evidencia para recomendar
   un camino.
 
+En el MVP inicial, Human Handoff significa marcar la necesidad de
+revisión humana y recomendar un próximo paso claro. No implica capturar
+datos personales ni abrir automáticamente una conversación comercial.
+
 ---
 
 ## Primer contexto de validación: Team360.live
@@ -531,8 +559,11 @@ Derivar a revisión humana cuando:
 - Vera estará visible en la home pública de Team360 como asistente
   de ventas y diagnóstico de automatización.
 - La validación inicial cubre: calidad de conversación, precisión
-  del contenido, pertinencia de respuestas, lead capture,
-  step-to-action y calidad del diagnóstico.
+  del contenido, pertinencia de respuestas, extracción de slots,
+  preguntas mínimas y calidad del diagnóstico.
+- Step-to-Action, lead capture, `diagnostic_code` y WhatsApp handoff
+  quedan como extensiones futuras posteriores a validar el MVP
+  conversacional.
 - La carga inicial del knowledge puede hacerse con un script
   controlado de carga/update desde `approved/`.
 - La interfaz de administración de knowledge se construirá
@@ -578,12 +609,15 @@ clasificación, validación de evidencia y actualización del corpus.
 
 ## Referencias cruzadas silenciosas
 
-- `WhatsApp` → seguridad, accesos, MFA y lead capture.
+- `WhatsApp` → seguridad, accesos, MFA y canal operativo. No pedir
+  WhatsApp de contacto durante el diagnóstico inicial.
 - `CRM` → integraciones y trazabilidad comercial.
 - `Excel` / `reportes` → KPI y backoffice.
 - `Documentos propios` → RAG y knowledge base.
 - `Datos sensibles` / `cuentas de terceros` → `human_review_required`.
-- `Presupuesto` o `diagnóstico completo` → Step-to-Action.
+- `Presupuesto` o `diagnóstico completo` → señal futura de
+  Step-to-Action; no capturar datos personales en el MVP salvo pedido
+  explícito del usuario.
 - `Automatizable pero no vendible hoy` → `future_opportunity`
   o `human_review_required`.
 
