@@ -11,6 +11,7 @@ export interface ServiceMetric {
 export interface Service {
   id: string;
   name: string;
+  commercialName?: string;
   description: string;
   clientSummary: string;
   category: string;
@@ -22,6 +23,8 @@ export interface Service {
   nextStep: string;
   visibleToClient: boolean;
   metrics: ServiceMetric[];
+  configurationDetails?: ServiceMetric[];
+  readinessNotes?: string[];
   workflowSteps: string[];
   integrationNames: string[];
 }
@@ -50,6 +53,7 @@ export const services: Service[] = [
   {
     id: "svc_sales_diagnosis",
     name: "Asistente Inteligente Vera",
+    commercialName: "Vera",
     description: "Servicio comercial visible para ventas y diagnóstico inicial de automatización en Team360.live.",
     clientSummary: "Vera conversa con visitantes, interpreta necesidades de automatización y deja leads trazables para revisión en Console.",
     category: "sales_diagnosis",
@@ -61,12 +65,24 @@ export const services: Service[] = [
     nextStep: "Conectar la home pública al assistant instance técnico team360_sales_diagnosis.",
     visibleToClient: true,
     metrics: [
+      { id: "service-state", label: "Servicio", value: "Activo" },
+      { id: "public-channel", label: "Canal futuro", value: "Home pública" },
+      { id: "l2-state", label: "Knowledge L2", value: "Preparado" },
+    ],
+    configurationDetails: [
+      { id: "service-code", label: "Service code", value: "svc_sales_diagnosis" },
       { id: "assistant-instance", label: "Assistant instance", value: "team360_sales_diagnosis" },
       { id: "package-code", label: "Package", value: "pkg_sales_diagnosis" },
       { id: "knowledge-scope", label: "Knowledge scope", value: "ks_team360_sales_diagnosis" },
+      { id: "template-code", label: "Template", value: "team360_sales_automation_diagnosis" },
     ],
-    workflowSteps: ["Texto libre", "Extracción de slots", "Checklist dinámico", "Resultado de diagnóstico", "Captura de lead"],
-    integrationNames: ["Home pública futura", "Console Team360"],
+    readinessNotes: [
+      "Vera es marca visible; los identificadores técnicos se mantienen neutrales para soportar rebranding.",
+      "La home pública todavía no está enganchada al assistant instance.",
+      "La base de conocimiento L2 queda preparada como scope, sin ingesta ArangoDB/Milvus activa.",
+    ],
+    workflowSteps: ["Texto libre", "Extracción de slots", "Contexto L0/L1", "Checklist dinámico", "Resultado de diagnóstico", "Captura de lead"],
+    integrationNames: ["Home pública futura", "Console Team360", "Knowledge L2 preparada"],
   },
   {
     id: "svc-carmel-leads",

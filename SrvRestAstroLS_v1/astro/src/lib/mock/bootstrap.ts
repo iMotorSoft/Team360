@@ -20,6 +20,8 @@ export interface MockProfile {
   id: MockProfileId;
   label: string;
   description: string;
+  userName: string;
+  userEmail: string;
   defaultWorkspaceId: string;
 }
 
@@ -91,7 +93,7 @@ export interface MockWorkspaceContext {
   dashboardCards: DashboardCard[];
 }
 
-interface MockProfileDefinition extends MockProfile {
+interface MockProfileDefinition extends Omit<MockProfile, "userName" | "userEmail"> {
   userId: string;
   accessibleOrganizationIds: string[];
   accessibleWorkspaceIds: string[];
@@ -237,7 +239,7 @@ const profileDefinitions: Record<MockProfileId, MockProfileDefinition> = {
       "team.manage",
       "support.read",
     ],
-    enabledModules: ["home", "services", "results", "reports", "automations", "files", "alerts", "tasks", "team", "support", "settings"],
+    enabledModules: ["home", "services", "results", "reports", "diagnosis", "automations", "files", "alerts", "tasks", "team", "support", "settings"],
     technicalDepth: "business",
   },
 };
@@ -285,12 +287,18 @@ function getNotificationSummary(accessibleWorkspaceIds: string[], activeWorkspac
 }
 
 export function getMockProfiles(): MockProfile[] {
-  return Object.values(profileDefinitions).map(({ id, label, description, defaultWorkspaceId }) => ({
-    id,
-    label,
-    description,
-    defaultWorkspaceId,
-  }));
+  return Object.values(profileDefinitions).map(({ id, label, description, defaultWorkspaceId, userId }) => {
+    const user = requireById(users, userId, "user");
+
+    return {
+      id,
+      label,
+      description,
+      userName: user.name,
+      userEmail: user.email,
+      defaultWorkspaceId,
+    };
+  });
 }
 
 export function getMockBootstrap(

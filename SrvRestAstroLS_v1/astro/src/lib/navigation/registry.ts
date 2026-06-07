@@ -226,7 +226,7 @@ export const navigationRegistry: NavigationRegistryItem[] = [
     icon: "automation",
     group: "operations",
     module: "diagnosis",
-    audiences: ["owner", "operator", "partner"],
+    audiences: ["owner", "operator", "partner", "client"],
     requiresWorkspace: true,
   },
 ];

@@ -12,6 +12,14 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
+### 2026-06-07 - Representacion Console de Team360.live y Vera
+
+- Se valido y ajusto la Console mock para representar Team360.live como cliente real y el servicio `Asistente Inteligente Vera` como servicio comercial visible.
+- La navegacion mock habilita `diagnosis` para el admin cliente de Team360.live, manteniendo el flujo actual de `automation_diagnosis`.
+- Los codigos tecnicos estables se mantienen como `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis` y `svc_sales_diagnosis`; `Vera` queda como marca visible.
+- El detalle de servicio deja explicito que la home publica y L2/RAG ArangoDB/Milvus no estan activos todavia.
+- No se modificaron invariantes de arquitectura, motor conversacional, migraciones ni contrato `/api/diagnosis/*`.
+
 ### 2026-06-07 - Materializacion inicial de configuracion productiva Team360.live / Vera
 
 - Se avanzo desde documentacion hacia configuracion inicial mediante seed SQL y mocks, manteniendo los invariantes de arquitectura viva.

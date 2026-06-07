@@ -120,17 +120,58 @@
             <dl class="mt-4 space-y-3 text-xs">
               <div class="flex justify-between gap-3"><dt class="text-[#91a2ad]">Organización</dt><dd class="font-bold text-[#587184]">{getOrganizationNameForWorkspace(service.workspaceId)}</dd></div>
               <div class="flex justify-between gap-3"><dt class="text-[#91a2ad]">Workspace</dt><dd class="font-bold text-[#587184]">{getWorkspaceName(service.workspaceId)}</dd></div>
+              {#if service.commercialName}
+                <div class="flex justify-between gap-3"><dt class="text-[#91a2ad]">Marca visible</dt><dd class="font-bold text-[#587184]">{service.commercialName}</dd></div>
+              {/if}
               <div class="flex justify-between gap-3"><dt class="text-[#91a2ad]">Categoría</dt><dd class="font-bold text-[#587184]">{service.category}</dd></div>
               <div class="flex justify-between gap-3"><dt class="text-[#91a2ad]">Última ejecución</dt><dd class="font-bold text-[#587184]">{formatDateTime(service.lastRunAt, consoleContext.locale)}</dd></div>
             </dl>
           </section>
+          {#if service.configurationDetails?.length}
+            <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5">
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Configuración productiva</p>
+              <dl class="mt-4 space-y-3 text-xs">
+                {#each service.configurationDetails as detail}
+                  <div class="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-3">
+                    <dt class="text-[#91a2ad]">{detail.label}</dt>
+                    <dd class="font-bold text-[#587184]">{detail.value}</dd>
+                  </div>
+                {/each}
+              </dl>
+            </section>
+          {/if}
         </aside>
       </div>
+      {#if service.readinessNotes?.length}
+        <section class="mt-5 rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6">
+          <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Estado de salida</p>
+          <div class="mt-4 grid gap-3 lg:grid-cols-3">
+            {#each service.readinessNotes as note}
+              <p class="rounded-xl bg-[#f8fbfa] p-3 text-xs font-semibold leading-5 text-[#668092]">{note}</p>
+            {/each}
+          </div>
+        </section>
+      {/if}
     {:else if activeTab === "results"}
-      <div class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {#each service.metrics as metric}
-          <StatCard label={metric.label} value={metric.value} trend={metric.trend} description="Indicador visible del servicio seleccionado." />
-        {/each}
+      <div class="mt-6 space-y-5">
+        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {#each service.metrics as metric}
+            <StatCard label={metric.label} value={metric.value} trend={metric.trend} description="Indicador visible del servicio seleccionado." />
+          {/each}
+        </div>
+        {#if service.configurationDetails?.length}
+          <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5">
+            <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Códigos técnicos estables</p>
+            <div class="mt-4 grid gap-3 md:grid-cols-2">
+              {#each service.configurationDetails as detail}
+                <div class="rounded-xl bg-[#f8fbfa] p-3">
+                  <p class="text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[#91a2ad]">{detail.label}</p>
+                  <p class="mt-1 text-xs font-bold text-[#31536b]">{detail.value}</p>
+                </div>
+              {/each}
+            </div>
+          </section>
+        {/if}
       </div>
     {:else if activeTab === "reports"}
       <div class="mt-6 space-y-3">
