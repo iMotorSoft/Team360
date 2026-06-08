@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import pytest
 
 import tempfile
@@ -12,8 +13,11 @@ from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
 from modules.knowledge_ingestion.schemas import (
     INGESTION_PHASES,
     DOCUMENT_TYPES,
+    DocumentUpsertStatus,
+    KnowledgeDocumentPersistenceResult,
     ORGANIZATION_MEMBER_ROLE_CODES,
     ORGANIZATION_ROLE_CODES,
+    PackagePersistResult,
     PackageScanRequest,
     SCOPE_TYPES,
     SOURCE_TYPES,
@@ -1343,3 +1347,307 @@ class TestKnowledgePackageScanner:
         ws_issues = [i for i in result.documents[0].issues if i.field == "workspace_code"]
         assert len(ws_issues) == 1
         assert ws_issues[0].severity == "warning"
+
+
+# ---------------------------------------------------------------------------
+# Package document persistence (Fase 1.3b)
+# ---------------------------------------------------------------------------
+
+
+class TestKnowledgeIngestionPersistence:
+    """Tests for persist_package_documents — Phase 1.3b.
+
+    Persists approved candidates as KnowledgeDocuments.
+    No chunks, no embeddings, no ArangoDB, no Milvus.
+    """
+
+    @pytest.mark.anyio
+    async def test_dry_run_does_not_create_run_or_upsert(self):
+        """dry_run=True should not create ingestion run nor upsert documents."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=True,
+        )
+        assert result.run_id is None
+        assert result.inserted_count == 0
+        assert result.candidate_count == 1
+        assert result.persisted_count == 0
+        assert len(conn.statements) == 5  # resolve_ingestion_context queries only
+
+    @pytest.mark.anyio
+    async def test_persist_inserts_new_document(self):
+        """Valid approved candidate without existing DB row should insert."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,  # find_by_source returns no existing doc
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.run_id == "run-uuid"
+        assert result.inserted_count == 1
+        assert result.persisted_count == 1
+        assert result.candidate_count == 1
+        assert len(result.documents) == 1
+        assert result.documents[0].status == DocumentUpsertStatus.INSERTED
+        assert result.documents[0].document_id == "doc-uuid"
+        # Verify INSERT was called (find_by_source + INSERT INTO knowledge_documents)
+        insert_sqls = [
+            sql for sql, _ in conn.statements
+            if "insert into knowledge_documents" in sql
+        ]
+        assert len(insert_sqls) == 1
+        # Verify run status updated to completed
+        update_run_sqls = [
+            sql for sql, _ in conn.statements
+            if "update knowledge_ingestion_runs" in sql
+        ]
+        assert any("completed" in sql for sql in update_run_sqls)
+
+    @pytest.mark.anyio
+    async def test_persist_unchanged_same_content_hash(self):
+        """Existing doc with same content_hash should return unchanged (no UPDATE)."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        file_path = Path(root) / "approved" / "test.md"
+        expected_hash = hashlib.sha256(file_path.read_bytes()).hexdigest()
+
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            {"id": "doc-uuid", "content_hash": expected_hash},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.unchanged_count == 1
+        assert result.persisted_count == 0
+        assert result.inserted_count == 0
+        assert result.updated_count == 0
+        assert result.documents[0].status == DocumentUpsertStatus.UNCHANGED
+        # No UPDATE knowledge_documents should have been executed
+        update_kd_sqls = [
+            sql for sql, _ in conn.statements
+            if "update knowledge_documents" in sql
+        ]
+        assert len(update_kd_sqls) == 0
+
+    @pytest.mark.anyio
+    async def test_persist_updated_different_hash(self):
+        """Existing doc with different content_hash should UPDATE."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            {"id": "doc-uuid", "content_hash": "old-content-hash-that-definitely-differs"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.updated_count == 1
+        assert result.persisted_count == 1
+        assert result.inserted_count == 0
+        assert result.unchanged_count == 0
+        assert result.documents[0].status == DocumentUpsertStatus.UPDATED
+        # Verify UPDATE was executed
+        update_kd_sqls = [
+            sql for sql, _ in conn.statements
+            if "update knowledge_documents" in sql
+        ]
+        assert len(update_kd_sqls) == 1
+
+    @pytest.mark.anyio
+    async def test_persist_invalid_document_not_persisted(self):
+        """Document with validation errors should not be persisted."""
+        fm = _VALID_FRONTMATTER.replace(
+            'document_type: policy', 'document_type: unknown_type'
+        )
+        root = _make_package_dir([("test.md", fm)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.invalid_count >= 1
+        assert result.persisted_count == 0
+        assert result.inserted_count == 0
+        # Scanner sets candidate based only on status/ingestion_status,
+        # not on other validation fields — so candidate_count may be >0
+        # even when the document is invalid.
+        # No INSERT/UPDATE knowledge_documents should have been executed
+        kd_sqls = [
+            sql for sql, _ in conn.statements
+            if "knowledge_documents" in sql and ("insert" in sql or "update" in sql)
+        ]
+        assert len(kd_sqls) == 0
+
+    @pytest.mark.anyio
+    async def test_persist_draft_document_not_persisted(self):
+        """Draft documents (candidate_for_ingestion=False) are skipped."""
+        draft_fm = _VALID_FRONTMATTER.replace(
+            "status: approved", "status: draft"
+        ).replace(
+            "ingestion_status: ready", "ingestion_status: not_ready"
+        )
+        root = _make_package_dir([("draft.md", draft_fm)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.skipped_count >= 1
+        assert result.persisted_count == 0
+        assert result.candidate_count == 0
+        assert result.run_id == "run-uuid"
+
+    @pytest.mark.anyio
+    async def test_persist_no_chunks_created(self):
+        """Verify no knowledge_chunks inserts are emitted."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.inserted_count == 1
+        # Verify no knowledge_chunks touched
+        chunk_sqls = [
+            sql for sql, _ in conn.statements
+            if "knowledge_chunks" in sql
+        ]
+        assert len(chunk_sqls) == 0
+        # Verify no embedding or vector references
+        all_sql = " ".join(sql for sql, _ in conn.statements)
+        assert "embedding" not in all_sql.lower()
+        assert "milvus" not in all_sql.lower()
+        assert "arango" not in all_sql.lower()
+
+    @pytest.mark.anyio
+    async def test_persist_propagates_triggered_by_email(self):
+        """triggered_by_email should be resolved and stored in the run."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "user-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            triggered_by_email="mario.rojas@alquimiablue.com",
+            dry_run=False,
+        )
+        assert result.inserted_count == 1
+        # Verify triggered_by_user_id propagated to run
+        insert_run = next(
+            params for sql, params in conn.statements
+            if "insert into knowledge_ingestion_runs" in sql
+        )
+        assert insert_run["triggered_by_user_id"] == "user-uuid"
+        # Verify user was looked up (core_users query present)
+        user_sqls = [
+            sql for sql, _ in conn.statements
+            if "core_users" in sql
+        ]
+        assert len(user_sqls) == 1

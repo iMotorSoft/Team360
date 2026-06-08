@@ -80,6 +80,147 @@ class KnowledgeIngestionRepository:
         )
         return {"run_id": row["id"]}
 
+    async def find_knowledge_document_by_source(
+        self,
+        conn: AsyncConnection,
+        knowledge_scope_id: str,
+        source_uri: str,
+    ) -> dict[str, Any] | None:
+        return await fetch_one(
+            conn,
+            """
+            select id::text, content_hash
+            from knowledge_documents
+            where knowledge_scope_id = %(knowledge_scope_id)s
+              and source_uri = %(source_uri)s
+            """,
+            {
+                "knowledge_scope_id": knowledge_scope_id,
+                "source_uri": source_uri,
+            },
+        )
+
+    async def insert_knowledge_document(
+        self,
+        conn: AsyncConnection,
+        *,
+        knowledge_scope_id: str,
+        source_type: str,
+        source_uri: str,
+        title: str,
+        content_hash: str,
+        metadata_jsonb: dict[str, Any],
+        node_path: str | None = None,
+    ) -> str:
+        row = await fetch_one(
+            conn,
+            """
+            insert into knowledge_documents (
+                knowledge_scope_id,
+                source_type,
+                source_uri,
+                title,
+                content_hash,
+                metadata_jsonb,
+                node_path
+            ) values (
+                %(knowledge_scope_id)s,
+                %(source_type)s,
+                %(source_uri)s,
+                %(title)s,
+                %(content_hash)s,
+                %(metadata_jsonb)s,
+                %(node_path)s
+            )
+            returning id::text
+            """,
+            {
+                "knowledge_scope_id": knowledge_scope_id,
+                "source_type": source_type,
+                "source_uri": source_uri,
+                "title": title,
+                "content_hash": content_hash,
+                "metadata_jsonb": Jsonb(metadata_jsonb),
+                "node_path": node_path,
+            },
+        )
+        if row is None:
+            raise DatabaseExecutionError("insert_knowledge_document returned no row")
+        return row["id"]
+
+    async def update_knowledge_document(
+        self,
+        conn: AsyncConnection,
+        *,
+        document_id: str,
+        source_type: str,
+        title: str,
+        content_hash: str,
+        metadata_jsonb: dict[str, Any],
+        node_path: str | None = None,
+    ) -> None:
+        await execute(
+            conn,
+            """
+            update knowledge_documents
+            set source_type = %(source_type)s,
+                title = %(title)s,
+                content_hash = %(content_hash)s,
+                metadata_jsonb = %(metadata_jsonb)s,
+                node_path = %(node_path)s,
+                updated_at_utc = now()
+            where id = %(document_id)s
+            """,
+            {
+                "document_id": document_id,
+                "source_type": source_type,
+                "title": title,
+                "content_hash": content_hash,
+                "metadata_jsonb": Jsonb(metadata_jsonb),
+                "node_path": node_path,
+            },
+        )
+
+    async def upsert_knowledge_document(
+        self,
+        conn: AsyncConnection,
+        *,
+        knowledge_scope_id: str,
+        source_type: str,
+        source_uri: str,
+        title: str,
+        content_hash: str,
+        metadata_jsonb: dict[str, Any],
+        node_path: str | None = None,
+    ) -> tuple[str, str]:
+        existing = await self.find_knowledge_document_by_source(
+            conn, knowledge_scope_id, source_uri,
+        )
+        if existing is None:
+            doc_id = await self.insert_knowledge_document(
+                conn=conn,
+                knowledge_scope_id=knowledge_scope_id,
+                source_type=source_type,
+                source_uri=source_uri,
+                title=title,
+                content_hash=content_hash,
+                metadata_jsonb=metadata_jsonb,
+                node_path=node_path,
+            )
+            return doc_id, "inserted"
+        if existing["content_hash"] == content_hash:
+            return existing["id"], "unchanged"
+        await self.update_knowledge_document(
+            conn=conn,
+            document_id=existing["id"],
+            source_type=source_type,
+            title=title,
+            content_hash=content_hash,
+            metadata_jsonb=metadata_jsonb,
+            node_path=node_path,
+        )
+        return existing["id"], "updated"
+
     async def resolve_ingestion_context(
         self,
         conn: AsyncConnection,

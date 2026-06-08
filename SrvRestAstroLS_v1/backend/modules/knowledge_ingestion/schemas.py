@@ -366,3 +366,44 @@ class PackageMetadata:
     package_profile: dict[str, Any]
     scope_mapping: dict[str, Any]
     access_tags: dict[str, Any]
+
+
+# ---------------------------------------------------------------------------
+# Persistence schemas (Fase 1.3b)
+# ---------------------------------------------------------------------------
+
+
+class DocumentUpsertStatus:
+    INSERTED = "inserted"
+    UPDATED = "updated"
+    UNCHANGED = "unchanged"
+    SKIPPED = "skipped"
+    INVALID = "invalid"
+
+
+@dataclass
+class KnowledgeDocumentPersistenceResult:
+    relative_path: str
+    status: str  # DocumentUpsertStatus.*
+    document_id: str | None = None
+    action: str = ""
+    errors: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+
+
+@dataclass
+class PackagePersistResult:
+    package_code: str
+    package_root: str
+    scanned_count: int
+    candidate_count: int
+    persisted_count: int
+    inserted_count: int
+    updated_count: int
+    unchanged_count: int
+    skipped_count: int
+    invalid_count: int
+    documents: list[KnowledgeDocumentPersistenceResult]
+    warnings: list[str]
+    errors: list[str]
+    run_id: str | None = None

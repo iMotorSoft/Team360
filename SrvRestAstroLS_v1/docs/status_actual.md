@@ -1089,6 +1089,27 @@ Incluye estructura inicial para:
 - 69/69 tests knowledge ingestion pasan.
 - No se tocó el documento approved, drafts, frontend, routes, diagnosis, migrations ni embeddings.
 
+### 2026-06-08 - Fase 1.3b: persistencia controlada de KnowledgeDocument
+
+- Se agregó `persist_package_documents()` en `worker.py`:
+  - Recibe codes (org, workspace, scope, package), resuelve contexto, scanea, persiste.
+  - `dry_run=True`: solo scanea, 0 writes, no crea ingestion_run.
+  - `dry_run=False`: crea ingestion_run, upserta candidates como KnowledgeDocuments, marca run completed.
+  - Si falla upsert → run `failed`.
+- Se agregaron en `repository.py`:
+  - `find_knowledge_document_by_source()` — busca por `knowledge_scope_id` + `source_uri`.
+  - `insert_knowledge_document()` — INSERT con RETURNING id.
+  - `update_knowledge_document()` — UPDATE por id.
+  - `upsert_knowledge_document()` — lógica unificada: no existe → inserted; existe + mismo hash → unchanged; existe + hash distinto → updated.
+- Idempotencia por `(knowledge_scope_id, source_uri)` sin constraint DB.
+- `content_hash` = sha256 del contenido completo del archivo.
+- `source_uri` obligatorio: si falta o vacío, no se persiste.
+- `title` usa `frontmatter.title` o fallback a filename stem.
+- `document_type` y resto de metadata van dentro de `metadata_jsonb`.
+- No se tocó migration: `knowledge_documents` existente cubre todas las columnas.
+- 8 tests nuevos (total: 77 tests knowledge ingestion).
+- No se crean chunks, embeddings, ArangoDB ni Milvus.
+
 ## Notas de seguridad
 
 - No se grabo la password de GitHub en archivos del proyecto.
