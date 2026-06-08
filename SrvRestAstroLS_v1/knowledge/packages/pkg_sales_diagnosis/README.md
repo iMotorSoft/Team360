@@ -4,6 +4,11 @@ Paquete de conocimiento del asistente de ventas, diagnóstico de automatización
 
 `Vera / Asistente Inteligente Vera` es el nombre comercial visible. Los identificadores core del paquete deben mantenerse técnicos y estables; no usar `vera_*` como identificador de runtime, scope, paquete, servicio, worker ni documento canónico.
 
+Este paquete es el primer caso concreto dentro de la fundacion documental
+`knowledge/`. No define por si solo la arquitectura general de knowledge de
+Team360. Las reglas transversales viven en `../../_standards/` y el knowledge
+reusable por multiples paquetes debe vivir en `../../global/`.
+
 ## Identificadores técnicos
 
 | Campo | Valor |
@@ -149,6 +154,7 @@ Ejemplos iniciales:
 
 ## Convenciones
 
+- Aplican los estandares generales de `../../_standards/`.
 - Los archivos dentro de `approved/{area_key}/` deben nombrarse en kebab-case, ej: `proceso-de-venta.md`.
 - Todo documento en `approved/` debe tener metadata YAML front-matter válida según la plantilla `drafts/document-template.md`.
 - Para promover un documento a `approved/`, los campos `evidence_level`, `evidence_sources`, `implementation_status`, `commercial_status`, `service_maturity`, `review_cycle`, `last_validated_at`, `validated_by`, `risk_level` y `approval_notes` deben estar completos.

@@ -1,4 +1,7 @@
 ---
+document_code: <stable_document_code>
+status: draft
+ingestion_status: not_ready
 knowledge_scope_code: ks_team360_sales_diagnosis
 scope_type: package
 organization_code: team360

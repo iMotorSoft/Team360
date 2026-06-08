@@ -7,6 +7,7 @@ It is managed as a `lat.md` documentation layer: source code can anchor to these
 - [[team360-platform]] — Product thesis, control plane, auditability and ERP AI Workflow Layer positioning.
 - [[multi-package-workers]] — Workspace, automation packages, package workers, worker configs, credentials and customer interaction boundaries.
 - [[knowledge-rag-graphrag]] — Knowledge scopes, RAG/GraphRAG retrieval modes, document/chunk model and future graph model.
+- [[knowledge-documents-foundation]] — Source knowledge document foundation: global/package/case separation, authoring standards, metadata, curation lifecycle, L0/L1/L2 and SemanticChunker preparation.
 - [[knowledge-scope-contract]] — Canonical KnowledgeScope / KnowledgeDocument / KnowledgeChunk / VectorEmbedding contract derived from JudaismoEnVivo Catalog/MD/Chunk, with multi-tenant filters, ArangoDB text/graph source, Milvus derived index and pgvector laboratory/fallback boundary.
 - [[ai-litellm]] — LiteLLM as OpenAI-compatible AI gateway, adapter boundary, model aliases, usage metadata and fallback rules.
 - [[ai-diagnosis-rag-runtime]] — Initial automation diagnosis RAG runtime: ArangoDB + Milvus + LiteLLM, with PostgreSQL as operational truth and pgvector as available but not primary for first release.

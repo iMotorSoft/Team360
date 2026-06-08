@@ -14,6 +14,22 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-08 - Fundacion documental Knowledge Documents
+
+- Se formalizo `SrvRestAstroLS_v1/knowledge/` como base general de documentos fuente knowledge para Team360.
+- Se agregaron estandares reusable en `knowledge/_standards/`:
+  - authoring editorial;
+  - metadata YAML/frontmatter;
+  - criterios L0/L1/L2 y preparacion para SemanticChunker;
+  - ciclo de curaduria `drafts/approved/exports/archive`.
+- Se agrego `knowledge/global/` para knowledge transversal no pegado a ventas ni a un paquete particular.
+- Se agrego `knowledge/packages/README.md` como indice y convencion de paquetes.
+- Se alineo `knowledge/packages/pkg_sales_diagnosis/README.md` para dejar explicito que es el primer paquete de validacion y no el limite arquitectonico.
+- Se agregaron `status_actual.md` locales para la nueva estructura documental activa.
+- Se agrego `lat.md/knowledge-documents-foundation.md` y se enlazo desde `lat.md/lat.md`.
+- Validacion: `git diff --check` OK; `uv run pytest tests/test_knowledge_ingestion.py` = 65 passed.
+- No se implemento ingestion runtime, SemanticChunker, embeddings, ArangoDB, Milvus, pgvector, endpoints, UI ni cambios de backend.
+
 ### 2026-06-08 - Fase 1.15 base organizacional para Knowledge Ingestion
 
 - Se preparo la base DB minima para que `knowledge_ingestion` resuelva una raiz organizacional real antes de registrar corridas.

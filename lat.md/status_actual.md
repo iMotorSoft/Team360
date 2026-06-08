@@ -12,6 +12,17 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
+### 2026-06-08 - Fundacion documental knowledge multi-package
+
+- Se agrego `knowledge-documents-foundation.md` como invariante estable para separar fundacion documental, paquetes knowledge y casos particulares.
+- Se fijo `SrvRestAstroLS_v1/knowledge/` como arbol canonico de documentos fuente.
+- Se declaro la separacion `_standards/`, `global/` y `packages/{package_code}/`.
+- Se documento el ciclo `drafts/`, `approved/`, `exports/`, `archive/`.
+- Se formalizaron criterios L0/L1/L2 y preparacion editorial para SemanticChunker sin implementar runtime.
+- Se aclaro que `pkg_sales_diagnosis` es el primer paquete concreto y que `Vera` sigue siendo solo nombre comercial visible.
+- Validacion: `git diff --check` OK; `uv run pytest tests/test_knowledge_ingestion.py` = 65 passed.
+- No se implementaron embeddings, ArangoDB, Milvus, pgvector, endpoints, UI ni ingestion runtime.
+
 ### 2026-06-08 - Fase 1.2: Scanner dry-run de paquetes knowledge
 
 - Se agrego `package_scanner.py` para validacion de documentos knowledge contra metadata del paquete, sin DB writes.
