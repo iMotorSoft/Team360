@@ -1167,6 +1167,69 @@ class TestKnowledgePackageScanner:
         assert not result.documents[0].issues
         assert result.documents[0].frontmatter["package_code"] == "pkg_sales_diagnosis"
 
+    def test_real_pkg_sales_diagnosis_has_approved_candidate(self):
+        package_root = (
+            Path(__file__).resolve().parents[2]
+            / "knowledge"
+            / "packages"
+            / "pkg_sales_diagnosis"
+        )
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=str(package_root),
+            dry_run=True,
+        ))
+
+        approved_doc = (
+            "approved/automatizaciones/"
+            "team360_sales_diagnosis_package_manual.md"
+        )
+        approved_results = [
+            doc for doc in result.documents if doc.relative_path == approved_doc
+        ]
+
+        assert result.errors == []
+        assert result.invalid_count == 0
+        assert result.candidate_count >= 1
+        assert result.skipped_count >= 1
+        assert all(doc.source_section == "approved" for doc in result.documents)
+        assert len(approved_results) == 1
+        assert approved_results[0].valid
+        assert approved_results[0].candidate_for_ingestion
+        assert approved_results[0].frontmatter["status"] == "approved"
+        assert approved_results[0].frontmatter["ingestion_status"] == "ready"
+        assert approved_results[0].frontmatter["package_code"] == "pkg_sales_diagnosis"
+        assert approved_results[0].frontmatter["organization_code"] == "team360_live"
+        assert approved_results[0].frontmatter["workspace_code"] == "team360_public_site"
+        assert (
+            approved_results[0].frontmatter["knowledge_scope_code"]
+            == "ks_team360_sales_diagnosis"
+        )
+
+    def test_real_pkg_sales_diagnosis_keeps_original_draft_not_ready(self):
+        package_root = (
+            Path(__file__).resolve().parents[2]
+            / "knowledge"
+            / "packages"
+            / "pkg_sales_diagnosis"
+        )
+        draft_doc = package_root / "drafts" / "team360_sales_diagnosis_package_manual.md"
+        approved_doc = (
+            package_root
+            / "approved"
+            / "automatizaciones"
+            / "team360_sales_diagnosis_package_manual.md"
+        )
+
+        assert draft_doc.exists()
+        assert approved_doc.exists()
+
+        draft_text = draft_doc.read_text(encoding="utf-8")
+        assert "status: draft" in draft_text
+        assert "ingestion_status: not_ready" in draft_text
+        assert "No debe ingerirse" in draft_text
+
     def test_scanner_does_not_modify_files(self):
         root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
         original = Path(root) / "approved" / "test.md"

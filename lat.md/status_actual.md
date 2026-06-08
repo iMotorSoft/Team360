@@ -12,6 +12,14 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
+### 2026-06-08 - Fase 1.3a primer candidato approved de paquete knowledge
+
+- Se agrego el primer documento `approved/` real para `pkg_sales_diagnosis` con metadata valida para scanner dry-run.
+- El scanner detecta el documento como `candidate_for_ingestion=True`.
+- La accion valida el ciclo documental de paquete sin cambiar invariantes de arquitectura viva.
+- Validacion: scanner dry-run real sobre `pkg_sales_diagnosis` con `candidate_count=1`; suite backend completa 155 passed.
+- No se implementaron DB writes, chunks, embeddings, ArangoDB, Milvus, SemanticChunker, endpoints ni runtime de ingesta.
+
 ### 2026-06-08 - Fase 1.2: Scanner dry-run de paquetes knowledge
 
 - Se agrego `package_scanner.py` para validacion de documentos knowledge contra metadata del paquete, sin DB writes.

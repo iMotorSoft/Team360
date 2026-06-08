@@ -14,6 +14,17 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-08 - Fase 1.3a primer documento approved para Knowledge Ingestion
+
+- Se agrego una copia controlada approved del manual de `pkg_sales_diagnosis` en `knowledge/packages/pkg_sales_diagnosis/approved/automatizaciones/team360_sales_diagnosis_package_manual.md`.
+- El draft original `knowledge/packages/pkg_sales_diagnosis/drafts/team360_sales_diagnosis_package_manual.md` no se movio, no se borro y conserva `status: draft` + `ingestion_status: not_ready`.
+- El documento approved usa `status: approved`, `ingestion_status: ready`, `organization_code: team360_live`, `workspace_code: team360_public_site`, `area_key: automatizaciones`, `topic_key: diagnostico_automatizacion`, `node_path: /automatizaciones/diagnostico-automatizacion`, `package_code: pkg_sales_diagnosis` y `knowledge_scope_code: ks_team360_sales_diagnosis`.
+- El scanner dry-run detecta el documento approved como `candidate_for_ingestion=True` con `candidate_count=1`.
+- Se agregaron tests para validar que el paquete real tenga al menos un candidato approved, que drafts sigan excluidos por defecto y que el draft original siga en estado no listo.
+- Validacion: scanner dry-run real sobre `pkg_sales_diagnosis` = `scanned_count=1`, `valid_count=1`, `candidate_count=1`, `skipped_count=3`, sin errores de resultado.
+- Validacion: `uv run pytest tests/test_knowledge_ingestion.py` = 67 passed; `uv run pytest` = 155 passed.
+- No se implemento persistencia DB, upsert de `knowledge_documents`, upsert de `knowledge_chunks`, chunks, embeddings, ArangoDB, Milvus, SemanticChunker, endpoints HTTP, frontend ni cambios en `automation_diagnosis`.
+
 ### 2026-06-08 - Fase 1.15 base organizacional para Knowledge Ingestion
 
 - Se preparo la base DB minima para que `knowledge_ingestion` resuelva una raiz organizacional real antes de registrar corridas.
