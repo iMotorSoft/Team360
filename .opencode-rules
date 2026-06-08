@@ -1,0 +1,201 @@
+# Reglas del Proyecto Team360
+
+Stack principal: Astro + Svelte 5 + Litestar + PostgreSQL + ArangoDB + Milvus + LiteLLM.
+
+Estas reglas aplican para agentes CLI como OpenCode, Codex o DeepSeek trabajando sobre este repositorio.
+
+---
+
+## 1. Reglas generales del repositorio
+
+* Antes de modificar un archivo, leer su contenido actual.
+* No crear motores paralelos si ya existe una implementación equivalente.
+* No reescribir migraciones ya aplicadas.
+* No tocar módulos no relacionados con la tarea.
+* Mantener cambios pequeños, auditables y testeables.
+* No guardar secretos, tokens, passwords ni API keys en código, tests, seeds o documentación.
+* Después de cambios relevantes, ejecutar validaciones:
+
+  * `git diff --check`
+  * tests del módulo afectado
+  * `uv run pytest` si aplica
+
+---
+
+## 2. Identificadores técnicos Team360
+
+* “Vera” es solo nombre comercial visible.
+* No usar `vera` como identificador técnico core.
+* No crear nombres como:
+
+  * `vera_team360_sales_diagnosis`
+  * `pkg_vera_sales_diagnosis`
+  * `ks_vera_team360_sales_diagnosis`
+* Usar identificadores técnicos estables, por ejemplo:
+
+  * `team360_sales_diagnosis`
+  * `pkg_sales_diagnosis`
+  * `ks_team360_sales_diagnosis`
+  * `svc_sales_diagnosis`
+
+---
+
+## 3. Frontend: Astro + Svelte 5 Runes
+
+* Usar Svelte 5 con runes.
+* No usar APIs antiguas de Svelte 4:
+
+  * `export let`
+  * `$:` reactive statements
+* Usar:
+
+  * `$state`
+  * `$derived`
+  * `$props`
+  * `$effect`
+* Integrar componentes Svelte en Astro con directivas correctas:
+
+  * `client:load`
+  * `client:visible`
+  * `client:idle`
+  * según corresponda.
+* Mantener estilos globales en Astro cuando sean de layout/base.
+* Mantener estilos específicos encapsulados en componentes cuando corresponda.
+* No tocar frontend si la tarea es exclusivamente backend o migraciones.
+
+---
+
+## 4. Backend: Python + Litestar
+
+* Usar Litestar para la API REST.
+* No asumir sintaxis de FastAPI o Flask.
+* Usar `async/await` por defecto en endpoints y servicios I/O.
+* Usar Pydantic v2 para schemas y validaciones.
+* Mantener validaciones estrictas de entrada.
+* No ocultar errores críticos con `except Exception` silencioso.
+* Los errores esperados deben tener manejo explícito y testeable.
+
+---
+
+## 5. PostgreSQL y repositories
+
+* PostgreSQL es la verdad operacional del sistema.
+* Guardar en PostgreSQL:
+
+  * usuarios
+  * workspaces
+  * estados operacionales
+  * auditoría
+  * documentos
+  * chunks
+  * ingestion runs
+  * políticas
+  * metadata mínima
+* Todo SQL debe estar dentro de repositories.
+* No escribir SQL directo en routes, services, workers o tests salvo setup controlado de test.
+* Usar psycopg 3 async directo y `psycopg_pool.AsyncConnectionPool`.
+* No usar SQLAlchemy, SQLModel o asyncpg como capa core salvo decisión técnica explícita documentada.
+
+---
+
+## 6. ArangoDB
+
+* ArangoDB se usa para grafo, jerarquía y documentos JSON dinámicos cuando corresponde.
+* Puede representar:
+
+  * KnowledgeMap
+  * KnowledgeNode
+  * relaciones conceptuales
+  * parent/children
+  * path
+  * permisos heredados
+* ArangoDB no reemplaza a PostgreSQL como verdad operacional.
+* No activar integración ArangoDB si la fase actual no lo pide.
+
+---
+
+## 7. Milvus / vectores
+
+* Milvus es índice vectorial derivado.
+* Milvus no decide permisos.
+* No hacer búsquedas globales sin filtros.
+* Toda búsqueda vectorial debe estar filtrada por:
+
+  * scope
+  * tenant/organization
+  * status activo
+  * permisos/access tags
+  * node_path/path prefix si aplica
+* El backend debe revalidar resultados antes de enviarlos al LLM.
+* No activar Milvus productivo si la fase actual no lo pide.
+
+---
+
+## 8. LiteLLM / LLMs
+
+* LiteLLM puede usarse como router/orquestador de modelos.
+* No hardcodear proveedor ni modelo en lógica core.
+* Permitir configurar proveedor/modelo por entorno o argumento según el diseño del proyecto.
+* No guardar llaves en código.
+* Manejar timeouts, errores HTTP, JSON inválido y fallback de forma explícita.
+* No escalar de modelo automáticamente sin decisión documentada.
+
+---
+
+## 9. Knowledge Ingestion Platform Service
+
+* El worker debe ser genérico:
+
+  * `knowledge_ingestion_worker`
+* No crear workers atados a marca o paquete específico, como:
+
+  * `vera_ingestion_worker`
+  * `sales_diagnosis_ingestion_worker`
+* No permitir documentos sin metadata mínima.
+* No permitir knowledge cross-customer.
+* No activar upload público sin auth.
+* No activar retrieval global sin filtros.
+* No indexar embeddings sin scope, tenant, status y permisos.
+* No implementar ArangoDB/Milvus si la fase actual es solo infraestructura PostgreSQL.
+* Mantener fases de ingesta auditables:
+
+  * metadata validation
+  * document conversion
+  * L0/L1 si aplica
+  * chunking
+  * persistence
+  * embeddings
+  * vector indexing
+  * graph update
+  * error/state tracking
+
+---
+
+## 10. Testing y validación
+
+Después de cambios backend:
+
+* Ejecutar tests del módulo afectado.
+* Ejecutar `uv run pytest` si el cambio toca schemas, repositories, workers, migraciones o configuración central.
+* Ejecutar `git diff --check`.
+* Validar que no aparezcan identificadores técnicos prohibidos relacionados con `vera`.
+* Si se modifican migraciones o schema, actualizar/verificar scripts de auditoría si existen.
+
+---
+
+## 11. Límites de implementación
+
+No implementar de más.
+
+Si la tarea pide Fase 1:
+
+* no agregar endpoints HTTP
+* no agregar frontend
+* no agregar upload público
+* no activar ArangoDB
+* no activar Milvus
+* no implementar KnowledgeMap/KnowledgeNode completo
+* no modificar `automation_diagnosis` salvo pedido explícito
+
+Preferir avance incremental, testeado y reversible.
+
