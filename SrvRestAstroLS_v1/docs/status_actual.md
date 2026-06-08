@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-07
+Ultima actualizacion: 2026-06-08
 
 ## Directorio de trabajo
 
@@ -13,6 +13,22 @@ Ultima actualizacion: 2026-06-07
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-08 - Fase 1.15 base organizacional para Knowledge Ingestion
+
+- Se preparo la base DB minima para que `knowledge_ingestion` resuelva una raiz organizacional real antes de registrar corridas.
+- Se agrego migracion `007_team360_core_organizations_users.sql` con:
+  - `core_organizations`;
+  - `core_organization_roles` como capacidades de organizacion;
+  - `core_organization_members` usando `user_id` real hacia `core_users`;
+  - `core_organization_member_roles` como roles del usuario dentro de la organizacion.
+- `core_users` ya existia desde la migracion 001; no se recreo, no se eliminaron columnas, no se hizo `email NOT NULL` y se agrego indice unico parcial sobre `lower(email)` solo cuando `email is not null`.
+- Se agregaron `organization_id` nullable en `core_workspaces` y `organization_id` + `triggered_by_user_id` nullable en `knowledge_ingestion_runs`.
+- Se seedearon organizaciones minimas `team360_platform` y `team360_live`, usuarios reales de Mario Rojas y memberships/roles separados por organizacion.
+- Se actualizo `KnowledgeIngestionRepository` para resolver `organization_code`, `workspace_code`, `knowledge_scope_code`, `package_code`, `assistant_instance_code`, `worker_code` y `triggered_by_email` a IDs reales.
+- Se actualizo `KnowledgeIngestionWorker.validate_and_register()` para crear corridas usando UUIDs reales y conservar codigos en `metadata_snapshot`; `dry_run` no crea runs ni simula UUIDs.
+- Se extendieron tests de `knowledge_ingestion` para cubrir resolucion de contexto, usuario disparador, errores claros y separacion de roles de organizacion vs miembro.
+- No se implemento auth, passwords, login, sessions, OAuth, endpoints, frontend, billing, CRM, ArangoDB, Milvus, embeddings, SemanticChunker ni upsert de documents/chunks.
 
 ### 2026-06-07 - Diseno tecnico Knowledge Ingestion multi-scope / multi-nivel
 

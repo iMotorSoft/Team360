@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-07
+Ultima actualizacion: 2026-06-08
 
 ## Estado general
 
@@ -11,6 +11,17 @@ Ultima actualizacion: 2026-06-07
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-08 - Base organizacional minima para ingesta de conocimiento
+
+- Se materializo una base organizacional minima para que Knowledge Ingestion opere con `organization_id` real, sin reemplazar los invariantes existentes de `[[console-multi-organization]]` ni crear CRM, billing, UI o portal de partners.
+- La migracion 007 agrega `core_organizations`, roles/capacidades de organizacion, memberships basados en `core_users.id` y roles de miembro dentro de organizacion.
+- Se mantiene separacion explicita:
+  - roles de organizacion (`core_organization_roles`) describen capacidades de la organizacion;
+  - roles de miembro (`core_organization_member_roles`) describen permisos del usuario dentro de esa organizacion.
+- `core_workspaces.organization_id` y `knowledge_ingestion_runs.organization_id` quedan como vinculos nullable para compatibilidad incremental.
+- `knowledge_ingestion_runs.triggered_by_user_id` permite trazabilidad de usuario cuando aplique; workers automaticos pueden dejarlo en null.
+- No se implementaron auth, login, passwords, OAuth, endpoints, frontend, ArangoDB, Milvus, embeddings, KnowledgeMap ni KnowledgeNode.
 
 ### 2026-06-07 - Diseno tecnico Knowledge Ingestion multi-scope / multi-nivel
 

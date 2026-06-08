@@ -348,6 +348,7 @@ MIGRATION_006_TABLES: dict[str, list[str]] = {
         "metadata_snapshot", "status", "phases_jsonb", "chunk_count",
         "token_count", "error_code", "error_detail",
         "started_at_utc", "completed_at_utc", "created_at_utc",
+        "updated_at_utc",
     ],
 }
 
@@ -355,6 +356,31 @@ MIGRATION_006_TABLES: dict[str, list[str]] = {
 MIGRATION_006_EXTENDED_COLUMNS: dict[str, list[str]] = {
     "knowledge_documents": ["node_path"],
     "knowledge_chunks": ["node_path", "permission_tags"],
+}
+
+MIGRATION_007_TABLES: dict[str, list[str]] = {
+    "core_organizations": [
+        "id", "organization_code", "display_name", "primary_type",
+        "status", "parent_organization_id", "metadata_jsonb",
+        "created_at_utc", "updated_at_utc",
+    ],
+    "core_organization_roles": [
+        "id", "organization_id", "role_code", "status", "metadata_jsonb",
+        "created_at_utc", "updated_at_utc",
+    ],
+    "core_organization_members": [
+        "id", "organization_id", "user_id", "status", "metadata_jsonb",
+        "created_at_utc", "updated_at_utc",
+    ],
+    "core_organization_member_roles": [
+        "id", "organization_member_id", "role_code", "status",
+        "metadata_jsonb", "created_at_utc", "updated_at_utc",
+    ],
+}
+
+MIGRATION_007_EXTENDED_COLUMNS: dict[str, list[str]] = {
+    "core_workspaces": ["organization_id"],
+    "knowledge_ingestion_runs": ["organization_id", "triggered_by_user_id"],
 }
 
 MIGRATION_004_TABLES: dict[str, list[str]] = {
@@ -417,6 +443,7 @@ REQUIRED_UNIQUE_INDEXES: list[dict[str, str]] = [
     {"name": "uq_ksb_default_per_entity", "table": "knowledge_scope_bindings", "reason": "single default per entity"},
     {"name": "uq_assistant_instances_workspace_code", "table": "assistant_instances", "reason": "unique assistant_code per workspace"},
     {"name": "uq_ksb_binding_scope_entity", "table": "knowledge_scope_bindings", "reason": "idempotent knowledge scope binding per entity"},
+    {"name": "uq_core_users_email_lower_present", "table": "core_users", "reason": "unique non-null email identity"},
 ]
 
 
@@ -447,6 +474,10 @@ REQUIRED_SEEDS: list[tuple[str, str, str]] = [
     ("worker_definitions", "worker_code", "calendar_handoff_worker"),
     ("worker_definitions", "worker_code", "agui_render_worker"),
     ("worker_definitions", "worker_code", "knowledge_ingestion_worker"),
+    ("core_users", "email", "mario.rojas@alquimiablue.com"),
+    ("core_users", "email", "mario.rojas.marconi@gmail.com"),
+    ("core_organizations", "organization_code", "team360_platform"),
+    ("core_organizations", "organization_code", "team360_live"),
 ]
 
 REQUIRED_003_CONSTRAINTS = {
@@ -510,9 +541,12 @@ def audit_schema(cursor: Any, result: AuditResult) -> None:
     all_expected.update(MIGRATION_003_TABLES)
     all_expected.update(MIGRATION_004_TABLES)
     all_expected.update(MIGRATION_006_TABLES)
+    all_expected.update(MIGRATION_007_TABLES)
 
     result.details.append(f"Tablas en DB: {len(db_tables)}")
-    result.details.append(f"Tablas esperadas (001+002+003+004+006): {len(all_expected)}")
+    result.details.append(
+        f"Tablas esperadas (001+002+003+004+006+007): {len(all_expected)}"
+    )
 
     for table_name, expected_cols in sorted(all_expected.items()):
         if table_name not in db_tables:
@@ -562,6 +596,31 @@ def audit_schema(cursor: Any, result: AuditResult) -> None:
         if missing:
             result.details.append(
                 f"  {table_name}: columnas 006 FALTAN: {', '.join(missing)}"
+            )
+
+    # Check migration 007 extended columns on existing tables
+    for table_name, expected_cols in MIGRATION_007_EXTENDED_COLUMNS.items():
+        if table_name not in db_tables:
+            continue
+        cursor.execute(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = %s
+            """,
+            (table_name,),
+        )
+        existing_cols = {row[0] for row in cursor.fetchall()}
+        present = [c for c in expected_cols if c in existing_cols]
+        missing = [c for c in expected_cols if c not in existing_cols]
+        if present:
+            result.details.append(
+                f"  {table_name}: columnas 007 presentes: {', '.join(present)}"
+            )
+        if missing:
+            result.failed += 1
+            result.details.append(
+                f"  {table_name}: columnas 007 FALTAN: {', '.join(missing)}"
             )
 
     # Check task_runs extensions
@@ -765,6 +824,9 @@ def audit_fks(cursor: Any, result: AuditResult) -> None:
         "fk_task_runs_area",
         "fk_task_runs_assigned_user",
         "fk_package_workers_knowledge_scope",
+        "fk_core_workspaces_organization",
+        "fk_kir_organization",
+        "fk_kir_triggered_by_user",
     ]
     cursor.execute(
         "SELECT conname FROM pg_constraint WHERE contype = 'f'"
@@ -785,6 +847,23 @@ def audit_fks(cursor: Any, result: AuditResult) -> None:
 
 def audit_seeds(cursor: Any, result: AuditResult) -> None:
     for table, code_col, code in REQUIRED_SEEDS:
+        cursor.execute(
+            """
+            SELECT count(*)
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = %s
+              AND column_name = %s
+            """,
+            (table, code_col),
+        )
+        if int(cursor.fetchone()[0]) == 0:
+            result.failed += 1
+            result.details.append(
+                f"  FALTA tabla/columna para seed {table}.{code_col}"
+            )
+            continue
+
         cursor.execute(
             f"SELECT count(*) FROM {table} WHERE {code_col} = %s",
             (code,),
@@ -854,6 +933,75 @@ def audit_multi_tenant_consistency(cursor: Any, result: AuditResult) -> None:
         )
     else:
         result.details.append("multi-tenant: no se detectaron cruces de workspace_id")
+
+
+def audit_organization_foundation(cursor: Any, result: AuditResult) -> None:
+    """Validate minimal organization foundation from migration 007."""
+    cursor.execute("""
+        SELECT count(*) FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'core_organizations'
+    """)
+    if cursor.fetchone()[0] == 0:
+        result.details.append(
+            "core_organizations: table does not exist, skipping organization audit"
+        )
+        return
+
+    expected_workspace_links = [
+        ("team360_platform", "team360_platform"),
+        ("team360_public_site", "team360_live"),
+    ]
+    for workspace_slug, organization_code in expected_workspace_links:
+        cursor.execute(
+            """
+            SELECT count(*)
+            FROM core_workspaces workspace
+            JOIN core_organizations organization
+              ON organization.id = workspace.organization_id
+            WHERE workspace.slug = %s
+              AND organization.organization_code = %s
+            """,
+            (workspace_slug, organization_code),
+        )
+        if int(cursor.fetchone()[0]) == 1:
+            result.passed += 1
+            result.details.append(
+                f"  workspace {workspace_slug} -> organization {organization_code}: OK"
+            )
+        else:
+            result.failed += 1
+            result.details.append(
+                f"  ERROR workspace {workspace_slug} no apunta a {organization_code}"
+            )
+
+    expected_memberships = [
+        ("mario.rojas@alquimiablue.com", "team360_platform"),
+        ("mario.rojas.marconi@gmail.com", "team360_live"),
+    ]
+    for email, organization_code in expected_memberships:
+        cursor.execute(
+            """
+            SELECT count(*)
+            FROM core_organization_members member
+            JOIN core_users app_user ON app_user.id = member.user_id
+            JOIN core_organizations organization
+              ON organization.id = member.organization_id
+            WHERE app_user.email = %s
+              AND organization.organization_code = %s
+              AND member.status = 'active'
+            """,
+            (email, organization_code),
+        )
+        if int(cursor.fetchone()[0]) == 1:
+            result.passed += 1
+            result.details.append(
+                f"  membership {email} -> {organization_code}: OK"
+            )
+        else:
+            result.failed += 1
+            result.details.append(
+                f"  ERROR membership {email} -> {organization_code} no existe"
+            )
 
 
 def audit_knowledge_scope_bindings(cursor: Any, result: AuditResult) -> None:
@@ -1198,13 +1346,16 @@ def main() -> None:
             print("\n=== 10. Multi-tenant consistency ===\n")
             audit_multi_tenant_consistency(cursor, result)
 
-            print("\n=== 11. Knowledge embeddings 003 ===\n")
+            print("\n=== 11. Organization foundation 007 ===\n")
+            audit_organization_foundation(cursor, result)
+
+            print("\n=== 12. Knowledge embeddings 003 ===\n")
             audit_knowledge_embeddings(cursor, result)
 
-            print("\n=== 12. Extensiones columnas 006 ===\n")
-            # Checked inside audit_schema via MIGRATION_006_EXTENDED_COLUMNS
+            print("\n=== 13. Extensiones columnas 006/007 ===\n")
+            # Checked inside audit_schema via MIGRATION_006/007_EXTENDED_COLUMNS
 
-            print("\n=== 13. Conteo de filas ===\n")
+            print("\n=== 14. Conteo de filas ===\n")
             audit_row_counts(cursor, result)
     finally:
         conn.close()

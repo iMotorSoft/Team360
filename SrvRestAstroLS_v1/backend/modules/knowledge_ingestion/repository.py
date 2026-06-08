@@ -12,6 +12,10 @@ from psycopg.types.json import Jsonb
 
 from modules.db.errors import DatabaseExecutionError
 from modules.db.transaction import execute, fetch_one
+from modules.knowledge_ingestion.schemas import (
+    IngestionContext,
+    IngestionContextRequest,
+)
 
 
 class KnowledgeIngestionRepository:
@@ -27,14 +31,18 @@ class KnowledgeIngestionRepository:
         knowledge_scope_id: str,
         document_source: str,
         metadata_snapshot: dict[str, Any],
+        organization_id: str | None = None,
         workspace_id: str | None = None,
+        triggered_by_user_id: str | None = None,
     ) -> dict[str, str]:
         row = await fetch_one(
             conn,
             """
             insert into knowledge_ingestion_runs (
                 knowledge_scope_id,
+                organization_id,
                 workspace_id,
+                triggered_by_user_id,
                 document_source,
                 metadata_snapshot,
                 status,
@@ -44,7 +52,9 @@ class KnowledgeIngestionRepository:
                 created_at_utc
             ) values (
                 %(knowledge_scope_id)s,
+                %(organization_id)s,
                 %(workspace_id)s,
+                %(triggered_by_user_id)s,
                 %(document_source)s,
                 %(metadata_snapshot)s,
                 'pending',
@@ -57,7 +67,9 @@ class KnowledgeIngestionRepository:
             """,
             {
                 "knowledge_scope_id": knowledge_scope_id,
+                "organization_id": organization_id,
                 "workspace_id": workspace_id,
+                "triggered_by_user_id": triggered_by_user_id,
                 "document_source": document_source,
                 "metadata_snapshot": Jsonb(metadata_snapshot),
             },
@@ -65,8 +77,182 @@ class KnowledgeIngestionRepository:
         if row is None:
             raise DatabaseExecutionError(
                 "create_ingestion_run returned no row"
-            )
+        )
         return {"run_id": row["id"]}
+
+    async def resolve_ingestion_context(
+        self,
+        conn: AsyncConnection,
+        organization_code: str,
+        workspace_code: str,
+        knowledge_scope_code: str,
+        package_code: str | None = None,
+        assistant_instance_code: str | None = None,
+        worker_code: str = "knowledge_ingestion_worker",
+        triggered_by_email: str | None = None,
+    ) -> IngestionContext:
+        """Resolve public ingestion codes to database ids.
+
+        Codes remain metadata. IDs returned by this method are the only values
+        used for FK columns such as knowledge_ingestion_runs.knowledge_scope_id.
+        """
+        request = IngestionContextRequest(
+            organization_code=organization_code,
+            workspace_code=workspace_code,
+            knowledge_scope_code=knowledge_scope_code,
+            package_code=package_code,
+            assistant_instance_code=assistant_instance_code,
+            worker_code=worker_code,
+            triggered_by_email=triggered_by_email,
+        )
+        errors = request.validate()
+        if errors:
+            raise ValueError(
+                f"Ingestion context validation failed: {'; '.join(errors)}"
+            )
+
+        organization = await fetch_one(
+            conn,
+            """
+            select id::text
+            from core_organizations
+            where organization_code = %(organization_code)s
+              and status = 'active'
+            """,
+            {"organization_code": organization_code},
+        )
+        if organization is None:
+            raise ValueError(f"organization_code not found: {organization_code}")
+
+        workspace = await fetch_one(
+            conn,
+            """
+            select id::text, organization_id::text
+            from core_workspaces
+            where slug = %(workspace_code)s
+              and status in ('active', 'testing')
+            """,
+            {"workspace_code": workspace_code},
+        )
+        if workspace is None:
+            raise ValueError(f"workspace_code not found: {workspace_code}")
+        if workspace["organization_id"] != organization["id"]:
+            raise ValueError(
+                "workspace_code does not belong to organization_code: "
+                f"{workspace_code} -> {organization_code}"
+            )
+
+        knowledge_scope = await fetch_one(
+            conn,
+            """
+            select id::text
+            from knowledge_scopes
+            where workspace_id = %(workspace_id)s::uuid
+              and scope_code = %(knowledge_scope_code)s
+              and status in ('active', 'testing')
+            """,
+            {
+                "workspace_id": workspace["id"],
+                "knowledge_scope_code": knowledge_scope_code,
+            },
+        )
+        if knowledge_scope is None:
+            raise ValueError(
+                "knowledge_scope_code not found for workspace_code: "
+                f"{knowledge_scope_code} -> {workspace_code}"
+            )
+
+        automation_package_id: str | None = None
+        if package_code:
+            package = await fetch_one(
+                conn,
+                """
+                select id::text
+                from automation_packages
+                where workspace_id = %(workspace_id)s::uuid
+                  and package_code = %(package_code)s
+                  and status in ('active', 'testing', 'paused')
+                """,
+                {"workspace_id": workspace["id"], "package_code": package_code},
+            )
+            if package is None:
+                raise ValueError(
+                    "package_code not found for workspace_code: "
+                    f"{package_code} -> {workspace_code}"
+                )
+            automation_package_id = package["id"]
+
+        assistant_instance_id: str | None = None
+        if assistant_instance_code:
+            assistant = await fetch_one(
+                conn,
+                """
+                select id::text
+                from assistant_instances
+                where workspace_id = %(workspace_id)s::uuid
+                  and assistant_code = %(assistant_instance_code)s
+                  and status in ('active', 'testing')
+                """,
+                {
+                    "workspace_id": workspace["id"],
+                    "assistant_instance_code": assistant_instance_code,
+                },
+            )
+            if assistant is None:
+                raise ValueError(
+                    "assistant_instance_code not found for workspace_code: "
+                    f"{assistant_instance_code} -> {workspace_code}"
+                )
+            assistant_instance_id = assistant["id"]
+
+        worker = await fetch_one(
+            conn,
+            """
+            select id::text
+            from worker_definitions
+            where worker_code = %(worker_code)s
+              and status in ('active', 'testing')
+            """,
+            {"worker_code": worker_code},
+        )
+        if worker is None:
+            raise ValueError(f"worker_code not found: {worker_code}")
+
+        triggered_by_user_id: str | None = None
+        if triggered_by_email:
+            user = await fetch_one(
+                conn,
+                """
+                select id::text
+                from core_users
+                where lower(email) = lower(%(triggered_by_email)s)
+                  and status in ('invited', 'active')
+                """,
+                {"triggered_by_email": triggered_by_email},
+            )
+            if user is None:
+                raise ValueError(
+                    f"triggered_by_email not found: {triggered_by_email}"
+                )
+            triggered_by_user_id = user["id"]
+
+        return IngestionContext(
+            organization_code=organization_code,
+            organization_id=organization["id"],
+            workspace_code=workspace_code,
+            workspace_id=workspace["id"],
+            knowledge_scope_code=knowledge_scope_code,
+            knowledge_scope_id=knowledge_scope["id"],
+            package_code=package_code,
+            automation_package_id=automation_package_id,
+            assistant_instance_code=assistant_instance_code,
+            assistant_instance_id=assistant_instance_id,
+            worker_code=worker_code,
+            worker_definition_id=worker["id"],
+            triggered_by_email=triggered_by_email,
+            triggered_by_user_id=triggered_by_user_id,
+            warnings=[],
+        )
 
     async def update_ingestion_run_status(
         self,
@@ -164,7 +350,9 @@ class KnowledgeIngestionRepository:
             select
                 id::text,
                 knowledge_scope_id::text,
+                organization_id::text,
                 workspace_id::text,
+                triggered_by_user_id::text,
                 document_source,
                 metadata_snapshot,
                 status,

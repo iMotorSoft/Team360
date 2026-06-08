@@ -38,6 +38,45 @@ SOURCE_TYPES = frozenset({"markdown", "pdf", "text", "html"})
 # Supported locales
 SUPPORTED_LOCALES = frozenset({"es", "en", "he"})
 
+# Organization capability roles are not user roles.
+ORGANIZATION_ROLE_CODES = frozenset({
+    "platform_owner",
+    "platform_admin",
+    "service_provider",
+    "technical_operator",
+    "partner",
+    "reseller",
+    "client",
+    "internal_client",
+    "demo_client",
+    "content_owner",
+    "billing_owner",
+})
+
+# Member roles apply to a user inside one organization.
+ORGANIZATION_MEMBER_ROLE_CODES = frozenset({
+    "organization_owner",
+    "organization_admin",
+    "technical_admin",
+    "content_admin",
+    "billing_admin",
+    "operator",
+    "viewer",
+})
+
+
+def _validate_code(name: str, value: str, *, required: bool = True) -> list[str]:
+    errors: list[str] = []
+    if not value:
+        if required:
+            errors.append(f"{name} is required")
+        return errors
+    if "/" in value:
+        errors.append(f"{name} must not contain '/'")
+    if value.strip() != value:
+        errors.append(f"{name} must not have leading or trailing whitespace")
+    return errors
+
 
 @dataclass
 class IngestionMetadata:
@@ -62,24 +101,29 @@ class IngestionMetadata:
     source_type: str = "markdown"
     package_code: str = ""
     assistant_instance_code: str = ""
+    service_code: str = ""
 
     def validate(self) -> list[str]:
         errors: list[str] = []
 
-        if not self.knowledge_scope_code:
-            errors.append("knowledge_scope_code is required")
+        errors.extend(_validate_code("knowledge_scope_code", self.knowledge_scope_code))
+        errors.extend(_validate_code("organization_code", self.organization_code))
+        errors.extend(_validate_code("workspace_code", self.workspace_code))
+        errors.extend(_validate_code("package_code", self.package_code, required=False))
+        errors.extend(
+            _validate_code(
+                "assistant_instance_code",
+                self.assistant_instance_code,
+                required=False,
+            )
+        )
+        errors.extend(_validate_code("service_code", self.service_code, required=False))
 
         if self.scope_type not in SCOPE_TYPES:
             errors.append(
                 f"scope_type must be one of {sorted(SCOPE_TYPES)}, "
                 f"got {self.scope_type!r}"
             )
-
-        if not self.organization_code:
-            errors.append("organization_code is required")
-
-        if not self.workspace_code:
-            errors.append("workspace_code is required")
 
         if not self.node_path or not self.node_path.startswith("/"):
             errors.append(
@@ -147,6 +191,7 @@ class IngestionMetadata:
             "workspace_code": self.workspace_code,
             "package_code": self.package_code,
             "assistant_instance_code": self.assistant_instance_code,
+            "service_code": self.service_code,
             "node_path": self.node_path,
             "area_key": self.area_key,
             "topic_key": self.topic_key,
@@ -160,10 +205,87 @@ class IngestionMetadata:
 
 
 @dataclass
+class IngestionContextRequest:
+    organization_code: str
+    workspace_code: str
+    knowledge_scope_code: str
+    package_code: str | None = None
+    assistant_instance_code: str | None = None
+    worker_code: str = "knowledge_ingestion_worker"
+    triggered_by_email: str | None = None
+
+    def validate(self) -> list[str]:
+        errors: list[str] = []
+        errors.extend(_validate_code("organization_code", self.organization_code))
+        errors.extend(_validate_code("workspace_code", self.workspace_code))
+        errors.extend(_validate_code("knowledge_scope_code", self.knowledge_scope_code))
+        errors.extend(
+            _validate_code("package_code", self.package_code or "", required=False)
+        )
+        errors.extend(
+            _validate_code(
+                "assistant_instance_code",
+                self.assistant_instance_code or "",
+                required=False,
+            )
+        )
+        errors.extend(_validate_code("worker_code", self.worker_code))
+        if self.triggered_by_email is not None:
+            email = self.triggered_by_email.strip()
+            if email != self.triggered_by_email:
+                errors.append(
+                    "triggered_by_email must not have leading or trailing whitespace"
+                )
+            if "@" not in email:
+                errors.append("triggered_by_email must be an email-like value")
+        return errors
+
+
+@dataclass
+class IngestionContext:
+    organization_code: str
+    organization_id: str
+    workspace_code: str
+    workspace_id: str
+    knowledge_scope_code: str
+    knowledge_scope_id: str
+    package_code: str | None = None
+    automation_package_id: str | None = None
+    assistant_instance_code: str | None = None
+    assistant_instance_id: str | None = None
+    worker_code: str = "knowledge_ingestion_worker"
+    worker_definition_id: str = ""
+    triggered_by_email: str | None = None
+    triggered_by_user_id: str | None = None
+    warnings: list[str] = field(default_factory=list)
+
+    def to_metadata_dict(self) -> dict[str, Any]:
+        return {
+            "organization_code": self.organization_code,
+            "organization_id": self.organization_id,
+            "workspace_code": self.workspace_code,
+            "workspace_id": self.workspace_id,
+            "knowledge_scope_code": self.knowledge_scope_code,
+            "knowledge_scope_id": self.knowledge_scope_id,
+            "package_code": self.package_code,
+            "automation_package_id": self.automation_package_id,
+            "assistant_instance_code": self.assistant_instance_code,
+            "assistant_instance_id": self.assistant_instance_id,
+            "worker_code": self.worker_code,
+            "worker_definition_id": self.worker_definition_id,
+            "triggered_by_email": self.triggered_by_email,
+            "triggered_by_user_id": self.triggered_by_user_id,
+            "warnings": self.warnings,
+        }
+
+
+@dataclass
 class IngestionRunRecord:
     id: str
     knowledge_scope_id: str
+    organization_id: str | None = None
     workspace_id: str | None = None
+    triggered_by_user_id: str | None = None
     document_source: str = ""
     metadata_snapshot: dict[str, Any] = field(default_factory=dict)
     status: str = "pending"

@@ -8,6 +8,8 @@ from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
 from modules.knowledge_ingestion.schemas import (
     INGESTION_PHASES,
     DOCUMENT_TYPES,
+    ORGANIZATION_MEMBER_ROLE_CODES,
+    ORGANIZATION_ROLE_CODES,
     SCOPE_TYPES,
     SOURCE_TYPES,
     SUPPORTED_LOCALES,
@@ -436,6 +438,7 @@ class TestIngestionMetadataToDict:
         assert d["source_type"] == "markdown"
         assert "package_code" in d
         assert "assistant_instance_code" in d
+        assert "service_code" in d
 
     def test_default_fields_in_dict(self):
         metadata = IngestionMetadata(
@@ -456,6 +459,7 @@ class TestIngestionMetadataToDict:
         d = metadata.to_metadata_dict()
         assert d["package_code"] == ""
         assert d["assistant_instance_code"] == ""
+        assert d["service_code"] == ""
         assert d["source_type"] == "markdown"
 
 
@@ -468,7 +472,13 @@ class TestKnowledgeIngestionWorker:
     @pytest.mark.anyio
     async def test_validate_and_register_success(self):
         worker = KnowledgeIngestionWorker()
-        conn = _FakeConnection(rows=[{"id": "00000000-0000-0000-0000-000000000001"}])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+        ])
 
         valid_metadata = IngestionMetadata(
             knowledge_scope_code="ks_team360_sales_diagnosis",
@@ -491,9 +501,109 @@ class TestKnowledgeIngestionWorker:
             document_source="documents/cobranzas.md",
         )
         assert "run_id" in result
+        assert result["run_id"] == "run-uuid"
         assert "phases" in result
         assert result["phases"]["validate_metadata"] == "completed"
         assert len(conn.statements) >= 1
+        insert_params = next(
+            params for sql, params in conn.statements
+            if "insert into knowledge_ingestion_runs" in sql
+        )
+        assert insert_params["organization_id"] == "org-uuid"
+        assert insert_params["workspace_id"] == "workspace-uuid"
+        assert insert_params["knowledge_scope_id"] == "scope-uuid"
+        assert insert_params["knowledge_scope_id"] != "ks_team360_sales_diagnosis"
+        assert insert_params["triggered_by_user_id"] is None
+
+    @pytest.mark.anyio
+    async def test_validate_and_register_uses_triggered_user_id(self):
+        worker = KnowledgeIngestionWorker()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "assistant-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "user-uuid"},
+            {"id": "run-uuid"},
+        ])
+
+        metadata = IngestionMetadata(
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            scope_type="assistant_instance",
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            node_path="/ventas/general",
+            area_key="ventas",
+            topic_key="general",
+            document_type="guide",
+            visibility="internal",
+            access_tags=["content_owner"],
+            locale="es",
+            version="1.0",
+            title="Ventas guide",
+            package_code="pkg_sales_diagnosis",
+            assistant_instance_code="team360_sales_diagnosis",
+            service_code="svc_sales_diagnosis",
+        )
+
+        result = await worker.validate_and_register(
+            conn=conn,
+            metadata=metadata,
+            document_source="documents/ventas.md",
+            triggered_by_email="mario.rojas.marconi@gmail.com",
+        )
+
+        assert result["context"].triggered_by_user_id == "user-uuid"
+        insert_params = next(
+            params for sql, params in conn.statements
+            if "insert into knowledge_ingestion_runs" in sql
+        )
+        assert insert_params["organization_id"] == "org-uuid"
+        assert insert_params["workspace_id"] == "workspace-uuid"
+        assert insert_params["knowledge_scope_id"] == "scope-uuid"
+        assert insert_params["triggered_by_user_id"] == "user-uuid"
+        snapshot = insert_params["metadata_snapshot"].obj
+        assert snapshot["organization_code"] == "team360_live"
+        assert snapshot["workspace_code"] == "team360_public_site"
+        assert snapshot["knowledge_scope_code"] == "ks_team360_sales_diagnosis"
+        assert snapshot["package_code"] == "pkg_sales_diagnosis"
+        assert snapshot["assistant_instance_code"] == "team360_sales_diagnosis"
+        assert snapshot["service_code"] == "svc_sales_diagnosis"
+        assert snapshot["triggered_by_email"] == "mario.rojas.marconi@gmail.com"
+
+    @pytest.mark.anyio
+    async def test_validate_and_register_dry_run_does_not_create_run(self):
+        worker = KnowledgeIngestionWorker()
+        conn = _FakeConnection()
+
+        metadata = IngestionMetadata(
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            scope_type="assistant_instance",
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            node_path="/ventas/general",
+            area_key="ventas",
+            topic_key="general",
+            document_type="guide",
+            visibility="internal",
+            access_tags=["content_owner"],
+            locale="es",
+            version="1.0",
+            title="Ventas guide",
+        )
+
+        result = await worker.validate_and_register(
+            conn=conn,
+            metadata=metadata,
+            document_source="documents/ventas.md",
+            dry_run=True,
+        )
+
+        assert result["run_id"] is None
+        assert result["dry_run"] is True
+        assert conn.statements == []
 
     @pytest.mark.anyio
     async def test_validate_and_register_raises_on_invalid(self):
@@ -595,6 +705,13 @@ class TestSchemaConstants:
         assert "pdf" in SOURCE_TYPES
         assert "html" in SOURCE_TYPES
 
+    def test_organization_roles_are_distinct_from_member_roles(self):
+        assert ORGANIZATION_ROLE_CODES
+        assert ORGANIZATION_MEMBER_ROLE_CODES
+        assert ORGANIZATION_ROLE_CODES.isdisjoint(ORGANIZATION_MEMBER_ROLE_CODES)
+        assert "platform_owner" in ORGANIZATION_ROLE_CODES
+        assert "organization_owner" in ORGANIZATION_MEMBER_ROLE_CODES
+
 
 # ---------------------------------------------------------------------------
 # Repository basic contract
@@ -606,3 +723,144 @@ class TestKnowledgeIngestionRepository:
         repo = KnowledgeIngestionRepository()
         assert repo is not None
         # No DB calls — repository uses injected connection
+
+    @pytest.mark.anyio
+    async def test_resolve_ingestion_context_success(self):
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "assistant-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "user-uuid"},
+        ])
+
+        context = await repo.resolve_ingestion_context(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            assistant_instance_code="team360_sales_diagnosis",
+            triggered_by_email="mario.rojas.marconi@gmail.com",
+        )
+
+        assert context.organization_id == "org-uuid"
+        assert context.workspace_id == "workspace-uuid"
+        assert context.knowledge_scope_id == "scope-uuid"
+        assert context.automation_package_id == "package-uuid"
+        assert context.assistant_instance_id == "assistant-uuid"
+        assert context.worker_definition_id == "worker-uuid"
+        assert context.triggered_by_user_id == "user-uuid"
+        assert context.organization_code == "team360_live"
+        assert context.knowledge_scope_code == "ks_team360_sales_diagnosis"
+        assert context.knowledge_scope_id != context.knowledge_scope_code
+        assert context.organization_id != context.organization_code
+
+    @pytest.mark.anyio
+    async def test_resolve_ingestion_context_unknown_organization(self):
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeConnection()
+
+        with pytest.raises(ValueError, match="organization_code not found"):
+            await repo.resolve_ingestion_context(
+                conn=conn,
+                organization_code="missing_org",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+            )
+
+    @pytest.mark.anyio
+    async def test_resolve_ingestion_context_workspace_wrong_organization(self):
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "other-org-uuid"},
+        ])
+
+        with pytest.raises(ValueError, match="workspace_code does not belong"):
+            await repo.resolve_ingestion_context(
+                conn=conn,
+                organization_code="team360_live",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+            )
+
+    @pytest.mark.anyio
+    async def test_resolve_ingestion_context_scope_is_filtered_by_workspace(self):
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            None,
+        ])
+
+        with pytest.raises(ValueError, match="knowledge_scope_code not found"):
+            await repo.resolve_ingestion_context(
+                conn=conn,
+                organization_code="team360_live",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+            )
+
+    @pytest.mark.anyio
+    async def test_resolve_ingestion_context_package_optional(self):
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "worker-uuid"},
+        ])
+
+        context = await repo.resolve_ingestion_context(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+        )
+
+        assert context.automation_package_id is None
+        assert context.assistant_instance_id is None
+        assert context.worker_definition_id == "worker-uuid"
+
+    @pytest.mark.anyio
+    async def test_resolve_ingestion_context_missing_worker(self):
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            None,
+        ])
+
+        with pytest.raises(ValueError, match="worker_code not found"):
+            await repo.resolve_ingestion_context(
+                conn=conn,
+                organization_code="team360_live",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+                worker_code="missing_worker",
+            )
+
+    @pytest.mark.anyio
+    async def test_resolve_ingestion_context_missing_triggered_user(self):
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "worker-uuid"},
+            None,
+        ])
+
+        with pytest.raises(ValueError, match="triggered_by_email not found"):
+            await repo.resolve_ingestion_context(
+                conn=conn,
+                organization_code="team360_live",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+                triggered_by_email="missing@example.com",
+            )

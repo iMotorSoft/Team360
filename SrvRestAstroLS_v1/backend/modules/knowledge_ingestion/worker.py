@@ -49,6 +49,9 @@ class KnowledgeIngestionWorker:
         conn: AsyncConnection,
         metadata: IngestionMetadata,
         document_source: str,
+        worker_code: str = "knowledge_ingestion_worker",
+        triggered_by_email: str | None = None,
+        dry_run: bool = False,
     ) -> dict[str, Any]:
         errors = metadata.validate()
         if errors:
@@ -56,18 +59,44 @@ class KnowledgeIngestionWorker:
                 f"Ingestion metadata validation failed: {'; '.join(errors)}"
             )
 
-        run = await self.repository.create_ingestion_run(
-            conn=conn,
-            knowledge_scope_id=metadata.knowledge_scope_code,
-            document_source=document_source,
-            metadata_snapshot=metadata.to_metadata_dict(),
-        )
-
         phases_status: dict[str, str] = {
             "validate_metadata": "completed",
         }
         for phase in INGESTION_PHASES[1:]:
             phases_status[phase] = "pending"
+
+        if dry_run:
+            return {
+                "run_id": None,
+                "dry_run": True,
+                "phases": phases_status,
+            }
+
+        context = await self.repository.resolve_ingestion_context(
+            conn=conn,
+            organization_code=metadata.organization_code,
+            workspace_code=metadata.workspace_code,
+            knowledge_scope_code=metadata.knowledge_scope_code,
+            package_code=metadata.package_code or None,
+            assistant_instance_code=metadata.assistant_instance_code or None,
+            worker_code=worker_code,
+            triggered_by_email=triggered_by_email,
+        )
+
+        metadata_snapshot = metadata.to_metadata_dict()
+        if triggered_by_email:
+            metadata_snapshot["triggered_by_email"] = triggered_by_email
+        metadata_snapshot["ingestion_context"] = context.to_metadata_dict()
+
+        run = await self.repository.create_ingestion_run(
+            conn=conn,
+            knowledge_scope_id=context.knowledge_scope_id,
+            document_source=document_source,
+            metadata_snapshot=metadata_snapshot,
+            organization_id=context.organization_id,
+            workspace_id=context.workspace_id,
+            triggered_by_user_id=context.triggered_by_user_id,
+        )
 
         await self.repository.update_ingestion_run_status(
             conn=conn,
@@ -76,7 +105,11 @@ class KnowledgeIngestionWorker:
             phases_jsonb=phases_status,
         )
 
-        return {"run_id": run["run_id"], "phases": phases_status}
+        return {
+            "run_id": run["run_id"],
+            "context": context,
+            "phases": phases_status,
+        }
 
     async def advance_phase(
         self,
