@@ -387,6 +387,7 @@ class KnowledgeDocumentPersistenceResult:
     status: str  # DocumentUpsertStatus.*
     document_id: str | None = None
     action: str = ""
+    chunk_count: int = 0
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
@@ -407,3 +408,4 @@ class PackagePersistResult:
     warnings: list[str]
     errors: list[str]
     run_id: str | None = None
+    total_chunk_count: int = 0

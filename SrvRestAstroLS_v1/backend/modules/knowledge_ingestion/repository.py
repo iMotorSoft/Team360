@@ -437,6 +437,95 @@ class KnowledgeIngestionRepository:
         )
         await execute(conn, sql, params)
 
+    async def delete_chunks_for_document(
+        self,
+        conn: AsyncConnection,
+        document_id: str,
+    ) -> int:
+        return await execute(
+            conn,
+            "delete from knowledge_chunks where knowledge_document_id = %(document_id)s",
+            {"document_id": document_id},
+        ) or 0
+
+    async def insert_knowledge_chunk(
+        self,
+        conn: AsyncConnection,
+        *,
+        document_id: str,
+        chunk_index: int,
+        title: str,
+        content: str,
+        metadata_jsonb: dict[str, Any],
+        token_count: int | None = None,
+        node_path: str | None = None,
+        permission_tags: list[str] | None = None,
+    ) -> None:
+        await execute(
+            conn,
+            """
+            insert into knowledge_chunks (
+                knowledge_document_id,
+                chunk_index,
+                title,
+                content,
+                metadata_jsonb,
+                token_count,
+                node_path,
+                permission_tags
+            ) values (
+                %(document_id)s,
+                %(chunk_index)s,
+                %(title)s,
+                %(content)s,
+                %(metadata_jsonb)s,
+                %(token_count)s,
+                %(node_path)s,
+                %(permission_tags)s
+            )
+            """,
+            {
+                "document_id": document_id,
+                "chunk_index": chunk_index,
+                "title": title,
+                "content": content,
+                "metadata_jsonb": Jsonb(metadata_jsonb),
+                "token_count": token_count,
+                "node_path": node_path,
+                "permission_tags": permission_tags,
+            },
+        )
+
+    async def replace_chunks_for_document(
+        self,
+        conn: AsyncConnection,
+        *,
+        document_id: str,
+        chunks: list[dict[str, Any]],
+    ) -> int:
+        """Delete old chunks and insert new ones in a single operation.
+
+        Each chunk dict must have: chunk_index, title, content, metadata_jsonb.
+        Optional: token_count, node_path, permission_tags.
+        Returns the number of chunks inserted.
+        """
+        await self.delete_chunks_for_document(conn, document_id)
+        count = 0
+        for chunk in chunks:
+            await self.insert_knowledge_chunk(
+                conn=conn,
+                document_id=document_id,
+                chunk_index=chunk["chunk_index"],
+                title=chunk.get("title", ""),
+                content=chunk["content"],
+                metadata_jsonb=chunk.get("metadata_jsonb", {}),
+                token_count=chunk.get("token_count"),
+                node_path=chunk.get("node_path"),
+                permission_tags=chunk.get("permission_tags"),
+            )
+            count += 1
+        return count
+
     async def update_document_node_path(
         self,
         conn: AsyncConnection,

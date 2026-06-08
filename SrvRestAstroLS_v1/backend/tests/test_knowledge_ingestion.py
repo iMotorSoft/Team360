@@ -8,6 +8,7 @@ import pytest
 import tempfile
 from pathlib import Path
 
+from modules.knowledge_ingestion.markdown_chunker import chunk_markdown
 from modules.knowledge_ingestion.package_scanner import KnowledgePackageScanner
 from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
 from modules.knowledge_ingestion.schemas import (
@@ -720,6 +721,122 @@ class TestSchemaConstants:
         assert ORGANIZATION_ROLE_CODES.isdisjoint(ORGANIZATION_MEMBER_ROLE_CODES)
         assert "platform_owner" in ORGANIZATION_ROLE_CODES
         assert "organization_owner" in ORGANIZATION_MEMBER_ROLE_CODES
+
+
+# ---------------------------------------------------------------------------
+# Markdown chunker (Fase 1.4a)
+# ---------------------------------------------------------------------------
+
+
+class TestMarkdownChunker:
+    def test_ignores_frontmatter(self):
+        md = """\
+---
+status: approved
+ingestion_status: ready
+---
+
+# Section One
+
+Body text.
+"""
+        chunks = chunk_markdown(md)
+        assert len(chunks) == 1
+        assert "# Section One" in chunks[0].content
+        assert "status: approved" not in chunks[0].content
+
+    def test_divides_by_headings(self):
+        md = """\
+# First
+
+Content A.
+
+## Second
+
+Content B.
+
+### Third
+
+Content C.
+"""
+        chunks = chunk_markdown(md)
+        assert len(chunks) == 3
+        assert chunks[0].title == "First"
+        assert chunks[1].title == "Second"
+        assert chunks[2].title == "Third"
+        assert chunks[0].heading_level == 1
+        assert chunks[1].heading_level == 2
+        assert chunks[2].heading_level == 3
+        assert "Content A." in chunks[0].content
+        assert "Content B." in chunks[1].content
+        assert "Content C." in chunks[2].content
+        assert chunks[0].chunk_index == 0
+        assert chunks[1].chunk_index == 1
+        assert chunks[2].chunk_index == 2
+
+    def test_no_headings_single_chunk(self):
+        md = "Just a paragraph.\n\nAnother paragraph.\n"
+        chunks = chunk_markdown(md)
+        assert len(chunks) == 1
+        assert chunks[0].chunk_index == 0
+        assert "Just a paragraph." in chunks[0].content
+        assert chunks[0].char_count > 0
+
+    def test_no_empty_chunks(self):
+        md = """\
+# Heading One
+
+## Heading Two
+
+### Heading Three
+"""
+        chunks = chunk_markdown(md)
+        # Each heading has at least itself in content
+        assert len(chunks) >= 1
+        for c in chunks:
+            assert len(c.content) > 0
+            assert c.char_count > 0
+
+    def test_heading_path_hierarchy(self):
+        md = """\
+# L1 A
+
+A body.
+
+## L2 A.1
+
+A.1 body.
+
+# L1 B
+
+B body.
+"""
+        chunks = chunk_markdown(md)
+        assert len(chunks) == 3
+        assert chunks[0].heading_path == ["L1 A"]
+        assert chunks[1].heading_path == ["L1 A", "L2 A.1"]
+        assert chunks[2].heading_path == ["L1 B"]
+
+    def test_base_metadata_propagated_to_chunks(self):
+        md = """\
+# Section
+Body.
+"""
+        meta = {"locale": "es", "document_type": "guide"}
+        chunks = chunk_markdown(md, base_metadata=meta)
+        assert len(chunks) == 1
+        for k, v in meta.items():
+            assert chunks[0].metadata.get(k) == v
+
+    def test_content_hash_stable(self):
+        md = "# Stable\nSame content."
+        c1 = chunk_markdown(md)
+        c2 = chunk_markdown(md)
+        assert c1[0].content_hash == c2[0].content_hash
+
+    def test_empty_body_returns_empty(self):
+        assert chunk_markdown("") == []
+        assert chunk_markdown("---\nkey: val\n---") == []
 
 
 # ---------------------------------------------------------------------------
@@ -1651,3 +1768,158 @@ class TestKnowledgeIngestionPersistence:
             if "core_users" in sql
         ]
         assert len(user_sqls) == 1
+
+    # ------------------------------------------------------------------
+    # include_chunks=True (Fase 1.4a)
+    # ------------------------------------------------------------------
+
+    @pytest.mark.anyio
+    async def test_include_chunks_true_inserts_chunks(self):
+        """include_chunks=True + inserted document should create chunks."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+        )
+        assert result.inserted_count == 1
+        assert result.documents[0].chunk_count >= 1
+        assert result.total_chunk_count >= 1
+        # Verify chunks were inserted (DELETE + INSERT into knowledge_chunks)
+        chunk_insert_sqls = [
+            sql for sql, _ in conn.statements
+            if "insert into knowledge_chunks" in sql
+        ]
+        assert len(chunk_insert_sqls) >= 1
+        chunk_delete_sqls = [
+            sql for sql, _ in conn.statements
+            if "delete from knowledge_chunks" in sql
+        ]
+        assert len(chunk_delete_sqls) == 1
+        # Verify embedding_status kept as pending
+        all_sql = " ".join(sql for sql, _ in conn.statements)
+        assert "embedding_status = 'completed'" not in all_sql
+        # Run should have chunk_count set
+        update_run = next(
+            params for sql, params in conn.statements
+            if "update knowledge_ingestion_runs" in sql and "completed" in sql
+        )
+        assert update_run["chunk_count"] >= 1
+
+    @pytest.mark.anyio
+    async def test_include_chunks_true_unchanged_skips_chunks(self):
+        """include_chunks=True + unchanged document should NOT touch chunks."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        file_path = Path(root) / "approved" / "test.md"
+        expected_hash = hashlib.sha256(file_path.read_bytes()).hexdigest()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            {"id": "doc-uuid", "content_hash": expected_hash},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+        )
+        assert result.unchanged_count == 1
+        assert result.documents[0].chunk_count == 0
+        assert result.total_chunk_count == 0
+        # No knowledge_chunks should have been touched
+        chunk_sqls = [
+            sql for sql, _ in conn.statements
+            if "knowledge_chunks" in sql
+        ]
+        assert len(chunk_sqls) == 0
+
+    @pytest.mark.anyio
+    async def test_include_chunks_dry_run_no_writes(self):
+        """dry_run=True + include_chunks=True should not write chunks."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=True,
+            include_chunks=True,
+        )
+        assert result.run_id is None
+        assert result.total_chunk_count >= 1  # estimated
+        # No DB writes at all
+        knowledge_sqls = [
+            sql for sql, _ in conn.statements
+            if "knowledge_documents" in sql or "knowledge_chunks" in sql
+        ]
+        assert len(knowledge_sqls) == 0
+
+    @pytest.mark.anyio
+    async def test_include_chunks_no_embeddings_called(self):
+        """include_chunks=True should not call embeddings/Milvus/Arango."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+        )
+        assert result.inserted_count == 1
+        assert result.total_chunk_count >= 1
+        all_sql = " ".join(sql for sql, _ in conn.statements)
+        assert "generate_embeddings" not in all_sql.lower()
+        assert "milvus" not in all_sql.lower()
+        assert "arango" not in all_sql.lower()
+        # embedding_status should remain 'pending'
+        assert "embedding_status = 'completed'" not in all_sql
+        assert "embedding_status = 'processing'" not in all_sql

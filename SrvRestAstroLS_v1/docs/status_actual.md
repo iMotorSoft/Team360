@@ -1110,6 +1110,26 @@ Incluye estructura inicial para:
 - 8 tests nuevos (total: 77 tests knowledge ingestion).
 - No se crean chunks, embeddings, ArangoDB ni Milvus.
 
+### 2026-06-08 - Fase 1.4a: chunking estructural por headings Markdown
+
+- Se creó `markdown_chunker.py` con `chunk_markdown()`:
+  - Ignora frontmatter YAML, divide por `#`/`##`/`###`.
+  - Sin headings → 1 chunk con todo el body.
+  - `chunk_hash` sha256 del contenido en `metadata_jsonb`.
+  - Heading path jerárquico preservado en metadata.
+  - Sin LLM, sin SemanticChunker.
+- Se agregó `include_chunks: bool = False` a `persist_package_documents()`.
+  - `include_chunks=True` + documento `inserted`/`updated` → `replace_chunks_for_document()`.
+  - `include_chunks=True` + `unchanged` → no toca chunks.
+  - `dry_run=True` + `include_chunks=True` → estima chunk_count sin writes.
+- Nuevos métodos en `repository.py`:
+  - `delete_chunks_for_document()` — DELETE por document_id.
+  - `insert_knowledge_chunk()` — INSERT de chunk individual.
+  - `replace_chunks_for_document()` — DELETE + INSERT batch.
+- No se tocó migration: `knowledge_chunks` (002 + 006) cubre todas las columnas.
+- 12 tests nuevos (total: 89 tests knowledge ingestion, 177 suite completa).
+- No se generan embeddings, no se activa Milvus/ArangoDB/SemanticChunker/LLM.
+
 ## Notas de seguridad
 
 - No se grabo la password de GitHub en archivos del proyecto.

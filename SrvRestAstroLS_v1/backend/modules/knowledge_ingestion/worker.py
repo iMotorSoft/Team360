@@ -28,6 +28,7 @@ from typing import Any
 
 from psycopg import AsyncConnection
 
+from modules.knowledge_ingestion.markdown_chunker import chunk_markdown
 from modules.knowledge_ingestion.package_scanner import KnowledgePackageScanner
 from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
 from modules.knowledge_ingestion.schemas import (
@@ -151,10 +152,12 @@ class KnowledgeIngestionWorker:
         assistant_instance_code: str | None = None,
         triggered_by_email: str | None = None,
         dry_run: bool = True,
+        include_chunks: bool = False,
     ) -> PackagePersistResult:
         """Scan a package and persist approved candidates as KnowledgeDocuments.
 
         Phase 1.3b: persists document metadata only — no chunks, no embeddings.
+        Phase 1.4a: include_chunks=True also generates structural Markdown chunks.
         """
         context = await self.repository.resolve_ingestion_context(
             conn=conn,
@@ -180,7 +183,17 @@ class KnowledgeIngestionWorker:
         warnings: list[str] = list(scan_result.warnings)
         errors: list[str] = list(scan_result.errors)
 
+        est_chunk_count = 0
         if dry_run:
+            if include_chunks:
+                for doc in scan_result.documents:
+                    if doc.valid and doc.candidate_for_ingestion:
+                        try:
+                            raw = doc.path.read_bytes()
+                            chunks = chunk_markdown(raw.decode("utf-8"))
+                            est_chunk_count += len(chunks)
+                        except Exception:
+                            pass
             return PackagePersistResult(
                 package_code=package_code,
                 package_root=package_root,
@@ -196,6 +209,7 @@ class KnowledgeIngestionWorker:
                 warnings=warnings,
                 errors=errors,
                 run_id=None,
+                total_chunk_count=est_chunk_count,
             )
 
         phases_status: dict[str, str] = {
@@ -319,14 +333,85 @@ class KnowledgeIngestionWorker:
             else:
                 unchanged_count += 1
 
+            doc_chunk_count = 0
+            if include_chunks and action in ("inserted", "updated"):
+                try:
+                    raw_bytes = doc.path.read_bytes()
+                    chunks = chunk_markdown(
+                        raw_bytes.decode("utf-8"),
+                        base_metadata={
+                            "document_id": doc_id,
+                            "relative_path": doc.relative_path,
+                            "knowledge_scope_code": knowledge_scope_code,
+                            "package_code": package_code,
+                            "assistant_instance_code": assistant_instance_code or "",
+                            "organization_code": organization_code,
+                            "workspace_code": workspace_code,
+                            "node_path": node_path or "",
+                            "access_tags": fm.get("access_tags", []),
+                            "document_type": fm.get("document_type", ""),
+                            "locale": fm.get("locale", ""),
+                            "source_section": doc.source_section,
+                        },
+                    )
+                except Exception as exc:
+                    persist_failed = True
+                    doc_results.append(KnowledgeDocumentPersistenceResult(
+                        relative_path=doc.relative_path,
+                        status=DocumentUpsertStatus.INVALID,
+                        document_id=doc_id,
+                        action="chunk_failed",
+                        errors=[f"Chunking failed: {exc}"],
+                    ))
+                    invalid_count += 1
+                    continue
+
+                chunk_rows = []
+                for c in chunks:
+                    chunk_meta = dict(c.metadata)
+                    chunk_meta["document_source_uri"] = doc.relative_path
+                    chunk_meta["content_hash"] = c.content_hash
+                    chunk_meta["heading_path"] = list(c.heading_path)
+                    chunk_meta["heading_level"] = c.heading_level
+                    chunk_rows.append({
+                        "chunk_index": c.chunk_index,
+                        "title": c.title,
+                        "content": c.content,
+                        "metadata_jsonb": chunk_meta,
+                        "token_count": None,
+                        "node_path": node_path,
+                        "permission_tags": fm.get("access_tags", []),
+                    })
+
+                try:
+                    actual = await self.repository.replace_chunks_for_document(
+                        conn=conn,
+                        document_id=doc_id,
+                        chunks=chunk_rows,
+                    )
+                    doc_chunk_count = actual
+                except Exception as exc:
+                    persist_failed = True
+                    doc_results.append(KnowledgeDocumentPersistenceResult(
+                        relative_path=doc.relative_path,
+                        status=DocumentUpsertStatus.INVALID,
+                        document_id=doc_id,
+                        action="chunk_replace_failed",
+                        errors=[f"Chunk replacement failed: {exc}"],
+                    ))
+                    invalid_count += 1
+                    continue
+
             doc_results.append(KnowledgeDocumentPersistenceResult(
                 relative_path=doc.relative_path,
                 status=action,
                 document_id=doc_id,
                 action=action,
+                chunk_count=doc_chunk_count,
             ))
 
         persisted_count = inserted_count + updated_count
+        total_chunk_count = sum(d.chunk_count for d in doc_results)
 
         if persist_failed:
             await self.repository.update_ingestion_run_status(
@@ -334,7 +419,7 @@ class KnowledgeIngestionWorker:
                 run_id=run_id,
                 status="failed",
                 error_code="PERSIST_ERROR",
-                error_detail="One or more document upserts failed",
+                error_detail="One or more document upserts or chunk replacements failed",
             )
         else:
             phases_status["save_document_chunks"] = "completed"
@@ -343,7 +428,7 @@ class KnowledgeIngestionWorker:
                 run_id=run_id,
                 status="completed",
                 phases_jsonb=phases_status,
-                chunk_count=0,
+                chunk_count=total_chunk_count,
                 token_count=0,
             )
 
@@ -362,6 +447,7 @@ class KnowledgeIngestionWorker:
             warnings=warnings,
             errors=errors,
             run_id=run_id,
+            total_chunk_count=total_chunk_count,
         )
 
     async def advance_phase(
