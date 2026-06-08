@@ -313,16 +313,26 @@ def _validate_document_frontmatter(
 
     doc_workspace = frontmatter.get("workspace_code", "")
     expected_workspace = pkg_meta.scope_mapping.get("workspace_code", "")
+    runtime_workspace = pkg_meta.scope_mapping.get("default_runtime_workspace_code", "")
+    runtime_org = pkg_meta.scope_mapping.get("default_runtime_organization_code", "")
+    doc_org = frontmatter.get("organization_code", "")
     if doc_workspace and expected_workspace and doc_workspace != expected_workspace:
-        issues.append(DocumentValidationIssue(
-            path=relative_path,
-            field="workspace_code",
-            message=(
-                f"workspace_code mismatch: frontmatter {doc_workspace!r} "
-                f"!= expected {expected_workspace!r} (from knowledge-scope-mapping)"
-            ),
-            severity="warning",
-        ))
+        is_runtime_target = (
+            runtime_workspace
+            and doc_workspace == runtime_workspace
+            and runtime_org
+            and doc_org == runtime_org
+        )
+        if not is_runtime_target:
+            issues.append(DocumentValidationIssue(
+                path=relative_path,
+                field="workspace_code",
+                message=(
+                    f"workspace_code mismatch: frontmatter {doc_workspace!r} "
+                    f"!= expected {expected_workspace!r} (from knowledge-scope-mapping)"
+                ),
+                severity="warning",
+            ))
 
     return valid, candidate, issues
 

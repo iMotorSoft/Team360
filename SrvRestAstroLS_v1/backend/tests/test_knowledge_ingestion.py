@@ -897,6 +897,8 @@ package_name: Test Package
 package_code: pkg_sales_diagnosis
 knowledge_scope_code: ks_team360_sales_diagnosis
 workspace_code: team360_platform
+default_runtime_organization_code: team360_live
+default_runtime_workspace_code: team360_public_site
 allowed_areas:
   finanzas:
     - general
@@ -1307,3 +1309,37 @@ class TestKnowledgePackageScanner:
         ))
         assert result.invalid_count == 1
         assert any("source_type" in i.field for i in result.documents[0].issues)
+
+    def test_runtime_workspace_matches_no_warning(self):
+        fm = _VALID_FRONTMATTER.replace(
+            'workspace_code: team360_platform',
+            'workspace_code: team360_public_site\norganization_code: team360_live'
+        )
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.valid_count == 1
+        assert result.candidate_count == 1
+        ws_issues = [i for i in result.documents[0].issues if i.field == "workspace_code"]
+        assert len(ws_issues) == 0, (
+            f"Expected no workspace_code warning for runtime target, got: {ws_issues}"
+        )
+
+    def test_undeclared_workspace_still_warns(self):
+        fm = _VALID_FRONTMATTER.replace(
+            'workspace_code: team360_platform',
+            'workspace_code: undeclared_workspace'
+        )
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.valid_count == 1
+        ws_issues = [i for i in result.documents[0].issues if i.field == "workspace_code"]
+        assert len(ws_issues) == 1
+        assert ws_issues[0].severity == "warning"

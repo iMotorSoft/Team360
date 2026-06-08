@@ -263,6 +263,12 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 - La documentacion completa de la base frontend queda en `docs/frontend/` y `docs/adr/ADR-004/`.
 - No se implemento codigo, rutas, componentes ni migraciones.
 
+### 2026-06-08 - Fase 1.3a-fix: conocimiento runtime target anclado en lat.md
+
+- Se agregó documento `lat.md/knowledge-runtime-target.md` que formaliza el concepto de runtime target vs package/platform workspace.
+- La regla de que `knowledge-scope-mapping.yaml` declara runtime targets opcionales queda capturada como invariante de arquitectura.
+- No se duplicó contenido de la bitácora técnica de `SrvRestAstroLS_v1/docs/status_actual.md`.
+
 ## Pendientes recomendados
 
 - Agregar nuevos documentos lat.md solo para conceptos estables de plataforma.

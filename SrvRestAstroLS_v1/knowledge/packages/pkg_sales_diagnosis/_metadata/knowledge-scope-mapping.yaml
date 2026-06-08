@@ -7,8 +7,18 @@ assistant_instance_code: team360_sales_diagnosis
 display_name: "Asistente Inteligente Vera"  # Solo nombre comercial; no usar como identificador técnico
 
 scope_type: package
+
+# Package / platform context: organization and workspace where this
+# package lives as a platform-level entity.
 organization_code: team360
 workspace_code: team360_platform
+
+# Runtime / default target: organization and workspace where the
+# first client deployment (Team360.live) runs. Documents targeting
+# this runtime are valid candidates and should not warn on mismatch
+# against the package-level workspace_code.
+default_runtime_organization_code: team360_live
+default_runtime_workspace_code: team360_public_site
 
 default_visibility: internal
 

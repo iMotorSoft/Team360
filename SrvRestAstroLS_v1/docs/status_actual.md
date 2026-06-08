@@ -1080,6 +1080,15 @@ Incluye estructura inicial para:
 - No se toco frontend, routes, diagnosis ni automation_diagnosis.
 - No se modificaron documentos knowledge existentes.
 
+### 2026-06-08 - Fase 1.3a-fix: runtime target explícito en scope mapping
+
+- Se agregó `default_runtime_organization_code: team360_live` y `default_runtime_workspace_code: team360_public_site` en `knowledge-scope-mapping.yaml`.
+- El scanner reconoce `default_runtime_workspace_code` + `organization_code` como target válido; si un documento apunta al runtime target, no genera warning de workspace_code mismatch.
+- Si un documento apunta a un workspace no declarado (ni package ni runtime), el warning se mantiene.
+- 2 tests nuevos: `test_runtime_workspace_matches_no_warning` (aprobación + candidate) y `test_undeclared_workspace_still_warns` (warning preservado).
+- 69/69 tests knowledge ingestion pasan.
+- No se tocó el documento approved, drafts, frontend, routes, diagnosis, migrations ni embeddings.
+
 ## Notas de seguridad
 
 - No se grabo la password de GitHub en archivos del proyecto.
