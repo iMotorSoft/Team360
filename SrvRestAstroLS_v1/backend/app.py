@@ -16,6 +16,13 @@ from modules.db.errors import DatabasePoolNotInitializedError
 from modules.db.pool import close_pool, get_pool, open_pool
 
 from routes.automation_diagnosis import classify, save_answer, start_session
+from routes.diagnosis import (
+    public_get_session,
+    public_lead,
+    public_message,
+    public_start,
+    public_submit_checklist,
+)
 from routes.health import get_health
 
 
@@ -57,6 +64,11 @@ def create_app() -> Litestar:
             start_session,
             save_answer,
             classify,
+            public_start,
+            public_message,
+            public_get_session,
+            public_submit_checklist,
+            public_lead,
         ],
         on_startup=[_open_db_pool],
         on_shutdown=[_close_db_pool],

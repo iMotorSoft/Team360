@@ -24,3 +24,54 @@ class SaveAnswerRequest(BaseModel):
 
 class ClassifyRequest(BaseModel):
     pass
+
+
+# ── Public API schemas (/api/diagnosis/*) ──────────────────────────────────
+
+
+class PublicStartRequest(BaseModel):
+    assistant_instance_code: str = "team360_sales_diagnosis"
+    assistant_display_name: str | None = None
+    source_channel: str | None = None
+    site_channel: str | None = None
+    source_url: str = ""
+    locale: str = "es"
+    visitor: dict = Field(default_factory=dict)
+    lead_owner: str | None = None
+    service_code: str | None = None
+    package_code: str | None = None
+    knowledge_scope_code: str | None = None
+    initial_text: str = ""
+
+
+class PublicMessageRequest(BaseModel):
+    session_id: str
+    text: str
+    locale: str | None = None
+
+
+class PublicMessageResponse(BaseModel):
+    session_id: str
+    status: str
+    message: str
+    next_action: str = "continue_conversation"
+    missing_slots: list = Field(default_factory=list)
+    checklist: list = Field(default_factory=list)
+    metadata: dict = Field(default_factory=lambda: {
+        "contract_version": "2026-06-07",
+        "mode": "wrapper_preliminary",
+        "checklist_real": False,
+        "lead_real": False,
+    })
+
+
+class PublicSubmitChecklistRequest(BaseModel):
+    session_id: str
+    answers: list = Field(default_factory=list)
+
+
+class PublicLeadRequest(BaseModel):
+    session_id: str
+    cta_type: str = ""
+    contact: dict = Field(default_factory=dict)
+    consent: bool = False

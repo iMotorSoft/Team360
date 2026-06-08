@@ -47,6 +47,9 @@ class _SyncToAsyncAdapter:
     async def classify(self, session_id):
         return self._service.classify(session_id)
 
+    def get_session(self, session_id):
+        return self._service.get_session(session_id)
+
 
 def _build_service():
     if _REPOSITORY_TYPE == "postgres":
@@ -58,6 +61,15 @@ def _build_service():
 
 
 _SERVICE = _build_service()
+
+
+def get_service():
+    """Return the shared automation diagnosis service instance.
+
+    Used by public wrapper routes in ``routes.diagnosis`` so
+    both route modules share the same in-memory/postgres service.
+    """
+    return _SERVICE
 
 
 @post("/api/automation-diagnosis/session/start")
