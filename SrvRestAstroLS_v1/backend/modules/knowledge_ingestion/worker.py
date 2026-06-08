@@ -7,6 +7,7 @@ Phase 1 provides the structural skeleton only:
   - Metadata validation (Fase 1 of the design)
   - Ingestion run registration
   - Phase tracking
+  - Package dry-run scan (Fase 1.2)
 
 Future phases will implement:
   - Convert to Markdown/text (Fase 2)
@@ -24,10 +25,13 @@ from typing import Any
 
 from psycopg import AsyncConnection
 
+from modules.knowledge_ingestion.package_scanner import KnowledgePackageScanner
 from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
 from modules.knowledge_ingestion.schemas import (
     INGESTION_PHASES,
     IngestionMetadata,
+    PackageScanRequest,
+    PackageScanResult,
 )
 
 
@@ -110,6 +114,24 @@ class KnowledgeIngestionWorker:
             "context": context,
             "phases": phases_status,
         }
+
+    def validate_package_dry_run(
+        self,
+        package_code: str,
+        package_root: str,
+        *,
+        include_drafts: bool = False,
+        experimental: bool = False,
+    ) -> PackageScanResult:
+        scanner = KnowledgePackageScanner()
+        request = PackageScanRequest(
+            package_code=package_code,
+            package_root=package_root,
+            dry_run=True,
+            include_drafts=include_drafts,
+            experimental=experimental,
+        )
+        return scanner.scan(request)
 
     async def advance_phase(
         self,

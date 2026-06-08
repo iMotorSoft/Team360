@@ -8,6 +8,7 @@ Team360 Pydantic Boundary policy (lat.md/postgres-driver-policy.md).
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 
@@ -310,3 +311,58 @@ INGESTION_PHASES = [
     "generate_embeddings",
     "index",
 ]
+
+
+# ---------------------------------------------------------------------------
+# Package scanner schemas (Fase 1.2)
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class DocumentValidationIssue:
+    path: str
+    field: str
+    message: str
+    severity: str = "error"
+
+
+@dataclass
+class ParsedKnowledgeDocument:
+    path: Path
+    relative_path: str
+    source_section: str
+    has_frontmatter: bool
+    frontmatter: dict[str, Any] | None
+    valid: bool
+    candidate_for_ingestion: bool
+    issues: list[DocumentValidationIssue]
+
+
+@dataclass
+class PackageScanRequest:
+    package_code: str
+    package_root: str
+    dry_run: bool = True
+    include_drafts: bool = False
+    experimental: bool = False
+
+
+@dataclass
+class PackageScanResult:
+    package_code: str
+    package_root: str
+    scanned_count: int
+    valid_count: int
+    invalid_count: int
+    candidate_count: int
+    skipped_count: int
+    documents: list[ParsedKnowledgeDocument]
+    warnings: list[str]
+    errors: list[str]
+
+
+@dataclass
+class PackageMetadata:
+    package_profile: dict[str, Any]
+    scope_mapping: dict[str, Any]
+    access_tags: dict[str, Any]

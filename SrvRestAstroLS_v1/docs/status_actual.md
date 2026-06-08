@@ -1054,6 +1054,21 @@ Incluye estructura inicial para:
 - Pendiente: validar v2 con GPT-5.5 antes de ejecutar.
 - No se modificaron `v360`, `litellm`, `postgres`, `.codex` ni `temp1.txt`.
 
+### 2026-06-08 - Fase 1.2: Scanner dry-run de paquetes knowledge
+
+- Se agrego `modules/knowledge_ingestion/package_scanner.py` como scanner/validator interno sin DB writes.
+- Se extendio `schemas.py` con `DocumentValidationIssue`, `ParsedKnowledgeDocument`, `PackageScanRequest`, `PackageScanResult`, `PackageMetadata`.
+- Se agrego `validate_package_dry_run()` en `KnowledgeIngestionWorker` como metodo interno/testeable.
+- Reglas de drafts: no incluidos por defecto; solo con `include_drafts=True` + `dry_run=True` o `experimental=True`; si falta dry_run/experimental, falla con error claro.
+- Validacion de frontmatter: YAML entre `---`, status, ingestion_status, document_type, area_key, topic_key, node_path, access_tags, locale, scope_type, visibility, source_type.
+- Validacion contra _metadata: package_code, knowledge_scope_code, workspace_code y access_tags catalog.
+- Validacion de paquete real `pkg_sales_diagnosis` contra metadata real: package-profile.yaml, knowledge-scope-mapping.yaml, access-tags.yaml.
+- 23 tests nuevos de scanner (total: 65 tests knowledge ingestion).
+- 153/153 tests suite completa.
+- No se persisten documents/chunks. No embeddings. No ArangoDB/Milvus.
+- No se toco frontend, routes, diagnosis ni automation_diagnosis.
+- No se modificaron documentos knowledge existentes.
+
 ## Notas de seguridad
 
 - No se grabo la password de GitHub en archivos del proyecto.

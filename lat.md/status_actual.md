@@ -12,6 +12,13 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
+### 2026-06-08 - Fase 1.2: Scanner dry-run de paquetes knowledge
+
+- Se agrego `package_scanner.py` para validacion de documentos knowledge contra metadata del paquete, sin DB writes.
+- Reglas de drafts: solo escaneables con `dry_run=True` o `experimental=True`.
+- Validacion de package_code, knowledge_scope_code, workspace_code, access_tags contra catalogo.
+- No se modifican invariantes de arquitectura: no se crean nuevas tablas, no se tocan contratos existentes.
+
 ### 2026-06-08 - Base organizacional minima para ingesta de conocimiento
 
 - Se materializo una base organizacional minima para que Knowledge Ingestion opere con `organization_id` real, sin reemplazar los invariantes existentes de `[[console-multi-organization]]` ni crear CRM, billing, UI o portal de partners.

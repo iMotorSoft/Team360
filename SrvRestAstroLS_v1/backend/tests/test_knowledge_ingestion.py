@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import pytest
 
+import tempfile
+from pathlib import Path
+
+from modules.knowledge_ingestion.package_scanner import KnowledgePackageScanner
 from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
 from modules.knowledge_ingestion.schemas import (
     INGESTION_PHASES,
     DOCUMENT_TYPES,
     ORGANIZATION_MEMBER_ROLE_CODES,
     ORGANIZATION_ROLE_CODES,
+    PackageScanRequest,
     SCOPE_TYPES,
     SOURCE_TYPES,
     SUPPORTED_LOCALES,
@@ -864,3 +869,378 @@ class TestKnowledgeIngestionRepository:
                 knowledge_scope_code="ks_team360_sales_diagnosis",
                 triggered_by_email="missing@example.com",
             )
+
+
+# ---------------------------------------------------------------------------
+# Package scanner (Fase 1.2)
+# ---------------------------------------------------------------------------
+
+
+def _make_package_dir(
+    approved_mds: list[tuple[str, str]],
+    drafts_mds: list[tuple[str, str]] | None = None,
+) -> str:
+    root = Path(tempfile.mkdtemp(prefix="pkg_test_"))
+    approved = root / "approved"
+    approved.mkdir(parents=True, exist_ok=True)
+    drafts_dir = root / "drafts"
+    drafts_dir.mkdir(parents=True, exist_ok=True)
+    meta = root / "_metadata"
+    meta.mkdir(parents=True, exist_ok=True)
+
+    (meta / "package-profile.yaml").write_text("""\
+package_code: pkg_sales_diagnosis
+package_name: Test Package
+""", encoding="utf-8")
+
+    (meta / "knowledge-scope-mapping.yaml").write_text("""\
+package_code: pkg_sales_diagnosis
+knowledge_scope_code: ks_team360_sales_diagnosis
+workspace_code: team360_platform
+allowed_areas:
+  finanzas:
+    - general
+  ventas:
+    - general
+""", encoding="utf-8")
+
+    (meta / "access-tags.yaml").write_text("""\
+package_code: pkg_sales_diagnosis
+tags:
+  - tag: ceo
+    description: CEO
+    level: 100
+  - tag: director_finanzas
+    description: Director
+    level: 80
+  - tag: public
+    description: Public
+    level: 0
+""", encoding="utf-8")
+
+    for rel_path, content in approved_mds:
+        fp = approved / rel_path
+        fp.parent.mkdir(parents=True, exist_ok=True)
+        fp.write_text(content, encoding="utf-8")
+
+    if drafts_mds:
+        for rel_path, content in drafts_mds:
+            fp = drafts_dir / rel_path
+            fp.parent.mkdir(parents=True, exist_ok=True)
+            fp.write_text(content, encoding="utf-8")
+
+    return str(root)
+
+
+_VALID_FRONTMATTER = """\
+---
+status: approved
+ingestion_status: ready
+document_type: policy
+area_key: finanzas
+topic_key: general
+node_path: "/finanzas/general"
+access_tags:
+  - ceo
+locale: es
+scope_type: package
+visibility: internal
+source_type: markdown
+package_code: pkg_sales_diagnosis
+knowledge_scope_code: ks_team360_sales_diagnosis
+workspace_code: team360_platform
+---
+
+# Test
+
+Content here.
+"""
+
+
+class TestKnowledgePackageScanner:
+    def test_approved_empty_returns_valid_scan_with_zero_docs(self):
+        root = _make_package_dir([])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.scanned_count == 0
+        assert result.valid_count == 0
+        assert result.invalid_count == 0
+        assert result.candidate_count == 0
+        assert not result.errors
+        assert any("No .md documents found" in w for w in result.warnings)
+
+    def test_drafts_not_included_by_default(self):
+        root = _make_package_dir([], [
+            ("draft-test.md", _VALID_FRONTMATTER),
+        ])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.scanned_count == 0
+        assert result.skipped_count == 1
+
+    def test_include_drafts_without_dry_run_fails(self):
+        root = _make_package_dir([])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_drafts=True,
+        ))
+        assert result.errors
+        assert any("include_drafts=True requires dry_run=True" in e for e in result.errors)
+
+    def test_include_drafts_with_dry_run_includes_drafts(self):
+        root = _make_package_dir([], [
+            ("draft-test.md", _VALID_FRONTMATTER),
+        ])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=True,
+            include_drafts=True,
+        ))
+        assert result.scanned_count == 1
+        assert result.documents[0].source_section == "drafts"
+
+    def test_document_without_frontmatter_is_invalid(self):
+        root = _make_package_dir([
+            ("no-fm.md", "Just content without frontmatter"),
+        ])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.scanned_count == 1
+        assert result.invalid_count == 1
+        assert result.valid_count == 0
+        assert not result.documents[0].valid
+        assert not result.documents[0].candidate_for_ingestion
+        assert result.documents[0].has_frontmatter is False
+
+    def test_status_draft_is_not_candidate_for_ingestion(self):
+        fm = _VALID_FRONTMATTER.replace("status: approved", "status: draft")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.scanned_count == 1
+        assert result.candidate_count == 0
+        assert not result.documents[0].candidate_for_ingestion
+
+    def test_ingestion_status_not_ready_is_not_candidate(self):
+        fm = _VALID_FRONTMATTER.replace("ingestion_status: ready", "ingestion_status: not_ready")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.scanned_count == 1
+        assert result.candidate_count == 0
+        assert not result.documents[0].candidate_for_ingestion
+
+    def test_area_key_with_slash_fails(self):
+        fm = _VALID_FRONTMATTER.replace("area_key: finanzas", "area_key: finanzas/cobranzas")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("area_key" in i.field for i in result.documents[0].issues)
+
+    def test_topic_key_with_slash_fails(self):
+        fm = _VALID_FRONTMATTER.replace("topic_key: general", "topic_key: general/detalle")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("topic_key" in i.field for i in result.documents[0].issues)
+
+    def test_node_path_invalid_fails(self):
+        fm = _VALID_FRONTMATTER.replace('node_path: "/finanzas/general"', 'node_path: "no-slash"')
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("node_path" in i.field for i in result.documents[0].issues)
+
+    def test_access_tags_empty_fails(self):
+        fm = _VALID_FRONTMATTER.replace("  - ceo", "")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("access_tags" in i.field for i in result.documents[0].issues)
+
+    def test_unknown_access_tag_fails(self):
+        fm = _VALID_FRONTMATTER.replace("  - ceo", "  - unknown_tag")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("access_tags" in i.field for i in result.documents[0].issues)
+
+    def test_package_code_mismatch_generates_error(self):
+        fm = _VALID_FRONTMATTER.replace(
+            "package_code: pkg_sales_diagnosis",
+            "package_code: pkg_wrong",
+        )
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("package_code" in i.field for i in result.documents[0].issues)
+
+    def test_knowledge_scope_code_mismatch_generates_warning(self):
+        fm = _VALID_FRONTMATTER.replace(
+            "knowledge_scope_code: ks_team360_sales_diagnosis",
+            "knowledge_scope_code: ks_wrong_scope",
+        )
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 0
+        issues = result.documents[0].issues
+        assert any("knowledge_scope_code" in i.field for i in issues)
+        assert all(i.severity == "warning" for i in issues if "knowledge_scope_code" in i.field)
+
+    def test_workspace_code_mismatch_generates_warning(self):
+        fm = _VALID_FRONTMATTER.replace(
+            "workspace_code: team360_platform",
+            "workspace_code: team360_public_site",
+        )
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 0
+        issues = result.documents[0].issues
+        assert any("workspace_code" in i.field for i in issues)
+        assert all(i.severity == "warning" for i in issues if "workspace_code" in i.field)
+
+    def test_valid_approved_document_is_candidate(self):
+        root = _make_package_dir([("finanzas/test.md", _VALID_FRONTMATTER)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.scanned_count == 1
+        assert result.valid_count == 1
+        assert result.candidate_count == 1
+        assert result.documents[0].valid
+        assert result.documents[0].candidate_for_ingestion
+        assert result.documents[0].has_frontmatter
+        assert not result.documents[0].issues
+        assert result.documents[0].frontmatter["package_code"] == "pkg_sales_diagnosis"
+
+    def test_scanner_does_not_modify_files(self):
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        original = Path(root) / "approved" / "test.md"
+        orig_mtime = original.stat().st_mtime
+        orig_content = original.read_text(encoding="utf-8")
+        scanner = KnowledgePackageScanner()
+        scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert original.stat().st_mtime == orig_mtime
+        assert original.read_text(encoding="utf-8") == orig_content
+
+    def test_locale_es_AR_normalizes_to_es(self):
+        fm = _VALID_FRONTMATTER.replace("locale: es", "locale: es-AR")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.valid_count == 1
+
+    def test_invalid_scope_type_fails(self):
+        fm = _VALID_FRONTMATTER.replace("scope_type: package", "scope_type: invalid_type")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("scope_type" in i.field for i in result.documents[0].issues)
+
+    def test_validate_package_dry_run_on_worker(self):
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        worker = KnowledgeIngestionWorker()
+        result = worker.validate_package_dry_run(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        )
+        assert result.scanned_count == 1
+        assert result.valid_count == 1
+        assert result.candidate_count == 1
+
+    def test_invalid_document_type_fails(self):
+        fm = _VALID_FRONTMATTER.replace("document_type: policy", "document_type: invalid_type")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("document_type" in i.field for i in result.documents[0].issues)
+
+    def test_invalid_visibility_fails(self):
+        fm = _VALID_FRONTMATTER.replace("visibility: internal", "visibility: secret")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("visibility" in i.field for i in result.documents[0].issues)
+
+    def test_invalid_source_type_fails(self):
+        fm = _VALID_FRONTMATTER.replace("source_type: markdown", "source_type: docx")
+        root = _make_package_dir([("test.md", fm)])
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+        ))
+        assert result.invalid_count == 1
+        assert any("source_type" in i.field for i in result.documents[0].issues)
