@@ -121,21 +121,21 @@
         <aside class="hidden space-y-4 2xl:block">
           <section class="rounded-2xl border border-[#e0e8ea] bg-white p-4">
             <p
-              class="text-[0.65rem] font-bold uppercase tracking-[0.17em] text-[#168b88]"
+              class="text-xs font-bold uppercase tracking-[0.17em] text-[#168b88]"
             >
               Workspace activo
             </p>
-            <p class="mt-2 text-sm font-bold text-[#31536b]">
+            <p class="mt-2 text-xl font-bold text-[#31536b]">
               {consoleContext.activeWorkspace.name}
             </p>
-            <p class="mt-1 text-xs leading-5 text-[#8396a2]">
+            <p class="mt-1 text-xl leading-5 text-[#8396a2]">
               {consoleContext.activeOrganization.name}
             </p>
             <div class="mt-4 flex flex-wrap gap-2">
-              <Badge variant="info" class="h-auto px-2 py-1 text-[0.6rem]"
+              <Badge variant="info" class="h-auto px-2 py-1 text-sm"
                 >{consoleContext.activeWorkspace.locale}</Badge
               >
-              <Badge variant="neutral" class="h-auto px-2 py-1 text-[0.6rem]"
+              <Badge variant="neutral" class="h-auto px-2 py-1 text-sm"
                 >{consoleContext.activeWorkspace.direction}</Badge
               >
             </div>
@@ -143,7 +143,7 @@
 
           <section class="rounded-2xl border border-[#e0e8ea] bg-white p-4">
             <p
-              class="text-[0.65rem] font-bold uppercase tracking-[0.17em] text-[#168b88]"
+              class="text-xs font-bold uppercase tracking-[0.17em] text-[#168b88]"
             >
               Pendientes
             </p>
@@ -152,15 +152,15 @@
                 <article
                   class="border-b border-[#edf1f2] pb-3 last:border-0 last:pb-0"
                 >
-                  <p class="text-xs font-bold leading-5 text-[#47657b]">
+                  <p class="text-sm font-bold leading-5 text-[#47657b]">
                     {task.title}
                   </p>
-                  <p class="mt-1 text-[0.67rem] text-[#91a2ad]">
+                  <p class="mt-1 text-md text-[#91a2ad]">
                     Vence {formatDate(task.dueDate, consoleContext.locale)}
                   </p>
                 </article>
               {:else}
-                <p class="text-xs leading-5 text-[#8396a2]">
+                <p class="text-lg leading-5 text-[#8396a2]">
                   No hay tareas pendientes.
                 </p>
               {/each}
@@ -169,7 +169,7 @@
 
           <section class="rounded-2xl border border-[#e0e8ea] bg-white p-4">
             <p
-              class="text-[0.65rem] font-bold uppercase tracking-[0.17em] text-[#168b88]"
+              class="text-xs font-bold uppercase tracking-[0.17em] text-[#168b88]"
             >
               Reportes recientes
             </p>
@@ -178,15 +178,15 @@
                 <article
                   class="border-b border-[#edf1f2] pb-3 last:border-0 last:pb-0"
                 >
-                  <p class="text-xs font-bold leading-5 text-[#47657b]">
+                  <p class="text-lg font-bold leading-5 text-[#47657b]">
                     {report.title}
                   </p>
-                  <p class="mt-1 text-[0.67rem] text-[#91a2ad]">
+                  <p class="mt-1 text-lg text-[#91a2ad]">
                     {report.period}
                   </p>
                 </article>
               {:else}
-                <p class="text-xs leading-5 text-[#8396a2]">
+                <p class="text-lg leading-5 text-[#8396a2]">
                   Aún no hay reportes en este workspace.
                 </p>
               {/each}
