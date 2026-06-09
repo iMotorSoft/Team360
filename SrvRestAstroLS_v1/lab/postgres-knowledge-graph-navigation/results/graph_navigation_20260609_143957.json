@@ -1,0 +1,570 @@
+{
+  "summary": {
+    "experiment": "PostgreSQL Knowledge Graph Navigation — Fase 1.6c",
+    "nodes_count": 27,
+    "edges_count": 48,
+    "cases_count": 12,
+    "total_queries": 12,
+    "passed": 5,
+    "failed": 7,
+    "queries_with_issues": 7,
+    "total_score": -3,
+    "max_possible_score": 36,
+    "min_possible_score": -36,
+    "categories": {
+      "graph_traversal": {
+        "total": 12,
+        "passed": 5,
+        "failed": 7,
+        "score": -3
+      }
+    },
+    "critical_cases": [
+      {
+        "case_id": "tc_02",
+        "description": "Retroceder desde whatsapp_handoff: debe llevar a planned_extension → commercial_limits",
+        "commercial_reason": "WhatsApp handoff no debe aparecer como capacidad lista. Debe llevar a planned_extension y límites.",
+        "start_node_id": "whatsapp_handoff",
+        "traversal_direction": "backward",
+        "max_depth": 4,
+        "visited_node_ids": [
+          "whatsapp_handoff"
+        ],
+        "visited_count": 1,
+        "path_count": 0,
+        "found_expected": [],
+        "found_expected_count": 0,
+        "expected_total": 2,
+        "missing_expected": [
+          "planned_extension",
+          "commercial_limits"
+        ],
+        "found_forbidden": [],
+        "found_forbidden_count": 0,
+        "exact_path_match": false,
+        "passed": false,
+        "score": -3,
+        "error": null
+      },
+      {
+        "case_id": "tc_03",
+        "description": "Retroceder desde step_to_action: debe llevar a planned_extension → commercial_limits",
+        "commercial_reason": "Step-to-Action es planned_extension. Nunca debe conectar a sellable_today.",
+        "start_node_id": "step_to_action",
+        "traversal_direction": "backward",
+        "max_depth": 3,
+        "visited_node_ids": [
+          "step_to_action"
+        ],
+        "visited_count": 1,
+        "path_count": 0,
+        "found_expected": [],
+        "found_expected_count": 0,
+        "expected_total": 2,
+        "missing_expected": [
+          "planned_extension",
+          "commercial_limits"
+        ],
+        "found_forbidden": [],
+        "found_forbidden_count": 0,
+        "exact_path_match": false,
+        "passed": false,
+        "score": -3,
+        "error": null
+      },
+      {
+        "case_id": "tc_04",
+        "description": "Desde automatable: no debe llegar a sellable_today como equivalente. Demostrar que no son lo mismo.",
+        "commercial_reason": "Crucial: automatable != sellable_today. El grafo debe mostrar la relación not_equivalent y los límites.",
+        "start_node_id": "automatable",
+        "traversal_direction": "bidirectional",
+        "max_depth": 2,
+        "visited_node_ids": [
+          "sellable_today",
+          "automatable"
+        ],
+        "visited_count": 2,
+        "path_count": 1,
+        "found_expected": [
+          "sellable_today"
+        ],
+        "found_expected_count": 1,
+        "expected_total": 2,
+        "missing_expected": [
+          "commercial_limits"
+        ],
+        "found_forbidden": [],
+        "found_forbidden_count": 0,
+        "exact_path_match": false,
+        "passed": false,
+        "score": 1,
+        "error": null
+      },
+      {
+        "case_id": "tc_08",
+        "description": "Filtro por knowledge_scope_code ks_team360_sales_diagnosis",
+        "commercial_reason": "Scope debe aislar su paquete. No debe devolver nodos fuera de este scope.",
+        "start_node_id": "knowledge_scope_sales_diagnosis",
+        "traversal_direction": "forward",
+        "max_depth": 3,
+        "visited_node_ids": [
+          "knowledge_scope_sales_diagnosis"
+        ],
+        "visited_count": 1,
+        "path_count": 0,
+        "found_expected": [],
+        "found_expected_count": 0,
+        "expected_total": 1,
+        "missing_expected": [
+          "package_sales_diagnosis"
+        ],
+        "found_forbidden": [],
+        "found_forbidden_count": 0,
+        "exact_path_match": false,
+        "passed": false,
+        "score": -3,
+        "error": null
+      },
+      {
+        "case_id": "tc_09",
+        "description": "Filtro por runtime target team360_live / team360_public_site",
+        "commercial_reason": "Runtime target define el contexto de ejecución. No debe mezclar con otros targets.",
+        "start_node_id": "runtime_target_team360_live",
+        "traversal_direction": "forward",
+        "max_depth": 3,
+        "visited_node_ids": [
+          "runtime_target_team360_live"
+        ],
+        "visited_count": 1,
+        "path_count": 0,
+        "found_expected": [],
+        "found_expected_count": 0,
+        "expected_total": 1,
+        "missing_expected": [
+          "knowledge_scope_sales_diagnosis"
+        ],
+        "found_forbidden": [],
+        "found_forbidden_count": 0,
+        "exact_path_match": false,
+        "passed": false,
+        "score": -3,
+        "error": null
+      },
+      {
+        "case_id": "tc_11",
+        "description": "Navegación parent/child: package → domain → concepts",
+        "commercial_reason": "Desde el paquete debe poder navegarse la jerarquía completa hasta conceptos hoja.",
+        "start_node_id": "package_sales_diagnosis",
+        "traversal_direction": "forward",
+        "max_depth": 5,
+        "visited_node_ids": [
+          "concrete_orientation",
+          "minimum_slots",
+          "useful_diagnosis",
+          "sales_diagnosis",
+          "package_sales_diagnosis"
+        ],
+        "visited_count": 5,
+        "path_count": 4,
+        "found_expected": [
+          "concrete_orientation",
+          "minimum_slots",
+          "useful_diagnosis",
+          "sales_diagnosis"
+        ],
+        "found_expected_count": 4,
+        "expected_total": 5,
+        "missing_expected": [
+          "commercial_limits"
+        ],
+        "found_forbidden": [],
+        "found_forbidden_count": 0,
+        "exact_path_match": false,
+        "passed": false,
+        "score": 1,
+        "error": null
+      },
+      {
+        "case_id": "tc_12",
+        "description": "Overpromise protection: lead_capture, whatsapp_handoff, diagnostic_code deben llevar a planned_extension, no a ready_today",
+        "commercial_reason": "Toda capacidad futura debe navegar a planned_extension. Nunca a sellable_today ni ready.",
+        "start_node_id": "lead_capture",
+        "traversal_direction": "backward",
+        "max_depth": 4,
+        "visited_node_ids": [
+          "lead_capture"
+        ],
+        "visited_count": 1,
+        "path_count": 0,
+        "found_expected": [],
+        "found_expected_count": 0,
+        "expected_total": 2,
+        "missing_expected": [
+          "planned_extension",
+          "commercial_limits"
+        ],
+        "found_forbidden": [],
+        "found_forbidden_count": 0,
+        "exact_path_match": false,
+        "passed": false,
+        "score": -3,
+        "error": null
+      }
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "tc_01",
+      "description": "Profundizar desde sales_diagnosis: debe navegar a minimum_slots → useful_diagnosis → concrete_orientation",
+      "commercial_reason": "Validar que el grafo permite profundizar desde el dominio general hasta conceptos concretos.",
+      "start_node_id": "sales_diagnosis",
+      "traversal_direction": "forward",
+      "max_depth": 4,
+      "visited_node_ids": [
+        "concrete_orientation",
+        "minimum_slots",
+        "useful_diagnosis",
+        "commercial_limits",
+        "sales_diagnosis",
+        "planned_extension",
+        "automatable",
+        "sellable_today"
+      ],
+      "visited_count": 8,
+      "path_count": 7,
+      "found_expected": [
+        "concrete_orientation",
+        "minimum_slots",
+        "useful_diagnosis"
+      ],
+      "found_expected_count": 3,
+      "expected_total": 3,
+      "missing_expected": [],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": true,
+      "score": 2,
+      "error": null
+    },
+    {
+      "case_id": "tc_02",
+      "description": "Retroceder desde whatsapp_handoff: debe llevar a planned_extension → commercial_limits",
+      "commercial_reason": "WhatsApp handoff no debe aparecer como capacidad lista. Debe llevar a planned_extension y límites.",
+      "start_node_id": "whatsapp_handoff",
+      "traversal_direction": "backward",
+      "max_depth": 4,
+      "visited_node_ids": [
+        "whatsapp_handoff"
+      ],
+      "visited_count": 1,
+      "path_count": 0,
+      "found_expected": [],
+      "found_expected_count": 0,
+      "expected_total": 2,
+      "missing_expected": [
+        "planned_extension",
+        "commercial_limits"
+      ],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": false,
+      "score": -3,
+      "error": null
+    },
+    {
+      "case_id": "tc_03",
+      "description": "Retroceder desde step_to_action: debe llevar a planned_extension → commercial_limits",
+      "commercial_reason": "Step-to-Action es planned_extension. Nunca debe conectar a sellable_today.",
+      "start_node_id": "step_to_action",
+      "traversal_direction": "backward",
+      "max_depth": 3,
+      "visited_node_ids": [
+        "step_to_action"
+      ],
+      "visited_count": 1,
+      "path_count": 0,
+      "found_expected": [],
+      "found_expected_count": 0,
+      "expected_total": 2,
+      "missing_expected": [
+        "planned_extension",
+        "commercial_limits"
+      ],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": false,
+      "score": -3,
+      "error": null
+    },
+    {
+      "case_id": "tc_04",
+      "description": "Desde automatable: no debe llegar a sellable_today como equivalente. Demostrar que no son lo mismo.",
+      "commercial_reason": "Crucial: automatable != sellable_today. El grafo debe mostrar la relación not_equivalent y los límites.",
+      "start_node_id": "automatable",
+      "traversal_direction": "bidirectional",
+      "max_depth": 2,
+      "visited_node_ids": [
+        "sellable_today",
+        "automatable"
+      ],
+      "visited_count": 2,
+      "path_count": 1,
+      "found_expected": [
+        "sellable_today"
+      ],
+      "found_expected_count": 1,
+      "expected_total": 2,
+      "missing_expected": [
+        "commercial_limits"
+      ],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": false,
+      "score": 1,
+      "error": null
+    },
+    {
+      "case_id": "tc_05",
+      "description": "Desde chunk_offer_decision: navegar a commercial_limits → planned_extension → supports_answer",
+      "commercial_reason": "Un chunk recuperado por pgvector debe conectar a límites comerciales y extensiones planificadas.",
+      "start_node_id": "chunk_offer_decision",
+      "traversal_direction": "forward",
+      "max_depth": 3,
+      "visited_node_ids": [
+        "planned_extension",
+        "commercial_limits",
+        "chunk_offer_decision"
+      ],
+      "visited_count": 3,
+      "path_count": 2,
+      "found_expected": [
+        "planned_extension",
+        "commercial_limits"
+      ],
+      "found_expected_count": 2,
+      "expected_total": 2,
+      "missing_expected": [],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": true,
+      "score": 2,
+      "error": null
+    },
+    {
+      "case_id": "tc_06",
+      "description": "Desde knowledge_base_service: navegar a metadata_auditability → access_tags → cross_customer_isolation",
+      "commercial_reason": "Knowledge Base as a Service requiere metadatos auditables, tags de acceso y aislamiento.",
+      "start_node_id": "knowledge_base_service",
+      "traversal_direction": "forward",
+      "max_depth": 4,
+      "visited_node_ids": [
+        "cross_customer_isolation",
+        "node_path_hierarchy",
+        "minimum_slots",
+        "commercial_limits",
+        "sales_diagnosis",
+        "knowledge_base_service",
+        "access_tags",
+        "useful_diagnosis",
+        "concrete_orientation",
+        "package_sales_diagnosis",
+        "planned_extension",
+        "automatable",
+        "sellable_today",
+        "knowledge_scope_sales_diagnosis",
+        "metadata_auditability"
+      ],
+      "visited_count": 15,
+      "path_count": 14,
+      "found_expected": [
+        "access_tags",
+        "cross_customer_isolation",
+        "metadata_auditability"
+      ],
+      "found_expected_count": 3,
+      "expected_total": 3,
+      "missing_expected": [],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": true,
+      "score": 2,
+      "error": null
+    },
+    {
+      "case_id": "tc_07",
+      "description": "Filtro por package_code pkg_sales_diagnosis",
+      "commercial_reason": "El paquete debe contener solo su dominio. No filtrar nodos de otros paquetes.",
+      "start_node_id": "package_sales_diagnosis",
+      "traversal_direction": "forward",
+      "max_depth": 3,
+      "visited_node_ids": [
+        "package_sales_diagnosis",
+        "sales_diagnosis"
+      ],
+      "visited_count": 2,
+      "path_count": 1,
+      "found_expected": [
+        "sales_diagnosis"
+      ],
+      "found_expected_count": 1,
+      "expected_total": 1,
+      "missing_expected": [],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": true,
+      "score": 2,
+      "error": null
+    },
+    {
+      "case_id": "tc_08",
+      "description": "Filtro por knowledge_scope_code ks_team360_sales_diagnosis",
+      "commercial_reason": "Scope debe aislar su paquete. No debe devolver nodos fuera de este scope.",
+      "start_node_id": "knowledge_scope_sales_diagnosis",
+      "traversal_direction": "forward",
+      "max_depth": 3,
+      "visited_node_ids": [
+        "knowledge_scope_sales_diagnosis"
+      ],
+      "visited_count": 1,
+      "path_count": 0,
+      "found_expected": [],
+      "found_expected_count": 0,
+      "expected_total": 1,
+      "missing_expected": [
+        "package_sales_diagnosis"
+      ],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": false,
+      "score": -3,
+      "error": null
+    },
+    {
+      "case_id": "tc_09",
+      "description": "Filtro por runtime target team360_live / team360_public_site",
+      "commercial_reason": "Runtime target define el contexto de ejecución. No debe mezclar con otros targets.",
+      "start_node_id": "runtime_target_team360_live",
+      "traversal_direction": "forward",
+      "max_depth": 3,
+      "visited_node_ids": [
+        "runtime_target_team360_live"
+      ],
+      "visited_count": 1,
+      "path_count": 0,
+      "found_expected": [],
+      "found_expected_count": 0,
+      "expected_total": 1,
+      "missing_expected": [
+        "knowledge_scope_sales_diagnosis"
+      ],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": false,
+      "score": -3,
+      "error": null
+    },
+    {
+      "case_id": "tc_10",
+      "description": "Cross-customer isolation: nodo de otro scope simulado no debe aparecer",
+      "commercial_reason": "Aislamiento cross-customer: un scope de cliente A no debe devolver nodos de cliente B.",
+      "start_node_id": "cross_customer_isolation",
+      "traversal_direction": "forward",
+      "max_depth": 3,
+      "visited_node_ids": [
+        "cross_customer_isolation",
+        "knowledge_scope_sales_diagnosis"
+      ],
+      "visited_count": 2,
+      "path_count": 1,
+      "found_expected": [
+        "knowledge_scope_sales_diagnosis"
+      ],
+      "found_expected_count": 1,
+      "expected_total": 1,
+      "missing_expected": [],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": true,
+      "score": 2,
+      "error": null
+    },
+    {
+      "case_id": "tc_11",
+      "description": "Navegación parent/child: package → domain → concepts",
+      "commercial_reason": "Desde el paquete debe poder navegarse la jerarquía completa hasta conceptos hoja.",
+      "start_node_id": "package_sales_diagnosis",
+      "traversal_direction": "forward",
+      "max_depth": 5,
+      "visited_node_ids": [
+        "concrete_orientation",
+        "minimum_slots",
+        "useful_diagnosis",
+        "sales_diagnosis",
+        "package_sales_diagnosis"
+      ],
+      "visited_count": 5,
+      "path_count": 4,
+      "found_expected": [
+        "concrete_orientation",
+        "minimum_slots",
+        "useful_diagnosis",
+        "sales_diagnosis"
+      ],
+      "found_expected_count": 4,
+      "expected_total": 5,
+      "missing_expected": [
+        "commercial_limits"
+      ],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": false,
+      "score": 1,
+      "error": null
+    },
+    {
+      "case_id": "tc_12",
+      "description": "Overpromise protection: lead_capture, whatsapp_handoff, diagnostic_code deben llevar a planned_extension, no a ready_today",
+      "commercial_reason": "Toda capacidad futura debe navegar a planned_extension. Nunca a sellable_today ni ready.",
+      "start_node_id": "lead_capture",
+      "traversal_direction": "backward",
+      "max_depth": 4,
+      "visited_node_ids": [
+        "lead_capture"
+      ],
+      "visited_count": 1,
+      "path_count": 0,
+      "found_expected": [],
+      "found_expected_count": 0,
+      "expected_total": 2,
+      "missing_expected": [
+        "planned_extension",
+        "commercial_limits"
+      ],
+      "found_forbidden": [],
+      "found_forbidden_count": 0,
+      "exact_path_match": false,
+      "passed": false,
+      "score": -3,
+      "error": null
+    }
+  ],
+  "meta": {
+    "experiment": "PostgreSQL Knowledge Graph Navigation — Fase 1.6c",
+    "description": "Validar si PostgreSQL 18 + adjacency tables + recursive CTE alcanza para el primer KnowledgeMap navegable de Team360 antes de decidir ArangoDB.",
+    "nodes_count": 27,
+    "edges_count": 48,
+    "cases_count": 12,
+    "created_at": "2026-06-09T00:00:00Z"
+  }
+}

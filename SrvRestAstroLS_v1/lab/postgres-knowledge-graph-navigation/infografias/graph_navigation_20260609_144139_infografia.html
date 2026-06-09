@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowledge Graph Navigation — Fase 1.6c</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+h1 { color: #38bdf8; margin-bottom: 0.5rem; }
+h2 { color: #818cf8; margin: 2rem 0 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+h3 { color: #a5b4fc; margin: 1.5rem 0 0.5rem; }
+p, li { color: #cbd5e1; line-height: 1.6; }
+.meta { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+.summary-cards { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.25rem; flex: 1; min-width: 140px; text-align: center; }
+.card .value { font-size: 2rem; font-weight: 700; color: #38bdf8; }
+.card .label { font-size: 0.85rem; color: #94a3b8; margin-top: 0.25rem; }
+.card.green .value { color: #22c55e; }
+.card.red .value { color: #ef4444; }
+.card.yellow .value { color: #eab308; }
+.score-bar { background: #1e293b; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+.score-bar-inner { background: linear-gradient(90deg, #ef4444, #eab308, #22c55e); height: 24px; border-radius: 4px; transition: width 0.5s; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+th { text-align: left; padding: 0.5rem 0.75rem; background: #1e293b; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #334155; }
+td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #1e293b; font-size: 0.9rem; }
+tr:hover td { background: #1e293b; }
+code { background: #334155; padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.85rem; }
+.footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #334155; color: #64748b; font-size: 0.8rem; text-align: center; }
+.pass-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.pass-badge.good { background: #166534; color: #86efac; }
+.pass-badge.warn { background: #713f12; color: #fde047; }
+.pass-badge.bad { background: #7f1d1d; color: #fca5a5; }
+</style>
+</head>
+<body>
+
+<h1>🧭 PostgreSQL Knowledge Graph Navigation</h1>
+<p class="meta">Fase 1.6c — PostgreSQL Knowledge Graph Navigation — Fase 1.6c<br>
+Generado: 2026-06-09 14:42 UTC · 27 nodos, 48 aristas, 12 casos de traversal</p>
+
+<div class="summary-cards">
+    <div class="card green">
+        <div class="value">12</div>
+        <div class="label">Casos exitosos (100.0%)</div>
+    </div>
+    <div class="card red">
+        <div class="value">0</div>
+        <div class="label">Casos fallidos</div>
+    </div>
+    <div class="card yellow">
+        <div class="value">0</div>
+        <div class="label">Nodos prohibidos</div>
+    </div>
+    <div class="card">
+        <div class="value">24</div>
+        <div class="label">Score total</div>
+    </div>
+</div>
+
+<h2>Resumen ejecutivo</h2>
+<p>12/12 casos de traversal pasaron el criterio de aceptación (100.0%).<br>
+Score total: 24 de -36–36 (83.3% del rango).<br>
+0 nodos prohibidos en resultados de traversal.</p>
+
+<div class="score-bar">
+    <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem;">
+        <span>Score: 24</span>
+        <span>83.3%</span>
+    </div>
+    <div style="background:#1e293b;border-radius:4px;">
+        <div class="score-bar-inner" style="width:83.3%;"></div>
+    </div>
+</div>
+
+<h3>Decisión</h3>
+<p>✅ PostgreSQL 18 + adjacency tables + recursive CTE es suficiente para primera etapa KnowledgeMap. ArangoDB no es necesario ahora.</p>
+
+<h2>Detalle de casos</h2>
+<table>
+<thead>
+<tr><th>#</th><th>ID</th><th>Descripción</th><th>Dir</th><th>MaxD</th><th>Visit</th><th>Exp</th><th>Proh</th><th>Score</th></tr>
+</thead>
+<tbody>
+<tr>
+            <td>✅</td>
+            <td><code>tc_01</code></td>
+            <td>Profundizar desde sales_diagnosis: debe navegar a minimum_sl</td>
+            <td>forward</td>
+            <td>4</td>
+            <td>8</td>
+            <td>3/3</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_02</code></td>
+            <td>Retroceder desde whatsapp_handoff: debe llevar a planned_ext</td>
+            <td>backward</td>
+            <td>4</td>
+            <td>3</td>
+            <td>2/2</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_03</code></td>
+            <td>Retroceder desde step_to_action: debe llevar a planned_exten</td>
+            <td>backward</td>
+            <td>3</td>
+            <td>3</td>
+            <td>2/2</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_04</code></td>
+            <td>Desde automatable: no debe llegar a sellable_today como equi</td>
+            <td>bidirectional</td>
+            <td>2</td>
+            <td>8</td>
+            <td>2/2</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_05</code></td>
+            <td>Desde chunk_offer_decision: navegar a commercial_limits → pl</td>
+            <td>forward</td>
+            <td>3</td>
+            <td>3</td>
+            <td>2/2</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_06</code></td>
+            <td>Desde knowledge_base_service: navegar a metadata_auditabilit</td>
+            <td>forward</td>
+            <td>4</td>
+            <td>15</td>
+            <td>3/3</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_07</code></td>
+            <td>Filtro por package_code pkg_sales_diagnosis</td>
+            <td>forward</td>
+            <td>3</td>
+            <td>2</td>
+            <td>1/1</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_08</code></td>
+            <td>Filtro por knowledge_scope_code ks_team360_sales_diagnosis</td>
+            <td>forward</td>
+            <td>3</td>
+            <td>3</td>
+            <td>1/1</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_09</code></td>
+            <td>Filtro por runtime target team360_live / team360_public_site</td>
+            <td>forward</td>
+            <td>3</td>
+            <td>2</td>
+            <td>1/1</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_10</code></td>
+            <td>Cross-customer isolation: nodo de otro scope simulado no deb</td>
+            <td>forward</td>
+            <td>3</td>
+            <td>4</td>
+            <td>1/1</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_11</code></td>
+            <td>Navegación parent/child: package → domain → concepts</td>
+            <td>forward</td>
+            <td>5</td>
+            <td>6</td>
+            <td>5/5</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>tc_12</code></td>
+            <td>Overpromise protection: lead_capture, whatsapp_handoff, diag</td>
+            <td>backward</td>
+            <td>4</td>
+            <td>4</td>
+            <td>2/2</td>
+            <td>0</td>
+            <td>+2</td>
+        </tr>
+
+</tbody>
+</table>
+
+<h2>Nodos más visitados</h2>
+<table>
+<thead>
+<tr><th>#</th><th>Nodo</th><th>Label</th><th>Visitas</th></tr>
+</thead>
+<tbody>
+<tr>
+            <td>1</td>
+            <td><code>commercial_limits</code></td>
+            <td>Límites comerciales</td>
+            <td>8</td>
+        </tr>
+<tr>
+            <td>2</td>
+            <td><code>planned_extension</code></td>
+            <td>Extensión planificada</td>
+            <td>7</td>
+        </tr>
+<tr>
+            <td>3</td>
+            <td><code>sales_diagnosis</code></td>
+            <td>Diagnóstico de automatización de ventas</td>
+            <td>7</td>
+        </tr>
+<tr>
+            <td>4</td>
+            <td><code>package_sales_diagnosis</code></td>
+            <td>Paquete pkg_sales_diagnosis</td>
+            <td>5</td>
+        </tr>
+<tr>
+            <td>5</td>
+            <td><code>concrete_orientation</code></td>
+            <td>Orientación concreta</td>
+            <td>4</td>
+        </tr>
+<tr>
+            <td>6</td>
+            <td><code>useful_diagnosis</code></td>
+            <td>Diagnóstico útil</td>
+            <td>4</td>
+        </tr>
+<tr>
+            <td>7</td>
+            <td><code>knowledge_scope_sales_diagnosis</code></td>
+            <td>Knowledge scope ks_team360_sales_diagnosis</td>
+            <td>4</td>
+        </tr>
+<tr>
+            <td>8</td>
+            <td><code>automatable</code></td>
+            <td>Automatizable</td>
+            <td>3</td>
+        </tr>
+<tr>
+            <td>9</td>
+            <td><code>minimum_slots</code></td>
+            <td>Slots mínimos</td>
+            <td>3</td>
+        </tr>
+<tr>
+            <td>10</td>
+            <td><code>sellable_today</code></td>
+            <td>Vendible hoy</td>
+            <td>3</td>
+        </tr>
+
+</tbody>
+</table>
+
+<h2>Tipos de relación en el grafo</h2>
+<table>
+<thead>
+<tr><th>Tipo de relación</th><th>Frecuencia</th></tr>
+</thead>
+<tbody>
+<tr><td><code>planned_extension_of</code></td><td>4</td></tr>
+<tr><td><code>depends_on</code></td><td>4</td></tr>
+<tr><td><code>includes</code></td><td>3</td></tr>
+<tr><td><code>requires</code></td><td>2</td></tr>
+<tr><td><code>supports</code></td><td>2</td></tr>
+<tr><td><code>not_equivalent</code></td><td>2</td></tr>
+<tr><td><code>references_concept</code></td><td>2</td></tr>
+<tr><td><code>describes_capability</code></td><td>2</td></tr>
+<tr><td><code>feeds_into</code></td><td>2</td></tr>
+<tr><td><code>mentions_concept</code></td><td>2</td></tr>
+<tr><td><code>scoped_by</code></td><td>2</td></tr>
+<tr><td><code>aims_for</code></td><td>2</td></tr>
+<tr><td><code>defines</code></td><td>1</td></tr>
+<tr><td><code>limits</code></td><td>1</td></tr>
+<tr><td><code>triggers</code></td><td>1</td></tr>
+<tr><td><code>bounded_by</code></td><td>1</td></tr>
+<tr><td><code>uses</code></td><td>1</td></tr>
+<tr><td><code>enforced_by</code></td><td>1</td></tr>
+<tr><td><code>contains_domain</code></td><td>1</td></tr>
+<tr><td><code>scopes_package</code></td><td>1</td></tr>
+<tr><td><code>deploys_scope</code></td><td>1</td></tr>
+<tr><td><code>identifies</code></td><td>1</td></tr>
+<tr><td><code>derived_from</code></td><td>1</td></tr>
+<tr><td><code>belongs_to_package</code></td><td>1</td></tr>
+<tr><td><code>respects</code></td><td>1</td></tr>
+<tr><td><code>protects_against_overpromise</code></td><td>1</td></tr>
+<tr><td><code>organizes</code></td><td>1</td></tr>
+<tr><td><code>supports_answer</code></td><td>1</td></tr>
+<tr><td><code>enables</code></td><td>1</td></tr>
+<tr><td><code>leverages</code></td><td>1</td></tr>
+<tr><td><code>exemplifies</code></td><td>1</td></tr>
+
+</tbody>
+</table>
+
+<h2>Recomendaciones técnicas</h2>
+<h3>Implementación PostgreSQL</h3>
+<ul>
+<li><code>knowledge_graph_nodes</code>: node_id (PK), node_type, node_path, knowledge_scope_code, metadata JSONB</li>
+<li><code>knowledge_graph_edges</code>: edge_id (PK), from_node_id (FK), to_node_id (FK), relation_type, direction, weight, metadata JSONB</li>
+<li>Índice GIN en node_path para filtro por prefijo jerárquico</li>
+<li>Índice GIN en metadata para filtros semánticos</li>
+<li>Vistas materializadas para traversals frecuentes</li>
+</ul>
+<h3>Cuándo reconsiderar ArangoDB</h3>
+<ul>
+<li>Más de 50k nodos con 5+ niveles de profundidad</li>
+<li>Traversals con múltiples condiciones de filtro en &lt;100ms</li>
+<li>Grafos con &gt;10 conexiones/nodo en promedio</li>
+<li>Necesidad de shortest-path, PageRank u otros algoritmos nativos de grafo</li>
+</ul>
+
+<h2>Próximos pasos</h2>
+<ol>
+<li>Migrar golden graph a tablas productivas (migración 004)</li>
+<li>Crear endpoints de navegación: <code>GET /knowledge/graph/traverse</code></li>
+<li>Integrar con retrieval: enriquecer chunks de pgvector con navegación de grafo</li>
+<li>Agregar más casos al golden graph (cross-package, cross-scope, cross-customer)</li>
+<li>Benchmark contra ArangoDB con el mismo dataset (opcional)</li>
+</ol>
+
+<div class="footer">
+Generado por Fase 1.6c — PostgreSQL Knowledge Graph Navigation Experiment · 2026-06-09 14:42 UTC
+</div>
+
+</body>
+</html>
