@@ -45,6 +45,21 @@ Regla de ubicacion:
 - Un invariante estable de arquitectura, dominio, IA, workers, paquetes, knowledge o seguridad va en `lat.md/`.
 - No duplicar el mismo contenido entre `lat.md/`, `docs/`, `data/reports/` y `SrvRestAstroLS_v1/docs/`; mover o enlazar, segun corresponda.
 
+## Laboratorio tecnico
+
+El proyecto puede usar `SrvRestAstroLS_v1/lab/` para experimentos tecnicos reproducibles y aislados de produccion.
+
+Reglas principales:
+
+- no modificar configuracion productiva desde `lab/`;
+- cada experimento debe tener su propia carpeta y README;
+- guardar resultados auditables en JSON/Markdown y, si aporta claridad, HTML;
+- ejecutar comandos desde la raiz del proyecto;
+- preferir `uv run` cuando corresponda;
+- si un experimento se adopta, migrarlo luego a codigo productivo, tests o documentacion formal.
+
+Ver detalles en `SrvRestAstroLS_v1/lab/README.md`.
+
 Convencion para `lat.md`:
 
 - `lat.md/lat.md` es el indice raiz de arquitectura viva.

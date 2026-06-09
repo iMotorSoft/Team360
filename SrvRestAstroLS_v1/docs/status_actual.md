@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-07
+Ultima actualizacion: 2026-06-09
 
 ## Directorio de trabajo
 
@@ -13,6 +13,15 @@ Ultima actualizacion: 2026-06-07
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-09 - Convencion de laboratorio tecnico reproducible
+
+- Se creo `SrvRestAstroLS_v1/lab/README.md` como convencion base para experimentos tecnicos pequenos, reproducibles, aislados de produccion, auditables y comparables.
+- Se documento que `lab/` no es codigo temporal descartable, sino un banco de pruebas para decidir rapido sin reconstruir contexto.
+- Se definieron casos de uso para comparar modelos LLM, embeddings, prompts, chunking, golden answers, paquetes knowledge, proveedores externos e infografias HTML.
+- Se establecieron reglas de estructura por experimento, resultados auditables en JSON/Markdown/HTML, ejecucion desde la raiz del proyecto y preferencia por `uv run` cuando corresponda.
+- Se agrego una referencia breve en `AGENTS.md` apuntando a `SrvRestAstroLS_v1/lab/README.md`.
+- No se crearon scripts, experimentos de ejemplo, integraciones productivas ni cambios de runtime.
 
 ### 2026-06-07 - Diseno tecnico Knowledge Ingestion multi-scope / multi-nivel
 
