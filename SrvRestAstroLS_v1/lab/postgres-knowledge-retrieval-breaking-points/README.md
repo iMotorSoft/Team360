@@ -741,7 +741,80 @@ Cuando se implemente la ejecución real de auditoría:
 
 ---
 
+## Reranking experiment — Fase 1.6g
+
+### Objetivo
+
+Medir si un reranker determinístico (oracle-lite de laboratorio) mejora el pass rate de los casos adversariales sobre pgvector top-k antes de evaluar Milvus, ArangoDB, hybrid search o cambios de infraestructura.
+
+### Hipótesis
+
+Si los fallos restantes post-knowledge-coverage son `embedding_ranking_problem` (no recall ni content_gap), un reranker debería rescatar casos donde el chunk correcto existe en top-N pero está rankeado fuera de top-K.
+
+### Estrategia
+
+- **Candidates**: pgvector top-N (default: 20)
+- **Baseline**: primeros K resultados sin rerank (default: 5)
+- **Reranker**: determinístico, sin modelo externo, sin LLM
+  - `rerank_score` = concept_match × 10 (expected) + acceptable_match × 3 — forbidden_match × 50 + title_boost × 2 + critical_terms × 1 + vector_score × 0.5
+  - Normaliza términos (lowercase, `_`/`-` → espacio, colapsa whitespace, remueve acentos)
+  - Términos críticos: planned_extension, no vender, automatable, sellable, whatsapp_handoff, lead_capture, diagnostic_code, vera, knowledge_scope, cross_customer_isolation, commercial_limits, concrete_orientation, step_to_action, offer_decision, minimum_slots, useful_diagnosis
+- **Evaluación**: se corre `evaluate_normalized` (matching normalizado) tanto en baseline como en reranked
+- **Referencia**: se conserva `evaluate_strict` (matching exacto de `run_breaking_points.py`) para comparabilidad
+
+### Outputs
+
+| Archivo | Contenido |
+|---------|-----------|
+| `results/reranking_experiment_{timestamp}.json` | Resultados completos con baseline, reranked y scores |
+| `results/reranking_experiment_{timestamp}.md` | Reporte ejecutivo con decisión arquitectónica |
+
+### Decision rules
+
+- Si pass rate mejora significativamente (>15pp) y el candidato correcto está en top-N (>80%): **pgvector + reranker es el próximo paso**
+- Si el candidato correcto no está en top-N (<60%): **el problema es recall/content_gap, no ranking**
+- Si forbidden concepts persisten: **safety/commercial filtering necesario**
+- Si fallan casos de grafo: **graph navigation necesario**
+- No se recomienda Milvus/ArangoDB sin evidencia de que reranker no alcanza
+
+### Ejecución
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Experimento completo (25 casos, top-20 candidates, top-5 eval)
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_reranking_experiment.py
+
+# Primeros 3 casos
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_reranking_experiment.py --max-cases 3
+
+# Custom
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_reranking_experiment.py \
+  --top-n 20 --top-k 5
+
+# Dry run (validación sin DB)
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_reranking_experiment.py --dry-run
+
+# Generar reporte detallado desde resultados existentes
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/scripts/generate_reranking_report.py
+```
+
+### No toca
+
+- ❌ Pipeline productivo
+- ❌ Frontend / routes / endpoints HTTP
+- ❌ diagnosis / automation_diagnosis
+- ❌ Milvus / ArangoDB (son objetos de evaluación)
+- ❌ Documentos approved/drafts
+- ❌ Migraciones
+- ❌ Re-embedding de chunks
+- ❌ LLM / chat completions
+- ❌ Secrets / API keys hardcodeadas
+
+---
+
 _Experiment design & run: Fase 1.6d — PostgreSQL Knowledge Retrieval Breaking Points_
 _RAG Failure Audit Extension: Fase 1.6e_
+_Reranking Experiment: Fase 1.6g_
 _Última actualización: 2026-06-09_
 _Ejecución baseline (1.6d): 2026-06-09 15:09 UTC_
