@@ -24,8 +24,8 @@ dependencies = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.uv]
-dev-dependencies = []
+[dependency-groups]
+dev = []
 
 [tool.hatch.build.targets.wheel]
 packages = ["modules", "routes", "models", "services", "middleware", "db"]
