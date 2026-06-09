@@ -1149,6 +1149,36 @@ Incluye estructura inicial para:
 - 89/89 tests knowledge ingestion, 177/177 suite completa.
 - Comando de integración: `cd backend && DB_PG_V360_URL="..." uv run python scripts/run_knowledge_ingestion_local.py`
 
+### 2026-06-08 - Fase 1.4b: estrategia de chunking controlada (semantic wrapper)
+
+- Se creó `modules/knowledge_ingestion/semantic_chunker.py`:
+  - Wrapper que intenta importar `SemanticChunker` de `langchain_experimental`.
+  - `is_semantic_chunker_available()` detecta disponibilidad en import time.
+  - `chunk_semantic()` retorna `list[ChunkResult]` compatible con persistencia actual.
+  - `_SEMANTIC_CHUNKER_AVAILABLE = False` actualmente (langchain_experimental no instalado).
+- Se extendió `worker.py`:
+  - `persist_package_documents()` ahora acepta `chunk_strategy` parameter.
+  - `CHUNK_STRATEGIES = {"structural", "semantic", "semantic_with_structural_fallback"}`.
+  - `_choose_chunking()`: dispatcher interno que selecciona chunker según estrategia.
+  - `structural` (default): comportamiento exacto pre-Fase 1.4b.
+  - `semantic`: error claro `RuntimeError` si SemanticChunker no disponible.
+  - `semantic_with_structural_fallback`: intenta semantic, cae a structural con warning.
+  - dry_run con `semantic` propaga error `RuntimeError` (no silent fallback).
+- Se actualizó `scripts/run_knowledge_ingestion_local.py`:
+  - Nuevo flag `--chunk-strategy` con choices: `structural`, `semantic`, `semantic_with_structural_fallback`.
+  - Se muestra estrategia en output.
+- Tests: 14 nuevos (total: 103 KI tests, 191 suite completa).
+  - `TestSemanticChunker`: verifica que module-level flag es False, `chunk_semantic()` raisea RuntimeError.
+  - `TestChunkStrategyStructural`: default, explicit, dry_run, no embeddings/Milvus/Arango.
+  - `TestChunkStrategySemantic`: unavailable → doc INVALID en persist, RuntimeError en dry_run, unchanged no llama chunking.
+  - `TestChunkStrategyFallback`: unavailable → structural + warning visible en output, dry_run estima chunks, unchanged no toca chunks.
+  - `TestChunkStrategyInvalid`: strategy inválida → ValueError.
+- No se tocó `pyproject.toml`: SemanticChunker no disponible, tests usan mock implícito vía module flag.
+- No embeddings, no Milvus, no ArangoDB, no LLM, no frontend, no routes, no migrations.
+- Integración local dry-run validada:
+  - `--chunk-strategy structural`: 40 chunks estimados.
+  - `--chunk-strategy semantic_with_structural_fallback`: 40 chunks estimados (fallback estructural).
+
 ## Notas de seguridad
 
 - No se grabo la password de GitHub en archivos del proyecto.

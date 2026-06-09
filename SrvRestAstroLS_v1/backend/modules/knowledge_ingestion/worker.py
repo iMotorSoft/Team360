@@ -29,18 +29,19 @@ from typing import Any
 
 from psycopg import AsyncConnection
 
-from modules.knowledge_ingestion.markdown_chunker import chunk_markdown
+from modules.knowledge_ingestion.semantic_chunker import (
+    chunk_semantic,
+    is_semantic_chunker_available,
+)
+
+# Valid chunk strategies
+CHUNK_STRATEGIES = frozenset({
+    "structural",
+    "semantic",
+    "semantic_with_structural_fallback",
+})
 
 
-def _sanitize_metadata(val: Any) -> Any:
-    """Convert non-JSON-serializable types (dates, etc.) to strings."""
-    if isinstance(val, (datetime.date, datetime.datetime)):
-        return val.isoformat()
-    if isinstance(val, dict):
-        return {k: _sanitize_metadata(v) for k, v in val.items()}
-    if isinstance(val, (list, tuple)):
-        return [_sanitize_metadata(v) for v in val]
-    return val
 from modules.knowledge_ingestion.package_scanner import KnowledgePackageScanner
 from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
 from modules.knowledge_ingestion.schemas import (
@@ -52,6 +53,17 @@ from modules.knowledge_ingestion.schemas import (
     PackageScanRequest,
     PackageScanResult,
 )
+
+
+def _sanitize_metadata(val: Any) -> Any:
+    """Convert non-JSON-serializable types (dates, etc.) to strings."""
+    if isinstance(val, (datetime.date, datetime.datetime)):
+        return val.isoformat()
+    if isinstance(val, dict):
+        return {k: _sanitize_metadata(v) for k, v in val.items()}
+    if isinstance(val, (list, tuple)):
+        return [_sanitize_metadata(v) for v in val]
+    return val
 
 
 class KnowledgeIngestionWorker:
@@ -152,6 +164,47 @@ class KnowledgeIngestionWorker:
         )
         return scanner.scan(request)
 
+    def _choose_chunking(
+        self,
+        raw_text: str,
+        *,
+        base_metadata: dict[str, Any] | None = None,
+        chunk_strategy: str,
+    ) -> tuple[list, list[str]]:
+        """Select chunking method based on strategy.
+
+        Returns (chunks, warnings).
+        """
+        if chunk_strategy == "structural":
+            from modules.knowledge_ingestion.markdown_chunker import chunk_markdown as _chunk
+
+            return _chunk(raw_text, base_metadata=base_metadata), []
+
+        if chunk_strategy == "semantic":
+            if not is_semantic_chunker_available():
+                raise RuntimeError(
+                    "SemanticChunker is not available. "
+                    "Cannot use chunk_strategy='semantic'."
+                )
+            return chunk_semantic(raw_text, base_metadata=base_metadata), []
+
+        if chunk_strategy == "semantic_with_structural_fallback":
+            if is_semantic_chunker_available():
+                try:
+                    return chunk_semantic(raw_text, base_metadata=base_metadata), []
+                except Exception as exc:
+                    warnings = [f"SemanticChunker failed ({exc}), falling back to structural"]
+                    from modules.knowledge_ingestion.markdown_chunker import chunk_markdown as _chunk
+
+                    return _chunk(raw_text, base_metadata=base_metadata), warnings
+            from modules.knowledge_ingestion.markdown_chunker import chunk_markdown as _chunk
+
+            return _chunk(raw_text, base_metadata=base_metadata), [
+                "SemanticChunker unavailable, using structural fallback",
+            ]
+
+        raise ValueError(f"Unknown chunk_strategy: {chunk_strategy!r}")
+
     async def persist_package_documents(
         self,
         conn: AsyncConnection,
@@ -165,12 +218,23 @@ class KnowledgeIngestionWorker:
         triggered_by_email: str | None = None,
         dry_run: bool = True,
         include_chunks: bool = False,
+        chunk_strategy: str = "structural",
     ) -> PackagePersistResult:
         """Scan a package and persist approved candidates as KnowledgeDocuments.
 
         Phase 1.3b: persists document metadata only — no chunks, no embeddings.
         Phase 1.4a: include_chunks=True also generates structural Markdown chunks.
+        Phase 1.4b: chunk_strategy selects chunking method:
+          - 'structural' (default): heading-based Markdown chunking.
+          - 'semantic': SemanticChunker via langchain_experimental.
+          - 'semantic_with_structural_fallback': try semantic, fall back to
+            structural if SemanticChunker unavailable (with warning).
         """
+        if chunk_strategy not in CHUNK_STRATEGIES:
+            raise ValueError(
+                f"Unknown chunk_strategy: {chunk_strategy!r}. "
+                f"Valid: {sorted(CHUNK_STRATEGIES)}"
+            )
         context = await self.repository.resolve_ingestion_context(
             conn=conn,
             organization_code=organization_code,
@@ -202,8 +266,13 @@ class KnowledgeIngestionWorker:
                     if doc.valid and doc.candidate_for_ingestion:
                         try:
                             raw = doc.path.read_bytes()
-                            chunks = chunk_markdown(raw.decode("utf-8"))
+                            chunks, _ = self._choose_chunking(
+                                raw.decode("utf-8"),
+                                chunk_strategy=chunk_strategy,
+                            )
                             est_chunk_count += len(chunks)
+                        except RuntimeError:
+                            raise
                         except Exception:
                             pass
             return PackagePersistResult(
@@ -347,26 +416,33 @@ class KnowledgeIngestionWorker:
                 unchanged_count += 1
 
             doc_chunk_count = 0
+            doc_chunk_warnings: list[str] = []
             if include_chunks and action in ("inserted", "updated"):
+                base_meta = {
+                    "document_id": doc_id,
+                    "relative_path": doc.relative_path,
+                    "knowledge_scope_code": knowledge_scope_code,
+                    "package_code": package_code,
+                    "assistant_instance_code": assistant_instance_code or "",
+                    "organization_code": organization_code,
+                    "workspace_code": workspace_code,
+                    "node_path": node_path or "",
+                    "access_tags": fm.get("access_tags", []),
+                    "document_type": fm.get("document_type", ""),
+                    "locale": fm.get("locale", ""),
+                    "source_section": doc.source_section,
+                    "chunk_strategy": chunk_strategy,
+                }
                 try:
                     raw_bytes = doc.path.read_bytes()
-                    chunks = chunk_markdown(
+                    chunks, chunk_warnings = self._choose_chunking(
                         raw_bytes.decode("utf-8"),
-                        base_metadata={
-                            "document_id": doc_id,
-                            "relative_path": doc.relative_path,
-                            "knowledge_scope_code": knowledge_scope_code,
-                            "package_code": package_code,
-                            "assistant_instance_code": assistant_instance_code or "",
-                            "organization_code": organization_code,
-                            "workspace_code": workspace_code,
-                            "node_path": node_path or "",
-                            "access_tags": fm.get("access_tags", []),
-                            "document_type": fm.get("document_type", ""),
-                            "locale": fm.get("locale", ""),
-                            "source_section": doc.source_section,
-                        },
+                        base_metadata=base_meta,
+                        chunk_strategy=chunk_strategy,
                     )
+                    if chunk_warnings:
+                        doc_chunk_warnings.extend(chunk_warnings)
+                        warnings.extend(chunk_warnings)
                 except Exception as exc:
                     persist_failed = True
                     doc_results.append(KnowledgeDocumentPersistenceResult(
@@ -421,6 +497,7 @@ class KnowledgeIngestionWorker:
                 document_id=doc_id,
                 action=action,
                 chunk_count=doc_chunk_count,
+                warnings=doc_chunk_warnings,
             ))
 
         persisted_count = inserted_count + updated_count

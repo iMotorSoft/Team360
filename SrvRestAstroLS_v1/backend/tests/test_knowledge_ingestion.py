@@ -1923,3 +1923,375 @@ class TestKnowledgeIngestionPersistence:
         # embedding_status should remain 'pending'
         assert "embedding_status = 'completed'" not in all_sql
         assert "embedding_status = 'processing'" not in all_sql
+
+
+# ---------------------------------------------------------------------------
+# Semantic chunker (Fase 1.4b)
+# ---------------------------------------------------------------------------
+
+
+class TestSemanticChunker:
+    """Tests for semantic_chunker.py wrapper.
+
+    SemanticChunker from langchain_experimental is NOT installed.
+    Tests validate error handling and fallback behavior.
+    """
+
+    def test_semantic_chunker_not_available_by_default(self):
+        from modules.knowledge_ingestion.semantic_chunker import (
+            is_semantic_chunker_available,
+        )
+        assert is_semantic_chunker_available() is False
+
+    def test_chunk_semantic_raises_when_unavailable(self):
+        from modules.knowledge_ingestion.semantic_chunker import chunk_semantic
+
+        with pytest.raises(RuntimeError, match="SemanticChunker is not available"):
+            chunk_semantic("# Hello\nWorld.")
+
+    def test_chunk_semantic_empty_body_returns_empty(self):
+        from modules.knowledge_ingestion.semantic_chunker import chunk_semantic
+
+        with pytest.raises(RuntimeError):
+            chunk_semantic("")
+        with pytest.raises(RuntimeError):
+            chunk_semantic("---\nkey: val\n---")
+
+
+class TestChunkStrategyStructural:
+    """Tests for chunk_strategy='structural' (default) in persist_package_documents."""
+
+    @pytest.mark.anyio
+    async def test_structural_default_strategy(self):
+        """Default chunk_strategy should be 'structural'."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+        )
+        assert result.inserted_count == 1
+        assert result.documents[0].chunk_count >= 1
+
+    @pytest.mark.anyio
+    async def test_explicit_structural_strategy(self):
+        """Explicit chunk_strategy='structural' should work identically."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+            chunk_strategy="structural",
+        )
+        assert result.inserted_count == 1
+        assert result.documents[0].chunk_count >= 1
+
+    @pytest.mark.anyio
+    async def test_structural_dry_run_estimates_chunks(self):
+        """dry_run with structural should estimate chunk count."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=True,
+            include_chunks=True,
+            chunk_strategy="structural",
+        )
+        assert result.run_id is None
+        assert result.total_chunk_count >= 1
+
+    @pytest.mark.anyio
+    async def test_structural_no_embeddings_milvus_arango(self):
+        """structural chunking should not call embeddings/Milvus/Arango."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+            chunk_strategy="structural",
+        )
+        assert result.inserted_count == 1
+        all_sql = " ".join(sql for sql, _ in conn.statements)
+        assert "embedding" not in all_sql.lower()
+        assert "milvus" not in all_sql.lower()
+        assert "arango" not in all_sql.lower()
+
+
+class TestChunkStrategySemantic:
+    """Tests for chunk_strategy='semantic' — should error if not available."""
+
+    @pytest.mark.anyio
+    async def test_semantic_unavailable_reports_invalid(self):
+        """SemanticChunker not available should report doc as invalid chunk_failed."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+            chunk_strategy="semantic",
+        )
+        assert result.invalid_count >= 1
+        failing = [d for d in result.documents if d.status == DocumentUpsertStatus.INVALID]
+        assert len(failing) >= 1
+        assert any("SemanticChunker is not available" in e for e in failing[0].errors)
+
+    @pytest.mark.anyio
+    async def test_semantic_unavailable_dry_run_raises(self):
+        """dry_run with semantic unavailable should propagate RuntimeError."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        with pytest.raises(RuntimeError, match="SemanticChunker is not available"):
+            await worker.persist_package_documents(
+                conn=conn,
+                organization_code="team360_live",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+                package_code="pkg_sales_diagnosis",
+                package_root=root,
+                dry_run=True,
+                include_chunks=True,
+                chunk_strategy="semantic",
+            )
+
+    @pytest.mark.anyio
+    async def test_semantic_unchanged_never_calls_chunking(self):
+        """Unchanged document with semantic strategy should not call chunking."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        file_path = Path(root) / "approved" / "test.md"
+        expected_hash = hashlib.sha256(file_path.read_bytes()).hexdigest()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            {"id": "doc-uuid", "content_hash": expected_hash},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+            chunk_strategy="semantic",
+        )
+        assert result.unchanged_count == 1
+        assert result.documents[0].chunk_count == 0
+
+
+class TestChunkStrategyFallback:
+    """Tests for chunk_strategy='semantic_with_structural_fallback'."""
+
+    @pytest.mark.anyio
+    async def test_fallback_uses_structural_when_semantic_unavailable(self):
+        """Fallback strategy should use structural when SemanticChunker unavailable."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+            chunk_strategy="semantic_with_structural_fallback",
+        )
+        assert result.inserted_count == 1
+        # With SemanticChunker unavailable, fallback uses structural
+        assert result.documents[0].chunk_count >= 1
+        assert any("SemanticChunker unavailable" in w for w in result.warnings)
+        chunk_sqls = [
+            sql for sql, _ in conn.statements
+            if "insert into knowledge_chunks" in sql
+        ]
+        assert len(chunk_sqls) >= 1
+        # Verify no embeddings/Milvus/Arango
+        all_sql = " ".join(sql for sql, _ in conn.statements)
+        assert "embedding" not in all_sql.lower()
+        assert "milvus" not in all_sql.lower()
+        assert "arango" not in all_sql.lower()
+
+    @pytest.mark.anyio
+    async def test_fallback_dry_run_estimates_with_structural(self):
+        """Fallback dry run should estimate chunks via structural."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=True,
+            include_chunks=True,
+            chunk_strategy="semantic_with_structural_fallback",
+        )
+        assert result.run_id is None
+        assert result.total_chunk_count >= 1
+
+    @pytest.mark.anyio
+    async def test_fallback_unchanged_skips_chunks(self):
+        """Unchanged with fallback strategy should not touch chunks."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        file_path = Path(root) / "approved" / "test.md"
+        expected_hash = hashlib.sha256(file_path.read_bytes()).hexdigest()
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            {"id": "doc-uuid", "content_hash": expected_hash},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+            chunk_strategy="semantic_with_structural_fallback",
+        )
+        assert result.unchanged_count == 1
+        assert result.documents[0].chunk_count == 0
+
+
+class TestChunkStrategyInvalid:
+    """Tests for invalid chunk_strategy values."""
+
+    @pytest.mark.anyio
+    async def test_unknown_strategy_raises(self):
+        """Unknown chunk_strategy should raise ValueError."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        with pytest.raises(ValueError, match="Unknown chunk_strategy"):
+            await worker.persist_package_documents(
+                conn=conn,
+                organization_code="team360_live",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+                package_code="pkg_sales_diagnosis",
+                package_root=root,
+                dry_run=True,
+                include_chunks=True,
+                chunk_strategy="invalid_strategy",
+            )

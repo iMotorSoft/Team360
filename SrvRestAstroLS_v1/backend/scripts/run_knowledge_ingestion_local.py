@@ -45,6 +45,9 @@ def main() -> None:
                         help="Generate chunks (default: True)")
     parser.add_argument("--no-chunks", action="store_false", dest="include_chunks",
                         help="Skip chunk generation")
+    parser.add_argument("--chunk-strategy", default="structural",
+                        choices=["structural", "semantic", "semantic_with_structural_fallback"],
+                        help="Chunking strategy (default: structural)")
     args = parser.parse_args()
 
     dsn = _resolve_dsn()
@@ -84,6 +87,7 @@ def main() -> None:
                 triggered_by_email="mario.rojas.marconi@gmail.com",
                 dry_run=args.dry_run,
                 include_chunks=args.include_chunks,
+                chunk_strategy=args.chunk_strategy,
             )
         finally:
             await conn.close()
@@ -93,6 +97,7 @@ def main() -> None:
         print("KNOWLEDGE INGESTION RESULT")
         print("=" * 55)
         print(f"  Mode:              {'DRY RUN' if args.dry_run else 'PERSIST'}")
+        print(f"  Chunk strategy:    {args.chunk_strategy}")
         print(f"  Package:           {result.package_code}")
         print(f"  Package root:      {result.package_root}")
         print(f"  Scanned:           {result.scanned_count}")

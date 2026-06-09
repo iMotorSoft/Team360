@@ -277,6 +277,14 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 - Idempotencia verificada: segunda corrida devuelve `unchanged`.
 - No se crearon nuevos documentos lat.md — el chunking estructural es implementación temporal (semantic_chunker vendrá después).
 
+### 2026-06-08 - Fase 1.4b: estrategia de chunking controlada
+
+- Se creó `semantic_chunker.py` como wrapper de SemanticChunker (langchain_experimental).
+- `chunk_strategy` parameter en `persist_package_documents()`: `structural` (default), `semantic`, `semantic_with_structural_fallback`.
+- Structural sigue siendo default operativo; semantic error si no disponible; fallback controlado con warning.
+- No se agregaron dependencias ni se tocó `pyproject.toml`.
+- Behavioral invariant: `lat.md/knowledge-runtime-target.md` no se modificó — el cambio es implementación, no arquitectura.
+
 ## Pendientes recomendados
 
 - Agregar nuevos documentos lat.md solo para conceptos estables de plataforma.
