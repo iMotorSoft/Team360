@@ -1245,6 +1245,23 @@ Incluye estructura inicial para:
   - `--chunk-strategy structural`: 40 chunks estimados.
   - `--chunk-strategy semantic_with_structural_fallback`: 40 chunks estimados (fallback estructural).
 
+### 2026-06-09 - Fase 1.6d completa: Breaking Points lab runner + ejecucion real
+
+- Creado `run_breaking_points.py`: runner que importa `KnowledgeIngestionWorker` desde backend vía sys.path, lee `golden_cases/breaking_point_cases.json`, ejecuta retrieval pgvector con OpenAI embedding, evalúa expected/forbidden concepts sin LLM, guarda JSON+Markdown.
+- Creado `scripts/generate_report.py`: lee JSON y genera reporte detallado con matriz de ruptura, análisis por caso, arquitectura implicada.
+- Creado `scripts/generate_infographics.py`: genera HTML dark-theme con summary cards y tabla ejecutiva.
+- Actualizado README.md con instrucciones de ejecución (desde `backend/` con `uv run`), tabla de parámetros, variables de entorno, resultados baseline.
+- **Ejecución real validada**:
+  - `--dry-run`: 25/25 casos OK.
+  - `--max-cases 3`: 2/3 PASS, bp_03 FAIL (step_to_action no en chunks).
+  - `--limit 5` (full 25): 5/25 PASS (20%), 20/25 FAIL, score total -31.
+  - 0 conceptos prohibidos en top-3 (el sistema no alucina ni recupera ruido).
+- **Hallazgo principal**: 20/20 fallos son `embedding_ranking_problem` → **content_gap**, no límite de pgvector. Cuando el chunk contiene el concepto exacto (automatizable, diagnostic_code, scope), el retrieval funciona perfectamente. El punto de ruptura actual es cobertura del corpus (40 chunks), no el backend vectorial.
+- Decisión algorítmica: D. Pero interpretación humana: PostgreSQL alcanza con mejor contenido/metadata filters/reranking.
+- No se tocó: pipeline productivo, frontend, routes, HTTP, diagnosis, automation_diagnosis, Milvus, ArangoDB, migraciones.
+- Rama: `feature/knowledge-ingestion-service`
+- No se hizo git add ni commit.
+
 ## Notas de seguridad
 
 - No se grabo la password de GitHub en archivos del proyecto.
