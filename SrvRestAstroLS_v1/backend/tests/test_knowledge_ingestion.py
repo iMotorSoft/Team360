@@ -2295,3 +2295,343 @@ class TestChunkStrategyInvalid:
                 include_chunks=True,
                 chunk_strategy="invalid_strategy",
             )
+
+
+# ---------------------------------------------------------------------------
+# Embedding provider — unit tests with mocked HTTP
+# ---------------------------------------------------------------------------
+
+
+class TestOpenAIEmbeddingProvider:
+    def test_missing_api_key_raises_error(self, monkeypatch):
+        from modules.knowledge_ingestion.embedding_provider import (
+            OpenAIEmbeddingProvider,
+            EmbeddingProviderError,
+        )
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+        monkeypatch.delenv("OpenAI_Key_JAI_query", raising=False)
+        provider = OpenAIEmbeddingProvider(api_key="")
+        with pytest.raises(EmbeddingProviderError, match="OPENAI_API_KEY not found"):
+            provider.embed_texts(["test"])
+
+    def test_empty_texts_returns_empty(self):
+        from modules.knowledge_ingestion.embedding_provider import (
+            OpenAIEmbeddingProvider,
+        )
+        provider = OpenAIEmbeddingProvider(api_key="sk-test")
+        result = provider.embed_texts([])
+        assert result == []
+
+    def test_dimension_mismatch_raises_error(self):
+        from unittest.mock import Mock
+        from modules.knowledge_ingestion.embedding_provider import (
+            OpenAIEmbeddingProvider,
+            EmbeddingProviderError,
+        )
+        mock_response = {
+            "data": [
+                {"index": 0, "embedding": [0.1, 0.2, 0.3]},
+            ]
+        }
+        mock_client = Mock()
+        mock_client.post.return_value.status_code = 200
+        mock_client.post.return_value.json.return_value = mock_response
+
+        provider = OpenAIEmbeddingProvider(api_key="sk-test", http_client=mock_client)
+        with pytest.raises(EmbeddingProviderError, match="dimension mismatch"):
+            provider.embed_texts(["hello"])
+
+    def test_successful_embedding(self):
+        from unittest.mock import Mock
+        from modules.knowledge_ingestion.embedding_provider import (
+            OpenAIEmbeddingProvider,
+            EXPECTED_DIMENSIONS,
+        )
+        fake_embedding = [0.1] * EXPECTED_DIMENSIONS
+        mock_response = {
+            "data": [
+                {"index": 0, "embedding": fake_embedding},
+                {"index": 1, "embedding": fake_embedding},
+            ]
+        }
+        mock_client = Mock()
+        mock_client.post.return_value.status_code = 200
+        mock_client.post.return_value.json.return_value = mock_response
+
+        provider = OpenAIEmbeddingProvider(api_key="sk-test", http_client=mock_client)
+        result = provider.embed_texts(["hello", "world"])
+        assert len(result) == 2
+        assert len(result[0]) == EXPECTED_DIMENSIONS
+        assert all(isinstance(x, float) for x in result[0])
+
+    def test_non_float_values_raises_error(self):
+        from unittest.mock import Mock
+        from modules.knowledge_ingestion.embedding_provider import (
+            OpenAIEmbeddingProvider,
+            EmbeddingProviderError,
+            EXPECTED_DIMENSIONS,
+        )
+        bad_embedding = [1] * EXPECTED_DIMENSIONS
+        mock_response = {
+            "data": [
+                {"index": 0, "embedding": bad_embedding},
+            ]
+        }
+        mock_client = Mock()
+        mock_client.post.return_value.status_code = 200
+        mock_client.post.return_value.json.return_value = mock_response
+
+        provider = OpenAIEmbeddingProvider(api_key="sk-test", http_client=mock_client)
+        with pytest.raises(EmbeddingProviderError, match="not all floats"):
+            provider.embed_texts(["hello"])
+
+    def test_http_error_raises(self):
+        from unittest.mock import Mock
+        from modules.knowledge_ingestion.embedding_provider import (
+            OpenAIEmbeddingProvider,
+            EmbeddingProviderError,
+        )
+        mock_client = Mock()
+        mock_client.post.return_value.status_code = 401
+        mock_client.post.return_value.text = "Unauthorized"
+
+        provider = OpenAIEmbeddingProvider(api_key="sk-bad", http_client=mock_client)
+        with pytest.raises(EmbeddingProviderError, match="401"):
+            provider.embed_texts(["hello"])
+
+    def test_missing_data_key_raises(self):
+        from unittest.mock import Mock
+        from modules.knowledge_ingestion.embedding_provider import (
+            OpenAIEmbeddingProvider,
+            EmbeddingProviderError,
+        )
+        mock_client = Mock()
+        mock_client.post.return_value.status_code = 200
+        mock_client.post.return_value.json.return_value = {"not_data": []}
+
+        provider = OpenAIEmbeddingProvider(api_key="sk-test", http_client=mock_client)
+        with pytest.raises(EmbeddingProviderError, match="missing 'data'"):
+            provider.embed_texts(["hello"])
+
+    def test_count_mismatch_raises(self):
+        from unittest.mock import Mock
+        from modules.knowledge_ingestion.embedding_provider import (
+            OpenAIEmbeddingProvider,
+            EmbeddingProviderError,
+        )
+        mock_client = Mock()
+        mock_client.post.return_value.status_code = 200
+        mock_client.post.return_value.json.return_value = {
+            "data": [{"index": 0, "embedding": [0.1]}],
+        }
+
+        provider = OpenAIEmbeddingProvider(api_key="sk-test", http_client=mock_client)
+        with pytest.raises(EmbeddingProviderError, match="count mismatch"):
+            provider.embed_texts(["hello", "world"])
+
+
+# ---------------------------------------------------------------------------
+# Embedding worker — dry_run and repository integration
+# ---------------------------------------------------------------------------
+
+
+class _FakeEmbeddingConn:
+    """Minimal fake connection to capture SQL and return canned rows."""
+
+    def __init__(self):
+        self.statements: list[tuple[str, dict]] = []
+        self._rows: list[dict | None] = []
+        self.autocommit = False
+
+    async def set_autocommit(self, val: bool) -> None:
+        self.autocommit = val
+
+    async def execute(self, sql: str, params: dict | None = None):
+        self.statements.append((sql, params or {}))
+        return self
+
+    async def fetchone(self):
+        if not self._rows:
+            return None
+        return self._rows.pop(0)
+
+    async def fetchall(self):
+        return self._rows
+
+    def cursor(self):
+        return self
+
+    def __aiter__(self):
+        return iter([])
+
+    def __anext__(self):
+        raise StopAsyncIteration
+
+
+class TestEmbedPendingChunks:
+    def _run(self, coro):
+        import asyncio
+        return asyncio.run(coro)
+
+    def test_dry_run_no_writes_no_provider_call(self):
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        conn = _FakeEmbeddingConn()
+        worker = KnowledgeIngestionWorker()
+        repo = worker.repository
+
+        async def fake_resolve(*args, **kwargs):
+            return type("Ctx", (), {
+                "knowledge_scope_id": "scope-1",
+                "organization_id": "org-1",
+                "workspace_id": "ws-1",
+                "to_metadata_dict": lambda: {},
+            })()
+
+        async def fake_find_embedding_model(*args, **kwargs):
+            return "model-uuid-1"
+
+        async def fake_list_pending(*args, **kwargs):
+            return []
+
+        repo.resolve_ingestion_context = fake_resolve
+        repo.find_embedding_model_id = fake_find_embedding_model
+        repo.list_pending_chunks_for_embedding = fake_list_pending
+
+        result = self._run(worker.embed_pending_chunks(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            dry_run=True,
+        ))
+
+        assert result["dry_run"] is True
+        assert result["pending_count"] == 0
+        assert len(conn.statements) == 0
+
+    def test_dry_run_reports_pending_chunks(self):
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        conn = _FakeEmbeddingConn()
+        worker = KnowledgeIngestionWorker()
+        repo = worker.repository
+
+        async def fake_resolve(*args, **kwargs):
+            return type("Ctx", (), {
+                "knowledge_scope_id": "scope-1",
+                "organization_id": "org-1",
+                "workspace_id": "ws-1",
+                "to_metadata_dict": lambda: {},
+            })()
+
+        async def fake_find_embedding_model(*args, **kwargs):
+            return "model-uuid-1"
+
+        async def fake_list_pending(*args, **kwargs):
+            return [
+                {"chunk_id": "c1", "chunk_index": 0, "title": "Test",
+                 "content": "hello world", "content_hash": "abc123",
+                 "knowledge_scope_id": "scope-1", "metadata_jsonb": {}},
+            ]
+
+        repo.resolve_ingestion_context = fake_resolve
+        repo.find_embedding_model_id = fake_find_embedding_model
+        repo.list_pending_chunks_for_embedding = fake_list_pending
+
+        result = self._run(worker.embed_pending_chunks(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            dry_run=True,
+        ))
+
+        assert result["dry_run"] is True
+        assert result["pending_count"] == 1
+        assert result["chunks"][0]["chunk_id"] == "c1"
+
+    def test_embedding_model_not_found_raises(self):
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        conn = _FakeEmbeddingConn()
+        worker = KnowledgeIngestionWorker()
+        repo = worker.repository
+
+        async def fake_resolve(*args, **kwargs):
+            return type("Ctx", (), {
+                "knowledge_scope_id": "scope-1",
+                "organization_id": "org-1",
+                "workspace_id": "ws-1",
+                "to_metadata_dict": lambda: {},
+            })()
+
+        async def fake_find_embedding_model(*args, **kwargs):
+            return None
+
+        repo.resolve_ingestion_context = fake_resolve
+        repo.find_embedding_model_id = fake_find_embedding_model
+
+        with pytest.raises(ValueError, match="No active embedding model"):
+            self._run(worker.embed_pending_chunks(
+                conn=conn,
+                organization_code="team360_live",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+                dry_run=True,
+            ))
+
+    def test_missing_api_key_reported(self):
+        from unittest.mock import patch
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        from modules.knowledge_ingestion.embedding_provider import (
+            EmbeddingProviderError,
+            OpenAIEmbeddingProvider,
+        )
+
+        conn = _FakeEmbeddingConn()
+        worker = KnowledgeIngestionWorker()
+        repo = worker.repository
+
+        async def fake_resolve(*args, **kwargs):
+            return type("Ctx", (), {
+                "knowledge_scope_id": "scope-1",
+                "organization_id": "org-1",
+                "workspace_id": "ws-1",
+                "to_metadata_dict": lambda: {},
+            })()
+
+        async def fake_find_embedding_model(*args, **kwargs):
+            return "model-uuid-1"
+
+        async def fake_list_pending(*args, **kwargs):
+            return [
+                {"chunk_id": "c1", "chunk_index": 0, "title": "Test",
+                 "content": "hello", "content_hash": "abc",
+                 "knowledge_scope_id": "scope-1", "metadata_jsonb": {}},
+            ]
+
+        async def fake_find_existing(*args, **kwargs):
+            return None
+
+        async def fake_update_status(*args, **kwargs):
+            conn.statements.append(("update_status", kwargs))
+
+        repo.resolve_ingestion_context = fake_resolve
+        repo.find_embedding_model_id = fake_find_embedding_model
+        repo.list_pending_chunks_for_embedding = fake_list_pending
+        repo.find_existing_chunk_embedding = fake_find_existing
+        repo.update_chunk_embedding_status = fake_update_status
+        repo.mark_chunk_embedding_failed = fake_update_status
+
+        with patch.object(
+            OpenAIEmbeddingProvider, "embed_texts",
+            side_effect=EmbeddingProviderError("No API key"),
+        ):
+            result = self._run(worker.embed_pending_chunks(
+                conn=conn,
+                organization_code="team360_live",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+                dry_run=False,
+            ))
+
+        assert result["error_count"] == 1
+        assert any("No API key" in e for e in result["errors"])

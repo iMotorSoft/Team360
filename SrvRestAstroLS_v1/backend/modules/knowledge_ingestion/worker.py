@@ -29,6 +29,15 @@ from typing import Any
 
 from psycopg import AsyncConnection
 
+from modules.knowledge_ingestion.embedding_provider import (
+    EMBEDDING_VERSION,
+    DEFAULT_EMBEDDING_PROVIDER,
+    DEFAULT_EMBEDDING_DIMENSIONS,
+    EXPECTED_DIMENSIONS,
+    OPENAI_DEFAULT_MODEL,
+    EmbeddingProviderError,
+    OpenAIEmbeddingProvider,
+)
 from modules.knowledge_ingestion.semantic_chunker import (
     chunk_semantic,
     is_semantic_chunker_available,
@@ -568,3 +577,155 @@ class KnowledgeIngestionWorker:
                 f"Cannot jump from {current_phase} (index {current_idx}) "
                 f"to {next_phase} (index {next_idx})"
             )
+
+    async def embed_pending_chunks(
+        self,
+        conn: AsyncConnection,
+        *,
+        organization_code: str,
+        workspace_code: str,
+        knowledge_scope_code: str,
+        package_code: str | None = None,
+        assistant_instance_code: str | None = None,
+        embedding_provider_code: str = DEFAULT_EMBEDDING_PROVIDER,
+        embedding_model: str = OPENAI_DEFAULT_MODEL,
+        embedding_dimensions: int = EXPECTED_DIMENSIONS,
+        embedding_version: str = EMBEDDING_VERSION,
+        limit: int = 100,
+        dry_run: bool = True,
+    ) -> dict[str, Any]:
+        context = await self.repository.resolve_ingestion_context(
+            conn=conn,
+            organization_code=organization_code,
+            workspace_code=workspace_code,
+            knowledge_scope_code=knowledge_scope_code,
+            package_code=package_code,
+            assistant_instance_code=assistant_instance_code,
+            worker_code="knowledge_ingestion_worker",
+        )
+
+        embedding_model_id = await self.repository.find_embedding_model_id(
+            conn,
+            provider_code=embedding_provider_code,
+            model_code=embedding_model,
+            dimensions=embedding_dimensions,
+        )
+        if embedding_model_id is None:
+            raise ValueError(
+                f"No active embedding model found for "
+                f"{embedding_provider_code}/{embedding_model} "
+                f"({embedding_dimensions}d)"
+            )
+
+        pending = await self.repository.list_pending_chunks_for_embedding(
+            conn,
+            knowledge_scope_id=context.knowledge_scope_id,
+            limit=limit,
+        )
+
+        if dry_run:
+            return {
+                "dry_run": True,
+                "knowledge_scope_id": context.knowledge_scope_id,
+                "embedding_model_id": embedding_model_id,
+                "pending_count": len(pending),
+                "chunks": [
+                    {
+                        "chunk_id": c["chunk_id"],
+                        "chunk_index": c["chunk_index"],
+                        "title": c["title"][:60],
+                        "content_length": len(c["content"]),
+                    }
+                    for c in pending
+                ],
+            }
+
+        provider = OpenAIEmbeddingProvider(
+            model=embedding_model,
+            dimensions=embedding_dimensions,
+        )
+
+        embedded_count = 0
+        skipped_count = 0
+        error_count = 0
+        errors: list[str] = []
+
+        for chunk in pending:
+            chunk_id = chunk["chunk_id"]
+            content_hash = chunk.get("content_hash") or ""
+            scope_id = chunk["knowledge_scope_id"]
+
+            existing = await self.repository.find_existing_chunk_embedding(
+                conn,
+                chunk_id=chunk_id,
+                embedding_model_id=embedding_model_id,
+                content_hash=content_hash,
+            )
+            if existing is not None and existing.get("embedding_status") in ("ready",):
+                skipped_count += 1
+                continue
+
+            await self.repository.update_chunk_embedding_status(
+                conn, chunk_id=chunk_id, status="processing",
+            )
+
+            try:
+                texts = [chunk["content"]]
+                embeddings = provider.embed_texts(texts)
+                if not embeddings:
+                    raise EmbeddingProviderError("Empty embedding response")
+            except EmbeddingProviderError as exc:
+                error_count += 1
+                error_msg = f"chunk {chunk_id}: {exc}"
+                errors.append(error_msg)
+                await self.repository.update_chunk_embedding_status(
+                    conn, chunk_id=chunk_id, status="failed",
+                )
+                if existing is not None:
+                    await self.repository.mark_chunk_embedding_failed(
+                        conn, existing["chunk_embedding_id"],
+                    )
+                continue
+
+            try:
+                embedding_id = await self.repository.insert_chunk_embedding(
+                    conn,
+                    chunk_id=chunk_id,
+                    knowledge_scope_id=scope_id,
+                    embedding_model_id=embedding_model_id,
+                    embedding=embeddings[0],
+                    content_hash=content_hash,
+                    metadata_jsonb={
+                        "embedding_version": embedding_version,
+                        "provider": embedding_provider_code,
+                        "model": embedding_model,
+                        "dimensions": embedding_dimensions,
+                    },
+                )
+            except Exception as exc:
+                error_count += 1
+                error_msg = f"chunk {chunk_id} insert failed: {exc}"
+                errors.append(error_msg)
+                await self.repository.update_chunk_embedding_status(
+                    conn, chunk_id=chunk_id, status="failed",
+                )
+                continue
+
+            await self.repository.update_chunk_embedding_status(
+                conn, chunk_id=chunk_id, status="completed",
+            )
+            embedded_count += 1
+
+        return {
+            "dry_run": False,
+            "knowledge_scope_id": context.knowledge_scope_id,
+            "embedding_model_id": embedding_model_id,
+            "embedding_model": embedding_model,
+            "embedding_dimensions": embedding_dimensions,
+            "embedding_version": embedding_version,
+            "pending_count": len(pending),
+            "embedded_count": embedded_count,
+            "skipped_count": skipped_count,
+            "error_count": error_count,
+            "errors": errors,
+        }

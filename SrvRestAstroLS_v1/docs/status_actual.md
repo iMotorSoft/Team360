@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-08
+Ultima actualizacion: 2026-06-09
 
 ## Directorio de trabajo
 
@@ -1148,6 +1148,35 @@ Incluye estructura inicial para:
   - No Milvus, no ArangoDB, no LLM calls.
 - 89/89 tests knowledge ingestion, 177/177 suite completa.
 - Comando de integración: `cd backend && DB_PG_V360_URL="..." uv run python scripts/run_knowledge_ingestion_local.py`
+
+### 2026-06-09 - Fase 1.5: pipeline de embeddings productivo con OpenAI
+
+- Se implementó el pipeline de generación y persistencia de embeddings para chunks con
+  `embedding_status='pending'` usando OpenAI `text-embedding-3-small` (1536d, cosine).
+- Se creó `modules/knowledge_ingestion/embedding_provider.py`:
+  - `OpenAIEmbeddingProvider` con `httpx`, sin dependencia directa del paquete `openai`.
+  - `embed_texts(texts)` → `list[list[float]]` con validación de dimensión, encoding, errores HTTP.
+  - API key desde `OPENAI_API_KEY` con fallback `OpenAI_Key_JAI_query`.
+  - No se hardcodean secrets ni se loggean keys.
+- Se extendió `repository.py` con 7 métodos:
+  - `find_embedding_model_id()` — busca modelo semilla por `provider/model/dimensions`.
+  - `list_pending_chunks_for_embedding()` — chunks `pending`, opcional `knowledge_scope_id`, join a `knowledge_documents`.
+  - `find_existing_chunk_embedding()` — idempotencia por `chunk_id + model_id + content_hash`.
+  - `insert_chunk_embedding()` — INSERT con `embedding_status='ready'`.
+  - `update_chunk_embedding_status()` — actualiza `knowledge_chunks.embedding_status`.
+  - `mark_chunk_embedding_ready/failed()` — actualiza `knowledge_chunk_embeddings.embedding_status`.
+- Se extendió `worker.py` con `embed_pending_chunks()`:
+  - `dry_run=True` por defecto: reporta pendientes, 0 writes.
+  - `dry_run=False`: por cada chunk → verifica idempotencia, marca processing, genera embedding, inserta, marca completed.
+  - En error → marca chunk `failed`, marca embedding `failed` si existía registro previo.
+- Se creó `scripts/run_knowledge_embedding_local.py` con `--dry-run` (default), `--no-dry-run`, `--limit N`.
+- Se agregaron 12 tests: `TestOpenAIEmbeddingProvider` (8 tests) + `TestEmbedPendingChunks` (4 tests).
+- Dry-run real: 40 pending chunks detectados, 0 writes.
+- Embedding real (`--no-dry-run --limit 10`): 10/10 embeddings insertados, 1536d, estado ready, version `team360-openai-small-1536-v1`.
+- Se corrigió `list_pending_chunks_for_embedding`: `knowledge_scope_id` se resuelve mediante JOIN a `knowledge_documents` (`kc` no tiene columna directa), `content_hash` extraído de `metadata_jsonb ->> 'content_hash'`.
+- Validación: 203/203 tests suite completa.
+- DB verificada: 10 embeddings `ready`, 1536d, `knowledge_chunks` chunks 0-9 marcados `completed`, chunks 10-39 `pending`.
+- No se implementaron: Milvus, ArangoDB, retrieval, endpoints HTTP, frontend, SemanticChunker, Qwen/Perplexity como provider default.
 
 ### 2026-06-08 - Fase 1.4b: estrategia de chunking controlada (semantic wrapper)
 

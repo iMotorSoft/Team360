@@ -600,3 +600,195 @@ class KnowledgeIngestionRepository:
             """,
             {"run_id": run_id},
         )
+
+    async def find_embedding_model_id(
+        self,
+        conn: AsyncConnection,
+        provider_code: str = "openai",
+        model_code: str = "text-embedding-3-small",
+        dimensions: int = 1536,
+    ) -> str | None:
+        row = await fetch_one(
+            conn,
+            """
+            select embedding_model_id::text
+            from knowledge_embedding_models
+            where provider_code = %(provider_code)s
+              and model_code = %(model_code)s
+              and dimension = %(dimensions)s
+              and status = 'active'
+            """,
+            {
+                "provider_code": provider_code,
+                "model_code": model_code,
+                "dimensions": dimensions,
+            },
+        )
+        return row["embedding_model_id"] if row else None
+
+    async def list_pending_chunks_for_embedding(
+        self,
+        conn: AsyncConnection,
+        knowledge_scope_id: str | None = None,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        where = ["kc.embedding_status = 'pending'"]
+        params: dict[str, Any] = {"limit": limit}
+        if knowledge_scope_id is not None:
+            where.append("kd.knowledge_scope_id = %(knowledge_scope_id)s")
+            params["knowledge_scope_id"] = knowledge_scope_id
+        sql = f"""
+            select
+                kc.id::text as chunk_id,
+                kc.knowledge_document_id::text as document_id,
+                kd.knowledge_scope_id::text as knowledge_scope_id,
+                kc.chunk_index,
+                kc.title,
+                kc.content,
+                kc.metadata_jsonb ->> 'content_hash' as content_hash,
+                kc.metadata_jsonb
+            from knowledge_chunks kc
+            join knowledge_documents kd on kd.id = kc.knowledge_document_id
+            where {' and '.join(where)}
+            order by kc.chunk_index
+            limit %(limit)s
+        """
+        rows = await conn.execute(sql, params)
+        return await rows.fetchall() or []
+
+    async def find_existing_chunk_embedding(
+        self,
+        conn: AsyncConnection,
+        chunk_id: str,
+        embedding_model_id: str,
+        content_hash: str | None = None,
+    ) -> dict[str, Any] | None:
+        if content_hash is not None:
+            row = await fetch_one(
+                conn,
+                """
+                select chunk_embedding_id::text, embedding_status, content_hash
+                from knowledge_chunk_embeddings
+                where knowledge_chunk_id = %(chunk_id)s
+                  and embedding_model_id = %(embedding_model_id)s
+                  and content_hash = %(content_hash)s
+                """,
+                {
+                    "chunk_id": chunk_id,
+                    "embedding_model_id": embedding_model_id,
+                    "content_hash": content_hash,
+                },
+            )
+        else:
+            row = await fetch_one(
+                conn,
+                """
+                select chunk_embedding_id::text, embedding_status, content_hash
+                from knowledge_chunk_embeddings
+                where knowledge_chunk_id = %(chunk_id)s
+                  and embedding_model_id = %(embedding_model_id)s
+                """,
+                {
+                    "chunk_id": chunk_id,
+                    "embedding_model_id": embedding_model_id,
+                },
+            )
+        return row
+
+    async def insert_chunk_embedding(
+        self,
+        conn: AsyncConnection,
+        *,
+        chunk_id: str,
+        knowledge_scope_id: str,
+        embedding_model_id: str,
+        embedding: list[float],
+        content_hash: str,
+        metadata_jsonb: dict[str, Any] | None = None,
+    ) -> str:
+        row = await fetch_one(
+            conn,
+            """
+            insert into knowledge_chunk_embeddings (
+                knowledge_chunk_id,
+                knowledge_scope_id,
+                embedding_model_id,
+                embedding,
+                embedding_status,
+                content_hash,
+                metadata_jsonb,
+                embedded_at_utc
+            ) values (
+                %(chunk_id)s,
+                %(knowledge_scope_id)s,
+                %(embedding_model_id)s,
+                %(embedding)s,
+                'ready',
+                %(content_hash)s,
+                %(metadata_jsonb)s,
+                now()
+            )
+            returning chunk_embedding_id::text
+            """,
+            {
+                "chunk_id": chunk_id,
+                "knowledge_scope_id": knowledge_scope_id,
+                "embedding_model_id": embedding_model_id,
+                "embedding": embedding,
+                "content_hash": content_hash,
+                "metadata_jsonb": Jsonb(metadata_jsonb or {}),
+            },
+        )
+        if row is None:
+            raise DatabaseExecutionError("insert_chunk_embedding returned no row")
+        return row["chunk_embedding_id"]
+
+    async def update_chunk_embedding_status(
+        self,
+        conn: AsyncConnection,
+        chunk_id: str,
+        status: str,
+    ) -> None:
+        await execute(
+            conn,
+            """
+            update knowledge_chunks
+            set embedding_status = %(status)s,
+                updated_at_utc = now()
+            where id = %(chunk_id)s
+            """,
+            {"chunk_id": chunk_id, "status": status},
+        )
+
+    async def mark_chunk_embedding_ready(
+        self,
+        conn: AsyncConnection,
+        chunk_embedding_id: str,
+    ) -> None:
+        await execute(
+            conn,
+            """
+            update knowledge_chunk_embeddings
+            set embedding_status = 'ready',
+                embedded_at_utc = now(),
+                updated_at_utc = now()
+            where chunk_embedding_id = %(chunk_embedding_id)s
+            """,
+            {"chunk_embedding_id": chunk_embedding_id},
+        )
+
+    async def mark_chunk_embedding_failed(
+        self,
+        conn: AsyncConnection,
+        chunk_embedding_id: str,
+    ) -> None:
+        await execute(
+            conn,
+            """
+            update knowledge_chunk_embeddings
+            set embedding_status = 'failed',
+                updated_at_utc = now()
+            where chunk_embedding_id = %(chunk_embedding_id)s
+            """,
+            {"chunk_embedding_id": chunk_embedding_id},
+        )
