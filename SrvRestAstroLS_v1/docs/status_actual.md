@@ -1262,6 +1262,28 @@ Incluye estructura inicial para:
 - Rama: `feature/knowledge-ingestion-service`
 - No se hizo git add ni commit.
 
+### 2026-06-09 - Fase 1.6g: Oracle-lite reranking experiment (techo del reranker)
+
+- Se creó `run_oracle_lite_reranking_experiment.py` con reranker oracle-lite que reordena candidates usando `expected_concepts` del golden case como señal perfecta.
+- Resultado: oráculo basado en conceptos esperados mejora de 11/25 (44%) a 17/25 (68%), +24pp, gap al techo = 24pp.
+- Casos mejorados: 6 (bp_01, bp_03, bp_07, bp_08, bp_14, bp_18). Casos empeorados: 0 (oráculo nunca empeora).
+- Decisión arquitectónica: B. Diseñar reranker runtime — el margen de 24pp justifica una Fase 1.6h con reranker no-oráculo.
+- No se tocó: pipeline productivo, frontend, routes, HTTP, diagnosis, automation_diagnosis, Milvus, ArangoDB, migraciones.
+- Rama: `feature/knowledge-ingestion-service`
+
+### 2026-06-09 - Fase 1.6h: Non-oracle reranking experiment (señales reales)
+
+- Se creó `run_non_oracle_reranking_experiment.py` con reranker determinístico usando 6 señales reales (lexical_overlap, phrase_match, domain_vocabulary, safety, metadata_boost, vector_distance).
+- Baseline: 11/25 (44%). Non-oracle reranked: 11/25 (44%). Delta: +0.0pp. Oracle-lite: 68%.
+- Gap to oracle: 24pp — margen que un cross-encoder puede recuperar.
+- Casos mejorados: 1 (bp_14). Casos empeorados: 1 (bp_05 — conceptos prohibidos entraron en top-5).
+- Conceptos prohibidos baseline: 0. Conceptos prohibidos reranked: 3 — riesgo comercial: el reranker lexical empujó chunks con contenido sensible.
+- Clasificación de fallos post-reranking: correct_not_in_candidates (8), reranker_not_powerful_enough (3), forbidden_concepts_still_present (2), semantic_gap_or_paraphrase_problem (1).
+- Recomendación: F. Cross-encoder necesario — señales léxicas no alcanzan. El gap de 24pp entre oracle-lite (68%) y non-oracle (44%) significa que el conocimiento semántico (qué conceptos esperar por caso) es necesario; un cross-encoder real (ej. BAAI/bge-reranker-v2-m3) puede cerrar ese gap.
+- Reportes generados: `results/non_oracle_reranking_20260609_165520.json`, `.md`, `_detailed_report.md`.
+- Rama: `feature/knowledge-ingestion-service`
+- No se hizo git add ni commit.
+
 ## Notas de seguridad
 
 - No se grabo la password de GitHub en archivos del proyecto.

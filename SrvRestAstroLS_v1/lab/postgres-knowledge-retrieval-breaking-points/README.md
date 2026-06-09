@@ -813,8 +813,86 @@ uv run python ../lab/postgres-knowledge-retrieval-breaking-points/scripts/genera
 
 ---
 
+## Non-oracle reranking experiment — Fase 1.6h
+
+### Objetivo
+
+Validar si un reranker que **NO usa golden answers** (expected_concepts, acceptable_concepts, forbidden_concepts) puede mejorar el retrieval de pgvector. Es una simulación más cercana a producción que el oracle-lite de Fase 1.6g.
+
+### Diferencia clave con oracle-lite (1.6g)
+
+| Aspecto | Oracle-lite (1.6g) | Non-oracle (1.6h) |
+|---------|-------------------|-------------------|
+| Usa expected_concepts para reordenar? | **Sí** (oráculo) | **No** |
+| Señales del reranker | concept_match, forbidden_penalty, critical_terms | lexical_overlap, phrase_match, domain_vocabulary, safety_signals, metadata_boost, vector_score |
+| Producción-ready? | No (solo laboratorio) | Más cercano (solo query + candidates) |
+| Techo teórico | Alto (conoce la respuesta) | Limitado por señales léxicas |
+
+### Estrategia
+
+- **Candidates**: pgvector top-N (default: 20)
+- **Baseline**: top-K sin rerank (default: 5)
+- **Non-oracle reranker** (6 señales, 0 oráculo):
+
+  | Señal | Peso | Descripción |
+  |-------|------|-------------|
+  | `vector_score` | 0.40 | Similaridad coseno original de pgvector |
+  | `lexical_overlap` | 0.20 | Jaccard + coverage de tokens query↔candidate |
+  | `phrase_match` | 0.15 | N-gramas (2,3) de query en texto del candidate |
+  | `domain_term_score` | 0.10 | Vocabulario de dominio compartido query↔candidate |
+  | `safety_signal_score` | 0.10 | Si query es comercial → boost por términos de safety en candidate |
+  | `metadata_boost` | 0.05 | Mapping node_path → intención de query |
+  | `risk_penalty` | -0.15 | Penaliza candidates genéricos si query es específica |
+
+- **Golden cases**: usados SOLO para evaluación post-reranking, nunca para reordenar
+
+### Clasificación de fallos (nueva)
+
+| Clasificación | Significado |
+|--------------|-------------|
+| `correct_not_in_candidates` | El concepto esperado no existe en ningún candidate top-N (content_gap) |
+| `semantic_gap_or_paraphrase_problem` | El concepto existe pero el overlap léxico query↔chunk es bajo (<0.15) → necesita cross-encoder |
+| `reranker_not_powerful_enough` | El concepto existe y tiene overlap léxico, pero el reranker no lo impulsó lo suficiente |
+| `forbidden_concepts_still_present` | Conceptos prohibidos en top-3 del reranked |
+
+### Oracle gap
+
+Se mide la diferencia contra el techo oracle-lite (68%):
+
+`gap_to_oracle = oracle_lite_pass_rate - non_oracle_pass_rate`
+
+Esto indica cuánto margen queda para un cross-encoder real.
+
+### Ejecución
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Experimento completo
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_non_oracle_reranking_experiment.py
+
+# Dry run
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_non_oracle_reranking_experiment.py --dry-run
+
+# Generar reporte detallado
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/scripts/generate_non_oracle_reranking_report.py
+```
+
+### No toca
+
+- ❌ Pipeline productivo
+- ❌ Frontend / routes / endpoints HTTP
+- ❌ diagnosis / automation_diagnosis
+- ❌ Milvus / ArangoDB
+- ❌ Documentos approved/drafts
+- ❌ Migraciones / re-embedding / corpus
+- ❌ LLM / chat completions
+- ❌ Secrets / API keys hardcodeadas
+
+---
+
 _Experiment design & run: Fase 1.6d — PostgreSQL Knowledge Retrieval Breaking Points_
 _RAG Failure Audit Extension: Fase 1.6e_
 _Reranking Experiment: Fase 1.6g_
+_Non-oracle Reranking Experiment: Fase 1.6h_
 _Última actualización: 2026-06-09_
-_Ejecución baseline (1.6d): 2026-06-09 15:09 UTC_
