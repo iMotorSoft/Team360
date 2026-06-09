@@ -895,4 +895,112 @@ _Experiment design & run: Fase 1.6d — PostgreSQL Knowledge Retrieval Breaking 
 _RAG Failure Audit Extension: Fase 1.6e_
 _Reranking Experiment: Fase 1.6g_
 _Non-oracle Reranking Experiment: Fase 1.6h_
+_Cross-encoder Reranking Experiment: Fase 1.6i_
 _Última actualización: 2026-06-09_
+
+---
+
+## Cross-encoder reranking experiment — Fase 1.6i
+
+### Objetivo
+
+Evaluar si un reranker semántico real tipo cross-encoder puede cerrar parte del gap entre:
+
+| Experimento | Pass rate | Tipo |
+|-------------|-----------|------|
+| Baseline pgvector | 44% | pgvector top-5 puro |
+| Non-oracle lexical (1.6h) | 44% | 6 señales léxicas+metadata |
+| Oracle-lite (1.6g) | 68% | Determinístico con golden answers (techo) |
+| **Cross-encoder (1.6i)** | **?** | BAAI/bge-reranker-v2-m3 sobre top-20 |
+
+### Hipótesis
+
+Si el cross-encoder puede recuperar parte del gap de 24pp entre non-oracle (44%) y oracle-lite (68%), entonces un reranker semántico cross-encoder está justificado como siguiente paso de runtime, antes que Milvus o ArangoDB.
+
+### Estrategia
+
+- **Candidates**: pgvector top-N (default: 20)
+- **Baseline**: primeros K resultados sin rerank (default: 5)
+- **Cross-encoder reranker**: `BAAI/bge-reranker-v2-m3` (multilingüe, compatible ES/EN)
+  - Input: `[query, candidate_text]` donde candidate_text = `title | node_path | content_preview`
+  - Texto truncado a `--max-candidate-chars` (default: 1600 caracteres)
+  - Score: cross-encoder similarity (0-1)
+  - Reordenamiento por score descendente
+- **Evaluación**: `evaluate_normalized` sobre baseline y reranked
+- **Comparación contra**: baseline (44%), non-oracle lexical (44%), oracle-lite (68%)
+- **Golden cases**: usados SOLO para evaluación, nunca para reordenar
+
+### Dependencias
+
+Este experimento requiere dependencias opcionales de ML no instaladas por defecto:
+
+```bash
+cd SrvRestAstroLS_v1/backend
+uv add "sentence-transformers>=3.0"
+uv add "torch>=2.0"
+uv add "transformers>=4.40"
+```
+
+El script falla con mensaje claro si las dependencias no están disponibles. No modifica `pyproject.toml` sin confirmación. No descarga modelos sin confirmación.
+
+**⚠️ El modelo BAAI/bge-reranker-v2-m3 pesa ~1.1GB.** La primera ejecución lo descarga automáticamente a la caché de HuggingFace.
+
+### Parámetros de `run_cross_encoder_reranking_experiment.py`
+
+| Parámetro | Default | Descripción |
+|-----------|---------|-------------|
+| `--top-n` | `20` | Candidate pool size (1-50) |
+| `--top-k` | `5` | Evaluation window (1-50) |
+| `--model-name` | `BAAI/bge-reranker-v2-m3` | Cross-encoder model |
+| `--device` | `cpu` | Device (`cpu`, `cuda`, `mps`) |
+| `--max-candidate-chars` | `1600` | Max chars per candidate text |
+| `--max-cases` | `None` | Ejecutar solo primeros N casos |
+| `--dry-run` | `False` | Validar sin DB ni OpenAI |
+
+### Decision rules
+
+- Si cross-encoder ≥60% y gap to oracle ≤10pp → **diseñar cross-encoder runtime experimental**
+- Si cross-encoder ≥55% y high-risk no empeora → **diseñar reranker runtime controlado**
+- Si cross-encoder > non-oracle +5pp → **probar modelo más liviano** (optimizar latencia/costo)
+- Si cross-encoder > baseline pero <55% → **efecto positivo marginal, evaluar con más datos**
+- Si correct candidate no está en top-N (<60%) → **mejorar content coverage primero**
+- Si cross-encoder no mejora en absoluto → **no usar reranker todavía**
+
+### Outputs
+
+| Archivo | Contenido |
+|---------|-----------|
+| `results/cross_encoder_reranking_{timestamp}.json` | Resultados completos |
+| `results/cross_encoder_reranking_{timestamp}.md` | Reporte ejecutivo |
+| `results/cross_encoder_reranking_{timestamp}_detailed_report.md` | Reporte detallado por caso |
+
+### Ejecución
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Bloqueo por dependencias (si no están instaladas)
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_cross_encoder_reranking_experiment.py
+
+# Experimento completo (requiere sentence-transformers + torch)
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_cross_encoder_reranking_experiment.py
+
+# Dry run
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_cross_encoder_reranking_experiment.py --dry-run
+
+# Generar reporte detallado
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/scripts/generate_cross_encoder_reranking_report.py
+```
+
+### No toca
+
+- ❌ Pipeline productivo
+- ❌ Frontend / routes / endpoints HTTP
+- ❌ diagnosis / automation_diagnosis
+- ❌ Milvus / ArangoDB (son objetos de evaluación)
+- ❌ Documentos approved/drafts
+- ❌ Migraciones / re-embedding / corpus
+- ❌ LLM / chat completions
+- ❌ Secrets / API keys hardcodeadas
+- ❌ pyproject.toml (sin confirmación)
+- ❌ Instalación de dependencias globales

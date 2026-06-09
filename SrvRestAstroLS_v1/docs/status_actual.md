@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-09
+Ultima actualizacion: 2026-06-09 (Fase 1.6i preparada, bloqueada por dependencias)
 
 ## Directorio de trabajo
 
@@ -1281,6 +1281,19 @@ Incluye estructura inicial para:
 - Clasificación de fallos post-reranking: correct_not_in_candidates (8), reranker_not_powerful_enough (3), forbidden_concepts_still_present (2), semantic_gap_or_paraphrase_problem (1).
 - Recomendación: F. Cross-encoder necesario — señales léxicas no alcanzan. El gap de 24pp entre oracle-lite (68%) y non-oracle (44%) significa que el conocimiento semántico (qué conceptos esperar por caso) es necesario; un cross-encoder real (ej. BAAI/bge-reranker-v2-m3) puede cerrar ese gap.
 - Reportes generados: `results/non_oracle_reranking_20260609_165520.json`, `.md`, `_detailed_report.md`.
+- Rama: `feature/knowledge-ingestion-service`
+- No se hizo git add ni commit.
+
+### 2026-06-09 - Fase 1.6i: Cross-encoder reranking experiment (preparación)
+
+- Se creó `run_cross_encoder_reranking_experiment.py` con estructura completa para evaluar BAAI/bge-reranker-v2-m3 sobre los 25 breaking point cases.
+- El script detecta dependencias faltantes (sentence-transformers, torch, transformers) y termina con status BLOCKED + instrucciones claras, sin traceback.
+- Se creó `scripts/generate_cross_encoder_reranking_report.py` que maneja ausencia de resultados con mensaje instructivo.
+- Se actualizó `README.md` con sección Fase 1.6i completa: objetivo, hipótesis, estrategia, parámetros, decision rules, outputs.
+- **No se instalaron dependencias.** No se descargaron modelos. No se modificó pyproject.toml.
+- Dependencias opcionales para ejecutar: `uv add "sentence-transformers>=3.0" "torch>=2.0" "transformers>=4.40"`.
+- **Estado: bloqueado por dependencias.** El experimento queda preparado para ejecutarse cuando se instalen las dependencias.
+- No se tocó: backend productivo, frontend, routes, migrations, Milvus, ArangoDB, LLM.
 - Rama: `feature/knowledge-ingestion-service`
 - No se hizo git add ni commit.
 
