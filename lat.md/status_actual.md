@@ -269,6 +269,14 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 - La regla de que `knowledge-scope-mapping.yaml` declara runtime targets opcionales queda capturada como invariante de arquitectura.
 - No se duplicó contenido de la bitácora técnica de `SrvRestAstroLS_v1/docs/status_actual.md`.
 
+### 2026-06-08 - Fase 1.4a-integration: validación PostgreSQL local
+
+- Migraciones 006 y 007 aplicadas contra DB local.
+- Integración real exitosa: 1 documento → 40 chunks, embedding_status='pending'.
+- Se corrigió serialización de `datetime.date` en metadata.
+- Idempotencia verificada: segunda corrida devuelve `unchanged`.
+- No se crearon nuevos documentos lat.md — el chunking estructural es implementación temporal (semantic_chunker vendrá después).
+
 ## Pendientes recomendados
 
 - Agregar nuevos documentos lat.md solo para conceptos estables de plataforma.

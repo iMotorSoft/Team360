@@ -22,6 +22,7 @@ Future phases will implement:
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,17 @@ from typing import Any
 from psycopg import AsyncConnection
 
 from modules.knowledge_ingestion.markdown_chunker import chunk_markdown
+
+
+def _sanitize_metadata(val: Any) -> Any:
+    """Convert non-JSON-serializable types (dates, etc.) to strings."""
+    if isinstance(val, (datetime.date, datetime.datetime)):
+        return val.isoformat()
+    if isinstance(val, dict):
+        return {k: _sanitize_metadata(v) for k, v in val.items()}
+    if isinstance(val, (list, tuple)):
+        return [_sanitize_metadata(v) for v in val]
+    return val
 from modules.knowledge_ingestion.package_scanner import KnowledgePackageScanner
 from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
 from modules.knowledge_ingestion.schemas import (
@@ -301,6 +313,7 @@ class KnowledgeIngestionWorker:
             metadata_payload["content_hash"] = content_hash
             metadata_payload["scanner_valid"] = doc.valid
             metadata_payload["scanner_candidate"] = doc.candidate_for_ingestion
+            metadata_payload = _sanitize_metadata(metadata_payload)
 
             node_path = fm.get("node_path")
 
@@ -368,7 +381,7 @@ class KnowledgeIngestionWorker:
 
                 chunk_rows = []
                 for c in chunks:
-                    chunk_meta = dict(c.metadata)
+                    chunk_meta = _sanitize_metadata(dict(c.metadata))
                     chunk_meta["document_source_uri"] = doc.relative_path
                     chunk_meta["content_hash"] = c.content_hash
                     chunk_meta["heading_path"] = list(c.heading_path)

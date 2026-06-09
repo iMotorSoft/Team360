@@ -1130,6 +1130,25 @@ Incluye estructura inicial para:
 - 12 tests nuevos (total: 89 tests knowledge ingestion, 177 suite completa).
 - No se generan embeddings, no se activa Milvus/ArangoDB/SemanticChunker/LLM.
 
+### 2026-06-08 - Fase 1.4a-integration: validación real contra PostgreSQL local
+
+- Migraciones 006 y 007 aplicadas contra DB local `team360`.
+- Se creó `scripts/run_knowledge_ingestion_local.py` para integración local:
+  - `--dry-run` (default): lee el paquete, estima chunks, 0 writes.
+  - `--no-dry-run`: persiste documents + chunks contra DB real.
+- Se corrigió `worker.py`: `_sanitize_metadata()` convierte `datetime.date` a ISO string para JSON serialization.
+- Dry-run (`--dry-run`): 1 scanned, 1 candidate, ~40 chunks estimados, 0 writes.
+- Primera persistencia real (`--no-dry-run`): 1 documento inserted, 40 chunks creados, run completed.
+- Segunda persistencia (idempotencia): 1 unchanged, 0 chunks reemplazados.
+- DB verification:
+  - `knowledge_ingestion_runs`: 3 runs (1 failed de intento previo, 2 completed)
+  - `knowledge_documents`: 1 documento (status=active, source_uri, content_hash, node_path ok)
+  - `knowledge_chunks`: 40 chunks (embedding_status='pending', permission_tags heredados, heading_path preservado)
+  - `knowledge_chunk_embeddings`: 0 rows (no embeddings generados)
+  - No Milvus, no ArangoDB, no LLM calls.
+- 89/89 tests knowledge ingestion, 177/177 suite completa.
+- Comando de integración: `cd backend && DB_PG_V360_URL="..." uv run python scripts/run_knowledge_ingestion_local.py`
+
 ## Notas de seguridad
 
 - No se grabo la password de GitHub en archivos del proyecto.
