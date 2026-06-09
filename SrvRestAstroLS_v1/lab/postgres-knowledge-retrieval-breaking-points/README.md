@@ -650,6 +650,98 @@ Esto valida exactamente el propósito del laboratorio: el sistema no "se rompe" 
 
 ---
 
+## RAG failure audit extension — Fase 1.6e
+
+### Objetivo
+
+Construir un módulo de auditoría RAG dentro del laboratorio que clasifique fallos en 6 categorías precisas, sin culpar automáticamente al vector store. El objetivo es que *cada fallo* tenga un diagnóstico accionable: mejorar contenido, agregar metadata, aplicar filtros, incorporar reranking, o —solo en última instancia— evaluar Milvus/ArangoDB.
+
+### Las 6 categorías de fallo
+
+| Categoría | Clasificación | Significado |
+|-----------|---------------|-------------|
+| **CONTENT_GAP** | `content_gap` | El corpus no contiene el concepto o regla que la pregunta requiere. No es problema del vector store. |
+| **EMBEDDING_RANKING_PROBLEM** | `reranker_needed` / `hybrid_search_needed` | El chunk correcto existe en el corpus pero está rankeado detrás de chunks semánticamente cercanos e incorrectos. |
+| **SCOPE_LEAKAGE** | `scope_filter_missing` / `metadata_filter_needed` | La pregunta cruza cliente, workspace, package o dominio. El retrieval trae resultados fuera del scope autorizado. |
+| **IMPOSSIBLE_FILTER** | `metadata_absent` | La pregunta requiere filtrar por metadata que no existe en el modelo de datos. No es problema de ranking ni de BD. |
+| **DEEP_TRAVERSAL_UNSUPPORTED** | `graph_navigation_needed` | La pregunta requiere combinar 3+ piezas de información dispersas o navegar relaciones de grafo no capturadas en el embedding plano. |
+| **LATENCY_TRAP** | `content_gap` / `reranker_needed` | La pregunta se responde rápido pero con contenido incompleto, genérico, incorrecto o peligroso. Latencia baja no es calidad. |
+
+### ¿Por qué no culpar automáticamente al vector store?
+
+El árbol de decisión del laboratorio (sección 16) ya establece que antes de culpar a pgvector, Milvus o ArangoDB, se debe descartar:
+
+1. **Falta de contenido** (content_gap): El corpus no cubre el tema. Agregar chunk.
+2. **Chunking insuficiente**: El chunk no captura la semántica necesaria. Re-chunking.
+3. **Metadata ausente**: El campo metadata no existe. Agregar al modelo.
+4. **Filtro de scope faltante**: El scope filter no se aplica. Agregar filtro.
+5. **Ranking insuficiente**: El chunk correcto está en top-5 pero no en top-1. Reranking.
+
+Solo si todas las anteriores fallan y el corpus supera 50k-100k chunks *entonces* considerar Milvus.
+Solo si la navegación requiere >5 niveles de grafo o algoritmos nativos *entonces* considerar ArangoDB.
+
+### Cómo interpretar fallos en la auditoría
+
+Para cada caso en `golden_cases/rag_audit_failure_cases.json`, cuando se ejecute retrieval real:
+
+1. Ejecutar query contra pgvector (top-5/10).
+2. Comparar `expected_retrieval_evidence` contra chunks recuperados.
+3. Si ningún chunk contiene `expected_retrieval_evidence` -> **CONTENT_GAP** (si el concepto no existe en el corpus) o **EMBEDDING_RANKING_PROBLEM** (si existe pero no rankeó).
+4. Si algún chunk recuperado pertenece a otro scope -> **SCOPE_LEAKAGE**.
+5. Si la query pide filtro que no existe en metadata -> **IMPOSSIBLE_FILTER** (diagnosticar sin correr retrieval).
+6. Si la query requiere combinar 3+ chunks y top-k solo trae piezas aisladas -> **DEEP_TRAVERSAL_UNSUPPORTED**.
+7. Si el contenido recuperado es genérico/insuficiente para responder -> **LATENCY_TRAP**.
+
+### Cómo decidir entre fixes
+
+| Fallo clasificado | Fix recomendado |
+|-------------------|-----------------|
+| CONTENT_GAP | Agregar chunk con el contenido faltante. Marcar `should_trigger_content_patch: true`. |
+| EMBEDDING_RANKING_PROBLEM | Probar reranking cross-encoder. Si persiste, hybrid search. Marcar `should_trigger_reranker` o `should_trigger_hybrid_search`. |
+| SCOPE_LEAKAGE | Agregar/forzar scope filter en retrieval. Agregar chunk restrictivo de alcance. |
+| IMPOSSIBLE_FILTER | Agregar metadata field al modelo de datos. No tocar BD vectorial. |
+| DEEP_TRAVERSAL_UNSUPPORTED | Chunk narrativo que describa la relación. Si no alcanza, grafo PostgreSQL recursive CTE. ArangoDB solo si >5 niveles. |
+| LATENCY_TRAP | Agregar chunk con contenido específico. Reranker si el contenido existe pero rankea bajo. |
+
+### Dataset de auditoría
+
+Ver `golden_cases/rag_audit_failure_cases.json` con **36 casos** (6 por categoría). Cada caso incluye:
+
+- `correct_human_answer`: Respuesta correcta que un humano experto daría.
+- `expected_retrieval_evidence`: Conceptos que deben aparecer en los chunks recuperados.
+- `forbidden_answer_patterns`: Patrones que el RAG no debe generar.
+- `likely_pathological_rag_answer`: Lo que un RAG sin las defensas adecuadas probablemente respondería.
+- `technical_diagnosis`: Por qué ocurre el fallo desde la perspectiva del sistema.
+- `expected_failure_classification`: Categoría de fallo esperada.
+- `architecture_implication`: Implicación arquitectónica concreta.
+- `recommended_fix_if_fails`: Qué hacer si el caso falla.
+- `should_trigger_*`: Banderas booleanas que indican qué acción recomienda el caso.
+
+### Inventario de casos (generado)
+
+Ejecutar para generar inventario estático sin DB ni APIs:
+
+```bash
+cd SrvRestAstroLS_v1/backend
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/scripts/generate_failure_case_report.py
+```
+
+Output: `results/rag_failure_case_inventory.md`
+
+### Próximos pasos (futura corrida)
+
+Cuando se implemente la ejecución real de auditoría:
+
+1. Para cada caso en `rag_audit_failure_cases.json`, ejecutar retrieval contra pgvector.
+2. Comparar `expected_retrieval_evidence` contra top-k.
+3. Clasificar el fallo real vs la clasificación esperada.
+4. Si la clasificación real difiere de la esperada, el caso está mal diseñado o el sistema se comportó inesperadamente.
+5. Acumular matriz de confusión de clasificaciones.
+6. Decidir si el sistema necesita content_patch, reranker, hybrid, graph, Milvus o ArangoDB basado en evidencia empírica, no en teoría.
+
+---
+
 _Experiment design & run: Fase 1.6d — PostgreSQL Knowledge Retrieval Breaking Points_
+_RAG Failure Audit Extension: Fase 1.6e_
 _Última actualización: 2026-06-09_
-_Ejecución baseline: 2026-06-09 15:09 UTC_
+_Ejecución baseline (1.6d): 2026-06-09 15:09 UTC_
