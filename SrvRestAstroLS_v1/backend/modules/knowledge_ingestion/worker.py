@@ -729,3 +729,74 @@ class KnowledgeIngestionWorker:
             "error_count": error_count,
             "errors": errors,
         }
+
+    async def retrieve_knowledge_chunks(
+        self,
+        conn: AsyncConnection,
+        *,
+        organization_code: str,
+        workspace_code: str,
+        knowledge_scope_code: str,
+        query: str,
+        embedding_model: str = OPENAI_DEFAULT_MODEL,
+        embedding_dimensions: int = EXPECTED_DIMENSIONS,
+        embedding_version: str = EMBEDDING_VERSION,
+        limit: int = 5,
+        min_score: float | None = None,
+    ) -> dict[str, Any]:
+        if not query or not query.strip():
+            raise ValueError("query is required for retrieval")
+        if limit < 1 or limit > 50:
+            raise ValueError(f"limit must be between 1 and 50, got {limit}")
+        if not embedding_version:
+            raise ValueError("embedding_version is required for retrieval")
+
+        context = await self.repository.resolve_ingestion_context(
+            conn=conn,
+            organization_code=organization_code,
+            workspace_code=workspace_code,
+            knowledge_scope_code=knowledge_scope_code,
+            worker_code="knowledge_ingestion_worker",
+        )
+
+        provider = OpenAIEmbeddingProvider(
+            model=embedding_model,
+            dimensions=embedding_dimensions,
+        )
+        query_embeddings = provider.embed_texts([query])
+        if not query_embeddings:
+            raise EmbeddingProviderError("Empty embedding response for query")
+
+        results = await self.repository.search_chunks_by_embedding(
+            conn,
+            knowledge_scope_id=context.knowledge_scope_id,
+            query_embedding=query_embeddings[0],
+            embedding_version=embedding_version,
+            limit=limit,
+            min_score=min_score,
+        )
+
+        return {
+            "query": query,
+            "embedding_model": embedding_model,
+            "embedding_dimensions": embedding_dimensions,
+            "embedding_version": embedding_version,
+            "knowledge_scope_id": context.knowledge_scope_id,
+            "result_count": len(results),
+            "results": [
+                {
+                    "rank": i + 1,
+                    "score": round(r["score"], 6) if r.get("score") is not None else None,
+                    "chunk_id": r["chunk_id"],
+                    "document_id": r["document_id"],
+                    "source_uri": r["source_uri"],
+                    "chunk_index": r["chunk_index"],
+                    "title": r["title"],
+                    "node_path": r.get("node_path"),
+                    "content_preview": r["content"][:300] if r.get("content") else "",
+                    "chunk_metadata": r.get("chunk_metadata"),
+                    "embedding_metadata": r.get("embedding_metadata"),
+                }
+                for i, r in enumerate(results)
+            ],
+        }

@@ -777,6 +777,58 @@ class KnowledgeIngestionRepository:
             {"chunk_embedding_id": chunk_embedding_id},
         )
 
+    async def search_chunks_by_embedding(
+        self,
+        conn: AsyncConnection,
+        *,
+        knowledge_scope_id: str,
+        query_embedding: list[float],
+        embedding_version: str,
+        limit: int = 5,
+        min_score: float | None = None,
+    ) -> list[dict[str, Any]]:
+        if limit < 1 or limit > 50:
+            raise ValueError(f"limit must be between 1 and 50, got {limit}")
+        if not embedding_version:
+            raise ValueError("embedding_version is required for retrieval")
+        sql = """
+            select
+                kce.chunk_embedding_id::text,
+                kc.id::text as chunk_id,
+                kc.knowledge_document_id::text as document_id,
+                kd.source_uri,
+                kd.knowledge_scope_id::text as scope_id,
+                kc.chunk_index,
+                kc.title,
+                kc.content,
+                kc.node_path,
+                kc.metadata_jsonb as chunk_metadata,
+                kce.metadata_jsonb as embedding_metadata,
+                1 - (kce.embedding <=> %(query_embedding)s::vector) as score
+            from knowledge_chunk_embeddings kce
+            join knowledge_chunks kc on kc.id = kce.knowledge_chunk_id
+            join knowledge_documents kd on kd.id = kc.knowledge_document_id
+            where kce.embedding_status = 'ready'
+              and kce.knowledge_scope_id = %(knowledge_scope_id)s
+              and kce.embedding is not null
+              and kce.metadata_jsonb->>'embedding_version' = %(embedding_version)s
+        """
+        params: dict[str, Any] = {
+            "query_embedding": query_embedding,
+            "knowledge_scope_id": knowledge_scope_id,
+            "embedding_version": embedding_version,
+            "limit": limit,
+        }
+        if min_score is not None:
+            sql += " and (1 - (kce.embedding <=> %(query_embedding)s::vector)) >= %(min_score)s"
+            params["min_score"] = min_score
+        sql += """
+            order by kce.embedding <=> %(query_embedding)s::vector
+            limit %(limit)s
+        """
+        rows = await conn.execute(sql, params)
+        return await rows.fetchall() or []
+
     async def mark_chunk_embedding_failed(
         self,
         conn: AsyncConnection,

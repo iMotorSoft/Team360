@@ -1149,6 +1149,43 @@ Incluye estructura inicial para:
 - 89/89 tests knowledge ingestion, 177/177 suite completa.
 - Comando de integración: `cd backend && DB_PG_V360_URL="..." uv run python scripts/run_knowledge_ingestion_local.py`
 
+### 2026-06-09 - Fase 1.6a: retrieval local PostgreSQL/pgvector
+
+- Se agregó `search_chunks_by_embedding()` en `repository.py`:
+  - Búsqueda por similitud coseno (`<=>` operator) sobre `knowledge_chunk_embeddings`.
+  - Filtros obligatorios: `knowledge_scope_id`, `embedding_version`, `embedding_status='ready'`.
+  - Filtro opcional: `min_score`.
+  - Limit validado entre 1 y 50.
+  - JOIN con `knowledge_chunks` (recupera `chunk_metadata` con `heading_path`, `chunk_strategy`, `access_tags`, `chunk_hash`) y `knowledge_documents` (recupera `source_uri`).
+  - Score = `1 - cosine_distance`.
+- Se agregó `retrieve_knowledge_chunks()` en `worker.py`:
+  - Resuelve contexto organizacional (códigos → UUIDs).
+  - Genera embedding de la query con `OpenAIEmbeddingProvider`.
+  - Delega la búsqueda al repository.
+  - Devuelve estructura con `query`, `embedding_version`, `result_count`, `results[]`.
+  - No llama LLM/chat — solo embedding + pgvector.
+- Se creó `scripts/run_knowledge_retrieval_local.py`:
+  - `--query` obligatorio, `--limit` (1–50, default 5), `--min-score` opcional.
+  - Imprime advertencia clara: OpenAI para embedding, PostgreSQL/pgvector para retrieval, no Milvus, no ArangoDB, no LLM.
+  - Muestra rank, score, chunk_id, source_uri, title, node_path, content_preview.
+- Se agregaron 12 tests en `TestKnowledgeRetrieval`:
+  - query vacía, limit <1, limit >50, embedding_version vacío.
+  - repository valida limit y version.
+  - resultados incluyen chunk_metadata y embedding_metadata.
+  - scope_id filtrado en SQL.
+  - min_score en SQL.
+  - sin resultados devuelve vacío.
+  - sin LLM/chat completions.
+- No se creó migración: schema 003 cubre todo (HNSW cosine index listo).
+- No se tocó frontend, routes, diagnosis, automation_diagnosis, Milvus, ArangoDB, LLM.
+- Validación:
+  - 127 KI tests pasan (115 anteriores + 12 nuevos).
+  - 215 suite completa pasan (203 anteriores + 12 nuevos).
+  - 3 queries reales contra DB local con resultados semánticamente relevantes:
+    - "automatizable pero no vendible hoy" → rank 1 Offer Decision (0.604), rank 2 Límite comercial (0.541).
+    - "preguntas mínimas del diagnóstico" → rank 1 Criterios de diagnóstico (0.506).
+    - "aporte del diagnóstico comercial" → rank 1 Diagnóstico amplio de automatización (0.681).
+
 ### 2026-06-09 - Fase 1.5: pipeline de embeddings productivo con OpenAI
 
 - Se implementó el pipeline de generación y persistencia de embeddings para chunks con

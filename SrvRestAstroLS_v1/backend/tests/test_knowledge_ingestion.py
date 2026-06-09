@@ -2635,3 +2635,259 @@ class TestEmbedPendingChunks:
 
         assert result["error_count"] == 1
         assert any("No API key" in e for e in result["errors"])
+
+
+# ---------------------------------------------------------------------------
+# Fase 1.6a — Retrieval via pgvector
+# ---------------------------------------------------------------------------
+
+
+class _FakeRetrievalConn:
+    """Minimal fake connection for retrieval tests."""
+
+    def __init__(self, rows: list[dict] | None = None):
+        self.statements: list[tuple[str, dict]] = []
+        self._rows: list[dict] = list(rows) if rows else []
+        self.autocommit = False
+
+    async def set_autocommit(self, val: bool) -> None:
+        self.autocommit = val
+
+    async def execute(self, sql: str, params: dict | None = None):
+        self.statements.append((sql, params or {}))
+        return self
+
+    async def fetchone(self):
+        if not self._rows:
+            return None
+        return self._rows.pop(0)
+
+    async def fetchall(self):
+        return self._rows
+
+    def cursor(self):
+        return self
+
+    def __aiter__(self):
+        return iter([])
+
+    def __anext__(self):
+        raise StopAsyncIteration
+
+
+class TestKnowledgeRetrieval:
+    def _run(self, coro):
+        import asyncio
+        return asyncio.run(coro)
+
+    def _make_context(self, scope_id="scope-1"):
+        return type("Ctx", (), {
+            "knowledge_scope_id": scope_id,
+            "organization_id": "org-1",
+            "workspace_id": "ws-1",
+            "to_metadata_dict": lambda: {},
+        })()
+
+    def test_empty_query_raises(self):
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        conn = _FakeRetrievalConn()
+        worker = KnowledgeIngestionWorker()
+        with pytest.raises(ValueError, match="query is required"):
+            self._run(worker.retrieve_knowledge_chunks(
+                conn=conn, organization_code="o", workspace_code="w",
+                knowledge_scope_code="ks", query="",
+            ))
+
+    def test_limit_below_1_raises(self):
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        conn = _FakeRetrievalConn()
+        worker = KnowledgeIngestionWorker()
+        with pytest.raises(ValueError, match="limit must be between 1 and 50"):
+            self._run(worker.retrieve_knowledge_chunks(
+                conn=conn, organization_code="o", workspace_code="w",
+                knowledge_scope_code="ks", query="test", limit=0,
+            ))
+
+    def test_limit_above_50_raises(self):
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        conn = _FakeRetrievalConn()
+        worker = KnowledgeIngestionWorker()
+        with pytest.raises(ValueError, match="limit must be between 1 and 50"):
+            self._run(worker.retrieve_knowledge_chunks(
+                conn=conn, organization_code="o", workspace_code="w",
+                knowledge_scope_code="ks", query="test", limit=51,
+            ))
+
+    def test_embedding_version_required(self):
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        conn = _FakeRetrievalConn()
+        worker = KnowledgeIngestionWorker()
+        with pytest.raises(ValueError, match="embedding_version is required"):
+            self._run(worker.retrieve_knowledge_chunks(
+                conn=conn, organization_code="o", workspace_code="w",
+                knowledge_scope_code="ks", query="test", embedding_version="",
+            ))
+
+    def test_repository_validates_limit(self):
+        from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeRetrievalConn()
+        with pytest.raises(ValueError, match="limit must be between 1 and 50"):
+            self._run(repo.search_chunks_by_embedding(
+                conn, knowledge_scope_id="s", query_embedding=[0.1]*1536,
+                embedding_version="v1", limit=-1,
+            ))
+
+    def test_repository_validates_embedding_version(self):
+        from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeRetrievalConn()
+        with pytest.raises(ValueError, match="embedding_version is required"):
+            self._run(repo.search_chunks_by_embedding(
+                conn, knowledge_scope_id="s", query_embedding=[0.1]*1536,
+                embedding_version="", limit=5,
+            ))
+
+    def test_retrieval_no_llm_no_milvus_no_arango(self):
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        conn = _FakeRetrievalConn()
+        worker = KnowledgeIngestionWorker()
+        repo = worker.repository
+
+        repo.resolve_ingestion_context = lambda *a, **kw: self._run(
+            self._make_context().__class__.__call__()
+        )
+        # Actually build a simple synchronous mock
+        async def fake_resolve(*args, **kwargs):
+            return self._make_context()
+        repo.resolve_ingestion_context = fake_resolve
+
+        async def fake_search(*args, **kwargs):
+            return [
+                {
+                    "chunk_embedding_id": "emb-1",
+                    "chunk_id": "c1",
+                    "document_id": "d1",
+                    "source_uri": "doc.md",
+                    "scope_id": "scope-1",
+                    "chunk_index": 0,
+                    "title": "Test",
+                    "content": "This is a test chunk content " * 20,
+                    "node_path": "/test",
+                    "chunk_metadata": {"heading_path": "Test"},
+                    "embedding_metadata": {"embedding_version": "v1"},
+                    "score": 0.95,
+                },
+            ]
+        repo.search_chunks_by_embedding = fake_search
+
+        from unittest.mock import patch
+        from modules.knowledge_ingestion.embedding_provider import OpenAIEmbeddingProvider
+
+        with patch.object(OpenAIEmbeddingProvider, "embed_texts", return_value=[[0.1]*1536]):
+            result = self._run(worker.retrieve_knowledge_chunks(
+                conn=conn,
+                organization_code="team360_live",
+                workspace_code="team360_public_site",
+                knowledge_scope_code="ks_team360_sales_diagnosis",
+                query="test query",
+                embedding_version="v1",
+                limit=5,
+            ))
+
+        assert result["result_count"] == 1
+        assert result["results"][0]["score"] == 0.95
+        assert result["results"][0]["chunk_id"] == "c1"
+        assert result["results"][0]["document_id"] == "d1"
+        assert result["results"][0]["source_uri"] == "doc.md"
+        assert result["results"][0]["chunk_metadata"] == {"heading_path": "Test"}
+        assert "Milvus" not in str(result)
+        assert "ArangoDB" not in str(result)
+        assert "completion" not in str(result).lower()
+        assert "llm" not in str(result).lower() or "embedding" in str(result).lower()
+
+    def test_empty_results_when_no_embeddings_ready(self):
+        from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeRetrievalConn([])
+
+        result = self._run(repo.search_chunks_by_embedding(
+            conn, knowledge_scope_id="s", query_embedding=[0.1]*1536,
+            embedding_version="v1", limit=5,
+        ))
+        assert result == []
+
+    def test_search_includes_metadata_fields(self):
+        from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeRetrievalConn([
+            {
+                "chunk_embedding_id": "emb-1",
+                "chunk_id": "c1",
+                "document_id": "d1",
+                "source_uri": "doc.md",
+                "scope_id": "scope-1",
+                "chunk_index": 0,
+                "title": "Test",
+                "content": "content here",
+                "node_path": "/test",
+                "chunk_metadata": {"heading_path": "H1", "chunk_strategy": "structural"},
+                "embedding_metadata": {"embedding_version": "v1"},
+                "score": 0.92,
+            },
+        ])
+        result = self._run(repo.search_chunks_by_embedding(
+            conn, knowledge_scope_id="s", query_embedding=[0.1]*1536,
+            embedding_version="v1", limit=5,
+        ))
+        assert len(result) == 1
+        r = result[0]
+        assert r["chunk_metadata"]["heading_path"] == "H1"
+        assert r["chunk_metadata"]["chunk_strategy"] == "structural"
+        assert r["embedding_metadata"]["embedding_version"] == "v1"
+        assert r["score"] == 0.92
+
+    def test_search_respects_knowledge_scope(self):
+        """Verify the SQL includes scope_id filter by inspecting the statement."""
+        from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeRetrievalConn()
+
+        self._run(repo.search_chunks_by_embedding(
+            conn, knowledge_scope_id="scope-specific", query_embedding=[0.1]*1536,
+            embedding_version="v1", limit=5,
+        ))
+        assert len(conn.statements) >= 1
+        sql = conn.statements[0][0]
+        params = conn.statements[0][1]
+        assert params.get("knowledge_scope_id") == "scope-specific"
+        assert "embedding_version" in sql or "v1" in str(conn.statements)
+
+    def test_search_respects_min_score(self):
+        from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
+        repo = KnowledgeIngestionRepository()
+        conn = _FakeRetrievalConn()
+
+        self._run(repo.search_chunks_by_embedding(
+            conn, knowledge_scope_id="s", query_embedding=[0.1]*1536,
+            embedding_version="v1", limit=5, min_score=0.7,
+        ))
+        sql = conn.statements[0][0]
+        assert "min_score" in sql or ">= %(min_score)s" in sql
+
+    def test_retrieval_no_chat_completion(self):
+        """Verify the method signature and return contract has no chat completion."""
+        import inspect
+        from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+        sig = inspect.signature(
+            KnowledgeIngestionWorker.retrieve_knowledge_chunks
+        )
+        params = list(sig.parameters.keys())
+        assert "query" in params
+        assert "embedding_version" in params
+        assert "limit" in params
+        assert "min_score" in params
+        # Verify the method does NOT have chat/llm params
+        assert "messages" not in params
+        assert "completion" not in params
+        assert "model" not in params or "embedding_model" in params

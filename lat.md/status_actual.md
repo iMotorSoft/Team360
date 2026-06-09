@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-08
+Ultima actualizacion: 2026-06-09
 
 ## Estado general
 
@@ -284,6 +284,16 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 - Structural sigue siendo default operativo; semantic error si no disponible; fallback controlado con warning.
 - No se agregaron dependencias ni se tocó `pyproject.toml`.
 - Behavioral invariant: `lat.md/knowledge-runtime-target.md` no se modificó — el cambio es implementación, no arquitectura.
+
+### 2026-06-09 - Fase 1.6a: retrieval local PostgreSQL/pgvector
+
+- Se agregó `search_chunks_by_embedding()` en repository para retrieval por similitud coseno vía pgvector.
+- Se agregó `retrieve_knowledge_chunks()` en worker: genera embedding de query con OpenAI, busca top-k por pgvector, filtra por scope/versión.
+- Se creó `scripts/run_knowledge_retrieval_local.py` con advertencia de uso de OpenAI, PostgreSQL/pgvector, y exclusión de Milvus/ArangoDB/LLM.
+- Se agregaron 12 tests de retrieval (validación de límites, embedding_version requerido, scope, min_score, metadata, sin LLM/chat).
+- No se crearon migraciones. No se tocaron frontend/routes/diagnosis/automation_diagnosis/Milvus/ArangoDB.
+- 215/215 tests suite completa.
+- 3 queries reales validadas contra DB local con resultados semánticamente relevantes.
 
 ## Pendientes recomendados
 
