@@ -15,9 +15,7 @@
 >
   <div>
     <div class="flex flex-wrap items-center gap-2">
-      <p class="text-sm font-bold uppercase tracking-[0.16em] text-[#5c7788]">
-        Contexto operativo
-      </p>
+      <p class="top-badge-neutral">Contexto operativo</p>
       {#if consoleContext.bootstrap.uiHints.showDelegatedAccessNotice}
         <Badge variant="warning" class="h-auto px-2 py-1 text-sm"
           >Acceso delegado</Badge

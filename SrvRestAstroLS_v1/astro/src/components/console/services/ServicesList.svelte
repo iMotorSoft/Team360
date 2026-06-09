@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatCard, StatusBadge } from "../../ui";
+  import { Card, EmptyState, SectionHeader, StatCard, StatusBadge } from "../../ui";
   import { formatDateTime } from "../../../lib/formatters";
   import { getOrganizationNameForWorkspace, getVisibleServices, getWorkspaceName } from "../../../lib/mock";
   import { buildServiceDetailRoute, deriveConsoleAudience } from "../../../lib/navigation/derive";
@@ -33,7 +33,7 @@
 
   <div class="mt-6 grid gap-4 xl:grid-cols-2">
     {#each visibleServices as service}
-      <article class="rounded-3xl border border-[#e0e8ea] bg-white p-5 shadow-[0_24px_60px_-54px_rgba(16,45,79,0.7)] sm:p-6">
+      <Card variant="large">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p class="text-[0.68rem] font-bold uppercase tracking-[0.15em] text-[#168b88]">{service.packageName}</p>
@@ -76,7 +76,7 @@
             Ver servicio
           </a>
         </div>
-      </article>
+      </Card>
     {/each}
     {#if visibleServices.length === 0}
       <EmptyState

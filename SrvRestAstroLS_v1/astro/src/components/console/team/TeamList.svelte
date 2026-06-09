@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatusBadge } from "../../ui";
+  import { Card, EmptyState, SectionHeader, StatusBadge } from "../../ui";
   import { organizations, users, workspaces } from "../../../lib/mock";
   import { consoleContext } from "../../../stores/consoleContext.svelte";
 
@@ -30,7 +30,7 @@
 
   <div class="mt-7 grid gap-4 xl:grid-cols-2">
     {#each visibleUsers as user}
-      <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+      <Card variant="flat">
         <div class="flex items-start gap-4">
           <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-[#153b5b] text-xs font-bold text-white">{user.avatarInitials}</span>
           <div class="min-w-0 flex-1">
@@ -54,7 +54,7 @@
             {/each}
           </div>
         </div>
-      </article>
+      </Card>
     {/each}
     {#if visibleUsers.length === 0}
       <EmptyState

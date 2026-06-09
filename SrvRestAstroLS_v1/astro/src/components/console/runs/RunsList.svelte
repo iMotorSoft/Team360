@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatusBadge } from "../../ui";
+  import { Card, EmptyState, SectionHeader, StatusBadge } from "../../ui";
   import { formatDateTime, formatDuration } from "../../../lib/formatters";
   import { getAccessibleWorkspaceIds, runs, services } from "../../../lib/mock";
   import { consoleContext } from "../../../stores/consoleContext.svelte";
@@ -25,7 +25,7 @@
   {#if consoleContext.bootstrap.uiHints.technicalDepth !== "business"}
     <div class="mt-7 space-y-3">
       {#each visibleRuns as run}
-        <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+        <Card variant="flat">
           <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <div class="flex flex-wrap gap-2">
@@ -42,7 +42,7 @@
               <div><dt class="text-[#91a2ad]">Errores</dt><dd class="mt-1 font-bold text-[#587184]">{run.errorCount}</dd></div>
             </dl>
           </div>
-        </article>
+        </Card>
       {/each}
       {#if visibleRuns.length === 0}
         <EmptyState

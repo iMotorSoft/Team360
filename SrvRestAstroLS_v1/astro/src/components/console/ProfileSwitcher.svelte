@@ -33,13 +33,11 @@
 </script>
 
 <label class="block">
-  <span
-    class="mb-1.5 block text-xs font-bold uppercase tracking-[0.18em] text-[#78909f]"
-    >Perfil mock / diseño</span
-  >
+  <span class="mb-1.5 block top-badge-neutral">Perfil mock / diseño</span>
   <select
     aria-label="Cambiar perfil mock de diseño"
-    class="w-full rounded-xl border border-[#dbe5e7] bg-white px-3 py-2 text-sm font-semibold text-[#21415e] transition focus-visible:border-[#71cfc6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
+    class="w-full rounded-xl border border-[#dbe5e7] bg-white px-3 py-2 text-base
+    font-semibold text-[#21415e] transition focus-visible:border-[#71cfc6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
     onchange={changeProfile}
     value={consoleContext.activeProfile}
   >

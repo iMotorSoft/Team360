@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatusBadge } from "../../ui";
+  import { Card, EmptyState, SectionHeader, StatusBadge } from "../../ui";
   import { formatDateTime } from "../../../lib/formatters";
   import { getAccessibleWorkspaceIds, getWorkspaceName, reports, services } from "../../../lib/mock";
   import { deriveConsoleAudience } from "../../../lib/navigation/derive";
@@ -40,7 +40,7 @@
   {#if visibleReports.length > 0}
     <div class="mt-7 grid gap-3 md:hidden">
       {#each visibleReports as report}
-        <article class="rounded-2xl border border-[#e0e8ea] bg-white p-4">
+        <Card variant="flat" padding="p-4">
           <div class="flex items-start justify-between gap-3">
             <div>
               <h2 class="text-sm font-bold text-[#31536b]">{report.title}</h2>
@@ -56,10 +56,10 @@
           <button class="mt-4 rounded-full border border-[#d5e4e4] px-3 py-1.5 text-xs font-bold text-[#78909f]" disabled type="button">
             {report.status === "ready" ? "Descarga no disponible en mock" : "Preparación en curso"}
           </button>
-        </article>
+        </Card>
       {/each}
     </div>
-    <div class="mt-7 hidden overflow-hidden rounded-3xl border border-[#e0e8ea] bg-white shadow-[0_24px_60px_-54px_rgba(16,45,79,0.7)] md:block">
+    <Card tag="div" variant="large" padding="p-0" class="mt-7 hidden overflow-hidden md:block">
     <div class="overflow-x-auto">
       <table class="w-full min-w-[58rem] text-start text-sm">
         <thead class="bg-[#f4f8f8] text-[0.65rem] uppercase tracking-[0.15em] text-[#78909f]">
@@ -93,7 +93,7 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </Card>
   {:else}
     <EmptyState
       class="mt-7"

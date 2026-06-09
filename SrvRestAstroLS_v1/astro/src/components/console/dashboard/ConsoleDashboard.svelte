@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, StatusBadge } from "../../ui";
+  import { Badge, Card, StatusBadge } from "../../ui";
   import { formatDate, formatDateTime } from "../../../lib/formatters";
   import {
     buildConsoleRoute,
@@ -224,9 +224,7 @@
 
   <div class="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
     {#each cards as [label, value, description]}
-      <article
-        class="rounded-2xl border border-[#e0e8ea] bg-white p-5 shadow-[0_18px_45px_-42px_rgba(16,45,79,0.7)]"
-      >
+      <Card variant="default">
         <p class="text-sm font-bold uppercase tracking-[0.15em] text-[#78909f]">
           {label}
         </p>
@@ -234,24 +232,16 @@
           {value}
         </p>
         <p class="mt-2 text-sm leading-5 text-[#82939d]">{description}</p>
-      </article>
+      </Card>
     {/each}
   </div>
 
   <div class="mt-6 grid gap-5 xl:grid-cols-[1.45fr_0.85fr]">
-    <section
-      class="rounded-3xl border border-[#e0e8ea] bg-white p-5 shadow-[0_24px_60px_-52px_rgba(16,45,79,0.65)] sm:p-6"
-    >
+    <Card tag="section" variant="large">
       <div class="flex items-center justify-between gap-3">
         <div>
-          <p
-            class="text-sm font-bold uppercase tracking-[0.17em] text-[#168b88]"
-          >
-            Servicios
-          </p>
-          <h2
-            class="mt-1.5 text-3xl font-bold tracking-[-0.035em] text-[#173b5b]"
-          >
+          <p class="top-badge">Servicios</p>
+          <h2 class="title-h2">
             {audience === "owner"
               ? "Prestaciones destacadas de la red"
               : audience === "operator"
@@ -273,7 +263,7 @@
 
       <div class="mt-5 space-y-3">
         {#each audience === "owner" ? visibleServices.slice(0, 4) : context.services.slice(0, 4) as service}
-          <article class="rounded-2xl border border-[#e8eef0] bg-[#fbfcfb] p-4">
+          <Card variant="light">
             <div
               class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
             >
@@ -291,23 +281,17 @@
               <span>{service.packageName}</span>
               <span>Próximo paso: {service.nextStep}</span>
             </div>
-          </article>
+          </Card>
         {/each}
       </div>
-    </section>
+    </Card>
 
-    <section
-      class="rounded-3xl border border-[#e0e8ea] bg-white p-5 shadow-[0_24px_60px_-52px_rgba(16,45,79,0.65)] sm:p-6"
-    >
-      <p class="text-sm font-bold uppercase tracking-[0.17em] text-[#168b88]">
-        Atención requerida
-      </p>
-      <h2 class="mt-2 text-3xl font-bold tracking-[-0.035em]">
-        Prioridades visibles
-      </h2>
+    <Card tag="section" variant="large">
+      <p class="top-badge">Atención requerida</p>
+      <h2 class="title-h2">Prioridades visibles</h2>
       <div class="mt-5 space-y-3">
         {#each (audience === "client" ? context.alerts : visibleAlerts).slice(0, 4) as alert}
-          <article class="rounded-2xl border border-[#e8eef0] bg-[#fbfcfb] p-4">
+          <Card variant="light">
             <div class="flex items-center justify-between gap-3">
               <StatusBadge status={alert.severity} />
               <span class="text-sm text-[#7c909b]"
@@ -317,7 +301,7 @@
             <p class="mt-2 text-base font-semibold leading-5 text-[#284c67]">
               {alert.title}
             </p>
-          </article>
+          </Card>
         {:else}
           <p
             class="rounded-2xl border border-white/10 bg-white/[0.07] p-4 text-base leading-5 text-white/70"
@@ -326,17 +310,17 @@
           </p>
         {/each}
       </div>
-    </section>
+    </Card>
   </div>
 
   <div class="mt-6 grid gap-5 xl:grid-cols-2">
-    <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6">
-      <p class="text-sm font-bold uppercase tracking-[0.17em] text-[#168b88]">
+    <Card tag="section" variant="flat-large">
+      <p class="top-badge">
         {audience === "owner" || audience === "operator"
           ? "Actividad técnica"
           : "Próximos pasos"}
       </p>
-      <h2 class="mt-1.5 text-3xl font-bold tracking-[-0.035em] text-[#173b5b]">
+      <h2 class="title-h2">
         {audience === "owner" || audience === "operator"
           ? "Ejecuciones recientes"
           : "Tareas pendientes"}
@@ -344,22 +328,24 @@
       <div class="mt-5 space-y-2">
         {#if audience === "owner" || audience === "operator"}
           {#each visibleRuns.slice(0, 4) as run}
-            <article
-              class="flex items-center justify-between gap-3 rounded-xl border border-[#edf1f2] px-3 py-3"
+            <Card
+              variant="mini"
+              class="flex items-center justify-between gap-3 px-3 py-3"
             >
               <div>
                 <p class="text-sm font-bold text-[#36566f]">{run.workerName}</p>
                 <p class="mt-1 text-sm text-[#8a9ba6]">{run.summary}</p>
               </div>
               <StatusBadge status={run.status} />
-            </article>
+            </Card>
           {/each}
         {:else}
           {#each context.tasks
             .filter(({ status }) => status !== "completed")
             .slice(0, 4) as task}
-            <article
-              class="flex items-center justify-between gap-3 rounded-xl border border-[#edf1f2] px-3 py-3"
+            <Card
+              variant="mini"
+              class="flex items-center justify-between gap-3 px-3 py-3"
             >
               <div>
                 <p class="text-base font-bold text-[#36566f]">{task.title}</p>
@@ -368,7 +354,7 @@
                 </p>
               </div>
               <StatusBadge status={task.status} />
-            </article>
+            </Card>
           {:else}
             <p class="rounded-xl bg-[#f4f8f8] p-4 text-base text-[#718793]">
               No hay tareas pendientes en este workspace.
@@ -376,32 +362,29 @@
           {/each}
         {/if}
       </div>
-    </section>
+    </Card>
 
-    <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6">
-      <p class="text-sm font-bold uppercase tracking-[0.17em] text-[#168b88]">
-        Resultados
-      </p>
-      <h2 class="mt-1.5 text-3xl font-bold tracking-[-0.035em] text-[#173b5b]">
-        Reportes recientes
-      </h2>
+    <Card tag="section" variant="flat-large">
+      <p class="top-badge">Resultados</p>
+      <h2 class="title-h2">Reportes recientes</h2>
       <div class="mt-5 space-y-2">
         {#each (audience === "client" ? context.reports : visibleReports).slice(0, 4) as report}
-          <article
-            class="flex items-center justify-between gap-3 rounded-xl border border-[#edf1f2] px-3 py-3"
+          <Card
+            variant="mini"
+            class="flex items-center justify-between gap-3 px-3 py-3"
           >
             <div>
               <p class="text-lg font-bold text-[#36566f]">{report.title}</p>
               <p class="mt-1 text-lg text-[#8a9ba6]">{report.period}</p>
             </div>
             <StatusBadge status={report.status} />
-          </article>
+          </Card>
         {:else}
           <p class="rounded-xl bg-[#f4f8f8] p-4 text-base text-[#718793]">
             Todavía no hay reportes disponibles.
           </p>
         {/each}
       </div>
-    </section>
+    </Card>
   </div>
 </section>

@@ -87,28 +87,28 @@
   >
     {#each groups as group}
       <div>
-        <p
-          class="px-3 text-xs font-bold uppercase tracking-[0.2em] text-[#91a2ad]"
-        >
+        <p class="px-3 top-badge-neutral">
           {t(navigationGroupLabelKeys[group.id], consoleContext.locale)}
         </p>
         <ul class="mt-2 space-y-1">
           {#each group.items as item}
             <li>
               <a
-                class={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-base font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] ${
+                class={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-lg font-semibold 
+                transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] ${
                   item.view === view
                     ? "bg-[#e4f5f3] text-[#147d79]"
-                    : "text-[#587184] hover:bg-white hover:text-[#214762]"
+                    : "text-[#587184] hover:bg-base-200 hover:text-[#214762]"
                 }`}
                 href={item.href}
                 onclick={onClose}
               >
-                <ConsoleIcon class="size-[1.05rem]" name={item.icon} />
+                <ConsoleIcon class="size-[1.5rem]" name={item.icon} />
                 <span>{t(item.labelKey, consoleContext.locale)}</span>
                 {#if item.view === "alerts" && consoleContext.notificationSummary.activeWorkspaceAlerts}
                   <span
-                    class="ms-auto grid min-w-5 place-items-center rounded-full bg-[#e86852] px-1.5 py-0.5 text-[0.62rem] font-bold text-white"
+                    class="ms-auto grid min-w-5 place-items-center rounded-full bg-[#e86852]
+                    px-1.5 py-0.5 text-[0.62rem] font-bold text-white"
                   >
                     {consoleContext.notificationSummary.activeWorkspaceAlerts}
                   </span>
@@ -123,10 +123,8 @@
 
   <div class="border-t border-[#e2eaec] p-4">
     <div class="rounded-2xl border border-[#d8e7e7] bg-white p-3">
-      <p class="text-xs font-bold uppercase tracking-[0.17em] text-[#168b88]">
-        Modo diseño
-      </p>
-      <p class="mt-1.5 text-sm leading-5 text-[#6d8391]">
+      <p class="top-badge">Modo diseño</p>
+      <p class="mt-1.5 text-base leading-5 text-[#6d8391]">
         Datos simulados. Sin autenticación ni operaciones reales.
       </p>
     </div>

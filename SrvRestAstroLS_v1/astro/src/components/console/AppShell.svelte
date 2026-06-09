@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, type Snippet } from "svelte";
-  import { Badge } from "../ui";
+  import { Badge, Card } from "../ui";
   import { formatDate } from "../../lib/formatters";
   import { getMockWorkspaceContext, type MockProfileId } from "../../lib/mock";
   import { deriveNavigation } from "../../lib/navigation/derive";
@@ -119,12 +119,8 @@
         </main>
 
         <aside class="hidden space-y-4 2xl:block">
-          <section class="rounded-2xl border border-[#e0e8ea] bg-white p-4">
-            <p
-              class="text-xs font-bold uppercase tracking-[0.17em] text-[#168b88]"
-            >
-              Workspace activo
-            </p>
+          <Card tag="section" variant="flat" padding="p-4">
+            <p class="top-badge-neutral">Workspace activo</p>
             <p class="mt-2 text-xl font-bold text-[#31536b]">
               {consoleContext.activeWorkspace.name}
             </p>
@@ -139,20 +135,16 @@
                 >{consoleContext.activeWorkspace.direction}</Badge
               >
             </div>
-          </section>
+          </Card>
 
-          <section class="rounded-2xl border border-[#e0e8ea] bg-white p-4">
-            <p
-              class="text-xs font-bold uppercase tracking-[0.17em] text-[#168b88]"
-            >
-              Pendientes
-            </p>
+          <Card tag="section" variant="flat" padding="p-4">
+            <p class="top-badge">Pendientes</p>
             <div class="mt-3 space-y-3">
               {#each pendingTasks.slice(0, 3) as task}
                 <article
                   class="border-b border-[#edf1f2] pb-3 last:border-0 last:pb-0"
                 >
-                  <p class="text-sm font-bold leading-5 text-[#47657b]">
+                  <p class="text-lg font-bold leading-5 text-[#47657b]">
                     {task.title}
                   </p>
                   <p class="mt-1 text-md text-[#91a2ad]">
@@ -165,14 +157,10 @@
                 </p>
               {/each}
             </div>
-          </section>
+          </Card>
 
-          <section class="rounded-2xl border border-[#e0e8ea] bg-white p-4">
-            <p
-              class="text-xs font-bold uppercase tracking-[0.17em] text-[#168b88]"
-            >
-              Reportes recientes
-            </p>
+          <Card tag="section" variant="flat" padding="p-4">
+            <p class="top-badge">Reportes recientes</p>
             <div class="mt-3 space-y-3">
               {#each recentReports as report}
                 <article
@@ -191,7 +179,7 @@
                 </p>
               {/each}
             </div>
-          </section>
+          </Card>
         </aside>
       </div>
     </div>

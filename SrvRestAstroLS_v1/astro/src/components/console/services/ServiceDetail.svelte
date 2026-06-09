@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import {
     Button,
+    Card,
     EmptyState,
     SectionHeader,
     StatCard,
@@ -133,9 +134,7 @@
 
     {#if activeTab === "summary"}
       <div class="mt-6 grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
-        <section
-          class="rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6"
-        >
+        <Card tag="section" variant="large">
           <p
             class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
           >
@@ -152,10 +151,10 @@
               </div>
             {/each}
           </div>
-        </section>
+        </Card>
 
         <aside class="space-y-4">
-          <section class="rounded-3xl bg-[#123653] p-5 text-white sm:p-6">
+          <Card tag="section" variant="dark">
             <p
               class="text-sm font-bold uppercase tracking-[0.16em] text-[#86ddd5]"
             >
@@ -164,8 +163,8 @@
             <p class="mt-3 text-base font-semibold leading-6 text-white/85">
               {service.nextStep}
             </p>
-          </section>
-          <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5">
+          </Card>
+          <Card tag="section" variant="flat" rounded="rounded-3xl">
             <p
               class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
             >
@@ -195,7 +194,7 @@
                 </dd>
               </div>
             </dl>
-          </section>
+          </Card>
         </aside>
       </div>
     {:else if activeTab === "results"}
@@ -212,7 +211,7 @@
     {:else if activeTab === "reports"}
       <div class="mt-6 space-y-3">
         {#each serviceReports as report}
-          <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+          <Card variant="flat">
             <div
               class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
             >
@@ -233,7 +232,7 @@
                 ? "Descarga no disponible en mock"
                 : "Preparación en curso"}
             </Button>
-          </article>
+          </Card>
         {:else}
           <EmptyState
             title="Todavía no hay reportes asociados."
@@ -245,7 +244,7 @@
     {:else if activeTab === "alerts"}
       <div class="mt-6 space-y-3">
         {#each serviceAlerts as alert}
-          <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+          <Card variant="flat">
             <div class="flex flex-wrap gap-2">
               <StatusBadge status={alert.severity} />
               <StatusBadge status={alert.status} />
@@ -256,7 +255,7 @@
             >
               Acción sugerida: {alert.suggestedAction}
             </p>
-          </article>
+          </Card>
         {:else}
           <EmptyState
             title="No hay alertas registradas."
@@ -268,8 +267,9 @@
     {:else if activeTab === "tasks"}
       <div class="mt-6 space-y-3">
         {#each serviceTasks as task}
-          <article
-            class="flex flex-col gap-3 rounded-2xl border border-[#e0e8ea] bg-white p-5 sm:flex-row sm:items-center sm:justify-between"
+          <Card
+            variant="flat"
+            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
               <p class="text-base font-bold text-[#31536b]">{task.title}</p>
@@ -286,7 +286,7 @@
                 label={`Prioridad ${task.priority}`}
               /><StatusBadge status={task.status} />
             </div>
-          </article>
+          </Card>
         {:else}
           <EmptyState
             title="No hay acciones pendientes."
@@ -297,7 +297,7 @@
       </div>
     {:else if activeTab === "history"}
       <div class="mt-6 grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
-        <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5">
+        <Card tag="section" variant="flat" rounded="rounded-3xl">
           <p
             class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
           >
@@ -326,8 +326,8 @@
               </p>
             {/each}
           </div>
-        </section>
-        <section class="rounded-3xl bg-[#123653] p-5 text-white">
+        </Card>
+        <Card tag="section" variant="dark">
           <p
             class="text-sm font-bold uppercase tracking-[0.16em] text-[#86ddd5]"
           >
@@ -342,11 +342,11 @@
             disabled
             variant="ghost">Soporte no disponible en mock</Button
           >
-        </section>
+        </Card>
       </div>
     {:else if activeTab === "configuration"}
       <div class="mt-6 grid gap-5 xl:grid-cols-2">
-        <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5">
+        <Card tag="section" variant="flat" rounded="rounded-3xl">
           <p
             class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
           >
@@ -362,8 +362,8 @@
               </div>
             {/each}
           </div>
-        </section>
-        <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5">
+        </Card>
+        <Card tag="section" variant="flat" rounded="rounded-3xl">
           <p
             class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
           >
@@ -378,15 +378,15 @@
             disabled
             variant="ghost">Edición no disponible en mock</Button
           >
-        </section>
+        </Card>
       </div>
     {:else if activeTab === "technical"}
       <div class="mt-6 grid gap-5 xl:grid-cols-2">
-        <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5">
+        <Card tag="section" variant="flat" rounded="rounded-3xl">
           <p
             class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
           >
-            Workers vinculados
+            Workers vinculado
           </p>
           <div class="mt-4 space-y-3">
             {#each serviceWorkers as worker}
@@ -408,8 +408,8 @@
               <p class="text-sm text-[#8396a2]">Sin worker mock vinculado.</p>
             {/each}
           </div>
-        </section>
-        <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5">
+        </Card>
+        <Card tag="section" variant="flat" rounded="rounded-3xl">
           <p
             class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
           >
@@ -428,12 +428,12 @@
               <p class="text-sm text-[#8396a2]">Sin runs mock registrados.</p>
             {/each}
           </div>
-        </section>
+        </Card>
       </div>
     {/if}
   </section>
 {:else}
-  <section class="rounded-3xl border border-[#e0e8ea] bg-white p-6">
+  <Card tag="section" variant="flat" rounded="rounded-3xl" padding="p-6">
     <p class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]">
       Servicio no disponible
     </p>
@@ -454,5 +454,5 @@
     >
       Volver a servicios
     </a>
-  </section>
+  </Card>
 {/if}

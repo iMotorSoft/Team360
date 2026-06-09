@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatusBadge } from "../../ui";
+  import { Card, EmptyState, SectionHeader, StatusBadge } from "../../ui";
   import { formatDate } from "../../../lib/formatters";
   import { getAccessibleWorkspaceIds, getWorkspaceName, services, tasks } from "../../../lib/mock";
   import { deriveConsoleAudience } from "../../../lib/navigation/derive";
@@ -27,7 +27,7 @@
 
   <div class="mt-7 space-y-3">
     {#each visibleTasks as task}
-      <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+      <Card variant="flat">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div class="flex flex-wrap gap-2">
@@ -42,7 +42,7 @@
             <div><dt class="text-[#91a2ad]">Vencimiento</dt><dd class="mt-1 font-bold text-[#587184]">{formatDate(task.dueDate, consoleContext.locale)}</dd></div>
           </dl>
         </div>
-      </article>
+      </Card>
     {/each}
     {#if visibleTasks.length === 0}
       <EmptyState
