@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-09 (Fase 1.6i preparada, bloqueada por dependencias)
+Ultima actualizacion: 2026-06-09 (Fase 1.6j ejecutada — Milvus benchmark)
 
 ## Directorio de trabajo
 
@@ -1294,6 +1294,21 @@ Incluye estructura inicial para:
 - Dependencias opcionales para ejecutar: `uv add "sentence-transformers>=3.0" "torch>=2.0" "transformers>=4.40"`.
 - **Estado: bloqueado por dependencias.** El experimento queda preparado para ejecutarse cuando se instalen las dependencias.
 - No se tocó: backend productivo, frontend, routes, migrations, Milvus, ArangoDB, LLM.
+- Rama: `feature/knowledge-ingestion-service`
+- No se hizo git add ni commit.
+
+### 2026-06-09 - Fase 1.6j: Milvus 2.6 vs pgvector benchmark
+
+- Se ejecutó benchmark comparando Milvus 2.6 vs PostgreSQL/pgvector como índice vectorial derivado para los 25 breaking-point cases.
+- Se crearon `scripts/generate_report.py`, `scripts/generate_infographics.py` y `README.md` en `lab/milvus-pgvector-benchmark/`.
+- **Resultados:** pgvector 11/25 (44.0%), Milvus 11/25 (44.0%). Calidad idéntica.
+- **Latencia:** pgvector 859.2ms avg vs Milvus 13.9ms avg (~62x más rápido).
+- **Casos mejorados/empeorados:** 0/0. Ambos sistemas recuperan los mismos candidatos correctos (17/25) y fallan los mismos 14 casos.
+- **Clasificación de fallos:** 8 correct_not_in_candidates (content_gap), resto ranking/overpromise — idéntico en ambos sistemas.
+- **Recomendación:** D. Evaluar Milvus como índice derivado por latencia — significativamente más rápido. No mejora calidad de retrieval. PostgreSQL sigue siendo source of truth.
+- Reportes generados: `results/milvus_pgvector_benchmark_20260609_172200.json`, `.md`, `_detailed_report.md`, `infografias/milvus_pgvector_benchmark_20260609_172200_infografia.html`.
+- Se corrigió import path en `run_milvus_benchmark.py` (sys.path para shared utils desde breaking-points lab) y API de `IndexParams` para pymilvus 3.0.
+- Colección Milvus experimental: `team360_lab_pgvector_benchmark_openai_small_1536` (139 embeddings indexados, HNSW COSINE).
 - Rama: `feature/knowledge-ingestion-service`
 - No se hizo git add ni commit.
 

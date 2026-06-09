@@ -1,0 +1,1271 @@
+{
+  "summary": {
+    "experiment": "Milvus 2.6 vs PostgreSQL/pgvector benchmark — Fase 1.6j",
+    "collection_name": "team360_lab_pgvector_benchmark_openai_small_1536",
+    "embedding_model": "text-embedding-3-small",
+    "embedding_version": "team360-openai-small-1536-v1",
+    "dimensions": 1536,
+    "knowledge_scope": "ks_team360_sales_diagnosis",
+    "top_n": 20,
+    "top_k": 5,
+    "total_queries": 25,
+    "indexed_count": 139,
+    "indexing_time_s": 0.0,
+    "pgvector_pass_norm": 11,
+    "pgvector_pass_rate": 44.0,
+    "milvus_pass_norm": 11,
+    "milvus_pass_rate": 44.0,
+    "delta_pass_rate": 0.0,
+    "high_risk_total": 11,
+    "high_risk_pgvector": 9,
+    "high_risk_milvus": 9,
+    "cases_improved": 0,
+    "cases_worsened": 0,
+    "cases_same": 25,
+    "correct_in_pgvector": 17,
+    "correct_in_milvus": 17,
+    "forbidden_pgvector": 1,
+    "forbidden_milvus": 1,
+    "avg_latency_pgvector_ms": 859.2,
+    "avg_latency_milvus_ms": 13.9,
+    "total_failed_milvus": 14,
+    "failure_classification": {
+      "correct_not_in_candidates": 8,
+      "ranking_still_insufficient": 5,
+      "forbidden_concepts_still_present": 1
+    },
+    "architecture_recommendation": "D. Evaluar Milvus como índice derivado por latencia — significativamente más rápido."
+  },
+  "cases": [
+    {
+      "case_id": "bp_01",
+      "query": "¿Qué diferencia hay entre un proceso automatizable y uno que ya vendemos?",
+      "category": "A. Confusión semántica",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "automatizable",
+        "sellable_today",
+        "commercial_limits"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 3825.7,
+      "mv_latency_ms": 185.0,
+      "baseline_norm": {
+        "case_id": "bp_01",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_01",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_02",
+      "query": "¿El código de diagnóstico es lo mismo que el resultado del diagnóstico?",
+      "category": "A. Confusión semántica",
+      "risk_level": "medium",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "diagnostic_code",
+        "diagnosis_result"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 803.6,
+      "mv_latency_ms": 6.9,
+      "baseline_norm": {
+        "case_id": "bp_02",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "diagnosis_result"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_02",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "diagnosis_result"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_03",
+      "query": "¿Qué acciones automáticas podemos hacer después del diagnóstico?",
+      "category": "A. Confusión semántica",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "step_to_action",
+        "planned_extension"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 715.8,
+      "mv_latency_ms": 3.5,
+      "baseline_norm": {
+        "case_id": "bp_03",
+        "passed": true,
+        "score": 2,
+        "expected_found_top1": false,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [],
+        "architecture_implication": "graph_navigation_needed"
+      },
+      "milvus_norm": {
+        "case_id": "bp_03",
+        "passed": true,
+        "score": 2,
+        "expected_found_top1": false,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [],
+        "architecture_implication": "graph_navigation_needed"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_04",
+      "query": "¿Qué puedo automatizar en ventas y CRM?",
+      "category": "A. Confusión semántica",
+      "risk_level": "medium",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "sales_diagnosis",
+        "concrete_orientation",
+        "automatable"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 836.9,
+      "mv_latency_ms": 4.1,
+      "baseline_norm": {
+        "case_id": "bp_04",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "concrete_orientation",
+          "automatable"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_04",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "concrete_orientation",
+          "automatable"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "ranking_still_insufficient"
+    },
+    {
+      "case_id": "bp_05",
+      "query": "¿Ya podemos vender Step-to-Action como listo?",
+      "category": "B. Overpromise comercial",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "step_to_action",
+        "planned_extension",
+        "commercial_limits"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 845.1,
+      "mv_latency_ms": 5.4,
+      "baseline_norm": {
+        "case_id": "bp_05",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_05",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_06",
+      "query": "¿WhatsApp handoff ya está funcionando?",
+      "category": "B. Overpromise comercial",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "whatsapp_handoff",
+        "planned_extension"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 591.4,
+      "mv_latency_ms": 4.4,
+      "baseline_norm": {
+        "case_id": "bp_06",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_06",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_07",
+      "query": "Necesito captura automática de leads con CRM y WhatsApp. ¿Lo tienen?",
+      "category": "B. Overpromise comercial",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "lead_capture",
+        "planned_extension",
+        "commercial_limits"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 825.3,
+      "mv_latency_ms": 5.1,
+      "baseline_norm": {
+        "case_id": "bp_07",
+        "passed": true,
+        "score": 2,
+        "expected_found_top1": false,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_07",
+        "passed": true,
+        "score": 2,
+        "expected_found_top1": false,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_08",
+      "query": "¿El diagnóstico asigna un código de seguimiento?",
+      "category": "B. Overpromise comercial",
+      "risk_level": "medium",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "diagnostic_code",
+        "planned_extension"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 728.9,
+      "mv_latency_ms": 3.4,
+      "baseline_norm": {
+        "case_id": "bp_08",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_08",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_09",
+      "query": "Si algo es automatable en teoría, ¿ya lo podemos vender como solución?",
+      "category": "B. Overpromise comercial",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "automatable",
+        "sellable_today",
+        "commercial_limits",
+        "offer_decision"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 677.4,
+      "mv_latency_ms": 3.7,
+      "baseline_norm": {
+        "case_id": "bp_09",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_09",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "vector_backend_not_the_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_10",
+      "query": "¿Vera es el identificador del paquete o del asistente?",
+      "category": "C. Ambigüedad técnica",
+      "risk_level": "medium",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "vera_commercial_name",
+        "technical_identifiers",
+        "package_sales_diagnosis"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": false,
+      "correct_in_candidates_mv": false,
+      "pg_latency_ms": 1098.6,
+      "mv_latency_ms": 4.9,
+      "baseline_norm": {
+        "case_id": "bp_10",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "vera_commercial_name",
+          "technical_identifiers",
+          "package_sales_diagnosis"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_10",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "vera_commercial_name",
+          "technical_identifiers",
+          "package_sales_diagnosis"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "correct_not_in_candidates"
+    },
+    {
+      "case_id": "bp_11",
+      "query": "¿Cuál es la diferencia entre knowledge scope y package?",
+      "category": "C. Ambigüedad técnica",
+      "risk_level": "low",
+      "pass_criteria": "top5_contains_expected",
+      "expected_concepts": [
+        "knowledge_scope_sales_diagnosis",
+        "package_sales_diagnosis",
+        "cross_customer_isolation"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 627.2,
+      "mv_latency_ms": 5.1,
+      "baseline_norm": {
+        "case_id": "bp_11",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "knowledge_scope_sales_diagnosis",
+          "package_sales_diagnosis",
+          "cross_customer_isolation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_11",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "knowledge_scope_sales_diagnosis",
+          "package_sales_diagnosis",
+          "cross_customer_isolation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "ranking_still_insufficient"
+    },
+    {
+      "case_id": "bp_12",
+      "query": "¿embedding_status pending significa que algo está mal?",
+      "category": "C. Ambigüedad técnica",
+      "risk_level": "low",
+      "pass_criteria": "top5_contains_expected",
+      "expected_concepts": [
+        "retrieval_chunk",
+        "approved_document"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": false,
+      "correct_in_candidates_mv": false,
+      "pg_latency_ms": 721.8,
+      "mv_latency_ms": 5.6,
+      "baseline_norm": {
+        "case_id": "bp_12",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "retrieval_chunk",
+          "approved_document"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_12",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "retrieval_chunk",
+          "approved_document"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "correct_not_in_candidates"
+    },
+    {
+      "case_id": "bp_13",
+      "query": "¿Puedo usar conocimiento de otro cliente si es parecido?",
+      "category": "D. Multi-tenant / scope leakage",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "cross_customer_isolation",
+        "knowledge_scope_sales_diagnosis",
+        "access_tags"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 845.9,
+      "mv_latency_ms": 19.5,
+      "baseline_norm": {
+        "case_id": "bp_13",
+        "passed": false,
+        "score": -2,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [
+          "compartir conocimiento entre clientes"
+        ],
+        "missing_expected_normalized": [
+          "knowledge_scope_sales_diagnosis",
+          "access_tags"
+        ],
+        "architecture_implication": "reranker_needed"
+      },
+      "milvus_norm": {
+        "case_id": "bp_13",
+        "passed": false,
+        "score": -2,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [
+          "compartir conocimiento entre clientes"
+        ],
+        "missing_expected_normalized": [
+          "knowledge_scope_sales_diagnosis",
+          "access_tags"
+        ],
+        "architecture_implication": "reranker_needed"
+      },
+      "milvus_helped": false,
+      "failure_classification": "forbidden_concepts_still_present"
+    },
+    {
+      "case_id": "bp_14",
+      "query": "Dame el diagnóstico de ventas para Team360",
+      "category": "D. Multi-tenant / scope leakage",
+      "risk_level": "medium",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "sales_diagnosis",
+        "knowledge_scope_sales_diagnosis"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 705.2,
+      "mv_latency_ms": 3.5,
+      "baseline_norm": {
+        "case_id": "bp_14",
+        "passed": false,
+        "score": 1,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "knowledge_scope_sales_diagnosis"
+        ],
+        "architecture_implication": "metadata_filter_needed"
+      },
+      "milvus_norm": {
+        "case_id": "bp_14",
+        "passed": false,
+        "score": 1,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "knowledge_scope_sales_diagnosis"
+        ],
+        "architecture_implication": "metadata_filter_needed"
+      },
+      "milvus_helped": false,
+      "failure_classification": "ranking_still_insufficient"
+    },
+    {
+      "case_id": "bp_15",
+      "query": "Configuración de runtime para el asistente de diagnóstico",
+      "category": "D. Multi-tenant / scope leakage",
+      "risk_level": "medium",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "runtime_target_team360_live",
+        "knowledge_scope_sales_diagnosis"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": false,
+      "correct_in_candidates_mv": false,
+      "pg_latency_ms": 587.0,
+      "mv_latency_ms": 4.8,
+      "baseline_norm": {
+        "case_id": "bp_15",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "runtime_target_team360_live",
+          "knowledge_scope_sales_diagnosis"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_15",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "runtime_target_team360_live",
+          "knowledge_scope_sales_diagnosis"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "correct_not_in_candidates"
+    },
+    {
+      "case_id": "bp_16",
+      "query": "¿Cuál es la regla actual para vender automatización de ventas?",
+      "category": "E. Versionado / actualidad",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "commercial_limits",
+        "offer_decision",
+        "sellable_today"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 1404.8,
+      "mv_latency_ms": 3.4,
+      "baseline_norm": {
+        "case_id": "bp_16",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "metadata_filter_needed"
+      },
+      "milvus_norm": {
+        "case_id": "bp_16",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "metadata_filter_needed"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_17",
+      "query": "¿Step-to-Action sigue en desarrollo o ya funciona?",
+      "category": "E. Versionado / actualidad",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "step_to_action",
+        "planned_extension",
+        "commercial_limits"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 577.9,
+      "mv_latency_ms": 17.6,
+      "baseline_norm": {
+        "case_id": "bp_17",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "metadata_filter_needed"
+      },
+      "milvus_norm": {
+        "case_id": "bp_17",
+        "passed": true,
+        "score": 3,
+        "expected_found_top1": true,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits"
+        ],
+        "architecture_implication": "metadata_filter_needed"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_18",
+      "query": "¿Qué pasa si el cliente pide automatización completa incluyendo WhatsApp, CRM, ads y acciones?",
+      "category": "F. Contexto insuficiente",
+      "risk_level": "high",
+      "pass_criteria": "top5_contains_expected",
+      "expected_concepts": [
+        "commercial_limits",
+        "planned_extension",
+        "concrete_orientation"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 577.1,
+      "mv_latency_ms": 5.4,
+      "baseline_norm": {
+        "case_id": "bp_18",
+        "passed": true,
+        "score": 2,
+        "expected_found_top1": false,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "graph_navigation_needed"
+      },
+      "milvus_norm": {
+        "case_id": "bp_18",
+        "passed": true,
+        "score": 2,
+        "expected_found_top1": false,
+        "expected_found_top3": true,
+        "expected_found_top5": true,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "graph_navigation_needed"
+      },
+      "milvus_helped": false,
+      "failure_classification": ""
+    },
+    {
+      "case_id": "bp_19",
+      "query": "Necesito automatización completa de redes sociales, email marketing y reporting. ¿Team360 lo cubre?",
+      "category": "F. Contexto insuficiente",
+      "risk_level": "medium",
+      "pass_criteria": "top5_contains_expected",
+      "expected_concepts": [
+        "sales_diagnosis",
+        "concrete_orientation"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": false,
+      "correct_in_candidates_mv": false,
+      "pg_latency_ms": 579.8,
+      "mv_latency_ms": 3.5,
+      "baseline_norm": {
+        "case_id": "bp_19",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_19",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "correct_not_in_candidates"
+    },
+    {
+      "case_id": "bp_20",
+      "query": "¿Qué preguntas tengo que hacer para diagnosticar bien una oportunidad?",
+      "category": "F. Contexto insuficiente",
+      "risk_level": "medium",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "minimum_slots",
+        "useful_diagnosis",
+        "concrete_orientation"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": false,
+      "correct_in_candidates_mv": false,
+      "pg_latency_ms": 562.3,
+      "mv_latency_ms": 4.4,
+      "baseline_norm": {
+        "case_id": "bp_20",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "minimum_slots",
+          "useful_diagnosis",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_20",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "minimum_slots",
+          "useful_diagnosis",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "correct_not_in_candidates"
+    },
+    {
+      "case_id": "bp_21",
+      "query": "¿Cómo integro WhatsApp con CRM para automatizar ventas?",
+      "category": "G. Ruido deliberado",
+      "risk_level": "medium",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "whatsapp_handoff",
+        "planned_extension",
+        "commercial_limits"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 697.6,
+      "mv_latency_ms": 18.6,
+      "baseline_norm": {
+        "case_id": "bp_21",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "whatsapp_handoff",
+          "planned_extension",
+          "commercial_limits"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_21",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "whatsapp_handoff",
+          "planned_extension",
+          "commercial_limits"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "ranking_still_insufficient"
+    },
+    {
+      "case_id": "bp_22",
+      "query": "¿Team360 tiene inteligencia artificial completa que hace todo automático?",
+      "category": "G. Ruido deliberado",
+      "risk_level": "medium",
+      "pass_criteria": "top5_contains_expected",
+      "expected_concepts": [
+        "concrete_orientation",
+        "sales_diagnosis"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": false,
+      "correct_in_candidates_mv": false,
+      "pg_latency_ms": 836.4,
+      "mv_latency_ms": 4.6,
+      "baseline_norm": {
+        "case_id": "bp_22",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "concrete_orientation",
+          "sales_diagnosis"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_22",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "concrete_orientation",
+          "sales_diagnosis"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "correct_not_in_candidates"
+    },
+    {
+      "case_id": "bp_23",
+      "query": "automation workflow diagnosis handoff lead capture scoring routing",
+      "category": "G. Ruido deliberado",
+      "risk_level": "medium",
+      "pass_criteria": "top5_contains_expected",
+      "expected_concepts": [
+        "sales_diagnosis",
+        "concrete_orientation"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": false,
+      "correct_in_candidates_mv": false,
+      "pg_latency_ms": 574.0,
+      "mv_latency_ms": 3.6,
+      "baseline_norm": {
+        "case_id": "bp_23",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_23",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "correct_not_in_candidates"
+    },
+    {
+      "case_id": "bp_24",
+      "query": "Seguro que se puede hacer todo en una semana, ¿no? ¿Cuánto costaría?",
+      "category": "H. Inducción al LLM",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "expected_concepts": [
+        "commercial_limits",
+        "concrete_orientation"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": false,
+      "correct_in_candidates_mv": false,
+      "pg_latency_ms": 602.7,
+      "mv_latency_ms": 3.4,
+      "baseline_norm": {
+        "case_id": "bp_24",
+        "passed": false,
+        "score": -5,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_24",
+        "passed": false,
+        "score": -5,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "commercial_limits",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "correct_not_in_candidates"
+    },
+    {
+      "case_id": "bp_25",
+      "query": "Dame el paso a paso completo para implementar automatización de ventas con IA",
+      "category": "H. Inducción al LLM",
+      "risk_level": "medium",
+      "pass_criteria": "top5_contains_expected",
+      "expected_concepts": [
+        "sales_diagnosis",
+        "minimum_slots",
+        "concrete_orientation"
+      ],
+      "pg_candidate_count": 20,
+      "mv_candidate_count": 20,
+      "correct_in_candidates_pg": true,
+      "correct_in_candidates_mv": true,
+      "pg_latency_ms": 631.3,
+      "mv_latency_ms": 17.5,
+      "baseline_norm": {
+        "case_id": "bp_25",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "minimum_slots",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_norm": {
+        "case_id": "bp_25",
+        "passed": false,
+        "score": 0,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected_normalized": [
+          "sales_diagnosis",
+          "minimum_slots",
+          "concrete_orientation"
+        ],
+        "architecture_implication": "embedding_ranking_problem"
+      },
+      "milvus_helped": false,
+      "failure_classification": "ranking_still_insufficient"
+    }
+  ],
+  "latencies_ms": {
+    "pgvector": [
+      3825.652599334717,
+      803.5883903503418,
+      715.7585620880127,
+      836.9383811950684,
+      845.1430797576904,
+      591.3856029510498,
+      825.2594470977783,
+      728.9047241210938,
+      677.3791313171387,
+      1098.5517501831055,
+      627.1586418151855,
+      721.8084335327148,
+      845.8528518676758,
+      705.2016258239746,
+      586.958646774292,
+      1404.8349857330322,
+      577.9252052307129,
+      577.1303176879883,
+      579.8337459564209,
+      562.2520446777344,
+      697.6242065429688,
+      836.3921642303467,
+      573.9955902099609,
+      602.7054786682129,
+      631.3014030456543
+    ],
+    "milvus": [
+      184.98587608337402,
+      6.911754608154297,
+      3.4661293029785156,
+      4.057168960571289,
+      5.386829376220703,
+      4.431486129760742,
+      5.148172378540039,
+      3.432035446166992,
+      3.6766529083251953,
+      4.876375198364258,
+      5.118846893310547,
+      5.6209564208984375,
+      19.51432228088379,
+      3.5076141357421875,
+      4.845142364501953,
+      3.390073776245117,
+      17.588138580322266,
+      5.4035186767578125,
+      3.4766197204589844,
+      4.356861114501953,
+      18.593311309814453,
+      4.641532897949219,
+      3.5734176635742188,
+      3.380298614501953,
+      17.476797103881836
+    ]
+  }
+}
