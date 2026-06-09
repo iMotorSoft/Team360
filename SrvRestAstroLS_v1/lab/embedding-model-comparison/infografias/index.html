@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embedding Model Comparison - Team360</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem; background: #f8fafc; color: #1e293b; }
+  h1 { color: #0f172a; border-bottom: 3px solid #3b82f6; padding-bottom: 0.5rem; }
+  h2 { color: #334155; margin-top: 2rem; }
+  .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+  .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
+  .mock-badge { background: #fef3c7; color: #92400e; }
+  .real-badge { background: #dbeafe; color: #1e40af; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+  th { background: #f1f5f9; font-weight: 600; }
+  .ok { color: #16a34a; }
+  .err { color: #dc2626; }
+  .skip { color: #ca8a04; }
+  footer { margin-top: 3rem; text-align: center; color: #94a3b8; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<h1>🧪 Embedding Model Comparison</h1>
+<div style="margin-bottom:1rem">
+  <span class="badge mock-badge">MOCK</span>
+  <span style="color:#64748b;margin-left:0.5rem">20260609_130900</span>
+</div>
+
+<div class="card">
+  <h2>Top-3 Retrieval Rate</h2>
+  
+        <div style="margin-bottom:1.5rem">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem">
+            <span><strong>openai</strong> / text-embedding-3-small</span>
+            <span>7/10 (70%)</span>
+          </div>
+          <div style="background:#e5e7eb;border-radius:8px;overflow:hidden;height:24px">
+            <div style="width:70%;background:#22c55e;height:100%;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.8rem">
+              70%
+            </div>
+          </div>
+        </div>
+        <div style="margin-bottom:1.5rem">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem">
+            <span><strong>openrouter</strong> / qwen/qwen3-embedding-8b</span>
+            <span>7/10 (70%)</span>
+          </div>
+          <div style="background:#e5e7eb;border-radius:8px;overflow:hidden;height:24px">
+            <div style="width:70%;background:#22c55e;height:100%;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.8rem">
+              70%
+            </div>
+          </div>
+        </div>
+        <div style="margin-bottom:1.5rem">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem">
+            <span><strong>perplexity</strong> / pplx-embed-v1-0.6b</span>
+            <span>7/10 (70%)</span>
+          </div>
+          <div style="background:#e5e7eb;border-radius:8px;overflow:hidden;height:24px">
+            <div style="width:70%;background:#22c55e;height:100%;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.8rem">
+              70%
+            </div>
+          </div>
+        </div>
+</div>
+
+<div class="card">
+  <h2>Model Details</h2>
+  <table>
+    <tr>
+      <th>Provider</th>
+      <th>Model</th>
+      <th>Requested Dims</th>
+      <th>Actual Dims</th>
+      <th>Format</th>
+      <th>Status</th>
+    </tr>
+    <tr>
+      <td>openai</td>
+      <td>text-embedding-3-small</td>
+      <td>1536</td>
+      <td>1536</td>
+      <td>float</td>
+      <td class="ok">
+        ✓
+      </td>
+    </tr><tr>
+      <td>openrouter</td>
+      <td>qwen/qwen3-embedding-8b</td>
+      <td>1536</td>
+      <td>1536</td>
+      <td>float</td>
+      <td class="ok">
+        ✓
+      </td>
+    </tr><tr>
+      <td>perplexity</td>
+      <td>pplx-embed-v1-0.6b</td>
+      <td>—</td>
+      <td>1536</td>
+      <td>float</td>
+      <td class="ok">
+        ✓
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Latency</h2>
+  <table>
+    <tr>
+      <th>Provider</th>
+      <th>Model</th>
+      <th>Chunks (ms)</th>
+      <th>Queries (ms)</th>
+    </tr>
+    <tr>
+      <td>openai</td>
+      <td>text-embedding-3-small</td>
+      <td>0</td>
+      <td>0</td>
+    </tr><tr>
+      <td>openrouter</td>
+      <td>qwen/qwen3-embedding-8b</td>
+      <td>0</td>
+      <td>0</td>
+    </tr><tr>
+      <td>perplexity</td>
+      <td>pplx-embed-v1-0.6b</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </table>
+</div>
+
+<footer>
+  Team360 · lab/embedding-model-comparison · Generated 20260609_130900
+</footer>
+</body>
+</html>

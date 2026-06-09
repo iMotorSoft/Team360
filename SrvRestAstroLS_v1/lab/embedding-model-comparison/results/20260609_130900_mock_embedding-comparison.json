@@ -1,0 +1,2165 @@
+{
+  "experiment": "embedding-model-comparison",
+  "timestamp": "20260609_130900",
+  "mode": "mock",
+  "dataset": {
+    "total_chunks": 18,
+    "total_queries": 10
+  },
+  "models": [
+    {
+      "provider": "openai",
+      "model": "text-embedding-3-small",
+      "requested_dimensions": 1536,
+      "actual_dimensions": 1536,
+      "encoding_format": "float",
+      "api_compatible": true,
+      "error": null,
+      "skipped": false,
+      "latency_ms": {
+        "batch_chunks": 0,
+        "batch_queries": 0
+      },
+      "retrieval": {
+        "q_001": {
+          "query": "Como automatizar conversaciones de ventas en Team360",
+          "expected": [
+            "chunk_002",
+            "chunk_001"
+          ],
+          "acceptable": [
+            "chunk_012",
+            "chunk_003"
+          ],
+          "top1": [
+            "chunk_012"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_012",
+            "chunk_011",
+            "chunk_014"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_012",
+            "chunk_011",
+            "chunk_014",
+            "chunk_017",
+            "chunk_002"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.332993
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.183523
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.159068
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.103158
+            },
+            {
+              "chunk_id": "chunk_002",
+              "similarity": 0.053416
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.039548
+            },
+            {
+              "chunk_id": "chunk_005",
+              "similarity": 0.01915
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.015893
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": -0.001883
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": -0.029839
+            }
+          ]
+        },
+        "q_002": {
+          "query": "Que metricas analiza el diagnostico de ventas",
+          "expected": [
+            "chunk_003",
+            "chunk_004"
+          ],
+          "acceptable": [
+            "chunk_005"
+          ],
+          "top1": [
+            "chunk_008"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_008",
+            "chunk_007",
+            "chunk_017"
+          ],
+          "top3_hit": false,
+          "top5": [
+            "chunk_008",
+            "chunk_007",
+            "chunk_017",
+            "chunk_009",
+            "chunk_013"
+          ],
+          "top5_hit": false,
+          "scores": [
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.310702
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": 0.26279
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.259935
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.194746
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.160997
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.098794
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": -0.000516
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": -0.018376
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": -0.025219
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": -0.033255
+            }
+          ]
+        },
+        "q_003": {
+          "query": "Como integrar Team360 con mi sistema via API",
+          "expected": [
+            "chunk_006",
+            "chunk_007"
+          ],
+          "acceptable": [
+            "chunk_008"
+          ],
+          "top1": [
+            "chunk_001"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_001",
+            "chunk_006",
+            "chunk_018"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_001",
+            "chunk_006",
+            "chunk_018",
+            "chunk_004",
+            "chunk_007"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.257361
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.247069
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.186371
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.132992
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": 0.043134
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": 0.042245
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.0224
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": -0.017789
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": -0.022853
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": -0.05445
+            }
+          ]
+        },
+        "q_004": {
+          "query": "Team360 va a soportar WhatsApp",
+          "expected": [
+            "chunk_009",
+            "chunk_010"
+          ],
+          "acceptable": [
+            "chunk_011"
+          ],
+          "top1": [
+            "chunk_010"
+          ],
+          "top1_hit": true,
+          "top3": [
+            "chunk_010",
+            "chunk_009",
+            "chunk_008"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_010",
+            "chunk_009",
+            "chunk_008",
+            "chunk_015",
+            "chunk_004"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.389416
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.218476
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.1464
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.041975
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.035663
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.017944
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.00109
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": -0.031347
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": -0.094754
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": -0.099202
+            }
+          ]
+        },
+        "q_005": {
+          "query": "Cuando algo es automatico no significa que se venda solo",
+          "expected": [
+            "chunk_012"
+          ],
+          "acceptable": [
+            "chunk_013",
+            "chunk_001"
+          ],
+          "top1": [
+            "chunk_011"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_011",
+            "chunk_001",
+            "chunk_018"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_011",
+            "chunk_001",
+            "chunk_018",
+            "chunk_015",
+            "chunk_016"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.291584
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.27173
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.196889
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.141688
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": 0.137497
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.081614
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.056537
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.026281
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.013696
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.004321
+            }
+          ]
+        },
+        "q_006": {
+          "query": "Configuracion minima para arrancar con Team360",
+          "expected": [
+            "chunk_014",
+            "chunk_015"
+          ],
+          "acceptable": [
+            "chunk_013"
+          ],
+          "top1": [
+            "chunk_013"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_013",
+            "chunk_017",
+            "chunk_006"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_013",
+            "chunk_017",
+            "chunk_006",
+            "chunk_009",
+            "chunk_011"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.555315
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.328736
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.259443
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.118838
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.107926
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.107197
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": 0.088035
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.065058
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.040275
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": 0.030014
+            }
+          ]
+        },
+        "q_007": {
+          "query": "Team360 funciona en ingles y espanol",
+          "expected": [
+            "chunk_016"
+          ],
+          "acceptable": [],
+          "top1": [
+            "chunk_005"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_005",
+            "chunk_002",
+            "chunk_012"
+          ],
+          "top3_hit": false,
+          "top5": [
+            "chunk_005",
+            "chunk_002",
+            "chunk_012",
+            "chunk_011",
+            "chunk_014"
+          ],
+          "top5_hit": false,
+          "scores": [
+            {
+              "chunk_id": "chunk_005",
+              "similarity": 0.491598
+            },
+            {
+              "chunk_id": "chunk_002",
+              "similarity": 0.398355
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.261454
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.172473
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.142071
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.096701
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.078339
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.018002
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": -0.030021
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": -0.039039
+            }
+          ]
+        },
+        "q_008": {
+          "query": "Que es Vera y como se relaciona con Team360",
+          "expected": [
+            "chunk_018",
+            "chunk_017"
+          ],
+          "acceptable": [
+            "chunk_003"
+          ],
+          "top1": [
+            "chunk_006"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_006",
+            "chunk_017",
+            "chunk_009"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_006",
+            "chunk_017",
+            "chunk_009",
+            "chunk_001",
+            "chunk_011"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.322919
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.263617
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.164395
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.148601
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.129255
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.067006
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.055919
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.045739
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.008712
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": -0.010418
+            }
+          ]
+        },
+        "q_009": {
+          "query": "Como funciona el scoring de diagnostico automatico",
+          "expected": [
+            "chunk_005",
+            "chunk_004"
+          ],
+          "acceptable": [
+            "chunk_003"
+          ],
+          "top1": [
+            "chunk_016"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_016",
+            "chunk_003",
+            "chunk_015"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_016",
+            "chunk_003",
+            "chunk_015",
+            "chunk_018",
+            "chunk_013"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_016",
+              "similarity": 0.262023
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": 0.146901
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.100231
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.085449
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.019726
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.011886
+            },
+            {
+              "chunk_id": "chunk_005",
+              "similarity": 0.003873
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": -0.035765
+            },
+            {
+              "chunk_id": "chunk_002",
+              "similarity": -0.045912
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": -0.052816
+            }
+          ]
+        },
+        "q_010": {
+          "query": "Integracion con Mercado Libre en Team360",
+          "expected": [
+            "chunk_008"
+          ],
+          "acceptable": [
+            "chunk_006",
+            "chunk_001"
+          ],
+          "top1": [
+            "chunk_002"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_002",
+            "chunk_015",
+            "chunk_012"
+          ],
+          "top3_hit": false,
+          "top5": [
+            "chunk_002",
+            "chunk_015",
+            "chunk_012",
+            "chunk_008",
+            "chunk_010"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_002",
+              "similarity": 0.261101
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.156342
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.140118
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.125724
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.095518
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.072353
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.014776
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.001032
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": -0.026836
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": -0.039115
+            }
+          ]
+        }
+      },
+      "top1_hits": 1,
+      "top3_hits": 7,
+      "top5_hits": 8,
+      "total_queries": 10
+    },
+    {
+      "provider": "openrouter",
+      "model": "qwen/qwen3-embedding-8b",
+      "requested_dimensions": 1536,
+      "actual_dimensions": 1536,
+      "encoding_format": "float",
+      "api_compatible": true,
+      "error": null,
+      "skipped": false,
+      "latency_ms": {
+        "batch_chunks": 0,
+        "batch_queries": 0
+      },
+      "retrieval": {
+        "q_001": {
+          "query": "Como automatizar conversaciones de ventas en Team360",
+          "expected": [
+            "chunk_002",
+            "chunk_001"
+          ],
+          "acceptable": [
+            "chunk_012",
+            "chunk_003"
+          ],
+          "top1": [
+            "chunk_012"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_012",
+            "chunk_011",
+            "chunk_014"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_012",
+            "chunk_011",
+            "chunk_014",
+            "chunk_017",
+            "chunk_002"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.332993
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.183523
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.159068
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.103158
+            },
+            {
+              "chunk_id": "chunk_002",
+              "similarity": 0.053416
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.039548
+            },
+            {
+              "chunk_id": "chunk_005",
+              "similarity": 0.01915
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.015893
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": -0.001883
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": -0.029839
+            }
+          ]
+        },
+        "q_002": {
+          "query": "Que metricas analiza el diagnostico de ventas",
+          "expected": [
+            "chunk_003",
+            "chunk_004"
+          ],
+          "acceptable": [
+            "chunk_005"
+          ],
+          "top1": [
+            "chunk_008"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_008",
+            "chunk_007",
+            "chunk_017"
+          ],
+          "top3_hit": false,
+          "top5": [
+            "chunk_008",
+            "chunk_007",
+            "chunk_017",
+            "chunk_009",
+            "chunk_013"
+          ],
+          "top5_hit": false,
+          "scores": [
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.310702
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": 0.26279
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.259935
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.194746
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.160997
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.098794
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": -0.000516
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": -0.018376
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": -0.025219
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": -0.033255
+            }
+          ]
+        },
+        "q_003": {
+          "query": "Como integrar Team360 con mi sistema via API",
+          "expected": [
+            "chunk_006",
+            "chunk_007"
+          ],
+          "acceptable": [
+            "chunk_008"
+          ],
+          "top1": [
+            "chunk_001"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_001",
+            "chunk_006",
+            "chunk_018"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_001",
+            "chunk_006",
+            "chunk_018",
+            "chunk_004",
+            "chunk_007"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.257361
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.247069
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.186371
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.132992
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": 0.043134
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": 0.042245
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.0224
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": -0.017789
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": -0.022853
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": -0.05445
+            }
+          ]
+        },
+        "q_004": {
+          "query": "Team360 va a soportar WhatsApp",
+          "expected": [
+            "chunk_009",
+            "chunk_010"
+          ],
+          "acceptable": [
+            "chunk_011"
+          ],
+          "top1": [
+            "chunk_010"
+          ],
+          "top1_hit": true,
+          "top3": [
+            "chunk_010",
+            "chunk_009",
+            "chunk_008"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_010",
+            "chunk_009",
+            "chunk_008",
+            "chunk_015",
+            "chunk_004"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.389416
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.218476
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.1464
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.041975
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.035663
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.017944
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.00109
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": -0.031347
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": -0.094754
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": -0.099202
+            }
+          ]
+        },
+        "q_005": {
+          "query": "Cuando algo es automatico no significa que se venda solo",
+          "expected": [
+            "chunk_012"
+          ],
+          "acceptable": [
+            "chunk_013",
+            "chunk_001"
+          ],
+          "top1": [
+            "chunk_011"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_011",
+            "chunk_001",
+            "chunk_018"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_011",
+            "chunk_001",
+            "chunk_018",
+            "chunk_015",
+            "chunk_016"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.291584
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.27173
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.196889
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.141688
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": 0.137497
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.081614
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.056537
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.026281
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.013696
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.004321
+            }
+          ]
+        },
+        "q_006": {
+          "query": "Configuracion minima para arrancar con Team360",
+          "expected": [
+            "chunk_014",
+            "chunk_015"
+          ],
+          "acceptable": [
+            "chunk_013"
+          ],
+          "top1": [
+            "chunk_013"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_013",
+            "chunk_017",
+            "chunk_006"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_013",
+            "chunk_017",
+            "chunk_006",
+            "chunk_009",
+            "chunk_011"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.555315
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.328736
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.259443
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.118838
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.107926
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.107197
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": 0.088035
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.065058
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.040275
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": 0.030014
+            }
+          ]
+        },
+        "q_007": {
+          "query": "Team360 funciona en ingles y espanol",
+          "expected": [
+            "chunk_016"
+          ],
+          "acceptable": [],
+          "top1": [
+            "chunk_005"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_005",
+            "chunk_002",
+            "chunk_012"
+          ],
+          "top3_hit": false,
+          "top5": [
+            "chunk_005",
+            "chunk_002",
+            "chunk_012",
+            "chunk_011",
+            "chunk_014"
+          ],
+          "top5_hit": false,
+          "scores": [
+            {
+              "chunk_id": "chunk_005",
+              "similarity": 0.491598
+            },
+            {
+              "chunk_id": "chunk_002",
+              "similarity": 0.398355
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.261454
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.172473
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.142071
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.096701
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.078339
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.018002
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": -0.030021
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": -0.039039
+            }
+          ]
+        },
+        "q_008": {
+          "query": "Que es Vera y como se relaciona con Team360",
+          "expected": [
+            "chunk_018",
+            "chunk_017"
+          ],
+          "acceptable": [
+            "chunk_003"
+          ],
+          "top1": [
+            "chunk_006"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_006",
+            "chunk_017",
+            "chunk_009"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_006",
+            "chunk_017",
+            "chunk_009",
+            "chunk_001",
+            "chunk_011"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.322919
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.263617
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.164395
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.148601
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.129255
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.067006
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.055919
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.045739
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.008712
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": -0.010418
+            }
+          ]
+        },
+        "q_009": {
+          "query": "Como funciona el scoring de diagnostico automatico",
+          "expected": [
+            "chunk_005",
+            "chunk_004"
+          ],
+          "acceptable": [
+            "chunk_003"
+          ],
+          "top1": [
+            "chunk_016"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_016",
+            "chunk_003",
+            "chunk_015"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_016",
+            "chunk_003",
+            "chunk_015",
+            "chunk_018",
+            "chunk_013"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_016",
+              "similarity": 0.262023
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": 0.146901
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.100231
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.085449
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.019726
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.011886
+            },
+            {
+              "chunk_id": "chunk_005",
+              "similarity": 0.003873
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": -0.035765
+            },
+            {
+              "chunk_id": "chunk_002",
+              "similarity": -0.045912
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": -0.052816
+            }
+          ]
+        },
+        "q_010": {
+          "query": "Integracion con Mercado Libre en Team360",
+          "expected": [
+            "chunk_008"
+          ],
+          "acceptable": [
+            "chunk_006",
+            "chunk_001"
+          ],
+          "top1": [
+            "chunk_002"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_002",
+            "chunk_015",
+            "chunk_012"
+          ],
+          "top3_hit": false,
+          "top5": [
+            "chunk_002",
+            "chunk_015",
+            "chunk_012",
+            "chunk_008",
+            "chunk_010"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_002",
+              "similarity": 0.261101
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.156342
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.140118
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.125724
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.095518
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.072353
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.014776
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.001032
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": -0.026836
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": -0.039115
+            }
+          ]
+        }
+      },
+      "top1_hits": 1,
+      "top3_hits": 7,
+      "top5_hits": 8,
+      "total_queries": 10
+    },
+    {
+      "provider": "perplexity",
+      "model": "pplx-embed-v1-0.6b",
+      "requested_dimensions": null,
+      "actual_dimensions": 1536,
+      "encoding_format": "float",
+      "api_compatible": true,
+      "error": null,
+      "skipped": false,
+      "latency_ms": {
+        "batch_chunks": 0,
+        "batch_queries": 0
+      },
+      "retrieval": {
+        "q_001": {
+          "query": "Como automatizar conversaciones de ventas en Team360",
+          "expected": [
+            "chunk_002",
+            "chunk_001"
+          ],
+          "acceptable": [
+            "chunk_012",
+            "chunk_003"
+          ],
+          "top1": [
+            "chunk_012"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_012",
+            "chunk_011",
+            "chunk_014"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_012",
+            "chunk_011",
+            "chunk_014",
+            "chunk_017",
+            "chunk_002"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.332993
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.183523
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.159068
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.103158
+            },
+            {
+              "chunk_id": "chunk_002",
+              "similarity": 0.053416
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.039548
+            },
+            {
+              "chunk_id": "chunk_005",
+              "similarity": 0.01915
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.015893
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": -0.001883
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": -0.029839
+            }
+          ]
+        },
+        "q_002": {
+          "query": "Que metricas analiza el diagnostico de ventas",
+          "expected": [
+            "chunk_003",
+            "chunk_004"
+          ],
+          "acceptable": [
+            "chunk_005"
+          ],
+          "top1": [
+            "chunk_008"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_008",
+            "chunk_007",
+            "chunk_017"
+          ],
+          "top3_hit": false,
+          "top5": [
+            "chunk_008",
+            "chunk_007",
+            "chunk_017",
+            "chunk_009",
+            "chunk_013"
+          ],
+          "top5_hit": false,
+          "scores": [
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.310702
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": 0.26279
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.259935
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.194746
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.160997
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.098794
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": -0.000516
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": -0.018376
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": -0.025219
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": -0.033255
+            }
+          ]
+        },
+        "q_003": {
+          "query": "Como integrar Team360 con mi sistema via API",
+          "expected": [
+            "chunk_006",
+            "chunk_007"
+          ],
+          "acceptable": [
+            "chunk_008"
+          ],
+          "top1": [
+            "chunk_001"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_001",
+            "chunk_006",
+            "chunk_018"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_001",
+            "chunk_006",
+            "chunk_018",
+            "chunk_004",
+            "chunk_007"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.257361
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.247069
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.186371
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.132992
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": 0.043134
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": 0.042245
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.0224
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": -0.017789
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": -0.022853
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": -0.05445
+            }
+          ]
+        },
+        "q_004": {
+          "query": "Team360 va a soportar WhatsApp",
+          "expected": [
+            "chunk_009",
+            "chunk_010"
+          ],
+          "acceptable": [
+            "chunk_011"
+          ],
+          "top1": [
+            "chunk_010"
+          ],
+          "top1_hit": true,
+          "top3": [
+            "chunk_010",
+            "chunk_009",
+            "chunk_008"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_010",
+            "chunk_009",
+            "chunk_008",
+            "chunk_015",
+            "chunk_004"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.389416
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.218476
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.1464
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.041975
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.035663
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.017944
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.00109
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": -0.031347
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": -0.094754
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": -0.099202
+            }
+          ]
+        },
+        "q_005": {
+          "query": "Cuando algo es automatico no significa que se venda solo",
+          "expected": [
+            "chunk_012"
+          ],
+          "acceptable": [
+            "chunk_013",
+            "chunk_001"
+          ],
+          "top1": [
+            "chunk_011"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_011",
+            "chunk_001",
+            "chunk_018"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_011",
+            "chunk_001",
+            "chunk_018",
+            "chunk_015",
+            "chunk_016"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.291584
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.27173
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.196889
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.141688
+            },
+            {
+              "chunk_id": "chunk_016",
+              "similarity": 0.137497
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.081614
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.056537
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.026281
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.013696
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.004321
+            }
+          ]
+        },
+        "q_006": {
+          "query": "Configuracion minima para arrancar con Team360",
+          "expected": [
+            "chunk_014",
+            "chunk_015"
+          ],
+          "acceptable": [
+            "chunk_013"
+          ],
+          "top1": [
+            "chunk_013"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_013",
+            "chunk_017",
+            "chunk_006"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_013",
+            "chunk_017",
+            "chunk_006",
+            "chunk_009",
+            "chunk_011"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.555315
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.328736
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.259443
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.118838
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.107926
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.107197
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": 0.088035
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.065058
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.040275
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": 0.030014
+            }
+          ]
+        },
+        "q_007": {
+          "query": "Team360 funciona en ingles y espanol",
+          "expected": [
+            "chunk_016"
+          ],
+          "acceptable": [],
+          "top1": [
+            "chunk_005"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_005",
+            "chunk_002",
+            "chunk_012"
+          ],
+          "top3_hit": false,
+          "top5": [
+            "chunk_005",
+            "chunk_002",
+            "chunk_012",
+            "chunk_011",
+            "chunk_014"
+          ],
+          "top5_hit": false,
+          "scores": [
+            {
+              "chunk_id": "chunk_005",
+              "similarity": 0.491598
+            },
+            {
+              "chunk_id": "chunk_002",
+              "similarity": 0.398355
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.261454
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.172473
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.142071
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.096701
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.078339
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.018002
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": -0.030021
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": -0.039039
+            }
+          ]
+        },
+        "q_008": {
+          "query": "Que es Vera y como se relaciona con Team360",
+          "expected": [
+            "chunk_018",
+            "chunk_017"
+          ],
+          "acceptable": [
+            "chunk_003"
+          ],
+          "top1": [
+            "chunk_006"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_006",
+            "chunk_017",
+            "chunk_009"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_006",
+            "chunk_017",
+            "chunk_009",
+            "chunk_001",
+            "chunk_011"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.322919
+            },
+            {
+              "chunk_id": "chunk_017",
+              "similarity": 0.263617
+            },
+            {
+              "chunk_id": "chunk_009",
+              "similarity": 0.164395
+            },
+            {
+              "chunk_id": "chunk_001",
+              "similarity": 0.148601
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": 0.129255
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.067006
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.055919
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.045739
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.008712
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": -0.010418
+            }
+          ]
+        },
+        "q_009": {
+          "query": "Como funciona el scoring de diagnostico automatico",
+          "expected": [
+            "chunk_005",
+            "chunk_004"
+          ],
+          "acceptable": [
+            "chunk_003"
+          ],
+          "top1": [
+            "chunk_016"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_016",
+            "chunk_003",
+            "chunk_015"
+          ],
+          "top3_hit": true,
+          "top5": [
+            "chunk_016",
+            "chunk_003",
+            "chunk_015",
+            "chunk_018",
+            "chunk_013"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_016",
+              "similarity": 0.262023
+            },
+            {
+              "chunk_id": "chunk_003",
+              "similarity": 0.146901
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.100231
+            },
+            {
+              "chunk_id": "chunk_018",
+              "similarity": 0.085449
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.019726
+            },
+            {
+              "chunk_id": "chunk_014",
+              "similarity": 0.011886
+            },
+            {
+              "chunk_id": "chunk_005",
+              "similarity": 0.003873
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": -0.035765
+            },
+            {
+              "chunk_id": "chunk_002",
+              "similarity": -0.045912
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": -0.052816
+            }
+          ]
+        },
+        "q_010": {
+          "query": "Integracion con Mercado Libre en Team360",
+          "expected": [
+            "chunk_008"
+          ],
+          "acceptable": [
+            "chunk_006",
+            "chunk_001"
+          ],
+          "top1": [
+            "chunk_002"
+          ],
+          "top1_hit": false,
+          "top3": [
+            "chunk_002",
+            "chunk_015",
+            "chunk_012"
+          ],
+          "top3_hit": false,
+          "top5": [
+            "chunk_002",
+            "chunk_015",
+            "chunk_012",
+            "chunk_008",
+            "chunk_010"
+          ],
+          "top5_hit": true,
+          "scores": [
+            {
+              "chunk_id": "chunk_002",
+              "similarity": 0.261101
+            },
+            {
+              "chunk_id": "chunk_015",
+              "similarity": 0.156342
+            },
+            {
+              "chunk_id": "chunk_012",
+              "similarity": 0.140118
+            },
+            {
+              "chunk_id": "chunk_008",
+              "similarity": 0.125724
+            },
+            {
+              "chunk_id": "chunk_010",
+              "similarity": 0.095518
+            },
+            {
+              "chunk_id": "chunk_006",
+              "similarity": 0.072353
+            },
+            {
+              "chunk_id": "chunk_004",
+              "similarity": 0.014776
+            },
+            {
+              "chunk_id": "chunk_013",
+              "similarity": 0.001032
+            },
+            {
+              "chunk_id": "chunk_007",
+              "similarity": -0.026836
+            },
+            {
+              "chunk_id": "chunk_011",
+              "similarity": -0.039115
+            }
+          ]
+        }
+      },
+      "top1_hits": 1,
+      "top3_hits": 7,
+      "top5_hits": 8,
+      "total_queries": 10
+    }
+  ]
+}
