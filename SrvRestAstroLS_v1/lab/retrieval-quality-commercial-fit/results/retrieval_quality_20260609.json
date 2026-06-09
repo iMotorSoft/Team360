@@ -1,0 +1,1510 @@
+{
+  "summary": {
+    "experiment": "Retrieval Quality & Commercial Fit Test — Fase 1.6b",
+    "embedding_model": "text-embedding-3-small",
+    "dimensions": 1536,
+    "embedding_version": "team360-openai-small-1536-v1",
+    "knowledge_scope": "ks_team360_sales_diagnosis",
+    "limit": 5,
+    "total_queries": 25,
+    "passed": 21,
+    "failed": 4,
+    "forbidden_detected": 0,
+    "queries_with_issues": 4,
+    "total_score": 37,
+    "max_possible_score": 75,
+    "min_possible_score": -75,
+    "avg_latency_seconds": 0.88,
+    "categories": {
+      "ambiguas_antihumo": {
+        "total": 5,
+        "passed": 4,
+        "failed": 1,
+        "score": 6
+      },
+      "commercial_ventas": {
+        "total": 5,
+        "passed": 4,
+        "failed": 1,
+        "score": 9
+      },
+      "knowledge_base_service": {
+        "total": 5,
+        "passed": 4,
+        "failed": 1,
+        "score": 5
+      },
+      "producto_limites": {
+        "total": 5,
+        "passed": 4,
+        "failed": 1,
+        "score": 5
+      },
+      "tecnico": {
+        "total": 5,
+        "passed": 5,
+        "failed": 0,
+        "score": 12
+      }
+    },
+    "critical_cases": [
+      {
+        "query_id": "q_07",
+        "query": "¿lead capture está listo?",
+        "category": "producto_limites",
+        "commercial_risk_level": "high",
+        "pass_criteria": "top_3_contains_expected",
+        "total_results": 5,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": false,
+        "passed": false,
+        "score": -5,
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+            "title": "Primer contexto de validación: Team360.live",
+            "score": 0.426891,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 2,
+            "chunk_id": "bb477574-4074-4342-957c-fe9db83da486",
+            "title": "Trigger",
+            "score": 0.394809,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 3,
+            "chunk_id": "28c3e497-674b-426b-83cc-2c2c1da819fd",
+            "title": "Recommended Next Steps",
+            "score": 0.391902,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 4,
+            "chunk_id": "4160142f-7236-4a57-b3c4-5b158ebd9c8f",
+            "title": "Entrada comercial inicial",
+            "score": 0.391877,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 5,
+            "chunk_id": "a7bb9f6e-0fb1-49aa-a755-f3a828b6ef1a",
+            "title": "Procesos comerciales",
+            "score": 0.378361,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          }
+        ]
+      },
+      {
+        "query_id": "q_19",
+        "query": "¿Cómo se evita knowledge cross-customer?",
+        "category": "knowledge_base_service",
+        "commercial_risk_level": "high",
+        "pass_criteria": "top_5_contains_expected",
+        "total_results": 5,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": false,
+        "passed": false,
+        "score": -5,
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "9d3257cb-cd41-4869-aa00-c3d43330be12",
+            "title": "Seguridad y HITL",
+            "score": 0.460742,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 2,
+            "chunk_id": "b53847c0-9e63-4ae7-9e27-161e8b5fb69d",
+            "title": "Referencias cruzadas silenciosas",
+            "score": 0.431848,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 3,
+            "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+            "title": "Primer contexto de validación: Team360.live",
+            "score": 0.412093,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 4,
+            "chunk_id": "bd734232-8644-45b2-bb90-e28636c65915",
+            "title": "Qué no debe prometer Vera",
+            "score": 0.396051,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 5,
+            "chunk_id": "6b3d1f54-c2fb-453a-83a9-12338a4f4112",
+            "title": "Reglas de conversación",
+            "score": 0.386077,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          }
+        ]
+      },
+      {
+        "query_id": "q_22",
+        "query": "¿Vera puede capturar leads y mandar WhatsApp?",
+        "category": "ambiguas_antihumo",
+        "commercial_risk_level": "high",
+        "pass_criteria": "top_3_contains_expected",
+        "total_results": 5,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": false,
+        "passed": false,
+        "score": -5,
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+            "title": "Primer contexto de validación: Team360.live",
+            "score": 0.49847,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 2,
+            "chunk_id": "b53847c0-9e63-4ae7-9e27-161e8b5fb69d",
+            "title": "Referencias cruzadas silenciosas",
+            "score": 0.496274,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 3,
+            "chunk_id": "e9f2eca1-d99a-4380-bfb4-d593d75bc35f",
+            "title": "Flujo conceptual de Vera",
+            "score": 0.47307,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 4,
+            "chunk_id": "a7bb9f6e-0fb1-49aa-a755-f3a828b6ef1a",
+            "title": "Procesos comerciales",
+            "score": 0.450328,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 5,
+            "chunk_id": "f1bfde33-0797-49c2-9f78-3e6460c98f50",
+            "title": "Procesos de integración",
+            "score": 0.44628,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          }
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {
+      "query_id": "q_01",
+      "query": "¿Qué valor real se puede vender en la primera etapa?",
+      "category": "commercial_ventas",
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.432311,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "4160142f-7236-4a57-b3c4-5b158ebd9c8f",
+          "title": "Entrada comercial inicial",
+          "score": 0.384304,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+          "title": "Primer contexto de validación: Team360.live",
+          "score": 0.3561,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.355959,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "3937eb5a-e06c-4357-b178-9a534314d999",
+          "title": "Badges sugeridos",
+          "score": 0.323881,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_02",
+      "query": "¿Qué NO debe venderse todavía?",
+      "category": "commercial_ventas",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 2,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.400113,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "bd734232-8644-45b2-bb90-e28636c65915",
+          "title": "Qué no debe prometer Vera",
+          "score": 0.388168,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.347958,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "858b9b94-9a12-4eb5-a48a-67c8edd7472e",
+          "title": "Service Maturity",
+          "score": 0.30628,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "3937eb5a-e06c-4357-b178-9a534314d999",
+          "title": "Badges sugeridos",
+          "score": 0.28828,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_03",
+      "query": "¿Qué significa diagnóstico útil?",
+      "category": "commercial_ventas",
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": false,
+      "expected_found_top5": false,
+      "forbidden_in_top3": false,
+      "passed": false,
+      "score": 0,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "4050f833-5056-446b-a7bc-dfdb1acfca34",
+          "title": "Propósito del paquete",
+          "score": 0.499678,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "59c47253-2b97-43c1-8d0e-82a38e96112e",
+          "title": "Qué puede diagnosticar Vera",
+          "score": 0.466769,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "6791cf47-9c9f-49e0-85b6-385798cca04c",
+          "title": "L0 Abstract",
+          "score": 0.44885,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "e9f2eca1-d99a-4380-bfb4-d593d75bc35f",
+          "title": "Flujo conceptual de Vera",
+          "score": 0.444217,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "b5cff940-e57e-4a0e-996e-ee06c31be05a",
+          "title": "Criterios de diagnóstico",
+          "score": 0.435344,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_04",
+      "query": "¿Qué significa orientación concreta?",
+      "category": "commercial_ventas",
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_5_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": false,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 1,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "a589965d-efed-46ee-a473-ebf2340605b8",
+          "title": "Alcance funcional",
+          "score": 0.327752,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "c4124117-8dbc-408c-b5d1-154167a8676c",
+          "title": "UI Hints",
+          "score": 0.307667,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "e42d383c-5c12-4023-b09c-62212ad3f4fc",
+          "title": "Checklist sugerido",
+          "score": 0.302886,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "6b3d1f54-c2fb-453a-83a9-12338a4f4112",
+          "title": "Reglas de conversación",
+          "score": 0.297906,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "858b9b94-9a12-4eb5-a48a-67c8edd7472e",
+          "title": "Service Maturity",
+          "score": 0.297797,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_05",
+      "query": "¿Qué diferencia hay entre automatizable y vendible hoy?",
+      "category": "commercial_ventas",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.610457,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.532253,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "e32144bd-3be1-451d-8fa7-f2a5a689eadf",
+          "title": "Impacto",
+          "score": 0.483535,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "3937eb5a-e06c-4357-b178-9a534314d999",
+          "title": "Badges sugeridos",
+          "score": 0.437769,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "c8696480-4488-45a1-a164-9aabd7518862",
+          "title": "Factibilidad",
+          "score": 0.403002,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_06",
+      "query": "¿Step-to-Action está listo para vender?",
+      "category": "producto_limites",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_1_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "6f1bae41-e60a-4297-a97d-64abc31c7616",
+          "title": "Step-to-Action como extensión futura",
+          "score": 0.584204,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.485488,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.464061,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "4160142f-7236-4a57-b3c4-5b158ebd9c8f",
+          "title": "Entrada comercial inicial",
+          "score": 0.452425,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "28c3e497-674b-426b-83cc-2c2c1da819fd",
+          "title": "Recommended Next Steps",
+          "score": 0.430891,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_07",
+      "query": "¿lead capture está listo?",
+      "category": "producto_limites",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": false,
+      "expected_found_top5": false,
+      "forbidden_in_top3": false,
+      "passed": false,
+      "score": -5,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+          "title": "Primer contexto de validación: Team360.live",
+          "score": 0.426891,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "bb477574-4074-4342-957c-fe9db83da486",
+          "title": "Trigger",
+          "score": 0.394809,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "28c3e497-674b-426b-83cc-2c2c1da819fd",
+          "title": "Recommended Next Steps",
+          "score": 0.391902,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "4160142f-7236-4a57-b3c4-5b158ebd9c8f",
+          "title": "Entrada comercial inicial",
+          "score": 0.391877,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "a7bb9f6e-0fb1-49aa-a755-f3a828b6ef1a",
+          "title": "Procesos comerciales",
+          "score": 0.378361,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_08",
+      "query": "¿WhatsApp handoff está listo?",
+      "category": "producto_limites",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "0d61b419-9010-4c38-afab-4856aacf8284",
+          "title": "Diagnostic Code y WhatsApp Handoff futuro",
+          "score": 0.557886,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "843860a0-cc95-4f22-948e-5f123d618124",
+          "title": "Human Handoff",
+          "score": 0.455078,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "b53847c0-9e63-4ae7-9e27-161e8b5fb69d",
+          "title": "Referencias cruzadas silenciosas",
+          "score": 0.440053,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "186826e0-ecad-4b7b-aa77-de485873eaf6",
+          "title": "Suggested Assistant Message futuro",
+          "score": 0.433414,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "f1bfde33-0797-49c2-9f78-3e6460c98f50",
+          "title": "Procesos de integración",
+          "score": 0.393526,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_09",
+      "query": "¿diagnostic_code está listo?",
+      "category": "producto_limites",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 2,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "22c70939-7679-437c-b12d-c94857d0b71e",
+          "title": "Manual del paquete de diagnóstico de automatización",
+          "score": 0.512866,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "0d61b419-9010-4c38-afab-4856aacf8284",
+          "title": "Diagnostic Code y WhatsApp Handoff futuro",
+          "score": 0.506543,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "186826e0-ecad-4b7b-aa77-de485873eaf6",
+          "title": "Suggested Assistant Message futuro",
+          "score": 0.431697,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "9544254c-30e8-4613-8a87-a9cd47639526",
+          "title": "Future Required Data",
+          "score": 0.42909,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "e9f2eca1-d99a-4380-bfb4-d593d75bc35f",
+          "title": "Flujo conceptual de Vera",
+          "score": 0.428957,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_10",
+      "query": "¿Qué capacidades son planned_extension?",
+      "category": "producto_limites",
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 2,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "858b9b94-9a12-4eb5-a48a-67c8edd7472e",
+          "title": "Service Maturity",
+          "score": 0.385266,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "a589965d-efed-46ee-a473-ebf2340605b8",
+          "title": "Alcance funcional",
+          "score": 0.381537,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "6f1bae41-e60a-4297-a97d-64abc31c7616",
+          "title": "Step-to-Action como extensión futura",
+          "score": 0.380046,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "f1bfde33-0797-49c2-9f78-3e6460c98f50",
+          "title": "Procesos de integración",
+          "score": 0.338947,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "22c70939-7679-437c-b12d-c94857d0b71e",
+          "title": "Manual del paquete de diagnóstico de automatización",
+          "score": 0.33844,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_11",
+      "query": "¿Qué son slots mínimos?",
+      "category": "tecnico",
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "996ae442-6922-419a-abb5-cdbd5321d08b",
+          "title": "Slots principales",
+          "score": 0.369598,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "e32144bd-3be1-451d-8fa7-f2a5a689eadf",
+          "title": "Impacto",
+          "score": 0.297501,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.286617,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "c4124117-8dbc-408c-b5d1-154167a8676c",
+          "title": "UI Hints",
+          "score": 0.279989,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "9a3cf8d0-9b5f-4c59-897e-c35e297ad203",
+          "title": "Riesgo",
+          "score": 0.276536,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_12",
+      "query": "¿Cómo se conecta knowledge_scope con package?",
+      "category": "tecnico",
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_5_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 2,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "8654aceb-4bfc-4d41-87ba-be1c6967cb8c",
+          "title": "Ciclo evolutivo del knowledge",
+          "score": 0.415432,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "6791cf47-9c9f-49e0-85b6-385798cca04c",
+          "title": "L0 Abstract",
+          "score": 0.391061,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "4050f833-5056-446b-a7bc-dfdb1acfca34",
+          "title": "Propósito del paquete",
+          "score": 0.358768,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+          "title": "Primer contexto de validación: Team360.live",
+          "score": 0.317208,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "19a88481-fcaf-481e-9c7c-fbc0e9eff704",
+          "title": "Procesos de conocimiento",
+          "score": 0.312896,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_13",
+      "query": "¿Qué rol tiene embedding_status pending/ready?",
+      "category": "tecnico",
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_5_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 2,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "858b9b94-9a12-4eb5-a48a-67c8edd7472e",
+          "title": "Service Maturity",
+          "score": 0.367652,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "22c70939-7679-437c-b12d-c94857d0b71e",
+          "title": "Manual del paquete de diagnóstico de automatización",
+          "score": 0.365722,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.347225,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "bb477574-4074-4342-957c-fe9db83da486",
+          "title": "Trigger",
+          "score": 0.346928,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "186826e0-ecad-4b7b-aa77-de485873eaf6",
+          "title": "Suggested Assistant Message futuro",
+          "score": 0.339564,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_14",
+      "query": "¿Qué implica runtime target Team360.live?",
+      "category": "tecnico",
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 2,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "c8696480-4488-45a1-a164-9aabd7518862",
+          "title": "Factibilidad",
+          "score": 0.534629,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+          "title": "Primer contexto de validación: Team360.live",
+          "score": 0.512542,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.447753,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "bb477574-4074-4342-957c-fe9db83da486",
+          "title": "Trigger",
+          "score": 0.415561,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "bd734232-8644-45b2-bb90-e28636c65915",
+          "title": "Qué no debe prometer Vera",
+          "score": 0.40572,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_15",
+      "query": "¿Qué diferencia hay entre package context y runtime target?",
+      "category": "tecnico",
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_5_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "4050f833-5056-446b-a7bc-dfdb1acfca34",
+          "title": "Propósito del paquete",
+          "score": 0.320395,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "858b9b94-9a12-4eb5-a48a-67c8edd7472e",
+          "title": "Service Maturity",
+          "score": 0.296937,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "6791cf47-9c9f-49e0-85b6-385798cca04c",
+          "title": "L0 Abstract",
+          "score": 0.295356,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.295065,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.293005,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_16",
+      "query": "¿Este sistema sirve para ofrecer knowledge base a clientes?",
+      "category": "knowledge_base_service",
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_5_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "19a88481-fcaf-481e-9c7c-fbc0e9eff704",
+          "title": "Procesos de conocimiento",
+          "score": 0.561641,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+          "title": "Primer contexto de validación: Team360.live",
+          "score": 0.482064,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "6791cf47-9c9f-49e0-85b6-385798cca04c",
+          "title": "L0 Abstract",
+          "score": 0.477611,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "8654aceb-4bfc-4d41-87ba-be1c6967cb8c",
+          "title": "Ciclo evolutivo del knowledge",
+          "score": 0.456088,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "a7bb9f6e-0fb1-49aa-a755-f3a828b6ef1a",
+          "title": "Procesos comerciales",
+          "score": 0.451672,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_17",
+      "query": "¿Qué necesita una knowledge base de cliente para ser confiable?",
+      "category": "knowledge_base_service",
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_5_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+          "title": "Primer contexto de validación: Team360.live",
+          "score": 0.490953,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "9d3257cb-cd41-4869-aa00-c3d43330be12",
+          "title": "Seguridad y HITL",
+          "score": 0.47939,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "19a88481-fcaf-481e-9c7c-fbc0e9eff704",
+          "title": "Procesos de conocimiento",
+          "score": 0.462984,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "07ab6671-ba4c-402b-883d-b4374c6770c0",
+          "title": "Modelos recomendados según tarea",
+          "score": 0.438773,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "8654aceb-4bfc-4d41-87ba-be1c6967cb8c",
+          "title": "Ciclo evolutivo del knowledge",
+          "score": 0.437637,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_18",
+      "query": "¿Qué riesgo hay si se mezclan scopes o clientes?",
+      "category": "knowledge_base_service",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_5_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 2,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "9a3cf8d0-9b5f-4c59-897e-c35e297ad203",
+          "title": "Riesgo",
+          "score": 0.4821,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "275694f7-480c-492a-803a-3b21aaccbf41",
+          "title": "Risk Flags",
+          "score": 0.447807,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "b53847c0-9e63-4ae7-9e27-161e8b5fb69d",
+          "title": "Referencias cruzadas silenciosas",
+          "score": 0.407,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "9d3257cb-cd41-4869-aa00-c3d43330be12",
+          "title": "Seguridad y HITL",
+          "score": 0.406966,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "6b3d1f54-c2fb-453a-83a9-12338a4f4112",
+          "title": "Reglas de conversación",
+          "score": 0.406396,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_19",
+      "query": "¿Cómo se evita knowledge cross-customer?",
+      "category": "knowledge_base_service",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_5_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": false,
+      "expected_found_top5": false,
+      "forbidden_in_top3": false,
+      "passed": false,
+      "score": -5,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "9d3257cb-cd41-4869-aa00-c3d43330be12",
+          "title": "Seguridad y HITL",
+          "score": 0.460742,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "b53847c0-9e63-4ae7-9e27-161e8b5fb69d",
+          "title": "Referencias cruzadas silenciosas",
+          "score": 0.431848,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+          "title": "Primer contexto de validación: Team360.live",
+          "score": 0.412093,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "bd734232-8644-45b2-bb90-e28636c65915",
+          "title": "Qué no debe prometer Vera",
+          "score": 0.396051,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "6b3d1f54-c2fb-453a-83a9-12338a4f4112",
+          "title": "Reglas de conversación",
+          "score": 0.386077,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_20",
+      "query": "¿Qué metadata ayuda a auditar conocimiento?",
+      "category": "knowledge_base_service",
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_5_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 2,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "19a88481-fcaf-481e-9c7c-fbc0e9eff704",
+          "title": "Procesos de conocimiento",
+          "score": 0.507238,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "8654aceb-4bfc-4d41-87ba-be1c6967cb8c",
+          "title": "Ciclo evolutivo del knowledge",
+          "score": 0.477297,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "9d3257cb-cd41-4869-aa00-c3d43330be12",
+          "title": "Seguridad y HITL",
+          "score": 0.431364,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "07ab6671-ba4c-402b-883d-b4374c6770c0",
+          "title": "Modelos recomendados según tarea",
+          "score": 0.401457,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+          "title": "Primer contexto de validación: Team360.live",
+          "score": 0.386278,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_21",
+      "query": "Quiero automatizar todo, ¿qué vendemos ya?",
+      "category": "ambiguas_antihumo",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.581653,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.546503,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "99e3c3e3-8b6e-40ca-843c-a5be2f2a58fc",
+          "title": "Diagnóstico amplio de automatización",
+          "score": 0.526071,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "a7bb9f6e-0fb1-49aa-a755-f3a828b6ef1a",
+          "title": "Procesos comerciales",
+          "score": 0.518523,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "f1bfde33-0797-49c2-9f78-3e6460c98f50",
+          "title": "Procesos de integración",
+          "score": 0.495219,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_22",
+      "query": "¿Vera puede capturar leads y mandar WhatsApp?",
+      "category": "ambiguas_antihumo",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": false,
+      "expected_found_top5": false,
+      "forbidden_in_top3": false,
+      "passed": false,
+      "score": -5,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "890b069e-1c60-4b64-b004-2c92c135efac",
+          "title": "Primer contexto de validación: Team360.live",
+          "score": 0.49847,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "b53847c0-9e63-4ae7-9e27-161e8b5fb69d",
+          "title": "Referencias cruzadas silenciosas",
+          "score": 0.496274,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "e9f2eca1-d99a-4380-bfb4-d593d75bc35f",
+          "title": "Flujo conceptual de Vera",
+          "score": 0.47307,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "a7bb9f6e-0fb1-49aa-a755-f3a828b6ef1a",
+          "title": "Procesos comerciales",
+          "score": 0.450328,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "f1bfde33-0797-49c2-9f78-3e6460c98f50",
+          "title": "Procesos de integración",
+          "score": 0.44628,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_23",
+      "query": "¿Todo lo automatizable es producto vendible?",
+      "category": "ambiguas_antihumo",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.602115,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.580968,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "e32144bd-3be1-451d-8fa7-f2a5a689eadf",
+          "title": "Impacto",
+          "score": 0.489261,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "6791cf47-9c9f-49e0-85b6-385798cca04c",
+          "title": "L0 Abstract",
+          "score": 0.462179,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "99e3c3e3-8b6e-40ca-843c-a5be2f2a58fc",
+          "title": "Diagnóstico amplio de automatización",
+          "score": 0.460582,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_24",
+      "query": "¿Podemos vender Step-to-Action como listo?",
+      "category": "ambiguas_antihumo",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_1_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 3,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "6f1bae41-e60a-4297-a97d-64abc31c7616",
+          "title": "Step-to-Action como extensión futura",
+          "score": 0.58343,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.531345,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.469505,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "4160142f-7236-4a57-b3c4-5b158ebd9c8f",
+          "title": "Entrada comercial inicial",
+          "score": 0.42422,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "3937eb5a-e06c-4357-b178-9a534314d999",
+          "title": "Badges sugeridos",
+          "score": 0.412628,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "query_id": "q_25",
+      "query": "¿Qué le digo a un cliente que pide IA para ventas?",
+      "category": "ambiguas_antihumo",
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": false,
+      "passed": true,
+      "score": 2,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "6b3d1f54-c2fb-453a-83a9-12338a4f4112",
+          "title": "Reglas de conversación",
+          "score": 0.526492,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "4160142f-7236-4a57-b3c4-5b158ebd9c8f",
+          "title": "Entrada comercial inicial",
+          "score": 0.525822,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.505601,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.499211,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "186826e0-ecad-4b7b-aa77-de485873eaf6",
+          "title": "Suggested Assistant Message futuro",
+          "score": 0.498457,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    }
+  ],
+  "latencies": [
+    1.762,
+    4.005,
+    0.794,
+    0.771,
+    0.723,
+    0.587,
+    0.653,
+    0.676,
+    0.671,
+    0.697,
+    0.852,
+    0.751,
+    0.653,
+    0.613,
+    0.639,
+    0.847,
+    0.805,
+    0.718,
+    0.726,
+    0.807,
+    0.666,
+    0.58,
+    0.59,
+    0.681,
+    0.66
+  ]
+}

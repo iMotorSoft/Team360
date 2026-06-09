@@ -1,0 +1,270 @@
+{
+  "meta": {
+    "experiment": "Retrieval Quality & Commercial Fit Test — Fase 1.6b",
+    "embedding_model": "openai/text-embedding-3-small",
+    "dimensions": 1536,
+    "embedding_version": "team360-openai-small-1536-v1",
+    "knowledge_scope": "ks_team360_sales_diagnosis",
+    "document": "approved/automatizaciones/team360_sales_diagnosis_package_manual.md",
+    "created_at": "2026-06-09T00:00:00Z",
+    "categories": {
+      "commercial_ventas": "A. Comercial / ventas",
+      "producto_limites": "B. Producto / límites",
+      "tecnico": "C. Técnico",
+      "knowledge_base_service": "D. Knowledge Base as a Service",
+      "ambiguas_antihumo": "E. Ambiguas / anti-humo"
+    }
+  },
+  "cases": [
+    {
+      "query_id": "q_01",
+      "query": "¿Qué valor real se puede vender en la primera etapa?",
+      "category": "commercial_ventas",
+      "expected_concepts": ["sellable_now", "pilot", "Offer Decision", "automatable"],
+      "forbidden_concepts": ["todo automatizable", "vender todo", "sin límite"],
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "El retrieval debe recuperar Offer Decision y Límite comercial, no chunks genéricos."
+    },
+    {
+      "query_id": "q_02",
+      "query": "¿Qué NO debe venderse todavía?",
+      "category": "commercial_ventas",
+      "expected_concepts": ["Límite comercial", "planned_extension", "no vendible hoy", "futuro"],
+      "forbidden_concepts": ["vender ya", "listo productivo", "activado hoy"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "Crítico: si el retrieval sugiere chunks de capacidades listas en vez de límites, hay riesgo comercial."
+    },
+    {
+      "query_id": "q_03",
+      "query": "¿Qué significa diagnóstico útil?",
+      "category": "commercial_ventas",
+      "expected_concepts": ["orientación concreta", "diagnóstico amplio", "Offer Decision", "clasificación"],
+      "forbidden_concepts": ["prometer automatización total", "respuesta genérica"],
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "Debe recuperar Diagnóstico amplio y Offer Decision, no solo introducción."
+    },
+    {
+      "query_id": "q_04",
+      "query": "¿Qué significa orientación concreta?",
+      "category": "commercial_ventas",
+      "expected_concepts": ["Offer Decision", "categoría", "diagnóstico", "próximos pasos"],
+      "forbidden_concepts": ["síndrome del niño", "solo información"],
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_5_contains_expected",
+      "notes": "La orientación concreta se da mediante la Offer Decision y los criterios de diagnóstico."
+    },
+    {
+      "query_id": "q_05",
+      "query": "¿Qué diferencia hay entre automatizable y vendible hoy?",
+      "category": "commercial_ventas",
+      "expected_concepts": ["Offer Decision", "Límite comercial", "automatizable", "sellable_now", "pilot", "oportunidad futura"],
+      "forbidden_concepts": ["es lo mismo", "todo es vendible"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "Concepto central del documento. Offer Decision define 4 categorías que separan claramente automatable de vendible."
+    },
+    {
+      "query_id": "q_06",
+      "query": "¿Step-to-Action está listo para vender?",
+      "category": "producto_limites",
+      "expected_concepts": ["planned_extension", "Step-to-Action", "no vender como listo", "futuro"],
+      "forbidden_concepts": ["listo productivo", "ya disponible", "activado hoy", "vendible ahora"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_1_contains_expected",
+      "notes": "Frontmatter dice supports_step_to_action: false, step_to_action_status: planned_extension. Crítico que el retrieval no lo muestre como capacidad activa."
+    },
+    {
+      "query_id": "q_07",
+      "query": "¿lead capture está listo?",
+      "category": "producto_limites",
+      "expected_concepts": ["planned_extension", "futuro", "no listo", "lead capture"],
+      "forbidden_concepts": ["listo", "capturando leads hoy", "activado", "productivo"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "lead capture es planned_extension en el frontmatter. No debe aparecer como capacidad actual."
+    },
+    {
+      "query_id": "q_08",
+      "query": "¿WhatsApp handoff está listo?",
+      "category": "producto_limites",
+      "expected_concepts": ["planned_extension", "WhatApp Handoff futuro", "diagnostic_code", "futuro", "Handoff"],
+      "forbidden_concepts": ["handoff activo", "WhatsApp listo", "en producción", "vendible hoy"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "WhatsApp Handoff está documentado como capacidad futura en Step-to-Action."
+    },
+    {
+      "query_id": "q_09",
+      "query": "¿diagnostic_code está listo?",
+      "category": "producto_limites",
+      "expected_concepts": ["planned_extension", "Diagnostic Code futuro", "diagnostic_code", "WhatsApp Handoff futuro", "futuro"],
+      "forbidden_concepts": ["código activo", "en producción", "diagnóstico con código listo"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "diagnostic_code es parte de Step-to-Action como planned_extension."
+    },
+    {
+      "query_id": "q_10",
+      "query": "¿Qué capacidades son planned_extension?",
+      "category": "producto_limites",
+      "expected_concepts": ["Step-to-Action", "planned_extension", "lead capture", "WhatsApp Handoff futuro", "Diagnostic Code futuro", "Human Handoff"],
+      "forbidden_concepts": ["capacidades activas", "vendibles hoy"],
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "Debe recuperar la sección Step-to-Action como extensión futura y sus subsecciones."
+    },
+    {
+      "query_id": "q_11",
+      "query": "¿Qué son slots mínimos?",
+      "category": "tecnico",
+      "expected_concepts": ["Slots principales", "campos obligatorios", "diagnóstico", "proceso"],
+      "forbidden_concepts": [],
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "Slots principales define los campos que el asistente debe recopilar."
+    },
+    {
+      "query_id": "q_12",
+      "query": "¿Cómo se conecta knowledge_scope con package?",
+      "category": "tecnico",
+      "expected_concepts": ["pkg_sales_diagnosis", "ks_team360_sales_diagnosis", "scope_type", "package"],
+      "forbidden_concepts": [],
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_5_contains_expected",
+      "notes": "El frontmatter del documento relaciona package_code con knowledge_scope_code."
+    },
+    {
+      "query_id": "q_13",
+      "query": "¿Qué rol tiene embedding_status pending/ready?",
+      "category": "tecnico",
+      "expected_concepts": ["embedding", "chunk", "estado", "pendiente", "listo"],
+      "forbidden_concepts": [],
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_5_contains_expected",
+      "notes": "Concepto del pipeline técnico. Puede no estar en el knowledge document directamente."
+    },
+    {
+      "query_id": "q_14",
+      "query": "¿Qué implica runtime target Team360.live?",
+      "category": "tecnico",
+      "expected_concepts": ["team360_live", "primer contexto de validación", "runtime", "público"],
+      "forbidden_concepts": [],
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "El documento tiene sección 'Primer contexto de validación: Team360.live' y frontmatter organization_code: team360_live."
+    },
+    {
+      "query_id": "q_15",
+      "query": "¿Qué diferencia hay entre package context y runtime target?",
+      "category": "tecnico",
+      "expected_concepts": ["package_code", "workspace_code", "organization_code", "runtime", "pkg_sales_diagnosis", "ks_team360_sales_diagnosis"],
+      "forbidden_concepts": [],
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_5_contains_expected",
+      "notes": "Package define el qué, runtime target define el dónde se ejecuta."
+    },
+    {
+      "query_id": "q_16",
+      "query": "¿Este sistema sirve para ofrecer knowledge base a clientes?",
+      "category": "knowledge_base_service",
+      "expected_concepts": ["scope", "paquete de conocimiento", "documento", "chunk", "knowledge_scope", "knowledge_base"],
+      "forbidden_concepts": [],
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_5_contains_expected",
+      "notes": "Debe recuperar secciones que describan la estructura documental del paquete."
+    },
+    {
+      "query_id": "q_17",
+      "query": "¿Qué necesita una knowledge base de cliente para ser confiable?",
+      "category": "knowledge_base_service",
+      "expected_concepts": ["evidencia", "validación", "approved", "revisión", "ciclo evolutivo", "knowledge"],
+      "forbidden_concepts": ["sin validación", "draft", "no revisado"],
+      "commercial_risk_level": "medium",
+      "pass_criteria": "top_5_contains_expected",
+      "notes": "El documento describe ciclo evolutivo del knowledge y validaciones."
+    },
+    {
+      "query_id": "q_18",
+      "query": "¿Qué riesgo hay si se mezclan scopes o clientes?",
+      "category": "knowledge_base_service",
+      "expected_concepts": ["knowledge_scope", "acceso", "permiso", "scope", "knowledge_scope_code"],
+      "forbidden_concepts": ["mezclar está bien", "no hay riesgo"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_5_contains_expected",
+      "notes": "Un scope por cliente/organización. Mezclar riesgos de seguridad y contaminación de datos."
+    },
+    {
+      "query_id": "q_19",
+      "query": "¿Cómo se evita knowledge cross-customer?",
+      "category": "knowledge_base_service",
+      "expected_concepts": ["knowledge_scope", "access_tags", "permission_tags", "scope", "aislamiento"],
+      "forbidden_concepts": ["compartir todo", "sin aislamiento"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_5_contains_expected",
+      "notes": "Mezclar chunks de clientes distintos rompe el modelo de tenant. Scope isolation es clave."
+    },
+    {
+      "query_id": "q_20",
+      "query": "¿Qué metadata ayuda a auditar conocimiento?",
+      "category": "knowledge_base_service",
+      "expected_concepts": ["metadata", "version", "estado", "approved", "revisión", "evidencia"],
+      "forbidden_concepts": [],
+      "commercial_risk_level": "low",
+      "pass_criteria": "top_5_contains_expected",
+      "notes": "El frontmatter tiene version, status, last_review, evidence_level, validated_by."
+    },
+    {
+      "query_id": "q_21",
+      "query": "Quiero automatizar todo, ¿qué vendemos ya?",
+      "category": "ambiguas_antihumo",
+      "expected_concepts": ["Offer Decision", "Límite comercial", "automatizable", "sellable_now", "pilot", "no vendible hoy"],
+      "forbidden_concepts": ["vender todo", "automatización total", "todo es vendible"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "Query ambigua que pide 'vender ya'. Debe responder con límites comerciales, no capabilities listas."
+    },
+    {
+      "query_id": "q_22",
+      "query": "¿Vera puede capturar leads y mandar WhatsApp?",
+      "category": "ambiguas_antihumo",
+      "expected_concepts": ["planned_extension", "futuro", "lead capture", "WhatsApp Handoff futuro", "no listo"],
+      "forbidden_concepts": ["Vera puede capturar leads", "WhatsApp listo", "Vera envía WhatsApp", "listo productivo"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "Query que usa 'Vera' como nombre comercial. El retrieval no debe mostrar capacidades futuras como listas. Vera es nombre visible, no técnico."
+    },
+    {
+      "query_id": "q_23",
+      "query": "¿Todo lo automatizable es producto vendible?",
+      "category": "ambiguas_antihumo",
+      "expected_concepts": ["Offer Decision", "Límite comercial", "no vendible hoy", "automatizable", "oportunidad futura"],
+      "forbidden_concepts": ["sí, todo", "es lo mismo", "automatizable = vendible"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "Trampa comercial clásica. El retrieval debe separar automatable (técnico) de vendible (comercial)."
+    },
+    {
+      "query_id": "q_24",
+      "query": "¿Podemos vender Step-to-Action como listo?",
+      "category": "ambiguas_antihumo",
+      "expected_concepts": ["planned_extension", "Step-to-Action", "no vender como listo", "futuro", "no vendible hoy"],
+      "forbidden_concepts": ["sí, vender como listo", "está listo", "Step-to-Action activo", "productivo"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_1_contains_expected",
+      "notes": "Frontmatter explícitamente dice supports_step_to_action: false. Si el retrieval no lo marca como planned_extension, hay riesgo de overpromise."
+    },
+    {
+      "query_id": "q_25",
+      "query": "¿Qué le digo a un cliente que pide IA para ventas?",
+      "category": "ambiguas_antihumo",
+      "expected_concepts": ["Offer Decision", "diagnóstico amplio", "orientación concreta", "Límite comercial", "Service Maturity"],
+      "forbidden_concepts": ["vendemos todo", "sin límites", "IA para todo"],
+      "commercial_risk_level": "high",
+      "pass_criteria": "top_3_contains_expected",
+      "notes": "Query real de cliente. Debe recuperar límites y oferta real, no prometer."
+    }
+  ]
+}
