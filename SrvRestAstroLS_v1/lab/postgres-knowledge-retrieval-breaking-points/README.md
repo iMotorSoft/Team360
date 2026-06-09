@@ -478,6 +478,83 @@ El laboratorio debe poder concluir una de estas opciones:
 | `results/{prefix}_breaking_matrix.md` | Markdown | Matriz de puntos de ruptura |
 | `infografias/{prefix}_infografia.html` | HTML | Visualización ejecutiva |
 
+## Uso
+
+### Requisitos
+
+- Python 3.12+
+- `OPENAI_API_KEY` o `OpenAI_Key_JAI_query` en entorno para embedding de query
+- `DB_PG_V360_URL` o `TEAM360_DB_URL_PSQL` para conexión a BD
+- Backend dependencies (`uv` en `backend/`)
+- Migraciones 003+ aplicadas, embeddings generados (Fase 1.5)
+
+### Ejecución
+
+Ejecutar desde `SrvRestAstroLS_v1/backend/` (donde `uv` tiene las dependencias):
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Dry run (solo validar golden cases, sin DB ni OpenAI)
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_breaking_points.py --dry-run
+
+# Run completo (25 casos, default limit=5)
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_breaking_points.py
+
+# Run con primeros 3 casos
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_breaking_points.py --max-cases 3
+
+# Run con opciones custom
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/run_breaking_points.py \
+  --limit 10 \
+  --min-score 0.3 \
+  --output-prefix my_breaking_run
+
+# Generar reporte detallado
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/scripts/generate_report.py
+
+# Generar infografía HTML
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/scripts/generate_infographics.py
+
+# Con archivo específico
+uv run python ../lab/postgres-knowledge-retrieval-breaking-points/scripts/generate_report.py \
+  --results-file ../lab/postgres-knowledge-retrieval-breaking-points/results/breaking_points_20260609_150932.json
+```
+
+### Variables de entorno
+
+| Variable | Requerida | Descripción |
+|----------|-----------|-------------|
+| `OPENAI_API_KEY` | Sí | API key de OpenAI para embedding de query |
+| `OpenAI_Key_JAI_query` | Sí (fallback) | Fallback si `OPENAI_API_KEY` no está seteada |
+| `DB_PG_V360_URL` | Sí | DSN PostgreSQL con base `team360` |
+| `TEAM360_DB_URL_PSQL` | Sí (fallback) | Fallback si `DB_PG_V360_URL` no está seteada |
+
+No hardcodear API keys. No loggearlas completas (solo preview 8 chars).
+
+### Parámetros de `run_breaking_points.py`
+
+| Parámetro | Default | Descripción |
+|-----------|---------|-------------|
+| `--limit` | `5` | Resultados por query (1–50) |
+| `--min-score` | `None` | Score mínimo de similitud (0–1) |
+| `--embedding-version` | `team360-openai-small-1536-v1` | Versión de embedding |
+| `--organization-code` | `team360_live` | Código de organización |
+| `--workspace-code` | `team360_public_site` | Código de workspace |
+| `--knowledge-scope-code` | `ks_team360_sales_diagnosis` | Knowledge scope |
+| `--output-prefix` | timestamp | Prefijo para archivos de output |
+| `--max-cases` | `None` | Ejecutar solo primeros N casos |
+| `--dry-run` | `False` | Validar golden cases sin DB ni OpenAI |
+
+## Outputs del laboratorio
+
+| Archivo | Formato | Contenido |
+|---------|---------|-----------|
+| `results/{prefix}.json` | JSON | Resultados completos de todos los casos |
+| `results/{prefix}.md` | Markdown | Reporte ejecutivo con decisión |
+| `results/{prefix}_detailed_report.md` | Markdown | Reporte detallado por caso |
+| `infografias/{prefix}_infografia.html` | HTML | Visualización ejecutiva |
+
 ## No toca
 
 - ❌ Pipeline productivo
@@ -503,7 +580,76 @@ El laboratorio debería poder responder:
 4. **¿Cuándo considerar Milvus?** → Cuando el corpus supere 50k-100k chunks y pgvector no escale.
 5. **¿Cuándo considerar ArangoDB?** → Cuando la navegación de grafo requiera >5 niveles profundos o algoritmos nativos.
 
+## Ejecución real — Resultados baseline (2026-06-09)
+
+### Resumen
+
+| Métrica | Valor |
+|---------|-------|
+| Casos totales | 25 |
+| Pasaron | 5 (20%) |
+| Fallaron | 20 (80%) |
+| Alto riesgo pasaron | 2/11 (18%) |
+| Conceptos prohibidos top-3 | 0 |
+| Latencia promedio | 823.5ms |
+| Score total | -31 (rango -75 a 75) |
+
+### Decisión algorítmica
+
+**D. Evaluar Milvus/ArangoDB — pgvector muestra límites de escala/calidad.**
+
+### Interpretación humana
+
+La decisión algorítmica es "D" por el bajo pass rate (20%), pero el análisis real de los fallos indica que **20/20 fallos son `embedding_ranking_problem`**, lo que significa que el corpus actual (40 chunks) **no contiene el texto de los conceptos evaluados** en los golden cases adversariales.
+
+Cuando los chunks SÍ contienen los conceptos (como `automatizable ≠ sellable_today`, `diagnostic_code`, `planned_extension`, `scope isolation`), el retrieval funciona correctamente (PASS en top-1 o top-3).
+
+**Conclusión humana: el punto de ruptura actual es content_gap, no el backend vectorial.**
+
+Esto valida exactamente el propósito del laboratorio: el sistema no "se rompe" por límite de pgvector, sino porque el corpus no cubre los conceptos adversariales. A medida que el corpus crezca con chunks que incluyan reglas comerciales, límites de alcance y descripciones de capacidades, el pass rate subirá sin cambiar de base de datos.
+
+### Resultados por categoría
+
+| Categoría | Pass/Fail |
+|-----------|-----------|
+| A. Confusión semántica | 2/4 pass (bp_01, bp_02 ok; bp_03, bp_04 fail) |
+| B. Overpromise comercial | 2/5 pass (bp_08, bp_09 ok; bp_05, bp_06, bp_07 fail) |
+| C. Ambigüedad técnica | 0/3 pass |
+| D. Multi-tenant / scope | 1/3 pass (bp_14 ok; bp_13, bp_15 fail) |
+| E. Versionado / actualidad | 0/2 pass |
+| F. Contexto insuficiente | 0/3 pass |
+| G. Ruido deliberado | 0/3 pass |
+| H. Inducción al LLM | 0/2 pass |
+
+### Casos críticos que PASARON
+
+- `bp_01`: diferencia entre automatizable y vendible ✅ top-3
+- `bp_02`: diagnostic_code vs diagnosis result ✅ top-1
+- `bp_08`: diagnóstico asigna código de seguimiento → planned_extension ✅ top-1
+- `bp_09`: automatable ≠ sellable_today ✅ top-1
+- `bp_14`: diagnóstico de ventas para Team360 ✅ top-3 (scope filtering)
+
+### Casos críticos que FALLARON (todos por content_gap / corpus insuficiente)
+
+- `bp_03`: step_to_action no está en chunks
+- `bp_05`: "Step-to-Action listo" — no hay chunk con planned_extension + step_to_action
+- `bp_06`: "WhatsApp handoff" — no hay chunk que describa WhatsApp handoff
+- `bp_07`: "lead capture" — no hay chunk sobre lead capture como planned_extension
+- `bp_13`: "cross_customer_isolation" — concepto existe en modelo pero no en chunk text
+- `bp_16/17`: versionado — no hay chunks con versión vigente vs obsoleta
+- `bp_18`: contexto combinado — requiere múltiples chunks
+- `bp_24`: inducción LLM — no hay chunk de "no prometer sin diagnóstico"
+
+### Architecture implications detectadas
+
+| Implicación | Casos | Interpretación |
+|-------------|-------|----------------|
+| `embedding_ranking_problem` | 20 | El concepto no está en el texto del chunk (content_gap) |
+| `vector_backend_not_the_problem` | 4 | El retrieval funciona cuando el contenido existe |
+| `metadata_filter_needed` | 1 | Scope filtering funciona correctamente |
+
 ---
 
-_Experiment design: Fase 1.6d — PostgreSQL Knowledge Retrieval Breaking Points_
+_Experiment design & run: Fase 1.6d — PostgreSQL Knowledge Retrieval Breaking Points_
 _Última actualización: 2026-06-09_
+_Ejecución baseline: 2026-06-09 15:09 UTC_

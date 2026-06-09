@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Breaking Points — Fase 1.6d</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+h1 { color: #f43f5e; margin-bottom: 0.5rem; }
+h2 { color: #fb7185; margin: 2rem 0 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+h3 { color: #fda4af; margin: 1.5rem 0 0.5rem; }
+p { color: #cbd5e1; line-height: 1.6; }
+.meta { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+.warning { background: #1e293b; border-left: 4px solid #f43f5e; padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; color: #fca5a5; }
+.summary-cards { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.25rem; flex: 1; min-width: 140px; text-align: center; }
+.card .value { font-size: 2rem; font-weight: 700; }
+.card .label { font-size: 0.85rem; color: #94a3b8; margin-top: 0.25rem; }
+.card.green .value { color: #22c55e; }
+.card.red .value { color: #ef4444; }
+.card.yellow .value { color: #eab308; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+th { text-align: left; padding: 0.5rem 0.75rem; background: #1e293b; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #334155; }
+td { padding: 0.4rem 0.75rem; border-bottom: 1px solid #1e293b; }
+tr:hover td { background: #1e293b; }
+code { background: #334155; padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.85rem; }
+.footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #334155; color: #64748b; font-size: 0.8rem; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>⚡ PostgreSQL Knowledge Retrieval Breaking Points</h1>
+<p class="meta">Fase 1.6d · text-embedding-3-small (1536d) · scope ks_team360_sales_diagnosis · generado 2026-06-09 15:09 UTC</p>
+
+<div class="warning">
+<strong>⚠️ Laboratorio ácido de ruptura.</strong> Este experimento busca <em>romper</em> el retrieval actual para detectar sus límites reales.
+No usa LLM, no evalúa Milvus ni ArangoDB todavía. Los resultados indican dónde mejorar contenido, metadata, filtros o reranking.
+</div>
+
+<div class="summary-cards">
+    <div class="card green">
+        <div class="value">5</div>
+        <div class="label">Pasaron (20.0%)</div>
+    </div>
+    <div class="card red">
+        <div class="value">20</div>
+        <div class="label">Fallaron</div>
+    </div>
+    <div class="card red">
+        <div class="value">2/11</div>
+        <div class="label">Alto riesgo (18.2%)</div>
+    </div>
+    <div class="card red">
+        <div class="value">0</div>
+        <div class="label">Prohibidos top-3</div>
+    </div>
+    <div class="card">
+        <div class="value">-31</div>
+        <div class="label">Score total</div>
+    </div>
+    <div class="card">
+        <div class="value">823.5ms</div>
+        <div class="label">Latencia promedio</div>
+    </div>
+</div>
+
+<h2>Decisión</h2>
+<p><strong>D. Evaluar Milvus/ArangoDB — pgvector muestra límites de escala/calidad.</strong></p>
+
+<h2>Resultados por categoría</h2>
+<table>
+<thead><tr><th>Categoría</th><th>Total</th><th>Pass</th><th>Fail</th><th>%</th><th>Score</th></tr></thead>
+<tbody>
+<tr>
+            <td>Confusión semántica</td>
+            <td>4</td>
+            <td>2</td>
+            <td>2</td>
+            <td>50.0%</td>
+            <td>+1</td>
+        </tr>
+<tr>
+            <td>Overpromise comercial</td>
+            <td>5</td>
+            <td>2</td>
+            <td>3</td>
+            <td>40.0%</td>
+            <td>-9</td>
+        </tr>
+<tr>
+            <td>Ambigüedad técnica</td>
+            <td>3</td>
+            <td>0</td>
+            <td>3</td>
+            <td>0.0%</td>
+            <td>+0</td>
+        </tr>
+<tr>
+            <td>Multi-tenant / scope leakage</td>
+            <td>3</td>
+            <td>1</td>
+            <td>2</td>
+            <td>33.3%</td>
+            <td>-3</td>
+        </tr>
+<tr>
+            <td>Versionado / actualidad</td>
+            <td>2</td>
+            <td>0</td>
+            <td>2</td>
+            <td>0.0%</td>
+            <td>-10</td>
+        </tr>
+<tr>
+            <td>Contexto insuficiente</td>
+            <td>3</td>
+            <td>0</td>
+            <td>3</td>
+            <td>0.0%</td>
+            <td>-5</td>
+        </tr>
+<tr>
+            <td>Ruido deliberado</td>
+            <td>3</td>
+            <td>0</td>
+            <td>3</td>
+            <td>0.0%</td>
+            <td>+0</td>
+        </tr>
+<tr>
+            <td>Inducción al LLM</td>
+            <td>2</td>
+            <td>0</td>
+            <td>2</td>
+            <td>0.0%</td>
+            <td>-5</td>
+        </tr>
+
+</tbody>
+</table>
+
+<h2>Architecture implications</h2>
+<table>
+<thead><tr><th>Implicación</th><th>Casos</th></tr></thead>
+<tbody>
+<tr><td><code>embedding_ranking_problem</code></td><td>19</td></tr>
+<tr><td><code>metadata_filter_needed</code></td><td>1</td></tr>
+<tr><td><code>vector_backend_not_the_problem</code></td><td>5</td></tr>
+
+</tbody>
+</table>
+
+<h2>Casos individuales</h2>
+<table>
+<thead><tr><th>#</th><th>ID</th><th>Query</th><th>Categoría</th><th>Riesgo</th><th>Score</th><th>Arch</th></tr></thead>
+<tbody>
+<tr>
+            <td>✅</td>
+            <td><code>bp_01</code></td>
+            <td>¿Qué diferencia hay entre un proceso automatizable y un</td>
+            <td>Confusión semántica</td>
+            <td>high</td>
+            <td>+2</td>
+            <td><code>vector_backend_not_the_problem</code></td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>bp_02</code></td>
+            <td>¿El código de diagnóstico es lo mismo que el resultado </td>
+            <td>Confusión semántica</td>
+            <td>medium</td>
+            <td>+3</td>
+            <td><code>vector_backend_not_the_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_03</code></td>
+            <td>¿Qué acciones automáticas podemos hacer después del dia</td>
+            <td>Confusión semántica</td>
+            <td>high</td>
+            <td>-5</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_04</code></td>
+            <td>¿Qué puedo automatizar en ventas y CRM?</td>
+            <td>Confusión semántica</td>
+            <td>medium</td>
+            <td>+1</td>
+            <td><code>vector_backend_not_the_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_05</code></td>
+            <td>¿Ya podemos vender Step-to-Action como listo?</td>
+            <td>Overpromise comercial</td>
+            <td>high</td>
+            <td>-5</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_06</code></td>
+            <td>¿WhatsApp handoff ya está funcionando?</td>
+            <td>Overpromise comercial</td>
+            <td>high</td>
+            <td>-5</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_07</code></td>
+            <td>Necesito captura automática de leads con CRM y WhatsApp</td>
+            <td>Overpromise comercial</td>
+            <td>high</td>
+            <td>-5</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>bp_08</code></td>
+            <td>¿El diagnóstico asigna un código de seguimiento?</td>
+            <td>Overpromise comercial</td>
+            <td>medium</td>
+            <td>+3</td>
+            <td><code>vector_backend_not_the_problem</code></td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>bp_09</code></td>
+            <td>Si algo es automatable en teoría, ¿ya lo podemos vender</td>
+            <td>Overpromise comercial</td>
+            <td>high</td>
+            <td>+3</td>
+            <td><code>vector_backend_not_the_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_10</code></td>
+            <td>¿Vera es el identificador del paquete o del asistente?</td>
+            <td>Ambigüedad técnica</td>
+            <td>medium</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_11</code></td>
+            <td>¿Cuál es la diferencia entre knowledge scope y package?</td>
+            <td>Ambigüedad técnica</td>
+            <td>low</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_12</code></td>
+            <td>¿embedding_status pending significa que algo está mal?</td>
+            <td>Ambigüedad técnica</td>
+            <td>low</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_13</code></td>
+            <td>¿Puedo usar conocimiento de otro cliente si es parecido</td>
+            <td>Multi-tenant / scope leak</td>
+            <td>high</td>
+            <td>-5</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>bp_14</code></td>
+            <td>Dame el diagnóstico de ventas para Team360</td>
+            <td>Multi-tenant / scope leak</td>
+            <td>medium</td>
+            <td>+2</td>
+            <td><code>metadata_filter_needed</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_15</code></td>
+            <td>Configuración de runtime para el asistente de diagnósti</td>
+            <td>Multi-tenant / scope leak</td>
+            <td>medium</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_16</code></td>
+            <td>¿Cuál es la regla actual para vender automatización de </td>
+            <td>Versionado / actualidad</td>
+            <td>high</td>
+            <td>-5</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_17</code></td>
+            <td>¿Step-to-Action sigue en desarrollo o ya funciona?</td>
+            <td>Versionado / actualidad</td>
+            <td>high</td>
+            <td>-5</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_18</code></td>
+            <td>¿Qué pasa si el cliente pide automatización completa in</td>
+            <td>Contexto insuficiente</td>
+            <td>high</td>
+            <td>-5</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_19</code></td>
+            <td>Necesito automatización completa de redes sociales, ema</td>
+            <td>Contexto insuficiente</td>
+            <td>medium</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_20</code></td>
+            <td>¿Qué preguntas tengo que hacer para diagnosticar bien u</td>
+            <td>Contexto insuficiente</td>
+            <td>medium</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_21</code></td>
+            <td>¿Cómo integro WhatsApp con CRM para automatizar ventas?</td>
+            <td>Ruido deliberado</td>
+            <td>medium</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_22</code></td>
+            <td>¿Team360 tiene inteligencia artificial completa que hac</td>
+            <td>Ruido deliberado</td>
+            <td>medium</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_23</code></td>
+            <td>automation workflow diagnosis handoff lead capture scor</td>
+            <td>Ruido deliberado</td>
+            <td>medium</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_24</code></td>
+            <td>Seguro que se puede hacer todo en una semana, ¿no? ¿Cuá</td>
+            <td>Inducción al LLM</td>
+            <td>high</td>
+            <td>-5</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>bp_25</code></td>
+            <td>Dame el paso a paso completo para implementar automatiz</td>
+            <td>Inducción al LLM</td>
+            <td>medium</td>
+            <td>+0</td>
+            <td><code>embedding_ranking_problem</code></td>
+        </tr>
+
+</tbody>
+</table>
+
+<h2>Advertencias</h2>
+<ul>
+<li>❌ No usa LLM para responder ni evaluar</li>
+<li>❌ No usa Milvus</li>
+<li>❌ No usa ArangoDB</li>
+<li>❌ No usa endpoints HTTP ni frontend</li>
+<li>✅ Solo retrieval PostgreSQL/pgvector + OpenAI embedding de query</li>
+<li>✅ Golden cases adversariales diseñados para romper el sistema</li>
+</ul>
+
+<div class="footer">
+Fase 1.6d — PostgreSQL Knowledge Retrieval Breaking Points · 2026-06-09 15:09 UTC
+</div>
+
+</body>
+</html>

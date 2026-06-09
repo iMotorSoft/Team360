@@ -1,0 +1,284 @@
+{
+  "summary": {
+    "experiment": "PostgreSQL Knowledge Retrieval Breaking Points — Fase 1.6d",
+    "embedding_model": "text-embedding-3-small",
+    "embedding_version": "team360-openai-small-1536-v1",
+    "dimensions": 1536,
+    "knowledge_scope": "ks_team360_sales_diagnosis",
+    "limit": 5,
+    "total_queries": 3,
+    "passed": 2,
+    "failed": 1,
+    "high_risk_total": 2,
+    "high_risk_passed": 1,
+    "forbidden_concepts_total": 0,
+    "queries_with_issues": 1,
+    "total_score": 0,
+    "max_possible_score": 9,
+    "min_possible_score": -9,
+    "avg_latency_ms": 2421.9,
+    "decision": "B. PostgreSQL alcanza con mejoras de metadata filters / contenido / reranking.",
+    "categories": {
+      "A. Confusión semántica": {
+        "total": 3,
+        "passed": 2,
+        "failed": 1,
+        "score": 0
+      }
+    },
+    "architecture_implications": {
+      "embedding_ranking_problem": 1,
+      "vector_backend_not_the_problem": 2
+    },
+    "critical_cases": [
+      {
+        "case_id": "bp_03",
+        "category": "A. Confusión semántica",
+        "query": "¿Qué acciones automáticas podemos hacer después del diagnóstico?",
+        "risk_level": "high",
+        "pass_criteria": "top3_contains_expected",
+        "total_results": 5,
+        "expected_found_top1": false,
+        "expected_found_top3": false,
+        "expected_found_top5": false,
+        "forbidden_in_top3": [],
+        "missing_expected": [
+          "step_to_action",
+          "planned_extension"
+        ],
+        "passed": false,
+        "score": -5,
+        "likely_failure_modes": [
+          "overpromise_risk",
+          "embedding_ranking_problem"
+        ],
+        "recommended_fix_if_fails": "Agregar chunk con restricción explícita: 'Step-to-Action no está listo para producción'",
+        "architecture_implication": "embedding_ranking_problem",
+        "notes": "expected concepts not found in top-5",
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "6b3d1f54-c2fb-453a-83a9-12338a4f4112",
+            "title": "Reglas de conversación",
+            "score": 0.52626,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 2,
+            "chunk_id": "99e3c3e3-8b6e-40ca-843c-a5be2f2a58fc",
+            "title": "Diagnóstico amplio de automatización",
+            "score": 0.520714,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 3,
+            "chunk_id": "28c3e497-674b-426b-83cc-2c2c1da819fd",
+            "title": "Recommended Next Steps",
+            "score": 0.50838,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 4,
+            "chunk_id": "e9f2eca1-d99a-4380-bfb4-d593d75bc35f",
+            "title": "Flujo conceptual de Vera",
+            "score": 0.4935,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          },
+          {
+            "rank": 5,
+            "chunk_id": "22c70939-7679-437c-b12d-c94857d0b71e",
+            "title": "Manual del paquete de diagnóstico de automatización",
+            "score": 0.493416,
+            "node_path": "/automatizaciones/diagnostico-automatizacion"
+          }
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "bp_01",
+      "category": "A. Confusión semántica",
+      "query": "¿Qué diferencia hay entre un proceso automatizable y uno que ya vendemos?",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": [],
+      "missing_expected": [
+        "sellable_today",
+        "commercial_limits"
+      ],
+      "passed": true,
+      "score": 2,
+      "likely_failure_modes": [],
+      "recommended_fix_if_fails": "Agregar chunk específico que contraste ambos conceptos explícitamente con tabla comparativa",
+      "architecture_implication": "vector_backend_not_the_problem",
+      "notes": "",
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "b5d2e54a-bf56-4dcd-bbf2-7467df8ae097",
+          "title": "Offer Decision",
+          "score": 0.603947,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "62cba66d-a7fa-444a-a553-81a68fa286d7",
+          "title": "Límite comercial",
+          "score": 0.600467,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "e32144bd-3be1-451d-8fa7-f2a5a689eadf",
+          "title": "Impacto",
+          "score": 0.486415,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "f1bfde33-0797-49c2-9f78-3e6460c98f50",
+          "title": "Procesos de integración",
+          "score": 0.470022,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "99e3c3e3-8b6e-40ca-843c-a5be2f2a58fc",
+          "title": "Diagnóstico amplio de automatización",
+          "score": 0.458732,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "case_id": "bp_02",
+      "category": "A. Confusión semántica",
+      "query": "¿El código de diagnóstico es lo mismo que el resultado del diagnóstico?",
+      "risk_level": "medium",
+      "pass_criteria": "top3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": true,
+      "expected_found_top3": true,
+      "expected_found_top5": true,
+      "forbidden_in_top3": [],
+      "missing_expected": [
+        "diagnosis_result"
+      ],
+      "passed": true,
+      "score": 3,
+      "likely_failure_modes": [],
+      "recommended_fix_if_fails": "Mejorar naming en chunks para diferenciar conceptos similares",
+      "architecture_implication": "vector_backend_not_the_problem",
+      "notes": "",
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "0d61b419-9010-4c38-afab-4856aacf8284",
+          "title": "Diagnostic Code y WhatsApp Handoff futuro",
+          "score": 0.511669,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "4050f833-5056-446b-a7bc-dfdb1acfca34",
+          "title": "Propósito del paquete",
+          "score": 0.476946,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "b5cff940-e57e-4a0e-996e-ee06c31be05a",
+          "title": "Criterios de diagnóstico",
+          "score": 0.467159,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "e9f2eca1-d99a-4380-bfb4-d593d75bc35f",
+          "title": "Flujo conceptual de Vera",
+          "score": 0.450915,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "186826e0-ecad-4b7b-aa77-de485873eaf6",
+          "title": "Suggested Assistant Message futuro",
+          "score": 0.443861,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    },
+    {
+      "case_id": "bp_03",
+      "category": "A. Confusión semántica",
+      "query": "¿Qué acciones automáticas podemos hacer después del diagnóstico?",
+      "risk_level": "high",
+      "pass_criteria": "top3_contains_expected",
+      "total_results": 5,
+      "expected_found_top1": false,
+      "expected_found_top3": false,
+      "expected_found_top5": false,
+      "forbidden_in_top3": [],
+      "missing_expected": [
+        "step_to_action",
+        "planned_extension"
+      ],
+      "passed": false,
+      "score": -5,
+      "likely_failure_modes": [
+        "overpromise_risk",
+        "embedding_ranking_problem"
+      ],
+      "recommended_fix_if_fails": "Agregar chunk con restricción explícita: 'Step-to-Action no está listo para producción'",
+      "architecture_implication": "embedding_ranking_problem",
+      "notes": "expected concepts not found in top-5",
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "6b3d1f54-c2fb-453a-83a9-12338a4f4112",
+          "title": "Reglas de conversación",
+          "score": 0.52626,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "99e3c3e3-8b6e-40ca-843c-a5be2f2a58fc",
+          "title": "Diagnóstico amplio de automatización",
+          "score": 0.520714,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "28c3e497-674b-426b-83cc-2c2c1da819fd",
+          "title": "Recommended Next Steps",
+          "score": 0.50838,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "e9f2eca1-d99a-4380-bfb4-d593d75bc35f",
+          "title": "Flujo conceptual de Vera",
+          "score": 0.4935,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "22c70939-7679-437c-b12d-c94857d0b71e",
+          "title": "Manual del paquete de diagnóstico de automatización",
+          "score": 0.493416,
+          "node_path": "/automatizaciones/diagnostico-automatizacion"
+        }
+      ]
+    }
+  ],
+  "latencies_ms": [
+    1584.8,
+    643.0,
+    5038.0
+  ]
+}
