@@ -2,7 +2,7 @@
 
 **Experimento:** Team360 RAG Failure Audit — Fase 1.6e
 **Total de casos:** 36
-**Generado:** 2026-06-09 15:36 UTC
+**Generado:** 2026-06-09 16:07 UTC
 
 ---
 
@@ -223,4 +223,4 @@ sino calidad y cobertura del contenido, metadata, filtros y reranking.
 ---
 
 _Generado por RAG Failure Audit — Fase 1.6e. Sin LLM, sin DB, sin retrieval._
-_2026-06-09 15:36 UTC_
+_2026-06-09 16:07 UTC_
