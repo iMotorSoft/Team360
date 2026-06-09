@@ -2,8 +2,9 @@
   "meta": {
     "description": "Golden dataset for embedding model comparison on Team360 domain",
     "created": "2026-06-09",
-    "total_chunks": 18,
-    "total_queries": 10,
+    "updated": "2026-06-09",
+    "total_chunks": 28,
+    "total_queries": 18,
     "topics": [
       "automatizacion comercial",
       "diagnostico de ventas",
@@ -12,7 +13,11 @@
       "automatizable vs vendible",
       "slots minimos",
       "espanol e ingles tecnico",
-      "Team360.live / pkg_sales_diagnosis / Vera"
+      "Team360.live / pkg_sales_diagnosis / Vera",
+      "multilingual hebrew eval",
+      "conceptos hebreo-espanol",
+      "ingles tecnico mixto",
+      "comparacion conceptual"
     ]
   },
   "chunks": [
@@ -141,6 +146,82 @@
       "title": "Separacion de marca tecnica y comercial",
       "content": "Team360 mantiene separacion entre la marca tecnica (Team360) usada en APIs, documentacion de desarrollo y configuracion, y la marca comercial (Vera) usada en comunicacion con clientes no tecnicos. pkg_sales_diagnosis es el nombre interno del modulo; Vera Diagnostics es su equivalente comercial.",
       "language": "es"
+    },
+    {
+      "id": "chunk_019",
+      "topic": "multilingual hebrew eval",
+      "subtopic": "conceptos hebreo-espanol",
+      "title": "Shabat / שבת — concepto de descanso semanal",
+      "content": "Shabat (שבת) es el septimo dia de la semana judia, dedicado al descanso y la espiritualidad. Comienza al atardecer del viernes y termina al anochecer del sabado. En espanol se traduce como sabado, aunque el concepto abarca descanso, familia y desconexion de actividades laborales. No debe confundirse con domingo ni con un simple fin de semana.",
+      "language": "es"
+    },
+    {
+      "id": "chunk_020",
+      "topic": "multilingual hebrew eval",
+      "subtopic": "conceptos hebreo-espanol",
+      "title": "Tefilá / תפילה — concepto de oracion",
+      "content": "Tefilá (תפילה) es la oracion en la tradicion judia. Se diferencia de la oracion cristiana en su estructura formal, horarios fijos y texto comunitario. En espanol coloquial se traduce como oracion o rezo, pero el concepto incluye alabanza, peticion y agradecimiento en un orden liturgico establecido.",
+      "language": "es"
+    },
+    {
+      "id": "chunk_021",
+      "topic": "multilingual hebrew eval",
+      "subtopic": "conceptos hebreo-espanol",
+      "title": "Teshuvá / תשובה — retorno espiritual",
+      "content": "Teshuvá (תשובה) significa literalmente retorno o respuesta. En el contexto judio se refiere al arrepentimiento y la vuelta a un camino etico. En espanol se traduce como arrepentimiento, aunque el concepto hebreo implica restauracion activa de relaciones, no solo culpa. No debe reducirse a un sentimiento de remordimiento.",
+      "language": "es"
+    },
+    {
+      "id": "chunk_022",
+      "topic": "multilingual hebrew eval",
+      "subtopic": "conceptos hebreo-espanol",
+      "title": "Kashrut / כשרות — normas alimentarias",
+      "content": "Kashrut (כשרות) es el conjunto de normas alimentarias judias. Lo que cumple estas normas se denomina kasher o kosher. En espanol se traduce como normas alimentarias judias o simplemente como comida permitida. Incluye restricciones de mezcla de carnes y lacteos, tipos de animales permitidos y metodos de faenamiento.",
+      "language": "es"
+    },
+    {
+      "id": "chunk_023",
+      "topic": "multilingual hebrew eval",
+      "subtopic": "conceptos hebreo-espanol",
+      "title": "Halajá / הלכה — ley judia",
+      "content": "Halajá (הלכה) es el cuerpo legal de la tradicion judia que regula la vida religiosa, familiar y civil. Deriva de la Torah, el Talmud y la tradicion rabinica. En espanol se traduce como ley judia o legislacion rabinica. Es un sistema jurisprudencial en evolucion, no un codigo fijo.",
+      "language": "es"
+    },
+    {
+      "id": "chunk_024",
+      "topic": "multilingual hebrew eval",
+      "subtopic": "conceptos hebreo-espanol",
+      "title": "Shabat transliterado vs sabado",
+      "content": "Shabat transliterado del hebreo שבת es el termino culturalmente especifico, mientras que sabado es su traduccion aproximada al espanol. Ambos terminos deben recuperar el chunk sobre Shabat aunque uno use transliteracion y otro traduccion. Esto prueba la capacidad del modelo de vincular variantes linguisticas del mismo concepto.",
+      "language": "es"
+    },
+    {
+      "id": "chunk_025",
+      "topic": "ingles tecnico mixto",
+      "title": "Workflow automation y lead scoring en Team360",
+      "content": "Team360 implements workflow automation for commercial conversations. The lead scoring module evaluates conversion rate, response time, and intent resolution to prioritize sales opportunities. RAG retrieval over knowledge packages enriches the LLM context with domain-specific rules. Semantic chunking splits documents into meaningful segments before embedding.",
+      "language": "en"
+    },
+    {
+      "id": "chunk_026",
+      "topic": "ingles tecnico mixto",
+      "title": "Embedding provider y RAG retrieval pipeline",
+      "content": "The embedding provider converts text chunks into vector representations for semantic search. In the RAG retrieval pipeline, a user query is embedded with the same model, then cosine similarity finds the most relevant chunks. The current production provider is OpenAI text-embedding-3-small with 1536 dimensions stored in pgvector.",
+      "language": "en"
+    },
+    {
+      "id": "chunk_027",
+      "topic": "comparacion conceptual",
+      "title": "Vera es marca comercial visible, no identificador tecnico",
+      "content": "Vera es la marca no tecnica orientada al cliente final. No es un package_code ni un identificador interno. El package_code tecnico correspondiente es pkg_sales_diagnosis. En documentacion tecnica, configuracion y APIs se usa Team360 o pkg_sales_diagnosis. Vera solo aparece en comunicacion comercial con el cliente.",
+      "language": "es"
+    },
+    {
+      "id": "chunk_028",
+      "topic": "comparacion conceptual",
+      "title": "Step-to-Action es planned extension no capacidad actual",
+      "content": "Step-to-Action es una extension planificada de Team360, no una capacidad productiva actual. Permite automatizar secuencias de acciones comerciales en lugar de solo respuestas conversacionales. Aun no esta disponible para venta ni implementacion en clientes. No debe considerarse parte del pipeline activo de Knowledge Ingestion.",
+      "language": "es"
     }
   ],
   "queries": [
@@ -213,6 +294,70 @@
       "expected_relevant_chunk_ids": ["chunk_008"],
       "acceptable_chunk_ids": ["chunk_006", "chunk_001"],
       "notes": "Consulta especifica sobre integracion ML"
+    },
+    {
+      "id": "q_011",
+      "query": "Que relacion hay entre teshuvá y retorno espiritual",
+      "expected_relevant_chunk_ids": ["chunk_021"],
+      "acceptable_chunk_ids": [],
+      "tags": ["hebreo", "transliteracion", "espanol"],
+      "notes": "Concepto hebreo Teshuvá / תשובה — debe recuperar chunk_021 aunque busque en espanol"
+    },
+    {
+      "id": "q_012",
+      "query": "Explícame qué es kashrut en español",
+      "expected_relevant_chunk_ids": ["chunk_022"],
+      "acceptable_chunk_ids": [],
+      "tags": ["hebreo", "transliteracion", "espanol"],
+      "notes": "Concepto Kashrut / כשרות — transliteracion hebrea que debe mapear al chunk en espanol"
+    },
+    {
+      "id": "q_013",
+      "query": "מה המשמעות של שבת",
+      "expected_relevant_chunk_ids": ["chunk_019"],
+      "acceptable_chunk_ids": ["chunk_024"],
+      "tags": ["hebreo", "escritura hebrea"],
+      "notes": "Query en hebreo: '¿Cual es el significado de Shabat?' — debe recuperar chunk sobre Shabat"
+    },
+    {
+      "id": "q_014",
+      "query": "Tefilá es lo mismo que oracion",
+      "expected_relevant_chunk_ids": ["chunk_020"],
+      "acceptable_chunk_ids": [],
+      "tags": ["hebreo", "transliteracion", "comparacion"],
+      "notes": "Compara transliteracion Tefilá con traduccion oracion — debe recuperar chunk_020"
+    },
+    {
+      "id": "q_015",
+      "query": "Cómo se diferencia un workflow automation de un diagnóstico comercial",
+      "expected_relevant_chunk_ids": ["chunk_025", "chunk_003"],
+      "acceptable_chunk_ids": ["chunk_001"],
+      "tags": ["ingles tecnico", "espanol", "comparacion"],
+      "notes": "Mezcla ingles tecnico y espanol comercial — workflow automation vs diagnostico"
+    },
+    {
+      "id": "q_016",
+      "query": "Step-to-Action ya esta listo para vender",
+      "expected_relevant_chunk_ids": ["chunk_028"],
+      "acceptable_chunk_ids": [],
+      "tags": ["conceptual", "planned_extension"],
+      "notes": "Debe distinguir que Step-to-Action es planned_extension, no capacidad actual"
+    },
+    {
+      "id": "q_017",
+      "query": "Vera es un package_code tecnico",
+      "expected_relevant_chunk_ids": ["chunk_027", "chunk_017"],
+      "acceptable_chunk_ids": ["chunk_018"],
+      "tags": ["conceptual", "Vera", "marca"],
+      "notes": "Debe aclarar que Vera es marca comercial, no identificador tecnico"
+    },
+    {
+      "id": "q_018",
+      "query": "lead scoring con CRM y WhatsApp automation",
+      "expected_relevant_chunk_ids": ["chunk_025", "chunk_005"],
+      "acceptable_chunk_ids": ["chunk_009", "chunk_010"],
+      "tags": ["ingles tecnico", "comercial", "multicanal"],
+      "notes": "Mezcla ingles tecnico lead scoring con canales comerciales"
     }
   ],
   "evaluation_notes": [
@@ -220,6 +365,10 @@
     "acceptable_chunk_ids son chunks alternativos validos si el contexto es similar semanticamente",
     "Una query se considera acertada si al menos un expected aparece en top-3",
     "Para top-5 se evaluan expected + acceptable combinados",
-    "Queries en espanol coloquial (q_005) prueban robustez multilingue"
+    "Queries en espanol coloquial (q_005) prueban robustez multilingue",
+    "Queries q_011 a q_018 son evaluacion multilingue hebreo (escritura hebrea, transliteracion, espanol, ingles tecnico, conceptual)",
+    "Hebreo en escritura original (q_013) prueba capacidad de multilingual retrieval sin traduccion intermedia",
+    "Transliteracion (q_011, q_012, q_014) prueba vinculacion entre transliteracion y contenido en espanol",
+    "Conceptual (q_016, q_017) prueba que el modelo distingue matices: planned vs actual, marca vs tecnico"
   ]
 }
