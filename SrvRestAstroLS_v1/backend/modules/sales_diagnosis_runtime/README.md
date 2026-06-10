@@ -768,3 +768,25 @@ En `TestDevSalesDiagnosisRouteLiteLLM`:
 11. ~~1.8l -- Provider mode boundary.~~ **(Completado)**
 12. ~~1.8m -- Milvus retrieval opt-in boundary.~~ **(Completado)**
 13. ~~1.8n -- LiteLLM LLM provider opt-in boundary.~~ **(Completado)**
+14. ~~1.8o -- LiteLLM HTTP smoke opt-in for dev endpoint.~~ **(Completado)**
+
+## Fase 1.8o — LiteLLM HTTP smoke opt-in for dev endpoint
+
+### Smoke script separado
+
+`scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py`:
+
+- Smoke HTTP opt-in que requiere backend corriendo con `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm`.
+- Si el provider env no es `litellm`, hace skip con mensaje claro (exit 0).
+- Si faltan `TEAM360_LITELLM_BASE_URL` o `TEAM360_LITELLM_API_KEY`, el backend devuelve HTTP 500 y el smoke valida el mensaje de error controlado (sin leaks de secrets).
+- Si LiteLLM esta configurado, valida:
+  1. Status 201.
+  2. Response contract estable (9 keys esperadas).
+  3. session_id preservado.
+  4. runtime_mode = `dev_fake`.
+  5. retrieved_sources son chunks fake (prefijo `dev_doc_`), no Milvus real.
+  6. Guardrail unsafe (dev_test_unsafe_llm) funciona: response_type `unsafe_blocked`.
+  7. No stack traces en errores 400.
+  8. No leaks de DB por defecto.
+- Sin cambios en el script base, sin tocar frontend, sin Milvus real, sin DB real.
+- Sin dependencias extra (urllib stdlib).

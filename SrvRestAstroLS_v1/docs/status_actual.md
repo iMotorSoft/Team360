@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8n — LiteLLM LLM provider opt-in boundary)
+Ultima actualizacion: 2026-06-10 (Fase 1.8o — LiteLLM HTTP smoke opt-in for dev endpoint)
 
 ## Directorio de trabajo
 
@@ -65,6 +65,34 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
   - `test_milvus_retrieval_does_not_force_real_llm` — Milvus retrieval + fake LLM coexisten.
 - Validacion: `uv run pytest` = 335 passed, 9 skipped (+4 nuevos).
 - No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real por default, Milvus real por default, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8o — LiteLLM HTTP smoke opt-in for dev endpoint
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py`:
+  - Smoke HTTP opt-in independiente del smoke base (evita ensuciar el existente).
+  - Si `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER` no es `litellm`, hace skip (exit 0, no es fallo).
+  - Si faltan `TEAM360_LITELLM_BASE_URL` o `TEAM360_LITELLM_API_KEY`, el backend devuelve HTTP 500 controlado; el smoke valida mensaje de error sin leaks de secrets.
+  - Si LiteLLM esta configurado, valida:
+    1. Status 201.
+    2. Response contract estable (9 keys esperadas).
+    3. session_id preservado.
+    4. runtime_mode = `dev_fake`.
+    5. retrieved_sources son chunks fake (prefijo `dev_doc_*`), no Milvus real.
+    6. Guardrail unsafe (`dev_test_unsafe_llm`) funciona: response_type `unsafe_blocked`.
+    7. No stack traces en errores 400.
+    8. No leaks de DB por defecto.
+  - Sin dependencias extra (urllib stdlib). No imprime API keys ni headers sensibles.
+- Se actualizaron:
+  - `scripts/README.md`: nueva entrada con descripcion y ejemplo de uso.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.8o agregada.
+  - `status_actual.md`: este registro.
+- Validacion: `uv run pytest` = 335 passed, 9 skipped (sin regresiones).
+- Validacion: `uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py` = 36 passed.
+- Validacion: smoke default InMemory = OK.
+- Validacion: smoke Postgres opt-in = OK.
+- Validacion: smoke LiteLLM opt-in (sin env LiteLLM) = SKIP con mensaje claro.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real por default, Milvus real por default, ArangoDB, cross-encoder, routes, schemas, tests existentes, smoke base.
 - Sin creacion de rama nueva.
 
 ### 2026-06-10 - Team360 DB URL visible en globalVar

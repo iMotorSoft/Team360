@@ -68,3 +68,15 @@ Si PostgreSQL falla durante el snapshot, el backend debe responder HTTP 503 y el
   # terminal 2: smoke postgres con cleanup
   uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
   ```
+
+- `smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py`: smoke HTTP opt-in del endpoint interno/dev con proveedor LLM LiteLLM. Requiere backend corriendo con `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm`. Si faltan `TEAM360_LITELLM_BASE_URL` o `TEAM360_LITELLM_API_KEY`, el backend devuelve HTTP 500 controlado y el smoke lo valida como skip. Si estan configuradas, valida response contract, session_id, runtime_mode, retrieved_sources fake, guardrail unsafe y no stack traces. No requiere DB, no requiere Milvus.
+
+  ```bash
+  cd backend
+  # terminal 1: backend con LiteLLM
+  TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
+    uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  # terminal 2: smoke LiteLLM opt-in
+  TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
+    uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+  ```
