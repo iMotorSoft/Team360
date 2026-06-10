@@ -17,6 +17,17 @@ from modules.sales_diagnosis_runtime.contracts import (
 # ---------------------------------------------------------------------------
 
 
+class QueryEmbeddingProvider(Protocol):
+    """Produces a query embedding vector from user text.
+
+    This is a separate concern from retrieval to allow embedding and
+    vector search to evolve independently.
+    """
+
+    def embed_query(self, text: str) -> list[float]:
+        ...
+
+
 class RetrievalProvider(Protocol):
     def retrieve(
         self,

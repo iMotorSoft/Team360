@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8a — Sales Diagnosis Assistant Runtime Skeleton)
+Ultima actualizacion: 2026-06-10 (Fase 1.8b — MilvusRetrievalProvider runtime backend-only)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,27 @@ Ultima actualizacion: 2026-06-10 (Fase 1.8a — Sales Diagnosis Assistant Runtim
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.8b — MilvusRetrievalProvider runtime backend-only
+
+- Se creo `backend/modules/sales_diagnosis_runtime/milvus_provider.py` con:
+  - `MilvusRuntimeConfig`: dataclass configurable por constructor o env vars (TEAM360_MILVUS_URI, TEAM360_MILVUS_HOST, TEAM360_MILVUS_PORT, TEAM360_MILVUS_TOKEN, TEAM360_MILVUS_COLLECTION, TEAM360_EMBEDDING_VERSION, TEAM360_KNOWLEDGE_SCOPE_ID). `__repr__` oculta token.
+  - `MilvusRetrievalProvider`: implementa `RetrievalProvider`, import lazy de pymilvus, conexion lazy al llamar retrieve, filtros por knowledge_scope_code y embedding_version, mapeo seguro a RetrievedChunk con fallbacks para campos faltantes.
+- Se agrego `QueryEmbeddingProvider` protocol en `providers.py` para separar embedding de retrieval.
+- Se agregaron errores `MilvusConfigurationError` y `MilvusSearchError` en `errors.py`.
+- Se actualizo `__init__.py` con exports de MilvusRetrievalProvider, MilvusRuntimeConfig, MilvusConfigurationError, MilvusSearchError, QueryEmbeddingProvider.
+- Se crearon 20 tests en `tests/test_sales_diagnosis_milvus_provider.py` con fakes (FakeEmbeddingProvider, FakeMilvusCollection, FakeHit) que cubren:
+  - QueryEmbeddingProvider protocol con fake embedding.
+  - MilvusRetrievalProvider: requiere embedding provider, mapeo de resultados, multiples resultados, filtros, configuracion, campos faltantes, resultado vacio, multiples result sets.
+  - MilvusRuntimeConfig: defaults, from_env, repr oculta token, int_or_none helper, no secrets en error.
+  - Runtime integration: runtime con MilvusRetrievalProvider real sin LLM, eventos, capacidades futuras.
+  - Configuracion: no secrets en repr ni error messages.
+- pymilvus 3.0.0 disponible en entorno. No se modifico pyproject.toml.
+- Validacion: `uv run pytest tests/test_sales_diagnosis_milvus_provider.py tests/test_sales_diagnosis_runtime_contracts.py` = 57/57 passed.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se toca DB, no se crearon migraciones.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
 
 ### 2026-06-10 - Fase 1.8a — Sales Diagnosis Assistant Runtime Skeleton
 

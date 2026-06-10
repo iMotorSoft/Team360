@@ -1,0 +1,280 @@
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass, field
+from typing import Any
+
+from modules.sales_diagnosis_runtime.contracts import (
+    RetrievedChunk,
+)
+from modules.sales_diagnosis_runtime.errors import (
+    MilvusConfigurationError,
+    MilvusSearchError,
+    RetrievalUnavailableError,
+)
+from modules.sales_diagnosis_runtime.providers import (
+    QueryEmbeddingProvider,
+    RetrievalProvider,
+)
+
+
+# ---------------------------------------------------------------------------
+# Config
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class MilvusRuntimeConfig:
+    uri: str | None = None
+    host: str | None = None
+    port: int | None = None
+    token: str | None = None
+    collection_name: str = "knowledge_chunks"
+    embedding_version: str = ""
+    knowledge_scope_id: str | None = None
+    timeout_seconds: float = 10.0
+    top_n_default: int = 20
+    top_k_default: int = 5
+    vector_field: str = "embedding"
+    output_fields: tuple[str, ...] = (
+        "chunk_id",
+        "document_id",
+        "knowledge_scope_id",
+        "source_uri",
+        "title",
+        "node_path",
+        "content_preview",
+        "content",
+    )
+    metric_type: str = "COSINE"
+
+    @classmethod
+    def from_env(cls) -> MilvusRuntimeConfig:
+        return cls(
+            uri=os.environ.get("TEAM360_MILVUS_URI"),
+            host=os.environ.get("TEAM360_MILVUS_HOST"),
+            port=_int_or_none(os.environ.get("TEAM360_MILVUS_PORT")),
+            token=os.environ.get("TEAM360_MILVUS_TOKEN"),
+            collection_name=os.environ.get(
+                "TEAM360_MILVUS_COLLECTION", "knowledge_chunks"
+            ),
+            embedding_version=os.environ.get(
+                "TEAM360_EMBEDDING_VERSION", ""
+            ),
+            knowledge_scope_id=os.environ.get("TEAM360_KNOWLEDGE_SCOPE_ID"),
+        )
+
+    def __repr__(self) -> str:
+        d = self.__dict__.copy()
+        if d.get("token"):
+            d["token"] = "***"
+        fields = ", ".join(f"{k}={v!r}" for k, v in d.items())
+        return f"MilvusRuntimeConfig({fields})"
+
+
+def _int_or_none(val: str | None) -> int | None:
+    if val is None:
+        return None
+    try:
+        return int(val)
+    except (ValueError, TypeError):
+        return None
+
+
+# ---------------------------------------------------------------------------
+# Provider
+# ---------------------------------------------------------------------------
+
+
+class MilvusRetrievalProvider:
+    """Retrieval provider backed by Milvus 2.6.
+
+    Architecture invariants:
+    - Milvus is a derived vector index, not source of truth.
+    - PostgreSQL 18 remains source of truth.
+    - This provider reads from Milvus only.
+    - Index is reconstructible from PostgreSQL at any time.
+
+    Requires:
+    - A QueryEmbeddingProvider to convert user text to query vectors.
+    - pymilvus >= 3.0.0 (lazy imported, error if missing).
+    """
+
+    def __init__(
+        self,
+        config: MilvusRuntimeConfig | None = None,
+        embedding_provider: QueryEmbeddingProvider | None = None,
+        _client: Any = None,
+    ) -> None:
+        self._config = config or MilvusRuntimeConfig.from_env()
+        self._embedding_provider = embedding_provider
+        self._client = _client  # Injected for tests; None means lazy connect.
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def retrieve(
+        self,
+        input: Any,
+        state: Any,
+        top_k: int | None = None,
+        top_n: int | None = None,
+    ) -> list[RetrievedChunk]:
+        if self._embedding_provider is None:
+            raise RetrievalUnavailableError(
+                "MilvusRetrievalProvider requires a QueryEmbeddingProvider. "
+                "Configure one or use NullRetrievalProvider for development."
+            )
+
+        query_vector = self._embedding_provider.embed_query(
+            getattr(input, "user_message", "") or ""
+        )
+        if not query_vector:
+            return []
+
+        collection = self._connect()
+        search_params = self._build_search_params(collection)
+        filters = self._build_filters(input, state)
+        k = top_k or self._config.top_k_default
+        n = top_n or self._config.top_n_default
+
+        try:
+            results = collection.search(
+                data=[query_vector],
+                anns_field=self._config.vector_field,
+                param=search_params,
+                limit=n,
+                expr=filters,
+                output_fields=list(self._config.output_fields),
+            )
+        except Exception as exc:
+            raise MilvusSearchError(
+                f"Milvus search failed: {exc}"
+            ) from exc
+
+        return self._map_results(results, k)
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _connect(self) -> Any:
+        if self._client is not None:
+            return self._client
+
+        try:
+            from pymilvus import Collection, connections
+        except ImportError:
+            raise MilvusConfigurationError(
+                "pymilvus is not installed. "
+                "Install it with 'uv add pymilvus>=3.0.0'."
+            ) from None
+
+        cfg = self._config
+        if cfg.uri:
+            conn_alias = "team360_runtime"
+            connections.connect(
+                alias=conn_alias,
+                uri=cfg.uri,
+                token=cfg.token or "",
+                timeout=cfg.timeout_seconds,
+            )
+        elif cfg.host:
+            conn_alias = "team360_runtime"
+            connections.connect(
+                alias=conn_alias,
+                host=cfg.host,
+                port=cfg.port or 19530,
+                token=cfg.token or "",
+                timeout=cfg.timeout_seconds,
+            )
+        else:
+            raise MilvusConfigurationError(
+                "Milvus connection not configured. "
+                "Set TEAM360_MILVUS_URI or TEAM360_MILVUS_HOST."
+            )
+
+        collection = Collection(name=cfg.collection_name, using=conn_alias)
+        collection.load()
+        return collection
+
+    def _build_search_params(self, collection: Any) -> dict[str, Any]:
+        idx_type = "IVF_FLAT"
+        try:
+            for idx in collection.indexes:
+                idx_type = idx.params.get("index_type", idx_type) or idx_type
+        except Exception:
+            pass
+        nprobe = min(self._config.top_n_default, 16)
+        return {
+            "metric_type": self._config.metric_type,
+            "params": {"nprobe": nprobe},
+        }
+
+    def _build_filters(self, input: Any, state: Any) -> str:
+        filters: list[str] = []
+
+        scope_code = getattr(input, "knowledge_scope_code", None) or ""
+        if scope_code:
+            filters.append(f'knowledge_scope_code == "{scope_code}"')
+
+        if self._config.embedding_version:
+            filters.append(
+                f'embedding_version == "{self._config.embedding_version}"'
+            )
+
+        return " and ".join(filters) if filters else ""
+
+    def _map_results(
+        self,
+        raw_results: Any,
+        top_k: int,
+    ) -> list[RetrievedChunk]:
+        chunks: list[RetrievedChunk] = []
+        for result_set in raw_results:
+            for i in range(min(len(result_set), top_k)):
+                hit = result_set[i]
+                fields: dict[str, Any] = {}
+                if hasattr(hit, "entity") and hit.entity is not None:
+                    ent = hit.entity
+                    if hasattr(ent, "fields"):
+                        fields = ent.fields
+                if not fields and hasattr(hit, "fields"):
+                    fields = hit.fields
+
+                chunk_id = self._safe_str(fields, "chunk_id", hit.id)
+                document_id = self._safe_str(fields, "document_id", "")
+                knowledge_scope_id = self._safe_str(
+                    fields, "knowledge_scope_id", ""
+                )
+                source_uri = self._safe_str(fields, "source_uri", "")
+                title = self._safe_str(fields, "title")
+                node_path = self._safe_str(fields, "node_path")
+                content_preview = self._safe_str(fields, "content_preview", "")
+                content = self._safe_str(fields, "content", "")
+
+                chunks.append(RetrievedChunk(
+                    chunk_id=str(chunk_id),
+                    document_id=str(document_id),
+                    knowledge_scope_id=str(knowledge_scope_id),
+                    source_uri=str(source_uri),
+                    title=str(title) if title else None,
+                    node_path=str(node_path) if node_path else None,
+                    score=float(hit.score),
+                    content_preview=str(content_preview),
+                    content=str(content),
+                ))
+            break  # Only process first result set (single query vector)
+        return chunks
+
+    @staticmethod
+    def _safe_str(
+        fields: dict[str, Any],
+        key: str,
+        default: str | None = None,
+    ) -> str | None:
+        val = fields.get(key)
+        if val is None:
+            return default
+        return str(val)

@@ -20,3 +20,11 @@ class UnsafeResponseError(SalesDiagnosisRuntimeError):
 
 class InvalidAssistantRuntimeInputError(SalesDiagnosisRuntimeError):
     """Raised when the input fails validation."""
+
+
+class MilvusConfigurationError(SalesDiagnosisRuntimeError):
+    """Raised when Milvus connection configuration is invalid or missing."""
+
+
+class MilvusSearchError(SalesDiagnosisRuntimeError):
+    """Raised when a Milvus search operation fails."""

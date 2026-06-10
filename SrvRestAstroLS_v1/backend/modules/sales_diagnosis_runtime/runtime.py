@@ -8,6 +8,7 @@ from modules.sales_diagnosis_runtime.contracts import (
     AssistantTurnOutput,
     ConversationState,
     ProgressiveEvent,
+    RetrievedChunk,
     RuntimeMetrics,
 )
 from modules.sales_diagnosis_runtime.errors import (
@@ -15,6 +16,7 @@ from modules.sales_diagnosis_runtime.errors import (
     InvalidAssistantRuntimeInputError,
     LLMUnavailableError,
     RetrievalUnavailableError,
+    SalesDiagnosisRuntimeError,
     UnsafeResponseError,
 )
 from modules.sales_diagnosis_runtime.policies import GuardrailPolicy, PromptPolicy
@@ -100,7 +102,15 @@ class AssistantConversationRuntime:
             event_type="team360.status.retrieval_started",
             safe_to_show=True,
         ))
-        chunks = self._retrieval.retrieve(input, state)
+        chunks: list[RetrievedChunk] = []
+        try:
+            chunks = self._retrieval.retrieve(input, state)
+        except SalesDiagnosisRuntimeError as exc:
+            events.append(ProgressiveEvent(
+                event_type="team360.status.retrieval_failed",
+                payload={"error": str(exc)},
+                safe_to_show=True,
+            ))
 
         # Evaluate if we have real providers or only null
         has_real_retrieval = not isinstance(self._retrieval, NullRetrievalProvider)

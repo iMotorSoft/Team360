@@ -11,9 +11,15 @@ from modules.sales_diagnosis_runtime.errors import (
     GuardrailViolationError,
     InvalidAssistantRuntimeInputError,
     LLMUnavailableError,
+    MilvusConfigurationError,
+    MilvusSearchError,
     RetrievalUnavailableError,
     SalesDiagnosisRuntimeError,
     UnsafeResponseError,
+)
+from modules.sales_diagnosis_runtime.milvus_provider import (
+    MilvusRetrievalProvider,
+    MilvusRuntimeConfig,
 )
 from modules.sales_diagnosis_runtime.policies import GuardrailPolicy, PromptPolicy
 from modules.sales_diagnosis_runtime.providers import (
@@ -22,6 +28,7 @@ from modules.sales_diagnosis_runtime.providers import (
     MetricsRecorder,
     NullLLMProvider,
     NullRetrievalProvider,
+    QueryEmbeddingProvider,
     RetrievalProvider,
     StateRepository,
 )
@@ -40,10 +47,15 @@ __all__ = [
     "LLMProvider",
     "LLMUnavailableError",
     "MetricsRecorder",
+    "MilvusConfigurationError",
+    "MilvusRetrievalProvider",
+    "MilvusRuntimeConfig",
+    "MilvusSearchError",
     "NullLLMProvider",
     "NullRetrievalProvider",
     "ProgressiveEvent",
     "PromptPolicy",
+    "QueryEmbeddingProvider",
     "RetrievalProvider",
     "RetrievalUnavailableError",
     "RetrievedChunk",
