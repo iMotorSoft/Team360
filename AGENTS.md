@@ -14,7 +14,11 @@ Convencion operativa de ramas:
 
 - `main`: estado estable validado.
 - `feature/console-backend-core`: rama de desarrollo e integracion general de plataforma, backend, DB, documentacion tecnica y alineacion UX-backend.
+- Desarrollo funcional real, incluyendo backend, runtime, servicios, endpoints, persistencia, assistant runtime, providers, conversation state, guardrails productivos e interfaces internas funcionales, debe realizarse desde `origin/feature/console-backend-core` o una rama derivada explicitamente de esa base.
+- `feature/knowledge-ingestion-service`: rama para labs, investigacion, knowledge ingestion, pruebas RAG/asistente, decision notes y validaciones previas a implementacion funcional.
 - `ux/team360-console-design-handoff`: rama de diseno visual, frontend mock y handoff UX antes de integrar.
+- Las ramas de UX/diseno quedan para mocks, referencias visuales, Home premium, prototipos estaticos y handoff para disenadores. No deben mezclarse con runtime funcional.
+- Antes de avanzar con una tarea, clasificarla como lab/investigacion, desarrollo funcional o UX/mock. Si cambia de categoria, cambiar tambien la rama/base de trabajo.
 - Cuando una instruccion de trabajo mencione `desarrollo`, `dev` o `backend`, interpretar que la rama destino es `feature/console-backend-core`.
 - `Objetivo: desarrollo` dentro de `SrvRestAstroLS_v1/docs/status_actual.md` describe el tipo de bitacora tecnica; para trabajo Git corresponde usar `feature/console-backend-core`.
 - No crear una rama local llamada `desarrollo`.

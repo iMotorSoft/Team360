@@ -41,6 +41,13 @@ Cuando una instruccion mencione `desarrollo`, usar `feature/console-backend-core
 
 Frases equivalentes incluyen `trabajamos con ...`, `vamos a ...` y `pasemos a ...`.
 
+### Ownership por tipo de trabajo
+
+- Desarrollo funcional real, incluyendo backend, runtime, servicios, endpoints, persistencia, assistant runtime, providers, conversation state, guardrails productivos e interfaces internas funcionales, debe realizarse desde `origin/feature/console-backend-core` o una rama derivada explicitamente de esa base.
+- `feature/knowledge-ingestion-service` queda para labs, investigacion, knowledge ingestion, pruebas RAG/asistente, decision notes y validaciones previas a implementacion funcional.
+- Las ramas de UX/diseno quedan para mocks, referencias visuales, Home premium, prototipos estaticos y handoff para disenadores. No deben mezclarse con runtime funcional.
+- Antes de avanzar con una tarea, clasificarla como lab/investigacion, desarrollo funcional o UX/mock. Si cambia de categoria, cambiar tambien la rama/base de trabajo.
+
 ### Protocolo seguro para cambiar de rama
 1. Ejecutar `git status --short` y `git branch --show-current`.
 2. Si hay cualquier cambio pendiente (`M`, `A`, `D`, `??`, `UU` u otro), detenerse. Reportar rama actual, cambios pendientes, rama destino solicitada y recomendación. No ejecutar checkout.

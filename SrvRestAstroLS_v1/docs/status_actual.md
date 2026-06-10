@@ -14,6 +14,14 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-10 - Aclaracion de ownership por tipo de trabajo y rama
+
+- Se reviso la documentacion operativa existente en `AGENTS.md`, `.agents/skills/team360-project/SKILL.md`, `lat.md/`, `docs/` y `SrvRestAstroLS_v1/docs/`.
+- Se detecto que la regla ya estaba parcialmente documentada para `feature/console-backend-core`, `ux/team360-console-design-handoff` y ownership de experimentos `lab/`, pero faltaba explicitar `feature/knowledge-ingestion-service` como rama de investigacion/validacion/decision notes fuera de labs.
+- Se agrego la regla minima en `AGENTS.md` y `.agents/skills/team360-project/SKILL.md`: Knowledge branch para investigar/validar/decidir, Console backend core para implementar funcional y UX/design para mock/handoff visual.
+- No se toco codigo productivo, frontend, backend runtime, labs, migraciones, DB, endpoints ni `team360_orquestador`.
+- No se hizo checkout, merge, rebase, push, git add ni commit.
+
 ### 2026-06-10 - Fase 1.7e — Sales Diagnosis Assistant Lab Closure and Architecture Decision Note
 
 - Se creo la decision note de cierre de labs del asistente conversacional de ventas/diagnostico en `lab/sales-diagnosis-assistant-conversation/decision_notes/20260610_sales_diagnosis_assistant_lab_closure.md`.
