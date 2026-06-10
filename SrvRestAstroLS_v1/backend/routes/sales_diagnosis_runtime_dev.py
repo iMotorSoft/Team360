@@ -21,6 +21,9 @@ Retrieval provider selection (env var):
 
 LLM provider selection (env var):
 - Default (unset or "fake"): _DevFakeLLMProvider (no OpenAI/LiteLLM)
+- ``TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm``: uses
+  _DevLiteLLMProvider via LiteLLM proxy (requires TEAM360_LITELLM_BASE_URL
+  and TEAM360_LITELLM_API_KEY).
 - Invalid values: HTTP 500 controlled error
 - Request metadata flag ``dev_test_unsafe_llm`` (bool) takes precedence over env var.
 
@@ -50,10 +53,12 @@ from modules.sales_diagnosis_runtime.errors import (
     InvalidAssistantRuntimeInputError,
     UnsafeResponseError,
 )
+from modules.automation_diagnosis.litellm_client import LiteLLMClient
 from modules.sales_diagnosis_runtime.milvus_provider import (
     MilvusRetrievalProvider,
     MilvusRuntimeConfig,
 )
+from modules.sales_diagnosis_runtime.policies import PromptPolicy
 from modules.sales_diagnosis_runtime.providers import (
     LLMProvider,
     QueryEmbeddingProvider,
@@ -136,6 +141,66 @@ class _DevUnsafeFakeLLMProvider:
 
     def generate(self, input: AssistantTurnInput, state: ConversationState, context: list[RetrievedChunk]) -> str:
         return _UNSAFE_RESPONSE
+
+
+class _DevLiteLLMProvider:
+    """LiteLLM provider for dev endpoint via LiteLLM proxy.
+
+    Requires TEAM360_LITELLM_BASE_URL and TEAM360_LITELLM_API_KEY.
+    No OpenAI SDK — uses urllib via LiteLLMClient.
+    """
+
+    def __init__(self) -> None:
+        self._client = self._build_client()
+        self._prompt_policy = PromptPolicy()
+
+    @staticmethod
+    def _build_client() -> LiteLLMClient:
+        base_url = os.environ.get("TEAM360_LITELLM_BASE_URL")
+        if not base_url:
+            raise HTTPException(
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(
+                    f"{_DEV_LLM_PROVIDER_ENV}=litellm requires "
+                    "TEAM360_LITELLM_BASE_URL."
+                ),
+            )
+        api_key = (
+            os.environ.get("TEAM360_LITELLM_API_KEY")
+            or os.environ.get("LITELLM_API_KEY")
+            or os.environ.get("LITELLM_MASTER_KEY")
+        )
+        if not api_key:
+            raise HTTPException(
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(
+                    f"{_DEV_LLM_PROVIDER_ENV}=litellm requires "
+                    "TEAM360_LITELLM_API_KEY."
+                ),
+            )
+        return LiteLLMClient(base_url=base_url, api_key=api_key)
+
+    def generate(
+        self,
+        input: AssistantTurnInput,
+        state: ConversationState,
+        context: list[RetrievedChunk],
+    ) -> str:
+        system_prompt = self._prompt_policy.build_system_prompt(
+            assistant_instance_code=input.assistant_instance_code,
+            package_code=input.package_code,
+        )
+        turn_prompt = self._prompt_policy.build_turn_prompt(input, state, context)
+        model = (
+            os.environ.get("TEAM360_LITELLM_MODEL_ALIAS")
+            or "openrouter_qwen3_30b_a3b_thinking_2507"
+        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": turn_prompt},
+        ]
+        response = self._client.chat_completion(model=model, messages=messages)
+        return response.content
 
 
 class _DevFakeEmbeddingProvider:
@@ -288,11 +353,13 @@ def _resolve_llm_provider(metadata: dict) -> LLMProvider:
     mode = os.environ.get(_DEV_LLM_PROVIDER_ENV, "").strip().lower()
     if not mode or mode == "fake":
         return _DevFakeLLMProvider()
+    if mode == "litellm":
+        return _DevLiteLLMProvider()
     raise HTTPException(
         status_code=HTTP_500_INTERNAL_SERVER_ERROR,
         detail=(
             f"Invalid {_DEV_LLM_PROVIDER_ENV}={mode!r}. "
-            "Use 'fake' (default)."
+            "Use 'fake' (default) or 'litellm'."
         ),
     )
 

@@ -704,9 +704,52 @@ Modificado:
 ### No implementa
 
 - OpenAI real por default.
-- LiteLLM real.
+- LiteLLM real (solo opt-in boundary).
 - LLM real.
 - Milvus real en tests — solo opt-in mockeado.
+- Frontend, Astro, Svelte, UI, SSE, ArangoDB, pgvector, cross-encoder.
+- Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+
+## Fase 1.8n — LiteLLM LLM provider opt-in boundary
+
+### Que cambio
+
+El endpoint interno/dev ahora acepta `litellm` como valor para la env var
+`TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER`:
+
+| Variable | Valores aceptados |
+|----------|-------------------|
+| `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER` | `fake` (default), `litellm` |
+
+Cuando se selecciona `litellm`:
+
+1. Se crea `_DevLiteLLMProvider` que usa `LiteLLMClient` de `automation_diagnosis`.
+2. Requiere `TEAM360_LITELLM_BASE_URL` y `TEAM360_LITELLM_API_KEY` — si falta → HTTP 500.
+3. Usa `PromptPolicy.build_system_prompt()` y `build_turn_prompt()` para construir el prompt.
+4. Modelo via `TEAM360_LITELLM_MODEL_ALIAS` (default: `openrouter_qwen3_30b_a3b_thinking_2507`).
+5. No OpenAI SDK — usa urllib directo via `LiteLLMClient`.
+6. `dev_test_unsafe_llm` en metadata sigue teniendo prioridad sobre la env var.
+
+### Funcion nueva
+
+- `_DevLiteLLMProvider` en `routes/sales_diagnosis_runtime_dev.py`: implementa `LLMProvider` protocol, construye prompts y llama LiteLLM proxy.
+
+### Tests nuevos (4)
+
+En `TestDevSalesDiagnosisRouteLiteLLM`:
+
+| Test | Que valida |
+|------|------------|
+| `test_litellm_mode_is_accepted_with_env_config` | Env vars seteadas → `_DevLiteLLMProvider` |
+| `test_litellm_mode_without_config_returns_controlled_error` | Sin config → HTTP 500 |
+| `test_litellm_mode_does_not_leak_secrets` | HTTP 500 sin `sk-` ni `password` |
+| `test_milvus_retrieval_does_not_force_real_llm` | Milvus retrieval + fake LLM coexisten |
+
+### No implementa
+
+- OpenAI real por default.
+- LiteLLM real sin config explicita.
+- LLM real en tests — solo opt-in mockeado.
 - Frontend, Astro, Svelte, UI, SSE, ArangoDB, pgvector, cross-encoder.
 - Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
 
@@ -724,3 +767,4 @@ Modificado:
 10. ~~1.8k -- Postgres opt-in HTTP smoke for dev endpoint.~~ **(Completado)**
 11. ~~1.8l -- Provider mode boundary.~~ **(Completado)**
 12. ~~1.8m -- Milvus retrieval opt-in boundary.~~ **(Completado)**
+13. ~~1.8n -- LiteLLM LLM provider opt-in boundary.~~ **(Completado)**

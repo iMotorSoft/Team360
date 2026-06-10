@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8m — Milvus retrieval opt-in boundary)
+Ultima actualizacion: 2026-06-10 (Fase 1.8n — LiteLLM LLM provider opt-in boundary)
 
 ## Directorio de trabajo
 
@@ -45,6 +45,26 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 - Se modifico `test_invalid_retrieval_provider_returns_controlled_error` para usar `"pinecone"` en vez de `"milvus"` (ahora valido).
 - Validacion: `uv run pytest` = 331 passed, 9 skipped (+4 nuevos).
 - No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8n — LiteLLM LLM provider opt-in boundary for dev endpoint
+
+- Se extendio `_resolve_llm_provider()` en `routes/sales_diagnosis_runtime_dev.py`:
+  - `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm` ahora es valido.
+  - Crea `_DevLiteLLMProvider` que usa `LiteLLMClient` de `automation_diagnosis` (urllib, no OpenAI SDK).
+  - Requiere `TEAM360_LITELLM_BASE_URL` y `TEAM360_LITELLM_API_KEY` — si falta → HTTP 500.
+  - Construye prompts via `PromptPolicy.build_system_prompt()` y `build_turn_prompt()`.
+  - Modelo via `TEAM360_LITELLM_MODEL_ALIAS` (default: `openrouter_qwen3_30b_a3b_thinking_2507`).
+  - Valores invalidos siguen dando HTTP 500.
+  - `dev_test_unsafe_llm` en metadata sigue teniendo prioridad.
+- Se creo `_DevLiteLLMProvider` en la route file: implementa `LLMProvider` protocol.
+- Se agrego `TestDevSalesDiagnosisRouteLiteLLM` con 4 tests:
+  - `test_litellm_mode_is_accepted_with_env_config` — LiteLLM mode con env vars aceptado.
+  - `test_litellm_mode_without_config_returns_controlled_error` — Sin config → HTTP 500.
+  - `test_litellm_mode_does_not_leak_secrets` — Error sin secrets.
+  - `test_milvus_retrieval_does_not_force_real_llm` — Milvus retrieval + fake LLM coexisten.
+- Validacion: `uv run pytest` = 335 passed, 9 skipped (+4 nuevos).
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real por default, Milvus real por default, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes.
 - Sin creacion de rama nueva.
 
 ### 2026-06-10 - Team360 DB URL visible en globalVar

@@ -17,6 +17,7 @@ from routes.sales_diagnosis_runtime_dev import (
     _DEV_STATE_REPOSITORY_ENV,
     _DevFakeLLMProvider,
     _DevFakeRetrievalProvider,
+    _DevLiteLLMProvider,
     _DevPostgresStateRepository,
     _DevUnsafeFakeLLMProvider,
     _resolve_llm_provider,
@@ -272,6 +273,62 @@ class TestDevSalesDiagnosisRouteMilvus:
                 assert exc.status_code == HTTP_500_INTERNAL_SERVER_ERROR
         finally:
             os.environ.pop(_DEV_STATE_REPOSITORY_ENV, None)
+
+
+class TestDevSalesDiagnosisRouteLiteLLM:
+    """Tests for LiteLLM LLM provider opt-in in the dev endpoint."""
+
+    def test_litellm_mode_is_accepted_with_env_config(self):
+        os.environ[_DEV_LLM_PROVIDER_ENV] = "litellm"
+        os.environ["TEAM360_LITELLM_BASE_URL"] = "http://localhost:4000"
+        os.environ["TEAM360_LITELLM_API_KEY"] = "sk-test-key"
+        try:
+            provider = _resolve_llm_provider({})
+            assert isinstance(provider, _DevLiteLLMProvider)
+        finally:
+            os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+            os.environ.pop("TEAM360_LITELLM_BASE_URL", None)
+            os.environ.pop("TEAM360_LITELLM_API_KEY", None)
+            os.environ.pop("LITELLM_API_KEY", None)
+            os.environ.pop("LITELLM_MASTER_KEY", None)
+
+    def test_litellm_mode_without_config_returns_controlled_error(self):
+        os.environ[_DEV_LLM_PROVIDER_ENV] = "litellm"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            body_text = resp.text.lower()
+            assert "litellm" in body_text
+            assert "team360_litellm_base_url" in body_text
+        finally:
+            os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+
+    def test_litellm_mode_does_not_leak_secrets(self):
+        os.environ[_DEV_LLM_PROVIDER_ENV] = "litellm"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            body_text = resp.text.lower()
+            assert "sk-" not in body_text
+            assert "password" not in body_text
+            assert "team360_litellm" in body_text
+        finally:
+            os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+
+    def test_milvus_retrieval_does_not_force_real_llm(self):
+        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "milvus"
+        os.environ["TEAM360_MILVUS_URI"] = "http://localhost:19530"
+        os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+        try:
+            retrieval = _resolve_retrieval_provider()
+            assert isinstance(retrieval, MilvusRetrievalProvider)
+            llm = _resolve_llm_provider({})
+            assert isinstance(llm, _DevFakeLLMProvider)
+        finally:
+            os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+            os.environ.pop("TEAM360_MILVUS_URI", None)
 
 
 def _json_dumps(obj: dict) -> str:
