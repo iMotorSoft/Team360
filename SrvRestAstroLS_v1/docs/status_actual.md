@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-09
+Ultima actualizacion: 2026-06-10 (Orquestación global Team360)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,14 @@ Ultima actualizacion: 2026-06-09
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Documento global de orquestacion Team360
+
+- Se creo `lat.md/team360-global-orchestration.md` como vista transversal para coordinar ramas Git, hilos de chat, frentes tecnicos, labs, knowledge y decisiones comerciales/productivas.
+- Se enlazo el documento desde `lat.md/lat.md`.
+- Se actualizo `lat.md/status_actual.md` porque se agrego un nuevo documento dentro de `lat.md/`.
+- El documento registra roles de ramas, regla de UX real vs handoff visual, separacion knowledge ingestion vs documentacion editorial, ownership de `lab/`, decisiones globales de producto y formato de cierre por rama.
+- No se modifico codigo productivo, backend runtime, frontend, migraciones, paquetes knowledge editoriales ni ramas distintas a `feature/console-backend-core`.
 
 ### 2026-06-09 - Convencion de laboratorio tecnico reproducible
 

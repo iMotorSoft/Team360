@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-07
+Ultima actualizacion: 2026-06-10
 
 ## Estado general
 
@@ -11,6 +11,16 @@ Ultima actualizacion: 2026-06-07
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-10 - Orquestación global entre ramas y frentes
+
+- Se creo `team360-global-orchestration.md` como documento transversal de arquitectura viva.
+- Se documento el mapa actual de ramas (`main`, `feature/console-backend-core`, `ux/team360-console-design-handoff`, `feature/knowledge-ingestion-service`, `docs/knowledge-documents-foundation`) y sus responsabilidades.
+- Se fijo la regla operativa: trabajar separado, decidir globalmente.
+- Se agregaron reglas para coordinar UX real vs handoff visual, knowledge ingestion vs documentacion editorial, ownership de `lab/` por hipotesis validada y cierre de trabajo por rama.
+- Se registraron decisiones globales de producto: `pkg_sales_diagnosis` evolutivo, Team360.live como primer contexto de validacion, Vera como marca visible, diagnosis mas amplio que ventas y capacidades futuras no vendibles como listas.
+- Se actualizo `lat.md/lat.md` con la referencia `[[team360-global-orchestration]]`.
+- No se modifico codigo productivo, migraciones, runtime, frontend ni documentos knowledge editoriales.
 
 ### 2026-06-07 - Diseno tecnico Knowledge Ingestion multi-scope / multi-nivel
 
