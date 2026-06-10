@@ -51,10 +51,20 @@ Si PostgreSQL falla durante el snapshot, el backend debe responder HTTP 503 y el
 
 - `smoke_sales_diagnosis_runtime_dev_endpoint.py`: smoke HTTP del endpoint interno/dev `POST /api/dev/sales-diagnosis-runtime/turn`. Requiere backend corriendo. Valida response contract, turn_count, guardrails, IDs prohibidos, runtime_mode, y que no se usen servicios reales. No requiere DB, no requiere LLM real, no requiere Milvus.
 
+  Soporta el flag `--cleanup` para eliminar las sesiones de prueba de PostgreSQL
+  cuando el backend corre con `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres`
+  (requiere `TEAM360_DB_URL` en el entorno del smoke).
+
   ```bash
   cd backend
-  # terminal 1: backend
+  # terminal 1: backend (default inmemory)
   uv run uvicorn app:app --host 127.0.0.1 --port 8000
-  # terminal 2: smoke
+  # terminal 2: smoke default
   uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+
+  # terminal 1: backend (postgres opt-in)
+  TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+    uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  # terminal 2: smoke postgres con cleanup
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
   ```

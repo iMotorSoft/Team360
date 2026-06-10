@@ -576,6 +576,41 @@ En `tests/test_sales_diagnosis_runtime_dev_route.py`:
 - ArangoDB / cross-encoder.
 - Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
 
+## Fase 1.8k — Postgres opt-in HTTP smoke
+
+### Que cambio
+
+El smoke script `scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py` se
+extendio para soportar el modo PostgreSQL via el flag `--cleanup`.
+
+Cuando el backend corre con `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres`,
+el smoke detecta y muestra el modo activo en su encabezado.
+
+Con `--cleanup`, al finalizar elimina las sesiones de prueba de la tabla
+`sales_diagnosis_conversation_states` en PostgreSQL (requiere `TEAM360_DB_URL`
+en el entorno del smoke). El cleanup es opcional y no bloqueante.
+
+### Smoke con PostgreSQL (opt-in)
+
+```bash
+# Terminal 1: backend con Postgres
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8000
+
+# Terminal 2: smoke con cleanup opcional
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
+```
+
+### No implementa
+
+- Endpoint publico final.
+- SSE productivo.
+- Frontend.
+- LLM real / OpenAI / LiteLLM.
+- Milvus real.
+- ArangoDB / cross-encoder.
+- Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
+
 ## Proximas fases sugeridas
 
 1. ~~1.8b -- MilvusRetrievalProvider runtime con fallback pgvector.~~ **(Completado)**
@@ -587,3 +622,4 @@ En `tests/test_sales_diagnosis_runtime_dev_route.py`:
 7. ~~1.8h -- Internal dev endpoint contract.~~ **(Completado)**
 8. ~~1.8i -- Dev endpoint hardening + smoke script.~~ **(Completado)**
 9. ~~1.8j -- Postgres opt-in state repository for dev endpoint.~~ **(Completado)**
+10. ~~1.8k -- Postgres opt-in HTTP smoke for dev endpoint.~~ **(Completado)**

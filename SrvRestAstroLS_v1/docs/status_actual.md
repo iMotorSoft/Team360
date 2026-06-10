@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8j — Postgres opt-in state repository for dev endpoint)
+Ultima actualizacion: 2026-06-10 (Fase 1.8k — Postgres opt-in HTTP smoke for dev endpoint)
 
 ## Directorio de trabajo
 
@@ -179,6 +179,23 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
   - `status_actual.md`: este registro.
 
 - No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes, smoke existente.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8k — Postgres opt-in HTTP smoke for dev endpoint
+
+- Se extendio `scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py`:
+  - Detecta y muestra `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY` activo en backend.
+  - Nuevo flag `--cleanup`: elimina las sesiones de prueba de PostgreSQL al finalizar.
+  - `_cleanup_postgres_sessions()`: conecta via `get_team360_db_url_psql()`, DELETE por session_id, no bloqueante, warning si no hay `TEAM360_DB_URL`.
+  - Requiere `TEAM360_DB_URL` en el entorno del smoke (no necesita estar seteado para InMemory).
+  - Sin cambios en el flujo de validaciones HTTP existentes (sigue 30 checks).
+
+- Se actualizaron:
+  - `scripts/README.md`: entrada con flag `--cleanup` y ejemplo postgres.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.8k.
+  - `status_actual.md`: este registro.
+
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, routes, schemas, tests existentes.
 - Sin creacion de rama nueva.
 
 ### 2026-06-10 - Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState persistence

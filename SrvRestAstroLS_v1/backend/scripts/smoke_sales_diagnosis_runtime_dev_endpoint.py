@@ -1,24 +1,35 @@
 """Smoke for the internal/dev sales diagnosis runtime endpoint.
 
-The backend must already be running. This script only calls the HTTP
-endpoint; it does not start servers, touch DBs, or read secrets.
+The backend must already be running. This script calls the HTTP
+endpoint; it does not start servers or read secrets.
+
+Supports two state repository modes via environment variable
+``TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY`` (set on the backend side).
+When the backend is running with ``=postgres`` and ``TEAM360_DB_URL`` is
+available in the caller's environment, this script optionally cleans up
+the test sessions from PostgreSQL after the run (``--cleanup`` flag).
 
 Usage:
-    # Start backend in another terminal:
+    # Terminal 1 — backend (default inmemory):
     cd SrvRestAstroLS_v1/backend
     uv run uvicorn app:app --host 127.0.0.1 --port 8000
 
-    # Run smoke:
+    # Terminal 2 — smoke default:
     uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
 
-    # Custom URL:
-    uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --backend-url http://127.0.0.1:8011
+    # Terminal 1 — backend (postgres opt-in):
+    TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \\
+      uv run uvicorn app:app --host 127.0.0.1 --port 8000
+
+    # Terminal 2 — smoke postgres (same smoke, optional cleanup):
+    uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import urllib.error
 import urllib.request
@@ -31,6 +42,9 @@ ENDPOINT = "/api/dev/sales-diagnosis-runtime/turn"
 UNIQUE_SESSION = f"smoke_dev_{uuid4().hex[:12]}"
 CHECKS: list[str] = []
 FAILURES: list[str] = []
+
+_DEV_STATE_REPOSITORY_ENV = "TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY"
+_TABLE_NAME = "sales_diagnosis_conversation_states"
 
 
 def _check(name: str, passed: bool, detail: str = "") -> None:
@@ -98,13 +112,49 @@ def _post_turn(
     return _request_json("POST", f"{base_url}{ENDPOINT}", payload, timeout=timeout)
 
 
-def run_smoke(base_url: str, timeout: float) -> None:
+def _detect_state_mode() -> str:
+    mode = os.environ.get(_DEV_STATE_REPOSITORY_ENV, "").strip().lower()
+    if mode == "postgres":
+        return "postgres"
+    return "inmemory"
+
+
+def _cleanup_postgres_sessions() -> None:
+    """Delete smoke test sessions from PostgreSQL if TEAM360_DB_URL is available."""
+    from globalVar import get_team360_db_url_psql
+
+    dsn = get_team360_db_url_psql()
+    if not dsn:
+        print("  [cleanup] TEAM360_DB_URL not set — skipping Postgres cleanup")
+        return
+    try:
+        import psycopg
+
+        with psycopg.connect(dsn) as conn:
+            with conn.cursor() as cur:
+                sessions = ["smoke_unsafe_session", UNIQUE_SESSION]
+                for sid in sessions:
+                    if sid:
+                        cur.execute(
+                            f"DELETE FROM {_TABLE_NAME} WHERE session_id = %(sid)s",
+                            {"sid": sid},
+                        )
+                        if cur.rowcount:
+                            print(f"  [cleanup] Deleted session {sid!r}")
+                conn.commit()
+    except Exception as exc:
+        print(f"  [cleanup] Warning: could not clean up sessions: {exc}")
+
+
+def run_smoke(base_url: str, timeout: float, cleanup: bool = False) -> None:
     global CHECKS, FAILURES
     CHECKS = []
     FAILURES = []
 
+    state_mode = _detect_state_mode()
     print("=== Sales Diagnosis Dev Endpoint Smoke ===")
-    print(f"Backend URL: {base_url}{ENDPOINT}")
+    print(f"Backend URL:       {base_url}{ENDPOINT}")
+    print(f"State repository:  {state_mode}")
     print()
 
     # ------------------------------------------------------------------
@@ -351,6 +401,9 @@ def run_smoke(base_url: str, timeout: float) -> None:
     print()
     print("=== SMOKE PASSED ===")
 
+    if cleanup:
+        _cleanup_postgres_sessions()
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -367,9 +420,14 @@ def main() -> None:
         default=30.0,
         help="HTTP timeout in seconds (default: 30.0)",
     )
+    parser.add_argument(
+        "--cleanup",
+        action="store_true",
+        help="Delete smoke test sessions from PostgreSQL (requires TEAM360_DB_URL)",
+    )
     args = parser.parse_args()
 
-    run_smoke(args.backend_url.rstrip("/"), args.timeout)
+    run_smoke(args.backend_url.rstrip("/"), args.timeout, cleanup=args.cleanup)
     sys.exit(0)
 
 
