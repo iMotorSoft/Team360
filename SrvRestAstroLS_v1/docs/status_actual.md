@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8c — QueryEmbeddingProvider + Prompt/GuardrailPolicy hardening)
+Ultima actualizacion: 2026-06-10 (Fase 1.8d — ConversationState persistence skeleton)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,25 @@ Ultima actualizacion: 2026-06-10 (Fase 1.8c — QueryEmbeddingProvider + Prompt/
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.8d — ConversationState persistence skeleton
+
+- Se creo `backend/modules/sales_diagnosis_runtime/state_repository.py` con:
+  - `ConversationStateSerializer`: serializa ConversationState a/desde dict JSON-compatible (jsonb-ready); preserva todos los campos incluyendo `last_sources` con `RetrievedChunk`; valida `session_id` no vacio en `to_dict`/`from_dict`; maneja campos faltantes con defaults seguros.
+  - `InMemoryConversationStateRepository`: implementa `StateRepository` protocol; almacena dicts serializados para round-trip fiel con el serializer; devuelve copias independientes en cada `load()`; usado en tests y dev.
+  - `PostgresConversationStateRepository skeleton`: implementa `StateRepository` protocol con pool inyectado; SQL directo con `INSERT ... ON CONFLICT DO UPDATE`; `load()` via SELECT/fetch_one; `__repr__` sin secrets; `SUGGESTED_DDL` constante con DDL de tabla sugerida (`sales_diagnosis_conversation_states` con state_jsonb). Requiere pool inyectado; levanta `StateRepositoryError` si no hay pool. No crea migracion, no conecta a DB real.
+- Se agregaron errores `StateRepositoryError` y `StateSerializationError` en `errors.py`.
+- Se actualizo `runtime.py`:
+  - `_load_or_create_state()`: maneja gracefulmente errores de load (falla → crea estado fresco); incrementa `turn_count` en cada turno (estado nuevo o existente).
+  - `_save_state()`: maneja gracefulmente errores de save (non-blocking, no falla la respuesta).
+- Se actualizo `__init__.py` con 6 nuevos exports.
+- Se crearon 27 tests en `tests/test_sales_diagnosis_state_repository.py` que cubren: serializer round-trip (core fields, chunks, sin chunks, optional fields, empty session_id, JSON compat, None fields), in-memory repo (save/load, missing, independent copy, overwrite, multiple sessions), postgres skeleton (repr sin secret, pool injection, error sin pool, DDL contract), runtime integration (initial state, turn_count increment, save after turn, preserve across turns, load existing, load failure graceful, save failure graceful, sin state repo, serializer-compatible storage).
+- Validacion: `uv run pytest` = 257/257 passed (230 existentes + 27 nuevos).
+- `git diff --check` = OK. Secret scan = 0 hits.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se toca DB, no se crearon migraciones.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
 
 ### 2026-06-10 - Fase 1.8c — QueryEmbeddingProvider + Prompt/GuardrailPolicy hardening
 

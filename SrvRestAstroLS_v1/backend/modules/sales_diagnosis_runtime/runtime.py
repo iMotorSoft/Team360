@@ -219,17 +219,25 @@ class AssistantConversationRuntime:
             raise InvalidAssistantRuntimeInputError("user_message is required")
 
     def _load_or_create_state(self, input: AssistantTurnInput) -> ConversationState:
+        state: ConversationState | None = None
         if self._state_repo:
-            existing = self._state_repo.load(input.session_id)
-            if existing is not None:
-                return existing
-        return ConversationState(
-            session_id=input.session_id,
-            assistant_instance_code=input.assistant_instance_code,
-            package_code=input.package_code,
-            knowledge_scope_code=input.knowledge_scope_code,
-        )
+            try:
+                state = self._state_repo.load(input.session_id)
+            except SalesDiagnosisRuntimeError:
+                pass  # Fall through to create fresh state
+        if state is None:
+            state = ConversationState(
+                session_id=input.session_id,
+                assistant_instance_code=input.assistant_instance_code,
+                package_code=input.package_code,
+                knowledge_scope_code=input.knowledge_scope_code,
+            )
+        state.turn_count += 1
+        return state
 
     def _save_state(self, state: ConversationState) -> None:
         if self._state_repo:
-            self._state_repo.save(state)
+            try:
+                self._state_repo.save(state)
+            except SalesDiagnosisRuntimeError:
+                pass  # Non-blocking: don't fail the response for save errors

@@ -28,3 +28,11 @@ class MilvusConfigurationError(SalesDiagnosisRuntimeError):
 
 class MilvusSearchError(SalesDiagnosisRuntimeError):
     """Raised when a Milvus search operation fails."""
+
+
+class StateRepositoryError(SalesDiagnosisRuntimeError):
+    """Raised when a state repository operation fails."""
+
+
+class StateSerializationError(SalesDiagnosisRuntimeError):
+    """Raised when conversation state serialization or deserialization fails."""

@@ -54,6 +54,7 @@ Template seguro = acuse/progreso, no reemplaza LLM
 | `providers.py` | Interfaces, Null providers y QueryEmbeddingProvider |
 | `policies.py` | PromptPolicy y GuardrailPolicy |
 | `runtime.py` | AssistantConversationRuntime orchestrator |
+| `state_repository.py` | ConversationStateSerializer, InMemoryConversationStateRepository, PostgresConversationStateRepository |
 
 ## MilvusRetrievalProvider — Fase 1.8b
 
@@ -96,6 +97,61 @@ uv run pytest tests/test_sales_diagnosis_runtime_contracts.py -v
 uv run pytest tests/test_sales_diagnosis_milvus_provider.py -v
 ```
 
+## Fase 1.8d — ConversationState persistence skeleton
+
+### ConversationStateSerializer
+
+Convierte `ConversationState` a/desde dict JSON-compatible para almacenamiento jsonb.
+
+* `to_dict(state)` — serializa todos los campos incluyendo `last_sources` (list[RetrievedChunk]).
+* `from_dict(data)` — reconstruye `ConversationState` desde dict; campos faltantes usan defaults seguros.
+* Valida `session_id` no vacío en ambas direcciones.
+
+### InMemoryConversationStateRepository
+
+Implementa `StateRepository` protocol sin DB. Almacena estados serializados como dicts para fidelidad round-trip con el serializer. Usado en tests y desarrollo.
+
+### PostgresConversationStateRepository skeleton
+
+Implementa `StateRepository` protocol con pool inyectado.
+
+* Usa SQL directo con psycopg 3.
+* `load(session_id)` — SELECT con fetch_one.
+* `save(state)` — INSERT ... ON CONFLICT DO UPDATE (upsert).
+* Requiere pool inyectado; levanta `StateRepositoryError` si no hay pool.
+* `__repr__` sin secrets.
+* `SUGGESTED_DDL` contiene la tabla sugerida.
+* **No crea migración; no conecta a DB en esta fase.**
+
+### Tabla sugerida
+
+```sql
+sales_diagnosis_conversation_states (
+    session_id          text        PRIMARY KEY,
+    assistant_instance_code text    NOT NULL,
+    package_code        text        NOT NULL,
+    knowledge_scope_code text       NOT NULL,
+    state_jsonb         jsonb       NOT NULL,
+    created_at_utc      timestamptz NOT NULL DEFAULT now(),
+    updated_at_utc      timestamptz NOT NULL DEFAULT now()
+);
+```
+
+### Tests
+
+* `test_sales_diagnosis_state_repository.py` — 27 tests (serializer round-trip, in-memory repo, postgres skeleton, runtime integration, graceful failure).
+
+### No implementa
+
+* Endpoints HTTP.
+* SSE productivo.
+* Frontend.
+* DB real.
+* Migraciones.
+* Milvus real.
+* LLM real.
+* ArangoDB / cross-encoder.
+
 ## Fase 1.8c — QueryEmbeddingProvider and Policy Hardening
 
 ### QueryEmbeddingProvider
@@ -136,6 +192,6 @@ uv run pytest tests/test_sales_diagnosis_milvus_provider.py -v
 
 1. ~~1.8b -- MilvusRetrievalProvider runtime con fallback pgvector.~~ **(Completado)**
 2. ~~1.8c -- QueryEmbeddingProvider + Prompt/GuardrailPolicy hardening.~~ **(Completado)**
-3. 1.8d -- ConversationState persistence en PostgreSQL.
-4. 1.8e -- Progressive event contract interno completo.
+3. ~~1.8d -- ConversationState persistence skeleton.~~ **(Completado)**
+4. 1.8e -- backend-only runtime integration smoke with fakes.
 5. 1.8f -- Endpoint backend-only controlado.

@@ -19,6 +19,8 @@ from modules.sales_diagnosis_runtime.errors import (
     MilvusSearchError,
     RetrievalUnavailableError,
     SalesDiagnosisRuntimeError,
+    StateRepositoryError,
+    StateSerializationError,
     UnsafeResponseError,
 )
 from modules.sales_diagnosis_runtime.milvus_provider import (
@@ -37,17 +39,24 @@ from modules.sales_diagnosis_runtime.providers import (
     StateRepository,
 )
 from modules.sales_diagnosis_runtime.runtime import AssistantConversationRuntime
+from modules.sales_diagnosis_runtime.state_repository import (
+    ConversationStateSerializer,
+    InMemoryConversationStateRepository,
+    PostgresConversationStateRepository,
+)
 
 __all__ = [
     "AssistantConversationRuntime",
     "AssistantTurnInput",
     "AssistantTurnOutput",
     "ConversationState",
+    "ConversationStateSerializer",
     "GuardrailPolicy",
     "GuardrailResult",
     "GuardrailViolationError",
-    "InvalidAssistantRuntimeInputError",
+    "InMemoryConversationStateRepository",
     "InMemoryStateRepository",
+    "InvalidAssistantRuntimeInputError",
     "LLMProvider",
     "LLMUnavailableError",
     "MetricsRecorder",
@@ -58,6 +67,7 @@ __all__ = [
     "NullLLMProvider",
     "NullRetrievalProvider",
     "OpenAIQueryEmbeddingProvider",
+    "PostgresConversationStateRepository",
     "ProgressiveEvent",
     "PromptPolicy",
     "QueryEmbeddingConfig",
@@ -68,5 +78,7 @@ __all__ = [
     "RuntimeMetrics",
     "SalesDiagnosisRuntimeError",
     "StateRepository",
+    "StateRepositoryError",
+    "StateSerializationError",
     "UnsafeResponseError",
 ]
