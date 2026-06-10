@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8g — Async runtime boundary / Postgres state repository decision)
+Ultima actualizacion: 2026-06-10 (Fase 1.8h — Internal dev endpoint contract for Sales Diagnosis Runtime)
 
 ## Directorio de trabajo
 
@@ -83,6 +83,44 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 - Validacion: `uv run pytest` = 299/299 passed, 9 skipped (DB-dependent). Sin regresiones.
 - No se convirtio `handle_turn()` a async. No se tocaron endpoints, frontend, routes, migraciones, LLM real, Milvus real, ArangoDB.
 - No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+
+### 2026-06-10 - Fase 1.8h — Internal dev endpoint contract for Sales Diagnosis Runtime
+
+- Se creo el endpoint interno/dev `POST /api/dev/sales-diagnosis-runtime/turn`:
+  - Usa `AssistantConversationRuntime` real con providers fake por defecto.
+  - `_DevFakeRetrievalProvider`: 2 chunks controlados, no Milvus.
+  - `_DevFakeLLMProvider`: retorna `SAFE_ACK_TEXT`, no OpenAI/LiteLLM.
+  - `InMemoryConversationStateRepository` compartido entre requests para persistencia de sesion.
+  - `PromptPolicy` real y `GuardrailPolicy` real activos.
+  - Si `metadata.dev_test_unsafe_llm = true`, usa `_DevUnsafeFakeLLMProvider` que genera texto inseguro → guardrail bloquea → `response_type: "unsafe_blocked"`.
+  - Rechaza IDs prohibidos (prefijo `vera_*`) con HTTP 400.
+  - `runtime_mode: "dev_fake"` en toda respuesta.
+  - No expone stack traces.
+
+- Se crearon schemas Pydantic en `routes/sales_diagnosis_runtime_schemas.py`:
+  - `DevTurnRequest`: session_id, message (requeridos), codes con defaults, metadata.
+  - `DevTurnResponse`: session_id, response_text, response_type, fallback_applied, guardrail_flags, retrieved_sources, turn_count, events, runtime_mode.
+
+- Se registro el route handler en `app.py`.
+
+- Se crearon 12 tests en `tests/test_sales_diagnosis_runtime_dev_route.py`:
+  1. Returns 201 with safe response.
+  2. Requires message (400).
+  3. Requires session_id (400).
+  4. Uses default codes.
+  5. Rejects prohibited vera assistant_instance_code.
+  6. Rejects prohibited vera package_code.
+  7. Guardrail blocks unsafe fake LLM.
+  8. Increments turn_count same session.
+  9. Does not call real LLM.
+  10. Does not call real Milvus (fake sources returned).
+  11. Response contract stable (expected keys).
+  12. No stack trace in error responses.
+
+- Validacion: `uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py` = 12/12 passed.
+- Sin frontend, sin SSE, sin LLM real, sin Milvus real, sin DB real, sin ArangoDB.
+- Sin Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
+- Sin creacion de rama nueva.
 
 ### 2026-06-10 - Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState persistence
 

@@ -24,6 +24,7 @@ from routes.diagnosis import (
     public_submit_checklist,
 )
 from routes.health import get_health
+from routes.sales_diagnosis_runtime_dev import dev_sales_diagnosis_turn
 
 
 @get("/api/health")
@@ -69,6 +70,7 @@ def create_app() -> Litestar:
             public_get_session,
             public_submit_checklist,
             public_lead,
+            dev_sales_diagnosis_turn,
         ],
         on_startup=[_open_db_pool],
         on_shutdown=[_close_db_pool],

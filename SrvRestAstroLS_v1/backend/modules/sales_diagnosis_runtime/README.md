@@ -405,11 +405,96 @@ Resultado: 12 passed, 7 skipped (dependen de TEAM360_DB_URL).
 ### No implementa
 
 - Conversion de `handle_turn()` a async.
-- Endpoints HTTP.
+- Endpoints HTTP publicos.
 - SSE productivo.
 - LLM real.
 - Milvus real.
 - ArangoDB / cross-encoder.
+- Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
+
+## Fase 1.8h — Internal dev endpoint contract
+
+### Endpoint
+
+`POST /api/dev/sales-diagnosis-runtime/turn`
+
+Endpoint backend-only interno/dev. NO es endpoint publico final.
+
+### Request
+
+```json
+{
+  "session_id": "dev-session-001",
+  "message": "Quiero automatizar consultas comerciales por WhatsApp",
+  "assistant_instance_code": "team360_sales_diagnosis",
+  "package_code": "pkg_sales_diagnosis",
+  "knowledge_scope_code": "ks_team360_sales_diagnosis",
+  "metadata": {
+    "channel": "dev"
+  }
+}
+```
+
+- `session_id` y `message` son obligatorios.
+- Los codes tienen defaults seguros.
+- Rechaza IDs prohibidos con prefijo `vera_`.
+
+### Response
+
+```json
+{
+  "session_id": "dev-session-001",
+  "response_text": "...",
+  "response_type": "final",
+  "fallback_applied": false,
+  "guardrail_flags": [],
+  "retrieved_sources": [...],
+  "turn_count": 1,
+  "events": [...],
+  "runtime_mode": "dev_fake"
+}
+```
+
+`runtime_mode: "dev_fake"` indica que es una ejecucion interna/dev con providers fake.
+
+### Providers por defecto
+
+- `_DevFakeRetrievalProvider`: chunks controlados, no Milvus.
+- `_DevFakeLLMProvider`: retorna SAFE_ACK_TEXT, no OpenAI/LiteLLM.
+- `InMemoryConversationStateRepository`: estado en memoria, compartido entre requests.
+- `PromptPolicy` real.
+- `GuardrailPolicy` real.
+
+### Modo unsafe test
+
+Si `metadata.dev_test_unsafe_llm = true`, se usa `_DevUnsafeFakeLLMProvider` que genera texto inseguro para ejercitar `GuardrailPolicy`. El endpoint responde con `response_type: "unsafe_blocked"` y `guardrail_flags: ["unsafe_response_blocked"]`.
+
+### Archivos nuevos
+
+| Archivo | Proposito |
+|---------|-----------|
+| `routes/sales_diagnosis_runtime_schemas.py` | Schemas Pydantic para request/response |
+| `routes/sales_diagnosis_runtime_dev.py` | Route handler con fakes |
+| `tests/test_sales_diagnosis_runtime_dev_route.py` | 12 tests HTTP |
+
+### Tests
+
+```bash
+cd SrvRestAstroLS_v1/backend
+uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py -v
+```
+
+Resultado: 12 passed.
+
+### No implementa
+
+- Endpoint publico final.
+- SSE productivo.
+- Frontend.
+- LLM real / OpenAI / LiteLLM.
+- Milvus real.
+- ArangoDB / cross-encoder.
+- DB real por defecto.
 - Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
 
 ## Proximas fases sugeridas
@@ -420,3 +505,4 @@ Resultado: 12 passed, 7 skipped (dependen de TEAM360_DB_URL).
 4. ~~1.8e -- PostgreSQL 18 local integration smoke for ConversationState persistence.~~ **(Completado)**
 5. ~~1.8f -- backend-only runtime integration smoke with fakes + Postgres state.~~ **(Completado)**
 6. ~~1.8g -- Async runtime boundary / Postgres state repository decision.~~ **(Completado)**
+7. ~~1.8h -- Internal dev endpoint contract.~~ **(Completado)**
