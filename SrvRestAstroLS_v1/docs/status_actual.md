@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8h — Internal dev endpoint contract for Sales Diagnosis Runtime)
+Ultima actualizacion: 2026-06-10 (Fase 1.8i — Dev endpoint hardening + smoke script)
 
 ## Directorio de trabajo
 
@@ -120,6 +120,36 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 - Validacion: `uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py` = 12/12 passed.
 - Sin frontend, sin SSE, sin LLM real, sin Milvus real, sin DB real, sin ArangoDB.
 - Sin Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8i — Dev endpoint hardening + smoke script
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py`:
+  - Invoca `POST /api/dev/sales-diagnosis-runtime/turn` por HTTP.
+  - Requiere backend corriendo (no DB, no LLM real, no Milvus).
+  - `--backend-url` argumento (default `http://127.0.0.1:8000`).
+  - Usa `urllib.request` (stdlib, sin dependencias extras).
+  - Valida 12 condiciones:
+    1. Request valido devuelve 201.
+    2. Response contract estable (9 keys).
+    3. session_id se preserva.
+    4. turn_count incrementa (1 → 2).
+    5. Defaults seguros de codes.
+    6. IDs prohibidos Vera (`vera_team360_sales_diagnosis`, `pkg_vera_sales_diagnosis`, `ks_vera_team360_sales_diagnosis`) devuelven 400 con detail "prohibited".
+    7. Fake unsafe controlado (`dev_test_unsafe_llm`) → response_type `unsafe_blocked` + guardrail_flags `["unsafe_response_blocked"]`.
+    8. No stack trace en errores 400.
+    9. runtime_mode = `dev_fake` en todas las respuestas.
+    10. No LLM real (response es SAFE_ACK_TEXT, no texto generado por LLM real).
+    11. No Milvus real (sources son chunks con prefijo `dev_doc_*`).
+    12. No DB real (no leaks de "postgres" en respuestas).
+  - Report PASS/FAIL por check, exit 0 si todo pasa, exit 1 si falla.
+
+- Se actualizaron:
+  - `scripts/README.md`: nueva entrada con descripcion y ejemplo de uso.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.8i agregada.
+  - `status_actual.md`: este registro.
+
+- Sin tocar frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
 - Sin creacion de rama nueva.
 
 ### 2026-06-10 - Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState persistence

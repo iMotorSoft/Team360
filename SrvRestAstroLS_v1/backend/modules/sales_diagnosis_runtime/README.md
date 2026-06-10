@@ -497,6 +497,34 @@ Resultado: 12 passed.
 - DB real por defecto.
 - Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
 
+## Fase 1.8i — Dev endpoint hardening + smoke script
+
+### Smoke script
+
+`scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py` invoca el endpoint
+por HTTP y valida 12 condiciones:
+
+1. Request valido devuelve 201.
+2. Response contract estable (9 keys esperadas).
+3. session_id se preserva entre requests.
+4. turn_count incrementa en misma sesion.
+5. Defaults seguros de codes.
+6. IDs prohibidos Vera devuelven 400.
+7. Fake unsafe controlado activa guardrail.
+8. No stacktrace en errores.
+9. runtime_mode = dev_fake.
+10. No LLM real.
+11. No Milvus real.
+12. No DB real por defecto.
+
+Requiere backend corriendo, no requiere DB, no requiere LLM real,
+no requiere Milvus.
+
+```bash
+cd SrvRestAstroLS_v1/backend
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+```
+
 ## Proximas fases sugeridas
 
 1. ~~1.8b -- MilvusRetrievalProvider runtime con fallback pgvector.~~ **(Completado)**
@@ -506,3 +534,4 @@ Resultado: 12 passed.
 5. ~~1.8f -- backend-only runtime integration smoke with fakes + Postgres state.~~ **(Completado)**
 6. ~~1.8g -- Async runtime boundary / Postgres state repository decision.~~ **(Completado)**
 7. ~~1.8h -- Internal dev endpoint contract.~~ **(Completado)**
+8. ~~1.8i -- Dev endpoint hardening + smoke script.~~ **(Completado)**

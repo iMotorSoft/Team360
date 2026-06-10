@@ -48,3 +48,13 @@ Si PostgreSQL falla durante el snapshot, el backend debe responder HTTP 503 y el
 ## sync_conversation_states
 
 - `smoke_sales_diagnosis_state_postgres.py`: smoke original (sync bridge) para validar tabla `sales_diagnosis_conversation_states` contra PostgreSQL real. Pre-1.8g, reemplazado por el smoke async.
+
+- `smoke_sales_diagnosis_runtime_dev_endpoint.py`: smoke HTTP del endpoint interno/dev `POST /api/dev/sales-diagnosis-runtime/turn`. Requiere backend corriendo. Valida response contract, turn_count, guardrails, IDs prohibidos, runtime_mode, y que no se usen servicios reales. No requiere DB, no requiere LLM real, no requiere Milvus.
+
+  ```bash
+  cd backend
+  # terminal 1: backend
+  uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  # terminal 2: smoke
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+  ```
