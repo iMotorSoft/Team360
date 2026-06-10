@@ -221,3 +221,85 @@ cat lab/sales-diagnosis-assistant-conversation/results/guardrail_fix_latest.md
 - No activa WhatsApp handoff
 - No usa CRM real
 - No hardcodea API keys
+
+## Fase 1.7d — Progressive Response Simulation
+
+Simula una experiencia progresiva tipo SSE/AG-UI sin implementar endpoints reales. Compara 3 estrategias de respuesta para medir latencia percibida, time-to-first-user-value y tradeoffs.
+
+### Estrategias
+
+| Estrategia | Quick answer | Final answer | LLM calls | Riesgo |
+|------------|-------------|--------------|-----------|--------|
+| `single-call` | — | LLM completa (500 tok) | 1 | Percepción lenta si >3s |
+| `progressive-two-step` | LLM corta (120 tok) | LLM completa (500 tok) | 2 | Duplica costo/latencia total |
+| `templated-quick-final-llm` | Template (0ms LLM) | LLM completa (500 tok) | 1 | Quick genérica |
+
+### Eventos simulados
+
+```
+team360.status.retrieval_started → team360.sources.ready → team360.answer.quick_started
+→ team360.answer.quick_ready → team360.status.final_started → team360.answer.final_ready
+→ team360.metrics.ready → team360.done
+```
+
+### Ejecución
+
+```bash
+# Dry run:
+uv run python lab/sales-diagnosis-assistant-conversation/run_progressive_response_lab.py --dry-run
+
+# Sin LLM (solo validar flujo de eventos, casos 2):
+uv run python lab/sales-diagnosis-assistant-conversation/run_progressive_response_lab.py \
+  --no-llm --strategy templated-quick-final-llm --limit-cases 2
+
+# Single-call baseline (casos 3):
+uv run python lab/sales-diagnosis-assistant-conversation/run_progressive_response_lab.py \
+  --strategy single-call --limit-cases 3
+
+# Progressive two-step (casos 3):
+uv run python lab/sales-diagnosis-assistant-conversation/run_progressive_response_lab.py \
+  --strategy progressive-two-step --limit-cases 3
+
+# Templated quick + final LLM (casos 3):
+uv run python lab/sales-diagnosis-assistant-conversation/run_progressive_response_lab.py \
+  --strategy templated-quick-final-llm --limit-cases 3
+
+# Todos los casos y todas las estrategias (requiere LLM):
+uv run python lab/sales-diagnosis-assistant-conversation/run_progressive_response_lab.py \
+  --strategy single-call
+uv run python lab/sales-diagnosis-assistant-conversation/run_progressive_response_lab.py \
+  --strategy progressive-two-step
+uv run python lab/sales-diagnosis-assistant-conversation/run_progressive_response_lab.py \
+  --strategy templated-quick-final-llm
+```
+
+### Reportes
+
+```bash
+# Reporte detallado:
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/generate_progressive_report.py
+
+# Infografía HTML:
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/generate_progressive_infographics.py
+```
+
+### Archivos
+
+```
+run_progressive_response_lab.py       # Runner con 3 estrategias
+scripts/generate_progressive_report.py      # Reporte detallado markdown
+scripts/generate_progressive_infographics.py # Infografía HTML
+results/progressive_response_*.json         # Resultados crudos
+results/progressive_response_*_detailed_report.md  # Reporte detallado
+infografias/progressive_response_*_infografia.html  # Infografía
+```
+
+### Métricas
+
+- avg_time_to_first_status_ms / sources_ready_ms / quick_answer_ms / final_answer_ms
+- p50/p95 quick answer and final answer
+- Quick answer safe rate (0 forbidden claims)
+- Final answer pass rate
+- Guardrail failures count
+- Perceived latency gain vs single-call baseline
+- Additional LLM cost estimate (tokens and latency)

@@ -1,0 +1,727 @@
+{
+  "summary": {
+    "experiment": "Fase 1.7d — Latency / Progressive Response Simulation",
+    "strategy": "templated-quick-final-llm",
+    "model": "gpt-5-nano",
+    "top_n": 20,
+    "top_k": 5,
+    "max_context_chars": 6000,
+    "quick_max_output_tokens": 120,
+    "final_max_output_tokens": 500,
+    "total_scenarios": 2,
+    "total_turns": 4,
+    "avg_time_to_first_status_ms": 0,
+    "avg_time_to_sources_ready_ms": 0,
+    "avg_time_to_quick_answer_ms": 0.0,
+    "avg_time_to_final_answer_ms": 0.0,
+    "avg_total_time_ms": 0.0,
+    "p50_quick_answer_ms": 0,
+    "p95_quick_answer_ms": 0,
+    "p50_final_answer_ms": 0.0,
+    "p95_final_answer_ms": 0.1,
+    "p95_total_ms": 0.1,
+    "avg_retrieval_latency_ms": 0,
+    "quick_answer_safe_rate": 100.0,
+    "final_answer_pass_rate": 100.0,
+    "combined_pass_rate": 100.0,
+    "final_guardrail_failure_count": 0,
+    "perceived_latency_gain_ms": null,
+    "perceived_latency_gain_percent": null,
+    "baseline_avg_total_ms": 0.0,
+    "no_llm_mode": true,
+    "additional_llm_cost_estimate": {
+      "quick_llm_calls": 0,
+      "final_llm_calls": 0,
+      "total_llm_latency_ms": 0
+    },
+    "empty_turn_count": 0,
+    "timeout_or_error_count": 0
+  },
+  "scenarios": [
+    {
+      "case_id": "conv_01",
+      "title": "Consulta genérica sobre automatización",
+      "category": "consulta_generica",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "strategy": "templated-quick-final-llm",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Quiero automatizar mi negocio.",
+          "retrieval_chunks": [],
+          "context_chars": 0,
+          "retrieval_latency_ms": 0,
+          "strategy": "templated-quick-final-llm",
+          "response_text": "Gracias por tu consulta. Veo que querés automatizar tu negocio. Contame un poco más sobre tu rubro y cómo recibís consultas hoy para orientarte mejor.",
+          "quick_answer_text": "Gracias por tu consulta. Veo que querés automatizar tu negocio. Contame un poco más sobre tu rubro y cómo recibís consultas hoy para orientarte mejor.",
+          "final_answer_text": "Gracias por tu consulta. Veo que querés automatizar tu negocio. Contame un poco más sobre tu rubro y cómo recibís consultas hoy para orientarte mejor.",
+          "llm_latency_ms": 0,
+          "total_latency_ms": 0.1,
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093609537,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.sources.ready",
+              "timestamp_ms": 1781093609537,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 1,
+              "payload": "no-llm mode (template only)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.quick_started",
+              "timestamp_ms": 1781093609537,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 1,
+              "payload": "Generando respuesta rápida (template)...",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.quick_ready",
+              "timestamp_ms": 1781093609537,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 1,
+              "payload": "Respuesta rápida (templated, 0ms LLM)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.final_ready",
+              "timestamp_ms": 1781093609537,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 1,
+              "payload": "(no-llm final same as quick)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.done",
+              "timestamp_ms": 1781093609537,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 1,
+              "payload": "",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "parsed": {
+            "question_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "detected_slots": {
+              "business_type": true,
+              "inquiry_volume": true
+            },
+            "response_length": 150
+          },
+          "evaluation": {
+            "quick_answer": {
+              "passed": true,
+              "failure_type": null,
+              "response_empty": false,
+              "response_too_long": false,
+              "response_length": 150,
+              "question_count": 0,
+              "too_many_questions": false,
+              "useful_orientation_present": false,
+              "diagnosis_orientation_present": false,
+              "concrete_next_step_present": false,
+              "forbidden_claim_real": [],
+              "forbidden_claim_negated": [],
+              "unsupported_pricing_claim": false,
+              "pricing_correctly_declined": false,
+              "unsupported_sla_claim": false,
+              "sla_correctly_declined": false,
+              "unsupported_timeline_claim": false,
+              "timeline_correctly_declined": false,
+              "has_any_forbidden": false,
+              "capabilities_mentioned": [],
+              "correctly_explained_caps": [],
+              "misrepresented_caps": [],
+              "any_correctly_explained": false,
+              "any_misrepresented": false,
+              "says_not_documented_when_missing": false,
+              "invents_undocumented_detail": false,
+              "uses_retrieved_context_signal": false,
+              "detected_slots": {
+                "business_type": true,
+                "inquiry_volume": true
+              },
+              "slot_detection_count": 2
+            },
+            "final_answer": {
+              "passed": true,
+              "failure_type": null,
+              "response_empty": false,
+              "response_too_long": false,
+              "response_length": 150,
+              "question_count": 0,
+              "too_many_questions": false,
+              "useful_orientation_present": false,
+              "diagnosis_orientation_present": false,
+              "concrete_next_step_present": false,
+              "forbidden_claim_real": [],
+              "forbidden_claim_negated": [],
+              "unsupported_pricing_claim": false,
+              "pricing_correctly_declined": false,
+              "unsupported_sla_claim": false,
+              "sla_correctly_declined": false,
+              "unsupported_timeline_claim": false,
+              "timeline_correctly_declined": false,
+              "has_any_forbidden": false,
+              "capabilities_mentioned": [],
+              "correctly_explained_caps": [],
+              "misrepresented_caps": [],
+              "any_correctly_explained": false,
+              "any_misrepresented": false,
+              "says_not_documented_when_missing": false,
+              "invents_undocumented_detail": false,
+              "uses_retrieved_context_signal": false,
+              "detected_slots": {
+                "business_type": true,
+                "inquiry_volume": true
+              },
+              "slot_detection_count": 2
+            },
+            "combined_pass": true
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Tengo una empresa de servicios y recibo consultas por WhatsApp.",
+          "retrieval_chunks": [],
+          "context_chars": 0,
+          "retrieval_latency_ms": 0,
+          "strategy": "templated-quick-final-llm",
+          "response_text": "Gracias por tu consulta. Veo que querés automatizar tu negocio. Contame un poco más sobre tu rubro y cómo recibís consultas hoy para orientarte mejor.",
+          "quick_answer_text": "Gracias por tu consulta. Veo que querés automatizar tu negocio. Contame un poco más sobre tu rubro y cómo recibís consultas hoy para orientarte mejor.",
+          "final_answer_text": "Gracias por tu consulta. Veo que querés automatizar tu negocio. Contame un poco más sobre tu rubro y cómo recibís consultas hoy para orientarte mejor.",
+          "llm_latency_ms": 0,
+          "total_latency_ms": 0.0,
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093609538,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.sources.ready",
+              "timestamp_ms": 1781093609538,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 2,
+              "payload": "no-llm mode (template only)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.quick_started",
+              "timestamp_ms": 1781093609538,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 2,
+              "payload": "Generando respuesta rápida (template)...",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.quick_ready",
+              "timestamp_ms": 1781093609538,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 2,
+              "payload": "Respuesta rápida (templated, 0ms LLM)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.final_ready",
+              "timestamp_ms": 1781093609538,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 2,
+              "payload": "(no-llm final same as quick)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.done",
+              "timestamp_ms": 1781093609538,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 2,
+              "payload": "",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "parsed": {
+            "question_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "detected_slots": {
+              "business_type": true,
+              "inquiry_volume": true
+            },
+            "response_length": 150
+          },
+          "evaluation": {
+            "quick_answer": {
+              "passed": true,
+              "failure_type": null,
+              "response_empty": false,
+              "response_too_long": false,
+              "response_length": 150,
+              "question_count": 0,
+              "too_many_questions": false,
+              "useful_orientation_present": false,
+              "diagnosis_orientation_present": false,
+              "concrete_next_step_present": false,
+              "forbidden_claim_real": [],
+              "forbidden_claim_negated": [],
+              "unsupported_pricing_claim": false,
+              "pricing_correctly_declined": false,
+              "unsupported_sla_claim": false,
+              "sla_correctly_declined": false,
+              "unsupported_timeline_claim": false,
+              "timeline_correctly_declined": false,
+              "has_any_forbidden": false,
+              "capabilities_mentioned": [],
+              "correctly_explained_caps": [],
+              "misrepresented_caps": [],
+              "any_correctly_explained": false,
+              "any_misrepresented": false,
+              "says_not_documented_when_missing": false,
+              "invents_undocumented_detail": false,
+              "uses_retrieved_context_signal": false,
+              "detected_slots": {
+                "business_type": true,
+                "inquiry_volume": true
+              },
+              "slot_detection_count": 2
+            },
+            "final_answer": {
+              "passed": true,
+              "failure_type": null,
+              "response_empty": false,
+              "response_too_long": false,
+              "response_length": 150,
+              "question_count": 0,
+              "too_many_questions": false,
+              "useful_orientation_present": false,
+              "diagnosis_orientation_present": false,
+              "concrete_next_step_present": false,
+              "forbidden_claim_real": [],
+              "forbidden_claim_negated": [],
+              "unsupported_pricing_claim": false,
+              "pricing_correctly_declined": false,
+              "unsupported_sla_claim": false,
+              "sla_correctly_declined": false,
+              "unsupported_timeline_claim": false,
+              "timeline_correctly_declined": false,
+              "has_any_forbidden": false,
+              "capabilities_mentioned": [],
+              "correctly_explained_caps": [],
+              "misrepresented_caps": [],
+              "any_correctly_explained": false,
+              "any_misrepresented": false,
+              "says_not_documented_when_missing": false,
+              "invents_undocumented_detail": false,
+              "uses_retrieved_context_signal": false,
+              "detected_slots": {
+                "business_type": true,
+                "inquiry_volume": true
+              },
+              "slot_detection_count": 2
+            },
+            "combined_pass": true
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_02",
+      "title": "Leads perdidos por falta de seguimiento",
+      "category": "leads_perdidos",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "strategy": "templated-quick-final-llm",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Tengo muchos leads pero se pierden porque nadie les responde rápido.",
+          "retrieval_chunks": [],
+          "context_chars": 0,
+          "retrieval_latency_ms": 0,
+          "strategy": "templated-quick-final-llm",
+          "response_text": "Entiendo que estás perdiendo leads por demoras en la respuesta. Es un problema frecuente que podemos diagnosticar. ¿De qué canales vienen esas consultas?",
+          "quick_answer_text": "Entiendo que estás perdiendo leads por demoras en la respuesta. Es un problema frecuente que podemos diagnosticar. ¿De qué canales vienen esas consultas?",
+          "final_answer_text": "Entiendo que estás perdiendo leads por demoras en la respuesta. Es un problema frecuente que podemos diagnosticar. ¿De qué canales vienen esas consultas?",
+          "llm_latency_ms": 0,
+          "total_latency_ms": 0.0,
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093609539,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.sources.ready",
+              "timestamp_ms": 1781093609539,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 1,
+              "payload": "no-llm mode (template only)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.quick_started",
+              "timestamp_ms": 1781093609539,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 1,
+              "payload": "Generando respuesta rápida (template)...",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.quick_ready",
+              "timestamp_ms": 1781093609539,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 1,
+              "payload": "Respuesta rápida (templated, 0ms LLM)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.final_ready",
+              "timestamp_ms": 1781093609539,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 1,
+              "payload": "(no-llm final same as quick)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.done",
+              "timestamp_ms": 1781093609539,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 1,
+              "payload": "",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "parsed": {
+            "question_count": 1,
+            "gives_orientation": true,
+            "says_not_documented": false,
+            "detected_slots": {
+              "current_channel": true,
+              "inquiry_volume": true,
+              "main_pain": true
+            },
+            "response_length": 153
+          },
+          "evaluation": {
+            "quick_answer": {
+              "passed": true,
+              "failure_type": null,
+              "response_empty": false,
+              "response_too_long": false,
+              "response_length": 153,
+              "question_count": 1,
+              "too_many_questions": false,
+              "useful_orientation_present": true,
+              "diagnosis_orientation_present": false,
+              "concrete_next_step_present": false,
+              "forbidden_claim_real": [],
+              "forbidden_claim_negated": [],
+              "unsupported_pricing_claim": false,
+              "pricing_correctly_declined": false,
+              "unsupported_sla_claim": false,
+              "sla_correctly_declined": false,
+              "unsupported_timeline_claim": false,
+              "timeline_correctly_declined": false,
+              "has_any_forbidden": false,
+              "capabilities_mentioned": [],
+              "correctly_explained_caps": [],
+              "misrepresented_caps": [],
+              "any_correctly_explained": false,
+              "any_misrepresented": false,
+              "says_not_documented_when_missing": false,
+              "invents_undocumented_detail": false,
+              "uses_retrieved_context_signal": false,
+              "detected_slots": {
+                "current_channel": true,
+                "inquiry_volume": true,
+                "main_pain": true
+              },
+              "slot_detection_count": 3
+            },
+            "final_answer": {
+              "passed": true,
+              "failure_type": null,
+              "response_empty": false,
+              "response_too_long": false,
+              "response_length": 153,
+              "question_count": 1,
+              "too_many_questions": false,
+              "useful_orientation_present": true,
+              "diagnosis_orientation_present": false,
+              "concrete_next_step_present": false,
+              "forbidden_claim_real": [],
+              "forbidden_claim_negated": [],
+              "unsupported_pricing_claim": false,
+              "pricing_correctly_declined": false,
+              "unsupported_sla_claim": false,
+              "sla_correctly_declined": false,
+              "unsupported_timeline_claim": false,
+              "timeline_correctly_declined": false,
+              "has_any_forbidden": false,
+              "capabilities_mentioned": [],
+              "correctly_explained_caps": [],
+              "misrepresented_caps": [],
+              "any_correctly_explained": false,
+              "any_misrepresented": false,
+              "says_not_documented_when_missing": false,
+              "invents_undocumented_detail": false,
+              "uses_retrieved_context_signal": false,
+              "detected_slots": {
+                "current_channel": true,
+                "inquiry_volume": true,
+                "main_pain": true
+              },
+              "slot_detection_count": 3
+            },
+            "combined_pass": true
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Vienen de Facebook e Instagram.",
+          "retrieval_chunks": [],
+          "context_chars": 0,
+          "retrieval_latency_ms": 0,
+          "strategy": "templated-quick-final-llm",
+          "response_text": "Entiendo que estás perdiendo leads por demoras en la respuesta. Es un problema frecuente que podemos diagnosticar. ¿De qué canales vienen esas consultas?",
+          "quick_answer_text": "Entiendo que estás perdiendo leads por demoras en la respuesta. Es un problema frecuente que podemos diagnosticar. ¿De qué canales vienen esas consultas?",
+          "final_answer_text": "Entiendo que estás perdiendo leads por demoras en la respuesta. Es un problema frecuente que podemos diagnosticar. ¿De qué canales vienen esas consultas?",
+          "llm_latency_ms": 0,
+          "total_latency_ms": 0.0,
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093609540,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.sources.ready",
+              "timestamp_ms": 1781093609540,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 2,
+              "payload": "no-llm mode (template only)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.quick_started",
+              "timestamp_ms": 1781093609540,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 2,
+              "payload": "Generando respuesta rápida (template)...",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.quick_ready",
+              "timestamp_ms": 1781093609540,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 2,
+              "payload": "Respuesta rápida (templated, 0ms LLM)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.answer.final_ready",
+              "timestamp_ms": 1781093609540,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 2,
+              "payload": "(no-llm final same as quick)",
+              "safe_to_show": true,
+              "notes": ""
+            },
+            {
+              "event_type": "team360.done",
+              "timestamp_ms": 1781093609540,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 2,
+              "payload": "",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "parsed": {
+            "question_count": 1,
+            "gives_orientation": true,
+            "says_not_documented": false,
+            "detected_slots": {
+              "current_channel": true,
+              "inquiry_volume": true,
+              "main_pain": true
+            },
+            "response_length": 153
+          },
+          "evaluation": {
+            "quick_answer": {
+              "passed": true,
+              "failure_type": null,
+              "response_empty": false,
+              "response_too_long": false,
+              "response_length": 153,
+              "question_count": 1,
+              "too_many_questions": false,
+              "useful_orientation_present": true,
+              "diagnosis_orientation_present": false,
+              "concrete_next_step_present": false,
+              "forbidden_claim_real": [],
+              "forbidden_claim_negated": [],
+              "unsupported_pricing_claim": false,
+              "pricing_correctly_declined": false,
+              "unsupported_sla_claim": false,
+              "sla_correctly_declined": false,
+              "unsupported_timeline_claim": false,
+              "timeline_correctly_declined": false,
+              "has_any_forbidden": false,
+              "capabilities_mentioned": [],
+              "correctly_explained_caps": [],
+              "misrepresented_caps": [],
+              "any_correctly_explained": false,
+              "any_misrepresented": false,
+              "says_not_documented_when_missing": false,
+              "invents_undocumented_detail": false,
+              "uses_retrieved_context_signal": false,
+              "detected_slots": {
+                "current_channel": true,
+                "inquiry_volume": true,
+                "main_pain": true
+              },
+              "slot_detection_count": 3
+            },
+            "final_answer": {
+              "passed": true,
+              "failure_type": null,
+              "response_empty": false,
+              "response_too_long": false,
+              "response_length": 153,
+              "question_count": 1,
+              "too_many_questions": false,
+              "useful_orientation_present": true,
+              "diagnosis_orientation_present": false,
+              "concrete_next_step_present": false,
+              "forbidden_claim_real": [],
+              "forbidden_claim_negated": [],
+              "unsupported_pricing_claim": false,
+              "pricing_correctly_declined": false,
+              "unsupported_sla_claim": false,
+              "sla_correctly_declined": false,
+              "unsupported_timeline_claim": false,
+              "timeline_correctly_declined": false,
+              "has_any_forbidden": false,
+              "capabilities_mentioned": [],
+              "correctly_explained_caps": [],
+              "misrepresented_caps": [],
+              "any_correctly_explained": false,
+              "any_misrepresented": false,
+              "says_not_documented_when_missing": false,
+              "invents_undocumented_detail": false,
+              "uses_retrieved_context_signal": false,
+              "detected_slots": {
+                "current_channel": true,
+                "inquiry_volume": true,
+                "main_pain": true
+              },
+              "slot_detection_count": 3
+            },
+            "combined_pass": true
+          }
+        }
+      ]
+    }
+  ],
+  "latencies_ms": {
+    "retrieval": [],
+    "quick_llm": [],
+    "final_llm": [],
+    "total": [
+      0.1,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "time_to_quick_answer": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "time_to_final_answer": [
+      0.1,
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.7c — Fix real guardrail failures del Conversation Lab)
+Ultima actualizacion: 2026-06-10 (Fase 1.7d — Progressive Response Simulation Lab)
 
 ## Directorio de trabajo
 
@@ -37,6 +37,20 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
   - Fallos residuales: 0 de guardrail; 6 escenarios con slots faltantes (knowledge coverage, fuera de alcance de 1.7c).
 - No se toco frontend, routes, endpoints HTTP, diagnosis productivo, migraciones, corpus, ArangoDB, cross-encoder, runtime productivo, Step-to-Action, lead capture, diagnostic_code, WhatsApp handoff ni CRM real.
 - No se hardcodearon API keys. No se hizo git add/commit.
+
+### 2026-06-10 - Fase 1.7d — Progressive Response Simulation Lab
+
+- Se creo `run_progressive_response_lab.py` con 3 estrategias:
+  - `single-call`: baseline (1 LLM call, final answer como primer valor de usuario)
+  - `progressive-two-step`: LLM quick (120 tok) + LLM final (500 tok), quick answer como primer valor
+  - `templated-quick-final-llm`: template contextual (0ms LLM) + LLM final, quick answer como primer valor
+- Se implementaron eventos semanticos simulados (team360.status.*, team360.sources.*, team360.answer.*, team360.metrics.*, team360.done, team360.error) sin endpoints reales, sin SSE, sin frontend.
+- Se creo `scripts/generate_progressive_report.py` para reporte detallado por turno/evento.
+- Se creo `scripts/generate_progressive_infographics.py` para infografia HTML con latencias, quick/final pass rates y bars por scenario.
+- Se actualizo README.md con documentacion de Fase 1.7d, eventos, estrategias, ejecucion y metricas.
+- Metricas registradas: avg time to first status, sources ready, quick answer, final answer; p50/p95 quick/final; quick safe rate; final pass rate; guardrail failures; perceived latency gain vs baseline.
+- No se toco frontend, routes, endpoints HTTP, diagnosis productivo, migraciones, corpus, ArangoDB, cross-encoder, runtime productivo, Step-to-Action, lead capture, diagnostic_code, WhatsApp handoff, CRM real ni SSE productivo.
+- No se hardcodearon API keys. No se hizo git add/commit. Pendiente de confirmacion para commit.
 
 ### 2026-06-10 - Fase 1.7b — Evaluación heurística refinada del Sales Diagnosis Conversation Lab
 
