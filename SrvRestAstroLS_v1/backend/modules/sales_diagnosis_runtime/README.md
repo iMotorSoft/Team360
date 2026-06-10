@@ -336,6 +336,82 @@ TEAM360_DB_URL=postgresql://user:pass@localhost:5432/team360 \
 * DB real.
 * ArangoDB / cross-encoder.
 
+## Fase 1.8g — Async runtime boundary / Postgres state repository decision
+
+### Decision
+
+**Runtime core stays sync.** `AsyncStateRepository` protocol and
+`AsyncPostgresConversationStateRepository` are added as the async boundary
+for production persistence. Full rationale in `async_boundary_decision.md`.
+
+### AsyncStateRepository protocol
+
+```python
+class AsyncStateRepository(Protocol):
+    async def load(self, session_id: str) -> ConversationState | None: ...
+    async def save(self, state: ConversationState) -> None: ...
+```
+
+Defined in `providers.py`. Mirrors sync `StateRepository` with async methods.
+
+### AsyncInMemoryStateRepository
+
+Async in-memory implementation for testing. Same contract as
+`AsyncStateRepository`, no DB required.
+
+### AsyncPostgresConversationStateRepository
+
+Real async production repository in `state_repository.py`:
+
+- Owns an injected `AsyncConnectionPool` from `psycopg_pool`.
+- Uses `modules.db.transaction.fetch_one` and `execute` — no ORM.
+- `load()` — `SELECT state_jsonb` → `ConversationStateSerializer.from_dict`.
+- `save()` — `INSERT ... ON CONFLICT DO UPDATE` (UPSERT).
+- Raises `StateRepositoryError` if no pool injected.
+- `__repr__` without secrets.
+
+### Async smoke
+
+`scripts/smoke_sales_diagnosis_state_postgres_async.py`:
+
+- Applies migration 007, instantiates `AsyncPostgresConversationStateRepository`.
+- Validates: save → load → verify fields → update → load again → verify.
+- Loads non-existent session_id → returns None.
+- Cleans up after itself.
+
+```bash
+cd SrvRestAstroLS_v1/backend
+TEAM360_DB_URL=postgresql://user:pass@localhost:5432/v360 \
+  uv run python scripts/smoke_sales_diagnosis_state_postgres_async.py
+```
+
+### Archivos nuevos
+
+| Archivo | Proposito |
+|---------|-----------|
+| `async_boundary_decision.md` | Documenta la decision async boundary |
+| `scripts/smoke_sales_diagnosis_state_postgres_async.py` | Async smoke contra PostgreSQL real |
+| `tests/test_sales_diagnosis_async_state_repository.py` | 19 tests (12 pass sin DB, 7 skip) |
+
+### Tests
+
+```bash
+cd SrvRestAstroLS_v1/backend
+uv run pytest tests/test_sales_diagnosis_async_state_repository.py -v
+```
+
+Resultado: 12 passed, 7 skipped (dependen de TEAM360_DB_URL).
+
+### No implementa
+
+- Conversion de `handle_turn()` a async.
+- Endpoints HTTP.
+- SSE productivo.
+- LLM real.
+- Milvus real.
+- ArangoDB / cross-encoder.
+- Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
+
 ## Proximas fases sugeridas
 
 1. ~~1.8b -- MilvusRetrievalProvider runtime con fallback pgvector.~~ **(Completado)**
@@ -343,3 +419,4 @@ TEAM360_DB_URL=postgresql://user:pass@localhost:5432/team360 \
 3. ~~1.8d -- ConversationState persistence skeleton.~~ **(Completado)**
 4. ~~1.8e -- PostgreSQL 18 local integration smoke for ConversationState persistence.~~ **(Completado)**
 5. ~~1.8f -- backend-only runtime integration smoke with fakes + Postgres state.~~ **(Completado)**
+6. ~~1.8g -- Async runtime boundary / Postgres state repository decision.~~ **(Completado)**

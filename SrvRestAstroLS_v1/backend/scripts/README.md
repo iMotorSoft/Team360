@@ -32,3 +32,19 @@ Si PostgreSQL falla durante el snapshot, el backend debe responder HTTP 503 y el
   TEAM360_DB_URL=postgresql://user:pass@localhost:5432/team360 \
     uv run python scripts/smoke_sales_diagnosis_runtime_postgres.py
   ```
+
+- `smoke_sales_diagnosis_state_postgres_async.py`: smoke async de `AsyncPostgresConversationStateRepository` contra PostgreSQL 18 real.
+  - Usa psycopg_pool.AsyncConnectionPool directamente.
+  - Valida save → load → update → load non-existent → verify round-trip fidelity con ConversationStateSerializer y RetrievedChunks.
+  - Requiere `TEAM360_DB_URL` (o `TEAM360_DB_URL_PSQL`) y migracion 007 aplicada.
+  - No runtime, no endpoint, no LLM, no Milvus.
+
+  ```bash
+  cd backend
+  TEAM360_DB_URL=postgresql://user:pass@localhost:5432/v360 \
+    uv run python scripts/smoke_sales_diagnosis_state_postgres_async.py
+  ```
+
+## sync_conversation_states
+
+- `smoke_sales_diagnosis_state_postgres.py`: smoke original (sync bridge) para validar tabla `sales_diagnosis_conversation_states` contra PostgreSQL real. Pre-1.8g, reemplazado por el smoke async.

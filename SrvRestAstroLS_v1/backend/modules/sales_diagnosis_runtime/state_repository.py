@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Any
 
+from modules.db.transaction import execute, fetch_one
 from modules.sales_diagnosis_runtime.contracts import (
     ConversationState,
     RetrievedChunk,
@@ -11,7 +12,10 @@ from modules.sales_diagnosis_runtime.errors import (
     StateRepositoryError,
     StateSerializationError,
 )
-from modules.sales_diagnosis_runtime.providers import StateRepository
+from modules.sales_diagnosis_runtime.providers import (
+    AsyncStateRepository,
+    StateRepository,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -234,5 +238,93 @@ class PostgresConversationStateRepository:
     def __repr__(self) -> str:
         return (
             f"PostgresConversationStateRepository(table="
+            f"{self.TABLE_NAME!r}, pool_configured={self._pool is not None})"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Async Postgres repository
+# ---------------------------------------------------------------------------
+
+
+class AsyncPostgresConversationStateRepository:
+    """Async PostgreSQL-backed conversation state repository.
+
+    Production implementation of AsyncStateRepository.
+    Uses psycopg 3 async pool directly — no ORM.
+    State stored as jsonb in sales_diagnosis_conversation_states table.
+
+    Requires an injected AsyncConnectionPool.
+    """
+
+    TABLE_NAME = "sales_diagnosis_conversation_states"
+
+    def __init__(self, pool: Any = None) -> None:
+        self._pool = pool
+
+    async def load(self, session_id: str) -> ConversationState | None:
+        self._ensure_pool()
+        import json
+
+        async with self._pool.connection() as conn:
+            row = await fetch_one(
+                conn,
+                f"SELECT state_jsonb FROM {self.TABLE_NAME} "
+                f"WHERE session_id = %(sid)s",
+                {"sid": session_id},
+            )
+        if row is None:
+            return None
+        raw = row["state_jsonb"]
+        if isinstance(raw, str):
+            raw = json.loads(raw)
+        if not isinstance(raw, dict):
+            raise StateRepositoryError(
+                f"Expected jsonb object for session_id={session_id!r}, "
+                f"got {type(raw).__name__}"
+            )
+        return ConversationStateSerializer.from_dict(raw)
+
+    async def save(self, state: ConversationState) -> None:
+        self._ensure_pool()
+        import json
+
+        serialized = ConversationStateSerializer.to_dict(state)
+        async with self._pool.connection() as conn:
+            await execute(
+                conn,
+                f"INSERT INTO {self.TABLE_NAME} "
+                f"(session_id, assistant_instance_code, package_code, "
+                f"knowledge_scope_code, state_jsonb, "
+                f"created_at_utc, updated_at_utc) "
+                f"VALUES (%(session_id)s, %(assistant_instance_code)s, "
+                f"%(package_code)s, %(knowledge_scope_code)s, "
+                f"%(state_jsonb)s::jsonb, now(), now()) "
+                f"ON CONFLICT (session_id) DO UPDATE SET "
+                f"state_jsonb = EXCLUDED.state_jsonb, "
+                f"updated_at_utc = now()",
+                {
+                    "session_id": serialized["session_id"],
+                    "assistant_instance_code": serialized[
+                        "assistant_instance_code"
+                    ],
+                    "package_code": serialized["package_code"],
+                    "knowledge_scope_code": serialized[
+                        "knowledge_scope_code"
+                    ],
+                    "state_jsonb": json.dumps(serialized),
+                },
+            )
+
+    def _ensure_pool(self) -> None:
+        if self._pool is None:
+            raise StateRepositoryError(
+                "AsyncPostgresConversationStateRepository requires "
+                "an injected pool. No pool was provided."
+            )
+
+    def __repr__(self) -> str:
+        return (
+            f"AsyncPostgresConversationStateRepository(table="
             f"{self.TABLE_NAME!r}, pool_configured={self._pool is not None})"
         )

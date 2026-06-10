@@ -113,6 +113,33 @@ class InMemoryStateRepository:
         self._store[state.session_id] = replace(state)
 
 
+class AsyncStateRepository(Protocol):
+    """Async version of StateRepository for production async boundaries.
+
+    This protocol exists for the future endpoint layer where async
+    orchestration is required. The core runtime remains sync.
+    """
+
+    async def load(self, session_id: str) -> ConversationState | None:
+        ...
+
+    async def save(self, state: ConversationState) -> None:
+        ...
+
+
+class AsyncInMemoryStateRepository:
+    """Async in-memory state repository for testing and development."""
+
+    def __init__(self) -> None:
+        self._store: dict[str, ConversationState] = {}
+
+    async def load(self, session_id: str) -> ConversationState | None:
+        return self._store.get(session_id)
+
+    async def save(self, state: ConversationState) -> None:
+        self._store[state.session_id] = replace(state)
+
+
 # ---------------------------------------------------------------------------
 # MetricsRecorder
 # ---------------------------------------------------------------------------

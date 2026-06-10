@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8f — Backend-only runtime integration smoke with fakes + Postgres state)
+Ultima actualizacion: 2026-06-10 (Fase 1.8g — Async runtime boundary / Postgres state repository decision)
 
 ## Directorio de trabajo
 
@@ -57,6 +57,32 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 - No se hardcodearon API keys.
 - `PostgresConversationStateRepository` sigue siendo sync skeleton documentado; el smoke usa su propio bridge sync.
 - No se creo rama nueva; todo en `feature/console-backend-core`.
+
+### 2026-06-10 - Fase 1.8g — Async runtime boundary / Postgres state repository decision
+
+- Se realizo la auditoria completa de contratos sync/async del Sales Diagnosis Runtime:
+  - Todos los protocolos son sync: `StateRepository`, `RetrievalProvider`, `LLMProvider`, `MetricsRecorder`, `AuditTrail`, `QueryEmbeddingProvider`.
+  - `AssistantConversationRuntime.handle_turn()` es sync — convertir a async romperia ~250 lineas de tests existentes en 5+ archivos.
+  - `PostgresConversationStateRepository` es un skeleton sync que lanza `StateRepositoryError` — nunca fue operacional por el async boundary irresuelto.
+  - El proyecto ya tiene un patron async establecido en `automation_diagnosis`: `AutomationDiagnosisPostgresRepository` (async def, AsyncConnection inyectada), `modules/db/transaction.py` (fetch_one, execute async), y `modules/db/pool.py` (AsyncConnectionPool).
+
+- **Decision**: Runtime core se mantiene sync. Se agrega el async boundary solo para persistencia.
+  - `AsyncStateRepository` protocol en `providers.py` — async version de `StateRepository` para produccion.
+  - `AsyncInMemoryStateRepository` en `providers.py` — implementacion in-memory async para testing.
+  - `AsyncPostgresConversationStateRepository` en `state_repository.py` — repositorio async productivo real contra PostgreSQL 18 con psycopg 3 pool.
+  - `PostgresConversationStateRepository` sync skeleton se mantiene como documentacion/referencia (no removido).
+  - Se creo `scripts/smoke_sales_diagnosis_state_postgres_async.py` — smoke async que valida save → load → update → load non-existent → verify round-trip con RetrievedChunks.
+  - Se creo `tests/test_sales_diagnosis_async_state_repository.py` — 19 tests: 2 protocolo, 5 in-memory async, 5 postgres sin DB (pool raises, repr, etc), 7 postgres con DB (skip si no hay TEAM360_DB_URL).
+  - Se creo `async_boundary_decision.md` — documenta la decision, arquitectura, archivos y futuro.
+
+- Se actualizaron READMEs:
+  - `modules/sales_diagnosis_runtime/README.md` con seccion Fase 1.8g.
+  - `backend/scripts/README.md` con entrada del nuevo smoke y referencias cruzadas.
+  - `docs/status_actual.md` con esta entrada.
+
+- Validacion: `uv run pytest` = 299/299 passed, 9 skipped (DB-dependent). Sin regresiones.
+- No se convirtio `handle_turn()` a async. No se tocaron endpoints, frontend, routes, migraciones, LLM real, Milvus real, ArangoDB.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
 
 ### 2026-06-10 - Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState persistence
 
