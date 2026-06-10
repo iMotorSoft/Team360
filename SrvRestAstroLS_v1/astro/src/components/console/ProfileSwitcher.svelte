@@ -2,6 +2,7 @@
   import { buildConsoleRoute } from "../../lib/navigation/derive";
   import type { ConsoleView } from "../../lib/navigation/registry";
   import { consoleContext } from "../../stores/consoleContext.svelte";
+  import CustomSelect from "./CustomSelect.svelte";
 
   let { view }: { view: ConsoleView } = $props();
 
@@ -16,14 +17,12 @@
     ),
   );
 
-  function changeProfile(event: Event) {
-    const profile = (event.currentTarget as HTMLSelectElement).value as
-      | "team360_admin"
-      | "team360_operator"
-      | "partner_admin"
-      | "client_admin";
-    const selected = designProfiles.find(({ id }) => id === profile);
+  const profileOptions = $derived(
+    designProfiles.map((p) => ({ value: p.id, label: p.label })),
+  );
 
+  function changeProfile(profileId: string) {
+    const selected = designProfiles.find(({ id }) => id === profileId);
     if (selected) {
       window.location.assign(
         buildConsoleRoute(selected.defaultWorkspaceId, view, selected.id),
@@ -32,17 +31,14 @@
   }
 </script>
 
-<label class="block">
-  <span class="mb-1.5 block top-badge-neutral">Perfil mock / diseño</span>
-  <select
-    aria-label="Cambiar perfil mock de diseño"
-    class="w-full rounded-xl border border-[#dbe5e7] bg-white px-3 py-2 text-base
-    font-semibold text-[#21415e] transition focus-visible:border-[#71cfc6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
-    onchange={changeProfile}
-    value={consoleContext.activeProfile}
+<div>
+  <span class="mb-1.5 block text-slate-400 text-lg capitalize font-semibold"
+    >Perfil mock / diseño</span
   >
-    {#each designProfiles as profile}
-      <option value={profile.id}>{profile.label}</option>
-    {/each}
-  </select>
-</label>
+  <CustomSelect
+    options={profileOptions}
+    value={consoleContext.activeProfile}
+    ariaLabel="Cambiar perfil mock de diseño"
+    onchange={changeProfile}
+  />
+</div>

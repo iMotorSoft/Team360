@@ -3,8 +3,13 @@
   import { consoleContext } from "../../stores/consoleContext.svelte";
   import ConsoleIcon from "./ConsoleIcon.svelte";
   import NotificationCenter from "./NotificationCenter.svelte";
+  import CustomSelect from "./CustomSelect.svelte";
 
   let { onMenu = () => undefined }: { onMenu?: () => void } = $props();
+
+  const localeOptions = $derived(
+    SUPPORTED_LOCALES.map((l) => ({ value: l, label: l })),
+  );
 </script>
 
 <header
@@ -25,49 +30,46 @@
       >
         {consoleContext.bootstrap.uiHints.profileLabel}
       </p>
-      <p class="mt-1 truncate text-base font-semibold text-[#284c67]">
+      <div class="details-text flex items-center gap-3 mt-1 truncate">
         {consoleContext.activeOrganization.name}
-        <span class="mx-1.5 text-[#a5b3bb]">/</span>
+        <div class="w-1.5 h-1.5 rounded-full bg-slate-400 pulse"></div>
         {consoleContext.activeWorkspace.name}
-      </p>
+      </div>
     </div>
   </div>
 
   <div class="flex items-center gap-2 sm:gap-3">
-    <label class="hidden sm:block">
-      <span class="sr-only">Idioma de interfaz</span>
-      <select
-        aria-label="Idioma de interfaz"
-        class="rounded-xl border border-[#e0e8eb] bg-white px-2.5 py-2 text-sm font-bold uppercase text-[#587184] transition focus-visible:border-[#71cfc6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
-        onchange={(event) =>
-          consoleContext.setLocale(
-            (event.currentTarget as HTMLSelectElement).value,
-          )}
+    <!-- Locale picker -->
+    <div class="hidden sm:block">
+      <CustomSelect
+        options={localeOptions}
         value={consoleContext.locale}
-      >
-        {#each SUPPORTED_LOCALES as locale}
-          <option value={locale}>{locale}</option>
-        {/each}
-      </select>
-    </label>
+        ariaLabel="Idioma de interfaz"
+        centered={true}
+        onchange={(v) => consoleContext.setLocale(v)}
+      />
+    </div>
+
     <button
       aria-label="Buscar"
-      class="hidden size-10 place-items-center rounded-xl border border-[#e0e8eb] bg-white text-[#526d81] transition hover:border-[#badbd9] hover:text-[#167f7c] sm:grid"
+      class="text-[#526d81] cursor-pointer size-11 grid place-items-center rounded-full
+      transition hover:bg-slate-100"
       type="button"
     >
-      <ConsoleIcon name="search" />
+      <ConsoleIcon name="search" class="size-7.5" />
     </button>
     <NotificationCenter />
     <div
       class="ms-1 hidden items-center gap-2 border-s border-[#e0e8eb] ps-3 sm:flex"
     >
       <span
-        class="grid size-9 place-items-center rounded-xl bg-[#153b5b] text-sm font-bold text-white"
+        class="grid size-12 mx-2 items-center rounded-full text-center
+        tracking-[0.1em] bg-base-content/80 text-base font-bold text-white"
       >
         {consoleContext.bootstrap.currentUser.avatarInitials}
       </span>
       <div class="hidden xl:block">
-        <p class="text-sm font-bold text-[#31536b]">
+        <p class="text-base font-bold text-[#31536b]">
           {consoleContext.bootstrap.currentUser.name}
         </p>
         <p class="mt-0.5 text-sm text-[#8a9ba6]">
