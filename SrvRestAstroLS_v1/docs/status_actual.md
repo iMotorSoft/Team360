@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8b — MilvusRetrievalProvider runtime backend-only)
+Ultima actualizacion: 2026-06-10 (Fase 1.8c — QueryEmbeddingProvider + Prompt/GuardrailPolicy hardening)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,25 @@ Ultima actualizacion: 2026-06-10 (Fase 1.8b — MilvusRetrievalProvider runtime 
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.8c — QueryEmbeddingProvider + Prompt/GuardrailPolicy hardening
+
+- Se creo `backend/modules/sales_diagnosis_runtime/embedding_provider.py` con:
+  - `QueryEmbeddingConfig`: dataclass con model, dimensions (1536 default), timeout_seconds, api_key_env, base_url_env; `from_env()` constructor; `__repr__` sin api_key_env.
+  - `OpenAIQueryEmbeddingProvider`: implementa `QueryEmbeddingProvider`; import lazy de `openai`; lee API key de env en runtime, no en import; valida texto no vacio (`InvalidAssistantRuntimeInputError`); valida dimension 1536 (`LLMUnavailableError`); `__repr__` sin secretos; acepta `_client` para tests.
+- Se endurecio `policies.py`:
+  - `PromptPolicy.build_system_prompt()`: diferenciacion explicita de automatable / vendible hoy / planned_extension / no documentado; prohibicion de CRM, cierre de ventas automatico y facturacion automatica como disponibles.
+  - `PromptPolicy.build_turn_prompt()`: contexto recuperado con source_uri, title, node_path y preview en formato estructurado; recordatorio de maximo 3 preguntas, espanol claro, sin HTML, sin AG-UI.
+  - `GuardrailPolicy`: `CAPABILITY_PATTERNS` extensible (step_to_action, lead_capture, diagnostic_code, whatsapp_handoff, crm, auto_billing); `DECLINE_PATTERNS` compartidos; `_has_decline()` unificado; `_build_contextual_fallback()` para fallback segun tipo de violation; metodos individuales: `is_lead_capture_ready()`, `is_diagnostic_code_ready()`, `is_whatsapp_handoff_ready()`, `is_crm_ready()`, `is_auto_billing_ready()`; `build_fallback_response()` con argumentos opcionales `input`/`state`.
+- Se actualizo `__init__.py` con exports de `QueryEmbeddingConfig`, `OpenAIQueryEmbeddingProvider`.
+- Se crearon 11 tests en `tests/test_sales_diagnosis_embedding_provider.py` con fakes que cubren: config defaults, config repr sin api_key_env, config from_env, import lazy, missing API key, empty query, fake client 1536, wrong dimension, repr sin secretos, config model, API failure.
+- Se crearon 39 tests en `tests/test_sales_diagnosis_policies.py` que cubren: PromptPolicy hardening (safe ack, future capabilities, system prompt con reglas, turn prompt con chunks, limits, diferenciacion), GuardrailPolicy individual capabilities (step_to_action, lead_capture, diagnostic_code, whatsapp_handoff, crm, auto_billing), evaluate_response integration (pricing, SLA, max questions, empty, happy path), fallback contextual (pricing, planned_extension, generico), negation detection.
+- Validacion: `uv run pytest` = 230/230 passed (180 existentes + 50 nuevos).
+- `git diff --check` = OK. Secret scan = 0 hits.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real en tests, no se toca DB, no se crearon migraciones.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
 
 ### 2026-06-10 - Fase 1.8b — MilvusRetrievalProvider runtime backend-only
 

@@ -7,6 +7,10 @@ from modules.sales_diagnosis_runtime.contracts import (
     RetrievedChunk,
     RuntimeMetrics,
 )
+from modules.sales_diagnosis_runtime.embedding_provider import (
+    OpenAIQueryEmbeddingProvider,
+    QueryEmbeddingConfig,
+)
 from modules.sales_diagnosis_runtime.errors import (
     GuardrailViolationError,
     InvalidAssistantRuntimeInputError,
@@ -53,8 +57,10 @@ __all__ = [
     "MilvusSearchError",
     "NullLLMProvider",
     "NullRetrievalProvider",
+    "OpenAIQueryEmbeddingProvider",
     "ProgressiveEvent",
     "PromptPolicy",
+    "QueryEmbeddingConfig",
     "QueryEmbeddingProvider",
     "RetrievalProvider",
     "RetrievalUnavailableError",

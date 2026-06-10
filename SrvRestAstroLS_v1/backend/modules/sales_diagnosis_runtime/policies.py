@@ -6,6 +6,7 @@ from modules.sales_diagnosis_runtime.contracts import (
     FORBIDDEN_TERMS,
     PLANNED_EXTENSIONS,
     SAFE_ACK_TEXT,
+    SALES_DIAGNOSIS_INSTANCE_CODE,
     AssistantTurnInput,
     ConversationState,
     GuardrailResult,
@@ -37,9 +38,16 @@ class PromptPolicy:
             "recuperar contexto del knowledge base y orientar sin prometer "
             "capacidades no disponibles. "
             "No inventes precios, plazos, SLA ni integraciones no documentadas. "
-            "No vendas Step-to-Action, lead_capture, diagnostic_code ni "
-            "WhatsApp handoff como disponibles. "
-            "Hacé máximo 3 preguntas por turno."
+            "No vendas Step-to-Action, lead_capture, diagnostic_code, "
+            "WhatsApp handoff, CRM ni cierre de ventas automático como disponibles. "
+            "Diferenciá claramente entre:\n"
+            "- **automatizable**: existe documentación y se puede vender hoy.\n"
+            "- **vendible hoy**: hay pricing o caso de uso documentado.\n"
+            "- **planned_extension**: aparece como capacidad futura, "
+            "no debe venderse como lista.\n"
+            "- **no documentado**: no hay información en el knowledge base.\n"
+            "Hacé máximo 3 preguntas por turno. "
+            "Respondé en español claro, sin HTML, sin formato AG-UI."
         )
 
     def build_turn_prompt(
@@ -50,16 +58,25 @@ class PromptPolicy:
     ) -> str:
         parts = [f"Usuario: {input.user_message}"]
         if context:
-            parts.append("\nContexto recuperado:")
+            parts.append("")
+            parts.append("Contexto recuperado del knowledge base:")
             for i, c in enumerate(context, 1):
-                parts.append(f"{i}. [{c.title}] {c.content_preview}")
+                src = c.source_uri or ""
+                title = c.title or ""
+                path = c.node_path or ""
+                meta = f"[{title}]({src})" if title and src else title or src
+                if path:
+                    meta = f"{meta} — {path}"
+                parts.append(f"{i}. {meta}")
+                parts.append(f"   {c.content_preview or '(sin preview)'}")
         if state.slots:
             parts.append(f"\nSlots actuales: {state.slots}")
         if state.history_summary:
             parts.append(f"\nHistorial: {state.history_summary}")
         parts.append(
             "\nRespondé de forma útil, concreta y sin prometer "
-            "capacidades no disponibles."
+            "capacidades no disponibles. "
+            "Máximo 3 preguntas. Usá español claro. Sin HTML ni AG-UI."
         )
         return "\n".join(parts)
 
@@ -95,9 +112,41 @@ class GuardrailPolicy:
     - 0 planned_extension misrepresented
     - 0 pricing/SLA hallucination
 
-    This skeleton implements the same heuristic layers from the lab evaluator.
-    Full policy registry is future (Fase 1.8c).
+    Hardened in Fase 1.8c:
+    - Individual detection methods for each future capability
+    - CRM and auto billing/sales closing detection
+    - Context-aware fallback builder
+    - Better word-boundary-aware regex patterns
     """
+
+    DECLINE_PATTERNS = frozenset({
+        "no está disponible",
+        "no está list",
+        "todavía no",
+        "capacidad futura",
+        "extensión futura",
+        "no ofrecemos",
+        "no incluimos",
+        "no contamos",
+        "no tenemos información",
+        "no documentado",
+        "consultá con nuestro equipo",
+        "no debe venderse como listo",
+        "no debe venderse como lista",
+    })
+
+    CAPABILITY_PATTERNS: dict[str, tuple[str, ...]] = {
+        "step_to_action": ("step-to-action", "steptoaction"),
+        "lead_capture": ("lead capture", "lead_capture"),
+        "diagnostic_code": ("diagnostic code", "diagnostic_code", "código de diagnóstico"),
+        "whatsapp_handoff": ("whatsapp handoff", "whatsapp_handoff", "whatsapp"),
+        "crm": ("crm", "customer relationship management"),
+        "auto_billing": (
+            "cierre de ventas automático",
+            "facturación automática",
+            "auto billing", "autobilling",
+        ),
+    }
 
     def evaluate_response(
         self,
@@ -123,20 +172,10 @@ class GuardrailPolicy:
                     result.forbidden_claims.append(term)
                     result.notes.append(f"forbidden_term_found:{term}")
 
-        # Planned extension check
-        for cap in PLANNED_EXTENSIONS:
-            cap_label = cap.replace("_", " ")
-            if cap_label in text_lower:
-                decline_patterns = [
-                    "no está disponible",
-                    "no está listo",
-                    "todavía no",
-                    "capacidad futura",
-                    "no ofrecemos",
-                    "no incluimos",
-                ]
-                has_decline = any(p in text_lower for p in decline_patterns)
-                if not has_decline:
+        # Planned extension checks — any future capability claimed as ready
+        for cap, patterns in self.CAPABILITY_PATTERNS.items():
+            if any(p in text_lower for p in patterns):
+                if not self._has_decline(text_lower):
                     result.planned_extension_misrepresented = True
                     result.notes.append(f"planned_extension_misrepresented:{cap}")
 
@@ -144,15 +183,7 @@ class GuardrailPolicy:
         pricing_terms = {"precio", "precios", "plazo", "plazos", "sla"}
         for term in pricing_terms:
             if term in text_lower:
-                decline_patterns = [
-                    "no contamos",
-                    "no tenemos información",
-                    "no documentado",
-                    "consultá con nuestro equipo",
-                    "no está disponible",
-                ]
-                has_decline = any(p in text_lower for p in decline_patterns)
-                if not has_decline:
+                if not self._has_decline(text_lower):
                     result.pricing_sla_hallucination = True
                     result.notes.append(f"unsupported_{term}_claim")
 
@@ -172,7 +203,11 @@ class GuardrailPolicy:
     def build_fallback_response(
         self,
         reason: str = "",
+        input: AssistantTurnInput | None = None,
+        state: ConversationState | None = None,
     ) -> str:
+        if result := self._build_contextual_fallback(reason, input, state):
+            return result
         if "guardrail" in reason or "unsafe" in reason:
             return (
                 "No puedo proporcionar esa información porque excede "
@@ -183,6 +218,37 @@ class GuardrailPolicy:
             "Ocurrió un error al procesar tu consulta. "
             "Por favor intentá de nuevo o escribinos directamente."
         )
+
+    def _build_contextual_fallback(
+        self,
+        reason: str,
+        input: AssistantTurnInput | None,
+        state: ConversationState | None,
+    ) -> str | None:
+        if not input or not input.user_message:
+            return None
+        if "precio" in reason or "sla" in reason or "pricing" in reason:
+            return (
+                "Entiendo tu consulta sobre costos o plazos. "
+                "No tengo información de precios ni SLA en mi base de conocimiento. "
+                "Por favor consultá con nuestro equipo comercial "
+                "para obtener una cotización personalizada."
+            )
+        if "planned_extension" in reason:
+            cap = reason.split(":")[-1] if ":" in reason else ""
+            cap_label = cap.replace("_", " ") if cap else "esa capacidad"
+            return (
+                f"Entiendo tu interés en {cap_label}. "
+                f"Según la documentación disponible, {cap_label} "
+                f"aparece como extensión planificada y no está disponible "
+                f"actualmente. ¿Querés que te informe sobre "
+                f"otras capacidades que sí están documentadas?"
+            )
+        return None
+
+    @staticmethod
+    def _has_decline(text: str) -> bool:
+        return any(p in text for p in GuardrailPolicy.DECLINE_PATTERNS)
 
     @staticmethod
     def _has_near_negation(text: str, term: str, window: int = 60) -> bool:
@@ -200,17 +266,49 @@ class GuardrailPolicy:
         context = text[start:end]
         return any(tok in context for tok in negation_tokens)
 
+    # ------------------------------------------------------------------
+    # Individual capability checks
+    # ------------------------------------------------------------------
+
     @staticmethod
-    def is_step_to_action_ready(response_text: str) -> bool:
-        """Detect if a response falsely claims Step-to-Action is available."""
-        text_lower = response_text.lower()
-        if "step-to-action" not in text_lower and "steptoaction" not in text_lower:
+    def _capability_ready(text: str, patterns: tuple[str, ...]) -> bool:
+        text_lower = text.lower()
+        if not any(p in text_lower for p in patterns):
             return False
-        decline_patterns = [
-            "no está disponible",
-            "no está listo",
-            "todavía no",
-            "capacidad futura",
-            "no ofrecemos",
-        ]
-        return not any(p in text_lower for p in decline_patterns)
+        return not GuardrailPolicy._has_decline(text_lower)
+
+    @classmethod
+    def is_step_to_action_ready(cls, response_text: str) -> bool:
+        return cls._capability_ready(
+            response_text, cls.CAPABILITY_PATTERNS["step_to_action"]
+        )
+
+    @classmethod
+    def is_lead_capture_ready(cls, response_text: str) -> bool:
+        return cls._capability_ready(
+            response_text, cls.CAPABILITY_PATTERNS["lead_capture"]
+        )
+
+    @classmethod
+    def is_diagnostic_code_ready(cls, response_text: str) -> bool:
+        return cls._capability_ready(
+            response_text, cls.CAPABILITY_PATTERNS["diagnostic_code"]
+        )
+
+    @classmethod
+    def is_whatsapp_handoff_ready(cls, response_text: str) -> bool:
+        return cls._capability_ready(
+            response_text, cls.CAPABILITY_PATTERNS["whatsapp_handoff"]
+        )
+
+    @classmethod
+    def is_crm_ready(cls, response_text: str) -> bool:
+        return cls._capability_ready(
+            response_text, cls.CAPABILITY_PATTERNS["crm"]
+        )
+
+    @classmethod
+    def is_auto_billing_ready(cls, response_text: str) -> bool:
+        return cls._capability_ready(
+            response_text, cls.CAPABILITY_PATTERNS["auto_billing"]
+        )

@@ -48,6 +48,7 @@ Template seguro = acuse/progreso, no reemplaza LLM
 |---------|-----------|
 | `__init__.py` | Export publico |
 | `contracts.py` | Dataclasses: TurnInput, TurnOutput, ConversationState, RetrievedChunk, GuardrailResult, ProgressiveEvent, RuntimeMetrics |
+| `embedding_provider.py` | QueryEmbeddingConfig + OpenAIQueryEmbeddingProvider |
 | `errors.py` | Excepciones controladas |
 | `milvus_provider.py` | MilvusRetrievalProvider + MilvusRuntimeConfig |
 | `providers.py` | Interfaces, Null providers y QueryEmbeddingProvider |
@@ -95,10 +96,46 @@ uv run pytest tests/test_sales_diagnosis_runtime_contracts.py -v
 uv run pytest tests/test_sales_diagnosis_milvus_provider.py -v
 ```
 
+## Fase 1.8c — QueryEmbeddingProvider and Policy Hardening
+
+### QueryEmbeddingProvider
+
+* `QueryEmbeddingConfig` — config con model, dimensions, timeout, api_key_env, base_url_env; repr sin secretos; constructor `from_env()`.
+* `OpenAIQueryEmbeddingProvider` — implementa `QueryEmbeddingProvider`; lazy import de `openai`; lee API key de env en runtime, no en import; valida texto no vacio; valida dimension 1536; `__repr__` sin secretos.
+
+### GuardrailPolicy (hardened)
+
+* `CAPABILITY_PATTERNS` — mapeo extensible de capacidades futuras (step_to_action, lead_capture, diagnostic_code, whatsapp_handoff, crm, auto_billing).
+* `DECLINE_PATTERNS` — patrones de declinacion compartidos.
+* `_has_decline()` — verificador unificado de declinacion.
+* `_build_contextual_fallback()` — fallback contextual segun el tipo de violation.
+* Metodos individuales: `is_lead_capture_ready()`, `is_diagnostic_code_ready()`, `is_whatsapp_handoff_ready()`, `is_crm_ready()`, `is_auto_billing_ready()`.
+
+### PromptPolicy (hardened)
+
+* System prompt con diferenciacion: automatizable / vendible hoy / planned_extension / no documentado.
+* Turn prompt con source, title, node_path y preview de cada chunk recuperado.
+* Recordatorio de maximo 3 preguntas, espanol claro, sin HTML, sin AG-UI.
+
+### Tests
+
+* `test_sales_diagnosis_embedding_provider.py` — 11 tests (config, config repr, missing key, empty query, fake client, wrong dimension, secret repr, config model, API failure).
+* `test_sales_diagnosis_policies.py` — 39 tests (PromptPolicy hardening, GuardrailPolicy individual capabilities, evaluate_response integration, fallback contextual, negation detection).
+
+### No implementa
+
+* Endpoints HTTP.
+* SSE productivo.
+* Frontend.
+* LLM real en tests.
+* Milvus real en tests.
+* DB real.
+* ArangoDB / cross-encoder.
+
 ## Proximas fases sugeridas
 
 1. ~~1.8b -- MilvusRetrievalProvider runtime con fallback pgvector.~~ **(Completado)**
-2. 1.8c -- Prompt y GuardrailPolicy hardening con registry en PostgreSQL.
+2. ~~1.8c -- QueryEmbeddingProvider + Prompt/GuardrailPolicy hardening.~~ **(Completado)**
 3. 1.8d -- ConversationState persistence en PostgreSQL.
 4. 1.8e -- Progressive event contract interno completo.
 5. 1.8f -- Endpoint backend-only controlado.
