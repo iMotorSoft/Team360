@@ -283,6 +283,26 @@ uv run python lab/sales-diagnosis-assistant-conversation/scripts/generate_progre
 uv run python lab/sales-diagnosis-assistant-conversation/scripts/generate_progressive_infographics.py
 ```
 
+## Lab closure decision
+
+Este lab ha completado su ciclo de experimentación. Las decisiones arquitectónicas validadas están documentadas en:
+
+[decision_notes/20260610_sales_diagnosis_assistant_lab_closure.md](decision_notes/20260610_sales_diagnosis_assistant_lab_closure.md)
+
+Resumen de cierre:
+
+- **PostgreSQL 18**: source of truth
+- **Milvus 2.6**: vector runtime derivado para conversación
+- **pgvector**: baseline/dev/fallback
+- **gpt-5-nano low**: primera respuesta inteligente
+- **Template seguro**: solo acuse/progreso, no reemplaza LLM
+- **AG-UI/SSE**: experiencia progresiva futura
+- **ArangoDB**: fuera por ahora
+- **Cross-encoder**: fuera por ahora
+- **GPT-5.5**: judge/oracle offline, no runtime
+
+Próximo paso recomendado: **Fase 1.8 — Runtime Design Handoff**.
+
 ### Archivos
 
 ```

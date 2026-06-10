@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.7d — Progressive Response Simulation Lab)
+Ultima actualizacion: 2026-06-10 (Fase 1.7e — Sales Diagnosis Assistant Lab Closure)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,26 @@ Ultima actualizacion: 2026-06-10 (Fase 1.7d — Progressive Response Simulation 
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.7e — Sales Diagnosis Assistant Lab Closure and Architecture Decision Note
+
+- Se creo la decision note de cierre de labs del asistente conversacional de ventas/diagnostico en `lab/sales-diagnosis-assistant-conversation/decision_notes/20260610_sales_diagnosis_assistant_lab_closure.md`.
+- Labs cerrados: Fase 1.6j (Milvus vs pgvector benchmark), 1.6k (RAG answer generation), 1.7 (Conversation lab), 1.7b (Evaluacion heuristica refinada), 1.7c (Guardrail forensic fix), 1.7d (Progressive response simulation).
+- Decisiones arquitectonicas documentadas:
+  - PostgreSQL 18 = source of truth.
+  - Milvus 2.6 = vector runtime derivado para conversacion.
+  - pgvector = baseline/dev/fallback.
+  - gpt-5-nano low = primera respuesta inteligente.
+  - Template seguro = solo acuse/progreso, no reemplaza LLM.
+  - AG-UI/SSE = experiencia progresiva futura.
+  - ArangoDB y cross-encoder = fuera por ahora.
+  - GPT-5.5 = judge/oracle offline, no runtime.
+- Guardrails estables: 0 real failures despues de 1.7c.
+- Respuesta progresiva adoptada conceptualmente, no implementada como runtime.
+- Proximo paso recomendado: Fase 1.8 — Runtime Design Handoff.
+- Se actualizo `README.md` del lab con seccion "Lab closure decision" y link relativo a la decision note.
+- No se toco runtime productivo, frontend, routes, endpoints, SSE productivo, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, corpus knowledge ni embeddings.
+- No se hardcodearon API keys. No se hizo git add/commit.
 
 ### 2026-06-10 - Fase 1.7c — Fix real guardrail failures del Conversation Lab
 
