@@ -4,9 +4,10 @@
 
 Modulo interno skeleton para el runtime del asistente de ventas/diagnostico de Team360.
 
-Define contratos, interfaces y orquestador basico sin implementar:
+Define contratos, interfaces y orquestador basico. La unica superficie HTTP
+vigente es el endpoint interno/dev documentado en Fase 1.8h-1.8p; no hay
+endpoint publico final.
 
-* endpoints HTTP;
 * SSE productivo;
 * frontend;
 * Milvus real;
@@ -34,7 +35,7 @@ Template seguro = acuse/progreso, no reemplaza LLM
 
 ## Que NO hace
 
-* No expone endpoints HTTP.
+* No expone endpoint publico final.
 * No implementa SSE.
 * No llama LLM real.
 * No toca DB.
@@ -769,6 +770,7 @@ En `TestDevSalesDiagnosisRouteLiteLLM`:
 12. ~~1.8m -- Milvus retrieval opt-in boundary.~~ **(Completado)**
 13. ~~1.8n -- LiteLLM LLM provider opt-in boundary.~~ **(Completado)**
 14. ~~1.8o -- LiteLLM HTTP smoke opt-in for dev endpoint.~~ **(Completado)**
+15. ~~1.8p -- Runtime dev endpoint release gate.~~ **(Completado)**
 
 ## Fase 1.8o — LiteLLM HTTP smoke opt-in for dev endpoint
 
@@ -790,3 +792,149 @@ En `TestDevSalesDiagnosisRouteLiteLLM`:
   8. No leaks de DB por defecto.
 - Sin cambios en el script base, sin tocar frontend, sin Milvus real, sin DB real.
 - Sin dependencias extra (urllib stdlib).
+
+## Fase 1.8p — Runtime dev endpoint release gate
+
+### Alcance
+
+Esta fase consolida el estado final del endpoint interno/dev antes de abrir
+cualquier endpoint no-dev.
+
+Endpoint vigente:
+
+`POST /api/dev/sales-diagnosis-runtime/turn`
+
+Este endpoint sigue siendo interno/dev:
+
+- ruta bajo `/api/dev/`;
+- `runtime_mode = "dev_fake"`;
+- defaults seguros sin servicios reales;
+- Pydantic solo en el borde HTTP;
+- `AssistantConversationRuntime`, `PromptPolicy` y `GuardrailPolicy` reales;
+- sin frontend, sin SSE productivo y sin endpoint publico nuevo.
+
+No llamar esta etapa MVP. No representa superficie publica ni contrato final de
+producto.
+
+### Matriz de modos
+
+| Dimension | Env var | Default seguro | Opt-in dev | Servicios reales por default |
+|-----------|---------|----------------|------------|------------------------------|
+| State | `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY` | `inmemory` | `postgres` | No |
+| Retrieval | `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER` | `fake` | `milvus` | No |
+| LLM | `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER` | `fake` | `litellm` | No |
+
+Defaults seguros:
+
+- state = `inmemory`;
+- retrieval = `fake`;
+- llm = `fake`.
+
+Con los defaults, pytest normal y el smoke base no usan PostgreSQL, Milvus,
+LiteLLM, OpenAI, ArangoDB, pgvector, cross-encoder ni servicios externos.
+
+### Combinaciones soportadas en dev
+
+| State | Retrieval | LLM | Estado |
+|-------|-----------|-----|--------|
+| `inmemory` | `fake` | `fake` | Default soportado |
+| `postgres` | `fake` | `fake` | Opt-in soportado con `TEAM360_DB_URL` y migracion 007 |
+| `inmemory` | `milvus` | `fake` | Opt-in soportado con `TEAM360_MILVUS_URI` o `TEAM360_MILVUS_HOST`; embedding fake |
+| `inmemory` | `fake` | `litellm` | Opt-in soportado con `TEAM360_LITELLM_BASE_URL` + `TEAM360_LITELLM_API_KEY` |
+| `postgres` | `milvus` | `fake` | Combinacion dev permitida si ambas configuraciones existen |
+| `postgres` | `fake` | `litellm` | Combinacion dev permitida si ambas configuraciones existen |
+| `inmemory` | `milvus` | `litellm` | Combinacion dev permitida si ambas configuraciones existen |
+| `postgres` | `milvus` | `litellm` | Permitida para pruebas manuales; no es default ni gate obligatorio |
+
+Valores invalidos devuelven HTTP 500 controlado y sin secrets.
+
+### Env vars por opt-in
+
+La configuracion runtime se resuelve desde `backend/globalVar.py`.
+Las env vars siguientes son las entradas que `globalVar.py` y los resolvers del
+endpoint dev leen para activar cada modo.
+
+State Postgres:
+
+| Variable | Requerida | Nota |
+|----------|-----------|------|
+| `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres` | Si | Activa state en PostgreSQL |
+| `TEAM360_DB_URL` o `TEAM360_DB_URL_PSQL` | Si | DSN PostgreSQL resuelto via `globalVar.get_team360_db_url_psql()`; no imprimir en logs |
+| Migracion `007_sales_diagnosis_conversation_states.sql` | Si | Tabla `sales_diagnosis_conversation_states` |
+
+Retrieval Milvus:
+
+| Variable | Requerida | Nota |
+|----------|-----------|------|
+| `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER=milvus` | Si | Activa `MilvusRetrievalProvider` |
+| `TEAM360_MILVUS_URI` o `TEAM360_MILVUS_HOST` | Si | Config minima de Milvus |
+| `TEAM360_MILVUS_PORT` | No | Default `19530` |
+| `TEAM360_MILVUS_TOKEN` | No | No debe imprimirse |
+| `TEAM360_MILVUS_COLLECTION` | No | Default del provider |
+| `TEAM360_EMBEDDING_VERSION` | No | Filtro opcional |
+| `TEAM360_KNOWLEDGE_SCOPE_ID` | No | Filtro opcional |
+
+LLM LiteLLM:
+
+| Variable | Requerida | Nota |
+|----------|-----------|------|
+| `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm` | Si | Activa `_DevLiteLLMProvider` |
+| `TEAM360_LITELLM_BASE_URL` | Si | URL del proxy LiteLLM |
+| `TEAM360_LITELLM_API_KEY` | Si | No debe imprimirse |
+| `TEAM360_LITELLM_MODEL_ALIAS` | No | Default `openrouter_qwen3_30b_a3b_thinking_2507` |
+
+### Smoke commands
+
+Base InMemory:
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Terminal 1
+uv run uvicorn app:app --host 127.0.0.1 --port 8000
+
+# Terminal 2
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+```
+
+Postgres opt-in:
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Terminal 1
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8000
+
+# Terminal 2
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
+```
+
+LiteLLM opt-in:
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Terminal 1
+TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8000
+
+# Terminal 2
+TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+```
+
+Si faltan `TEAM360_LITELLM_BASE_URL` o `TEAM360_LITELLM_API_KEY`, el smoke
+LiteLLM valida el HTTP 500 controlado como skip operativo, no como fallo.
+
+### Release gate confirmado
+
+- Pytest normal no usa servicios reales.
+- El endpoint sigue bajo `/api/dev/`.
+- No hay endpoint publico nuevo.
+- La configuracion DB del endpoint y smokes pasa por `backend/globalVar.py`.
+- No se toca frontend, Astro, Svelte, UI ni SSE productivo.
+- No se activa por default PostgreSQL, Milvus, LiteLLM, OpenAI, ArangoDB,
+  pgvector ni cross-encoder.
+- No hay Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.

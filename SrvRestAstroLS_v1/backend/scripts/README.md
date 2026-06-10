@@ -20,6 +20,43 @@ Si PostgreSQL falla durante el snapshot, el backend debe responder HTTP 503 y el
 
 ## sales_diagnosis_runtime
 
+### Runtime dev endpoint release gate
+
+Endpoint interno/dev:
+
+`POST /api/dev/sales-diagnosis-runtime/turn`
+
+Defaults seguros:
+
+| Dimension | Env var | Default | Opt-in |
+|-----------|---------|---------|--------|
+| State | `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY` | `inmemory` | `postgres` |
+| Retrieval | `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER` | `fake` | `milvus` |
+| LLM | `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER` | `fake` | `litellm` |
+
+El endpoint sigue siendo interno/dev. Pytest normal no usa servicios reales.
+No hay endpoint publico nuevo, frontend, SSE productivo, Step-to-Action,
+lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+La configuracion DB de los modos Postgres se resuelve desde `backend/globalVar.py`
+via `get_team360_db_url_psql()`; las env vars son entradas de esa configuracion.
+
+Comandos smoke del gate:
+
+```bash
+cd backend
+
+# Base InMemory
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+
+# Postgres opt-in (backend debe correr con TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres)
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
+
+# LiteLLM opt-in (backend debe correr con TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm)
+TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+```
+
 - `smoke_sales_diagnosis_runtime_postgres.py`: smoke backend-only del runtime completo `AssistantConversationRuntime` contra PostgreSQL 18 real.
   - Usa fake RetrievalProvider (no Milvus), fake LLMProvider (no OpenAI), fake MetricsRecorder y fake AuditTrail.
   - Realiza 4 turnos: safe → safe → soft guardrail (too_many_questions) → hard guardrail (unsafe_claim / UnsafeResponseError).

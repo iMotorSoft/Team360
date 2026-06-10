@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8o — LiteLLM HTTP smoke opt-in for dev endpoint)
+Ultima actualizacion: 2026-06-10 (Fase 1.8p — Runtime dev endpoint release gate)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,22 @@ Ultima actualizacion: 2026-06-10 (Fase 1.8o — LiteLLM HTTP smoke opt-in for de
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.8p — Runtime dev endpoint release gate
+
+- Se audito el endpoint interno/dev `POST /api/dev/sales-diagnosis-runtime/turn` antes de abrir cualquier endpoint no-dev.
+- Se documento en `backend/modules/sales_diagnosis_runtime/README.md` una matriz clara de modos:
+  - State: `inmemory` default / `postgres` opt-in.
+  - Retrieval: `fake` default / `milvus` opt-in.
+  - LLM: `fake` default / `litellm` opt-in.
+- Defaults seguros confirmados: `state=inmemory`, `retrieval=fake`, `llm=fake`.
+- Se documentaron env vars necesarias para cada opt-in, combinaciones soportadas en dev y comandos smoke base InMemory, Postgres opt-in y LiteLLM opt-in.
+- Se aclaro que la configuracion DB se resuelve desde `backend/globalVar.py` via `get_team360_db_url_psql()`; las env vars son entradas de esa configuracion.
+- Se actualizo `backend/scripts/README.md` con el release gate operativo y comandos smoke.
+- Pytest normal no usa servicios reales; los servicios reales siguen siendo opt-in.
+- El endpoint sigue siendo interno/dev bajo `/api/dev/`; no se abrio endpoint publico.
+- No se toco frontend, Astro, Svelte, UI, SSE productivo, endpoint publico, OpenAI SDK, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se creo rama nueva.
 
 ### 2026-06-10 - Fase 1.8l — Provider mode boundary for dev endpoint
 
