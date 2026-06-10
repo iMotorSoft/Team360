@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8i — Dev endpoint hardening + smoke script)
+Ultima actualizacion: 2026-06-10 (Fase 1.8j — Postgres opt-in state repository for dev endpoint)
 
 ## Directorio de trabajo
 
@@ -150,6 +150,35 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
   - `status_actual.md`: este registro.
 
 - Sin tocar frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8j — Postgres opt-in state repository for dev endpoint
+
+- Se modifico `routes/sales_diagnosis_runtime_dev.py`:
+  - Nuevo env `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY`:
+    - `inmemory` (default) o no seteado → `InMemoryConversationStateRepository`.
+    - `postgres` → `_DevPostgresStateRepository` via psycopg 3 sync.
+    - Cualquier otro valor → HTTP 500 con mensaje de valores aceptados.
+  - `_DevPostgresStateRepository`: sync, per-request connection, reusa SQL de `AsyncPostgresConversationStateRepository`, serializa via `ConversationStateSerializer`.
+  - Si `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres` pero no hay `TEAM360_DB_URL` → HTTP 500 con mensaje claro.
+  - Errores de psycopg capturados como HTTP 500 controlado.
+  - No leaks de secrets en errores.
+  - No se crea pool propio.
+  - `_shared_inmemory_repo` se mantiene como singleton para modo default.
+
+- Se agregaron 6 tests en `tests/test_sales_diagnosis_runtime_dev_route.py`:
+  1. `test_default_uses_inmemory_state_repository` — confirma que sin env se usa InMemory.
+  2. `test_postgres_opt_in_requires_db_url` — mode=postgres sin DB_URL → 500 con mensaje.
+  3. `test_invalid_state_repository_mode_returns_controlled_error` — modo invalido → 500.
+  4. `test_endpoint_still_works_with_default_inmemory` — endpoint funcional sin env.
+  5. `test_no_real_db_called_by_default` — no leak de "postgres" en respuesta default.
+  6. `test_no_secret_leak_on_postgres_config_error` — error de config sin secrets.
+
+- Se actualizaron:
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.8j.
+  - `status_actual.md`: este registro.
+
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes, smoke existente.
 - Sin creacion de rama nueva.
 
 ### 2026-06-10 - Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState persistence

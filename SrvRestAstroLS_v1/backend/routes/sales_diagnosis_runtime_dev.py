@@ -6,6 +6,12 @@ Production wiring (Postgres state, real Milvus, real LLM) is NOT active here.
 
 Endpoint: POST /api/dev/sales-diagnosis-runtime/turn
 
+State repository selection (env var):
+- Default (unset or "inmemory"): InMemoryConversationStateRepository
+- ``TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres``: uses PostgreSQL
+  via psycopg 3 sync (requires TEAM360_DB_URL and migration 007 applied).
+  This is an opt-in dev mode, not production.
+
 Request metadata flags:
 - ``dev_test_unsafe_llm`` (bool): if true, uses a FakeLLMProvider that returns
   unsafe text to exercise guardrail policy. Dev-only, not for prod.
@@ -13,11 +19,12 @@ Request metadata flags:
 
 from __future__ import annotations
 
-from dataclasses import asdict
+import json as _json
+import os
 
 from litestar import post
 from litestar.exceptions import HTTPException
-from litestar.status_codes import HTTP_400_BAD_REQUEST
+from litestar.status_codes import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 
 from modules.sales_diagnosis_runtime import (
     AssistantConversationRuntime,
@@ -32,11 +39,11 @@ from modules.sales_diagnosis_runtime.errors import (
     UnsafeResponseError,
 )
 from modules.sales_diagnosis_runtime.providers import (
-    InMemoryStateRepository,
     LLMProvider,
     RetrievalProvider,
 )
 from modules.sales_diagnosis_runtime.state_repository import (
+    ConversationStateSerializer,
     InMemoryConversationStateRepository,
 )
 
@@ -115,10 +122,130 @@ class _DevUnsafeFakeLLMProvider:
 
 
 # ---------------------------------------------------------------------------
-# Runtime factory
+# State repository selection
 # ---------------------------------------------------------------------------
 
-_SHARED_STATE_REPO = InMemoryConversationStateRepository()
+_DEV_STATE_REPOSITORY_ENV = "TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY"
+_TABLE_NAME = "sales_diagnosis_conversation_states"
+
+_shared_inmemory_repo = InMemoryConversationStateRepository()
+
+
+class _DevPostgresStateRepository:
+    """Sync PostgreSQL state repository for the dev endpoint.
+
+    Uses psycopg 3 sync directly — no pool, no ORM.
+    Opens a new connection per operation (acceptable for dev).
+    Requires migration 007 applied on the target database.
+    """
+
+    def __init__(self, dsn: str) -> None:
+        self._dsn = dsn
+
+    def load(self, session_id: str) -> ConversationState | None:
+        import psycopg
+        from psycopg.rows import dict_row
+
+        try:
+            with psycopg.connect(self._dsn, row_factory=dict_row) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"SELECT state_jsonb FROM {_TABLE_NAME} "
+                        f"WHERE session_id = %(sid)s",
+                        {"sid": session_id},
+                    )
+                    row = cur.fetchone()
+        except psycopg.Error:
+            raise HTTPException(
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Postgres state repository error: connection failed or table not found. "
+                "Ensure TEAM360_DB_URL is correct and migration 007 is applied.",
+            ) from None
+        if row is None:
+            return None
+        raw = row["state_jsonb"]
+        if isinstance(raw, str):
+            raw = _json.loads(raw)
+        if not isinstance(raw, dict):
+            raise HTTPException(
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Expected jsonb object for session_id={session_id!r}",
+            )
+        return ConversationStateSerializer.from_dict(raw)
+
+    def save(self, state: ConversationState) -> None:
+        import psycopg
+
+        serialized = ConversationStateSerializer.to_dict(state)
+        try:
+            with psycopg.connect(self._dsn) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"INSERT INTO {_TABLE_NAME} "
+                        f"(session_id, assistant_instance_code, package_code, "
+                        f"knowledge_scope_code, state_jsonb, "
+                        f"created_at_utc, updated_at_utc) "
+                        f"VALUES (%(session_id)s, %(assistant_instance_code)s, "
+                        f"%(package_code)s, %(knowledge_scope_code)s, "
+                        f"%(state_jsonb)s::jsonb, now(), now()) "
+                        f"ON CONFLICT (session_id) DO UPDATE SET "
+                        f"state_jsonb = EXCLUDED.state_jsonb, "
+                        f"updated_at_utc = now()",
+                        {
+                            "session_id": serialized["session_id"],
+                            "assistant_instance_code": serialized[
+                                "assistant_instance_code"
+                            ],
+                            "package_code": serialized["package_code"],
+                            "knowledge_scope_code": serialized[
+                                "knowledge_scope_code"
+                            ],
+                            "state_jsonb": _json.dumps(serialized),
+                        },
+                    )
+                conn.commit()
+        except psycopg.Error:
+            raise HTTPException(
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Postgres state repository error: connection failed or table not found. "
+                "Ensure TEAM360_DB_URL is correct and migration 007 is applied.",
+            ) from None
+
+
+def _resolve_state_repository():
+    mode = os.environ.get(_DEV_STATE_REPOSITORY_ENV, "").strip().lower()
+    if not mode or mode == "inmemory":
+        return _shared_inmemory_repo
+    if mode == "postgres":
+        dsn = _resolve_postgres_dsn()
+        return _DevPostgresStateRepository(dsn)
+    raise HTTPException(
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=(
+            f"Invalid {_DEV_STATE_REPOSITORY_ENV}={mode!r}. "
+            "Use 'inmemory' (default) or 'postgres'."
+        ),
+    )
+
+
+def _resolve_postgres_dsn() -> str:
+    from globalVar import get_team360_db_url_psql
+
+    dsn = get_team360_db_url_psql()
+    if not dsn:
+        raise HTTPException(
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=(
+                f"{_DEV_STATE_REPOSITORY_ENV}=postgres requires TEAM360_DB_URL. "
+                "Set the environment variable or configure globalVar.py."
+            ),
+        )
+    return dsn
+
+
+# ---------------------------------------------------------------------------
+# Runtime factory
+# ---------------------------------------------------------------------------
 
 
 def _build_dev_runtime(metadata: dict) -> AssistantConversationRuntime:
@@ -130,7 +257,7 @@ def _build_dev_runtime(metadata: dict) -> AssistantConversationRuntime:
     return AssistantConversationRuntime(
         retrieval_provider=retrieval,
         llm_provider=llm,
-        state_repository=_SHARED_STATE_REPO,
+        state_repository=_resolve_state_repository(),
         prompt_policy=PromptPolicy(),
         guardrail_policy=GuardrailPolicy(),
     )

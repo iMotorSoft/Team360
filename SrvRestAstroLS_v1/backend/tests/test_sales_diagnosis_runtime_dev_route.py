@@ -5,10 +5,20 @@ No real LLM. No real Milvus. No real DB. No real network.
 
 from __future__ import annotations
 
-from litestar.status_codes import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+import os
+
+from litestar.status_codes import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from litestar.testing import TestClient
 
 from app import create_app
+from routes.sales_diagnosis_runtime_dev import (
+    _DEV_STATE_REPOSITORY_ENV,
+    _DevPostgresStateRepository,
+    _resolve_state_repository,
+)
+from modules.sales_diagnosis_runtime.state_repository import (
+    InMemoryConversationStateRepository,
+)
 
 
 def _client():
@@ -16,11 +26,18 @@ def _client():
 
 
 DEV_TURN_PATH = "/api/dev/sales-diagnosis-runtime/turn"
+_COUNTER = 0
+
+
+def _unique_session() -> str:
+    global _COUNTER
+    _COUNTER += 1
+    return f"st-session-{_COUNTER:04d}"
 
 
 def _default_payload(**overrides: dict) -> dict:
     payload = {
-        "session_id": "dev-test-001",
+        "session_id": _unique_session(),
         "message": "Quiero automatizar consultas comerciales por WhatsApp",
         "assistant_instance_code": "team360_sales_diagnosis",
         "package_code": "pkg_sales_diagnosis",
@@ -31,13 +48,90 @@ def _default_payload(**overrides: dict) -> dict:
     return payload
 
 
-class TestDevSalesDiagnosisRoute:
-    def test_post_turn_returns_201_with_safe_response(self):
+class TestDevSalesDiagnosisRouteStateRepository:
+    """Tests for state repository selection in the dev endpoint."""
+
+    def test_default_uses_inmemory_state_repository(self):
+        os.environ.pop(_DEV_STATE_REPOSITORY_ENV, None)
+        repo = _resolve_state_repository()
+        assert isinstance(repo, InMemoryConversationStateRepository)
+
+    def test_postgres_opt_in_requires_db_url(self):
+        os.environ[_DEV_STATE_REPOSITORY_ENV] = "postgres"
+        from globalVar import get_team360_db_url_psql
+        from litestar.exceptions import HTTPException
+        try:
+            repo = _resolve_state_repository()
+            if get_team360_db_url_psql():
+                assert isinstance(repo, _DevPostgresStateRepository)
+            else:
+                assert False, "Expected HTTPException"
+        except HTTPException as exc:
+            assert exc.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            assert "TEAM360_DB_URL" in exc.detail
+        finally:
+            os.environ.pop(_DEV_STATE_REPOSITORY_ENV, None)
+
+    def test_invalid_state_repository_mode_returns_controlled_error(self):
+        os.environ[_DEV_STATE_REPOSITORY_ENV] = "invalid_mode"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            body_text = resp.text
+            assert "invalid_mode" in body_text
+            assert "inmemory" in body_text
+            assert "postgres" in body_text
+        finally:
+            os.environ.pop(_DEV_STATE_REPOSITORY_ENV, None)
+
+    def test_endpoint_still_works_with_default_inmemory(self):
+        os.environ.pop(_DEV_STATE_REPOSITORY_ENV, None)
         with _client() as client:
             resp = client.post(DEV_TURN_PATH, json=_default_payload())
         assert resp.status_code == HTTP_201_CREATED
         body = resp.json()
-        assert body["session_id"] == "dev-test-001"
+        assert body["runtime_mode"] == "dev_fake"
+        assert body["turn_count"] == 1
+        assert body["response_type"] == "final"
+
+    def test_no_real_db_called_by_default(self):
+        os.environ.pop(_DEV_STATE_REPOSITORY_ENV, None)
+        with _client() as client:
+            resp = client.post(DEV_TURN_PATH, json=_default_payload())
+        assert resp.status_code == HTTP_201_CREATED
+        body = resp.json()
+        assert "postgres" not in _json_dumps(body).lower()
+
+    def test_no_secret_leak_on_config_error(self):
+        os.environ[_DEV_STATE_REPOSITORY_ENV] = "invalid_mode"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            body_text = resp.text.lower()
+            assert "sk-" not in body_text
+            assert "invalid_mode" in body_text
+            assert "'inmemory'" in body_text
+            assert "'postgres'" in body_text
+        finally:
+            os.environ.pop(_DEV_STATE_REPOSITORY_ENV, None)
+
+
+def _json_dumps(obj: dict) -> str:
+    import json
+    return json.dumps(obj)
+
+
+class TestDevSalesDiagnosisRoute:
+    def test_post_turn_returns_201_with_safe_response(self):
+        payload = _default_payload()
+        expected_session = payload["session_id"]
+        with _client() as client:
+            resp = client.post(DEV_TURN_PATH, json=payload)
+        assert resp.status_code == HTTP_201_CREATED
+        body = resp.json()
+        assert body["session_id"] == expected_session
         assert body["response_type"] == "final"
         assert body["response_text"]
         assert body["runtime_mode"] == "dev_fake"

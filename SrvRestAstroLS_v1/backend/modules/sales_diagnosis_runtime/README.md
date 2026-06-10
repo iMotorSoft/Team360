@@ -525,6 +525,57 @@ cd SrvRestAstroLS_v1/backend
 uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
 ```
 
+## Fase 1.8j — Postgres opt-in state repository
+
+### Que cambio
+
+El endpoint interno/dev `POST /api/dev/sales-diagnosis-runtime/turn` ahora
+soporta dos modos de repositorio de estado seleccionables via env var:
+
+| Variable | Valor | Comportamiento |
+|----------|-------|---------------|
+| `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY` | *(unset)* o `inmemory` | InMemoryConversationStateRepository (**default**) |
+| `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY` | `postgres` | PostgreSQL via `_DevPostgresStateRepository` (psycopg 3 sync, per-request connection) |
+
+### Modo PostgreSQL
+
+- Usa `TEAM360_DB_URL` via `globalVar.get_team360_db_url()`.
+- Requiere migracion 007 aplicada (tabla `sales_diagnosis_conversation_states`).
+- Cada operacion abre conexion sincrona propia — aceptable para dev.
+- Si falta `TEAM360_DB_URL`, retorna HTTP 500 con mensaje claro.
+- Si el modo es invalido, retorna HTTP 500 con valores aceptados.
+
+### Smoke con PostgreSQL
+
+```bash
+cd SrvRestAstroLS_v1/backend
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8000
+# En otra terminal:
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+```
+
+### Tests nuevos (6)
+
+En `tests/test_sales_diagnosis_runtime_dev_route.py`:
+- `test_default_uses_inmemory_state_repository`
+- `test_postgres_opt_in_requires_db_url`
+- `test_invalid_state_repository_mode_returns_controlled_error`
+- `test_endpoint_still_works_with_default_inmemory`
+- `test_no_real_db_called_by_default`
+- `test_no_secret_leak_on_postgres_config_error`
+
+### No implementa
+
+- Endpoint publico final.
+- SSE productivo.
+- Frontend.
+- LLM real / OpenAI / LiteLLM.
+- Milvus real.
+- ArangoDB / cross-encoder.
+- Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
+
 ## Proximas fases sugeridas
 
 1. ~~1.8b -- MilvusRetrievalProvider runtime con fallback pgvector.~~ **(Completado)**
@@ -535,3 +586,4 @@ uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
 6. ~~1.8g -- Async runtime boundary / Postgres state repository decision.~~ **(Completado)**
 7. ~~1.8h -- Internal dev endpoint contract.~~ **(Completado)**
 8. ~~1.8i -- Dev endpoint hardening + smoke script.~~ **(Completado)**
+9. ~~1.8j -- Postgres opt-in state repository for dev endpoint.~~ **(Completado)**
