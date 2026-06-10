@@ -171,6 +171,31 @@ uv run python lab/sales-diagnosis-assistant-conversation/scripts/generate_report
 uv run python lab/sales-diagnosis-assistant-conversation/scripts/generate_infographics.py
 ```
 
+### Auditoría de fallos de guardrail
+
+```bash
+# Auditar fallos reales del último resultado reevaluado:
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/audit_guardrail_failures.py
+
+# Auditar archivo específico:
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/audit_guardrail_failures.py \
+  --results-file results/conversation_lab_20260610_112024_reevaluated.json
+```
+
+Genera `results/guardrail_failure_audit_<timestamp>.md` con detalle por turno, matched terms, negation status y probable cause.
+
+### Guardrail fixes report (Fase 1.7c)
+
+Tras aplicar correcciones en `evaluator.py`, generar reporte de fix:
+
+```bash
+# Reevaluar con evaluador corregido:
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/reevaluate_results.py
+
+# Ver reporte de fix guardado:
+cat lab/sales-diagnosis-assistant-conversation/results/guardrail_fix_latest.md
+```
+
 ## Decision rules
 
 - **A**: Asistente conversacional viable para siguiente fase controlada

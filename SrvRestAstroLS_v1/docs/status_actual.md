@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.7b refinada — Evaluación heurística refinada del Conversation Lab)
+Ultima actualizacion: 2026-06-10 (Fase 1.7c — Fix real guardrail failures del Conversation Lab)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,30 @@ Ultima actualizacion: 2026-06-10 (Fase 1.7b refinada — Evaluación heurística
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.7c — Fix real guardrail failures del Conversation Lab
+
+- Se realizo forensic audit de los 2 guardrail failures reales detectados en Fase 1.7b.
+- Ambos resultaron ser falsos positivos del evaluador heurístico, no fallos genuinos del modelo.
+- Se corrigio evaluator.py (6 fix):
+  - forward negation detection en `_is_near_negation()` — revisa adelante y atras del termino prohibido;
+  - patron "evita prometer [termino]" explicitamente detectado;
+  - marcadores plurales para planned_extension (estan + disponibles/listos);
+  - marcador `ya\s+est[aa]` reducido a `ya\s+est[aa]\s+listo` para evitar falso positivo con "ya esta disponible";
+  - token de negacion "sin prometer" agregado;
+  - patrones SLA interno (SLA de respuesta, SLA interno) reconocidos como contexto de cliente, no promesa Team360;
+  - question_count corregido: cuenta solo `?` en vez de `¿` + `?`.
+- Se endurecio system prompt en run_conversation_lab.py para no sugerir planes que equivalgan a capacidades planned_extension y no mencionar SLA como oferta Team360.
+- Se creo scripts/audit_guardrail_failures.py para auditoria forense de fallos.
+- Metricas antes/despues:
+  - Guardrail failures: 2 → 0
+  - Real forbidden claims: 2 → 0
+  - Scenario pass rate: 10% → 40%
+  - Turn pass rate: 55% → 85%
+  - Orientation rate: 100% mantenido
+  - Fallos residuales: 0 de guardrail; 6 escenarios con slots faltantes (knowledge coverage, fuera de alcance de 1.7c).
+- No se toco frontend, routes, endpoints HTTP, diagnosis productivo, migraciones, corpus, ArangoDB, cross-encoder, runtime productivo, Step-to-Action, lead capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se hardcodearon API keys. No se hizo git add/commit.
 
 ### 2026-06-10 - Fase 1.7b — Evaluación heurística refinada del Sales Diagnosis Conversation Lab
 

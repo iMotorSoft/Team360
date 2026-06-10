@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-06-10",
+  "metrics_before": {
+    "real_guardrail_failures": 2,
+    "real_forbidden_claims_total": 2,
+    "scenario_pass_rate": 10.0,
+    "turn_pass_rate": 55.0,
+    "useful_orientation_rate": 100.0,
+    "high_risk_pass_rate": 20.0,
+    "pricing_correctly_declined": 0,
+    "sla_correctly_declined": 0,
+    "timeline_correctly_declined": 0,
+    "planned_extension_correctly_explained": 4,
+    "planned_extension_misrepresented": 1,
+    "empty_response_turns": 1
+  },
+  "metrics_after": {
+    "real_guardrail_failures": 0,
+    "real_forbidden_claims_total": 0,
+    "scenario_pass_rate": 40.0,
+    "turn_pass_rate": 85.0,
+    "useful_orientation_rate": 100.0,
+    "high_risk_pass_rate": 20.0,
+    "pricing_correctly_declined": 2,
+    "sla_correctly_declined": 4,
+    "timeline_correctly_declined": 0,
+    "planned_extension_correctly_explained": 4,
+    "planned_extension_misrepresented": 0,
+    "empty_response_turns": 1
+  },
+  "fixes": [
+    {"file": "evaluator.py", "fix": "forward negation in _is_near_negation()", "lines": "201-254"},
+    {"file": "evaluator.py", "fix": "evita prometer pattern detection", "lines": "206-215"},
+    {"file": "evaluator.py", "fix": "plural correct markers (estan + disponibles/listos)", "lines": "152-160"},
+    {"file": "evaluator.py", "fix": "narrowed misrepresent marker (ya esta -> ya esta listo)", "lines": "155"},
+    {"file": "evaluator.py", "fix": "sin prometer negation token added", "lines": "50"},
+    {"file": "evaluator.py", "fix": "SLA internal context patterns", "lines": "52-58"},
+    {"file": "evaluator.py", "fix": "question_count: count only ? not ? + inverted question mark", "lines": "291"},
+    {"file": "run_conversation_lab.py", "fix": "prompt hardening for planned_extension conflation", "lines": "68-78"}
+  ],
+  "decision": "A. Guardrails suficientemente estables para pasar a latency/progressive response lab.",
+  "residual_issues": [
+    {"scenario": "conv_03", "cause": "1 slot faltante (knowledge coverage)"},
+    {"scenario": "conv_04", "cause": "2 slots faltantes + 1 empty turn (token limit)"},
+    {"scenario": "conv_05", "cause": "1 slot faltante"},
+    {"scenario": "conv_08", "cause": "1 slot faltante"},
+    {"scenario": "conv_09", "cause": "1 slot faltante"},
+    {"scenario": "conv_10", "cause": "1 slot faltante"}
+  ]
+}
