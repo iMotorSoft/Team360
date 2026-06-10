@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8p — Runtime dev endpoint release gate)
+Ultima actualizacion: 2026-06-10 (Fase 1.9a — Product route adapter skeleton)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,19 @@ Ultima actualizacion: 2026-06-10 (Fase 1.8p — Runtime dev endpoint release gat
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.9a — Product route adapter skeleton
+
+- Se agrego la ruta controlada `POST /api/sales-diagnosis-runtime/turn` como `product adapter skeleton`.
+- La ruta no reemplaza el endpoint interno/dev `POST /api/dev/sales-diagnosis-runtime/turn`.
+- La ruta queda deshabilitada por default via feature flag `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED`; si no esta activa responde HTTP 404 controlado y sin stacktrace.
+- Con la feature flag activa usa `AssistantConversationRuntime`, `PromptPolicy` y `GuardrailPolicy` reales.
+- Defaults seguros 1.9a: state `inmemory`, retrieval `fake`, LLM `fake`. No se activan servicios reales por default.
+- Se agregaron schemas HTTP separados `ProductTurnRequest` y `ProductTurnResponse`, manteniendo contrato compatible con el endpoint dev y `runtime_mode = product_adapter_skeleton`.
+- Se rechazan IDs prohibidos `vera_team360_sales_diagnosis`, `pkg_vera_sales_diagnosis`, `ks_vera_team360_sales_diagnosis` y `svc_vera_sales_diagnosis` con HTTP 400 controlado.
+- Se agrego `tests/test_sales_diagnosis_runtime_route.py` para cubrir feature flag, contrato, defaults seguros, no uso de LiteLLM/Milvus real y continuidad del endpoint dev.
+- No se toco frontend, Astro, Svelte, UI, SSE productivo, OpenAI SDK, servicios reales por default, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se creo rama nueva.
 
 ### 2026-06-10 - Fase 1.8p — Runtime dev endpoint release gate
 

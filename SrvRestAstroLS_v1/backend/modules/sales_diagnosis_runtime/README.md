@@ -938,3 +938,157 @@ LiteLLM valida el HTTP 500 controlado como skip operativo, no como fallo.
 - No se activa por default PostgreSQL, Milvus, LiteLLM, OpenAI, ArangoDB,
   pgvector ni cross-encoder.
 - No hay Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+
+## Fase 1.9a — Product route adapter skeleton
+
+### Alcance
+
+Esta fase agrega una ruta no-dev controlada para preparar la transicion desde
+el endpoint interno/dev hacia una superficie de producto.
+
+Endpoint:
+
+`POST /api/sales-diagnosis-runtime/turn`
+
+Importante:
+
+- es un `product adapter skeleton`;
+- no es endpoint final publico;
+- no reemplaza `POST /api/dev/sales-diagnosis-runtime/turn`;
+- no debe llamarse MVP;
+- no representa superficie productiva final.
+
+La ruta queda deshabilitada por default. Para habilitarla en pruebas
+controladas:
+
+```bash
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1
+```
+
+Valores verdaderos aceptados: `1`, `true`, `yes`, `on`.
+
+Si el flag no esta activo, la ruta responde HTTP 404 controlado y sin
+stacktrace.
+
+### Contrato HTTP
+
+Request minimo:
+
+```json
+{
+  "session_id": "prod-adapter-session-001",
+  "message": "Quiero automatizar consultas comerciales por WhatsApp"
+}
+```
+
+Defaults seguros de identificadores:
+
+```text
+assistant_instance_code = team360_sales_diagnosis
+package_code = pkg_sales_diagnosis
+knowledge_scope_code = ks_team360_sales_diagnosis
+```
+
+Tambien acepta metadata:
+
+```json
+{
+  "metadata": {
+    "channel": "api"
+  }
+}
+```
+
+Response estable:
+
+```json
+{
+  "session_id": "prod-adapter-session-001",
+  "response_text": "...",
+  "response_type": "final",
+  "fallback_applied": false,
+  "guardrail_flags": [],
+  "retrieved_sources": [],
+  "turn_count": 1,
+  "events": [],
+  "runtime_mode": "product_adapter_skeleton"
+}
+```
+
+El contrato reutiliza los schemas HTTP existentes con nombres separados:
+
+- `ProductTurnRequest`
+- `ProductTurnResponse`
+
+### Defaults seguros del adapter
+
+Cuando la feature flag esta activa, el adapter usa:
+
+| Dimension | Default 1.9a | Servicio real por default |
+|-----------|--------------|---------------------------|
+| State | `inmemory` | No |
+| Retrieval | `fake` | No |
+| LLM | `fake` | No |
+
+Decision 1.9a: no exigir PostgreSQL para esta fase porque pytest normal no
+debe depender de DB real. El adapter queda documentado como skeleton no
+productivo; la persistencia PostgreSQL para runtime ya esta validada en el
+endpoint dev via opt-in y PG18.
+
+No se activa por default:
+
+- PostgreSQL real;
+- Milvus real;
+- LiteLLM real;
+- OpenAI SDK;
+- ArangoDB;
+- pgvector;
+- cross-encoder.
+
+### Guardrails y rechazos
+
+La ruta usa `AssistantConversationRuntime`, `PromptPolicy` y
+`GuardrailPolicy` reales.
+
+Rechaza HTTP 400 controlado para IDs prohibidos:
+
+- `vera_team360_sales_diagnosis`
+- `pkg_vera_sales_diagnosis`
+- `ks_vera_team360_sales_diagnosis`
+- `svc_vera_sales_diagnosis`
+
+No expone stacktraces ni secrets en errores controlados.
+
+### Capacidades futuras no activadas
+
+Esta fase no implementa ni habilita:
+
+- frontend;
+- Astro;
+- Svelte;
+- UI;
+- SSE productivo;
+- Step-to-Action;
+- lead_capture;
+- diagnostic_code;
+- WhatsApp handoff;
+- CRM real.
+
+### Validacion esperada
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py
+uv run pytest tests/test_sales_diagnosis_runtime_route.py
+uv run pytest
+```
+
+El smoke HTTP existente sigue apuntando al endpoint interno/dev:
+
+```bash
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+```

@@ -1,4 +1,4 @@
-"""Pydantic schemas for the internal/dev sales diagnosis runtime endpoint.
+"""Pydantic schemas for sales diagnosis runtime HTTP endpoints.
 
 Pydantic is used only at the HTTP/API border for validation,
 serialization and OpenAPI generation, per lat.md/postgres-driver-policy.md.
@@ -28,3 +28,15 @@ class DevTurnResponse(BaseModel):
     turn_count: int = 0
     events: list[dict] = Field(default_factory=list)
     runtime_mode: str = "dev_fake"
+
+
+class ProductTurnRequest(DevTurnRequest):
+    """Request contract for the controlled product adapter skeleton."""
+
+    service_code: str | None = None
+
+
+class ProductTurnResponse(DevTurnResponse):
+    """Response contract for the controlled product adapter skeleton."""
+
+    runtime_mode: str = "product_adapter_skeleton"
