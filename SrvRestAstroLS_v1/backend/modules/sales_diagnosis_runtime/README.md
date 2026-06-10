@@ -120,22 +120,9 @@ Implementa `StateRepository` protocol con pool inyectado.
 * `save(state)` — INSERT ... ON CONFLICT DO UPDATE (upsert).
 * Requiere pool inyectado; levanta `StateRepositoryError` si no hay pool.
 * `__repr__` sin secrets.
-* `SUGGESTED_DDL` contiene la tabla sugerida.
-* **No crea migración; no conecta a DB en esta fase.**
-
-### Tabla sugerida
-
-```sql
-sales_diagnosis_conversation_states (
-    session_id          text        PRIMARY KEY,
-    assistant_instance_code text    NOT NULL,
-    package_code        text        NOT NULL,
-    knowledge_scope_code text       NOT NULL,
-    state_jsonb         jsonb       NOT NULL,
-    created_at_utc      timestamptz NOT NULL DEFAULT now(),
-    updated_at_utc      timestamptz NOT NULL DEFAULT now()
-);
-```
+* `SUGGESTED_DDL` contiene la DDL de referencia (sincronizada con la migracion).
+* `MIGRATION_FILE` apunta a `db/migrations/007_sales_diagnosis_conversation_states.sql`.
+* **Los metodos `load()` y `save()` son skeleton sync — no envuelven async calls correctamente. La futura frontera async del runtime resolvera esto.**
 
 ### Tests
 
@@ -146,11 +133,91 @@ sales_diagnosis_conversation_states (
 * Endpoints HTTP.
 * SSE productivo.
 * Frontend.
-* DB real.
-* Migraciones.
+* DB real via repository (el smoke script valida la tabla directamente).
 * Milvus real.
 * LLM real.
 * ArangoDB / cross-encoder.
+
+## Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState
+
+### Migracion
+
+`db/migrations/007_sales_diagnosis_conversation_states.sql`:
+
+```sql
+sales_diagnosis_conversation_states (
+    session_id              text        PRIMARY KEY,
+    assistant_instance_code text        NOT NULL,
+    package_code            text        NOT NULL,
+    knowledge_scope_code    text        NOT NULL,
+    state_jsonb             jsonb       NOT NULL,
+    created_at_utc          timestamptz NOT NULL DEFAULT now(),
+    updated_at_utc          timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT chk_sd_cs_jsonb_is_object
+        CHECK (jsonb_typeof(state_jsonb) = 'object'::text)
+);
+```
+
+4 indexes: `updated_at_utc DESC`, `assistant_instance_code`, `package_code`, `knowledge_scope_code`.
+
+### Env vars
+
+| Variable | Descripcion |
+|----------|-------------|
+| `TEAM360_DB_URL` | DSN PostgreSQL (prioridad) |
+| `TEAM360_DB_URL_PSQL` | Fallback si TEAM360_DB_URL no esta |
+
+### Smoke
+
+```bash
+cd SrvRestAstroLS_v1/backend
+TEAM360_DB_URL=postgresql://user:pass@localhost:5432/v360 \
+  uv run python scripts/smoke_sales_diagnosis_state_postgres.py
+```
+
+Flujo del smoke:
+1. Lee `TEAM360_DB_URL` (error si no configurado).
+2. Crea `AsyncConnectionPool`, adquiere conexion.
+3. Aplica `007_sales_diagnosis_conversation_states.sql` (idempotente).
+4. Genera `ConversationState` via `ConversationStateSerializer`.
+5. INSERT → SELECT + deserializa + verifica campos.
+6. UPSERT (update turn_count) → SELECT + verifica cambio.
+7. Verifica `updated_at_utc >= created_at_utc`.
+8. DELETE cleanup.
+9. Exit 0 en exito, 1 en fallo.
+
+### Tests de contrato
+
+`tests/test_sales_diagnosis_state_postgres_contract.py` — 8 tests:
+
+| Test | Que valida |
+|------|------------|
+| `test_migration_file_exists` | Archivo existe |
+| `test_migration_has_table_name` | Nombre de tabla en SQL |
+| `test_migration_has_jsonb_check_constraint` | CHECK constraint jsonb_typeof |
+| `test_migration_has_expected_indexes` | 4 indices esperados |
+| `test_migration_has_idempotent_create` | `IF NOT EXISTS` |
+| `test_repository_has_migration_reference` | `MIGRATION_FILE` apunta a `007_*.sql` |
+| `test_repository_table_name_matches_migration` | `TABLE_NAME` aparece en migracion |
+| `test_repository_repr_has_no_password` | `__repr__` sin secrets |
+| `test_load_raises_error_without_pool` | Error controlado sin pool |
+| `test_save_raises_error_without_pool` | Error controlado sin pool |
+| `test_smoke_script_exists` | Script existe |
+| `test_smoke_script_requires_env_var` | Error si TEAM360_DB_URL no configurado |
+| `test_smoke_script_sanitizes_url` | URL sanitizada en logs |
+| `test_smoke_script_uses_migration_file` | Referencia a migracion |
+| `test_smoke_passes_with_db_url` | (skip sin env) Smoke real contra PostgreSQL |
+
+### No implementa
+
+* Endpoints HTTP.
+* SSE productivo.
+* Frontend.
+* LLM real.
+* Milvus real.
+* ArangoDB / cross-encoder.
+* Llamada a `PostgresConversationStateRepository.load()/save()` (skeleton sync).
+* Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
 
 ## Fase 1.8c — QueryEmbeddingProvider and Policy Hardening
 
@@ -193,5 +260,5 @@ sales_diagnosis_conversation_states (
 1. ~~1.8b -- MilvusRetrievalProvider runtime con fallback pgvector.~~ **(Completado)**
 2. ~~1.8c -- QueryEmbeddingProvider + Prompt/GuardrailPolicy hardening.~~ **(Completado)**
 3. ~~1.8d -- ConversationState persistence skeleton.~~ **(Completado)**
-4. 1.8e -- backend-only runtime integration smoke with fakes.
-5. 1.8f -- Endpoint backend-only controlado.
+4. ~~1.8e -- PostgreSQL 18 local integration smoke for ConversationState persistence.~~ **(Completado)**
+5. 1.8f -- backend-only runtime integration smoke with fakes.

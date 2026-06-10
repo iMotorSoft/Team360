@@ -18,19 +18,32 @@ from modules.sales_diagnosis_runtime.providers import StateRepository
 # Constants
 # ---------------------------------------------------------------------------
 
+MIGRATION_FILE = "db/migrations/007_sales_diagnosis_conversation_states.sql"
+
 SUGGESTED_TABLE_DDL = """
 CREATE TABLE IF NOT EXISTS sales_diagnosis_conversation_states (
-    session_id          text        NOT NULL PRIMARY KEY,
-    assistant_instance_code text    NOT NULL,
-    package_code        text        NOT NULL,
-    knowledge_scope_code text       NOT NULL,
-    state_jsonb         jsonb       NOT NULL,
-    created_at_utc      timestamptz NOT NULL DEFAULT now(),
-    updated_at_utc      timestamptz NOT NULL DEFAULT now()
+    session_id              text        NOT NULL PRIMARY KEY,
+    assistant_instance_code text        NOT NULL,
+    package_code            text        NOT NULL,
+    knowledge_scope_code    text        NOT NULL,
+    state_jsonb             jsonb       NOT NULL,
+    created_at_utc          timestamptz NOT NULL DEFAULT now(),
+    updated_at_utc          timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT chk_sd_cs_jsonb_is_object
+        CHECK (jsonb_typeof(state_jsonb) = 'object'::text)
 );
 
-CREATE INDEX idx_sd_cs_updated_at
+CREATE INDEX IF NOT EXISTS idx_sd_cs_updated_at
     ON sales_diagnosis_conversation_states (updated_at_utc DESC);
+
+CREATE INDEX IF NOT EXISTS idx_sd_cs_assistant_instance
+    ON sales_diagnosis_conversation_states (assistant_instance_code);
+
+CREATE INDEX IF NOT EXISTS idx_sd_cs_package
+    ON sales_diagnosis_conversation_states (package_code);
+
+CREATE INDEX IF NOT EXISTS idx_sd_cs_knowledge_scope
+    ON sales_diagnosis_conversation_states (knowledge_scope_code);
 """
 
 
@@ -165,78 +178,51 @@ class PostgresConversationStateRepository:
     - state is stored as jsonb for schema flexibility.
     - SQL is written directly with psycopg 3; no ORM.
 
-    NOTE: This skeleton does NOT connect to any database.
+    NOTE: This class documents the intended SQL patterns but does NOT
+    currently wrap async DB calls correctly — the ``StateRepository``
+    protocol is sync while ``psycopg_pool.AsyncConnectionPool`` requires
+    async. A future async runtime boundary will resolve this.
+
     It requires an injected pool and will raise StateRepositoryError
     if called without one.
 
-    The sync protocol matches the StateRepository contract for this phase.
-    A full async implementation may be required at the runtime boundary.
+    The actual DDL lives in ``db/migrations/007_sales_diagnosis_conversation_states.sql``.
+    Use ``scripts/smoke_sales_diagnosis_state_postgres.py`` to validate
+    the table against a live PostgreSQL 18 instance.
     """
 
     TABLE_NAME = "sales_diagnosis_conversation_states"
+    MIGRATION_FILE = MIGRATION_FILE
     SUGGESTED_DDL = SUGGESTED_TABLE_DDL
 
     def __init__(self, pool: Any = None) -> None:
         self._pool = pool
 
     def load(self, session_id: str) -> ConversationState | None:
-        self._ensure_pool()
-        try:
-            from modules.db.transaction import fetch_one
+        """Load state from PostgreSQL (sync skeleton — not yet operational).
 
-            row = fetch_one(
-                self._pool,
-                f"SELECT state_jsonb FROM {self.TABLE_NAME} "
-                f"WHERE session_id = %s",
-                (session_id,),
-            )
-            if row is None:
-                return None
-            raw = row["state_jsonb"]
-            if isinstance(raw, dict):
-                return ConversationStateSerializer.from_dict(raw)
-            import json
-            return ConversationStateSerializer.from_dict(
-                json.loads(raw)
-            )
-        except Exception as exc:
-            raise StateRepositoryError(
-                f"Failed to load state for session {session_id}: {exc}"
-            ) from exc
+        Raises ``StateRepositoryError`` if no pool is injected.
+        """
+        self._ensure_pool()
+        raise StateRepositoryError(
+            "PostgresConversationStateRepository.load() is a sync skeleton. "
+            "Use scripts/smoke_sales_diagnosis_state_postgres.py or the "
+            "future async runtime boundary to interact with the DB table. "
+            f"Table: {self.TABLE_NAME}"
+        )
 
     def save(self, state: ConversationState) -> None:
+        """Save state to PostgreSQL (sync skeleton — not yet operational).
+
+        Raises ``StateRepositoryError`` if no pool is injected.
+        """
         self._ensure_pool()
-        raw = ConversationStateSerializer.to_dict(state)
-        try:
-            from modules.db.transaction import execute
-
-            import json
-
-            execute(
-                self._pool,
-                f"INSERT INTO {self.TABLE_NAME} "
-                f"(session_id, assistant_instance_code, package_code, "
-                f"knowledge_scope_code, state_jsonb, "
-                f"created_at_utc, updated_at_utc) "
-                f"VALUES (%s, %s, %s, %s, %s::jsonb, now(), now()) "
-                f"ON CONFLICT (session_id) DO UPDATE SET "
-                f"state_jsonb = EXCLUDED.state_jsonb, "
-                f"assistant_instance_code = EXCLUDED.assistant_instance_code, "
-                f"package_code = EXCLUDED.package_code, "
-                f"knowledge_scope_code = EXCLUDED.knowledge_scope_code, "
-                f"updated_at_utc = now()",
-                (
-                    state.session_id,
-                    state.assistant_instance_code,
-                    state.package_code,
-                    state.knowledge_scope_code,
-                    json.dumps(raw),
-                ),
-            )
-        except Exception as exc:
-            raise StateRepositoryError(
-                f"Failed to save state for session {state.session_id}: {exc}"
-            ) from exc
+        raise StateRepositoryError(
+            "PostgresConversationStateRepository.save() is a sync skeleton. "
+            "Use scripts/smoke_sales_diagnosis_state_postgres.py or the "
+            "future async runtime boundary to interact with the DB table. "
+            f"Table: {self.TABLE_NAME}"
+        )
 
     def _ensure_pool(self) -> None:
         if self._pool is None:

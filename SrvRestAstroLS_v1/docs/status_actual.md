@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8d — ConversationState persistence skeleton)
+Ultima actualizacion: 2026-06-10 (Fase 1.8e — PostgreSQL 18 local integration smoke)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,34 @@ Ultima actualizacion: 2026-06-10 (Fase 1.8d — ConversationState persistence sk
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState persistence
+
+- Se creo migracion `db/migrations/007_sales_diagnosis_conversation_states.sql` con:
+  - Tabla `sales_diagnosis_conversation_states` con `session_id` PK, `assistant_instance_code`, `package_code`, `knowledge_scope_code`, `state_jsonb` jsonb NOT NULL, `created_at_utc`, `updated_at_utc`.
+  - CHECK constraint `chk_sd_cs_jsonb_is_object` que valida `jsonb_typeof(state_jsonb) = 'object'`.
+  - 4 indices: `idx_sd_cs_updated_at` (DESC), `idx_sd_cs_assistant_instance`, `idx_sd_cs_package`, `idx_sd_cs_knowledge_scope`.
+  - Idempotente (`IF NOT EXISTS`).
+- Se actualizo `state_repository.py`:
+  - Agregada constante `MIGRATION_FILE` apuntando a `db/migrations/007_sales_diagnosis_conversation_states.sql`.
+  - `PostgresConversationStateRepository.load()` y `save()` ahora lanzan `StateRepositoryError` con mensaje claro de que son sync skeleton y la validacion via smoke script. La guardia `_ensure_pool()` se mantiene.
+  - `SUGGESTED_DDL` actualizada con CHECK constraint y 4 indices (sincronizada con migracion).
+- Se creo `scripts/smoke_sales_diagnosis_state_postgres.py`:
+  - Lee `TEAM360_DB_URL` (con fallback a `TEAM360_DB_URL_PSQL`); error si no configurado.
+  - Sanitiza URL para logging (password oculto).
+  - Crea `AsyncConnectionPool`, adquiere conexion.
+  - Aplica migracion 007 (idempotente).
+  - Flujo: generate test state via `ConversationStateSerializer` → INSERT → SELECT + deserializa + verifica (session_id, turn_count, slots, history_summary, pending_questions) → UPSERT (turn_count 3→5) → SELECT + verifica cambio → verifica `updated_at_utc >= created_at_utc` → DELETE cleanup.
+  - Exit 0 en exito, 1 en fallo.
+- Se creo `tests/test_sales_diagnosis_state_postgres_contract.py` con 15 tests:
+  - Migration contract (5): file exists, table name, CHECK constraint, 4 indexes, idempotent.
+  - Repository contract (5): migration reference, table name matches, repr no password, repr with pool, errors without pool.
+  - Smoke script contract (4): script exists, requires env var, sanitizes URL, uses migration file.
+  - Integration (1, skip sin env): smoke real passes with DB URL.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se toca Milvus, no se tocan otras tablas.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
 
 ### 2026-06-10 - Fase 1.8d — ConversationState persistence skeleton
 
