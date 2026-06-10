@@ -656,9 +656,59 @@ En `tests/test_sales_diagnosis_runtime_dev_route.py`:
 
 ### No implementa
 
-- Milvus real.
+- Milvus real (solo opt-in).
 - OpenAI/LiteLLM real.
-- Conexion a proveedores reales — solo el boundary selector.
+- Conexion a proveedores reales — solo el boundary selector preparado.
+
+## Fase 1.8m — Milvus retrieval opt-in boundary
+
+### Que cambio
+
+El endpoint interno/dev ahora acepta `milvus` como valor para la env var
+`TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER`:
+
+| Variable | Valores aceptados |
+|----------|-------------------|
+| `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER` | `fake` (default), `milvus` |
+
+Cuando se selecciona `milvus`:
+
+1. Se crea `MilvusRetrievalProvider` con config desde env (`MilvusRuntimeConfig.from_env()`).
+2. Se inyecta `_DevFakeEmbeddingProvider` (devuelve vector estatico 1536-dim, **no OpenAI**).
+3. Si falta `TEAM360_MILVUS_URI` y `TEAM360_MILVUS_HOST` → HTTP 500 controlado.
+4. Si Milvus no esta disponible, el runtime captura el error y continua con empty sources.
+5. Fake embedding no es real — no hay conexion a OpenAI ni a ningun embedding service.
+
+### Funcion nueva
+
+- `_DevFakeEmbeddingProvider` en `routes/sales_diagnosis_runtime_dev.py`: implementa `QueryEmbeddingProvider` protocol, retorna `[0.0] * 1536`.
+- `_resolve_retrieval_provider()` extendida para aceptar `"milvus"` y validar config minima.
+
+### Tests nuevos (4 + 1 modificado)
+
+En `TestDevSalesDiagnosisRouteMilvus`:
+
+| Test | Que valida |
+|------|------------|
+| `test_milvus_mode_is_accepted_with_env_config` | `TEAM360_MILVUS_URI` seteado → `_resolve_retrieval_provider()` retorna `MilvusRetrievalProvider` |
+| `test_milvus_mode_without_config_returns_controlled_error` | Sin `TEAM360_MILVUS_*` → HTTP 500 con mensaje |
+| `test_milvus_mode_config_error_does_not_leak_secrets` | HTTP 500 sin `sk-` ni `password` |
+| `test_postgres_state_still_works_with_fake_retrieval` | Postgres state mode coexiste con fake retrieval |
+
+Modificado:
+
+| Test | Cambio |
+|------|--------|
+| `test_invalid_retrieval_provider_returns_controlled_error` | Usa `"pinecone"` en vez de `"milvus"` (ahora valido) |
+
+### No implementa
+
+- OpenAI real por default.
+- LiteLLM real.
+- LLM real.
+- Milvus real en tests — solo opt-in mockeado.
+- Frontend, Astro, Svelte, UI, SSE, ArangoDB, pgvector, cross-encoder.
+- Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
 
 ## Proximas fases sugeridas
 
@@ -673,3 +723,4 @@ En `tests/test_sales_diagnosis_runtime_dev_route.py`:
 9. ~~1.8j -- Postgres opt-in state repository for dev endpoint.~~ **(Completado)**
 10. ~~1.8k -- Postgres opt-in HTTP smoke for dev endpoint.~~ **(Completado)**
 11. ~~1.8l -- Provider mode boundary.~~ **(Completado)**
+12. ~~1.8m -- Milvus retrieval opt-in boundary.~~ **(Completado)**

@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8l — Provider mode boundary)
+Ultima actualizacion: 2026-06-10 (Fase 1.8m — Milvus retrieval opt-in boundary)
 
 ## Directorio de trabajo
 
@@ -27,6 +27,24 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
   - Default, explicit fake, invalid values (controlled error, no secret leaks), unsafe flag precedence, runtime intacto.
 - Validacion: `uv run pytest` = 327 passed, 9 skipped (sin regresiones).
 - No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8m — Milvus retrieval opt-in boundary for dev endpoint
+
+- Se extendio `_resolve_retrieval_provider()` en `routes/sales_diagnosis_runtime_dev.py`:
+  - `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER=milvus` ahora es valido.
+  - Crea `MilvusRetrievalProvider` con `MilvusRuntimeConfig.from_env()` + `_DevFakeEmbeddingProvider` (vector estatico 1536-dim, no OpenAI).
+  - Si falta `TEAM360_MILVUS_URI` y `TEAM360_MILVUS_HOST` → HTTP 500 controlado.
+  - Valores invalidos siguen dando HTTP 500 (ej: `"pinecone"`).
+- Se creo `_DevFakeEmbeddingProvider`: implementa `QueryEmbeddingProvider` protocol sin OpenAI.
+- Se agrego `TestDevSalesDiagnosisRouteMilvus` con 4 tests:
+  - `test_milvus_mode_is_accepted_with_env_config` — Milvus mode con mock config es aceptado.
+  - `test_milvus_mode_without_config_returns_controlled_error` — Sin config → HTTP 500.
+  - `test_milvus_mode_config_error_does_not_leak_secrets` — Error sin secrets.
+  - `test_postgres_state_still_works_with_fake_retrieval` — Postgres state + fake retrieval OK.
+- Se modifico `test_invalid_retrieval_provider_returns_controlled_error` para usar `"pinecone"` en vez de `"milvus"` (ahora valido).
+- Validacion: `uv run pytest` = 331 passed, 9 skipped (+4 nuevos).
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes.
 - Sin creacion de rama nueva.
 
 ### 2026-06-10 - Team360 DB URL visible en globalVar

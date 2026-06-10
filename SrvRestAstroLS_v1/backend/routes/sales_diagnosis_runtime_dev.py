@@ -14,6 +14,9 @@ State repository selection (env var):
 
 Retrieval provider selection (env var):
 - Default (unset or "fake"): _DevFakeRetrievalProvider (no Milvus)
+- ``TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER=milvus``: uses
+  MilvusRetrievalProvider with a dev fake embedding provider (no OpenAI).
+  Requires TEAM360_MILVUS_URI or TEAM360_MILVUS_HOST.
 - Invalid values: HTTP 500 controlled error
 
 LLM provider selection (env var):
@@ -47,8 +50,13 @@ from modules.sales_diagnosis_runtime.errors import (
     InvalidAssistantRuntimeInputError,
     UnsafeResponseError,
 )
+from modules.sales_diagnosis_runtime.milvus_provider import (
+    MilvusRetrievalProvider,
+    MilvusRuntimeConfig,
+)
 from modules.sales_diagnosis_runtime.providers import (
     LLMProvider,
+    QueryEmbeddingProvider,
     RetrievalProvider,
 )
 from modules.sales_diagnosis_runtime.state_repository import (
@@ -128,6 +136,13 @@ class _DevUnsafeFakeLLMProvider:
 
     def generate(self, input: AssistantTurnInput, state: ConversationState, context: list[RetrievedChunk]) -> str:
         return _UNSAFE_RESPONSE
+
+
+class _DevFakeEmbeddingProvider:
+    """Fake embedding that returns a static 1536-dim vector, no OpenAI."""
+
+    def embed_query(self, text: str) -> list[float]:
+        return [0.0] * 1536
 
 
 # ---------------------------------------------------------------------------
@@ -243,11 +258,26 @@ def _resolve_retrieval_provider() -> RetrievalProvider:
     mode = os.environ.get(_DEV_RETRIEVAL_PROVIDER_ENV, "").strip().lower()
     if not mode or mode == "fake":
         return _DevFakeRetrievalProvider()
+    if mode == "milvus":
+        config = MilvusRuntimeConfig.from_env()
+        if not config.uri and not config.host:
+            raise HTTPException(
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(
+                    f"Invalid {_DEV_RETRIEVAL_PROVIDER_ENV}={mode!r}. "
+                    "Milvus mode requires TEAM360_MILVUS_URI or "
+                    "TEAM360_MILVUS_HOST."
+                ),
+            )
+        return MilvusRetrievalProvider(
+            config=config,
+            embedding_provider=_DevFakeEmbeddingProvider(),
+        )
     raise HTTPException(
         status_code=HTTP_500_INTERNAL_SERVER_ERROR,
         detail=(
             f"Invalid {_DEV_RETRIEVAL_PROVIDER_ENV}={mode!r}. "
-            "Use 'fake' (default)."
+            "Use 'fake' (default) or 'milvus'."
         ),
     )
 

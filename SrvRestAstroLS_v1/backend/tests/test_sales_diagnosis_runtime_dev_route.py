@@ -23,6 +23,9 @@ from routes.sales_diagnosis_runtime_dev import (
     _resolve_retrieval_provider,
     _resolve_state_repository,
 )
+from modules.sales_diagnosis_runtime.milvus_provider import (
+    MilvusRetrievalProvider,
+)
 from modules.sales_diagnosis_runtime.state_repository import (
     InMemoryConversationStateRepository,
 )
@@ -155,13 +158,13 @@ class TestDevSalesDiagnosisRouteProviders:
             os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
 
     def test_invalid_retrieval_provider_returns_controlled_error(self):
-        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "milvus"
+        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "pinecone"
         try:
             with _client() as client:
                 resp = client.post(DEV_TURN_PATH, json=_default_payload())
             assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
             body_text = resp.text
-            assert "milvus" in body_text
+            assert "pinecone" in body_text
             assert "fake" in body_text
         finally:
             os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
@@ -218,6 +221,57 @@ class TestDevSalesDiagnosisRouteProviders:
             assert "'fake'" in body_text
         finally:
             os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+
+
+class TestDevSalesDiagnosisRouteMilvus:
+    """Tests for Milvus retrieval opt-in in the dev endpoint."""
+
+    def test_milvus_mode_is_accepted_with_env_config(self):
+        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "milvus"
+        os.environ["TEAM360_MILVUS_URI"] = "http://localhost:19530"
+        try:
+            provider = _resolve_retrieval_provider()
+            assert isinstance(provider, MilvusRetrievalProvider)
+        finally:
+            os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+            os.environ.pop("TEAM360_MILVUS_URI", None)
+
+    def test_milvus_mode_without_config_returns_controlled_error(self):
+        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "milvus"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            body_text = resp.text.lower()
+            assert "milvus" in body_text
+            assert "team360_milvus" in body_text
+        finally:
+            os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+
+    def test_milvus_mode_config_error_does_not_leak_secrets(self):
+        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "milvus"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            body_text = resp.text.lower()
+            assert "sk-" not in body_text
+            assert "password" not in body_text
+            assert "team360_milvus" in body_text
+        finally:
+            os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+
+    def test_postgres_state_still_works_with_fake_retrieval(self):
+        os.environ[_DEV_STATE_REPOSITORY_ENV] = "postgres"
+        os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+        try:
+            from litestar.exceptions import HTTPException
+            try:
+                _resolve_state_repository()
+            except HTTPException as exc:
+                assert exc.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+        finally:
+            os.environ.pop(_DEV_STATE_REPOSITORY_ENV, None)
 
 
 def _json_dumps(obj: dict) -> str:
