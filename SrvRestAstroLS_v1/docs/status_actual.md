@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8e — PostgreSQL 18 local integration smoke)
+Ultima actualizacion: 2026-06-10 (Fase 1.8f — Backend-only runtime integration smoke with fakes + Postgres state)
 
 ## Directorio de trabajo
 
@@ -22,6 +22,41 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 - El fallback placeholder previo queda limitado al helper legacy `get_future_optional_team360_db_url()` para compatibilidad de scripts exploratorios.
 - Se agregaron tests directos en `tests/test_global_var.py`.
 - No se tocaron frontend, endpoints HTTP, routes, migraciones, labs ni `team360_orquestador`.
+
+### 2026-06-10 - Fase 1.8f — Backend-only runtime integration smoke with fakes + Postgres state
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_postgres.py`:
+  - `_SmokePostgresStateRepository`: sync bridge que implementa `StateRepository` protocol usando psycopg 3 sync directo, sin async, sin pool. Cada operacion abre/cierra conexion. Especifico para smoke; no reemplaza el async skeleton de `PostgresConversationStateRepository`.
+  - `FakeRetrievalProvider`: devuelve 2 chunks controlados (`CONTROLLED_CHUNKS`), no llama Milvus.
+  - `FakeLLMProvider`: modos configurables `safe`, `too_many_questions`, `unsafe_claim`, `empty`. No llama OpenAI/LiteLLM/OpenRouter.
+  - `FakeMetricsRecorder`: almacena turns en memoria.
+  - `FakeAuditTrail`: almacena records en memoria.
+  - Flujo de 4 turnos:
+    1. Turno 1 safe LLM: `AssistantConversationRuntime` real + fake retrieval + fake LLM safe → output con `response_type="final"`, `turn_count=1`. State guardado en Postgres real. Verifica `state_jsonb` y `turn_count` via SQL directo.
+    2. Turno 2 safe LLM: mismo `session_id` → carga state desde Postgres → `turn_count=2`. Slots/history_summary preservados.
+    3. Turno 3 soft guardrail: fake LLM `too_many_questions` → `max_questions_exceeded=True`, fallback aplicado, state guardado (`turn_count=3`).
+    4. Turno 4 hard guardrail: fake LLM `unsafe_claim` con `lead_capture listo y WhatsApp handoff con SLA` → `UnsafeResponseError` capturado, verifica bloqueo.
+  - Verifica existencia de tabla `sales_diagnosis_conversation_states` via `information_schema.tables`; si no existe, falla con mensaje claro: aplicar migracion 007.
+  - Cleanup via `_delete_smoke_session` en bloque `finally`.
+  - Usa `globalVar.get_team360_db_url()` para resolver DSN.
+  - No imprime URL cruda en logs.
+  - Exit 0 en exito, 1 en fallo, stdout con checks detallados.
+- Se creo `tests/test_sales_diagnosis_runtime_postgres_smoke_contract.py` con 10 tests:
+  - script exists, usa `get_team360_db_url()`, no imprime URL, falla sin env.
+  - usa fake retrieval (no Milvus), fake LLM (no OpenAI).
+  - guardrail failure case presente.
+  - cleanup de session smoke.
+  - referencia a migracion 007.
+  - integration test (skip sin env).
+- Se actualizo `README.md` del modulo con seccion Fase 1.8f.
+- Se actualizo `backend/scripts/README.md` con entrada del nuevo smoke.
+- Tests: `uv run pytest` = 281/282 passed, 1 skipped (integration sin env).
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se llama Milvus real, no se tocan otras tablas.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
+- `PostgresConversationStateRepository` sigue siendo sync skeleton documentado; el smoke usa su propio bridge sync.
+- No se creo rama nueva; todo en `feature/console-backend-core`.
 
 ### 2026-06-10 - Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState persistence
 

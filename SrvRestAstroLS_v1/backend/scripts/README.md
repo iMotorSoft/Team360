@@ -17,3 +17,18 @@ uv run python scripts/smoke_automation_diagnosis_litellm.py --backend-url http:/
 ```
 
 Si PostgreSQL falla durante el snapshot, el backend debe responder HTTP 503 y el smoke imprime el cuerpo truncado del error.
+
+## sales_diagnosis_runtime
+
+- `smoke_sales_diagnosis_runtime_postgres.py`: smoke backend-only del runtime completo `AssistantConversationRuntime` contra PostgreSQL 18 real.
+  - Usa fake RetrievalProvider (no Milvus), fake LLMProvider (no OpenAI), fake MetricsRecorder y fake AuditTrail.
+  - Realiza 4 turnos: safe → safe → soft guardrail (too_many_questions) → hard guardrail (unsafe_claim / UnsafeResponseError).
+  - Valida que state se guarda/carga entre turnos, turn_count incrementa, guardrails funcionan y cleanup se ejecuta.
+  - Requiere `TEAM360_DB_URL` y migracion 007 aplicada.
+  - No endpoint, no frontend, no LLM real, no Milvus real.
+
+  ```bash
+  cd backend
+  TEAM360_DB_URL=postgresql://user:pass@localhost:5432/team360 \
+    uv run python scripts/smoke_sales_diagnosis_runtime_postgres.py
+  ```

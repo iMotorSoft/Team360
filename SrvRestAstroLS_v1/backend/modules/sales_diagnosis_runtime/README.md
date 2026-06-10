@@ -219,6 +219,87 @@ Flujo del smoke:
 * Llamada a `PostgresConversationStateRepository.load()/save()` (skeleton sync).
 * Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
 
+## Fase 1.8f — Backend-only runtime integration smoke with fakes + Postgres state
+
+### Que prueba
+
+* `AssistantConversationRuntime` real con todas sus policies activas.
+* `PostgreSQL 18` real para ConversationState via `_SmokePostgresStateRepository` (sync bridge con psycopg 3 sync).
+* `fake RetrievalProvider` que devuelve chunks controlados (no Milvus).
+* `fake LLMProvider` con modos: safe, too_many_questions, unsafe_claim (no OpenAI, no LiteLLM).
+* `PromptPolicy` y `GuardrailPolicy` reales.
+* `GuardrailPolicy` evalua respuestas seguras e inseguras.
+* `UnsafeResponseError` se captura en el caso hard guardrail.
+
+### Que no prueba
+
+* Endpoints HTTP.
+* SSE productivo.
+* Frontend.
+* LLM real.
+* Milvus real.
+* OpenRouter / LiteLLM.
+* ArangoDB / cross-encoder.
+* Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
+
+### Flujo del smoke
+
+4 turnos:
+
+| Turno | LLM mode | Que valida |
+|-------|----------|------------|
+| 1 | safe | output con response_text, turn_count=1, state guardado en Postgres |
+| 2 | safe | turn_count=2, session_id preservado, state cargado desde Postgres |
+| 3 | too_many_questions | soft guardrail: max_questions_exceeded, fallback aplicado, state guardado |
+| 4 | unsafe_claim | hard guardrail: UnsafeResponseError capturado, menciona lead_capture |
+
+### Como correr
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Asegurar migracion 007 aplicada
+psql $TEAM360_DB_URL < db/migrations/007_sales_diagnosis_conversation_states.sql
+
+# Smoke
+TEAM360_DB_URL=postgresql://user:pass@localhost:5432/team360 \
+  uv run python scripts/smoke_sales_diagnosis_runtime_postgres.py
+```
+
+### Requiere
+
+* `TEAM360_DB_URL` configurado (lee desde `globalVar.get_team360_db_url()`).
+* Migracion `007_sales_diagnosis_conversation_states.sql` aplicada.
+* PostgreSQL 18 accesible desde el entorno.
+
+### Tests de contrato
+
+`tests/test_sales_diagnosis_runtime_postgres_smoke_contract.py` — 10 tests:
+
+| Test | Que valida |
+|------|------------|
+| `test_smoke_script_exists` | Script existe |
+| `test_uses_team360_db_url` | Usa `get_team360_db_url()` |
+| `test_does_not_print_raw_db_url` | No imprime URL en crudo |
+| `test_fails_without_team360_db_url` | Error si no hay env |
+| `test_uses_fake_retrieval_not_milvus` | FakeRetrievalProvider, no Milvus |
+| `test_uses_fake_llm_not_openai` | FakeLLMProvider, no OpenAI |
+| `test_has_guardrail_failure_case` | unsafe_claim + UnsafeResponseError |
+| `test_cleans_up_smoke_session` | DELETE en finally |
+| `test_references_migration_007` | Menciona migracion 007 |
+| `test_runtime_postgres_smoke_real_db` | (skip sin env) Smoke real |
+
+### No implementa
+
+* Endpoints HTTP.
+* SSE productivo.
+* Frontend.
+* LLM real.
+* Milvus real.
+* ArangoDB / cross-encoder.
+* Llamada a `PostgresConversationStateRepository.load()/save()` (sigue siendo sync skeleton).
+* Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
+
 ## Fase 1.8c — QueryEmbeddingProvider and Policy Hardening
 
 ### QueryEmbeddingProvider
@@ -261,4 +342,4 @@ Flujo del smoke:
 2. ~~1.8c -- QueryEmbeddingProvider + Prompt/GuardrailPolicy hardening.~~ **(Completado)**
 3. ~~1.8d -- ConversationState persistence skeleton.~~ **(Completado)**
 4. ~~1.8e -- PostgreSQL 18 local integration smoke for ConversationState persistence.~~ **(Completado)**
-5. 1.8f -- backend-only runtime integration smoke with fakes.
+5. ~~1.8f -- backend-only runtime integration smoke with fakes + Postgres state.~~ **(Completado)**
