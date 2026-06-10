@@ -14,6 +14,15 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-10 - Team360 DB URL visible en globalVar
+
+- Se actualizo `backend/globalVar.py` para exponer `TEAM360_DB_URL`, `TEAM360_DB_URL_PSQL`, `TEAM360_DB_NAME`, `TEAM360_DB_SCHEMA` y helpers `get_team360_db_url()` / `get_team360_db_url_psql()` como configuracion Team360 activa.
+- Se mantuvieron los nombres `FUTURE_OPTIONAL_*` como aliases compatibles para scripts existentes.
+- La resolucion activa de DSN queda alineada con `modules/db/settings.py`: prioridad `TEAM360_DB_URL`, fallback `TEAM360_DB_URL_PSQL`, fallback derivado desde `DB_PG_V360_URL`; sin DSN falso si no hay env configurada.
+- El fallback placeholder previo queda limitado al helper legacy `get_future_optional_team360_db_url()` para compatibilidad de scripts exploratorios.
+- Se agregaron tests directos en `tests/test_global_var.py`.
+- No se tocaron frontend, endpoints HTTP, routes, migraciones, labs ni `team360_orquestador`.
+
 ### 2026-06-10 - Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState persistence
 
 - Se creo migracion `db/migrations/007_sales_diagnosis_conversation_states.sql` con:
