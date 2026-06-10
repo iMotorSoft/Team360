@@ -1,0 +1,1294 @@
+{
+  "summary": {
+    "experiment": "RAG answer generation — Milvus + gpt-5-nano low — Fase 1.6k",
+    "model": "gpt-5-nano",
+    "reasoning_effort": "low",
+    "embedding_model": "text-embedding-3-small",
+    "dimensions": 1536,
+    "knowledge_scope": "ks_team360_sales_diagnosis",
+    "collection": "team360_lab_pgvector_benchmark_openai_small_1536",
+    "top_n": 20,
+    "top_k": 5,
+    "max_context_chars": 6000,
+    "total_cases": 16,
+    "passed": 7,
+    "pass_rate": 43.8,
+    "high_risk_total": 8,
+    "high_risk_passed": 4,
+    "high_risk_pass_rate": 50.0,
+    "avg_retrieval_latency_ms": 5.3,
+    "avg_llm_latency_ms": 4025.0,
+    "avg_total_latency_ms": 4833.6,
+    "p50_total_latency_ms": 4680.7,
+    "p95_total_latency_ms": 5922.8,
+    "avg_context_chars": 3343.3,
+    "forbidden_claims_total": 10,
+    "missing_context_handled_count": 7,
+    "useful_orientation_count": 8,
+    "minimal_questions_count": 11,
+    "must_include_ok": 9,
+    "forbidden_claims_detected": true,
+    "missing_context_count": 0,
+    "no_llm_mode": false,
+    "architecture_recommendation": "C. Probar gpt-5-mini / medium en siguiente lab."
+  },
+  "cases": [
+    {
+      "case_id": "rag_01",
+      "user_message": "Quiero saber si puedo automatizar mi negocio.",
+      "category": "comercial_general",
+      "risk_level": "medium",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 49,
+          "title": "Plan 2 — WhatsApp Asistente",
+          "content_preview": "### Plan 2 — WhatsApp Asistente\n\n**Descripción:** Asistente con información del negocio, servicios, horarios, precios orientativos, ubicación, formas de pago, procesos y derivación a humano.\n\n**Para q",
+          "score": 0.562179
+        },
+        {
+          "rank": 2,
+          "chunk_id": 63,
+          "title": "Límite comercial",
+          "content_preview": "### Límite comercial\n\nVera puede identificar que un proceso es automatizable sin afirmar\nque Team360 lo vende hoy como servicio. Debe clasificar la oportunidad\nusando las categorías de decisión de ofe",
+          "score": 0.535448
+        },
+        {
+          "rank": 3,
+          "chunk_id": 47,
+          "title": "Diagnóstico amplio de automatización",
+          "content_preview": "### Diagnóstico amplio de automatización\n\nEl asistente no está limitado a ventas. Puede evaluar procesos de:\n\n- Administración y backoffice.\n- Documentación y gestión documental.\n- Reportes y dashboar",
+          "score": 0.519162
+        },
+        {
+          "rank": 4,
+          "chunk_id": 27,
+          "title": "Regla 1: automatable ≠ sellable_today",
+          "content_preview": "## Regla 1: automatable ≠ sellable_today\n\nQue un proceso sea técnicamente automatizable no significa que Team360 lo venda hoy como servicio.\n\n**Cómo responder:**\n- \"El proceso es automatizable, pero e",
+          "score": 0.514985
+        },
+        {
+          "rank": 5,
+          "chunk_id": 86,
+          "title": "Agenda automation",
+          "content_preview": "## Agenda automation\n\n**Estado actual:** planned_extension. La agenda/turnos automática no está disponible como servicio general.\n\n**Por qué no vender como listo:** Agenda automation requiere integrac",
+          "score": 0.514786
+        }
+      ],
+      "context_chars": 3510,
+      "retrieval_latency_ms": 5.3,
+      "llm_response": "",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 4597.6,
+      "total_latency_ms": 5779.6,
+      "llm_usage": {
+        "prompt_tokens": 989,
+        "completion_tokens": 600,
+        "total_tokens": 1589
+      },
+      "evaluation": {
+        "passed": false,
+        "found_must_include": [],
+        "missing_must_include": [
+          "automatizable",
+          "diagnostico",
+          "orientacion"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": true,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": false,
+        "says_not_documented": false,
+        "gives_orientation": false,
+        "forbidden_claims_count": 0,
+        "response_length": 0
+      }
+    },
+    {
+      "case_id": "rag_02",
+      "user_message": "Tengo muchos leads pero se pierden por falta de seguimiento.",
+      "category": "ventas_seguimiento",
+      "risk_level": "medium",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 29,
+          "title": "Lead capture productivo general",
+          "content_preview": "## Lead capture productivo general\n\n**Estado actual:** planned_extension. La captura de leads no está implementada como servicio productivo general.\n\n**Por qué no vender como listo:** Lead capture req",
+          "score": 0.531182
+        },
+        {
+          "rank": 2,
+          "chunk_id": 73,
+          "title": "Procesos comerciales",
+          "content_preview": "### Procesos comerciales\n\n- Seguimiento de leads y clientes.\n- Automatización de cotizaciones y propuestas.\n- Conciliación simple de pagos y facturación operativa, cuando el\n  alcance es claro y no im",
+          "score": 0.454152
+        },
+        {
+          "rank": 3,
+          "chunk_id": 60,
+          "title": "Plan 3 — WhatsApp Comercial (Captura + Calificación)",
+          "content_preview": "### Plan 3 — WhatsApp Comercial (Captura + Calificación)\n\n**Descripción:** Captura de datos mínimos del consultante y calificación de leads.\n\n**Para quién:** Empresas que reciben leads por WhatsApp y ",
+          "score": 0.438435
+        },
+        {
+          "rank": 4,
+          "chunk_id": 55,
+          "title": "CRM handoff",
+          "content_preview": "## CRM handoff\n\n**Estado actual:** planned_extension. La integración automática con CRM para crear/actualizar contactos no está disponible como servicio general.\n\n**Por qué no vender como listo:** CRM",
+          "score": 0.408296
+        },
+        {
+          "rank": 5,
+          "chunk_id": 127,
+          "title": "Trigger",
+          "content_preview": "### Trigger\n\nDetectar señales futuras de continuidad comercial cuando el usuario\nmuestra interés en contratar un servicio, solicita presupuesto,\npide diagnóstico completo o completa un flujo de scorin",
+          "score": 0.401628
+        }
+      ],
+      "context_chars": 3530,
+      "retrieval_latency_ms": 7.3,
+      "llm_response": "",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 5022.1,
+      "total_latency_ms": 5782.7,
+      "llm_usage": {
+        "prompt_tokens": 946,
+        "completion_tokens": 600,
+        "total_tokens": 1546
+      },
+      "evaluation": {
+        "passed": false,
+        "found_must_include": [],
+        "missing_must_include": [
+          "lead",
+          "diagnostico",
+          "orientacion"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": true,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": false,
+        "says_not_documented": false,
+        "gives_orientation": false,
+        "forbidden_claims_count": 0,
+        "response_length": 0
+      }
+    },
+    {
+      "case_id": "rag_03",
+      "user_message": "Quiero que el asistente atienda por WhatsApp y me pase clientes listos.",
+      "category": "whatsapp",
+      "risk_level": "high",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 49,
+          "title": "Plan 2 — WhatsApp Asistente",
+          "content_preview": "### Plan 2 — WhatsApp Asistente\n\n**Descripción:** Asistente con información del negocio, servicios, horarios, precios orientativos, ubicación, formas de pago, procesos y derivación a humano.\n\n**Para q",
+          "score": 0.665935
+        },
+        {
+          "rank": 2,
+          "chunk_id": 40,
+          "title": "Plan 1 — WhatsApp Profesional",
+          "content_preview": "### Plan 1 — WhatsApp Profesional\n\n**Descripción:** Canal de WhatsApp configurado con bienvenida, FAQ básica, horarios y derivación humana.\n\n**Para quién:** Comercios, profesionales independientes, py",
+          "score": 0.611343
+        },
+        {
+          "rank": 3,
+          "chunk_id": 91,
+          "title": "Cómo responder comercialmente",
+          "content_preview": "## Cómo responder comercialmente\n\n**Cliente: \"¿Pueden automatizar WhatsApp?\"**\n\"Sí, ofrecemos paquetes de WhatsApp inteligente como servicio. Hay 4 planes según tu necesidad: desde FAQ básica con deri",
+          "score": 0.602119
+        },
+        {
+          "rank": 4,
+          "chunk_id": 60,
+          "title": "Plan 3 — WhatsApp Comercial (Captura + Calificación)",
+          "content_preview": "### Plan 3 — WhatsApp Comercial (Captura + Calificación)\n\n**Descripción:** Captura de datos mínimos del consultante y calificación de leads.\n\n**Para quién:** Empresas que reciben leads por WhatsApp y ",
+          "score": 0.550982
+        },
+        {
+          "rank": 5,
+          "chunk_id": 44,
+          "title": "WhatsApp handoff automático",
+          "content_preview": "## WhatsApp handoff automático\n\n**Estado actual:** planned_extension. El handoff automático desde el diagnosis package hacia WhatsApp no está implementado.\n\n**Por qué no vender como listo:** WhatsApp ",
+          "score": 0.549897
+        }
+      ],
+      "context_chars": 5193,
+      "retrieval_latency_ms": 3.8,
+      "llm_response": "Recomendación clara: para que el WhatsApp te “pase clientes listos” necesitas el Plan 3 — WhatsApp Comercial (Captura + Calificación). Eso te entrega leads precalificados con resumen comercial para ventas. Nota: el handoff automático al CRM no está disponible hoy; podemos entregar el resumen y derivar a tu equipo humano según reglas definidas.\n\nQué proponemos:\n- Plan 3: captura de datos, clasificación de leads (frío/tibio/caliente) y resumen comercial para ventas.\n- Derivación a humano para cerrar la venta; no prometer integración automática con tu CRM sin configuración.\n\nPreguntas necesarias (2-3 max):\n1) ¿Qué datos clave quieres capturar de los leads (ej.: nombre, interés, ubicación, presupuesto, urgencia)?\n2) ¿A dónde quieres recibir el resumen (email, CRM específico, grupo interno)? Si es CRM, ¿cuál?\n3) ¿Ya tienes contenidos de FAQ y precios orientativos para incluir en el chat, o los necesitamos definir?\n\nPuedo adaptar el plan a tu catálogo y reglas de calificación.",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 4900.6,
+      "total_latency_ms": 5674.5,
+      "llm_usage": {
+        "prompt_tokens": 1346,
+        "completion_tokens": 556,
+        "total_tokens": 1902
+      },
+      "evaluation": {
+        "passed": false,
+        "found_must_include": [],
+        "missing_must_include": [
+          "whatsapp handoff",
+          "planned extension"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [
+          "hallucinated_pricing_sla_precio"
+        ],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": false,
+        "gives_orientation": true,
+        "forbidden_claims_count": 1,
+        "response_length": 985
+      }
+    },
+    {
+      "case_id": "rag_04",
+      "user_message": "Necesito un diagnóstico de automatización pero no sé por dónde empezar.",
+      "category": "diagnostico",
+      "risk_level": "low",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 47,
+          "title": "Diagnóstico amplio de automatización",
+          "content_preview": "### Diagnóstico amplio de automatización\n\nEl asistente no está limitado a ventas. Puede evaluar procesos de:\n\n- Administración y backoffice.\n- Documentación y gestión documental.\n- Reportes y dashboar",
+          "score": 0.591392
+        },
+        {
+          "rank": 2,
+          "chunk_id": 63,
+          "title": "Límite comercial",
+          "content_preview": "### Límite comercial\n\nVera puede identificar que un proceso es automatizable sin afirmar\nque Team360 lo vende hoy como servicio. Debe clasificar la oportunidad\nusando las categorías de decisión de ofe",
+          "score": 0.523713
+        },
+        {
+          "rank": 3,
+          "chunk_id": 12,
+          "title": "L0 Abstract",
+          "content_preview": "## L0 Abstract\n\nEste documento define el paquete de conocimiento `pkg_sales_diagnosis`\nque alimenta al asistente de diagnóstico de automatización y ventas\nde Team360, visible comercialmente como Vera ",
+          "score": 0.48957
+        },
+        {
+          "rank": 4,
+          "chunk_id": 139,
+          "title": "Recommended Next Steps",
+          "content_preview": "### Recommended Next Steps\n\nSiempre mostrar un siguiente paso claro:\n\n- Coordinar llamada con el equipo.\n- Enviar presupuesto.\n- Probar un piloto.\n- Consultar con un responsable interno.\n- Leer más so",
+          "score": 0.482496
+        },
+        {
+          "rank": 5,
+          "chunk_id": 39,
+          "title": "Diagnóstico útil",
+          "content_preview": "### Diagnóstico útil\nPuede clasificar la oportunidad del cliente en: automatizable, vendible hoy, piloto, oportunidad futura, requiere revisión humana.",
+          "score": 0.4779
+        }
+      ],
+      "context_chars": 2798,
+      "retrieval_latency_ms": 5.4,
+      "llm_response": "Perfecto. Podemos hacer un diagnóstico rápido para saber si un proceso es automatizable y si está listo para vender hoy, piloto o requiere revisión.\n\nTres preguntas rápidas para empezar (máximo 3):\n1) ¿Qué proceso específico quieres evaluar (p. ej., backoffice, atención al cliente, reportes, carga de datos, etc.)?\n2) ¿Cuál es tu objetivo principal (reducción de tiempos, menos errores, cumplimiento, costo)?\n3) ¿Qué grado de implementación buscas: prueba piloto corta, solución lista para vender hoy, o simplemente entender la oportunidad para una revisión interna?\n\nQué te diré con tus respuestas:\n- Clasificación posible: automatizable; vendible hoy; piloto; oportunidad futura; requiere revisión humana.\n- Siguiente paso recomendado según la clasificación (p. ej., coordinar llamada, proponer piloto, enviar presupuesto, leer más).",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 3790.0,
+      "total_latency_ms": 4506.3,
+      "llm_usage": {
+        "prompt_tokens": 810,
+        "completion_tokens": 377,
+        "total_tokens": 1187
+      },
+      "evaluation": {
+        "passed": true,
+        "found_must_include": [
+          "diagnostico"
+        ],
+        "missing_must_include": [
+          "minimum slots",
+          "orientacion"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": false,
+        "gives_orientation": true,
+        "forbidden_claims_count": 0,
+        "response_length": 836
+      }
+    },
+    {
+      "case_id": "rag_05",
+      "user_message": "Quiero que el sistema cierre ventas solo y facture automáticamente.",
+      "category": "anti_overpromise",
+      "risk_level": "high",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 63,
+          "title": "Límite comercial",
+          "content_preview": "### Límite comercial\n\nVera puede identificar que un proceso es automatizable sin afirmar\nque Team360 lo vende hoy como servicio. Debe clasificar la oportunidad\nusando las categorías de decisión de ofe",
+          "score": 0.491354
+        },
+        {
+          "rank": 2,
+          "chunk_id": 73,
+          "title": "Procesos comerciales",
+          "content_preview": "### Procesos comerciales\n\n- Seguimiento de leads y clientes.\n- Automatización de cotizaciones y propuestas.\n- Conciliación simple de pagos y facturación operativa, cuando el\n  alcance es claro y no im",
+          "score": 0.484438
+        },
+        {
+          "rank": 3,
+          "chunk_id": 86,
+          "title": "Agenda automation",
+          "content_preview": "## Agenda automation\n\n**Estado actual:** planned_extension. La agenda/turnos automática no está disponible como servicio general.\n\n**Por qué no vender como listo:** Agenda automation requiere integrac",
+          "score": 0.472596
+        },
+        {
+          "rank": 4,
+          "chunk_id": 27,
+          "title": "Regla 1: automatable ≠ sellable_today",
+          "content_preview": "## Regla 1: automatable ≠ sellable_today\n\nQue un proceso sea técnicamente automatizable no significa que Team360 lo venda hoy como servicio.\n\n**Cómo responder:**\n- \"El proceso es automatizable, pero e",
+          "score": 0.46985
+        },
+        {
+          "rank": 5,
+          "chunk_id": 66,
+          "title": "Workflow execution",
+          "content_preview": "## Workflow execution\n\n**Estado actual:** planned_extension. La ejecución automática de workflows no está implementada.\n\n**Por qué no vender como listo:** La ejecución automática sobre sistemas extern",
+          "score": 0.460111
+        }
+      ],
+      "context_chars": 2876,
+      "retrieval_latency_ms": 5.5,
+      "llm_response": "Entendido. No podemos vender cierre de ventas automático o facturación automática hoy como servicio. Según nuestra clasificación, esto sería una oportunidad futura o requeriría revisión humana.\n\nQué sí podemos hacer ahora:\n- Clasificar y analizar si es automatable y cuál sería la mejor ruta (future_opportunity, pilot o human_review_required).\n- Ofrecer un diagnóstico para mapear procesos y definir próximos pasos comerciales.\n\nPreguntas (1–2):\n1) ¿Qué CRM y ERP usas (ejemplos) y qué volumen de ventas/facturas manejas mensualmente?\n2) ¿Qué grado de automatización esperas (desde generación de leads hasta cobros) y para qué plazo?\n\nNotas:\n- La agenda automática no está disponible hoy.\n- No prometemos capacidades no disponibles; cualquier avance se declarará como oportunidad futura o revisión necesaria.",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 5289.6,
+      "total_latency_ms": 5922.8,
+      "llm_usage": {
+        "prompt_tokens": 840,
+        "completion_tokens": 563,
+        "total_tokens": 1403
+      },
+      "evaluation": {
+        "passed": true,
+        "found_must_include": [
+          "diagnostico"
+        ],
+        "missing_must_include": [
+          "automatizable",
+          "limites"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": true,
+        "gives_orientation": true,
+        "forbidden_claims_count": 0,
+        "response_length": 809
+      }
+    },
+    {
+      "case_id": "rag_06",
+      "user_message": "¿Ya puede ejecutar acciones automáticamente después del diagnóstico?",
+      "category": "anti_overpromise",
+      "risk_level": "high",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 48,
+          "title": "Orientación concreta",
+          "content_preview": "### Orientación concreta\nDespués del diagnóstico, puede sugerir pasos concretos que el vendedor puede seguir. No ejecuta acciones automáticas.",
+          "score": 0.589798
+        },
+        {
+          "rank": 2,
+          "chunk_id": 112,
+          "title": "Cómo responder preguntas sobre alcance",
+          "content_preview": "## Cómo responder preguntas sobre alcance\n\n**\"¿Qué puede hacer el asistente?\"**\n\"Puedo mantener una conversación para entender tu situación, diagnosticar oportunidades de automatización, clasificar tu",
+          "score": 0.535742
+        },
+        {
+          "rank": 3,
+          "chunk_id": 3,
+          "title": "Manual del paquete de diagnóstico de automatización",
+          "content_preview": "# Manual del paquete de diagnóstico de automatización\n\n> Estado approved: primera copia controlada para validar el scanner dry-run\n> como candidato de ingesta. No activa persistencia DB, chunks, embed",
+          "score": 0.534541
+        },
+        {
+          "rank": 4,
+          "chunk_id": 47,
+          "title": "Diagnóstico amplio de automatización",
+          "content_preview": "### Diagnóstico amplio de automatización\n\nEl asistente no está limitado a ventas. Puede evaluar procesos de:\n\n- Administración y backoffice.\n- Documentación y gestión documental.\n- Reportes y dashboar",
+          "score": 0.527301
+        },
+        {
+          "rank": 5,
+          "chunk_id": 71,
+          "title": "Plan 4 — WhatsApp Diagnóstico AI",
+          "content_preview": "### Plan 4 — WhatsApp Diagnóstico AI\n\n**Descripción:** Primera entrevista inteligente con diagnóstico útil y orientación concreta.\n\n**Para quién:** Empresas que necesitan diagnosticar necesidades del ",
+          "score": 0.524252
+        }
+      ],
+      "context_chars": 3109,
+      "retrieval_latency_ms": 6.8,
+      "llm_response": "No. El diagnóstico actual termina en orientación y recomendaciones. La ejecución automática de acciones es una capacidad futura (planeada como extensión).\n\nDetalles útiles:\n- Actualmente puedo generar pasos concretos para que el vendedor implemente manualmente.\n- No ejecuto acciones automáticas ni cambios en tu CRM sin intervención humana.\n- Las integraciones deben evaluarse caso por caso; no puedo reemplazar al juicio comercial.\n\nPreguntas para afinar la orientación (máx. 2):\n1) ¿Qué tipo de acciones automáticas te gustaría considerar en el futuro (p. ej., actualizaciones de estado en CRM, envío de mensajes, generación de tareas)?\n2) ¿Qué CRM o sistema usan hoy y qué datos serían relevantes para vincular un diagnóstico con una acción manual?\n\nPuedo proponerte un plan de acción concreto para que lo ejecute tu equipo. ¿Prefieres que te dé una secuencia de pasos para el siguiente contacto con el cliente?",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 3955.8,
+      "total_latency_ms": 4680.7,
+      "llm_usage": {
+        "prompt_tokens": 848,
+        "completion_tokens": 392,
+        "total_tokens": 1240
+      },
+      "evaluation": {
+        "passed": false,
+        "found_must_include": [],
+        "missing_must_include": [
+          "step to action",
+          "planned extension"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [
+          "hallucinated_pricing_sla_ars"
+        ],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": true,
+        "gives_orientation": true,
+        "forbidden_claims_count": 1,
+        "response_length": 915
+      }
+    },
+    {
+      "case_id": "rag_07",
+      "user_message": "¿El diagnóstico ya captura leads y los manda al CRM?",
+      "category": "anti_overpromise",
+      "risk_level": "high",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 91,
+          "title": "Cómo responder comercialmente",
+          "content_preview": "## Cómo responder comercialmente\n\n**Cliente: \"¿Pueden automatizar WhatsApp?\"**\n\"Sí, ofrecemos paquetes de WhatsApp inteligente como servicio. Hay 4 planes según tu necesidad: desde FAQ básica con deri",
+          "score": 0.58259
+        },
+        {
+          "rank": 2,
+          "chunk_id": 71,
+          "title": "Plan 4 — WhatsApp Diagnóstico AI",
+          "content_preview": "### Plan 4 — WhatsApp Diagnóstico AI\n\n**Descripción:** Primera entrevista inteligente con diagnóstico útil y orientación concreta.\n\n**Para quién:** Empresas que necesitan diagnosticar necesidades del ",
+          "score": 0.56398
+        },
+        {
+          "rank": 3,
+          "chunk_id": 29,
+          "title": "Lead capture productivo general",
+          "content_preview": "## Lead capture productivo general\n\n**Estado actual:** planned_extension. La captura de leads no está implementada como servicio productivo general.\n\n**Por qué no vender como listo:** Lead capture req",
+          "score": 0.560285
+        },
+        {
+          "rank": 4,
+          "chunk_id": 60,
+          "title": "Plan 3 — WhatsApp Comercial (Captura + Calificación)",
+          "content_preview": "### Plan 3 — WhatsApp Comercial (Captura + Calificación)\n\n**Descripción:** Captura de datos mínimos del consultante y calificación de leads.\n\n**Para quién:** Empresas que reciben leads por WhatsApp y ",
+          "score": 0.556241
+        },
+        {
+          "rank": 5,
+          "chunk_id": 38,
+          "title": "Entrada comercial inicial",
+          "content_preview": "### Entrada comercial inicial\n\nVentas es el primer ángulo comercial. El asistente puede diagnosticar\ny orientar en:\n\n- Gestión de leads y oportunidades.\n- CRM y seguimiento comercial.\n- WhatsApp para ",
+          "score": 0.547512
+        }
+      ],
+      "context_chars": 4476,
+      "retrieval_latency_ms": 3.3,
+      "llm_response": "Respuesta breve: No. El diagnóstico (Plan 4) no captura leads ni los manda automáticamente al CRM. La captura de leads existe en Plan 3, pero la integración automática con CRM no está habilitada por defecto y requiere configuración adicional.\n\n- Lead capture general: planificada como extensión futura (no disponible hoy).\n- Integración CRM automática: evaluamos caso específico; no está garantizada de inmediato.\n\nSi quieres, cuéntame:\n1) ¿Qué CRM usan?\n2) ¿Necesitan exportación de leads o integración automática real?",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 3897.3,
+      "total_latency_ms": 4536.7,
+      "llm_usage": {
+        "prompt_tokens": 1141,
+        "completion_tokens": 440,
+        "total_tokens": 1581
+      },
+      "evaluation": {
+        "passed": true,
+        "found_must_include": [
+          "lead capture"
+        ],
+        "missing_must_include": [
+          "planned extension"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": true,
+        "gives_orientation": false,
+        "forbidden_claims_count": 0,
+        "response_length": 520
+      }
+    },
+    {
+      "case_id": "rag_08",
+      "user_message": "¿El sistema genera un código de diagnóstico único para seguimiento?",
+      "category": "anti_overpromise",
+      "risk_level": "medium",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 52,
+          "title": "Diagnostic code",
+          "content_preview": "## Diagnostic code\n\n**Estado actual:** planned_extension. El código único de diagnóstico por conversación no está implementado.\n\n**Por qué no vender como listo:** Diagnostic_code requiere un generador",
+          "score": 0.613474
+        },
+        {
+          "rank": 2,
+          "chunk_id": 129,
+          "title": "Diagnostic Code y WhatsApp Handoff futuro",
+          "content_preview": "### Diagnostic Code y WhatsApp Handoff futuro\n\nEl handoff futuro debe asociar la conversación a un `diagnostic_code`\nexistente o generar uno nuevo cuando el flujo lo permita. Ese código\nconservará el ",
+          "score": 0.534441
+        },
+        {
+          "rank": 3,
+          "chunk_id": 41,
+          "title": "Identificadores del paquete",
+          "content_preview": "## Identificadores del paquete\n\n| Campo | Valor |\n|-------|-------|\n| `package_code` | `pkg_sales_diagnosis` |\n| `knowledge_scope_code` | `ks_team360_sales_diagnosis` |\n| `assistant_instance_code` | `",
+          "score": 0.45966
+        },
+        {
+          "rank": 4,
+          "chunk_id": 118,
+          "title": "Criterios de diagnóstico",
+          "content_preview": "## Criterios de diagnóstico\n\nEl asistente evalúa cada proceso en cuatro dimensiones.",
+          "score": 0.456894
+        },
+        {
+          "rank": 5,
+          "chunk_id": 130,
+          "title": "Suggested Assistant Message futuro",
+          "content_preview": "### Suggested Assistant Message futuro\n\nEste mensaje no está activo en el MVP inicial. Solo debe usarse cuando\nse habilite la capa futura de continuidad comercial.\n\n> Puedo dejar este diagnóstico prep",
+          "score": 0.442707
+        }
+      ],
+      "context_chars": 3125,
+      "retrieval_latency_ms": 8.4,
+      "llm_response": "Respuesta breve:\n- Hoy no se genera un código de diagnóstico único. Es una extensión planificada (planned_extension). El resultado actual es la clasificación de oportunidad, no un código de seguimiento.\n\nQué implica para vos:\n- No hay continuidad automática ni generación de WhatsApp/handoff con código. Si querés avanzar, la próxima capa de continuidad está en roadmap, pero no está disponible en el MVP.\n\nPreguntas rápidas:\n1) ¿Quieres que te explique de forma breve cómo se clasifica la oportunidad y qué señales indicarían mayor prioridad?\n2) ¿Qué segmento u oportunidad quieres priorizar para que lo documentemos de forma clara y rastreable cuando esté disponible la continuidad?\n\nNota: si en el futuro habilitamos la continuidad, podríamos asociar la consulta a un diagnostic_code existente o generar uno nuevo para conservar el contexto. Por ahora, mantenemos solo la clasificación de oportunidad.",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 3813.6,
+      "total_latency_ms": 4536.7,
+      "llm_usage": {
+        "prompt_tokens": 944,
+        "completion_tokens": 379,
+        "total_tokens": 1323
+      },
+      "evaluation": {
+        "passed": true,
+        "found_must_include": [
+          "diagnostic code",
+          "planned extension"
+        ],
+        "missing_must_include": [],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": true,
+        "gives_orientation": false,
+        "forbidden_claims_count": 0,
+        "response_length": 904
+      }
+    },
+    {
+      "case_id": "rag_09",
+      "user_message": "¿Puede pasar automáticamente la conversación a WhatsApp?",
+      "category": "whatsapp",
+      "risk_level": "high",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 44,
+          "title": "WhatsApp handoff automático",
+          "content_preview": "## WhatsApp handoff automático\n\n**Estado actual:** planned_extension. El handoff automático desde el diagnosis package hacia WhatsApp no está implementado.\n\n**Por qué no vender como listo:** WhatsApp ",
+          "score": 0.609001
+        },
+        {
+          "rank": 2,
+          "chunk_id": 32,
+          "title": "WhatsApp handoff automático (NO disponible)",
+          "content_preview": "## WhatsApp handoff automático (NO disponible)\n\nEl handoff automático desde el diagnosis package hacia WhatsApp es planned_extension. Esto significa:\n\n- No existe un worker que genere un mensaje autom",
+          "score": 0.605243
+        },
+        {
+          "rank": 3,
+          "chunk_id": 62,
+          "title": "No está permitido",
+          "content_preview": "### No está permitido\n- Decir que \"WhatsApp handoff automático está listo\" (es planned_extension).\n- Decir que \"WhatsApp se integra automáticamente con el diagnóstico\" (no existe).\n- Prometer campañas",
+          "score": 0.575845
+        },
+        {
+          "rank": 4,
+          "chunk_id": 64,
+          "title": "Regla 6: WhatsApp service offer ≠ WhatsApp handoff automático listo",
+          "content_preview": "## Regla 6: WhatsApp service offer ≠ WhatsApp handoff automático listo\n\nTeam360 puede ofrecer paquetes de WhatsApp inteligente como servicio comercial sin que el handoff automático dentro del diagnosi",
+          "score": 0.568606
+        },
+        {
+          "rank": 5,
+          "chunk_id": 74,
+          "title": "Cómo responder preguntas comerciales sobre WhatsApp",
+          "content_preview": "## Cómo responder preguntas comerciales sobre WhatsApp\n\n**\"¿Conecta con WhatsApp?\"**\n\"Sí, ofrecemos paquetes de WhatsApp inteligente como servicio. Podemos configurar un canal para tu negocio con el a",
+          "score": 0.565847
+        }
+      ],
+      "context_chars": 3907,
+      "retrieval_latency_ms": 5.2,
+      "llm_response": "Actualmente no. El handoff automático desde el diagnóstico hacia WhatsApp es una capacidad planned_extension y no está disponible hoy.\n\nComo alternativa, sí podemos ofrecerte un paquete de WhatsApp inteligente como servicio (independiente del diagnóstico) con alcance y configuración definidos.\n\nQué te gustaría: \n- cotizar un paquete de WhatsApp inteligente, o\n- recibir más detalles sobre la evolución planificada del handoff automático dentro del diagnóstico?",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 2647.7,
+      "total_latency_ms": 3428.8,
+      "llm_usage": {
+        "prompt_tokens": 1030,
+        "completion_tokens": 223,
+        "total_tokens": 1253
+      },
+      "evaluation": {
+        "passed": false,
+        "found_must_include": [
+          "planned extension"
+        ],
+        "missing_must_include": [
+          "whatsapp handoff"
+        ],
+        "found_forbidden": [
+          "handoff automatico"
+        ],
+        "safety_flags": [
+          "hallucinated_pricing_sla_cotiza"
+        ],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": true,
+        "gives_orientation": true,
+        "forbidden_claims_count": 2,
+        "response_length": 462
+      }
+    },
+    {
+      "case_id": "rag_10",
+      "user_message": "Si algo se puede automatizar, ¿ya me lo pueden vender hoy?",
+      "category": "límites_comerciales",
+      "risk_level": "high",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 27,
+          "title": "Regla 1: automatable ≠ sellable_today",
+          "content_preview": "## Regla 1: automatable ≠ sellable_today\n\nQue un proceso sea técnicamente automatizable no significa que Team360 lo venda hoy como servicio.\n\n**Cómo responder:**\n- \"El proceso es automatizable, pero e",
+          "score": 0.648862
+        },
+        {
+          "rank": 2,
+          "chunk_id": 111,
+          "title": "Offer Decision",
+          "content_preview": "## Offer Decision\n\nCada oportunidad detectada debe clasificarse en una de estas\ncategorías. El asistente no debe mezclarlas ni prometer como\nvendible hoy algo que solo es una posibilidad futura.\n\n| Ca",
+          "score": 0.577798
+        },
+        {
+          "rank": 3,
+          "chunk_id": 63,
+          "title": "Límite comercial",
+          "content_preview": "### Límite comercial\n\nVera puede identificar que un proceso es automatizable sin afirmar\nque Team360 lo vende hoy como servicio. Debe clasificar la oportunidad\nusando las categorías de decisión de ofe",
+          "score": 0.554761
+        },
+        {
+          "rank": 4,
+          "chunk_id": 86,
+          "title": "Agenda automation",
+          "content_preview": "## Agenda automation\n\n**Estado actual:** planned_extension. La agenda/turnos automática no está disponible como servicio general.\n\n**Por qué no vender como listo:** Agenda automation requiere integrac",
+          "score": 0.55306
+        },
+        {
+          "rank": 5,
+          "chunk_id": 78,
+          "title": "Campaign automation",
+          "content_preview": "## Campaign automation\n\n**Estado actual:** planned_extension. Las campañas automáticas por WhatsApp no están disponibles como servicio general.\n\n**Por qué no vender como listo:** Campaign automation r",
+          "score": 0.514214
+        }
+      ],
+      "context_chars": 4345,
+      "retrieval_latency_ms": 7.5,
+      "llm_response": "No necesariamente. Automatizable no implica que ya lo vendamos hoy.\n\n- Si un proceso es automatizable, puede ser una oportunidad futura, pero no siempre es un servicio disponible ahora.\n- Clasificamos cada caso en: automatable, sellable_now, pilot, future_opportunity, o human_review_required.\n\n¿Qué proceso quieres evaluar exactamente? \n1) Descríbeme el proceso (breve): qué se hace, canales involucrados, datos sensibles, y alcance deseado. \n2) ¿Ya hay evidencias de capacidad de entrega (staff, herramientas, acceso, cumplimiento)? \n\nCon eso te digo la categoría correcta y el siguiente paso recomendado.",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 3233.2,
+      "total_latency_ms": 4217.4,
+      "llm_usage": {
+        "prompt_tokens": 1190,
+        "completion_tokens": 335,
+        "total_tokens": 1525
+      },
+      "evaluation": {
+        "passed": true,
+        "found_must_include": [
+          "automatizable"
+        ],
+        "missing_must_include": [
+          "sellable today",
+          "offer decision"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": false,
+        "gives_orientation": true,
+        "forbidden_claims_count": 0,
+        "response_length": 607
+      }
+    },
+    {
+      "case_id": "rag_11",
+      "user_message": "Quiero ofrecer esto a mis clientes como paquete comercial.",
+      "category": "límites_comerciales",
+      "risk_level": "medium",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 54,
+          "title": "Sí está permitido",
+          "content_preview": "### Sí está permitido\n- Ofrecer paquetes de WhatsApp inteligente como servicio comercial.\n- Describir qué incluye cada plan con alcance y límites.\n- Mencionar que la integración con sistemas del clien",
+          "score": 0.495158
+        },
+        {
+          "rank": 2,
+          "chunk_id": 26,
+          "title": "WhatsApp service offer (disponible)",
+          "content_preview": "## WhatsApp service offer (disponible)\n\nVer `[[paquetes-whatsapp-inteligente]]` para la descripción completa de los 4 planes.\n\nReglas:\n- Se ofrece como servicio profesional configurable, no como produ",
+          "score": 0.466563
+        },
+        {
+          "rank": 3,
+          "chunk_id": 110,
+          "title": "Referencias",
+          "content_preview": "## Referencias\n\n- `[[team360_sales_diagnosis_package_manual]]`: Offer Decision, Service Maturity\n- `[[capacidades-futuras-e-integraciones]]`: Estado actual de cada capacidad planned\n- `[[paquetes-what",
+          "score": 0.466003
+        },
+        {
+          "rank": 4,
+          "chunk_id": 49,
+          "title": "Plan 2 — WhatsApp Asistente",
+          "content_preview": "### Plan 2 — WhatsApp Asistente\n\n**Descripción:** Asistente con información del negocio, servicios, horarios, precios orientativos, ubicación, formas de pago, procesos y derivación a humano.\n\n**Para q",
+          "score": 0.455946
+        },
+        {
+          "rank": 5,
+          "chunk_id": 91,
+          "title": "Cómo responder comercialmente",
+          "content_preview": "## Cómo responder comercialmente\n\n**Cliente: \"¿Pueden automatizar WhatsApp?\"**\n\"Sí, ofrecemos paquetes de WhatsApp inteligente como servicio. Hay 4 planes según tu necesidad: desde FAQ básica con deri",
+          "score": 0.453319
+        }
+      ],
+      "context_chars": 3377,
+      "retrieval_latency_ms": 2.9,
+      "llm_response": "",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 4563.7,
+      "total_latency_ms": 5467.5,
+      "llm_usage": {
+        "prompt_tokens": 950,
+        "completion_tokens": 600,
+        "total_tokens": 1550
+      },
+      "evaluation": {
+        "passed": false,
+        "found_must_include": [],
+        "missing_must_include": [
+          "package",
+          "sales diagnosis",
+          "diagnostico"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": true,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": false,
+        "says_not_documented": false,
+        "gives_orientation": false,
+        "forbidden_claims_count": 0,
+        "response_length": 0
+      }
+    },
+    {
+      "case_id": "rag_12",
+      "user_message": "¿Qué cosas no debería prometer todavía?",
+      "category": "límites_comerciales",
+      "risk_level": "medium",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 4,
+          "title": "Reglas anti-overpromise",
+          "content_preview": "# Reglas anti-overpromise",
+          "score": 0.592319
+        },
+        {
+          "rank": 2,
+          "chunk_id": 107,
+          "title": "Qué no debe prometer Vera",
+          "content_preview": "## Qué no debe prometer Vera\n\n- No prometer implementación inmediata de todo proceso detectado.\n- No prometer resultados económicos garantizados.\n- No pedir ni guardar contraseñas, tokens, API keys ni",
+          "score": 0.571446
+        },
+        {
+          "rank": 3,
+          "chunk_id": 97,
+          "title": "Lo que el asistente NO debe hacer hoy",
+          "content_preview": "## Lo que el asistente NO debe hacer hoy\n\n- ❌ No prometer acciones automáticas reales. El diagnóstico termina en orientación, no en ejecución.\n- ❌ No ejecutar Step-to-Action. Es planned_extension.\n- ❌",
+          "score": 0.464331
+        },
+        {
+          "rank": 4,
+          "chunk_id": 96,
+          "title": "Qué NO se debe prometer",
+          "content_preview": "## Qué NO se debe prometer\n\n- \"Cualquier documento funciona.\" No. Los documentos deben estar curados, con metadata y alcance claro.\n- \"Se integra con cualquier fuente de datos.\" No. La ingesta es sobr",
+          "score": 0.455815
+        },
+        {
+          "rank": 5,
+          "chunk_id": 113,
+          "title": "Referencias",
+          "content_preview": "## Referencias\n\n- `[[reglas-anti-overpromise]]`: Reglas vinculantes para no prometer de más\n- `[[capacidades-futuras-e-integraciones]]`: Lo que no está listo hoy\n- `[[team360_sales_diagnosis_package_m",
+          "score": 0.441471
+        }
+      ],
+      "context_chars": 2397,
+      "retrieval_latency_ms": 3.4,
+      "llm_response": "",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 4920.9,
+      "total_latency_ms": 5816.2,
+      "llm_usage": {
+        "prompt_tokens": 769,
+        "completion_tokens": 600,
+        "total_tokens": 1369
+      },
+      "evaluation": {
+        "passed": false,
+        "found_must_include": [],
+        "missing_must_include": [
+          "planned extension",
+          "step to action",
+          "whatsapp handoff"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": true,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": false,
+        "says_not_documented": false,
+        "gives_orientation": false,
+        "forbidden_claims_count": 0,
+        "response_length": 0
+      }
+    },
+    {
+      "case_id": "rag_13",
+      "user_message": "¿Cuánto sale y en cuánto tiempo queda listo?",
+      "category": "límites_comerciales",
+      "risk_level": "high",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 139,
+          "title": "Recommended Next Steps",
+          "content_preview": "### Recommended Next Steps\n\nSiempre mostrar un siguiente paso claro:\n\n- Coordinar llamada con el equipo.\n- Enviar presupuesto.\n- Probar un piloto.\n- Consultar con un responsable interno.\n- Leer más so",
+          "score": 0.390519
+        },
+        {
+          "rank": 2,
+          "chunk_id": 33,
+          "title": "Regla 2: planned_extension ≠ ready_today",
+          "content_preview": "## Regla 2: planned_extension ≠ ready_today\n\nToda capacidad marcada como `planned_extension` NO está disponible productivamente.\n\n**No vender como listo:**\n- Step-to-Action\n- WhatsApp handoff automáti",
+          "score": 0.370035
+        },
+        {
+          "rank": 3,
+          "chunk_id": 45,
+          "title": "Regla 3: futuro ≠ productivo inicial",
+          "content_preview": "## Regla 3: futuro ≠ productivo inicial\n\nUna hoja de ruta, prototipo o laboratorio no es una capacidad comercial lista. No confundir dirección de producto con oferta actual.\n\n**Cómo responder:**\n- \"Es",
+          "score": 0.368282
+        },
+        {
+          "rank": 4,
+          "chunk_id": 86,
+          "title": "Agenda automation",
+          "content_preview": "## Agenda automation\n\n**Estado actual:** planned_extension. La agenda/turnos automática no está disponible como servicio general.\n\n**Por qué no vender como listo:** Agenda automation requiere integrac",
+          "score": 0.368249
+        },
+        {
+          "rank": 5,
+          "chunk_id": 85,
+          "title": "Regla 8: no prometer plazos, costos ni resultados",
+          "content_preview": "## Regla 8: no prometer plazos, costos ni resultados\n\nTeam360 no tiene SLA, precios ni garantías de resultado documentados en el knowledge actual.\n\n**No responder con:**\n- Precios, costos, suscripcion",
+          "score": 0.356978
+        }
+      ],
+      "context_chars": 2691,
+      "retrieval_latency_ms": 5.4,
+      "llm_response": "Gracias por consultar. No tenemos información de costos en el knowledge actual. Para precios y plazos, hay que consultar al equipo comercial.\n\nImportante: la agenda automática está marcada como planned_extension y no está disponible hoy. Si te interesa, puedo ayudarte con el diagnóstico actual y las opciones disponibles ahora.\n\nSiguiente paso recomendado:\n- Coordinar una llamada con el equipo para revisar alcance y opciones actuales, y aclarar costos/plazos.\n\nPreguntas rápidas para avanzar:\n1) ¿Cuál es el objetivo principal que buscas lograr con la automatización?\n2) ¿Quieres que te presente el diagnóstico actual y las opciones disponibles hoy antes de una llamada?",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 3209.8,
+      "total_latency_ms": 3881.4,
+      "llm_usage": {
+        "prompt_tokens": 805,
+        "completion_tokens": 394,
+        "total_tokens": 1199
+      },
+      "evaluation": {
+        "passed": false,
+        "found_must_include": [
+          "diagnostico"
+        ],
+        "missing_must_include": [
+          "orientacion"
+        ],
+        "found_forbidden": [
+          "precio",
+          "costo",
+          "plazo"
+        ],
+        "safety_flags": [
+          "hallucinated_pricing_sla_precio"
+        ],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": true,
+        "gives_orientation": true,
+        "forbidden_claims_count": 4,
+        "response_length": 673
+      }
+    },
+    {
+      "case_id": "rag_14",
+      "user_message": "Quiero IA para mi empresa.",
+      "category": "ambigüedad",
+      "risk_level": "medium",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 49,
+          "title": "Plan 2 — WhatsApp Asistente",
+          "content_preview": "### Plan 2 — WhatsApp Asistente\n\n**Descripción:** Asistente con información del negocio, servicios, horarios, precios orientativos, ubicación, formas de pago, procesos y derivación a humano.\n\n**Para q",
+          "score": 0.460136
+        },
+        {
+          "rank": 2,
+          "chunk_id": 63,
+          "title": "Límite comercial",
+          "content_preview": "### Límite comercial\n\nVera puede identificar que un proceso es automatizable sin afirmar\nque Team360 lo vende hoy como servicio. Debe clasificar la oportunidad\nusando las categorías de decisión de ofe",
+          "score": 0.449653
+        },
+        {
+          "rank": 3,
+          "chunk_id": 71,
+          "title": "Plan 4 — WhatsApp Diagnóstico AI",
+          "content_preview": "### Plan 4 — WhatsApp Diagnóstico AI\n\n**Descripción:** Primera entrevista inteligente con diagnóstico útil y orientación concreta.\n\n**Para quién:** Empresas que necesitan diagnosticar necesidades del ",
+          "score": 0.445249
+        },
+        {
+          "rank": 4,
+          "chunk_id": 79,
+          "title": "Relación entre planes",
+          "content_preview": "## Relación entre planes\n\n```\nPlan 1 — Profesional (FAQ + derivación)\n    │\n    ▼\nPlan 2 — Asistente (información del negocio)\n    │\n    ▼\nPlan 3 — Comercial (captura + calificación)\n    │\n    ▼\nPlan ",
+          "score": 0.441634
+        },
+        {
+          "rank": 5,
+          "chunk_id": 109,
+          "title": "Referencias",
+          "content_preview": "## Referencias\n\n- `[[aislamiento-scope-cliente]]`: Aislamiento por cliente\n- `[[reglas-anti-overpromise]]`: Reglas vinculantes\n- `[[alcance-productivo-inicial]]`: Qué se puede vender hoy\n- `[[team360_",
+          "score": 0.431349
+        }
+      ],
+      "context_chars": 3732,
+      "retrieval_latency_ms": 4.8,
+      "llm_response": "",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 4568.8,
+      "total_latency_ms": 5405.1,
+      "llm_usage": {
+        "prompt_tokens": 1055,
+        "completion_tokens": 600,
+        "total_tokens": 1655
+      },
+      "evaluation": {
+        "passed": false,
+        "found_must_include": [],
+        "missing_must_include": [
+          "diagnostico",
+          "orientacion"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": true,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": false,
+        "says_not_documented": false,
+        "gives_orientation": false,
+        "forbidden_claims_count": 0,
+        "response_length": 0
+      }
+    },
+    {
+      "case_id": "rag_15",
+      "user_message": "¿Mis datos se mezclan con los de otros clientes?",
+      "category": "seguridad_scope",
+      "risk_level": "high",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 36,
+          "title": "Cross-customer isolation",
+          "content_preview": "## Cross-customer isolation\n\n**NUNCA compartir conocimiento entre clientes distintos.**\n\nCada cliente/organización tiene su propio knowledge_scope aislado. Aunque dos clientes tengan procesos de negoc",
+          "score": 0.45344
+        },
+        {
+          "rank": 2,
+          "chunk_id": 8,
+          "title": "Aislamiento por scope y cliente",
+          "content_preview": "# Aislamiento por scope y cliente",
+          "score": 0.399529
+        },
+        {
+          "rank": 3,
+          "chunk_id": 128,
+          "title": "Future Required Data",
+          "content_preview": "### Future Required Data\n\n- Nombre\n- Apellido\n- WhatsApp (con código de país)\n- Email (opcional)\n- Empresa (opcional)\n- `diagnostic_code` — si existe del diagnóstico actual,\n  o debe asociarse uno nue",
+          "score": 0.396399
+        },
+        {
+          "rank": 4,
+          "chunk_id": 122,
+          "title": "Riesgo",
+          "content_preview": "### Riesgo\n\nNivel de exposición a datos sensibles, cumplimiento normativo,\ndependencia de terceros, criticidad del proceso y necesidad\nde supervisión humana.\n\n---",
+          "score": 0.392847
+        },
+        {
+          "rank": 5,
+          "chunk_id": 123,
+          "title": "Seguridad y HITL",
+          "content_preview": "## Seguridad y HITL\n\n- No almacenar credenciales, tokens, API keys ni passwords\n  en el knowledge del asistente.\n- No sugerir compartir contraseñas ni saltar MFA.\n- No automatizar acciones que requier",
+          "score": 0.391016
+        }
+      ],
+      "context_chars": 2266,
+      "retrieval_latency_ms": 4.3,
+      "llm_response": "No. No compartimos conocimiento entre clientes: cada organización tiene su propio knowledge_scope aislado por diseño. Si un caso se repite, debe documentarse en cada scope por separado.\n\n¿Quieres que revisemos y aclaremos tu scope actual para confirmar qué cubre y qué no? ¿Deseas saber qué información de diagnóstico queda aislada en tu organización?",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 2343.2,
+      "total_latency_ms": 3340.4,
+      "llm_usage": {
+        "prompt_tokens": 713,
+        "completion_tokens": 209,
+        "total_tokens": 922
+      },
+      "evaluation": {
+        "passed": true,
+        "found_must_include": [
+          "knowledge scope",
+          "cliente"
+        ],
+        "missing_must_include": [
+          "aislamiento"
+        ],
+        "found_forbidden": [],
+        "safety_flags": [
+          "hallucinated_pricing_sla_ars",
+          "hallucinated_pricing_sla_sla"
+        ],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": false,
+        "gives_orientation": false,
+        "forbidden_claims_count": 2,
+        "response_length": 351
+      }
+    },
+    {
+      "case_id": "rag_16",
+      "user_message": "Qué paquetes de WhatsApp inteligente podría ofrecer.",
+      "category": "whatsapp",
+      "risk_level": "medium",
+      "retrieval_chunks": [
+        {
+          "rank": 1,
+          "chunk_id": 2,
+          "title": "Paquetes de WhatsApp inteligente",
+          "content_preview": "# Paquetes de WhatsApp inteligente",
+          "score": 0.859851
+        },
+        {
+          "rank": 2,
+          "chunk_id": 26,
+          "title": "WhatsApp service offer (disponible)",
+          "content_preview": "## WhatsApp service offer (disponible)\n\nVer `[[paquetes-whatsapp-inteligente]]` para la descripción completa de los 4 planes.\n\nReglas:\n- Se ofrece como servicio profesional configurable, no como produ",
+          "score": 0.718181
+        },
+        {
+          "rank": 3,
+          "chunk_id": 90,
+          "title": "Referencias",
+          "content_preview": "## Referencias\n\n- `[[paquetes-whatsapp-inteligente]]`: Descripción completa de los 10 paquetes y 4 planes\n- `[[capacidades-futuras-e-integraciones]]`: WhatsApp handoff como planned_extension\n- `[[regl",
+          "score": 0.694575
+        },
+        {
+          "rank": 4,
+          "chunk_id": 64,
+          "title": "Regla 6: WhatsApp service offer ≠ WhatsApp handoff automático listo",
+          "content_preview": "## Regla 6: WhatsApp service offer ≠ WhatsApp handoff automático listo\n\nTeam360 puede ofrecer paquetes de WhatsApp inteligente como servicio comercial sin que el handoff automático dentro del diagnosi",
+          "score": 0.673356
+        },
+        {
+          "rank": 5,
+          "chunk_id": 54,
+          "title": "Sí está permitido",
+          "content_preview": "### Sí está permitido\n- Ofrecer paquetes de WhatsApp inteligente como servicio comercial.\n- Describir qué incluye cada plan con alcance y límites.\n- Mencionar que la integración con sistemas del clien",
+          "score": 0.673134
+        }
+      ],
+      "context_chars": 2161,
+      "retrieval_latency_ms": 5.5,
+      "llm_response": "Podemos ofrecer los paquetes de WhatsApp inteligente (10 paquetes) y 4 planes, con alcance y límites definidos. El servicio es profesional, requiere relevamiento, configuración y prueba; la integración con los sistemas del cliente se evalúa caso por caso. La derivación humana está disponible como parte del servicio. Nota: el handoff automático dentro del diagnóstico es una capacidad futura (planned extension) y no está lista hoy.\n\nPreguntas rápidas para orientarte:\n- ¿Qué volumen estimas de mensajes por mes y qué tipo de interacciones (ventas, soporte, pedidos)?\n- ¿Qué sistemas/CRM u otros sistemas quisieras integrar?",
+      "llm_model": "gpt-5-nano-2025-08-07",
+      "llm_latency_ms": 3646.3,
+      "total_latency_ms": 4360.3,
+      "llm_usage": {
+        "prompt_tokens": 688,
+        "completion_tokens": 457,
+        "total_tokens": 1145
+      },
+      "evaluation": {
+        "passed": true,
+        "found_must_include": [
+          "whatsapp",
+          "paquete",
+          "diagnostico"
+        ],
+        "missing_must_include": [],
+        "found_forbidden": [],
+        "safety_flags": [],
+        "empty_response": false,
+        "too_long": false,
+        "has_context": true,
+        "context_chunks_retrieved": 20,
+        "makes_question": true,
+        "says_not_documented": true,
+        "gives_orientation": true,
+        "forbidden_claims_count": 0,
+        "response_length": 625
+      }
+    }
+  ],
+  "latencies_ms": {
+    "retrieval": [
+      5.3,
+      7.3,
+      3.8,
+      5.4,
+      5.5,
+      6.8,
+      3.3,
+      8.4,
+      5.2,
+      7.5,
+      2.9,
+      3.4,
+      5.4,
+      4.8,
+      4.3,
+      5.5
+    ],
+    "llm": [
+      4597.6,
+      5022.1,
+      4900.6,
+      3790.0,
+      5289.6,
+      3955.8,
+      3897.3,
+      3813.6,
+      2647.7,
+      3233.2,
+      4563.7,
+      4920.9,
+      3209.8,
+      4568.8,
+      2343.2,
+      3646.3
+    ],
+    "total": [
+      5779.6,
+      5782.7,
+      5674.5,
+      4506.3,
+      5922.8,
+      4680.7,
+      4536.7,
+      4536.7,
+      3428.8,
+      4217.4,
+      5467.5,
+      5816.2,
+      3881.4,
+      5405.1,
+      3340.4,
+      4360.3
+    ]
+  }
+}

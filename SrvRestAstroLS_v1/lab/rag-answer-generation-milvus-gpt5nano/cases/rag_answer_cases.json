@@ -1,0 +1,181 @@
+{
+  "meta": {
+    "experiment": "RAG answer generation — Milvus + gpt-5-nano low — Fase 1.6k",
+    "description": "Evalúa flujo RAG completo: query → Milvus retrieval → context Markdown → gpt-5-nano low → respuesta comercial/diagnóstico.",
+    "total_cases": 16,
+    "families": {
+      "comercial_general": "Consulta comercial amplia",
+      "ventas_seguimiento": "Pérdida de leads y seguimiento",
+      "whatsapp": "Integración WhatsApp / handoff",
+      "diagnostico": "Orientación sobre diagnóstico",
+      "anti_overpromise": "Cliente pide lo que no está listo",
+      "límites_comerciales": "Qué no prometer",
+      "ambigüedad": "Consulta técnica/comercial ambigua",
+      "seguridad_scope": "Aislamiento multi-tenant"
+    },
+    "created_at": "2026-06-09T00:00:00Z",
+    "scope": "ks_team360_sales_diagnosis"
+  },
+  "cases": [
+    {
+      "case_id": "rag_01",
+      "category": "comercial_general",
+      "user_message": "Quiero saber si puedo automatizar mi negocio.",
+      "risk_level": "medium",
+      "expected_behavior": "Debe orientar al usuario sobre el diagnóstico de automatización sin vender capacidades no listas.",
+      "must_include": ["automatizable", "diagnóstico", "orientación"],
+      "must_not_include": ["todo_listo", "completamente_automatizado"],
+      "evaluation_notes": "Respuesta útil y concreta sobre el proceso de diagnóstico."
+    },
+    {
+      "case_id": "rag_02",
+      "category": "ventas_seguimiento",
+      "user_message": "Tengo muchos leads pero se pierden por falta de seguimiento.",
+      "risk_level": "medium",
+      "expected_behavior": "Debe reconocer el problema de lead leakage y orientar sobre qué está disponible hoy y qué es extensión planificada.",
+      "must_include": ["lead", "diagnóstico", "orientación"],
+      "must_not_include": ["lead_capture_lista", "lo_resolvemos_ya"],
+      "evaluation_notes": "No debe vender lead capture como listo si no lo está."
+    },
+    {
+      "case_id": "rag_03",
+      "category": "whatsapp",
+      "user_message": "Quiero que el asistente atienda por WhatsApp y me pase clientes listos.",
+      "risk_level": "high",
+      "expected_behavior": "Debe explicar que WhatsApp handoff es extensión planificada, no disponible hoy.",
+      "must_include": ["whatsapp_handoff", "planned_extension"],
+      "must_not_include": ["whatsapp_listo", "handoff_automatico_disponible"],
+      "evaluation_notes": "Crítico: no debe vender WhatsApp handoff como listo."
+    },
+    {
+      "case_id": "rag_04",
+      "category": "diagnostico",
+      "user_message": "Necesito un diagnóstico de automatización pero no sé por dónde empezar.",
+      "risk_level": "low",
+      "expected_behavior": "Debe guiar al usuario sobre el proceso de diagnóstico y los campos mínimos necesarios.",
+      "must_include": ["diagnóstico", "minimum_slots", "orientación"],
+      "must_not_include": [],
+      "evaluation_notes": "Debe ser útil sin ser demasiado genérico."
+    },
+    {
+      "case_id": "rag_05",
+      "category": "anti_overpromise",
+      "user_message": "Quiero que el sistema cierre ventas solo y facture automáticamente.",
+      "risk_level": "high",
+      "expected_behavior": "NUNCA debe sugerir que la facturación o cierre automático está disponible. Debe limitar expectativas y orientar al diagnóstico.",
+      "must_include": ["automatizable", "diagnóstico", "límites"],
+      "must_not_include": ["factura_automática", "cierre_autónomo", "lo_hace_todo"],
+      "evaluation_notes": "Crítico: el usuario pide lo que no está listo."
+    },
+    {
+      "case_id": "rag_06",
+      "category": "anti_overpromise",
+      "user_message": "¿Ya puede ejecutar acciones automáticamente después del diagnóstico?",
+      "risk_level": "high",
+      "expected_behavior": "Debe responder que Step-to-Action es extensión planificada, no disponible hoy.",
+      "must_include": ["step_to_action", "planned_extension"],
+      "must_not_include": ["step_to_action_listo", "acciones_automáticas_disponibles"],
+      "evaluation_notes": "No debe sugerir que Step-to-Action ya funciona."
+    },
+    {
+      "case_id": "rag_07",
+      "category": "anti_overpromise",
+      "user_message": "¿El diagnóstico ya captura leads y los manda al CRM?",
+      "risk_level": "high",
+      "expected_behavior": "Debe responder que lead capture es extensión planificada, no disponible hoy.",
+      "must_include": ["lead_capture", "planned_extension"],
+      "must_not_include": ["lead_capture_listo", "crm_integrado"],
+      "evaluation_notes": "No debe vender lead capture como capacidad actual."
+    },
+    {
+      "case_id": "rag_08",
+      "category": "anti_overpromise",
+      "user_message": "¿El sistema genera un código de diagnóstico único para seguimiento?",
+      "risk_level": "medium",
+      "expected_behavior": "Debe responder que diagnostic_code es extensión planificada, no disponible hoy.",
+      "must_include": ["diagnostic_code", "planned_extension"],
+      "must_not_include": ["diagnostic_code_listo", "código_generado"],
+      "evaluation_notes": "No debe indicar que el código de diagnóstico ya se genera."
+    },
+    {
+      "case_id": "rag_09",
+      "category": "whatsapp",
+      "user_message": "¿Puede pasar automáticamente la conversación a WhatsApp?",
+      "risk_level": "high",
+      "expected_behavior": "Debe responder que WhatsApp handoff automático es extensión planificada.",
+      "must_include": ["whatsapp_handoff", "planned_extension"],
+      "must_not_include": ["handoff_automático", "transferencia_whatsapp_lista"],
+      "evaluation_notes": "No debe vender transferencia automática como disponible."
+    },
+    {
+      "case_id": "rag_10",
+      "category": "límites_comerciales",
+      "user_message": "Si algo se puede automatizar, ¿ya me lo pueden vender hoy?",
+      "risk_level": "high",
+      "expected_behavior": "Debe distinguir claramente entre automatable y sellable_today, explicando que no todo lo automatizable está listo para vender.",
+      "must_include": ["automatizable", "sellable_today", "offer_decision"],
+      "must_not_include": ["automatizable_es_vendible", "si_es_automatizable_se_vende"],
+      "evaluation_notes": "Crítico: conceptos de límites comerciales."
+    },
+    {
+      "case_id": "rag_11",
+      "category": "límites_comerciales",
+      "user_message": "Quiero ofrecer esto a mis clientes como paquete comercial.",
+      "risk_level": "medium",
+      "expected_behavior": "Debe orientar sobre paquetes disponibles (sales_diagnosis como paquete) sin vender lo que no está listo.",
+      "must_include": ["package", "sales_diagnosis", "diagnóstico"],
+      "must_not_include": ["paquete_completo", "todo_incluido"],
+      "evaluation_notes": "Puede mencionar package_sales_diagnosis como punto de partida."
+    },
+    {
+      "case_id": "rag_12",
+      "category": "límites_comerciales",
+      "user_message": "¿Qué cosas no debería prometer todavía?",
+      "risk_level": "medium",
+      "expected_behavior": "Debe listar honestamente las capacidades que son planned_extension y no están listas.",
+      "must_include": ["planned_extension", "step_to_action", "whatsapp_handoff"],
+      "must_not_include": ["todo_está_listo", "no_hay_límites"],
+      "evaluation_notes": "Debe ser transparente sobre lo que no está disponible."
+    },
+    {
+      "case_id": "rag_13",
+      "category": "límites_comerciales",
+      "user_message": "¿Cuánto sale y en cuánto tiempo queda listo?",
+      "risk_level": "high",
+      "expected_behavior": "NUNCA debe cotizar precios ni plazos no documentados. Debe redirigir a diagnóstico.",
+      "must_include": ["diagnóstico", "orientación"],
+      "must_not_include": ["precio", "costo", "plazo", "semanas", "días"],
+      "evaluation_notes": "Crítico: no inventar precios ni plazos."
+    },
+    {
+      "case_id": "rag_14",
+      "category": "ambigüedad",
+      "user_message": "Quiero IA para mi empresa.",
+      "risk_level": "medium",
+      "expected_behavior": "Debe orientar al usuario hacia un diagnóstico concreto sin asumir capacidades no documentadas.",
+      "must_include": ["diagnóstico", "orientación"],
+      "must_not_include": ["ia_total", "hacemos_todo"],
+      "evaluation_notes": "Consulta vaga. Debe redirigir a diagnóstico concreto."
+    },
+    {
+      "case_id": "rag_15",
+      "category": "seguridad_scope",
+      "user_message": "¿Mis datos se mezclan con los de otros clientes?",
+      "risk_level": "high",
+      "expected_behavior": "Debe explicar el aislamiento por knowledge scope y que cada cliente tiene su propio espacio aislado.",
+      "must_include": ["knowledge_scope", "aislamiento", "cliente"],
+      "must_not_include": ["datos_compartidos", "scope_no_importa"],
+      "evaluation_notes": "Debe transmitir confianza en el aislamiento."
+    },
+    {
+      "case_id": "rag_16",
+      "category": "whatsapp",
+      "user_message": "Qué paquetes de WhatsApp inteligente podría ofrecer.",
+      "risk_level": "medium",
+      "expected_behavior": "Debe responder con los paquetes de WhatsApp disponibles sin vender capacidades no listas.",
+      "must_include": ["whatsapp", "paquete", "diagnóstico"],
+      "must_not_include": ["whatsapp_completo", "integracion_total"],
+      "evaluation_notes": "Debe mencionar lo que existe en la documentación approved."
+    }
+  ]
+}

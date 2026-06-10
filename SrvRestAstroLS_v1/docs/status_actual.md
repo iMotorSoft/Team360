@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-09 (Fase 1.6j ejecutada — Milvus benchmark)
+Ultima actualizacion: 2026-06-09 (Fase 1.6k ejecutada — RAG answer generation)
 
 ## Directorio de trabajo
 
@@ -1309,6 +1309,21 @@ Incluye estructura inicial para:
 - Reportes generados: `results/milvus_pgvector_benchmark_20260609_172200.json`, `.md`, `_detailed_report.md`, `infografias/milvus_pgvector_benchmark_20260609_172200_infografia.html`.
 - Se corrigió import path en `run_milvus_benchmark.py` (sys.path para shared utils desde breaking-points lab) y API de `IndexParams` para pymilvus 3.0.
 - Colección Milvus experimental: `team360_lab_pgvector_benchmark_openai_small_1536` (139 embeddings indexados, HNSW COSINE).
+- Rama: `feature/knowledge-ingestion-service`
+- No se hizo git add ni commit.
+
+### 2026-06-09 - Fase 1.6k: RAG answer generation lab — Milvus + gpt-5-nano low
+
+- Se creó `lab/rag-answer-generation-milvus-gpt5nano/` con flujo RAG completo: query → Milvus retrieval → contexto Markdown → gpt-5-nano low → respuesta comercial.
+- **16 casos de prueba** creados en `cases/rag_answer_cases.json` cubriendo: comercial general, ventas/seguimiento, WhatsApp, diagnóstico, anti-overpromise, límites comerciales, ambigüedad y seguridad/scope.
+- **Retrieval:** Milvus devuelve 20 chunks en ~5.3ms promedio. La colección Fase 1.6j (139 embeddings) reutilizada sin re-embedding.
+- **gpt-5-nano low:** Disponible en OpenAI API. Requiere `max_completion_tokens` (no `max_tokens`). Reasoning effort `low` soportado.
+- **Resultados heurísticos:** 7/16 pass (43.8%), 4/8 high-risk pass (50.0%). Latencia total ~4.8s (retrieval ~5ms + LLM ~4s).
+- **Hallazgos:** Retrieval en Milvus excelente (baja latencia). gpt-5-nano low genera respuestas coherentes. Evaluación heurística con falsos positivos en safety flags (substring matching muy agresivo — "ars"/"sla" matchean como subcadenas).
+- **Recomendación:** C. Probar gpt-5-mini / medium en siguiente lab. La latencia LLM (~4s) domina el tiempo total. Milvus no es cuello de botella.
+- Archivos creados: `README.md`, `run_rag_answer_lab.py`, `cases/rag_answer_cases.json`, `scripts/generate_report.py`, `scripts/generate_infographics.py`, `results/*.json/*.md`, `infografias/*.html`.
+- Fix: se corrigió `call_llm` para usar `max_completion_tokens` en modelos o-series/gpt-5.
+- No se tocó: frontend, routes, endpoints HTTP, diagnosis productivo, ArangoDB, cross-encoder, production runtime, migrations, documents approved/drafts, secrets.
 - Rama: `feature/knowledge-ingestion-service`
 - No se hizo git add ni commit.
 
