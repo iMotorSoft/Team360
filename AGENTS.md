@@ -15,10 +15,13 @@ Al iniciar cualquier sesion de agente de codigo, seguir el protocolo obligatorio
 Convencion operativa de ramas:
 
 - `main`: estado estable validado.
-- `feature/console-backend-core`: rama de desarrollo e integracion general de plataforma, backend, DB, documentacion tecnica y alineacion UX-backend.
+- `feature/console-backend-core`: producto funcional vivo; backend, Console, UX real conectada/productiva, diagnosis assistant, LiteLLM, PostgreSQL, runtime y orquestacion global viva. Tambien puede contener labs cuando validan backend runtime, assistant productivo, UX conectada o experiencia final de consola.
+- `feature/knowledge-ingestion-service`: knowledge ingestion / RAG / labs de knowledge; embeddings, chunking, scanner, retrieval, package behavior, golden answers, pruebas RAG/asistente como efecto del knowledge package y decision notes tecnicas de esa linea. No usar para desarrollo funcional productivo del runtime, backend o Console.
+- `docs/knowledge-documents-foundation`: contenido y documentacion knowledge, estandares, paquetes, manuales, authoring, metadata y contenido curado.
 - `ux/team360-console-design-handoff`: rama de diseno visual, frontend mock y handoff UX antes de integrar.
 - Cuando una instruccion de trabajo mencione `desarrollo`, `dev` o `backend`, interpretar que la rama destino es `feature/console-backend-core`.
 - `Objetivo: desarrollo` dentro de `SrvRestAstroLS_v1/docs/status_actual.md` describe el tipo de bitacora tecnica; para trabajo Git corresponde usar `feature/console-backend-core`.
+- No crear ramas funcionales nuevas salvo necesidad puntual explicita.
 - No crear una rama local llamada `desarrollo`.
 
 Separacion documental:

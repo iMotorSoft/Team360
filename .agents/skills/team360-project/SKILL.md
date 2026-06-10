@@ -67,9 +67,11 @@ Regla central:
 ### Mapa rápido de ramas
 
 - `main`: producción / snapshot estable.
-- `feature/console-backend-core`: backend, console, UX real productiva, diagnosis assistant, LiteLLM, PostgreSQL, `lab/` y orquestación global viva.
+- `feature/console-backend-core`: producto funcional vivo; backend, Console, UX real conectada/productiva, diagnosis assistant, LiteLLM, PostgreSQL, runtime y orquestación global viva.
+- `feature/console-backend-core` también puede contener labs cuando validan backend runtime, assistant productivo, UX conectada o experiencia final de consola.
 - `ux/team360-console-design-handoff`: referencia visual congelada / diseño base.
-- `feature/knowledge-ingestion-service`: ingestion service, embeddings, chunking, scanner, retrieval, package behavior, golden answers y labs de ingesta.
+- `feature/knowledge-ingestion-service`: knowledge ingestion / RAG / labs de knowledge; embeddings, chunking, scanner, retrieval, package behavior, golden answers, pruebas RAG/asistente como efecto del knowledge package y decision notes técnicas de esa línea.
+- `feature/knowledge-ingestion-service` no es para desarrollo funcional productivo del runtime, backend o Console.
 - `docs/knowledge-documents-foundation`: documentación knowledge, estándares, paquetes, manuales, authoring, metadata y contenido curado.
 
 ## Atajos de workflow de ramas

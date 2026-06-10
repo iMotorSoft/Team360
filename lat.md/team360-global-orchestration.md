@@ -15,10 +15,17 @@ Regla central:
 | Rama | Rol | Uso |
 |---|---|---|
 | `main` | Producción / snapshot estable | No trabajar directo salvo hotfix o consolidación final |
-| `feature/console-backend-core` | Desarrollo principal productivo | Backend, Console, UX real, diagnosis assistant, LiteLLM, PostgreSQL, `lab/` y orquestación viva |
+| `feature/console-backend-core` | Desarrollo funcional principal | Backend, Console, UX real conectada/productiva, diagnosis assistant, LiteLLM, PostgreSQL, runtime y orquestación viva |
 | `ux/team360-console-design-handoff` | Referencia visual congelada | Handoff visual, diseño base, no UX viva |
-| `feature/knowledge-ingestion-service` | Servicio técnico de ingesta | Embeddings, chunking, scanner, retrieval, package behavior, golden answers y labs de ingesta |
+| `feature/knowledge-ingestion-service` | Knowledge ingestion / RAG / labs de knowledge | Embeddings, chunking, scanner, retrieval, package behavior, golden answers, pruebas RAG/asistente como efecto del knowledge package y decision notes técnicas de esa línea |
 | `docs/knowledge-documents-foundation` | Documentación knowledge | Estándares, paquetes, manuales, authoring, metadata y contenido curado |
+
+Versión corta:
+
+- `feature/console-backend-core` = producto funcional vivo.
+- `feature/knowledge-ingestion-service` = knowledge ingestion / RAG / labs de knowledge.
+- `docs/knowledge-documents-foundation` = contenido y documentación knowledge.
+- `ux/team360-console-design-handoff` = referencia visual congelada.
 
 ## Regla de trabajo para una sola persona
 
@@ -32,6 +39,8 @@ El proyecto lo lleva principalmente una sola persona, por lo que se prefiere:
 - evitar ramas nuevas salvo experimento riesgoso, hotfix o necesidad real.
 
 No crear ramas por cada detalle menor.
+
+No crear ramas funcionales nuevas salvo necesidad puntual explícita.
 
 ## UX real vs handoff visual
 
@@ -73,7 +82,11 @@ Incluye:
 - retrieval;
 - package behavior;
 - golden answers;
-- labs de ingesta.
+- labs de ingesta;
+- pruebas RAG/asistente como efecto del knowledge package;
+- decision notes técnicas de esa línea.
+
+No usar esta rama para desarrollo funcional productivo del runtime, backend o Console.
 
 ### `docs/knowledge-documents-foundation`
 

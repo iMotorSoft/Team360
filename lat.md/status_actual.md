@@ -12,6 +12,14 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
+### 2026-06-10 - Ajuste de ownership por rama
+
+- Se refinó `team360-global-orchestration.md` para evitar ambigüedad entre producto funcional vivo, labs de knowledge/RAG, documentación editorial y handoff visual.
+- `feature/console-backend-core` queda descrita como desarrollo funcional principal/producto funcional vivo; los labs solo aplican allí cuando validan backend runtime, assistant productivo, UX conectada o experiencia final de consola.
+- `feature/knowledge-ingestion-service` queda descrita como knowledge ingestion / RAG / labs de knowledge, incluyendo pruebas RAG/asistente como efecto del knowledge package y decision notes técnicas de esa línea.
+- Se actualizó el mapa rápido de ramas en `.agents/skills/team360-project/SKILL.md` y la convención operativa en `AGENTS.md`.
+- No se modificó código productivo, frontend, backend runtime ni labs.
+
 ### 2026-06-10 - Orquestación global entre ramas y frentes
 
 - Se creo `team360-global-orchestration.md` como documento transversal de arquitectura viva.
