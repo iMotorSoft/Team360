@@ -10,6 +10,8 @@ Antes de cambios relevantes, leer:
 - `SrvRestAstroLS_v1/docs/status_actual.md`
 - `lat.md/lat.md` cuando el cambio afecte arquitectura, dominio, IA, workers, knowledge, seguridad, paquetes o reglas transversales.
 
+Al iniciar cualquier sesion de agente de codigo, seguir el protocolo obligatorio declarado en `.agents/skills/team360-project/SKILL.md`: leer reglas, verificar rama, verificar worktree y revisar `lat.md/team360-global-orchestration.md` si existe antes de modificar archivos.
+
 Convencion operativa de ramas:
 
 - `main`: estado estable validado.

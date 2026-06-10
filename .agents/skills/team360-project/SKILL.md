@@ -22,6 +22,56 @@ Usar esta copia del skill dentro del repo:
 ## Raíz del proyecto
 Asumir como raíz el directorio actual del repositorio Team360.
 
+## Protocolo obligatorio al iniciar una sesión de agente
+
+Al comenzar cualquier sesión de Codex CLI, OpenCode u otro agente de código, antes de modificar archivos, el agente debe ubicarse en el contexto del proyecto.
+
+Pasos obligatorios:
+
+1. Leer este skill:
+
+   `.agents/skills/team360-project/SKILL.md`
+
+2. Leer `AGENTS.md` si existe.
+
+3. Leer `lat.md/team360-global-orchestration.md` si existe.
+
+4. Verificar rama actual:
+
+   ```bash
+   git branch --show-current
+   ```
+
+5. Verificar estado del worktree:
+
+   ```bash
+   git status
+   ```
+
+6. No cambiar de rama si el worktree no está limpio.
+
+7. No modificar archivos si hay cambios o archivos untracked no esperados.
+
+8. No hacer commit, push, merge, rebase, reset, clean ni borrar ramas salvo pedido explícito del usuario.
+
+9. Confirmar que la tarea corresponde a la rama actual según el mapa de ramas Team360.
+
+10. Si la rama no corresponde, detenerse y explicar qué rama debería usarse.
+
+11. Si hay dudas sobre ownership de un cambio, revisar `lat.md/team360-global-orchestration.md`.
+
+Regla central:
+
+> Antes de ejecutar, ubicarse. Antes de modificar, verificar rama y estado.
+
+### Mapa rápido de ramas
+
+- `main`: producción / snapshot estable.
+- `feature/console-backend-core`: backend, console, UX real productiva, diagnosis assistant, LiteLLM, PostgreSQL, `lab/` y orquestación global viva.
+- `ux/team360-console-design-handoff`: referencia visual congelada / diseño base.
+- `feature/knowledge-ingestion-service`: ingestion service, embeddings, chunking, scanner, retrieval, package behavior, golden answers y labs de ingesta.
+- `docs/knowledge-documents-foundation`: documentación knowledge, estándares, paquetes, manuales, authoring, metadata y contenido curado.
+
 ## Atajos de workflow de ramas
 Interpretar frases claras del usuario como atajos de contexto de rama:
 
