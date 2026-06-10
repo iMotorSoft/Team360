@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.7e — Sales Diagnosis Assistant Lab Closure)
+Ultima actualizacion: 2026-06-10 (Fase 1.8 — Sales Diagnosis Assistant Runtime Design)
 
 ## Directorio de trabajo
 
@@ -32,6 +32,31 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 - Proximo paso recomendado: Fase 1.8 — Runtime Design Handoff.
 - Se actualizo `README.md` del lab con seccion "Lab closure decision" y link relativo a la decision note.
 - No se toco runtime productivo, frontend, routes, endpoints, SSE productivo, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, corpus knowledge ni embeddings.
+- No se hardcodearon API keys. No se hizo git add/commit.
+
+### 2026-06-10 - Fase 1.8 — Sales Diagnosis Assistant Runtime Design
+
+- Se creo el documento de diseno runtime en `docs/architecture/sales_diagnosis_assistant_runtime_design.md`.
+- Diseno basado en decisiones validadas por labs (Fase 1.6j–1.7e):
+  - PostgreSQL 18 = source of truth.
+  - Milvus 2.6 = vector runtime derivado para conversacion.
+  - pgvector = baseline/dev/fallback.
+  - gpt-5-nano low = primera respuesta inteligente.
+  - Template seguro = solo acuse/progreso, no reemplaza LLM.
+  - AG-UI/SSE = contrato futuro de eventos.
+- Componentes disenados (10): AssistantConversationRuntime, ConversationState, RetrievalProvider, MilvusVectorIndex, PromptPolicy, GuardrailPolicy, LLMProvider, ProgressiveEventEmitter, MetricsRecorder, AuditTrail.
+- Flujo runtime documentado: 13 pasos desde validacion hasta metricas.
+- Contratos de datos definidos (6): AssistantTurnInput, AssistantTurnOutput, ConversationState, RetrievedChunk, GuardrailResult, ProgressiveEvent.
+- Guardrails obligatorios documentados (5 reglas): no vender como listo, no inventar, diferenciar, limite de preguntas, empty response policy.
+- Template seguro documentado con reglas de configuracion por assistant_instance/package/dominio.
+- Progressive event contract definido (9 eventos semanticos).
+- Fallbacks documentados (8 escenarios con respuestas seguras).
+- Metricas definidas (por turno y por sesion).
+- Fuera de alcance documentado (10 componentes excluidos explicitamente).
+- Riesgos abiertos documentados (8 riesgos con mitigaciones).
+- Plan de implementacion futuro sugerido (Fase 1.8a–1.8f).
+- Criterios de avance definidos (8 condiciones).
+- No se implemento codigo productivo, no se crearon endpoints, no se toco frontend, no se modifico runtime, no se llamo LLM, Milvus ni DB.
 - No se hardcodearon API keys. No se hizo git add/commit.
 
 ### 2026-06-10 - Fase 1.7c — Fix real guardrail failures del Conversation Lab

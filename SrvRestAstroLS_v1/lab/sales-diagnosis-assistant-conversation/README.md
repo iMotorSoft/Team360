@@ -303,6 +303,9 @@ Resumen de cierre:
 
 Próximo paso recomendado: **Fase 1.8 — Runtime Design Handoff**.
 
+El diseño runtime completo está documentado en:
+[../../../docs/architecture/sales_diagnosis_assistant_runtime_design.md](../../../docs/architecture/sales_diagnosis_assistant_runtime_design.md)
+
 ### Archivos
 
 ```
