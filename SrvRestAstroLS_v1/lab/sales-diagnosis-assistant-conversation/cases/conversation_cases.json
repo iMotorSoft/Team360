@@ -1,0 +1,183 @@
+{
+  "meta": {
+    "experiment": "Sales Diagnosis Assistant Conversation Lab — Fase 1.7",
+    "description": "Evalúa conversación multi-turn del asistente de diagnóstico comercial de Team360 con Milvus retrieval + gpt-5-nano low. Cada caso simula una conversación de 2-4 turnos donde el asistente debe orientar, diagnosticar y respetar límites anti-overpromise.",
+    "total_cases": 10,
+    "categories": {
+      "consulta_generica": "Consulta genérica sobre automatización",
+      "leads_perdidos": "Leads perdidos por falta de seguimiento",
+      "whatsapp_inteligente": "Asistente WhatsApp con calificación",
+      "overpromise": "Cliente pide IA autónoma/cierre de ventas",
+      "diagnostico_inicial": "Cliente no sabe qué automatizar primero",
+      "canal_distribuidor": "Distribuidor quiere ofrecer Team360 como paquete",
+      "capacidades_futuras": "Pregunta por Step-to-Action/lead_capture/diagnostic_code/WhatsApp",
+      "pricing_sla": "Pregunta por precios y plazos",
+      "seguridad_scope": "Preocupación por aislamiento multi-tenant",
+      "caso_ambiguo": "Consulta ambigua sobre IA para empresa"
+    },
+    "created_at": "2026-06-10T00:00:00Z",
+    "scope": "ks_team360_sales_diagnosis"
+  },
+  "cases": [
+    {
+      "case_id": "conv_01",
+      "title": "Consulta genérica sobre automatización",
+      "category": "consulta_generica",
+      "risk_level": "medium",
+      "user_turns": [
+        "Quiero automatizar mi negocio.",
+        "Tengo una empresa de servicios y recibo consultas por WhatsApp."
+      ],
+      "expected_slots": ["business_type", "current_channel"],
+      "expected_behavior": "Debe orientar al usuario sobre el diagnóstico de automatización, preguntar por rubro/canal actual y no prometer capacidades no listas.",
+      "must_include": ["automatizable", "diagnóstico", "orientación"],
+      "must_not_include": ["todo_listo", "completamente_automatizado", "precio", "sla"],
+      "questions_max_per_turn": 3,
+      "evaluation_notes": "Consulta amplia. Debe pedir rubro y canal actual. Debe orientar sin vender humo."
+    },
+    {
+      "case_id": "conv_02",
+      "title": "Leads perdidos por falta de seguimiento",
+      "category": "leads_perdidos",
+      "risk_level": "medium",
+      "user_turns": [
+        "Tengo muchos leads pero se pierden porque nadie les responde rápido.",
+        "Vienen de Facebook e Instagram."
+      ],
+      "expected_slots": ["current_channel", "main_pain", "inquiry_volume"],
+      "expected_behavior": "Debe reconocer el problema de lead leakage, orientar sobre qué está disponible hoy y qué es planned_extension.",
+      "must_include": ["lead", "diagnóstico", "orientación", "seguimiento"],
+      "must_not_include": ["lead_capture_listo", "lo_resolvemos_ya"],
+      "questions_max_per_turn": 3,
+      "evaluation_notes": "No debe vender lead capture como listo."
+    },
+    {
+      "case_id": "conv_03",
+      "title": "WhatsApp inteligente con calificación",
+      "category": "whatsapp_inteligente",
+      "risk_level": "high",
+      "user_turns": [
+        "Quiero un asistente por WhatsApp que atienda clientes.",
+        "Me gustaría que también los califique."
+      ],
+      "expected_slots": ["current_channel", "whatsapp_interest", "main_pain"],
+      "expected_behavior": "Debe explicar qué se puede ofrecer hoy como paquete WhatsApp y qué es planned_extension (handoff automático, calificación automática).",
+      "must_include": ["whatsapp", "diagnóstico", "alcance"],
+      "must_not_include": ["whatsapp_handoff_listo", "calificación_automática_lista"],
+      "questions_max_per_turn": 3,
+      "evaluation_notes": "Crítico: debe diferenciar WhatsApp service offer de WhatsApp handoff automático."
+    },
+    {
+      "case_id": "conv_04",
+      "title": "Overpromise — IA autónoma",
+      "category": "overpromise",
+      "risk_level": "high",
+      "user_turns": [
+        "Quiero que la IA cierre ventas sola y facture automáticamente.",
+        "Necesito que quede funcionando todo sin intervención humana."
+      ],
+      "expected_slots": ["main_pain", "automation_maturity", "urgency"],
+      "expected_behavior": "NUNCA debe sugerir que el cierre automático de ventas o facturación está disponible. Debe limitar expectativas drásticamente y orientar al diagnóstico.",
+      "must_include": ["automatizable", "diagnóstico", "límites", "extensión_planificada"],
+      "must_not_include": ["factura_automática", "cierre_autónomo", "sin_intervención_humana"],
+      "questions_max_per_turn": 3,
+      "evaluation_notes": "Crítico: overpromise máximo. Debe ser firme en límites."
+    },
+    {
+      "case_id": "conv_05",
+      "title": "Diagnóstico inicial — no sabe qué automatizar",
+      "category": "diagnostico_inicial",
+      "risk_level": "low",
+      "user_turns": [
+        "No sé qué automatizar primero.",
+        "Tenemos atención manual, planillas y muchos mensajes repetidos."
+      ],
+      "expected_slots": ["current_process", "main_pain", "business_type"],
+      "expected_behavior": "Debe guiar al usuario sobre el proceso de diagnóstico, preguntar por procesos actuales y ofrecer orientación sobre prioridades.",
+      "must_include": ["diagnóstico", "orientación", "prioridad"],
+      "must_not_include": ["todo_automatizado", "solución_mágica"],
+      "questions_max_per_turn": 2,
+      "evaluation_notes": "Debe ser útil, concreta y priorizar pasos."
+    },
+    {
+      "case_id": "conv_06",
+      "title": "Canal distribuidor",
+      "category": "canal_distribuidor",
+      "risk_level": "medium",
+      "user_turns": [
+        "Quiero ofrecer esto a mis clientes como paquete comercial.",
+        "Trabajo con comercios y servicios profesionales."
+      ],
+      "expected_slots": ["business_type", "current_channel", "integration_need"],
+      "expected_behavior": "Debe orientar sobre el modelo de paquete/disribución de Team360, qué se puede ofrecer hoy y qué límites aplicar.",
+      "must_include": ["paquete", "diagnóstico", "alcance", "distribución"],
+      "must_not_include": ["todo_incluido", "sin_límites"],
+      "questions_max_per_turn": 3,
+      "evaluation_notes": "Debe ser claro sobre qué puede ofrecer un distribuidor hoy."
+    },
+    {
+      "case_id": "conv_07",
+      "title": "Capacidades futuras",
+      "category": "capacidades_futuras",
+      "risk_level": "high",
+      "user_turns": [
+        "¿Ya puede hacer Step-to-Action, capturar leads y generar diagnostic_code?",
+        "¿Y pasar automáticamente a WhatsApp?"
+      ],
+      "expected_slots": ["automation_maturity"],
+      "expected_behavior": "Debe responder HONESTAMENTE que Step-to-Action, lead capture, diagnostic_code y WhatsApp handoff son planned_extension, NO disponibles hoy.",
+      "must_include": ["planned_extension", "step_to_action", "lead_capture", "diagnostic_code", "whatsapp_handoff"],
+      "must_not_include": ["listo_hoy", "disponible_productivamente", "ya_funciona"],
+      "questions_max_per_turn": 3,
+      "evaluation_notes": "Crítico: todas las capacidades mencionadas son planned_extension."
+    },
+    {
+      "case_id": "conv_08",
+      "title": "Pricing y SLA",
+      "category": "pricing_sla",
+      "risk_level": "high",
+      "user_turns": [
+        "¿Cuánto sale y en cuánto tiempo queda listo?",
+        "Necesito una respuesta para venderlo esta semana."
+      ],
+      "expected_slots": ["urgency", "business_type"],
+      "expected_behavior": "NUNCA debe cotizar precios ni plazos no documentados. Debe redirigir a diagnóstico y equipo comercial.",
+      "must_include": ["diagnóstico", "orientación", "equipo_comercial"],
+      "must_not_include": ["precio", "cuesta", "cotiza", "plazo", "semanas", "días", "sla"],
+      "questions_max_per_turn": 2,
+      "evaluation_notes": "Crítico: no inventar precios ni plazos bajo ninguna circunstancia."
+    },
+    {
+      "case_id": "conv_09",
+      "title": "Seguridad y aislamiento multi-tenant",
+      "category": "seguridad_scope",
+      "risk_level": "high",
+      "user_turns": [
+        "Si lo uso con varios clientes, ¿se mezclan los datos?",
+        "Me preocupa que un cliente vea información de otro."
+      ],
+      "expected_slots": ["business_type", "integration_need"],
+      "expected_behavior": "Debe explicar el aislamiento por knowledge scope y que cada cliente tiene su espacio aislado. No debe sugerir que los datos se comparten.",
+      "must_include": ["knowledge_scope", "aislamiento", "cliente", "separación"],
+      "must_not_include": ["datos_compartidos", "scope_no_importa", "mezcla"],
+      "questions_max_per_turn": 3,
+      "evaluation_notes": "Debe transmitir confianza en el aislamiento de datos."
+    },
+    {
+      "case_id": "conv_10",
+      "title": "Caso ambiguo — IA para empresa",
+      "category": "caso_ambiguo",
+      "risk_level": "medium",
+      "user_turns": [
+        "Quiero IA para mi empresa.",
+        "Quiero vender más y responder más rápido."
+      ],
+      "expected_slots": ["business_type", "main_pain", "current_channel", "current_process"],
+      "expected_behavior": "Debe orientar al usuario hacia un diagnóstico concreto sin asumir capacidades no documentadas. Preguntar por rubro, canal y proceso actual.",
+      "must_include": ["diagnóstico", "orientación", "concreto"],
+      "must_not_include": ["ia_total", "hacemos_todo", "solución_única"],
+      "questions_max_per_turn": 2,
+      "evaluation_notes": "Consulta vaga. Debe redirigir a diagnóstico concreto."
+    }
+  ]
+}

@@ -1,0 +1,426 @@
+{
+  "summary": {
+    "experiment": "Sales Diagnosis Assistant Conversation Lab — Fase 1.7",
+    "model": "gpt-5-nano",
+    "reasoning_effort": null,
+    "embedding_model": "text-embedding-3-small",
+    "dimensions": 1536,
+    "collection": "team360_lab_pgvector_benchmark_openai_small_1536",
+    "top_n": 20,
+    "top_k": 5,
+    "max_context_chars": 6000,
+    "max_output_tokens": 500,
+    "total_scenarios": 2,
+    "passed_scenarios": 0,
+    "scenario_pass_rate": 0.0,
+    "total_turns": 4,
+    "passed_turns": 4,
+    "turn_pass_rate": 100.0,
+    "high_risk_total": 0,
+    "high_risk_passed": 0,
+    "high_risk_pass_rate": 0,
+    "avg_retrieval_latency_ms": 5.0,
+    "avg_llm_latency_ms": 0,
+    "avg_total_latency_ms": 987.8,
+    "p95_turn_latency_ms": 1141.7,
+    "avg_questions_per_turn": 0.0,
+    "max_questions_in_turn": 0,
+    "slots_filled_avg": 0.0,
+    "forbidden_claims_total": 0,
+    "planned_extension_misrepresented_count": 0,
+    "hallucinated_pricing_count": 0,
+    "useful_orientation_rate": 0.0,
+    "diagnosis_orientation_count": 0,
+    "guardrail_failure_count": 0,
+    "no_llm_mode": true,
+    "architecture_recommendation": "D. Requiere modelo alternativo.",
+    "cases_passed": 0,
+    "cases_failed": 2
+  },
+  "scenarios": [
+    {
+      "case_id": "conv_01",
+      "title": "Consulta genérica sobre automatización",
+      "category": "consulta_generica",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "scenario_evaluation": {
+        "passed": false,
+        "total_turns": 2,
+        "passed_turns": 2,
+        "turn_pass_rate": 100.0,
+        "total_forbidden_claims": 0,
+        "safety_flags": [],
+        "total_questions": 0,
+        "avg_questions_per_turn": 0.0,
+        "has_diagnosis_orientation": false,
+        "has_says_not_documented": false,
+        "expected_slots": [
+          "business_type",
+          "current_channel"
+        ],
+        "detected_slots": [],
+        "slots_filled": 0,
+        "all_slots_detected": false,
+        "planned_extension_misrepresented": false,
+        "hallucinated_pricing": false
+      },
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Quiero automatizar mi negocio.",
+          "retrieval_chunks": [
+            {
+              "rank": 1,
+              "chunk_id": 49,
+              "title": "Plan 2 — WhatsApp Asistente",
+              "content_preview": "### Plan 2 — WhatsApp Asistente\n\n**Descripción:** Asistente con información del negocio, servicios, horarios, precios orientativos, ubicación, formas de pago, procesos y derivación a humano.\n\n**Para q",
+              "score": 0.537613
+            },
+            {
+              "rank": 2,
+              "chunk_id": 63,
+              "title": "Límite comercial",
+              "content_preview": "### Límite comercial\n\nVera puede identificar que un proceso es automatizable sin afirmar\nque Team360 lo vende hoy como servicio. Debe clasificar la oportunidad\nusando las categorías de decisión de ofe",
+              "score": 0.518847
+            },
+            {
+              "rank": 3,
+              "chunk_id": 73,
+              "title": "Procesos comerciales",
+              "content_preview": "### Procesos comerciales\n\n- Seguimiento de leads y clientes.\n- Automatización de cotizaciones y propuestas.\n- Conciliación simple de pagos y facturación operativa, cuando el\n  alcance es claro y no im",
+              "score": 0.511971
+            },
+            {
+              "rank": 4,
+              "chunk_id": 86,
+              "title": "Agenda automation",
+              "content_preview": "## Agenda automation\n\n**Estado actual:** planned_extension. La agenda/turnos automática no está disponible como servicio general.\n\n**Por qué no vender como listo:** Agenda automation requiere integrac",
+              "score": 0.505632
+            },
+            {
+              "rank": 5,
+              "chunk_id": 47,
+              "title": "Diagnóstico amplio de automatización",
+              "content_preview": "### Diagnóstico amplio de automatización\n\nEl asistente no está limitado a ventas. Puede evaluar procesos de:\n\n- Administración y backoffice.\n- Documentación y gestión documental.\n- Reportes y dashboar",
+              "score": 0.500817
+            }
+          ],
+          "context_chars": 3348,
+          "retrieval_latency_ms": 5.3,
+          "response_text": "(no-llm mode)",
+          "llm_latency_ms": 0,
+          "total_latency_ms": 1141.7,
+          "parsed": {
+            "question_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "detected_slots": {},
+            "response_length": 13
+          },
+          "evaluation": {
+            "passed": true,
+            "found_must_include": [],
+            "missing_must_include": [
+              "automatizable",
+              "diagnostico",
+              "orientacion"
+            ],
+            "found_forbidden": [],
+            "safety_flags": [],
+            "empty_response": false,
+            "too_long": false,
+            "too_many_questions": false,
+            "has_context": true,
+            "context_chunks_retrieved": 20,
+            "question_count": 0,
+            "forbidden_claims_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "response_length": 13
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Tengo una empresa de servicios y recibo consultas por WhatsApp.",
+          "retrieval_chunks": [
+            {
+              "rank": 1,
+              "chunk_id": 74,
+              "title": "Cómo responder preguntas comerciales sobre WhatsApp",
+              "content_preview": "## Cómo responder preguntas comerciales sobre WhatsApp\n\n**\"¿Conecta con WhatsApp?\"**\n\"Sí, ofrecemos paquetes de WhatsApp inteligente como servicio. Podemos configurar un canal para tu negocio con el a",
+              "score": 0.616285
+            },
+            {
+              "rank": 2,
+              "chunk_id": 91,
+              "title": "Cómo responder comercialmente",
+              "content_preview": "## Cómo responder comercialmente\n\n**Cliente: \"¿Pueden automatizar WhatsApp?\"**\n\"Sí, ofrecemos paquetes de WhatsApp inteligente como servicio. Hay 4 planes según tu necesidad: desde FAQ básica con deri",
+              "score": 0.587905
+            },
+            {
+              "rank": 3,
+              "chunk_id": 67,
+              "title": "Dependencias técnicas de WhatsApp como servicio",
+              "content_preview": "## Dependencias técnicas de WhatsApp como servicio\n\nPara cualquier paquete WhatsApp se requiere:\n- Número de WhatsApp Business del cliente (obligatorio)\n- Configuración del proveedor de mensajería (Tw",
+              "score": 0.573762
+            },
+            {
+              "rank": 4,
+              "chunk_id": 49,
+              "title": "Plan 2 — WhatsApp Asistente",
+              "content_preview": "### Plan 2 — WhatsApp Asistente\n\n**Descripción:** Asistente con información del negocio, servicios, horarios, precios orientativos, ubicación, formas de pago, procesos y derivación a humano.\n\n**Para q",
+              "score": 0.570323
+            },
+            {
+              "rank": 5,
+              "chunk_id": 40,
+              "title": "Plan 1 — WhatsApp Profesional",
+              "content_preview": "### Plan 1 — WhatsApp Profesional\n\n**Descripción:** Canal de WhatsApp configurado con bienvenida, FAQ básica, horarios y derivación humana.\n\n**Para quién:** Comercios, profesionales independientes, py",
+              "score": 0.566159
+            }
+          ],
+          "context_chars": 4773,
+          "retrieval_latency_ms": 5.1,
+          "response_text": "(no-llm mode)",
+          "llm_latency_ms": 0,
+          "total_latency_ms": 1057.9,
+          "parsed": {
+            "question_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "detected_slots": {},
+            "response_length": 13
+          },
+          "evaluation": {
+            "passed": true,
+            "found_must_include": [],
+            "missing_must_include": [
+              "automatizable",
+              "diagnostico",
+              "orientacion"
+            ],
+            "found_forbidden": [],
+            "safety_flags": [],
+            "empty_response": false,
+            "too_long": false,
+            "too_many_questions": false,
+            "has_context": true,
+            "context_chunks_retrieved": 20,
+            "question_count": 0,
+            "forbidden_claims_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "response_length": 13
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_02",
+      "title": "Leads perdidos por falta de seguimiento",
+      "category": "leads_perdidos",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "scenario_evaluation": {
+        "passed": false,
+        "total_turns": 2,
+        "passed_turns": 2,
+        "turn_pass_rate": 100.0,
+        "total_forbidden_claims": 0,
+        "safety_flags": [],
+        "total_questions": 0,
+        "avg_questions_per_turn": 0.0,
+        "has_diagnosis_orientation": false,
+        "has_says_not_documented": false,
+        "expected_slots": [
+          "current_channel",
+          "main_pain",
+          "inquiry_volume"
+        ],
+        "detected_slots": [],
+        "slots_filled": 0,
+        "all_slots_detected": false,
+        "planned_extension_misrepresented": false,
+        "hallucinated_pricing": false
+      },
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Tengo muchos leads pero se pierden porque nadie les responde rápido.",
+          "retrieval_chunks": [
+            {
+              "rank": 1,
+              "chunk_id": 29,
+              "title": "Lead capture productivo general",
+              "content_preview": "## Lead capture productivo general\n\n**Estado actual:** planned_extension. La captura de leads no está implementada como servicio productivo general.\n\n**Por qué no vender como listo:** Lead capture req",
+              "score": 0.505234
+            },
+            {
+              "rank": 2,
+              "chunk_id": 60,
+              "title": "Plan 3 — WhatsApp Comercial (Captura + Calificación)",
+              "content_preview": "### Plan 3 — WhatsApp Comercial (Captura + Calificación)\n\n**Descripción:** Captura de datos mínimos del consultante y calificación de leads.\n\n**Para quién:** Empresas que reciben leads por WhatsApp y ",
+              "score": 0.416894
+            },
+            {
+              "rank": 3,
+              "chunk_id": 91,
+              "title": "Cómo responder comercialmente",
+              "content_preview": "## Cómo responder comercialmente\n\n**Cliente: \"¿Pueden automatizar WhatsApp?\"**\n\"Sí, ofrecemos paquetes de WhatsApp inteligente como servicio. Hay 4 planes según tu necesidad: desde FAQ básica con deri",
+              "score": 0.411382
+            },
+            {
+              "rank": 4,
+              "chunk_id": 55,
+              "title": "CRM handoff",
+              "content_preview": "## CRM handoff\n\n**Estado actual:** planned_extension. La integración automática con CRM para crear/actualizar contactos no está disponible como servicio general.\n\n**Por qué no vender como listo:** CRM",
+              "score": 0.405301
+            },
+            {
+              "rank": 5,
+              "chunk_id": 78,
+              "title": "Campaign automation",
+              "content_preview": "## Campaign automation\n\n**Estado actual:** planned_extension. Las campañas automáticas por WhatsApp no están disponibles como servicio general.\n\n**Por qué no vender como listo:** Campaign automation r",
+              "score": 0.401218
+            }
+          ],
+          "context_chars": 4115,
+          "retrieval_latency_ms": 4.1,
+          "response_text": "(no-llm mode)",
+          "llm_latency_ms": 0,
+          "total_latency_ms": 1088.4,
+          "parsed": {
+            "question_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "detected_slots": {},
+            "response_length": 13
+          },
+          "evaluation": {
+            "passed": true,
+            "found_must_include": [],
+            "missing_must_include": [
+              "lead",
+              "diagnostico",
+              "orientacion",
+              "seguimiento"
+            ],
+            "found_forbidden": [],
+            "safety_flags": [],
+            "empty_response": false,
+            "too_long": false,
+            "too_many_questions": false,
+            "has_context": true,
+            "context_chunks_retrieved": 20,
+            "question_count": 0,
+            "forbidden_claims_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "response_length": 13
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Vienen de Facebook e Instagram.",
+          "retrieval_chunks": [
+            {
+              "rank": 1,
+              "chunk_id": 5,
+              "title": "WhatsApp — límites comerciales e integraciones",
+              "content_preview": "# WhatsApp — límites comerciales e integraciones",
+              "score": 0.320665
+            },
+            {
+              "rank": 2,
+              "chunk_id": 43,
+              "title": "Reglas de engagement con WhatsApp",
+              "content_preview": "## Reglas de engagement con WhatsApp",
+              "score": 0.319596
+            },
+            {
+              "rank": 3,
+              "chunk_id": 110,
+              "title": "Referencias",
+              "content_preview": "## Referencias\n\n- `[[team360_sales_diagnosis_package_manual]]`: Offer Decision, Service Maturity\n- `[[capacidades-futuras-e-integraciones]]`: Estado actual de cada capacidad planned\n- `[[paquetes-what",
+              "score": 0.31231
+            },
+            {
+              "rank": 4,
+              "chunk_id": 74,
+              "title": "Cómo responder preguntas comerciales sobre WhatsApp",
+              "content_preview": "## Cómo responder preguntas comerciales sobre WhatsApp\n\n**\"¿Conecta con WhatsApp?\"**\n\"Sí, ofrecemos paquetes de WhatsApp inteligente como servicio. Podemos configurar un canal para tu negocio con el a",
+              "score": 0.305884
+            },
+            {
+              "rank": 5,
+              "chunk_id": 99,
+              "title": "Procesos de integración",
+              "content_preview": "### Procesos de integración\n\n- Conexión entre CRM, WhatsApp y fuentes de datos comerciales con\n  alcance definido.\n- Integraciones con ERP, plataformas de pago o sistemas contables\n  solo cuando exist",
+              "score": 0.29852
+            }
+          ],
+          "context_chars": 2358,
+          "retrieval_latency_ms": 5.4,
+          "response_text": "(no-llm mode)",
+          "llm_latency_ms": 0,
+          "total_latency_ms": 663.0,
+          "parsed": {
+            "question_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "detected_slots": {},
+            "response_length": 13
+          },
+          "evaluation": {
+            "passed": true,
+            "found_must_include": [],
+            "missing_must_include": [
+              "lead",
+              "diagnostico",
+              "orientacion",
+              "seguimiento"
+            ],
+            "found_forbidden": [],
+            "safety_flags": [],
+            "empty_response": false,
+            "too_long": false,
+            "too_many_questions": false,
+            "has_context": true,
+            "context_chunks_retrieved": 20,
+            "question_count": 0,
+            "forbidden_claims_count": 0,
+            "gives_orientation": false,
+            "says_not_documented": false,
+            "response_length": 13
+          }
+        }
+      ]
+    }
+  ],
+  "latencies_ms": {
+    "retrieval": [
+      5.3,
+      5.1,
+      4.1,
+      5.4
+    ],
+    "llm": [],
+    "total": [
+      1141.7,
+      1057.9,
+      1088.4,
+      663.0
+    ]
+  }
+}
