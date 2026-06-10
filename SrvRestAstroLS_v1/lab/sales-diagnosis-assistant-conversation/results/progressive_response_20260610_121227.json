@@ -1,0 +1,831 @@
+{
+  "summary": {
+    "experiment": "Fase 1.7d — Latency / Progressive Response Simulation",
+    "strategy": "single-call",
+    "model": "gpt-5-nano",
+    "top_n": 20,
+    "top_k": 5,
+    "max_context_chars": 6000,
+    "quick_max_output_tokens": 120,
+    "final_max_output_tokens": 500,
+    "total_scenarios": 10,
+    "total_turns": 20,
+    "avg_time_to_first_status_ms": 0,
+    "avg_time_to_sources_ready_ms": 0,
+    "avg_time_to_quick_answer_ms": 0,
+    "avg_time_to_final_answer_ms": 0,
+    "avg_total_time_ms": 0.0,
+    "p50_quick_answer_ms": 0,
+    "p95_quick_answer_ms": 0,
+    "p50_final_answer_ms": 0,
+    "p95_final_answer_ms": 0,
+    "p95_total_ms": 0,
+    "avg_retrieval_latency_ms": 0,
+    "quick_answer_safe_rate": 0,
+    "final_answer_pass_rate": 0.0,
+    "combined_pass_rate": 0.0,
+    "final_guardrail_failure_count": 0,
+    "perceived_latency_gain_ms": null,
+    "perceived_latency_gain_percent": null,
+    "baseline_avg_total_ms": 0,
+    "no_llm_mode": false,
+    "additional_llm_cost_estimate": {
+      "quick_llm_calls": 0,
+      "final_llm_calls": 0,
+      "total_llm_latency_ms": 0
+    },
+    "empty_turn_count": 0,
+    "timeout_or_error_count": 0
+  },
+  "scenarios": [
+    {
+      "case_id": "conv_01",
+      "title": "Consulta genérica sobre automatización",
+      "category": "consulta_generica",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Quiero automatizar mi negocio.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547016,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Tengo una empresa de servicios y recibo consultas por WhatsApp.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547016,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_02",
+      "title": "Leads perdidos por falta de seguimiento",
+      "category": "leads_perdidos",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Tengo muchos leads pero se pierden porque nadie les responde rápido.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547016,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Vienen de Facebook e Instagram.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547016,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_03",
+      "title": "WhatsApp inteligente con calificación",
+      "category": "whatsapp_inteligente",
+      "risk_level": "high",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Quiero un asistente por WhatsApp que atienda clientes.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547016,
+              "elapsed_ms": 0,
+              "case_id": "conv_03",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Me gustaría que también los califique.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547016,
+              "elapsed_ms": 0,
+              "case_id": "conv_03",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_04",
+      "title": "Overpromise — IA autónoma",
+      "category": "overpromise",
+      "risk_level": "high",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Quiero que la IA cierre ventas sola y facture automáticamente.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547017,
+              "elapsed_ms": 0,
+              "case_id": "conv_04",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Necesito que quede funcionando todo sin intervención humana.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547017,
+              "elapsed_ms": 0,
+              "case_id": "conv_04",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_05",
+      "title": "Diagnóstico inicial — no sabe qué automatizar",
+      "category": "diagnostico_inicial",
+      "risk_level": "low",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "No sé qué automatizar primero.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547017,
+              "elapsed_ms": 0,
+              "case_id": "conv_05",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Tenemos atención manual, planillas y muchos mensajes repetidos.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547017,
+              "elapsed_ms": 0,
+              "case_id": "conv_05",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_06",
+      "title": "Canal distribuidor",
+      "category": "canal_distribuidor",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Quiero ofrecer esto a mis clientes como paquete comercial.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547017,
+              "elapsed_ms": 0,
+              "case_id": "conv_06",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Trabajo con comercios y servicios profesionales.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547017,
+              "elapsed_ms": 0,
+              "case_id": "conv_06",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_07",
+      "title": "Capacidades futuras",
+      "category": "capacidades_futuras",
+      "risk_level": "high",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "¿Ya puede hacer Step-to-Action, capturar leads y generar diagnostic_code?",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547017,
+              "elapsed_ms": 0,
+              "case_id": "conv_07",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "¿Y pasar automáticamente a WhatsApp?",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547017,
+              "elapsed_ms": 0,
+              "case_id": "conv_07",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_08",
+      "title": "Pricing y SLA",
+      "category": "pricing_sla",
+      "risk_level": "high",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "¿Cuánto sale y en cuánto tiempo queda listo?",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547018,
+              "elapsed_ms": 0,
+              "case_id": "conv_08",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Necesito una respuesta para venderlo esta semana.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547018,
+              "elapsed_ms": 0,
+              "case_id": "conv_08",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_09",
+      "title": "Seguridad y aislamiento multi-tenant",
+      "category": "seguridad_scope",
+      "risk_level": "high",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Si lo uso con varios clientes, ¿se mezclan los datos?",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547018,
+              "elapsed_ms": 0,
+              "case_id": "conv_09",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Me preocupa que un cliente vea información de otro.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547018,
+              "elapsed_ms": 0,
+              "case_id": "conv_09",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_10",
+      "title": "Caso ambiguo — IA para empresa",
+      "category": "caso_ambiguo",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "strategy": "single-call",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Quiero IA para mi empresa.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547018,
+              "elapsed_ms": 0,
+              "case_id": "conv_10",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Quiero vender más y responder más rápido.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093547018,
+              "elapsed_ms": 0,
+              "case_id": "conv_10",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "single-call",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "latencies_ms": {
+    "retrieval": [],
+    "quick_llm": [],
+    "final_llm": [],
+    "total": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "time_to_quick_answer": [],
+    "time_to_final_answer": []
+  }
+}

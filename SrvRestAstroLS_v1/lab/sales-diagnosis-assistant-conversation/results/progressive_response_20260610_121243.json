@@ -1,0 +1,207 @@
+{
+  "summary": {
+    "experiment": "Fase 1.7d — Latency / Progressive Response Simulation",
+    "strategy": "templated-quick-final-llm",
+    "model": "gpt-5-nano",
+    "top_n": 20,
+    "top_k": 5,
+    "max_context_chars": 6000,
+    "quick_max_output_tokens": 120,
+    "final_max_output_tokens": 500,
+    "total_scenarios": 2,
+    "total_turns": 4,
+    "avg_time_to_first_status_ms": 0,
+    "avg_time_to_sources_ready_ms": 0,
+    "avg_time_to_quick_answer_ms": 0,
+    "avg_time_to_final_answer_ms": 0,
+    "avg_total_time_ms": 0.0,
+    "p50_quick_answer_ms": 0,
+    "p95_quick_answer_ms": 0,
+    "p50_final_answer_ms": 0,
+    "p95_final_answer_ms": 0,
+    "p95_total_ms": 0,
+    "avg_retrieval_latency_ms": 0,
+    "quick_answer_safe_rate": 0,
+    "final_answer_pass_rate": 0.0,
+    "combined_pass_rate": 0.0,
+    "final_guardrail_failure_count": 0,
+    "perceived_latency_gain_ms": null,
+    "perceived_latency_gain_percent": null,
+    "baseline_avg_total_ms": 0,
+    "no_llm_mode": true,
+    "additional_llm_cost_estimate": {
+      "quick_llm_calls": 0,
+      "final_llm_calls": 0,
+      "total_llm_latency_ms": 0
+    },
+    "empty_turn_count": 0,
+    "timeout_or_error_count": 0
+  },
+  "scenarios": [
+    {
+      "case_id": "conv_01",
+      "title": "Consulta genérica sobre automatización",
+      "category": "consulta_generica",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "strategy": "templated-quick-final-llm",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Quiero automatizar mi negocio.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093563079,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "templated-quick-final-llm",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Tengo una empresa de servicios y recibo consultas por WhatsApp.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093563080,
+              "elapsed_ms": 0,
+              "case_id": "conv_01",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "templated-quick-final-llm",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "conv_02",
+      "title": "Leads perdidos por falta de seguimiento",
+      "category": "leads_perdidos",
+      "risk_level": "medium",
+      "total_turns": 2,
+      "strategy": "templated-quick-final-llm",
+      "conversation_state": {
+        "slots_filled": [],
+        "total_questions_asked": 0,
+        "total_turns_processed": 0
+      },
+      "events": [],
+      "turns": [
+        {
+          "turn": 1,
+          "user_message": "Tengo muchos leads pero se pierden porque nadie les responde rápido.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093563080,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 1,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "templated-quick-final-llm",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "user_message": "Vienen de Facebook e Instagram.",
+          "events": [
+            {
+              "event_type": "team360.status.retrieval_started",
+              "timestamp_ms": 1781093563080,
+              "elapsed_ms": 0,
+              "case_id": "conv_02",
+              "turn_index": 2,
+              "payload": "Iniciando búsqueda de contexto relevante...",
+              "safe_to_show": true,
+              "notes": ""
+            }
+          ],
+          "retrieval_error": "No module named 'httpx'",
+          "response_text": "",
+          "total_latency_ms": 0,
+          "strategy": "templated-quick-final-llm",
+          "evaluation": {
+            "quick_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            },
+            "final_answer": {
+              "passed": false,
+              "failure_type": "retrieval_error"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "latencies_ms": {
+    "retrieval": [],
+    "quick_llm": [],
+    "final_llm": [],
+    "total": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "time_to_quick_answer": [],
+    "time_to_final_answer": []
+  }
+}

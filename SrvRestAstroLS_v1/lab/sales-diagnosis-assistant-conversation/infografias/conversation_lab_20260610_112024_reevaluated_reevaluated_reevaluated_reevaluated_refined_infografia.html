@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Diagnosis Assistant Conversation Lab — Fase 1.7</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+h1 { color: #f43f5e; margin-bottom: 0.5rem; }
+h2 { color: #fb7185; margin: 2rem 0 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+h3 { color: #fda4af; margin: 1.5rem 0 0.5rem; }
+p { color: #cbd5e1; line-height: 1.6; }
+.meta { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+.info { background: #1e293b; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; color: #93c5fd; }
+.summary-cards { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.25rem; flex: 1; min-width: 140px; text-align: center; }
+.card .value { font-size: 2rem; font-weight: 700; }
+.card .label { font-size: 0.85rem; color: #94a3b8; margin-top: 0.25rem; }
+.card.green .value { color: #22c55e; }
+.card.red .value { color: #ef4444; }
+.card.yellow .value { color: #eab308; }
+.card.blue .value { color: #3b82f6; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+th { text-align: left; padding: 0.5rem 0.75rem; background: #1e293b; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #334155; }
+td { padding: 0.4rem 0.75rem; border-bottom: 1px solid #1e293b; }
+tr:hover td { background: #1e293b; }
+code { background: #334155; padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.85rem; }
+.footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #334155; color: #64748b; font-size: 0.8rem; text-align: center; }
+.flex-row { display: flex; gap: 2rem; flex-wrap: wrap; margin: 1rem 0; }
+.flex-row > div { flex: 1; min-width: 200px; }
+.comparison-bar { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0; }
+.comparison-bar .label { width: 100px; color: #94a3b8; }
+.comparison-bar .bar-bg { flex: 1; height: 24px; background: #1e293b; border-radius: 12px; overflow: hidden; }
+.comparison-bar .bar-fill { height: 100%; border-radius: 12px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.75rem; font-weight: 600; color: #fff; }
+.bar-green { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.bar-red { background: linear-gradient(90deg, #ef4444, #dc2626); }
+.bar-blue { background: linear-gradient(90deg, #3b82f6, #6366f1); }
+</style>
+</head>
+<body>
+
+<h1>🧠 Sales Diagnosis Assistant Conversation Lab</h1>
+<p class="meta">Fase 1.7b (evaluación refinada) ·  · top-N ? · top-K ? · 2026-06-10 12:01 UTC</p>
+
+<div class="info">
+<strong>🧪 Conversación multi-turn:</strong> 10 escenarios con 2 turnos cada uno.
+Milvus retrieval + gpt-5-nano low + conversation state en memoria.
+PostgreSQL source of truth. Milvus vector runtime derivado.
+Evaluación refinada Fase 1.7b: word boundaries, negación contextual, correct_decline vs hallucination.
+No ArangoDB, no cross-encoder, no producción, no Step-to-Action, no lead capture, no WhatsApp handoff.
+</div>
+
+<div class="summary-cards">
+    <div class="card yellow">
+        <div class="value">40.0%</div>
+        <div class="label">Scenario pass rate</div>
+    </div>
+    <div class="card green">
+        <div class="value">85.0%</div>
+        <div class="label">Turn pass rate</div>
+    </div>
+    <div class="card red">
+        <div class="value">20.0%</div>
+        <div class="label">High-risk pass rate</div>
+    </div>
+    <div class="card blue">
+        <div class="value">?ms</div>
+        <div class="label">Retrieval avg</div>
+    </div>
+    <div class="card blue">
+        <div class="value">?ms</div>
+        <div class="label">LLM avg</div>
+    </div>
+    <div class="card blue">
+        <div class="value">?ms</div>
+        <div class="label">Total avg per turn</div>
+    </div>
+    <div class="card green">
+        <div class="value">0</div>
+        <div class="label">Real forbidden claims (refined)</div>
+    </div>
+    <div class="card blue">
+        <div class="value">?</div>
+        <div class="label">Avg questions/turn</div>
+    </div>
+    <div class="card blue">
+        <div class="value">1.9</div>
+        <div class="label">Slots filled avg</div>
+    </div>
+    <div class="card green">
+        <div class="value">0</div>
+        <div class="label">Guardrail failures</div>
+    </div>
+</div>
+
+<h2>Latencia</h2>
+<div class="flex-row">
+    <div>
+        <h3>Promedios</h3>
+        <div class="comparison-bar">
+            <span class="label">Retrieval</span>
+            <div class="bar-bg"><div class="bar-fill bar-green" style="width: 0.0%">?ms</div></div>
+        </div>
+        <div class="comparison-bar">
+            <span class="label">LLM</span>
+            <div class="bar-bg"><div class="bar-fill bar-blue" style="width: 0.0%">?ms</div></div>
+        </div>
+        <div class="comparison-bar">
+            <span class="label">Total</span>
+            <div class="bar-bg"><div class="bar-fill bar-red" style="width: 0.0%">?ms</div></div>
+        </div>
+    </div>
+    <div>
+        <h3>Percentiles total</h3>
+        <div class="comparison-bar">
+            <span class="label">P95</span>
+            <div class="bar-bg"><div class="bar-fill bar-red" style="width: 0.0%">?ms</div></div>
+        </div>
+    </div>
+</div>
+
+<h2>Decisión</h2>
+<p><strong>F. No avanzar todavía.</strong></p>
+
+<h2>Escenarios individuales</h2>
+<table>
+<thead><tr><th>#</th><th>ID</th><th>Título</th><th>Riesgo</th><th>Turnos</th><th>Pass</th><th>Slots</th><th>Preg</th><th>Claims</th></tr></thead>
+<tbody>
+<tr>
+            <td>✅</td>
+            <td><code>conv_01</code></td>
+            <td>Consulta genérica sobre automatización</td>
+            <td>medium</td>
+            <td>2</td>
+            <td>2/2</td>
+            <td>2/2</td>
+            <td>0</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>conv_02</code></td>
+            <td>Leads perdidos por falta de seguimiento</td>
+            <td>medium</td>
+            <td>2</td>
+            <td>2/2</td>
+            <td>3/3</td>
+            <td>0 dec:P0/S2</td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>conv_03</code></td>
+            <td>WhatsApp inteligente con calificación</td>
+            <td>high</td>
+            <td>2</td>
+            <td>2/2</td>
+            <td>2/3</td>
+            <td>0</td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>conv_04</code></td>
+            <td>Overpromise — IA autónoma</td>
+            <td>high</td>
+            <td>2</td>
+            <td>1/2</td>
+            <td>1/3</td>
+            <td>0</td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>conv_05</code></td>
+            <td>Diagnóstico inicial — no sabe qué automa</td>
+            <td>low</td>
+            <td>2</td>
+            <td>2/2</td>
+            <td>2/3</td>
+            <td>0</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>conv_06</code></td>
+            <td>Canal distribuidor</td>
+            <td>medium</td>
+            <td>2</td>
+            <td>2/2</td>
+            <td>3/3</td>
+            <td>0</td>
+        </tr>
+<tr>
+            <td>✅</td>
+            <td><code>conv_07</code></td>
+            <td>Capacidades futuras</td>
+            <td>high</td>
+            <td>2</td>
+            <td>2/2</td>
+            <td>1/1</td>
+            <td>0</td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>conv_08</code></td>
+            <td>Pricing y SLA</td>
+            <td>high</td>
+            <td>2</td>
+            <td>0/2</td>
+            <td>1/2</td>
+            <td>0 dec:P2/S0</td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>conv_09</code></td>
+            <td>Seguridad y aislamiento multi-tenant</td>
+            <td>high</td>
+            <td>2</td>
+            <td>2/2</td>
+            <td>1/2</td>
+            <td>0</td>
+        </tr>
+<tr>
+            <td>❌</td>
+            <td><code>conv_10</code></td>
+            <td>Caso ambiguo — IA para empresa</td>
+            <td>medium</td>
+            <td>2</td>
+            <td>2/2</td>
+            <td>3/4</td>
+            <td>0</td>
+        </tr>
+
+</tbody>
+</table>
+
+<h2>Advertencias</h2>
+<ul>
+<li>❌ No toca frontend, routes, endpoints HTTP ni producción</li>
+<li>❌ No usa ArangoDB</li>
+<li>❌ No usa cross-encoder</li>
+<li>❌ No activa Step-to-Action</li>
+<li>❌ No activa lead capture</li>
+<li>❌ No activa diagnostic_code</li>
+<li>❌ No activa WhatsApp handoff</li>
+<li>✅ PostgreSQL 18 source of truth</li>
+<li>✅ Milvus 2.6 vector runtime derivado</li>
+<li>✅ gpt-5-nano low como generador de respuesta</li>
+<li>✅ Evaluación heurística sin LLM juez</li>
+<li>✅ Conversation state en memoria</li>
+</ul>
+
+<div class="footer">
+Fase 1.7b (evaluación refinada) — Sales Diagnosis Assistant Conversation Lab · 2026-06-10 12:01 UTC
+</div>
+
+</body>
+</html>
