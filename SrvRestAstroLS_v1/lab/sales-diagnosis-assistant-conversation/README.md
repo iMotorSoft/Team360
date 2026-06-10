@@ -110,29 +110,66 @@ uv run python lab/sales-diagnosis-assistant-conversation/scripts/generate_infogr
 | `--no-llm` | `False` | Solo retrieval, sin LLM |
 | `--dry-run` | `False` | Validar conectividad |
 
-## Evaluación
+## Evaluación — Fase 1.7b (refinada)
 
-### Por turno
+La lógica de evaluación se extrajo a `evaluator.py` con 5 capas independientes:
 
-- Respuesta no vacía
-- Respuesta breve (< 2000 chars)
-- Máximo 3 preguntas
-- Orientación concreta presente
-- Sin forbidden claims
-- Sin pricing/SLA inventado
-- No promete Step-to-Action/lead_capture/diagnostic_code/WhatsApp handoff como listo
-- Diferencia planned_extension vs listo cuando corresponde
-- Usa contexto recuperado
-- Si falta info, pide slot mínimo
+| Capa | Función | Propósito |
+|------|---------|-----------|
+| 1. Response shape | `evaluate_response_shape()` | Empty, too_long, too_many_questions |
+| 2. Commercial usefulness | `evaluate_commercial_usefulness()` | Orientation, diagnosis, concrete steps |
+| 3. Safety/anti-overpromise | `evaluate_safety()` + `evaluate_planned_extension()` | Real forbidden vs correctly declined; planned extension tracking |
+| 4. Knowledge grounding | `evaluate_knowledge_grounding()` | Says_not_documented vs invents_detail |
+| 5. Slot behavior | `evaluate_slots()` | Detected slots count |
 
-### Por escenario
+### Mejoras respecto a Fase 1.7
 
-- Slots mínimos detectados
-- Diagnóstico inicial generado o encaminado
-- Límites respetados
-- Conversación útil
-- No exceso de preguntas
-- No alucinación comercial
+- **Word boundaries** (`\b`) en lugar de substring — evita falso positivo "ars" dentro de otra palabra
+- **Negación contextual** — detecta si un término prohibido aparece cerca de "no tenemos", "no está disponible", etc.
+- **Correct decline vs hallucination** — separa `pricing_correctly_declined` de `unsupported_pricing_claim`
+- **Planned extension tracking** — por capacidad individual (step_to_action, lead_capture, etc.)
+- **Empty response** — clasificación separada, no como guardrail failure
+
+### Taxonomía de fallos
+
+| Categoría | Significa |
+|-----------|-----------|
+| `empty_response` | Respuesta vacía (error de LLM o sin contenido) |
+| `response_too_long` | Excede 2000 caracteres |
+| `too_many_questions` | Más de 3 preguntas en un turno |
+| `real_forbidden_claim` | Término prohibido sin negación cercana |
+| `no_orientation` | No orienta ni diagnostica |
+| `planned_extension_misrepresented` | Capacidad futura vendida como lista |
+
+### Reevaluación sin LLM
+
+Para reevaluar resultados existentes sin re-ejecutar el lab:
+
+```bash
+# Reevaluar resultado más reciente:
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/reevaluate_results.py
+
+# Reevaluar archivo específico:
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/reevaluate_results.py \
+  --results-file results/conversation_lab_20260610_112024.json
+
+# Reevaluar y guardar en ruta específica:
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/reevaluate_results.py \
+  --results-file results/conversation_lab_20260610_112024.json \
+  --output results/reevaluated.json
+```
+
+Esto agrega `refined_evaluation` por turno y `refined_scenario_evaluation` por escenario al JSON.
+
+### Reporte e infografía con datos refinados
+
+```bash
+# Reporte detallado (usa refined_summary si existe):
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/generate_report.py
+
+# Infografía HTML (usa refined_summary si existe):
+uv run python lab/sales-diagnosis-assistant-conversation/scripts/generate_infographics.py
+```
 
 ## Decision rules
 

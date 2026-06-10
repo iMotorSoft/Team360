@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-09 (Fase 1.6k ejecutada — RAG answer generation)
+Ultima actualizacion: 2026-06-10 (Fase 1.7b refinada — Evaluación heurística refinada del Conversation Lab)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,19 @@ Ultima actualizacion: 2026-06-09 (Fase 1.6k ejecutada — RAG answer generation)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.7b — Evaluación heurística refinada del Sales Diagnosis Conversation Lab
+
+- Se creo `lab/sales-diagnosis-assistant-conversation/evaluator.py` con 5 capas de evaluación independientes: response shape, commercial usefulness, safety/anti-overpromise (con word boundaries y detección de negación contextual), knowledge grounding y slot behavior.
+- Se agregaron categorías separadas para `pricing_correctly_declined`, `sla_correctly_declined`, `timeline_correctly_declined` vs `unsupported_*_claim`, eliminando falsos positivos de la heurística Fase 1.7.
+- Se implementó detección de negación cercana (no, no tenemos, no contamos, todavía no, falta, no documentado) para evitar marcar respuestas correctas como fallos de guardrail.
+- Se agregó `scripts/reevaluate_results.py` para reprocesar resultados JSON existentes sin re-llamar LLM, agregando `refined_evaluation` por turno y `refined_scenario_evaluation` por escenario.
+- Se modificó `run_conversation_lab.py` para importar `evaluator.py` y almacenar `refined_evaluation` junto a la evaluación inline original.
+- Se modificaron `scripts/generate_report.py` y `scripts/generate_infographics.py` para soportar datos refinados cuando `refined_summary` existe en el JSON.
+- Se actualizó `README.md` con documentación de la nueva taxonomía, reevaluación y scripts.
+- Reevaluación sobre resultado `conversation_lab_20260610_112024.json`: scenario pass rate subió de 0% → 10%, turn pass rate subió de 0% → 55%, orientation rate se mantiene en 100%. Real forbidden claims se redujeron a 2 (casos genuinos). Guardrail failures bajaron a 2.
+- No se modificó frontend, routes, endpoints HTTP, diagnosis productivo, migraciones, corpus, ArangoDB, cross-encoder, runtime productivo, Step-to-Action, lead capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se hardcodearon API keys. No se hicieron git add/commit.
 
 ### 2026-06-08 - Fase 1.3a primer documento approved para Knowledge Ingestion
 

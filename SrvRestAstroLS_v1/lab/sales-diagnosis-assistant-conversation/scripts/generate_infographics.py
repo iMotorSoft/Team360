@@ -24,19 +24,30 @@ def find_latest_result(directory: Path) -> Path | None:
     return json_files[-1] if json_files else None
 
 
+def _get_scenario_se(scenario: dict) -> dict:
+    return scenario.get("refined_scenario_evaluation") or scenario.get("scenario_evaluation", {})
+
+
 def generate_html(report: dict) -> str:
-    summary = report["summary"]
+    summary = report.get("refined_summary") or report["summary"]
     scenarios = report["scenarios"]
+    has_refined = "refined_summary" in report
 
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     case_rows = ""
     for s in scenarios:
-        se = s.get("scenario_evaluation", {})
+        se = _get_scenario_se(s)
         passed = se.get("passed", False)
         status_icon = "✅" if passed else "❌"
-        forbidden = se.get("total_forbidden_claims", 0)
+        forbidden = se.get("real_forbidden_claims_total", se.get("total_forbidden_claims", 0))
         f_label = f" ⚠️{forbidden}" if forbidden else ""
+        if has_refined:
+            pricing_dec = se.get("pricing_correctly_declined_count", 0)
+            sla_dec = se.get("sla_correctly_declined_count", 0)
+            dec_label = f" dec:P{pricing_dec}/S{sla_dec}" if (pricing_dec or sla_dec) else ""
+        else:
+            dec_label = ""
         case_rows += f"""<tr>
             <td>{status_icon}</td>
             <td><code>{s['case_id']}</code></td>
@@ -45,14 +56,13 @@ def generate_html(report: dict) -> str:
             <td>{se.get('total_turns', 0)}</td>
             <td>{se.get('passed_turns', 0)}/{se.get('total_turns', 0)}</td>
             <td>{se.get('slots_filled', 0)}/{len(se.get('expected_slots', []))}</td>
-            <td>{se.get('total_questions', 0)}</td>
-            <td>{forbidden}{f_label}</td>
+            <td>{forbidden}{f_label}{dec_label}</td>
         </tr>\n"""
 
     rec = summary["architecture_recommendation"]
     spr = summary["scenario_pass_rate"]
-    hr = summary["high_risk_pass_rate"]
-    fc = summary["forbidden_claims_total"]
+    hr = summary.get("high_risk_pass_rate", 0)
+    fc = summary.get("real_forbidden_claims_total", summary.get("forbidden_claims_total", 0))
     tpr = summary["turn_pass_rate"]
 
     html = f"""<!DOCTYPE html>
@@ -98,12 +108,13 @@ code {{ background: #334155; padding: 0.15rem 0.35rem; border-radius: 4px; font-
 <body>
 
 <h1>🧠 Sales Diagnosis Assistant Conversation Lab</h1>
-<p class="meta">Fase 1.7 · {summary.get('model')} · top-N {summary.get('top_n')} · top-K {summary.get('top_k')} · {timestamp}</p>
+<p class="meta">{'Fase 1.7b (evaluación refinada)' if has_refined else 'Fase 1.7'} · {summary.get('model', summary.get('experiment', ''))} · top-N {summary.get('top_n', '?')} · top-K {summary.get('top_k', '?')} · {timestamp}</p>
 
 <div class="info">
 <strong>🧪 Conversación multi-turn:</strong> 10 escenarios con 2 turnos cada uno.
 Milvus retrieval + gpt-5-nano low + conversation state en memoria.
 PostgreSQL source of truth. Milvus vector runtime derivado.
+{'Evaluación refinada Fase 1.7b: word boundaries, negación contextual, correct_decline vs hallucination.' if has_refined else 'Evaluación heurística original Fase 1.7.'}
 No ArangoDB, no cross-encoder, no producción, no Step-to-Action, no lead capture, no WhatsApp handoff.
 </div>
 
@@ -121,31 +132,31 @@ No ArangoDB, no cross-encoder, no producción, no Step-to-Action, no lead captur
         <div class="label">High-risk pass rate</div>
     </div>
     <div class="card blue">
-        <div class="value">{summary['avg_retrieval_latency_ms']}ms</div>
+        <div class="value">{summary.get('avg_retrieval_latency_ms', '?')}ms</div>
         <div class="label">Retrieval avg</div>
     </div>
     <div class="card blue">
-        <div class="value">{summary['avg_llm_latency_ms']}ms</div>
+        <div class="value">{summary.get('avg_llm_latency_ms', '?')}ms</div>
         <div class="label">LLM avg</div>
     </div>
     <div class="card blue">
-        <div class="value">{summary['avg_total_latency_ms']}ms</div>
+        <div class="value">{summary.get('avg_total_latency_ms', '?')}ms</div>
         <div class="label">Total avg per turn</div>
     </div>
     <div class="card {'red' if fc > 0 else 'green'}">
         <div class="value">{fc}</div>
-        <div class="label">Forbidden claims</div>
+        <div class="label">{'Real forbidden claims (refined)' if has_refined else 'Forbidden claims'}</div>
     </div>
     <div class="card blue">
-        <div class="value">{summary['avg_questions_per_turn']}</div>
+        <div class="value">{summary.get('avg_questions_per_turn', '?')}</div>
         <div class="label">Avg questions/turn</div>
     </div>
     <div class="card blue">
-        <div class="value">{summary['slots_filled_avg']}</div>
+        <div class="value">{summary.get('slots_filled_avg', '?')}</div>
         <div class="label">Slots filled avg</div>
     </div>
-    <div class="card {'green' if summary['guardrail_failure_count'] == 0 else 'red'}">
-        <div class="value">{summary['guardrail_failure_count']}</div>
+    <div class="card {'green' if summary.get('guardrail_failure_count', 0) == 0 else 'red'}">
+        <div class="value">{summary.get('guardrail_failure_count', 0)}</div>
         <div class="label">Guardrail failures</div>
     </div>
 </div>
@@ -156,22 +167,22 @@ No ArangoDB, no cross-encoder, no producción, no Step-to-Action, no lead captur
         <h3>Promedios</h3>
         <div class="comparison-bar">
             <span class="label">Retrieval</span>
-            <div class="bar-bg"><div class="bar-fill bar-green" style="width: {min(summary['avg_retrieval_latency_ms']/10, 100)}%">{summary['avg_retrieval_latency_ms']}ms</div></div>
+            <div class="bar-bg"><div class="bar-fill bar-green" style="width: {min(summary.get('avg_retrieval_latency_ms', 0)/10, 100)}%">{summary.get('avg_retrieval_latency_ms', '?')}ms</div></div>
         </div>
         <div class="comparison-bar">
             <span class="label">LLM</span>
-            <div class="bar-bg"><div class="bar-fill bar-blue" style="width: {min(summary['avg_llm_latency_ms']/10, 100)}%">{summary['avg_llm_latency_ms']}ms</div></div>
+            <div class="bar-bg"><div class="bar-fill bar-blue" style="width: {min(summary.get('avg_llm_latency_ms', 0)/10, 100)}%">{summary.get('avg_llm_latency_ms', '?')}ms</div></div>
         </div>
         <div class="comparison-bar">
             <span class="label">Total</span>
-            <div class="bar-bg"><div class="bar-fill bar-red" style="width: {min(summary['avg_total_latency_ms']/10, 100)}%">{summary['avg_total_latency_ms']}ms</div></div>
+            <div class="bar-bg"><div class="bar-fill bar-red" style="width: {min(summary.get('avg_total_latency_ms', 0)/10, 100)}%">{summary.get('avg_total_latency_ms', '?')}ms</div></div>
         </div>
     </div>
     <div>
         <h3>Percentiles total</h3>
         <div class="comparison-bar">
             <span class="label">P95</span>
-            <div class="bar-bg"><div class="bar-fill bar-red" style="width: {min(summary['p95_turn_latency_ms']/10, 100)}%">{summary['p95_turn_latency_ms']}ms</div></div>
+            <div class="bar-bg"><div class="bar-fill bar-red" style="width: {min(summary.get('p95_turn_latency_ms', 0)/10, 100)}%">{summary.get('p95_turn_latency_ms', '?')}ms</div></div>
         </div>
     </div>
 </div>
@@ -204,7 +215,7 @@ No ArangoDB, no cross-encoder, no producción, no Step-to-Action, no lead captur
 </ul>
 
 <div class="footer">
-Fase 1.7 — Sales Diagnosis Assistant Conversation Lab · {timestamp}
+{'Fase 1.7b (evaluación refinada)' if has_refined else 'Fase 1.7'} — Sales Diagnosis Assistant Conversation Lab · {timestamp}
 </div>
 
 </body>
@@ -235,22 +246,25 @@ def main() -> None:
         report = json.load(f)
 
     html = generate_html(report)
+    has_refined = "refined_summary" in report
 
     output_path: Path
     if args.output:
         output_path = Path(args.output)
     else:
         stem = results_path.stem.replace(".json", "")
-        output_path = INFO_DIR / f"{stem}_infografia.html"
+        suffix = "_refined_infografia.html" if has_refined else "_infografia.html"
+        output_path = INFO_DIR / f"{stem}{suffix}"
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
 
-    s = report["summary"]
-    print(f"Infografia saved: {output_path}")
+    s = report.get("refined_summary") or report["summary"]
+    label = "Refined infografia" if has_refined else "Infografia"
+    print(f"{label} saved: {output_path}")
     print(f"  {s['total_scenarios']} scenarios, pass rate: {s['scenario_pass_rate']}%, "
-          f"high-risk: {s['high_risk_pass_rate']}%")
+          f"high-risk: {s.get('high_risk_pass_rate', 0)}%")
 
 
 if __name__ == "__main__":

@@ -51,6 +51,9 @@ sys.path.insert(0, str(BP_LAB_DIR))
 
 from run_reranking_experiment import normalize, _resolve_dsn, _validate_positive
 
+sys.path.insert(0, str(LAB_DIR))
+from evaluator import evaluate_turn as refined_evaluate_turn, evaluate_scenario as refined_evaluate_scenario
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -582,6 +585,7 @@ def main() -> None:
                     "total_latency_ms": 0,
                     "parsed": {"question_count": 0, "gives_orientation": False, "says_not_documented": False, "detected_slots": {}, "response_length": 0},
                     "evaluation": {"passed": False, "empty_response": True, "forbidden_claims_count": 0},
+                    "refined_evaluation": refined_evaluate_turn(response_text="", chunks=[], case=case),
                 })
                 continue
 
@@ -605,6 +609,7 @@ def main() -> None:
                     "total_latency_ms": round((time.time() - t_start) * 1000, 1),
                     "parsed": {"question_count": 0, "gives_orientation": False, "says_not_documented": False, "detected_slots": {}, "response_length": 0},
                     "evaluation": {"passed": False, "empty_response": True, "forbidden_claims_count": 0},
+                    "refined_evaluation": refined_evaluate_turn(response_text="", chunks=[], case=case),
                 })
                 continue
 
@@ -652,6 +657,7 @@ def main() -> None:
                 parsed = parse_response(no_llm_text)
                 turn_result["parsed"] = parsed
                 turn_result["evaluation"] = evaluate_turn(case, no_llm_text, chunks, parsed)
+                turn_result["refined_evaluation"] = refined_evaluate_turn(response_text=no_llm_text, chunks=chunks, case=case)
                 total_latencies.append(turn_result["total_latency_ms"])
                 turn_results.append(turn_result)
                 continue
@@ -681,6 +687,7 @@ def main() -> None:
                 parsed = parse_response(error_text)
                 turn_result["parsed"] = parsed
                 turn_result["evaluation"] = evaluate_turn(case, error_text, chunks, parsed)
+                turn_result["refined_evaluation"] = refined_evaluate_turn(response_text=error_text, chunks=chunks, case=case)
                 turn_results.append(turn_result)
                 continue
 
@@ -692,6 +699,7 @@ def main() -> None:
             response_text = llm_result["content"]
             parsed = parse_response(response_text)
             evaluation = evaluate_turn(case, response_text, chunks, parsed)
+            refined_evaluation = refined_evaluate_turn(response_text=response_text, chunks=chunks, case=case)
 
             # Update conversation state
             conversation_state["turn_count"] += 1
@@ -713,6 +721,7 @@ def main() -> None:
             turn_result["llm_usage"] = llm_result.get("usage", {})
             turn_result["parsed"] = parsed
             turn_result["evaluation"] = evaluation
+            turn_result["refined_evaluation"] = refined_evaluation
 
             turn_results.append(turn_result)
 
@@ -730,6 +739,7 @@ def main() -> None:
 
         # Evaluate full scenario
         scenario_eval = evaluate_scenario(case, turn_results, conversation_state)
+        refined_scenario_eval = refined_evaluate_scenario(case, turn_results)
         scenario_result = {
             "case_id": case_id,
             "title": title,
@@ -742,6 +752,7 @@ def main() -> None:
                 "total_turns_processed": conversation_state["turn_count"],
             },
             "scenario_evaluation": scenario_eval,
+            "refined_scenario_evaluation": refined_scenario_eval,
             "turns": turn_results,
         }
         scenario_results.append(scenario_result)
