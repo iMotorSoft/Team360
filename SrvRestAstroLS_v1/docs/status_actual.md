@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Orquestación global Team360)
+Ultima actualizacion: 2026-06-10 (Fase 1.8a — Sales Diagnosis Assistant Runtime Skeleton)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,29 @@ Ultima actualizacion: 2026-06-10 (Orquestación global Team360)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.8a — Sales Diagnosis Assistant Runtime Skeleton
+
+- Se creo el modulo `backend/modules/sales_diagnosis_runtime/` con 7 archivos:
+  - `contracts.py`: 6 dataclasses (AssistantTurnInput, AssistantTurnOutput, ConversationState, RetrievedChunk, GuardrailResult, ProgressiveEvent, RuntimeMetrics) y constantes (SAFE_ACK_TEXT, PLANNED_EXTENSIONS, FORBIDDEN_TERMS).
+  - `providers.py`: interfaces Protocol (RetrievalProvider, LLMProvider, StateRepository, MetricsRecorder, AuditTrail) y Null providers para testeo (NullRetrievalProvider, NullLLMProvider, InMemoryStateRepository).
+  - `policies.py`: PromptPolicy con prompts configurables por assistant/package/domain y GuardrailPolicy con evaluacion heuristica (forbidden claims, planned extension, pricing/SLA, max questions, empty response).
+  - `errors.py`: 6 excepciones controladas (SalesDiagnosisRuntimeError, RetrievalUnavailableError, LLMUnavailableError, GuardrailViolationError, UnsafeResponseError, InvalidAssistantRuntimeInputError).
+  - `runtime.py`: AssistantConversationRuntime skeleton con metodo handle_turn() que valida input, carga estado, emite eventos progresivos, aplica fallback seguro sin LLM sin Milvus y registra metricas/auditoria.
+  - `README.md`: documentacion del modulo.
+  - `__init__.py`: export publico completo.
+- Se crearon 37 tests en `backend/tests/test_sales_diagnosis_runtime_contracts.py` que cubren:
+  - Contratos: validacion de campos requeridos, serializacion, defaults.
+  - Runtime skeleton: fallback sin LLM, eventos progresivos, state repo, capacidades futuras.
+  - GuardrailPolicy: Step-to-Action detection, forbidden claims con/sin negacion, pricing/SLA, max questions, empty response, fallback responses.
+  - PromptPolicy: safe ack por dominio, system prompt con reglas, turn prompt con user message.
+  - Providers: Null providers, InMemoryStateRepository roundtrip.
+  - Constantes: PLANNED_EXTENSIONS, FORBIDDEN_TERMS, SAFE_ACK_TEXT.
+- Validacion: `uv run pytest tests/test_sales_diagnosis_runtime_contracts.py` = 37/37 passed.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se llama Milvus, no se toca DB.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
 
 ### 2026-06-10 - Documento global de orquestacion Team360
 
