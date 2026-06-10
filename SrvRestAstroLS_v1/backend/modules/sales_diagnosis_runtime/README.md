@@ -611,6 +611,55 @@ uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
 - ArangoDB / cross-encoder.
 - Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
 
+## Fase 1.8l — Provider mode boundary
+
+### Que cambio
+
+El endpoint interno/dev ahora expone dos nuevas variables de entorno para
+seleccionar el proveedor de retrieval y LLM:
+
+| Variable | Default | Valores aceptados | Descripcion |
+|----------|---------|-------------------|-------------|
+| `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER` | `fake` | `fake` | Fake retrieval (no Milvus). Futuros valores: `milvus`. |
+| `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER` | `fake` | `fake` | Fake LLM (no OpenAI/LiteLLM). Futuros valores: `openai`, `litellm`. |
+
+### Comportamiento
+
+- **Default:** ambos son `fake`. Comportamiento identico a Fase 1.8h.
+- **Valor invalido:** HTTP 500 con mensaje controlado que lista valores aceptados.
+- **`dev_test_unsafe_llm` en metadata:** tiene prioridad sobre la env var `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER`. Si se activa, usa `_DevUnsafeFakeLLMProvider` independientemente del valor de la env var.
+- No hay proveedores reales conectados — solo el boundary preparado.
+
+### Funciones nuevas
+
+En `routes/sales_diagnosis_runtime_dev.py`:
+
+- `_resolve_retrieval_provider()` — lee `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER`, retorna `_DevFakeRetrievalProvider` o lanza HTTP 500.
+- `_resolve_llm_provider(metadata)` — primero evalua flag `dev_test_unsafe_llm` en metadata; si no esta, lee `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER`. Retorna `_DevFakeLLMProvider`, `_DevUnsafeFakeLLMProvider` o lanza HTTP 500.
+
+### Tests nuevos (10)
+
+En `tests/test_sales_diagnosis_runtime_dev_route.py`:
+
+| Test | Que valida |
+|------|------------|
+| `test_default_uses_fake_retrieval_provider` | Sin env, `_resolve_retrieval_provider()` retorna `_DevFakeRetrievalProvider` |
+| `test_default_uses_fake_llm_provider` | Sin env, `_resolve_llm_provider({})` retorna `_DevFakeLLMProvider` |
+| `test_explicit_fake_retrieval_provider_is_accepted` | `=fake` explicito aceptado |
+| `test_explicit_fake_llm_provider_is_accepted` | `=fake` explicito aceptado |
+| `test_invalid_retrieval_provider_returns_controlled_error` | HTTP 500 con `"milvus"` y `"fake"` en mensaje |
+| `test_invalid_llm_provider_returns_controlled_error` | HTTP 500 con `"openai"` y `"fake"` en mensaje |
+| `test_unsafe_llm_flag_takes_precedence_over_env` | Metadata flag gana a env var `=fake` |
+| `test_unsafe_llm_flag_works_without_env` | Metadata flag funciona sin env var |
+| `test_explicit_fake_env_does_not_break_runtime` | HTTP 201, response contract intacto |
+| `test_invalid_provider_does_not_leak_secrets` | HTTP 500 sin `sk-` ni `password` |
+
+### No implementa
+
+- Milvus real.
+- OpenAI/LiteLLM real.
+- Conexion a proveedores reales — solo el boundary selector.
+
 ## Proximas fases sugeridas
 
 1. ~~1.8b -- MilvusRetrievalProvider runtime con fallback pgvector.~~ **(Completado)**
@@ -623,3 +672,4 @@ uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
 8. ~~1.8i -- Dev endpoint hardening + smoke script.~~ **(Completado)**
 9. ~~1.8j -- Postgres opt-in state repository for dev endpoint.~~ **(Completado)**
 10. ~~1.8k -- Postgres opt-in HTTP smoke for dev endpoint.~~ **(Completado)**
+11. ~~1.8l -- Provider mode boundary.~~ **(Completado)**

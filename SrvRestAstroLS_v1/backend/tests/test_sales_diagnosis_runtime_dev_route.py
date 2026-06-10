@@ -12,8 +12,15 @@ from litestar.testing import TestClient
 
 from app import create_app
 from routes.sales_diagnosis_runtime_dev import (
+    _DEV_LLM_PROVIDER_ENV,
+    _DEV_RETRIEVAL_PROVIDER_ENV,
     _DEV_STATE_REPOSITORY_ENV,
+    _DevFakeLLMProvider,
+    _DevFakeRetrievalProvider,
     _DevPostgresStateRepository,
+    _DevUnsafeFakeLLMProvider,
+    _resolve_llm_provider,
+    _resolve_retrieval_provider,
     _resolve_state_repository,
 )
 from modules.sales_diagnosis_runtime.state_repository import (
@@ -116,6 +123,101 @@ class TestDevSalesDiagnosisRouteStateRepository:
             assert "'postgres'" in body_text
         finally:
             os.environ.pop(_DEV_STATE_REPOSITORY_ENV, None)
+
+
+class TestDevSalesDiagnosisRouteProviders:
+    """Tests for provider mode selection in the dev endpoint."""
+
+    def test_default_uses_fake_retrieval_provider(self):
+        os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+        provider = _resolve_retrieval_provider()
+        assert isinstance(provider, _DevFakeRetrievalProvider)
+
+    def test_default_uses_fake_llm_provider(self):
+        os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+        provider = _resolve_llm_provider({})
+        assert isinstance(provider, _DevFakeLLMProvider)
+
+    def test_explicit_fake_retrieval_provider_is_accepted(self):
+        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "fake"
+        try:
+            provider = _resolve_retrieval_provider()
+            assert isinstance(provider, _DevFakeRetrievalProvider)
+        finally:
+            os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+
+    def test_explicit_fake_llm_provider_is_accepted(self):
+        os.environ[_DEV_LLM_PROVIDER_ENV] = "fake"
+        try:
+            provider = _resolve_llm_provider({})
+            assert isinstance(provider, _DevFakeLLMProvider)
+        finally:
+            os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+
+    def test_invalid_retrieval_provider_returns_controlled_error(self):
+        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "milvus"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            body_text = resp.text
+            assert "milvus" in body_text
+            assert "fake" in body_text
+        finally:
+            os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+
+    def test_invalid_llm_provider_returns_controlled_error(self):
+        os.environ[_DEV_LLM_PROVIDER_ENV] = "openai"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            body_text = resp.text
+            assert "openai" in body_text
+            assert "fake" in body_text
+        finally:
+            os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+
+    def test_unsafe_llm_flag_takes_precedence_over_env(self):
+        os.environ[_DEV_LLM_PROVIDER_ENV] = "fake"
+        try:
+            provider = _resolve_llm_provider({"dev_test_unsafe_llm": True})
+            assert isinstance(provider, _DevUnsafeFakeLLMProvider)
+        finally:
+            os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+
+    def test_unsafe_llm_flag_works_without_env(self):
+        os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+        provider = _resolve_llm_provider({"dev_test_unsafe_llm": True})
+        assert isinstance(provider, _DevUnsafeFakeLLMProvider)
+
+    def test_explicit_fake_env_does_not_break_runtime(self):
+        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "fake"
+        os.environ[_DEV_LLM_PROVIDER_ENV] = "fake"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_201_CREATED
+            body = resp.json()
+            assert body["runtime_mode"] == "dev_fake"
+            assert body["turn_count"] == 1
+        finally:
+            os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
+            os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
+
+    def test_invalid_provider_does_not_leak_secrets(self):
+        os.environ[_DEV_RETRIEVAL_PROVIDER_ENV] = "invalid_retrieval"
+        try:
+            with _client() as client:
+                resp = client.post(DEV_TURN_PATH, json=_default_payload())
+            assert resp.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+            body_text = resp.text.lower()
+            assert "sk-" not in body_text
+            assert "password" not in body_text
+            assert "invalid_retrieval" in body_text
+            assert "'fake'" in body_text
+        finally:
+            os.environ.pop(_DEV_RETRIEVAL_PROVIDER_ENV, None)
 
 
 def _json_dumps(obj: dict) -> str:

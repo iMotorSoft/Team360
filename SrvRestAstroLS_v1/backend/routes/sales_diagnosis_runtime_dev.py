@@ -12,6 +12,15 @@ State repository selection (env var):
   via psycopg 3 sync (requires TEAM360_DB_URL and migration 007 applied).
   This is an opt-in dev mode, not production.
 
+Retrieval provider selection (env var):
+- Default (unset or "fake"): _DevFakeRetrievalProvider (no Milvus)
+- Invalid values: HTTP 500 controlled error
+
+LLM provider selection (env var):
+- Default (unset or "fake"): _DevFakeLLMProvider (no OpenAI/LiteLLM)
+- Invalid values: HTTP 500 controlled error
+- Request metadata flag ``dev_test_unsafe_llm`` (bool) takes precedence over env var.
+
 Request metadata flags:
 - ``dev_test_unsafe_llm`` (bool): if true, uses a FakeLLMProvider that returns
   unsafe text to exercise guardrail policy. Dev-only, not for prod.
@@ -126,6 +135,8 @@ class _DevUnsafeFakeLLMProvider:
 # ---------------------------------------------------------------------------
 
 _DEV_STATE_REPOSITORY_ENV = "TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY"
+_DEV_RETRIEVAL_PROVIDER_ENV = "TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER"
+_DEV_LLM_PROVIDER_ENV = "TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER"
 _TABLE_NAME = "sales_diagnosis_conversation_states"
 
 _shared_inmemory_repo = InMemoryConversationStateRepository()
@@ -228,6 +239,34 @@ def _resolve_state_repository():
     )
 
 
+def _resolve_retrieval_provider() -> RetrievalProvider:
+    mode = os.environ.get(_DEV_RETRIEVAL_PROVIDER_ENV, "").strip().lower()
+    if not mode or mode == "fake":
+        return _DevFakeRetrievalProvider()
+    raise HTTPException(
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=(
+            f"Invalid {_DEV_RETRIEVAL_PROVIDER_ENV}={mode!r}. "
+            "Use 'fake' (default)."
+        ),
+    )
+
+
+def _resolve_llm_provider(metadata: dict) -> LLMProvider:
+    if metadata.get("dev_test_unsafe_llm"):
+        return _DevUnsafeFakeLLMProvider()
+    mode = os.environ.get(_DEV_LLM_PROVIDER_ENV, "").strip().lower()
+    if not mode or mode == "fake":
+        return _DevFakeLLMProvider()
+    raise HTTPException(
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=(
+            f"Invalid {_DEV_LLM_PROVIDER_ENV}={mode!r}. "
+            "Use 'fake' (default)."
+        ),
+    )
+
+
 def _resolve_postgres_dsn() -> str:
     from globalVar import get_team360_db_url_psql
 
@@ -249,14 +288,9 @@ def _resolve_postgres_dsn() -> str:
 
 
 def _build_dev_runtime(metadata: dict) -> AssistantConversationRuntime:
-    retrieval: RetrievalProvider = _DevFakeRetrievalProvider()
-    if metadata.get("dev_test_unsafe_llm"):
-        llm: LLMProvider = _DevUnsafeFakeLLMProvider()
-    else:
-        llm = _DevFakeLLMProvider()
     return AssistantConversationRuntime(
-        retrieval_provider=retrieval,
-        llm_provider=llm,
+        retrieval_provider=_resolve_retrieval_provider(),
+        llm_provider=_resolve_llm_provider(metadata),
         state_repository=_resolve_state_repository(),
         prompt_policy=PromptPolicy(),
         guardrail_policy=GuardrailPolicy(),

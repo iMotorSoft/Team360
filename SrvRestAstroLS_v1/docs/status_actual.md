@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8k — Postgres opt-in HTTP smoke for dev endpoint)
+Ultima actualizacion: 2026-06-10 (Fase 1.8l — Provider mode boundary)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,21 @@ Ultima actualizacion: 2026-06-10 (Fase 1.8k — Postgres opt-in HTTP smoke for d
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.8l — Provider mode boundary for dev endpoint
+
+- Se agregaron dos nuevas variables de entorno en `routes/sales_diagnosis_runtime_dev.py`:
+  - `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER` (default `fake`) — selecciona proveedor de retrieval.
+  - `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER` (default `fake`) — selecciona proveedor de LLM.
+- `_resolve_retrieval_provider()`: acepta `fake`, rechaza valores invalidos con HTTP 500.
+- `_resolve_llm_provider(metadata)`: prioriza flag `dev_test_unsafe_llm` en metadata sobre env var.
+- `_build_dev_runtime()` refactorizada para usar los nuevos resolvers.
+- No se conectaron proveedores reales — solo el boundary/config selector preparado y testeado.
+- Se agregaron 10 tests en `TestDevSalesDiagnosisRouteProviders`:
+  - Default, explicit fake, invalid values (controlled error, no secret leaks), unsafe flag precedence, runtime intacto.
+- Validacion: `uv run pytest` = 327 passed, 9 skipped (sin regresiones).
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes.
+- Sin creacion de rama nueva.
 
 ### 2026-06-10 - Team360 DB URL visible en globalVar
 
