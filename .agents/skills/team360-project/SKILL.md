@@ -101,6 +101,23 @@ Reglas de uso:
 13. Mantener SQL en repositories; no escribir SQL en endpoints ni rutas.
 14. No mezclar pools de conexión: Team360 usa `psycopg_pool.AsyncConnectionPool` para `public.*`; LangGraph PostgresSaver usa su pool interno para `langgraph.*`.
 
+## Convenciones para lab
+
+### Ownership de experimentos `lab/`
+
+Los experimentos en `SrvRestAstroLS_v1/lab/` pueden existir en distintas ramas.
+
+La rama correcta se decide por la hipótesis validada y el sistema bajo prueba, no solo por el nombre del directorio.
+
+Guía:
+
+- `feature/console-backend-core`: experimentos de backend runtime, assistant productivo, UX real conectada, rutas, diagnosis API o experiencia final de consola.
+- `feature/knowledge-ingestion-service`: experimentos de embeddings, chunking, scanner, retrieval, package behavior, validación de knowledge packages o golden answers de ingesta.
+- `docs/knowledge-documents-foundation`: experimentos de estructura documental, authoring, metadata, manuales, contenido curado o paquetes knowledge editoriales.
+- `ux/team360-console-design-handoff`: experimentos puramente visuales de handoff.
+
+Antes de mover o commitear un experimento `lab/`, preguntar: "¿qué hipótesis valida y qué sistema está bajo prueba?".
+
 ## Convenciones para Mercado Libre browser lab
 - `browser/` contiene helpers reutilizables
 - `probes/` contiene scripts ejecutables aislados
