@@ -105,6 +105,20 @@ class TestPromptPolicyHardened:
         assert "vendible" in prompt
         assert "planned_extension" in prompt or "extensión" in prompt
 
+    def test_system_prompt_contains_headless_quality_rubric(self):
+        policy = PromptPolicy()
+        prompt = policy.build_system_prompt().lower()
+        assert "respuesta directa" in prompt
+        assert "pocos minutos" in prompt
+        assert "menos de 10 minutos" in prompt
+        assert "no hace falta instalar software" in prompt
+        assert "mfa" in prompt
+        assert "requiere aprobación humana" in prompt
+        assert "formulario de leads disfrazado" in prompt
+        assert "preliminar" in prompt
+        assert "caso por caso" in prompt
+        assert "no conviene automatizar" in prompt
+
 
 # ===================================================================
 # GuardrailPolicy — individual capability checks
@@ -236,6 +250,14 @@ class TestGuardrailPolicyEvaluate:
         assert not result.passed
         assert result.planned_extension_misrepresented
 
+    def test_whatsapp_channel_without_handoff_claim_passes(self):
+        policy = GuardrailPolicy()
+        result = policy.evaluate_response(
+            "Podemos evaluar consultas que llegan por WhatsApp, "
+            "sin vender WhatsApp handoff como listo."
+        )
+        assert result.passed
+
     def test_crm_evaluate_rejects_ready_claim(self):
         policy = GuardrailPolicy()
         result = policy.evaluate_response(
@@ -243,6 +265,14 @@ class TestGuardrailPolicyEvaluate:
         )
         assert not result.passed
         assert result.planned_extension_misrepresented
+
+    def test_crm_comparison_without_ready_claim_passes(self):
+        policy = GuardrailPolicy()
+        result = policy.evaluate_response(
+            "El diagnóstico diferencia Team360 hoy de una alternativa con otro "
+            "partner o CRM externo; no promete capacidades futuras."
+        )
+        assert result.passed
 
     def test_auto_billing_evaluate_rejects_ready_claim(self):
         policy = GuardrailPolicy()
@@ -292,6 +322,53 @@ class TestGuardrailPolicyEvaluate:
             "No tenemos información de SLA. Consultá con nuestro equipo comercial."
         )
         assert not result.pricing_sla_hallucination
+
+    def test_diagnostic_response_time_without_implementation_claim_passes(self):
+        policy = GuardrailPolicy()
+        result = policy.evaluate_response(
+            "El diagnóstico responde en pocos minutos, normalmente en menos "
+            "de 10 minutos; no promete implementación inmediata."
+        )
+        assert result.passed
+
+    def test_implementation_timeline_claim_without_decline_fails(self):
+        policy = GuardrailPolicy()
+        result = policy.evaluate_response(
+            "El plazo de implementación garantizado es de 2 días."
+        )
+        assert not result.passed
+
+    def test_scope_dependent_cost_or_timeline_passes(self):
+        policy = GuardrailPolicy()
+        result = policy.evaluate_response(
+            "El diagnóstico es preliminar: el costo y los plazos dependen "
+            "del alcance y deben pactarse antes de implementar."
+        )
+        assert result.passed
+
+    def test_commercially_acidic_answers_pass_when_honest(self):
+        policy = GuardrailPolicy()
+        safe_answers = [
+            (
+                "No es lead generation disfrazada: el diagnóstico debe ser "
+                "honesto y puede decir que no conviene automatizar."
+            ),
+            (
+                "El diagnóstico es preliminar, puede requerir validación "
+                "adicional y no promete asumir el costo de la falla."
+            ),
+            (
+                "No siempre es automatizable; se evalúa caso por caso y "
+                "a veces conviene no automatizar."
+            ),
+            (
+                "Si depende de MFA o permisos cerrados, puede quedar bloqueado "
+                "y requiere aprobación humana; no se bypassa MFA."
+            ),
+        ]
+        for answer in safe_answers:
+            result = policy.evaluate_response(answer)
+            assert result.passed, result.notes
 
     def test_too_many_questions_fails(self):
         policy = GuardrailPolicy()

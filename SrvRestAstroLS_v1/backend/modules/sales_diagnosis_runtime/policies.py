@@ -37,15 +37,49 @@ class PromptPolicy:
             "Tu objetivo es entender qué necesita el usuario, "
             "recuperar contexto del knowledge base y orientar sin prometer "
             "capacidades no disponibles. "
+            "Respondé primero con una respuesta directa a la pregunta del usuario "
+            "en 1 o 2 frases; "
+            "después explicá el límite o el próximo paso si hace falta. "
             "No inventes precios, plazos, SLA ni integraciones no documentadas. "
             "No vendas Step-to-Action, lead_capture, diagnostic_code, "
             "WhatsApp handoff, CRM ni cierre de ventas automático como disponibles. "
+            "No afirmes integración CRM vía API REST como lista; si aparece CRM "
+            "en el contexto, tratalo como referencia externa o no documentada "
+            "salvo que la fuente diga explícitamente que está disponible hoy. "
             "Diferenciá claramente entre:\n"
             "- **automatizable**: existe documentación y se puede vender hoy.\n"
             "- **vendible hoy**: hay pricing o caso de uso documentado.\n"
             "- **planned_extension**: aparece como capacidad futura, "
             "no debe venderse como lista.\n"
             "- **no documentado**: no hay información en el knowledge base.\n"
+            "Reglas de respuesta para el diagnóstico headless:\n"
+            "- Para tiempo de diagnóstico, podés decir que responde en pocos minutos "
+            "o normalmente en menos de 10 minutos; no prometas implementación inmediata.\n"
+            "- Para instalación inicial, si no hay una fuente que diga lo contrario, "
+            "indicá que no hace falta instalar software para empezar y que se usa "
+            "desde el navegador.\n"
+            "- Para estado actual del proceso, distinguí manual, parcialmente "
+            "automatizado y ya automatizado; no asumas que todo es manual.\n"
+            "- Para MFA, permisos cerrados o sistemas restringidos, explicá que "
+            "puede quedar bloqueado, requiere aprobación humana y no se deben "
+            "bypassear controles.\n"
+            "- Para comparación con partners, diferenciá Team360 hoy de alternativas "
+            "externas y no prometas capacidades futuras.\n"
+            "- Para preguntas sobre lead generation, aclarar que el diagnóstico no "
+            "debe ser un formulario de leads disfrazado: debe ser honesto y puede "
+            "decir que no conviene automatizar.\n"
+            "- Para alucinación, responsabilidad o costo de error, aclarar que el "
+            "diagnóstico es preliminar, no garantiza viabilidad, no afirma sin datos "
+            "y puede requerir validación adicional.\n"
+            "- Para trampas o respuestas falsas, explicá que la calidad de la "
+            "información cambia el resultado y que no conviene mentir.\n"
+            "- Para incentivos comerciales, respondé que no siempre es automatizable, "
+            "la evaluación es caso por caso y a veces conviene no automatizar.\n"
+            "Frases canónicas útiles cuando aplican: no necesitas instalar nada; "
+            "detecta si ya está automatizado; distingue manual de automatizado; "
+            "puede quedar bloqueado por permisos cerrados; diferencia entre "
+            "Team360 hoy y otro partner; diagnóstico honesto; si no hay datos "
+            "no afirma; respuestas falsas cambian el resultado.\n"
             "Hacé máximo 3 preguntas por turno. "
             "Respondé en español claro, sin HTML, sin formato AG-UI."
         )
@@ -76,6 +110,9 @@ class PromptPolicy:
         parts.append(
             "\nRespondé de forma útil, concreta y sin prometer "
             "capacidades no disponibles. "
+            "Formato recomendado: respuesta directa, límite honesto y próximo "
+            "paso concreto si aplica. Evitá responder con un bloqueo genérico "
+            "cuando la pregunta sea comercialmente válida. "
             "Máximo 3 preguntas. Usá español claro. Sin HTML ni AG-UI."
         )
         return "\n".join(parts)
@@ -130,17 +167,58 @@ class GuardrailPolicy:
         "no contamos",
         "no tenemos información",
         "no documentado",
+        "no define",
+        "no fija",
+        "no informa",
+        "no cubre",
         "consultá con nuestro equipo",
         "no debe venderse como listo",
         "no debe venderse como lista",
+        "no prometo",
+        "no prometemos",
+        "no promete",
+        "no garantiza",
+        "no garantizamos",
+        "no asumimos",
+        "sin prometer",
+        "sin vender",
+        "no vender",
+        "preliminar",
+        "validación adicional",
+        "validacion adicional",
+        "caso por caso",
+        "no siempre",
+        "no conviene automatizar",
+        "depende del alcance",
+        "depende del acuerdo",
+        "según el alcance",
+        "segun el alcance",
+        "debe pactarse",
+        "puede quedar bloqueado",
+        "requiere aprobación humana",
+        "requiere aprobacion humana",
     })
 
     CAPABILITY_PATTERNS: dict[str, tuple[str, ...]] = {
         "step_to_action": ("step-to-action", "steptoaction"),
         "lead_capture": ("lead capture", "lead_capture"),
         "diagnostic_code": ("diagnostic code", "diagnostic_code", "código de diagnóstico"),
-        "whatsapp_handoff": ("whatsapp handoff", "whatsapp_handoff", "whatsapp"),
-        "crm": ("crm", "customer relationship management"),
+        "whatsapp_handoff": (
+            "whatsapp handoff",
+            "whatsapp_handoff",
+            "handoff por whatsapp",
+            "traspaso a whatsapp",
+        ),
+        "crm": (
+            "integración con crm",
+            "integracion con crm",
+            "crm integrado",
+            "crm lista",
+            "crm listo",
+            "crm operativo",
+            "crm disponible",
+            "customer relationship management",
+        ),
         "auto_billing": (
             "cierre de ventas automático",
             "facturación automática",
@@ -257,6 +335,7 @@ class GuardrailPolicy:
             "no", "no tenemos", "no contamos", "no está",
             "todavía no", "falta", "no documentado",
             "sin prometer", "evita prometer",
+            "depende", "según el alcance", "segun el alcance",
         }
         idx = text.find(term)
         if idx == -1:

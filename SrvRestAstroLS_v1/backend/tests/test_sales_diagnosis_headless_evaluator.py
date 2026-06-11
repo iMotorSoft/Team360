@@ -74,6 +74,12 @@ def test_forbidden_claim_detection_honors_simple_negation():
     assert "garantizado" not in hits
 
 
+def test_forbidden_claim_detection_honors_adjacent_no_negation():
+    text = "El diagnóstico es preliminar y no garantiza viabilidad."
+    hits = evaluator._find_forbidden_hits(text, [])
+    assert "garantiza" not in hits
+
+
 def test_forbidden_claim_detection_flags_unnegated_promises():
     text = "Garantizamos la automatización de cualquier proceso."
     hits = evaluator._find_forbidden_hits(text, [])

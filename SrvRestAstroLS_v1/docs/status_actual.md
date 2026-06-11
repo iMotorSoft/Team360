@@ -1913,3 +1913,57 @@ Incluye estructura inicial para:
   - `uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py --allow-empty-results` con `TEAM360_MILVUS_HOST=127.0.0.1` y collection/scope/version alineados = **16/16 passed**, sources reales, sin `dev_doc_*`.
 - No se toco frontend, Astro, Svelte, UI, Console, SSE productivo, pgvector, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
 - Pendiente recomendado: Fase 1.9q para PromptPolicy/GuardrailPolicy tuning si se quiere convertir WARN/FAIL de calidad en PASS sin tocar el diagnostico de fallback.
+
+### 2026-06-11 - Fase 1.9q - Headless PromptPolicy/GuardrailPolicy tuning
+
+- Confirmacion inicial:
+  - rama activa: `feature/console-backend-core`;
+  - worktree inicial limpio;
+  - Fase 1.9p committed en `1beb0af test(backend): fix headless evaluator litellm fallback detection`;
+  - no se creo rama nueva;
+  - no se hizo `git add` ni commit.
+- Analisis inicial:
+  - LiteLLM/fake pre-ajuste: **0 PASS / 8 WARN / 2 FAIL / 0 SKIP** en la corrida observada; sin provider fallback masivo.
+  - LiteLLM/Milvus pre-ajuste: **0 PASS / 10 WARN / 0 FAIL / 0 SKIP** en la corrida observada; `response_is_fallback=false`, sources reales, pero guardrail fallback en varios casos.
+  - Los WARN/FAIL eran de calidad, prompt o falsos positivos de guardrail/scoring, no de LiteLLM roto.
+- Cambios en `PromptPolicy`:
+  - respuesta directa antes de limites/proximo paso;
+  - rubrica para rapidez, instalacion, proceso manual/automatizado, MFA/permisos cerrados, partners, lead generation, alucinacion, responsabilidad, respuestas falsas e incentivo comercial;
+  - aclaracion de no vender CRM via API REST como disponible hoy salvo fuente explicita;
+  - frases canonicas reutilizables para mejorar cobertura semantica sin hardcodear por `case_id`.
+- Cambios en `GuardrailPolicy`:
+  - declinaciones seguras ampliadas (`preliminar`, `validacion adicional`, `caso por caso`, `depende del alcance`, `debe pactarse`, `requiere aprobacion humana`);
+  - deteccion de `WhatsApp` y `CRM` reducida a claims de capacidad lista para evitar falsos positivos;
+  - se mantienen bloqueos de Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM listo/integrado, cierre automatico, bypass de MFA, promesas absolutas y claims de precio/SLA/plazo no soportados.
+- Cambios en evaluator:
+  - `_phrase_negated()` ahora reconoce negacion adyacente como `no garantiza viabilidad`, evitando FAIL falso por forbidden claim `garantiza`.
+- Resultados finales del evaluator:
+  - fake/fake: **0 PASS / 10 WARN / 0 FAIL / 0 SKIP**; `response_is_fallback=true` esperado por LLM fake.
+  - LiteLLM/fake `openai_gpt-5-nano`: **2 PASS / 8 WARN / 0 FAIL / 0 SKIP**; `response_is_fallback=false`.
+  - LiteLLM/Milvus `openai_gpt-5-nano`: **5 PASS / 5 WARN / 0 FAIL / 0 SKIP**; `response_is_fallback=false`, sources reales, objetivo minimo alcanzado.
+  - LiteLLM/Milvus `gpt5.5-nano`: comparacion opcional no utilizable; **10/10 provider fallback** (`response_is_fallback=true`), documentado como SKIP operativo sin tocar config LiteLLM.
+- Acotacion Milvus:
+  - se uso Milvus estandar local `milvus26-standalone` con host `127.0.0.1`, MinIO `milvus26-minio` y etcd `milvus26-etcd`;
+  - collection `team360_lab_pgvector_benchmark_openai_small_1536`;
+  - scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`;
+  - embedding version `team360-openai-small-1536-v1`;
+  - no se uso token Milvus ni se activo Milvus por default.
+- Casos que siguen en WARN en LiteLLM/Milvus principal:
+  - `mfa_closed_004`, `partner_compare_005`, `leadgen_disguised_006`, `hallucination_007`, `trap_wrong_answers_009`;
+  - no son FAIL criticos ni provider fallback; quedan como posibles mejoras de prompt/policy posteriores si se busca superar el minimo.
+- Tests ejecutados:
+  - `uv run pytest tests/test_sales_diagnosis_headless_evaluator.py` = **12 passed**.
+  - `uv run pytest tests/test_sales_diagnosis_runtime_route.py` = **42 passed**.
+  - `uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py` = **36 passed**.
+  - `uv run pytest` = **398 passed, 9 skipped**.
+- Smokes de no regresion ejecutados:
+  - `uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --backend-url http://127.0.0.1:8018` = **30/30 passed**.
+  - `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --backend-url http://127.0.0.1:8018 --cleanup` = **30/30 passed**.
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py --backend-url http://127.0.0.1:8018 --cleanup` = **22/22 passed**.
+  - product adapter Milvus con host `127.0.0.1`, collection/scope/version alineados = **16/16 passed**, sources reales, sin `dev_doc_*`.
+  - product adapter LiteLLM con `openai_gpt-5-nano` = **13/13 passed**, `LiteLLM responded (not fallback)`.
+- Validaciones finales:
+  - `git diff --check` = OK.
+  - Secret scan = sin secretos reales; solo nombres literales permitidos, ejemplos documentales y claves fake de tests.
+- No se toco frontend, Astro, Svelte, UI, Console, SSE productivo, pgvector, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- LLM fake sigue default, retrieval fake sigue default, LiteLLM y Milvus siguen opt-in.

@@ -2249,3 +2249,71 @@ Los WARN/FAIL restantes pertenecen a calidad/guardrails y quedan como entrada
 para una fase posterior de PromptPolicy/GuardrailPolicy tuning.
 - Milvus sigue opt-in.
 - Product adapter sigue feature-flagged.
+
+## Fase 1.9q — Headless PromptPolicy/GuardrailPolicy tuning
+
+### Objetivo
+
+Mejorar la calidad del diagnosticador headless sin relajar guardrails criticos,
+sin vender capacidades futuras y sin activar superficie de producto nueva.
+
+### Cambios aplicados
+
+`PromptPolicy`:
+
+- exige respuesta directa antes de explicar limites;
+- agrega una rubrica reutilizable para preguntas sobre rapidez, instalacion,
+  estado manual/automatizado, MFA/permisos cerrados, partners, lead generation,
+  alucinacion, responsabilidad, respuestas falsas e incentivo comercial;
+- explicita que CRM via API REST no debe afirmarse como disponible hoy si la
+  fuente no lo documenta de forma explicita;
+- agrega frases canonicas para mejorar cobertura headless sin hardcodear por
+  `case_id` ni por texto exacto de pregunta.
+
+`GuardrailPolicy`:
+
+- amplia declinaciones seguras: `no promete`, `preliminar`,
+  `validacion adicional`, `caso por caso`, `depende del alcance`,
+  `debe pactarse`, `requiere aprobacion humana`;
+- reduce falsos positivos de `WhatsApp` y `CRM` a claims de capacidad lista,
+  manteniendo bloqueo de `WhatsApp handoff`, `CRM integrado/listo`,
+  `lead_capture`, `diagnostic_code`, Step-to-Action y cierre automatico;
+- permite respuestas comerciales acidas honestas cuando niegan automatizacion
+  forzada, lead generation disfrazada, bypass de MFA o garantias absolutas.
+
+`evaluate_sales_diagnosis_headless_responses.py`:
+
+- corrige scoring de negacion adyacente para no tratar `no garantiza
+  viabilidad` como forbidden claim `garantiza`.
+
+### Resultados finales observados
+
+Backend levantado en `127.0.0.1:8018`.
+
+| Escenario | Resultado | Fallback provider | Notas |
+| --- | ---: | --- | --- |
+| fake/fake | 0 PASS / 10 WARN / 0 FAIL / 0 SKIP | `true` esperado por fake LLM | Default seguro intacto |
+| LiteLLM/fake `openai_gpt-5-nano` | 2 PASS / 8 WARN / 0 FAIL / 0 SKIP | `false` | Sin Milvus, varios casos siguen parciales |
+| LiteLLM/Milvus `openai_gpt-5-nano` | 5 PASS / 5 WARN / 0 FAIL / 0 SKIP | `false` | Objetivo minimo alcanzado, sources reales |
+| LiteLLM/Milvus `gpt5.5-nano` | SKIP operativo | `true` en 10/10 | Alias no utilizable en proxy actual; no se cambio config |
+
+Milvus se ejecuto con instancia local estandar (`milvus26-standalone`) y:
+
+- `TEAM360_MILVUS_HOST=127.0.0.1`;
+- `TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536`;
+- `TEAM360_KNOWLEDGE_SCOPE_ID=8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`;
+- `TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1`.
+
+Los WARN restantes no son fallback masivo de LiteLLM. Se concentran en casos
+donde el modelo todavia responde con fallback de guardrail o cubre parcialmente
+claims esperados. No hubo FAIL criticos en el escenario principal
+LiteLLM/Milvus.
+
+### Invariantes conservadas
+
+- Product adapter sigue feature-flagged.
+- LLM fake sigue default.
+- Retrieval fake sigue default.
+- LiteLLM y Milvus siguen opt-in.
+- No se activo frontend, SSE productivo, Step-to-Action, lead_capture,
+  diagnostic_code, WhatsApp handoff ni CRM real.

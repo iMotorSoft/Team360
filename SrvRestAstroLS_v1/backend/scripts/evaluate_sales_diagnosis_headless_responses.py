@@ -198,6 +198,8 @@ def _phrase_negated(text_norm: str, phrase_norm: str) -> bool:
     if index < 0:
         return False
     window = text_norm[max(0, index - 70):index]
+    if window.rstrip().endswith("no"):
+        return True
     return any(neg in window for neg in NEGATION_PHRASES)
 
 
