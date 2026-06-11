@@ -18,6 +18,9 @@ LLM provider (env var):
 - ``TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai``: uses
   _ProductOpenAILLMProvider with OpenAI direct (requires TEAM360_OPENAI_KEY
   or OPENAI_API_KEY). Model via TEAM360_OPENAI_MODEL (default gpt-5-nano).
+- ``TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm``: uses
+  _ProductLiteLLMProvider via LiteLLM proxy (requires TEAM360_LITELLM_BASE_URL
+  and TEAM360_LITELLM_API_KEY). Default model alias: openai_gpt-5-nano.
 - Invalid values: HTTP 503 controlled error
 
 Safe provider defaults when enabled:
@@ -40,6 +43,10 @@ from litestar.status_codes import (
     HTTP_503_SERVICE_UNAVAILABLE,
 )
 
+from modules.automation_diagnosis.litellm_client import (
+    LiteLLMClient,
+    LiteLLMClientError,
+)
 from modules.sales_diagnosis_runtime import (
     AssistantConversationRuntime,
     AssistantTurnInput,
@@ -229,17 +236,80 @@ class _ProductOpenAILLMProvider:
             return SAFE_ACK_TEXT
 
 
+class _ProductLiteLLMProvider:
+    """LiteLLM provider for product adapter via LiteLLM proxy.
+
+    Requires TEAM360_LITELLM_BASE_URL and TEAM360_LITELLM_API_KEY.
+    Default model alias: openai_gpt-5-nano.
+    Uses LiteLLMClient via urllib (no OpenAI SDK).
+    """
+
+    def __init__(self) -> None:
+        self._client = self._build_client()
+        self._prompt_policy = PromptPolicy()
+
+    @staticmethod
+    def _build_client() -> LiteLLMClient:
+        base_url = os.environ.get("TEAM360_LITELLM_BASE_URL")
+        if not base_url:
+            raise HTTPException(
+                status_code=HTTP_503_SERVICE_UNAVAILABLE,
+                detail=(
+                    f"{PRODUCT_LLM_PROVIDER_ENV}=litellm requires "
+                    "TEAM360_LITELLM_BASE_URL."
+                ),
+            )
+        try:
+            return LiteLLMClient(base_url=base_url, api_key=None)
+        except LiteLLMClientError as exc:
+            raise HTTPException(
+                status_code=HTTP_503_SERVICE_UNAVAILABLE,
+                detail=(
+                    f"{PRODUCT_LLM_PROVIDER_ENV}=litellm config error: "
+                    f"{exc}. Check TEAM360_LITELLM_API_KEY."
+                ),
+            ) from exc
+
+    def generate(
+        self,
+        input: AssistantTurnInput,
+        state: ConversationState,
+        context: list[RetrievedChunk],
+    ) -> str:
+        system_prompt = self._prompt_policy.build_system_prompt(
+            assistant_instance_code=input.assistant_instance_code,
+            package_code=input.package_code,
+        )
+        turn_prompt = self._prompt_policy.build_turn_prompt(input, state, context)
+        model = (
+            os.environ.get("TEAM360_LITELLM_MODEL_ALIAS")
+            or "openai_gpt-5-nano"
+        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": turn_prompt},
+        ]
+        try:
+            response = self._client.chat_completion(model=model, messages=messages)
+            return response.content
+        except Exception:
+            from modules.sales_diagnosis_runtime.contracts import SAFE_ACK_TEXT
+            return SAFE_ACK_TEXT
+
+
 def _resolve_product_llm_provider() -> LLMProvider:
     mode = os.environ.get(PRODUCT_LLM_PROVIDER_ENV, "").strip().lower()
     if not mode or mode == "fake":
         return _DevFakeLLMProvider()
     if mode == "openai":
         return _ProductOpenAILLMProvider()
+    if mode == "litellm":
+        return _ProductLiteLLMProvider()
     raise HTTPException(
         status_code=HTTP_503_SERVICE_UNAVAILABLE,
         detail=(
             f"Invalid {PRODUCT_LLM_PROVIDER_ENV}={mode!r}. "
-            "Use 'fake' (default) or 'openai'."
+            "Use 'fake' (default), 'openai' or 'litellm'."
         ),
     )
 

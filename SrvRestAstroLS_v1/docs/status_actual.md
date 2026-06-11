@@ -159,6 +159,29 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 La key OpenAI se resuelve desde `globalVar.get_team360_openai_key()`, que lee `OpenAI_Key_JAI_query`, `TEAM360_OPENAI_KEY` o `OPENAI_API_KEY` del entorno.
 No es necesario exportarla explicitamente si ya esta configurada.
 
+### 2026-06-11 - Fase 1.9h — Product adapter LiteLLM opt-in boundary
+
+- Se agrego `_ProductLiteLLMProvider` en `routes/sales_diagnosis_runtime.py`.
+- Usa `LiteLLMClient` de `modules.automation_diagnosis.litellm_client` (urllib, no OpenAI SDK).
+- Requiere `TEAM360_LITELLM_BASE_URL` y `TEAM360_LITELLM_API_KEY`.
+- Modelo default: `openai_gpt-5-nano` via `TEAM360_LITELLM_MODEL_ALIAS`.
+- `_resolve_product_llm_provider()` actualizado para aceptar `litellm`.
+- Errores de config devuelven HTTP 503 controlado (no 500 como dev endpoint).
+- Tests agregados (6): accept, missing base_url, missing api_key, no-leak, no-network, invalid provider msg actualizado.
+- Se creo `scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py`.
+- Smoke skip controlado si falta config (exit 0).
+- Smoke con flag `--allow-fallback`.
+- Se actualizaron:
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9h, matriz caso H.
+  - `scripts/README.md`: seccion Fase 1.9h.
+  - `docs/status_actual.md`: este registro.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real, Milvus, ArangoDB,
+  pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code,
+  WhatsApp handoff, CRM real, endpoint dev, smokes existentes, tests existentes.
+- No se agregaron tests que dependan de LiteLLM real.
+- No se modifico el contrato HTTP publico.
+- No se creo rama nueva.
+
 ```bash
 # Terminal 1:
 TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \

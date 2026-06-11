@@ -239,3 +239,69 @@ Script:
   Retrieval sigue fake, state debe ser explicito (inmemory_test o postgres).
   No activa frontend, SSE, Step-to-Action, lead_capture, diagnostic_code,
   WhatsApp handoff ni CRM real.
+
+### Fase 1.9h — Product adapter LiteLLM HTTP smoke
+
+Script:
+
+- `smoke_sales_diagnosis_runtime_product_adapter_litellm.py`: smoke HTTP para el
+  endpoint no-dev `POST /api/sales-diagnosis-runtime/turn` con
+  `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`.
+
+  Requiere backend corriendo con LiteLLM opt-in. Usa solo stdlib (urllib).
+  No levanta servidores.
+
+  Si `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER` no es `litellm` o faltan
+  `TEAM360_LITELLM_BASE_URL` o `TEAM360_LITELLM_API_KEY`, hace SKIP controlado
+  con exit 0.
+
+  Valida:
+  1. Request valido devuelve 201.
+  2. session_id preservado.
+  3. runtime_mode = `product_adapter_skeleton`.
+  4. Response contract estable (9 keys esperadas).
+  5. No Milvus real (chunks fake con prefijo `dev_doc_*`).
+  6. No stacktrace en errores 400.
+  7. No DB real leak (inmemory_test state).
+  8. Provider result event distingue respuesta real LiteLLM vs fallback
+     (SAFE_ACK_TEXT). Por defecto falla si detecta fallback.
+  9. turn_count incrementa (1 → 2).
+
+  Flags:
+  - `--allow-fallback`: no fallar si LiteLLM devolvio fallback seguro.
+
+  Comandos:
+
+  ```bash
+  cd backend
+
+  # terminal 1: backend con product adapter + LiteLLM
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+  TEAM360_LITELLM_API_KEY=sk-... \
+    uv run uvicorn app:app --host 127.0.0.1 --port 8018
+
+  # terminal 2: smoke LiteLLM (sin envs -> skip)
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py
+
+  # smoke LiteLLM (con envs -> real)
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+  TEAM360_LITELLM_API_KEY=sk-... \
+    uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py
+
+  # smoke LiteLLM (con allow-fallback)
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+  TEAM360_LITELLM_API_KEY=sk-... \
+    uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py --allow-fallback
+  ```
+
+  Modelo default: `openai_gpt-5-nano` via `TEAM360_LITELLM_MODEL_ALIAS`.
+
+  LiteLLM es opt-in explicito. No usa OpenAI directo, no activa Milvus.
+  Retrieval sigue fake, state debe ser explicito (inmemory_test o postgres).
+  No activa frontend, SSE, Step-to-Action, lead_capture, diagnostic_code,
+  WhatsApp handoff ni CRM real.

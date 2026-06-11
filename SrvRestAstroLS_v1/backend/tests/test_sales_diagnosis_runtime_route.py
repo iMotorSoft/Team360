@@ -329,6 +329,7 @@ def test_product_route_rejects_invalid_llm_provider(monkeypatch):
     assert "Invalid" in detail
     assert "fake" in detail
     assert "openai" in detail
+    assert "litellm" in detail
 
 
 def test_product_route_openai_missing_api_key_returns_controlled_error(monkeypatch):
@@ -368,6 +369,85 @@ def test_product_route_openai_mode_does_not_call_openai_in_unit_tests(monkeypatc
     monkeypatch.delenv("OpenAI_Key_JAI_query", raising=False)
     monkeypatch.setenv("TEAM360_OPENAI_KEY", "sk-test-key")
     called: list[bool] = []
+
+    original_resolve = product_routes._resolve_product_llm_provider
+
+    def _mock_resolve():
+        from routes.sales_diagnosis_runtime_dev import _DevFakeLLMProvider
+        return _DevFakeLLMProvider()
+
+    monkeypatch.setattr(product_routes, "_resolve_product_llm_provider", _mock_resolve)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    body = resp.json()
+    assert body["runtime_mode"] == "product_adapter_skeleton"
+    assert body["response_type"] == "final"
+
+
+def test_product_route_accepts_litellm_provider(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "litellm")
+    monkeypatch.setenv("TEAM360_LITELLM_BASE_URL", "http://localhost:4000")
+    monkeypatch.setenv("TEAM360_LITELLM_API_KEY", "sk-litellm-test")
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    body = resp.json()
+    assert body["runtime_mode"] == "product_adapter_skeleton"
+    assert body["fallback_applied"] is not None
+
+
+def test_product_route_litellm_missing_base_url_returns_controlled_error(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "litellm")
+    monkeypatch.delenv("TEAM360_LITELLM_BASE_URL", raising=False)
+    monkeypatch.delenv("TEAM360_LITELLM_API_KEY", raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    detail = resp.json()["detail"]
+    assert PRODUCT_LLM_PROVIDER_ENV in detail
+    assert "TEAM360_LITELLM_BASE_URL" in detail
+    assert "Traceback" not in detail
+
+
+def test_product_route_litellm_missing_api_key_returns_controlled_error(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "litellm")
+    monkeypatch.setenv("TEAM360_LITELLM_BASE_URL", "http://localhost:4000")
+    monkeypatch.delenv("TEAM360_LITELLM_API_KEY", raising=False)
+    monkeypatch.delenv("LITELLM_API_KEY", raising=False)
+    monkeypatch.delenv("LITELLM_MASTER_KEY", raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    detail = resp.json()["detail"]
+    assert PRODUCT_LLM_PROVIDER_ENV in detail
+    assert "LITELLM_API_KEY" in detail or "config error" in detail
+    assert "Traceback" not in detail
+
+
+def test_product_route_litellm_config_error_does_not_leak_secrets(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "litellm")
+    monkeypatch.setenv("TEAM360_LITELLM_BASE_URL", "http://localhost:4000")
+    monkeypatch.setenv("TEAM360_LITELLM_API_KEY", "sk-litellm-secret-999")
+    monkeypatch.delenv("LITELLM_API_KEY", raising=False)
+
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    body = resp.json()
+    assert "sk-litellm-secret-999" not in resp.text.lower()
+    assert body["runtime_mode"] == "product_adapter_skeleton"
+
+
+def test_product_route_litellm_mode_does_not_call_litellm_in_unit_tests(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "litellm")
+    monkeypatch.setenv("TEAM360_LITELLM_BASE_URL", "http://localhost:4000")
+    monkeypatch.setenv("TEAM360_LITELLM_API_KEY", "sk-litellm-test-key")
 
     original_resolve = product_routes._resolve_product_llm_provider
 

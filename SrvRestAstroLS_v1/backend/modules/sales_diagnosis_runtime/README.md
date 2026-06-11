@@ -1684,6 +1684,106 @@ pasarlos por shell si ya estan configurados en el entorno.
 - No Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
 - No se modifico codigo, runtime, rutas, schemas ni tests existentes.
 
+## Fase 1.9h — Product adapter LiteLLM opt-in boundary
+
+### Alcance
+
+Esta fase agrega el proveedor LLM LiteLLM para el product adapter, opt-in
+explicito via `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`.
+
+No es endpoint final publico, no es MVP y no activa producto comercial.
+
+### Nueva clase
+
+`_ProductLiteLLMProvider` en `routes/sales_diagnosis_runtime.py`:
+
+- Implementa `LLMProvider` protocol.
+- Usa `LiteLLMClient` de `modules.automation_diagnosis.litellm_client` (urllib,
+  no OpenAI SDK).
+- Requiere `TEAM360_LITELLM_BASE_URL` (URL del proxy LiteLLM).
+- API key via `LiteLLMClient` constructor (`None` → `get_litellm_api_key()`).
+- Modelo via `TEAM360_LITELLM_MODEL_ALIAS` (default: `openai_gpt-5-nano`).
+- Construye prompts via `PromptPolicy`.
+- Si falta config → HTTP 503 controlado sin secrets.
+- Si la llamada LiteLLM falla → retorna `SAFE_ACK_TEXT` como fallback.
+- Errores de configuracion: HTTP 503 (no 500 como dev endpoint).
+
+### Env vars
+
+| Variable | Requerida | Default | Descripcion |
+|----------|-----------|---------|-------------|
+| `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm` | Si | — | Activa _ProductLiteLLMProvider |
+| `TEAM360_LITELLM_BASE_URL` | Si | — | URL del proxy LiteLLM |
+| `TEAM360_LITELLM_API_KEY` | Si | — | API key; no debe imprimirse |
+| `TEAM360_LITELLM_MODEL_ALIAS` | No | `openai_gpt-5-nano` | Alias de modelo en LiteLLM |
+
+### Matriz actualizada del product adapter
+
+| # | Route | State | LLM | HTTP | Notas |
+|---|-------|-------|-----|------|-------|
+| A | disabled | — | — | 404 | — |
+| B | enabled | unset | — | 503 | — |
+| C | enabled | inmemory_test | fake | 201 | LLM fake |
+| D | enabled | inmemory_test | openai | 201 | OpenAI opt-in |
+| E | enabled | postgres | fake | 201/503 | PG config |
+| F | enabled | inmemory_test | invalido | 503 | — |
+| G | enabled | inmemory_test | openai (smoke) | 201 | Smoke valida provider_result |
+| H | enabled | inmemory_test | litellm | 201 | LiteLLM opt-in |
+
+### Tests agregados (6)
+
+1. `test_product_route_accepts_litellm_provider` — litellm aceptado con envs
+2. `test_product_route_litellm_missing_base_url_returns_controlled_error` — 503 si falta URL
+3. `test_product_route_litellm_missing_api_key_returns_controlled_error` — 503 si falta key
+4. `test_product_route_litellm_config_error_does_not_leak_secrets` — no leaks
+5. `test_product_route_litellm_mode_does_not_call_litellm_in_unit_tests` — no network
+6. `test_product_route_rejects_invalid_llm_provider` actualizado — incluye `litellm` en mensaje
+
+Total: 33 tests en `test_sales_diagnosis_runtime_route.py`.
+
+### Smoke script
+
+`scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py`:
+
+- Smoke HTTP opt-in, requiere backend corriendo con
+  `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`.
+- Si no es `litellm` o faltan configs → skip (exit 0).
+- Valida: 201, session_id, runtime_mode, response contract, fake retrieval,
+  no stacktrace, no DB leak, provider_result event, turn_count.
+- `--allow-fallback` para no fallar si LiteLLM devolvio SAFE_ACK_TEXT.
+
+```bash
+cd backend
+
+# terminal 1: backend con product adapter + LiteLLM
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8018
+
+# terminal 2: smoke LiteLLM (sin envs -> skip)
+uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py
+
+# smoke LiteLLM (con envs -> real)
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py
+
+# smoke LiteLLM (con allow-fallback)
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py --allow-fallback
+```
+
+### Lo que no se toco
+
+- No frontend, Astro, Svelte, UI.
+- No SSE productivo.
+- No OpenAI real.
+- No Milvus real.
+- No ArangoDB, pgvector, cross-encoder.
+- No Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- NO se agregaron tests que dependan de LiteLLM real.
+- Pytest normal sigue sin network real.
+
 ### Resumen del bloque 1.9
 
 | Fase | Que agrega | Estado |
@@ -1694,4 +1794,5 @@ pasarlos por shell si ya estan configurados en el entorno.
 | 1.9d | Release gate: matriz, comandos consolidados, confirmacion de defaults y limites | Committed |
 | 1.9e | Product adapter OpenAI direct opt-in boundary: nueva env `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER`, `_ProductOpenAILLMProvider`, tests, matriz actualizada | Committed |
 | 1.9f | Product adapter OpenAI direct HTTP smoke: script, `team360.llm.provider_result` event, --allow-fallback, docs | Committed |
-| 1.9g | OpenAI direct real validation: helpers `get_team360_openai_key()` y `get_team360_openai_model()` en `globalVar.py`, resolucion centralizada con `OpenAI_Key_JAI_query`, smoke real OpenAI **14/14 passed**, `response_is_fallback=false` | Este documento |
+| 1.9g | OpenAI direct real validation: helpers `get_team360_openai_key()` y `get_team360_openai_model()` en `globalVar.py`, resolucion centralizada con `OpenAI_Key_JAI_query`, smoke real OpenAI **14/14 passed**, `response_is_fallback=false` | Committed |
+| 1.9h | Product adapter LiteLLM opt-in boundary: `_ProductLiteLLMProvider`, `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`, tests, smoke script, docs | Este documento |
