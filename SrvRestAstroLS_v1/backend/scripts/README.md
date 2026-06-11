@@ -306,6 +306,30 @@ Script:
   No activa frontend, SSE, Step-to-Action, lead_capture, diagnostic_code,
   WhatsApp handoff ni CRM real.
 
+- `inspect_sales_diagnosis_milvus_schema.py`: inspector reproducible del schema/corpus real de Milvus para Sales Diagnosis.
+
+  - Conecta solo si existe `TEAM360_MILVUS_URI` o `TEAM360_MILVUS_HOST`.
+  - Lista collection, fields, index info y row count.
+  - Resuelve aliases reales del provider:
+    - `knowledge_scope_code` -> `knowledge_scope_id`
+    - `source_uri` -> `node_path`
+    - `content` -> `content_preview`
+  - Reporta coverage de `knowledge_scope_id`, `embedding_version`, `source_uri`, `content` y metadata.
+  - Ejecuta una search minima con vector cero para confirmar retrieval real.
+  - Con la collection real de esta fase valida:
+    - `team360_lab_pgvector_benchmark_openai_small_1536`
+    - `knowledge_scope_id = 8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`
+    - `embedding_version = team360-openai-small-1536-v1`
+
+  ```bash
+  cd backend
+  TEAM360_MILVUS_HOST=127.0.0.1 \
+  TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536 \
+  TEAM360_KNOWLEDGE_SCOPE_ID=8b071443-5bd6-4fe4-bbc3-fc2dca179a5b \
+  TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1 \
+    uv run --with pymilvus python scripts/inspect_sales_diagnosis_milvus_schema.py
+  ```
+
 - `smoke_sales_diagnosis_runtime_product_adapter_milvus.py`: smoke HTTP opt-in
   del product adapter con Milvus retrieval.
 
@@ -323,15 +347,24 @@ Script:
   # smoke Milvus (con envs -> real)
   TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
   TEAM360_MILVUS_HOST=127.0.0.1 \
+  TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536 \
+  TEAM360_KNOWLEDGE_SCOPE_ID=8b071443-5bd6-4fe4-bbc3-fc2dca179a5b \
+  TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1 \
     uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py
 
   # smoke Milvus (con allow-empty-results, sin corpus cargado)
   TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
   TEAM360_MILVUS_HOST=127.0.0.1 \
+  TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536 \
+  TEAM360_KNOWLEDGE_SCOPE_ID=8b071443-5bd6-4fe4-bbc3-fc2dca179a5b \
+  TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1 \
     uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py --allow-empty-results
   ```
 
   Revisa conectividad/retrieval path contra Milvus real. Embedding fake
-  1536-dim (no OpenAI, no LiteLLM). Si el corpus no tiene resultados,
-  usar `--allow-empty-results`. No activa frontend, SSE, Step-to-Action,
-  lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+  1536-dim (no OpenAI, no LiteLLM). Con la collection real de esta fase,
+  `TEAM360_KNOWLEDGE_SCOPE_ID` y `TEAM360_EMBEDDING_VERSION` deben apuntar
+  al UUID/version observados para que `retrieved_sources` salga real.
+  Si el corpus no tiene resultados, usar `--allow-empty-results`. No activa
+  frontend, SSE, Step-to-Action, lead_capture, diagnostic_code,
+  WhatsApp handoff ni CRM real.

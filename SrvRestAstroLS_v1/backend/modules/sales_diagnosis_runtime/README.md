@@ -1863,6 +1863,7 @@ Smoke real Milvus queda para Fase 1.9l.
 | 1.9j | Product adapter LLM release gate: matriz LLM, comandos consolidados, confirmacion de defaults, provider_result event documentado, validaciones reales OpenAI + LiteLLM confirmadas | Committed |
 | 1.9k | Product adapter Milvus retrieval opt-in boundary: `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER`, `_resolve_product_retrieval_provider()`, `MilvusRetrievalProvider` con `_DevFakeEmbeddingProvider`, tests, docs. Smoke real Milvus queda para 1.9l | Committed |
 | 1.9l | Smoke real Milvus para product adapter: script `smoke_sales_diagnosis_runtime_product_adapter_milvus.py`, validacion completa 15/15 con --allow-empty-results, documento | Committed |
+| 1.9m | Milvus schema/corpus alignment: inspector `inspect_sales_diagnosis_milvus_schema.py`, provider alias resolution, real collection `team360_lab_pgvector_benchmark_openai_small_1536`, `knowledge_scope_id`/`embedding_version` alignment, smoke real 16/16 | Implemented (uncommitted) |
 
 ## Fase 1.9l — Product adapter Milvus real smoke
 
@@ -1947,3 +1948,98 @@ TEAM360_MILVUS_HOST=127.0.0.1 \
 - No Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
 - NO se modifico codigo del runtime, routes, schemas, tests ni smokes existentes.
 - No se creo rama nueva.
+
+## Fase 1.9m — Milvus schema/corpus alignment for Sales Diagnosis Product Adapter
+
+### Que se encontro en Milvus real
+
+Coleccion real usada para Sales Diagnosis:
+
+- `team360_lab_pgvector_benchmark_openai_small_1536`
+
+Schema real observado:
+
+- `id` `INT64` primary key
+- `chunk_id` `VARCHAR`
+- `document_id` `VARCHAR`
+- `knowledge_scope_id` `VARCHAR`
+- `embedding_version` `VARCHAR`
+- `content_preview` `VARCHAR`
+- `node_path` `VARCHAR`
+- `title` `VARCHAR`
+- `embedding` `FLOAT_VECTOR(1536)`
+
+Index real observado:
+
+- `embedding` -> `HNSW`, `metric_type=COSINE`, `M=16`, `efConstruction=200`
+
+Corpus real observado:
+
+- `row_count = 139`
+- `knowledge_scope_id = 8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`
+- `embedding_version = team360-openai-small-1536-v1`
+- ejemplos reales con `chunk_id`, `document_id`, `title`, `node_path` y `content_preview`
+
+### Como se alineo el provider
+
+`MilvusRetrievalProvider` ahora resuelve el schema live de la collection y usa aliases reales cuando el nombre canonical no existe:
+
+- `knowledge_scope_code` -> `knowledge_scope_id`
+- `source_uri` -> `node_path`
+- `content` -> `content_preview`
+
+Tambien sigue usando:
+
+- `chunk_id`
+- `document_id`
+- `embedding_version`
+- `title`
+- `content_preview`
+- `embedding`
+
+Esto permite que el product adapter siga feature-flagged y que la retrieval real llegue a `retrieved_sources` sin fake `dev_doc_*`.
+
+### Inspector reproducible
+
+Script nuevo:
+
+- `scripts/inspect_sales_diagnosis_milvus_schema.py`
+
+Valida:
+
+1. collection real usada por el runtime.
+2. fields reales y tipo/dim.
+3. index info.
+4. field map resuelto por el provider.
+5. row count.
+6. sample rows truncadas.
+7. coverage de `knowledge_scope_id`, `embedding_version`, `source_uri`, `content` y metadata.
+8. runtime filter vs corpus real.
+9. search minima con vector cero.
+
+### Envs relevantes para esta fase
+
+- `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus`
+- `TEAM360_MILVUS_HOST=127.0.0.1`
+- `TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536`
+- `TEAM360_KNOWLEDGE_SCOPE_ID=8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`
+- `TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1`
+
+### Validacion real
+
+- Inspector real: `OK`
+- Smoke Milvus real: `16/16 passed`
+- `retrieved_sources` reales y no vacios
+- sin `dev_doc_*`
+- sin secrets
+- sin stacktraces
+- LLM fake sigue default
+- Milvus sigue opt-in
+- pgvector no participa
+- frontend no se toca
+
+### Notas
+
+- `TEAM360_KNOWLEDGE_SCOPE_ID` es la llave real para esta collection; el code `ks_team360_sales_diagnosis` queda como identificador de request/historico, no como filtro directo sobre este corpus.
+- `source_uri` y `content` no existen como columnas en la collection real; se derivan via `node_path` y `content_preview`.
+- `metadata` no existe en la collection real y no forma parte del contrato HTTP actual.

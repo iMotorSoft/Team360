@@ -43,9 +43,28 @@ class FakeMilvusCollection:
     Returns configurable results for testing mapping and edge cases.
     """
 
-    def __init__(self, results: list | None = None) -> None:
+    def __init__(
+        self,
+        results: list | None = None,
+        schema_fields: list[str] | None = None,
+    ) -> None:
         self._results = results or []
         self.indexes: list[dict[str, Any]] = []
+        self.last_search: dict[str, Any] | None = None
+        self.schema = (
+            type(
+                "FakeSchema",
+                (),
+                {
+                    "fields": [
+                        type("FakeField", (), {"name": name})()
+                        for name in (schema_fields or [])
+                    ]
+                },
+            )()
+            if schema_fields is not None
+            else None
+        )
 
     def load(self) -> None:
         pass
@@ -59,6 +78,14 @@ class FakeMilvusCollection:
         expr: str,
         output_fields: list[str],
     ) -> list:
+        self.last_search = {
+            "data": data,
+            "anns_field": anns_field,
+            "param": param,
+            "limit": limit,
+            "expr": expr,
+            "output_fields": output_fields,
+        }
         return self._results
 
 
@@ -302,6 +329,89 @@ class TestMilvusRetrievalProvider:
         assert chunks[0].chunk_id == "c1"
         assert chunks[0].document_id == ""
         assert chunks[0].title is None
+
+    def test_milvus_provider_aligns_with_real_collection_schema_aliases(
+        self, sample_input, default_state, fake_embedding
+    ):
+        hit = FakeHit()
+        hit.entity.fields = {
+            "chunk_id": "87d34156-4254-4a65-9e71-732926a8de34",
+            "document_id": "9e9dc259-e601-4bc8-acff-a669969bcaa6",
+            "knowledge_scope_id": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+            "embedding_version": "team360-openai-small-1536-v1",
+            "content_preview": "# Alcance productivo inicial",
+            "node_path": "/automatizaciones/alcance-inicial",
+            "title": "Alcance productivo inicial",
+        }
+        collection = FakeMilvusCollection(
+            results=make_fake_result_set(hit),
+            schema_fields=[
+                "id",
+                "chunk_id",
+                "document_id",
+                "knowledge_scope_id",
+                "embedding_version",
+                "content_preview",
+                "node_path",
+                "title",
+                "embedding",
+            ],
+        )
+        config = MilvusRuntimeConfig(
+            knowledge_scope_id="8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+            embedding_version="team360-openai-small-1536-v1",
+        )
+        provider = MilvusRetrievalProvider(
+            config=config,
+            embedding_provider=fake_embedding,
+            _client=collection,
+        )
+
+        chunks = provider.retrieve(sample_input, default_state)
+
+        assert len(chunks) == 1
+        assert collection.last_search is not None
+        assert collection.last_search["anns_field"] == "embedding"
+        assert collection.last_search["expr"] == (
+            'knowledge_scope_id == "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b" '
+            'and embedding_version == "team360-openai-small-1536-v1"'
+        )
+        assert collection.last_search["output_fields"] == [
+            "chunk_id",
+            "document_id",
+            "knowledge_scope_id",
+            "embedding_version",
+            "node_path",
+            "title",
+            "content_preview",
+        ]
+        chunk = chunks[0]
+        assert chunk.chunk_id == "87d34156-4254-4a65-9e71-732926a8de34"
+        assert chunk.source_uri == "/automatizaciones/alcance-inicial"
+        assert chunk.node_path == "/automatizaciones/alcance-inicial"
+        assert chunk.content_preview == "# Alcance productivo inicial"
+        assert chunk.content == "# Alcance productivo inicial"
+
+    def test_milvus_provider_reports_missing_vector_field_as_controlled_error(
+        self, sample_input, default_state, fake_embedding
+    ):
+        collection = FakeMilvusCollection(
+            results=make_fake_result_set(FakeHit()),
+            schema_fields=[
+                "chunk_id",
+                "document_id",
+                "knowledge_scope_id",
+                "content_preview",
+                "node_path",
+            ],
+        )
+        provider = MilvusRetrievalProvider(
+            config=MilvusRuntimeConfig(),
+            embedding_provider=fake_embedding,
+            _client=collection,
+        )
+        with pytest.raises(MilvusConfigurationError, match="vector field"):
+            provider.retrieve(sample_input, default_state)
 
 
 # ---------------------------------------------------------------------------

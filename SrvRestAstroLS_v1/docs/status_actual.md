@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9l — Product adapter Milvus real smoke)
+Ultima actualizacion: 2026-06-11 (Fase 1.9m — Milvus schema/corpus alignment)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,41 @@ Ultima actualizacion: 2026-06-11 (Fase 1.9l — Product adapter Milvus real smok
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-11 - Fase 1.9m — Milvus schema/corpus alignment for Sales Diagnosis Product Adapter
+
+- Se agrego `scripts/inspect_sales_diagnosis_milvus_schema.py` como inspector reproducible del schema/corpus real de Milvus.
+- Se ajusto `MilvusRetrievalProvider` para resolver aliases reales de la collection viva sin romper el default fake:
+  - `knowledge_scope_code` -> `knowledge_scope_id`
+  - `source_uri` -> `node_path`
+  - `content` -> `content_preview`
+- Se preservo el comportamiento seguro por defecto:
+  - fake retrieval sigue default;
+  - LLM fake sigue default;
+  - Milvus sigue opt-in;
+  - pgvector no participa;
+  - frontend no se toca.
+- Se valido la collection real `team360_lab_pgvector_benchmark_openai_small_1536` con `139` filas:
+  - `knowledge_scope_id = 8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`
+  - `embedding_version = team360-openai-small-1536-v1`
+  - `embedding` `FLOAT_VECTOR(1536)`
+  - `node_path` como fallback de `source_uri`
+  - `content_preview` como fallback de `content`
+  - `metadata` no existe en la collection real
+- Se valido retrieval real con product adapter usando el UUID/version correctos: `retrieved_sources` reales y no vacios, sin `dev_doc_*`.
+- Se corroboro que el inspector reporta `OK` y que el runtime filter se alinea con la collection real cuando `TEAM360_KNOWLEDGE_SCOPE_ID` y `TEAM360_EMBEDDING_VERSION` apuntan al corpus observado.
+- Validaciones ejecutadas:
+  - `uv run pytest` = **379 passed, 9 skipped**
+  - `uv run pytest tests/test_sales_diagnosis_milvus_provider.py tests/test_sales_diagnosis_runtime_route.py tests/test_sales_diagnosis_runtime_dev_route.py` = **103 passed**
+  - `uv run python scripts/inspect_sales_diagnosis_milvus_schema.py` con pymilvus real = **OK**
+  - smoke Milvus real = **16/16 passed**
+  - smoke dev endpoint = **30/30 passed**
+  - smoke dev endpoint postgres cleanup = **30/30 passed**
+  - smoke product adapter Postgres = **22/22 passed**
+  - smoke product adapter OpenAI = **SKIP controlado** por provider no habilitado en esta sesion
+  - smoke product adapter LiteLLM = **SKIP controlado** por provider no habilitado en esta sesion
+- No se tocaron: frontend, Astro, Svelte, UI, SSE productivo, OpenAI real, LiteLLM real, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se creo rama nueva.
 
 ### 2026-06-10 - Fase 1.9b — Product adapter state hardening
 

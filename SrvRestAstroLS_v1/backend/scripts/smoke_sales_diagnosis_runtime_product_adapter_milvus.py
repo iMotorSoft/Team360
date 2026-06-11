@@ -63,6 +63,8 @@ PRODUCT_ROUTE_ENABLED_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED"
 PRODUCT_STATE_REPOSITORY_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY"
 PRODUCT_RETRIEVAL_PROVIDER_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER"
 PRODUCT_LLM_PROVIDER_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER"
+MILVUS_KNOWLEDGE_SCOPE_ID_ENV = "TEAM360_KNOWLEDGE_SCOPE_ID"
+MILVUS_EMBEDDING_VERSION_ENV = "TEAM360_EMBEDDING_VERSION"
 
 # Milvus config envs (from MilvusRuntimeConfig.from_env)
 MILVUS_URI_ENV = "TEAM360_MILVUS_URI"
@@ -140,11 +142,23 @@ def _detect_milvus_envs() -> tuple[str, str, str, str, bool, bool, str]:
     state = os.environ.get(PRODUCT_STATE_REPOSITORY_ENV, "").strip().lower()
     retrieval = os.environ.get(PRODUCT_RETRIEVAL_PROVIDER_ENV, "").strip().lower()
     llm = os.environ.get(PRODUCT_LLM_PROVIDER_ENV, "").strip().lower()
+    scope_id = os.environ.get(MILVUS_KNOWLEDGE_SCOPE_ID_ENV, "").strip()
+    embedding_version = os.environ.get(MILVUS_EMBEDDING_VERSION_ENV, "").strip()
     milvus_uri = os.environ.get(MILVUS_URI_ENV, "").strip()
     milvus_host = os.environ.get(MILVUS_HOST_ENV, "").strip()
     has_milvus_config = bool(milvus_uri or milvus_host)
     collection = os.environ.get(MILVUS_COLLECTION_ENV, "knowledge_chunks")
-    return route, state, retrieval, llm, has_milvus_config, bool(milvus_uri), collection
+    return (
+        route,
+        state,
+        retrieval,
+        llm,
+        scope_id,
+        embedding_version,
+        has_milvus_config,
+        bool(milvus_uri),
+        collection,
+    )
 
 
 def run_smoke(
@@ -156,7 +170,17 @@ def run_smoke(
     CHECKS = []
     FAILURES = []
 
-    route_env, state_env, retrieval_env, llm_env, has_milvus_config, has_uri, collection = (
+    (
+        route_env,
+        state_env,
+        retrieval_env,
+        llm_env,
+        scope_id_env,
+        embedding_version_env,
+        has_milvus_config,
+        has_uri,
+        collection,
+    ) = (
         _detect_milvus_envs()
     )
     print("=== Sales Diagnosis Product Adapter — Milvus Smoke ===")
@@ -165,6 +189,8 @@ def run_smoke(
     print(f"{PRODUCT_STATE_REPOSITORY_ENV}: {state_env!r}")
     print(f"{PRODUCT_RETRIEVAL_PROVIDER_ENV}: {retrieval_env!r}")
     print(f"{PRODUCT_LLM_PROVIDER_ENV}:   {llm_env!r}")
+    print(f"{MILVUS_KNOWLEDGE_SCOPE_ID_ENV}: {scope_id_env!r}")
+    print(f"{MILVUS_EMBEDDING_VERSION_ENV}:   {embedding_version_env!r}")
     print(f"Milvus configured:         {'yes' if has_milvus_config else 'no'}")
     print(f"Milvus collection:         {collection!r}")
     print(f"Session ID:                {UNIQUE_SESSION}")
