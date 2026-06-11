@@ -1784,6 +1784,42 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
 - NO se agregaron tests que dependan de LiteLLM real.
 - Pytest normal sigue sin network real.
 
+## Fase 1.9j — Product adapter LLM release gate
+
+### Matriz LLM del product adapter
+
+| Provider | Env | Default | Network real | Smoke | Validacion real | Fallback esperado |
+|----------|-----|---------|-------------|-------|----------------|-------------------|
+| `fake` | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER` unset o `fake` | **Si** | No | No aplica | No aplica | No aplica |
+| `openai` | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai` | No | Solo opt-in | `smoke_sales_diagnosis_runtime_product_adapter_openai.py` | `response_is_fallback=false` con gpt-5-nano | SAFE_ACK_TEXT (con --allow-fallback) |
+| `litellm` | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm` + `TEAM360_LITELLM_BASE_URL` + alias `openai_gpt-5-nano` | No | Solo opt-in | `smoke_sales_diagnosis_runtime_product_adapter_litellm.py` | `response_is_fallback=false` con openai_gpt-5-nano | SAFE_ACK_TEXT (con --allow-fallback) |
+
+### Evento team360.llm.provider_result
+
+Definido en `modules/sales_diagnosis_runtime/runtime.py`, el evento
+`team360.llm.provider_result` se emite despues de `self._llm.generate()` en el
+path de provider real.
+
+Payload:
+
+- `response_is_fallback` (bool):
+  - `false`: el provider respondio realmente. Los smokes reales fallan si detectan fallback.
+  - `true`: el provider devolvio `SAFE_ACK_TEXT`. Se aplico fallback seguro.
+- `--allow-fallback`: flag opcional en los smokes para no fallar incluso si se detecto fallback.
+
+No expone secrets, stacktrace ni detalles del provider.
+
+### Estado del product adapter tras el gate
+
+- Product adapter sigue feature-flagged (`TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED`).
+- No es endpoint publico final.
+- LLM fake sigue siendo default.
+- OpenAI directo y LiteLLM son opt-in explicitos.
+- Ambos fueron validados realmente con gpt-5-nano / openai_gpt-5-nano.
+- Retrieval sigue fake. Milvus real no esta activo en product adapter.
+- State sigue explicito (`postgres` o `inmemory_test`).
+- No hay frontend, SSE, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+
 ### Resumen del bloque 1.9
 
 | Fase | Que agrega | Estado |
@@ -1796,4 +1832,5 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
 | 1.9f | Product adapter OpenAI direct HTTP smoke: script, `team360.llm.provider_result` event, --allow-fallback, docs | Committed |
 | 1.9g | OpenAI direct real validation: helpers `get_team360_openai_key()` y `get_team360_openai_model()` en `globalVar.py`, resolucion centralizada con `OpenAI_Key_JAI_query`, smoke real OpenAI **14/14 passed**, `response_is_fallback=false` | Committed |
 | 1.9h | Product adapter LiteLLM opt-in boundary: `_ProductLiteLLMProvider`, `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`, tests, smoke script, docs | Committed |
-| 1.9i | LiteLLM real validation: smoke real **13/13 passed**, `response_is_fallback=false`, `openai_gpt-5-nano` alias, no fallback silencioso, no OpenAI directo | Este documento |
+| 1.9i | LiteLLM real validation: smoke real **13/13 passed**, `response_is_fallback=false`, `openai_gpt-5-nano` alias, no fallback silencioso, no OpenAI directo | Committed |
+| 1.9j | Product adapter LLM release gate: matriz LLM, comandos consolidados, confirmacion de defaults, provider_result event documentado, validaciones reales OpenAI + LiteLLM confirmadas | Este documento |

@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9i — LiteLLM real validation for Sales Diagnosis Product Adapter)
+Ultima actualizacion: 2026-06-11 (Fase 1.9j — Product adapter LLM release gate)
 
 ## Directorio de trabajo
 
@@ -212,6 +212,86 @@ No es necesario exportarla explicitamente si ya esta configurada.
   - Smoke product adapter LiteLLM (sin env): SKIP correcto.
   - Secret scan: sin leaks.
   - `git diff --check`: limpio.
+
+### 2026-06-11 - Fase 1.9j — Product adapter LLM release gate
+
+- Se cerro documental y operativamente el bloque LLM del product adapter.
+- Se definio la matriz LLM del product adapter:
+
+| Provider | Env | Default | Network real | Smoke | Validacion real | Fallback esperado |
+|----------|-----|---------|-------------|-------|----------------|-------------------|
+| `fake` | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER` unset o `fake` | **Si** | No | No aplica | No aplica | No aplica |
+| `openai` | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai` | No | Solo opt-in | `smoke_sales_diagnosis_runtime_product_adapter_openai.py` | `response_is_fallback=false` con gpt-5-nano | SAFE_ACK_TEXT (con --allow-fallback) |
+| `litellm` | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm` + `TEAM360_LITELLM_BASE_URL` + alias `openai_gpt-5-nano` | No | Solo opt-in | `smoke_sales_diagnosis_runtime_product_adapter_litellm.py` | `response_is_fallback=false` con openai_gpt-5-nano | SAFE_ACK_TEXT (con --allow-fallback) |
+
+- `team360.llm.provider_result` event documentado:
+  - `response_is_fallback=false`: provider real respondio. Smoke falla si detecta fallback.
+  - `response_is_fallback=true`: provider devolvio SAFE_ACK_TEXT (fallback seguro).
+  - `--allow-fallback` permite pasar incluso con fallback, para entornos sin credencial real.
+- Validaciones ejecutadas en el gate:
+  - pytest completa: **368 passed, 9 skipped**.
+  - Smoke dev InMemory: 30/30 passed.
+  - Smoke product adapter OpenAI (skip sin env): correcto.
+  - Smoke product adapter LiteLLM (skip sin env): correcto.
+  - Smoke product adapter Postgres (skip sin env): correcto.
+  - **Smoke OpenAI real**: 14/14 passed, `response_is_fallback=false`.
+  - **Smoke LiteLLM real**: 13/13 passed, `response_is_fallback=false`.
+  - Secret scan: sin leaks.
+  - `git diff --check`: limpio.
+- No se modifico codigo, runtime, rutas, schemas ni tests existentes.
+- No se creo rama nueva.
+
+Comandos smoke consolidados:
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Dev endpoint — InMemory (no DB, no LLM, no Milvus)
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+
+# Dev endpoint — Postgres opt-in
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
+
+# Dev endpoint — LiteLLM opt-in
+TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+
+# Product adapter — Postgres opt-in
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py --cleanup
+
+# Product adapter — OpenAI opt-in (skip si falta env o key)
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
+
+# Product adapter — LiteLLM opt-in (skip si falta env)
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py
+
+# Reales con backend levantado:
+# Terminal 1:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8018
+# Terminal 2:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
+
+# O con LiteLLM:
+# Terminal 1:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8018
+# Terminal 2:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py
+```
 
 ```bash
 # Terminal 1:
