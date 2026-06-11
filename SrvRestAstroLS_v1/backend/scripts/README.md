@@ -368,3 +368,45 @@ Script:
   Si el corpus no tiene resultados, usar `--allow-empty-results`. No activa
   frontend, SSE, Step-to-Action, lead_capture, diagnostic_code,
   WhatsApp handoff ni CRM real.
+
+### Fase 1.9n — Headless diagnostic response validation
+
+Script:
+
+- `evaluate_sales_diagnosis_headless_responses.py`: evaluador semantico headless
+  para preguntas de diagnostico de ventas. Envía un dataset JSON al endpoint
+  HTTP, evalua cobertura de claims esperados y claims prohibidos, y produce
+  PASS/WARN/FAIL/SKIP sin depender de UI, navegador o frontend.
+
+  - Usa `urllib` de la stdlib.
+  - Soporta `--endpoint product` y `--endpoint dev`.
+  - Default: `--endpoint product`.
+  - Si el product adapter no esta habilitado o faltan las envs minimas
+    (`TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1` y
+    `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test` o
+    `postgres`), hace skip controlado.
+  - Default fake/fake: LLM y retrieval quedan en fake salvo que el entorno
+    habilite OpenAI/LiteLLM/Milvus.
+  - `--fail-on-warn` hace fallar la ejecucion si alguna respuesta queda en WARN.
+  - `--allow-fallback` evita fallar si un modo real cae en fallback seguro.
+
+Dataset:
+
+- `tests/fixtures/sales_diagnosis_headless_questions_v1.json`
+
+Comandos:
+
+```bash
+cd backend
+
+# Baseline product adapter fake/fake
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+  uv run python scripts/evaluate_sales_diagnosis_headless_responses.py
+
+# Evaluacion dev
+uv run python scripts/evaluate_sales_diagnosis_headless_responses.py --endpoint dev
+```
+
+No activa frontend, SSE productivo, Step-to-Action, lead_capture,
+diagnostic_code, WhatsApp handoff ni CRM real.

@@ -1858,3 +1858,13 @@ Incluye estructura inicial para:
 - No se hardcodearon secretos reales.
 - Las credenciales de providers/LLM se modelaron como `secret_ref`.
 - `backend/temp1.txt` aparece modificado en el worktree y contiene material sensible o notas internas; no fue tocado en esta etapa.
+
+### 2026-06-11 - Fase 1.9n - Headless diagnostic response validation
+
+- Se agrego el dataset `backend/tests/fixtures/sales_diagnosis_headless_questions_v1.json` con 10 casos semanticos para evaluar rapidez, accesibilidad, MFA, derivacion a partner, honestidad comercial y limites.
+- Se agrego `backend/scripts/evaluate_sales_diagnosis_headless_responses.py` para ejecutar evaluacion headless contra `POST /api/sales-diagnosis-runtime/turn` o `POST /api/dev/sales-diagnosis-runtime/turn`.
+- El evaluator trabaja con scoring PASS/WARN/FAIL/SKIP, detection conservadora de claims prohibidos y negaciones simples.
+- Se agregaron tests unitarios puros en `backend/tests/test_sales_diagnosis_headless_evaluator.py`.
+- Se actualizo la documentacion de runtime y scripts con la fase 1.9n.
+- No se toco frontend, Astro, UI, SSE productivo, pgvector, ArangoDB, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- Pendiente: ejecutar pytest, evaluar contra endpoints disponibles y validar `git diff --check` + secret scan.

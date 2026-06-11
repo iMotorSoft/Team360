@@ -1864,6 +1864,7 @@ Smoke real Milvus queda para Fase 1.9l.
 | 1.9k | Product adapter Milvus retrieval opt-in boundary: `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER`, `_resolve_product_retrieval_provider()`, `MilvusRetrievalProvider` con `_DevFakeEmbeddingProvider`, tests, docs. Smoke real Milvus queda para 1.9l | Committed |
 | 1.9l | Smoke real Milvus para product adapter: script `smoke_sales_diagnosis_runtime_product_adapter_milvus.py`, validacion completa 15/15 con --allow-empty-results, documento | Committed |
 | 1.9m | Milvus schema/corpus alignment: inspector `inspect_sales_diagnosis_milvus_schema.py`, provider alias resolution, real collection `team360_lab_pgvector_benchmark_openai_small_1536`, `knowledge_scope_id`/`embedding_version` alignment, smoke real 16/16 | Implemented (uncommitted) |
+| 1.9n | Headless diagnostic response validation: dataset semantico `sales_diagnosis_headless_questions_v1.json`, evaluator `evaluate_sales_diagnosis_headless_responses.py`, scoring PASS/WARN/FAIL/SKIP sin frontend | Implemented (uncommitted) |
 
 ## Fase 1.9l — Product adapter Milvus real smoke
 
@@ -2043,3 +2044,124 @@ Valida:
 - `TEAM360_KNOWLEDGE_SCOPE_ID` es la llave real para esta collection; el code `ks_team360_sales_diagnosis` queda como identificador de request/historico, no como filtro directo sobre este corpus.
 - `source_uri` y `content` no existen como columnas en la collection real; se derivan via `node_path` y `content_preview`.
 - `metadata` no existe en la collection real y no forma parte del contrato HTTP actual.
+
+## Fase 1.9n — Headless diagnostic response validation
+
+### Objetivo
+
+Validar la calidad semantica de las respuestas del diagnosticador sin UI, sin navegador y sin comparacion textual exacta.
+La fase mide:
+
+- rapidez del diagnostico;
+- accesibilidad;
+- deteccion de procesos manuales vs automatizados;
+- bloqueos tecnicos como MFA o permisos cerrados;
+- derivacion responsable a partner o consultoria;
+- honestidad comercial;
+- limites de lo que la IA puede afirmar;
+- ausencia de promesas absolutas o capacidades futuras inventadas.
+
+### Dataset
+
+Archivo:
+
+- `tests/fixtures/sales_diagnosis_headless_questions_v1.json`
+
+Contiene 10 casos con:
+
+- `id` estable;
+- `level`;
+- `question`;
+- `expected_claims`;
+- `forbidden_claims`;
+- `validates`;
+- `optional_risk_flags`.
+
+### Evaluator
+
+Archivo:
+
+- `scripts/evaluate_sales_diagnosis_headless_responses.py`
+
+Caracteristicas:
+
+1. Lee el dataset JSON y envia cada pregunta al endpoint HTTP.
+2. Usa el product adapter por defecto cuando esta habilitado.
+3. Permite `--endpoint dev` para evaluar el endpoint interno/dev.
+4. Usa `urllib` de stdlib.
+5. No requiere frontend, navegador, WhatsApp ni CRM.
+6. No requiere OpenAI, LiteLLM o Milvus si el modo elegido no los habilita.
+7. Soporta fake/fake por defecto.
+8. Soporta opt-in real si el entorno habilita LLM o retrieval reales.
+9. Evalua cobertura de claims esperados, claims prohibidos, tono y limites.
+10. Produce PASS/WARN/FAIL/SKIP con resumen final.
+
+### Scoring
+
+- `PASS`: cubre al menos un claim esperado fuerte y no contiene claims prohibidos.
+- `WARN`: respuesta parcial, vaga o demasiado generica, pero no contradice la intencion.
+- `FAIL`: contradice el objetivo, promete de mas, alucina viabilidad, contiene forbidden claims o rompe el contrato HTTP.
+- `SKIP`: endpoint o provider no disponible de forma controlada.
+
+### Forbidden claims globales
+
+El evaluator aplica reglas conservadoras para detectar frases peligrosas como:
+
+- `garantizado`
+- `siempre automatizable`
+- `100% seguro`
+- `sin riesgos`
+- `sin costo de error`
+- `no hace falta consultoria`
+- `la ia decide sola`
+- `lead capture listo`
+- `crm integrado listo`
+- `whatsapp handoff listo`
+- `step-to-action disponible`
+
+Las negaciones simples como `no es garantizado` no se bloquean.
+
+### Comandos
+
+```bash
+cd backend
+
+# Evaluacion baseline fake/fake con product adapter habilitado
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+uv run python scripts/evaluate_sales_diagnosis_headless_responses.py
+
+# Evaluacion contra el endpoint dev
+uv run python scripts/evaluate_sales_diagnosis_headless_responses.py --endpoint dev
+
+# Evaluacion real con LiteLLM si esta disponible
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+TEAM360_LITELLM_API_KEY=sk-... \
+  uv run python scripts/evaluate_sales_diagnosis_headless_responses.py
+
+# Evaluacion con Milvus si esta disponible
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+TEAM360_MILVUS_HOST=127.0.0.1 \
+  uv run python scripts/evaluate_sales_diagnosis_headless_responses.py
+```
+
+### Validaciones esperadas
+
+- No frontend.
+- No SSE productivo.
+- No pgvector.
+- No ArangoDB.
+- No Step-to-Action.
+- No lead_capture.
+- No diagnostic_code.
+- No WhatsApp handoff.
+- No CRM real.
+- Fake retrieval sigue default.
+- LLM fake sigue default.
+- Milvus sigue opt-in.
+- Product adapter sigue feature-flagged.
