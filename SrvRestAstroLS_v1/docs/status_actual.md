@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9c — Product adapter Postgres HTTP smoke)
+Ultima actualizacion: 2026-06-11 (Fase 1.9d — Product adapter release gate)
 
 ## Directorio de trabajo
 
@@ -53,6 +53,27 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
   - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9c agregada.
   - `status_actual.md`: este registro (Fase 1.9c).
 - No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, routes, schemas, tests existentes, endpoint dev, endpoint product adapter, smokes existentes.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9d — Product adapter release gate
+
+- Se documento Fase 1.9d como release gate del bloque 1.9a–1.9c.
+- Se agrego matriz del product adapter (5 casos: A–E) en:
+  - `modules/sales_diagnosis_runtime/README.md`
+  - `docs/status_actual.md`
+- Se documentaron comandos smoke consolidados (dev InMemory, dev Postgres, dev LiteLLM, product adapter Postgres).
+- Se confirmo cleanup prefix: `smoke_product_pg_%` exclusivo; no toca `smoke_dev_*`, `smoke_unsafe_*` ni sesiones reales.
+- Se confirmaron defaults seguros:
+  - State: `inmemory_test` (explicito) o `postgres` para product adapter.
+  - Retrieval: `fake` no configurable en product adapter.
+  - LLM: `fake` no configurable en product adapter.
+- Se confirmo que product adapter NO tiene envs opt-in para retrieval ni LLM. Es intencional.
+- Se confirmo que errores controlados no exponen stacktrace, DB URL, API keys, tokens ni headers sensibles.
+- Se confirmo que product adapter sigue feature-flagged, no es endpoint publico final.
+- Se confirmo que no hay frontend, SSE, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- Se agrego resumen del bloque 1.9 con estado de cada fase.
+- No se modifico logica del endpoint, routes, schemas, tests, ni smokes existentes.
+- No se activaron servicios reales nuevos.
 - No se creo rama nueva.
 
 ### 2026-06-10 - Fase 1.9a — Product route adapter skeleton

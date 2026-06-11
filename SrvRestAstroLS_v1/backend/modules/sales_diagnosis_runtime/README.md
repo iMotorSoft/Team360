@@ -1319,3 +1319,125 @@ TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
   uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
 uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
 ```
+
+## Fase 1.9d — Product adapter release gate
+
+### Alcance
+
+Esta fase cierra documental y operativamente el bloque 1.9a–1.9c del product
+adapter antes de avanzar a cualquier integracion real de LLM/retrieval.
+
+No agrega features nuevas. No modifica la logica del endpoint. Es un release
+gate: verificacion + documentacion.
+
+### Matriz del product adapter
+
+| # | TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED | TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY | HTTP esperado | State backend | Retrieval | LLM | runtime_mode |
+|---|------------------------------------------------|---------------------------------------------------|---------------|---------------|-----------|-----|--------------|
+| A | unset / 0 | — | 404 controlado | — | — | — | — |
+| B | `1` | unset | 503 controlado | — | — | — | — |
+| C | `1` | `inmemory_test` | 201 | `InMemoryConversationStateRepository` (explicito) | `fake` | `fake` | `product_adapter_skeleton` |
+| D | `1` | `postgres` | 201 (si PG config OK) / 503 (si falta config DB) | `SyncPostgresConversationStateRepository` | `fake` | `fake` | `product_adapter_skeleton` |
+| E | `1` | valor invalido | 503 controlado | — | — | — | — |
+
+Casos:
+
+- **Caso A**: route flag ausente. El endpoint no responde. No expone stacktrace.
+- **Caso B**: route flag activo pero state repository no especificado. Error
+  controlado indicando que se requiere `postgres` o `inmemory_test`.
+- **Caso C**: route flag + state test explicito. Unico modo de usar InMemory
+  cuando la ruta esta habilitada. No productivo.
+- **Caso D**: route flag + Postgres. Exige `TEAM360_DB_URL` o
+  `TEAM360_DB_URL_PSQL`. Si falta config DB, HTTP 503 controlado sin secrets.
+- **Caso E**: state repository invalido (ej: `inmemory`, `mysql`, `redis`).
+  HTTP 503 controlado con valores aceptados.
+
+### Comandos smoke consolidados
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Dev endpoint — InMemory (no DB, no LLM, no Milvus)
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+
+# Dev endpoint — Postgres opt-in
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
+
+# Dev endpoint — LiteLLM opt-in
+TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+
+# Product adapter — Postgres opt-in
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py --cleanup
+```
+
+### Cleanup prefix confirmado
+
+El smoke product adapter Postgres con `--cleanup` borra solo filas con prefijo
+`smoke_product_pg_%` de `sales_diagnosis_conversation_states`.
+
+No borra:
+- `smoke_dev_*` (sesiones del dev endpoint smoke)
+- `smoke_unsafe_*` (sesiones de prueba de guardrail unsafe)
+- sesiones reales productivas
+
+El cleanup verifica `remaining_smoke_rows=0` despues del DELETE.
+
+### Defaults seguros confirmados
+
+| Dimension | Product adapter | Dev endpoint |
+|-----------|----------------|--------------|
+| State | `inmemory_test` (explicito) o `postgres` | `inmemory` default, `postgres` opt-in |
+| Retrieval | `fake` (no configurable) | `fake` default, `milvus` opt-in |
+| LLM | `fake` (no configurable) | `fake` default, `litellm` opt-in |
+
+Los defaults del product adapter NO tienen opt-in para retrieval ni LLM real.
+No existe env `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER` ni
+`TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER`. Es intencional: el adapter
+debe permanecer como skeleton controlado hasta que el release gate del bloque
+siguiente decida lo contrario.
+
+### Errores controlados sin exposicion
+
+Todas las respuestas de error del product adapter cumplen:
+
+- Sin stacktrace (`Traceback`, `File "..."` ausentes en body HTTP).
+- Sin DB URL ni DSN en detalles.
+- Sin API keys, tokens, ni headers sensibles.
+- Sin identificadores `vera_*` en logs de aplicacion.
+
+### Capacidades futuras no activadas
+
+Esta fase no implementa ni habilita:
+
+- frontend;
+- Astro;
+- Svelte;
+- UI;
+- Home premium;
+- Console UI;
+- SSE productivo;
+- OpenAI SDK;
+- OpenAI real;
+- LiteLLM real;
+- Milvus real;
+- ArangoDB;
+- pgvector;
+- cross-encoder;
+- Step-to-Action;
+- lead_capture;
+- diagnostic_code;
+- WhatsApp handoff;
+- CRM real.
+
+### Resumen del bloque 1.9
+
+| Fase | Que agrega | Estado |
+|------|------------|--------|
+| 1.9a | Product route adapter skeleton con feature flag, defaults seguros, contrato HTTP y tests | Committed |
+| 1.9b | State hardening: state repository obligatorio, `SyncPostgresConversationStateRepository`, errores controlados sin secrets | Committed |
+| 1.9c | Smoke HTTP product adapter con Postgres opt-in, cleanup prefijado y validacion de contrato completo | Committed |
+| 1.9d | Release gate: matriz, comandos consolidados, confirmacion de defaults y limites | Este documento |
