@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9g — OpenAI direct real validation)
+Ultima actualizacion: 2026-06-11 (Fase 1.9i — LiteLLM real validation for Sales Diagnosis Product Adapter)
 
 ## Directorio de trabajo
 
@@ -181,6 +181,37 @@ No es necesario exportarla explicitamente si ya esta configurada.
 - No se agregaron tests que dependan de LiteLLM real.
 - No se modifico el contrato HTTP publico.
 - No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9i — LiteLLM real validation for Sales Diagnosis Product Adapter
+
+- Se valido el product adapter contra LiteLLM real con alias `openai_gpt-5-nano`.
+- Backend levantado con:
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1`
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test`
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`
+  - `TEAM360_LITELLM_BASE_URL=http://localhost:4000`
+  - `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano`
+- Smoke LiteLLM real: **13/13 checks PASSED**.
+  - `response_is_fallback=false` — LiteLLM respondio realmente.
+  - No se uso fallback silencioso.
+  - No se uso OpenAI directo desde Team360.
+  - No se uso Milvus real.
+  - Retrieval sigue fake (chunks `dev_doc_*`).
+  - State: inmemory_test explicito.
+  - Sin stacktrace ni secrets en errores.
+- `/api/dev/sales-diagnosis-runtime/turn` sigue funcionando (30/30 passed en smoke InMemory).
+- Product adapter sigue feature-flagged.
+- LLM default sigue fake.
+- LiteLLM solo opt-in explicito.
+- No se modifico codigo, runtime, rutas, schemas ni tests existentes.
+- No se creo rama nueva.
+- Se ejecutaron todas las validaciones obligatorias:
+  - pytest completa: **368 passed, 9 skipped**.
+  - Smoke dev InMemory: 30/30 passed.
+  - Smoke dev LiteLLM (sin env): SKIP correcto.
+  - Smoke product adapter LiteLLM (sin env): SKIP correcto.
+  - Secret scan: sin leaks.
+  - `git diff --check`: limpio.
 
 ```bash
 # Terminal 1:

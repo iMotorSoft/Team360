@@ -1795,4 +1795,5 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
 | 1.9e | Product adapter OpenAI direct opt-in boundary: nueva env `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER`, `_ProductOpenAILLMProvider`, tests, matriz actualizada | Committed |
 | 1.9f | Product adapter OpenAI direct HTTP smoke: script, `team360.llm.provider_result` event, --allow-fallback, docs | Committed |
 | 1.9g | OpenAI direct real validation: helpers `get_team360_openai_key()` y `get_team360_openai_model()` en `globalVar.py`, resolucion centralizada con `OpenAI_Key_JAI_query`, smoke real OpenAI **14/14 passed**, `response_is_fallback=false` | Committed |
-| 1.9h | Product adapter LiteLLM opt-in boundary: `_ProductLiteLLMProvider`, `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`, tests, smoke script, docs | Este documento |
+| 1.9h | Product adapter LiteLLM opt-in boundary: `_ProductLiteLLMProvider`, `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`, tests, smoke script, docs | Committed |
+| 1.9i | LiteLLM real validation: smoke real **13/13 passed**, `response_is_fallback=false`, `openai_gpt-5-nano` alias, no fallback silencioso, no OpenAI directo | Este documento |
