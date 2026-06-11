@@ -1433,6 +1433,94 @@ Esta fase no implementa ni habilita:
 - WhatsApp handoff;
 - CRM real.
 
+## Fase 1.9e — Product adapter OpenAI direct opt-in boundary
+
+### Alcance
+
+Esta fase agrega un selector de LLM para el product adapter que permite
+usar OpenAI directo solo por opt-in explicito.
+
+No es endpoint final publico, no es MVP y no activa producto comercial.
+
+### Nueva env
+
+`TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER`
+
+Valores aceptados:
+
+| Valor | Comportamiento |
+|-------|----------------|
+| unset o `fake` | `_DevFakeLLMProvider` (default seguro, no OpenAI) |
+| `openai` | `_ProductOpenAILLMProvider` via OpenAI SDK directo |
+
+Default: `fake`.
+
+### OpenAI directo
+
+Cuando `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai`:
+
+- Requiere `TEAM360_OPENAI_KEY` o `OPENAI_API_KEY`.
+- Modelo via `TEAM360_OPENAI_MODEL` (default `gpt-5-nano`).
+- Usa el SDK de OpenAI con lazy import (no se importa al cargar el modulo).
+- Construye prompts via `PromptPolicy`.
+- Si la API key falta, responde HTTP 503 controlado sin secrets.
+- Si la llamada a OpenAI falla, el provider retorna `SAFE_ACK_TEXT` como
+  fallback (no expone stacktrace).
+- No usa LiteLLM.
+
+### Comportamiento ante errores
+
+- Provider invalido: HTTP 503 controlado listando valores aceptados.
+- API key faltante: HTTP 503 controlado, sin stacktrace, sin exponer env values.
+- API call fallida: el runtime devuelve respuesta 201 con fallback seguro
+  (SAFE_ACK_TEXT), sin leaks de secrets ni stacktrace.
+
+### Matriz actualizada del product adapter
+
+| # | TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED | TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY | TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER | HTTP esperado | State backend | Retrieval | LLM | runtime_mode |
+|---|------------------------------------------------|---------------------------------------------------|-----------------------------------------------|---------------|---------------|-----------|-----|--------------|
+| A | unset / 0 | — | — | 404 controlado | — | — | — | — |
+| B | `1` | unset | — | 503 controlado | — | — | — | — |
+| C | `1` | `inmemory_test` | unset o `fake` | 201 | `InMemoryConversationStateRepository` | `fake` | `fake` | `product_adapter_skeleton` |
+| D | `1` | `inmemory_test` | `openai` | 201 (con fallback si API no disponible) | `InMemoryConversationStateRepository` | `fake` | `openai` | `product_adapter_skeleton` |
+| E | `1` | `postgres` | unset o `fake` | 201 (si PG config OK) / 503 (si falta config DB) | `SyncPostgresConversationStateRepository` | `fake` | `fake` | `product_adapter_skeleton` |
+| F | `1` | `inmemory_test` | valor invalido | 503 controlado | — | — | — | — |
+
+### Tests agregados
+
+1. `test_product_route_llm_default_remains_fake`
+2. `test_product_route_accepts_explicit_fake_llm_provider`
+3. `test_product_route_rejects_invalid_llm_provider`
+4. `test_product_route_openai_missing_api_key_returns_controlled_error`
+5. `test_product_route_openai_config_error_does_not_leak_secrets`
+6. `test_product_route_openai_mode_does_not_call_openai_in_unit_tests`
+7. `test_product_route_state_hardening_still_required`
+
+Total: 28 tests en `test_sales_diagnosis_runtime_route.py`.
+
+### Capacidades futuras no activadas
+
+Esta fase no implementa ni habilita:
+
+- frontend;
+- Astro;
+- Svelte;
+- UI;
+- Home premium;
+- Console UI;
+- SSE productivo;
+- OpenAI real por default;
+- LiteLLM;
+- Milvus real;
+- ArangoDB;
+- pgvector;
+- cross-encoder;
+- Step-to-Action;
+- lead_capture;
+- diagnostic_code;
+- WhatsApp handoff;
+- CRM real.
+
 ### Resumen del bloque 1.9
 
 | Fase | Que agrega | Estado |
@@ -1440,4 +1528,5 @@ Esta fase no implementa ni habilita:
 | 1.9a | Product route adapter skeleton con feature flag, defaults seguros, contrato HTTP y tests | Committed |
 | 1.9b | State hardening: state repository obligatorio, `SyncPostgresConversationStateRepository`, errores controlados sin secrets | Committed |
 | 1.9c | Smoke HTTP product adapter con Postgres opt-in, cleanup prefijado y validacion de contrato completo | Committed |
-| 1.9d | Release gate: matriz, comandos consolidados, confirmacion de defaults y limites | Este documento |
+| 1.9d | Release gate: matriz, comandos consolidados, confirmacion de defaults y limites | Committed |
+| 1.9e | Product adapter OpenAI direct opt-in boundary: nueva env `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER`, `_ProductOpenAILLMProvider`, tests, matriz actualizada | Este documento |

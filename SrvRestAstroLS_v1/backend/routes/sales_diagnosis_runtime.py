@@ -13,11 +13,18 @@ State must be explicit when enabled:
 - TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres
 - TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test
 
+LLM provider (env var):
+- Default (unset or "fake"): _DevFakeLLMProvider (no OpenAI)
+- ``TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai``: uses
+  _ProductOpenAILLMProvider with OpenAI direct (requires TEAM360_OPENAI_KEY
+  or OPENAI_API_KEY). Model via TEAM360_OPENAI_MODEL (default gpt-5-nano).
+- Invalid values: HTTP 503 controlled error
+
 Safe provider defaults when enabled:
 - retrieval: fake
 - LLM: fake
 
-No Milvus, LiteLLM, OpenAI, SSE, Step-to-Action, lead_capture,
+No Milvus, LiteLLM, SSE, Step-to-Action, lead_capture,
 diagnostic_code, WhatsApp handoff or CRM is activated here.
 """
 
@@ -36,13 +43,16 @@ from litestar.status_codes import (
 from modules.sales_diagnosis_runtime import (
     AssistantConversationRuntime,
     AssistantTurnInput,
+    ConversationState,
     GuardrailPolicy,
     PromptPolicy,
+    RetrievedChunk,
 )
 from modules.sales_diagnosis_runtime.errors import (
     InvalidAssistantRuntimeInputError,
     UnsafeResponseError,
 )
+from modules.sales_diagnosis_runtime.providers import LLMProvider
 from modules.sales_diagnosis_runtime.state_repository import (
     InMemoryConversationStateRepository,
     SyncPostgresConversationStateRepository,
@@ -65,6 +75,7 @@ from .sales_diagnosis_runtime_schemas import (
 
 PRODUCT_ROUTE_ENABLED_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED"
 PRODUCT_STATE_REPOSITORY_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY"
+PRODUCT_LLM_PROVIDER_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER"
 PRODUCT_RUNTIME_MODE = "product_adapter_skeleton"
 
 _shared_product_inmemory_test_repo = InMemoryConversationStateRepository()
@@ -131,10 +142,95 @@ def _resolve_product_state_repository():
     )
 
 
+# ---------------------------------------------------------------------------
+# LLM provider
+# ---------------------------------------------------------------------------
+
+
+class _ProductOpenAILLMProvider:
+    """OpenAI LLM provider for product adapter.
+
+    Uses the OpenAI SDK with lazy import to avoid loading at module scope.
+    Requires TEAM360_OPENAI_KEY or OPENAI_API_KEY.
+    Model via TEAM360_OPENAI_MODEL (default gpt-5-nano).
+
+    Builds prompts via PromptPolicy.
+    """
+
+    def __init__(self) -> None:
+        self._api_key = self._resolve_api_key()
+        self._model = os.environ.get("TEAM360_OPENAI_MODEL", "").strip() or "gpt-5-nano"
+        self._prompt_policy = PromptPolicy()
+
+    @staticmethod
+    def _resolve_api_key() -> str:
+        api_key = (
+            os.environ.get("TEAM360_OPENAI_KEY")
+            or os.environ.get("OPENAI_API_KEY")
+        )
+        if not api_key:
+            raise HTTPException(
+                status_code=HTTP_503_SERVICE_UNAVAILABLE,
+                detail=(
+                    f"{PRODUCT_LLM_PROVIDER_ENV}=openai requires "
+                    "TEAM360_OPENAI_KEY or OPENAI_API_KEY."
+                ),
+            )
+        return api_key
+
+    def generate(
+        self,
+        input: AssistantTurnInput,
+        state: ConversationState,
+        context: list[RetrievedChunk],
+    ) -> str:
+        system_prompt = self._prompt_policy.build_system_prompt(
+            assistant_instance_code=input.assistant_instance_code,
+            package_code=input.package_code,
+        )
+        turn_prompt = self._prompt_policy.build_turn_prompt(input, state, context)
+
+        try:
+            from openai import OpenAI
+
+            client = OpenAI(api_key=self._api_key)
+            response = client.chat.completions.create(
+                model=self._model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": turn_prompt},
+                ],
+                timeout=30,
+            )
+            content = response.choices[0].message.content
+            if not content:
+                return "No se pudo generar una respuesta en este momento."
+            return content
+        except Exception:
+            from modules.sales_diagnosis_runtime.contracts import SAFE_ACK_TEXT
+
+            return SAFE_ACK_TEXT
+
+
+def _resolve_product_llm_provider() -> LLMProvider:
+    mode = os.environ.get(PRODUCT_LLM_PROVIDER_ENV, "").strip().lower()
+    if not mode or mode == "fake":
+        return _DevFakeLLMProvider()
+    if mode == "openai":
+        return _ProductOpenAILLMProvider()
+    raise HTTPException(
+        status_code=HTTP_503_SERVICE_UNAVAILABLE,
+        detail=(
+            f"Invalid {PRODUCT_LLM_PROVIDER_ENV}={mode!r}. "
+            "Use 'fake' (default) or 'openai'."
+        ),
+    )
+
+
 def _build_product_adapter_runtime() -> AssistantConversationRuntime:
     return AssistantConversationRuntime(
         retrieval_provider=_DevFakeRetrievalProvider(),
-        llm_provider=_DevFakeLLMProvider(),
+        llm_provider=_resolve_product_llm_provider(),
         state_repository=_resolve_product_state_repository(),
         prompt_policy=PromptPolicy(),
         guardrail_policy=GuardrailPolicy(),

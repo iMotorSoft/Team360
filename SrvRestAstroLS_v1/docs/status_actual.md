@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9d — Product adapter release gate)
+Ultima actualizacion: 2026-06-11 (Fase 1.9e — Product adapter OpenAI direct opt-in boundary)
 
 ## Directorio de trabajo
 
@@ -74,6 +74,34 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 - Se agrego resumen del bloque 1.9 con estado de cada fase.
 - No se modifico logica del endpoint, routes, schemas, tests, ni smokes existentes.
 - No se activaron servicios reales nuevos.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9e — Product adapter OpenAI direct opt-in boundary
+
+- Se agrego `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER` env para selector de LLM en product adapter.
+- Valores aceptados: `fake` (default) y `openai`.
+- Se creo `_ProductOpenAILLMProvider` en `routes/sales_diagnosis_runtime.py`:
+  - Lazy import de OpenAI SDK (no se importa al cargar modulo).
+  - API key via `TEAM360_OPENAI_KEY` o `OPENAI_API_KEY`.
+  - Modelo via `TEAM360_OPENAI_MODEL` (default `gpt-5-nano`).
+  - Prompts via `PromptPolicy`.
+  - Errores de API retornan `SAFE_ACK_TEXT` como fallback (sin stacktrace).
+- Si API key falta: HTTP 503 controlado sin secrets.
+- Si provider invalido: HTTP 503 controlado listando valores aceptados.
+- Se agregaron 7 tests nuevos en `test_sales_diagnosis_runtime_route.py`:
+  1. LLM default remains fake.
+  2. Accepts explicit fake LLM provider.
+  3. Rejects invalid LLM provider.
+  4. OpenAI missing API key returns controlled error.
+  5. OpenAI config error does not leak secrets.
+  6. OpenAI mode does not call OpenAI in unit tests.
+  7. State hardening still required.
+- Total tests: 28 en route file.
+- Matriz actualizada (6 casos: A–F).
+- Se actualizaron:
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9e, matriz actualizada.
+  - `status_actual.md`: este registro.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, LiteLLM, Milvus, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, endpoint dev, smokes existentes.
 - No se creo rama nueva.
 
 ### 2026-06-10 - Fase 1.9a — Product route adapter skeleton

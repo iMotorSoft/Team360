@@ -18,6 +18,7 @@ from litestar.testing import TestClient
 from app import create_app
 import routes.sales_diagnosis_runtime as product_routes
 from routes.sales_diagnosis_runtime import (
+    PRODUCT_LLM_PROVIDER_ENV,
     PRODUCT_ROUTE_ENABLED_ENV,
     PRODUCT_STATE_REPOSITORY_ENV,
 )
@@ -298,6 +299,94 @@ def test_product_route_keeps_dev_route_working(monkeypatch):
         resp = client.post(DEV_TURN_PATH, json=_default_payload(metadata={"channel": "dev"}))
     assert resp.status_code == HTTP_201_CREATED
     assert resp.json()["runtime_mode"] == "dev_fake"
+
+
+def test_product_route_llm_default_remains_fake(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.delenv(PRODUCT_LLM_PROVIDER_ENV, raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    assert "Recibí tu consulta" in resp.json()["response_text"]
+
+
+def test_product_route_accepts_explicit_fake_llm_provider(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "fake")
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    assert resp.json()["runtime_mode"] == "product_adapter_skeleton"
+
+
+def test_product_route_rejects_invalid_llm_provider(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "claude")
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    detail = resp.json()["detail"]
+    assert "Invalid" in detail
+    assert "fake" in detail
+    assert "openai" in detail
+
+
+def test_product_route_openai_missing_api_key_returns_controlled_error(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "openai")
+    monkeypatch.delenv("TEAM360_OPENAI_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    detail = resp.json()["detail"]
+    assert PRODUCT_LLM_PROVIDER_ENV in detail
+    assert "TEAM360_OPENAI_KEY" in detail
+    assert "Traceback" not in detail
+
+
+def test_product_route_openai_config_error_does_not_leak_secrets(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "openai")
+    monkeypatch.setenv("TEAM360_OPENAI_KEY", "sk-real-test-key-12345")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    body = resp.json()
+    assert "sk-real-test-key-12345" not in resp.text.lower()
+    assert body["runtime_mode"] == "product_adapter_skeleton"
+    assert body["fallback_applied"] is not None
+
+
+def test_product_route_openai_mode_does_not_call_openai_in_unit_tests(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "openai")
+    monkeypatch.setenv("TEAM360_OPENAI_KEY", "sk-test-key")
+    called: list[bool] = []
+
+    original_resolve = product_routes._resolve_product_llm_provider
+
+    def _mock_resolve():
+        from routes.sales_diagnosis_runtime_dev import _DevFakeLLMProvider
+        return _DevFakeLLMProvider()
+
+    monkeypatch.setattr(product_routes, "_resolve_product_llm_provider", _mock_resolve)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    body = resp.json()
+    assert body["runtime_mode"] == "product_adapter_skeleton"
+    assert body["response_type"] == "final"
+
+
+def test_product_route_state_hardening_still_required(monkeypatch):
+    _enable_product_route(monkeypatch)
+    monkeypatch.delenv(PRODUCT_STATE_REPOSITORY_ENV, raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
 
 
 def test_product_route_is_documented_as_adapter_skeleton_not_final_public_endpoint():
