@@ -23,11 +23,18 @@ LLM provider (env var):
   and TEAM360_LITELLM_API_KEY). Default model alias: openai_gpt-5-nano.
 - Invalid values: HTTP 503 controlled error
 
+Retrieval provider (env var):
+- Default (unset or ``"fake"``): _DevFakeRetrievalProvider (no Milvus)
+- ``TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus``: uses
+  MilvusRetrievalProvider with a dev fake embedding provider (no OpenAI).
+  Requires TEAM360_MILVUS_URI or TEAM360_MILVUS_HOST.
+- Invalid values: HTTP 503 controlled error
+
 Safe provider defaults when enabled:
 - retrieval: fake
 - LLM: fake
 
-No Milvus, LiteLLM, SSE, Step-to-Action, lead_capture,
+No Milvus real, LiteLLM, SSE, Step-to-Action, lead_capture,
 diagnostic_code, WhatsApp handoff or CRM is activated here.
 """
 
@@ -59,7 +66,11 @@ from modules.sales_diagnosis_runtime.errors import (
     InvalidAssistantRuntimeInputError,
     UnsafeResponseError,
 )
-from modules.sales_diagnosis_runtime.providers import LLMProvider
+from modules.sales_diagnosis_runtime.milvus_provider import (
+    MilvusRetrievalProvider,
+    MilvusRuntimeConfig,
+)
+from modules.sales_diagnosis_runtime.providers import LLMProvider, RetrievalProvider
 from modules.sales_diagnosis_runtime.state_repository import (
     InMemoryConversationStateRepository,
     SyncPostgresConversationStateRepository,
@@ -67,6 +78,7 @@ from modules.sales_diagnosis_runtime.state_repository import (
 )
 
 from .sales_diagnosis_runtime_dev import (
+    _DevFakeEmbeddingProvider,
     _DevFakeLLMProvider,
     _DevFakeRetrievalProvider,
     _PROHIBITED_CODES,
@@ -83,6 +95,7 @@ from .sales_diagnosis_runtime_schemas import (
 PRODUCT_ROUTE_ENABLED_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED"
 PRODUCT_STATE_REPOSITORY_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY"
 PRODUCT_LLM_PROVIDER_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER"
+PRODUCT_RETRIEVAL_PROVIDER_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER"
 PRODUCT_RUNTIME_MODE = "product_adapter_skeleton"
 
 _shared_product_inmemory_test_repo = InMemoryConversationStateRepository()
@@ -314,9 +327,41 @@ def _resolve_product_llm_provider() -> LLMProvider:
     )
 
 
+# ---------------------------------------------------------------------------
+# Retrieval provider
+# ---------------------------------------------------------------------------
+
+
+def _resolve_product_retrieval_provider() -> RetrievalProvider:
+    mode = os.environ.get(PRODUCT_RETRIEVAL_PROVIDER_ENV, "").strip().lower()
+    if not mode or mode == "fake":
+        return _DevFakeRetrievalProvider()
+    if mode == "milvus":
+        config = MilvusRuntimeConfig.from_env()
+        if not config.uri and not config.host:
+            raise HTTPException(
+                status_code=HTTP_503_SERVICE_UNAVAILABLE,
+                detail=(
+                    f"{PRODUCT_RETRIEVAL_PROVIDER_ENV}=milvus requires "
+                    "TEAM360_MILVUS_URI or TEAM360_MILVUS_HOST."
+                ),
+            )
+        return MilvusRetrievalProvider(
+            config=config,
+            embedding_provider=_DevFakeEmbeddingProvider(),
+        )
+    raise HTTPException(
+        status_code=HTTP_503_SERVICE_UNAVAILABLE,
+        detail=(
+            f"Invalid {PRODUCT_RETRIEVAL_PROVIDER_ENV}={mode!r}. "
+            "Use 'fake' (default) or 'milvus'."
+        ),
+    )
+
+
 def _build_product_adapter_runtime() -> AssistantConversationRuntime:
     return AssistantConversationRuntime(
-        retrieval_provider=_DevFakeRetrievalProvider(),
+        retrieval_provider=_resolve_product_retrieval_provider(),
         llm_provider=_resolve_product_llm_provider(),
         state_repository=_resolve_product_state_repository(),
         prompt_policy=PromptPolicy(),

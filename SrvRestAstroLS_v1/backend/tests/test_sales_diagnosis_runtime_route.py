@@ -19,6 +19,7 @@ from app import create_app
 import routes.sales_diagnosis_runtime as product_routes
 from routes.sales_diagnosis_runtime import (
     PRODUCT_LLM_PROVIDER_ENV,
+    PRODUCT_RETRIEVAL_PROVIDER_ENV,
     PRODUCT_ROUTE_ENABLED_ENV,
     PRODUCT_STATE_REPOSITORY_ENV,
 )
@@ -470,6 +471,148 @@ def test_product_route_state_hardening_still_required(monkeypatch):
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
     assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+
+
+# ---------------------------------------------------------------------------
+# Fase 1.9k — Product adapter Milvus retrieval opt-in boundary
+# ---------------------------------------------------------------------------
+
+
+def test_product_route_retrieval_default_remains_fake(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.delenv(PRODUCT_RETRIEVAL_PROVIDER_ENV, raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    chunks = resp.json()["retrieved_sources"]
+    assert chunks
+    assert chunks[0]["chunk_id"] == "dev_doc_1"
+
+
+def test_product_route_accepts_explicit_fake_retrieval_provider(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_RETRIEVAL_PROVIDER_ENV, "fake")
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    chunks = resp.json()["retrieved_sources"]
+    assert chunks
+    assert chunks[0]["chunk_id"] == "dev_doc_1"
+
+
+def test_product_route_accepts_milvus_retrieval_provider_with_mocked_config(monkeypatch):
+    monkeypatch.setenv(PRODUCT_RETRIEVAL_PROVIDER_ENV, "milvus")
+    monkeypatch.setenv("TEAM360_MILVUS_URI", "http://localhost:19530")
+    monkeypatch.setenv("TEAM360_MILVUS_TOKEN", "test-token")
+    provider = product_routes._resolve_product_retrieval_provider()
+    assert provider is not None
+    assert provider._config.uri == "http://localhost:19530"
+    from modules.sales_diagnosis_runtime.milvus_provider import MilvusRetrievalProvider
+    assert isinstance(provider, MilvusRetrievalProvider)
+
+
+def test_product_route_invalid_retrieval_provider_returns_controlled_503(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_RETRIEVAL_PROVIDER_ENV, "pinecone")
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    assert "Traceback" not in resp.text
+    assert "File \"" not in resp.text
+
+
+def test_product_route_invalid_retrieval_provider_lists_fake_and_milvus(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_RETRIEVAL_PROVIDER_ENV, "pinecone")
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    detail = resp.json()["detail"]
+    assert "Invalid" in detail
+    assert "fake" in detail
+    assert "milvus" in detail
+
+
+def test_product_route_milvus_missing_config_returns_controlled_503(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_RETRIEVAL_PROVIDER_ENV, "milvus")
+    monkeypatch.delenv("TEAM360_MILVUS_URI", raising=False)
+    monkeypatch.delenv("TEAM360_MILVUS_HOST", raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    detail = resp.json()["detail"]
+    assert PRODUCT_RETRIEVAL_PROVIDER_ENV in detail
+    assert "TEAM360_MILVUS_URI" in detail
+    assert "Traceback" not in detail
+
+
+def test_product_route_milvus_config_error_does_not_leak_secrets(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_RETRIEVAL_PROVIDER_ENV, "milvus")
+    monkeypatch.setenv("TEAM360_MILVUS_URI", "http://localhost:19530")
+    monkeypatch.setenv("TEAM360_MILVUS_TOKEN", "sensitive-milvus-token-999")
+
+    assert "sensitive-milvus-token-999" not in repr(
+        product_routes.MilvusRuntimeConfig.from_env()
+    )
+    assert "***" in repr(
+        product_routes.MilvusRuntimeConfig.from_env()
+    )
+
+
+def test_product_route_milvus_mode_does_not_call_real_network_in_unit_tests(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_RETRIEVAL_PROVIDER_ENV, "milvus")
+    monkeypatch.setenv("TEAM360_MILVUS_URI", "http://localhost:19530")
+    monkeypatch.setenv("TEAM360_MILVUS_TOKEN", "sk-milvus-test-token")
+
+    def _mock_resolve():
+        from routes.sales_diagnosis_runtime_dev import _DevFakeRetrievalProvider
+        return _DevFakeRetrievalProvider()
+
+    monkeypatch.setattr(
+        product_routes, "_resolve_product_retrieval_provider", _mock_resolve
+    )
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    body = resp.json()
+    assert body["runtime_mode"] == "product_adapter_skeleton"
+    assert body["response_type"] == "final"
+
+
+def test_product_route_openai_litellm_paths_not_broken_by_retrieval_selector(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_RETRIEVAL_PROVIDER_ENV, "fake")
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "openai")
+    monkeypatch.delenv("OpenAI_Key_JAI_query", raising=False)
+    monkeypatch.setenv("TEAM360_OPENAI_KEY", "sk-test-key")
+
+    original_resolve_llm = product_routes._resolve_product_llm_provider
+
+    def _mock_resolve_llm():
+        from routes.sales_diagnosis_runtime_dev import _DevFakeLLMProvider
+        return _DevFakeLLMProvider()
+
+    monkeypatch.setattr(product_routes, "_resolve_product_llm_provider", _mock_resolve_llm)
+
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    body = resp.json()
+    assert body["runtime_mode"] == "product_adapter_skeleton"
+    assert body["response_type"] == "final"
+
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "litellm")
+    monkeypatch.setenv("TEAM360_LITELLM_BASE_URL", "http://localhost:4000")
+    monkeypatch.setenv("TEAM360_LITELLM_API_KEY", "sk-litellm-test")
+
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    body = resp.json()
+    assert body["runtime_mode"] == "product_adapter_skeleton"
 
 
 def test_product_route_is_documented_as_adapter_skeleton_not_final_public_endpoint():

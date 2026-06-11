@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9j — Product adapter LLM release gate)
+Ultima actualizacion: 2026-06-11 (Fase 1.9k — Product adapter Milvus retrieval opt-in boundary)
 
 ## Directorio de trabajo
 
@@ -304,6 +304,44 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
   uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
 ```
+
+### 2026-06-11 - Fase 1.9k — Product adapter Milvus retrieval opt-in boundary
+
+- Se agrego `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER` en `routes/sales_diagnosis_runtime.py`.
+- Valores aceptados: `fake` (default) y `milvus` (opt-in).
+- Default obligatorio: `fake`.
+- `_resolve_product_retrieval_provider()` creada, con patron consistente con el dev endpoint.
+- `_build_product_adapter_runtime()` actualizada para usar `_resolve_product_retrieval_provider()`.
+- Modo `milvus` requiere `TEAM360_MILVUS_URI` o `TEAM360_MILVUS_HOST`.
+- Modo `milvus` usa `MilvusRetrievalProvider` con `_DevFakeEmbeddingProvider` (1536-dim, no OpenAI real).
+- Embedding fake: placeholder dev/product-adapter-boundary, no es estrategia final.
+- Errores de config devuelven HTTP 503 controlado (no 500), sin stacktrace ni secrets.
+- `MilvusRuntimeConfig.from_env()` usada tal cual existe; `__repr__` ya enmascara token.
+- No se creo `_ProductMilvusRetrievalProvider` — se reusa `MilvusRetrievalProvider` directo.
+- No se modifico `milvus_provider.py` ni `embedding_provider.py`.
+- No se modifico `runtime.py` ni `contracts.py`.
+- No se modifico el endpoint dev ni sus tests.
+- Tests agregados (9):
+  1. `product_route_retrieval_default_remains_fake`
+  2. `product_route_accepts_explicit_fake_retrieval_provider`
+  3. `product_route_accepts_milvus_retrieval_provider_with_mocked_config`
+  4. `product_route_invalid_retrieval_provider_returns_controlled_503`
+  5. `product_route_invalid_retrieval_provider_lists_fake_and_milvus`
+  6. `product_route_milvus_missing_config_returns_controlled_503`
+  7. `product_route_milvus_config_error_does_not_leak_secrets`
+  8. `product_route_milvus_mode_does_not_call_real_network_in_unit_tests`
+  9. `product_route_openai_litellm_paths_not_broken_by_retrieval_selector`
+- Smoke real Milvus queda para Fase 1.9l.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real, LiteLLM real,
+  Milvus real por default, ArangoDB, pgvector, cross-encoder, Step-to-Action,
+  lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- No se creo rama nueva.
+
+Se actualizaron:
+  - `routes/sales_diagnosis_runtime.py`: env var, resolver, imports, docstring.
+  - `tests/test_sales_diagnosis_runtime_route.py`: 9 nuevos tests.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9k, resumen bloque 1.9.
+  - `docs/status_actual.md`: este registro.
 
 ### 2026-06-10 - Fase 1.9a — Product route adapter skeleton
 

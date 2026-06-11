@@ -1820,6 +1820,33 @@ No expone secrets, stacktrace ni detalles del provider.
 - State sigue explicito (`postgres` o `inmemory_test`).
 - No hay frontend, SSE, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
 
+## Fase 1.9k — Product adapter Milvus retrieval opt-in boundary
+
+### Nueva env var: `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER`
+
+| Valor | Comportamiento | Default | Network real |
+|-------|---------------|---------|-------------|
+| `fake` (unset) | `_DevFakeRetrievalProvider` — chunks fijos `dev_doc_*` | **Si** | No |
+| `milvus` | `MilvusRetrievalProvider` + `_DevFakeEmbeddingProvider` (1536-dim) | No | Solo opt-in |
+
+### Detalles de implementacion
+
+- `_resolve_product_retrieval_provider()` en `routes/sales_diagnosis_runtime.py`.
+- Usa `MilvusRuntimeConfig.from_env()` existente (no se crearon nuevos env vars).
+- Si `milvus` es seleccionado pero falta `TEAM360_MILVUS_URI` y `TEAM360_MILVUS_HOST`: HTTP 503 controlado.
+- Si `milvus` es seleccionado con config valida: se instancia `MilvusRetrievalProvider` con `_DevFakeEmbeddingProvider`.
+- `_DevFakeEmbeddingProvider` devuelve vector 1536-dim de ceros, sin llamadas reales a OpenAI/LiteLLM.
+- Embedding fake es placeholder dev/product-adapter-boundary, no estrategia final.
+- `MilvusRuntimeConfig.__repr__` ya enmascara el token (`***`), sin leaks en errores.
+- No se creo clase wrapper nueva; se reusa `MilvusRetrievalProvider` directo.
+
+### Tests
+
+9 tests agregados en `tests/test_sales_diagnosis_runtime_route.py`:
+- Default, explicit fake, milvus aceptado con config, provider invalido, valores listados, config faltante, no leak de secrets, no network real en unit tests, compatibilidad con OpenAI/LiteLLM.
+
+Smoke real Milvus queda para Fase 1.9l.
+
 ### Resumen del bloque 1.9
 
 | Fase | Que agrega | Estado |
@@ -1833,4 +1860,5 @@ No expone secrets, stacktrace ni detalles del provider.
 | 1.9g | OpenAI direct real validation: helpers `get_team360_openai_key()` y `get_team360_openai_model()` en `globalVar.py`, resolucion centralizada con `OpenAI_Key_JAI_query`, smoke real OpenAI **14/14 passed**, `response_is_fallback=false` | Committed |
 | 1.9h | Product adapter LiteLLM opt-in boundary: `_ProductLiteLLMProvider`, `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`, tests, smoke script, docs | Committed |
 | 1.9i | LiteLLM real validation: smoke real **13/13 passed**, `response_is_fallback=false`, `openai_gpt-5-nano` alias, no fallback silencioso, no OpenAI directo | Committed |
-| 1.9j | Product adapter LLM release gate: matriz LLM, comandos consolidados, confirmacion de defaults, provider_result event documentado, validaciones reales OpenAI + LiteLLM confirmadas | Este documento |
+| 1.9j | Product adapter LLM release gate: matriz LLM, comandos consolidados, confirmacion de defaults, provider_result event documentado, validaciones reales OpenAI + LiteLLM confirmadas | Committed |
+| 1.9k | Product adapter Milvus retrieval opt-in boundary: `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER`, `_resolve_product_retrieval_provider()`, `MilvusRetrievalProvider` con `_DevFakeEmbeddingProvider`, tests, docs. Smoke real Milvus queda para 1.9l | Este documento |
