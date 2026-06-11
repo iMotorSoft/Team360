@@ -58,7 +58,7 @@ def _provider_config(*, real_llm: bool = False, real_retrieval: bool = False) ->
 def test_load_dataset_fixture():
     dataset = evaluator._load_dataset(FIXTURE_PATH)
     assert dataset["test_suite"] == "sales_diagnosis_headless_response_validation_v1"
-    assert len(dataset["cases"]) == 10
+    assert len(dataset["cases"]) == 25
     assert dataset["cases"][0]["id"] == "speed_simple_001"
 
 

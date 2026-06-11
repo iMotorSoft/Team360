@@ -1866,6 +1866,8 @@ Smoke real Milvus queda para Fase 1.9l.
 | 1.9m | Milvus schema/corpus alignment: inspector `inspect_sales_diagnosis_milvus_schema.py`, provider alias resolution, real collection `team360_lab_pgvector_benchmark_openai_small_1536`, `knowledge_scope_id`/`embedding_version` alignment, smoke real 16/16 | Implemented (uncommitted) |
 | 1.9n | Headless diagnostic response validation: dataset semantico `sales_diagnosis_headless_questions_v1.json`, evaluator `evaluate_sales_diagnosis_headless_responses.py`, scoring PASS/WARN/FAIL/SKIP sin frontend | Committed |
 | 1.9p | Diagnose LiteLLM fallback difference: flags diagnosticos del evaluator, separacion provider fallback vs guardrail fallback, evidencia de backend env/token | Implemented (uncommitted) |
+| 1.9q | Tune headless diagnostic prompt policy: PromptPolicy y GuardrailPolicy endurecidos para alinear con dataset v1 | Committed |
+| 1.9r | Headless diagnostic quality expansion: dataset ampliado de 10 a 25 casos, 15 casos nuevos en 14 categorias. Evaluator RISK_HINTS expandido, GLOBAL_FORBIDDEN_PATTERNS ampliado, PromptPolicy con reglas generales. Tests actualizados. Sin frontend, sin capacidades futuras activadas | Implemented |
 
 ## Fase 1.9l — Product adapter Milvus real smoke
 

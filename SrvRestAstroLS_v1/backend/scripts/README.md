@@ -510,6 +510,93 @@ Resultados finales observados:
 | LiteLLM/Milvus `openai_gpt-5-nano` | 5 PASS / 5 WARN / 0 FAIL / 0 SKIP | `response_is_fallback=false` |
 | LiteLLM/Milvus `gpt5.5-nano` | SKIP operativo | `response_is_fallback=true` en 10/10 |
 
+### Fase 1.9r — Headless diagnostic quality expansion
+
+El dataset headless se expandio de 10 a 25 casos (15 nuevos) para cubrir
+situaciones comerciales y tecnicas reales adicionales sin tocar UI ni activar
+capacidades futuras.
+
+**Categorias nuevas (14):**
+1. Proceso manual repetitivo (Excel a sistema)
+2. Datos sensibles / privacidad
+3. Sistema legacy sin API
+4. Portal externo de proveedor
+5. Proceso de baja frecuencia
+6. Error humano alto
+7. Automatizacion parcial
+8. Integracion CRM
+9. WhatsApp handoff
+10. Lead capture
+11. ROI
+12. Responsabilidad / supervision
+13. Acceso no autorizado (rechazo)
+14. Evasion de MFA (rechazo)
+15. Expectativa extrema
+
+**Cambios en evaluator:**
+- `RISK_HINTS` expandido con 20 nuevas entradas para flags de riesgo
+- `GLOBAL_FORBIDDEN_PATTERNS` ampliado de ~26 a ~47 patrones
+
+**Cambios en PromptPolicy:**
+- Reglas generales agregadas para cada nueva categoria (sin if por pregunta)
+- GuardrailPolicy sin cambios (ya cubre capacidades futuras via patrones)
+
+**Resultados con dataset ampliado (25 casos):**
+
+| Escenario | Resultado | Estado fallback |
+| --- | ---: | --- |
+| fake/fake | 1 PASS / 24 WARN / 0 FAIL / 0 SKIP | `response_is_fallback=true` esperado en fake |
+| LiteLLM/Milvus `openai_gpt-5-nano` | 0 PASS / 0 WARN / 25 FAIL / 0 SKIP | `response_is_fallback=true` — modelo devuelve contenido vacio |
+| LiteLLM/Milvus `openrouter_deepseek_4_flash` | 0 PASS / 0 WARN / 25 FAIL / 0 SKIP | `response_is_fallback=true` — Milvus devuelve `dev_doc_*` fakes |
+| `gpt5.5-nano` | SKIP operativo | Alias no existe en proxy |
+
+Los FAIL en LLM real corresponden a `response_is_fallback=true` por modelo
+que devuelve contenido vacio o config de retrieval que no conecta Milvus real.
+No se relajo el evaluador ni se hicieron cambios agresivos de prompt.
+
+Comandos principales (ver Fase 1.9q para comandos base):
+
+```bash
+# fake/fake con dataset ampliado
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+  uv run python scripts/evaluate_sales_diagnosis_headless_responses.py \
+    --print-events
+
+# LiteLLM/Milvus
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+TEAM360_MILVUS_HOST=127.0.0.1 \
+TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536 \
+TEAM360_KNOWLEDGE_SCOPE_ID=8b071443-5bd6-4fe4-bbc3-fc2dca179a5b \
+TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1 \
+  uv run python scripts/evaluate_sales_diagnosis_headless_responses.py \
+    --print-events \
+    --require-real-llm
+
+# Con allow-fallback para evaluar semanticamente aunque el LLM falle
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+TEAM360_MILVUS_HOST=127.0.0.1 \
+TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536 \
+TEAM360_KNOWLEDGE_SCOPE_ID=8b071443-5bd6-4fe4-bbc3-fc2dca179a5b \
+TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1 \
+  uv run python scripts/evaluate_sales_diagnosis_headless_responses.py \
+    --allow-fallback
+```
+
+No se creo frontend, no se activaron capacidades futuras
+(Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM).
+LLM fake y retrieval fake siguen siendo default.
+
 Acotacion Milvus: la validacion real uso Milvus estandar local
 `milvus26-standalone` (`127.0.0.1:19530`) con MinIO y etcd del stack
 `milvus26-*`. No se configuro token Milvus ni se activo retrieval real por

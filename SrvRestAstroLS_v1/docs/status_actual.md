@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9p — Diagnose LiteLLM fallback difference)
+Ultima actualizacion: 2026-06-11 (Fase 1.9r — Headless diagnostic quality expansion)
 
 ## Directorio de trabajo
 
@@ -1967,3 +1967,27 @@ Incluye estructura inicial para:
   - Secret scan = sin secretos reales; solo nombres literales permitidos, ejemplos documentales y claves fake de tests.
 - No se toco frontend, Astro, Svelte, UI, Console, SSE productivo, pgvector, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
 - LLM fake sigue default, retrieval fake sigue default, LiteLLM y Milvus siguen opt-in.
+
+### 2026-06-11 - Fase 1.9r — Headless diagnostic quality expansion
+
+- Se amplio el dataset `sales_diagnosis_headless_questions_v1.json` de **10 a 25 casos** (15 nuevos).
+- Categorias nuevas agregadas (14): repetitive manual, sensitive data, legacy no API, external portal, low frequency, human error, partial automation, CRM, WhatsApp handoff, lead capture, ROI, responsibility, unauthorized access, MFA bypass, extreme expectation.
+- `RISK_HINTS` expandido con 20 nuevas entradas.
+- `GLOBAL_FORBIDDEN_PATTERNS` ampliado de ~26 a ~47 patrones.
+- `PromptPolicy.build_system_prompt()` actualizado con reglas generales (sin if por pregunta).
+- GuardrailPolicy sin cambios.
+- Test `test_load_dataset_fixture` actualizado de 10 a 25.
+- Evaluaciones:
+
+| Escenario | Resultado | Fallback |
+| --- | ---: | --- |
+| fake/fake | 1 PASS / 24 WARN / 0 FAIL / 0 SKIP | `true` esperado |
+| LiteLLM/Milvus `openai_gpt-5-nano` | 0/0/25/0 FAIL | `true` — modelo contenido vacio |
+| LiteLLM/Milvus `openrouter_deepseek_4_flash` | 0/0/25/0 FAIL | `true` — fake dev_doc_* |
+| `gpt5.5-nano` | SKIP | Alias no existe |
+
+- Tests: **398 passed, 9 skipped** (sin regresiones).
+- `git diff --check` = OK.
+- Secret scan = sin leaks; solo nombres de variables literales, sin valores reales.
+- No se toco frontend, no capacidades futuras activadas, no rama nueva.
+- LLM fake default, retrieval fake default. LiteLLM y Milvus opt-in.
