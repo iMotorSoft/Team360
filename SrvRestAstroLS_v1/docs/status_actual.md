@@ -2014,3 +2014,39 @@ Incluye estructura inicial para:
 - No se creo rama nueva. Todo en `feature/console-backend-core`.
 - No se uso `feature/sales-diagnosis-runtime-skeleton`.
 - `archive-15ufPC/` no se agrego.
+
+### 2026-06-11 - Lab: alineacion con patrones de benchmark JudaismoEnVivo
+
+- Se revisaron como referencia los labs de JudaismoEnVivo:
+  - `reels_automation/labs/model_benchmark/`
+  - `SrvRestAstro_v2/lab/model-candidates-rag/`
+- Patrones utiles identificados:
+  - CLI con listado, filtros y dry-run;
+  - catalogo de modelos separado;
+  - resultados JSON/JSONL auditables y resumen tabular;
+  - medicion de duracion/latencia;
+  - errores como metadato sin abortar toda la matriz;
+  - comparativa agregada por modelo;
+  - documentacion de comandos, estructura y columnas.
+- Se excluyo explicitamente:
+  - datasets, prompts, golden answers y resultados de JudaismoEnVivo;
+  - secrets, credenciales, nombres de DB y configuracion de otro proyecto;
+  - modelos ajenos al diagnostico (`gpt5.5-nano`, `gpt5.4-nano`, Whisper, Flux, imagen/audio);
+  - logica de dominio de reels, halaja, DaisyUI o RAG de JudaismoEnVivo.
+- Cambios aplicados solo al lab `lab/model-evaluation-sales-diagnosis/`:
+  - IDs canonicos alineados con aliases reales Team360:
+    `openai_gpt-5-nano`, `openai_gpt_4o_mini_2024_07_18`,
+    `openrouter_qwen3_30b_a3b_thinking_2507`,
+    `openrouter_deepseek_4_flash` y `openai_direct_gpt-5-nano`;
+  - aliases legacy `litellm_*` mantenidos para compatibilidad CLI;
+  - validacion temprana de modelos desconocidos;
+  - resultados enriquecidos con `pass_rate` y `quality_status`;
+  - summary JSON enriquecido con totales, fastest model, best pass-rate,
+    modelos con fallas y modelos con fallback;
+  - `--output` ahora respeta la ruta JSONL custom documentada y ubica el
+    summary asociado junto a esa salida;
+  - README actualizado con patrones tomados y exclusiones.
+- No se modifico runtime productivo, product adapter, PromptPolicy,
+  GuardrailPolicy, frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+- Validaciones ejecutadas en el cierre de esta tarea se registran en el resumen final del agente.

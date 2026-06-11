@@ -21,11 +21,15 @@ def _load_results(path: Path) -> list[dict[str, Any]]:
         return json.loads(raw)
 
     if raw.strip()[:1] == b"{":
-        data = json.loads(raw)
-        if isinstance(data, dict):
-            if "results" in data:
-                return data["results"]
-            return [data]
+        try:
+            data = json.loads(raw)
+            if isinstance(data, dict):
+                if "results" in data:
+                    return data["results"]
+                return [data]
+        except json.JSONDecodeError:
+            pass
+        # Fall through to JSONL parsing
 
     lines = [
         json.loads(line) for line in raw.decode("utf-8").splitlines() if line.strip()
@@ -57,7 +61,7 @@ def _display_summary(
     header = (
         f"{'Model ID':40s} {'Provider':12s} {'Retrieval':10s} "
         f"{'Total':>6s} {'PASS':>5s} {'WARN':>5s} {'FAIL':>5s} "
-        f"{'SKIP':>5s} {'Fallback':>4s} {'Time':>7s} {'Avg/case':>9s}"
+        f"{'SKIP':>5s} {'Pass%':>7s} {'Fallback':>4s} {'Time':>7s} {'Avg/case':>9s}"
     )
     print(header)
     print("-" * (len(header) + 20))
@@ -74,17 +78,21 @@ def _display_summary(
         fallbacks = r.get("fallback_count", 0)
         duration = r.get("duration_seconds", 0.0)
         avg = r.get("avg_seconds_per_case", 0.0)
+        pass_rate = r.get("pass_rate")
         notes = r.get("notes", "")
 
         if total and isinstance(total, (int, float)) and total > 0:
             avg_str = f"{avg:.1f}s" if avg else f"{duration / total:.1f}s"
+            pass_rate_value = float(pass_rate) if pass_rate is not None else (passed / total) * 100
         else:
             avg_str = "N/A"
+            pass_rate_value = 0.0
 
         print(
             f"{model_id:40s} {provider:12s} {retrieval:10s} "
             f"{int(total):6d} {int(passed):5d} {int(warned):5d} {int(failed):5d} "
-            f"{int(skipped):5d} {int(fallbacks):4d} {duration:6.1f}s {avg_str:>9s}"
+            f"{int(skipped):5d} {pass_rate_value:6.1f}% {int(fallbacks):4d} "
+            f"{duration:6.1f}s {avg_str:>9s}"
         )
 
         if notes and notes != "ok":
@@ -108,12 +116,52 @@ def _display_summary(
     warned_total = sum(r.get("warn_count", 0) for r in results)
     failed_total = sum(r.get("fail_count", 0) for r in results)
     skipped_total = sum(r.get("skip_count", 0) for r in results)
+    fallback_total = sum(r.get("fallback_count", 0) for r in results)
     cases_total = sum(r.get("total_cases", 0) for r in results)
 
     print()
     print(f"Totals: {cases_total} cases | "
           f"PASS {passed_total} | WARN {warned_total} | "
-          f"FAIL {failed_total} | SKIP {skipped_total}")
+          f"FAIL {failed_total} | SKIP {skipped_total} | "
+          f"Fallback {fallback_total}")
+
+
+def _build_json_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
+    evaluated = [r for r in results if r.get("total_cases", 0) > 0]
+    fastest = min(evaluated, key=lambda r: r.get("avg_seconds_per_case", 0.0), default=None)
+    best_pass_rate = max(
+        evaluated,
+        key=lambda r: (
+            r.get("pass_rate")
+            if r.get("pass_rate") is not None
+            else (r.get("pass_count", 0) / r.get("total_cases", 1) * 100),
+            -r.get("fail_count", 0),
+            -r.get("fallback_count", 0),
+        ),
+        default=None,
+    )
+    return {
+        "total_evaluations": len(results),
+        "total_cases": sum(r.get("total_cases", 0) for r in results),
+        "total_pass": sum(r.get("pass_count", 0) for r in results),
+        "total_warn": sum(r.get("warn_count", 0) for r in results),
+        "total_fail": sum(r.get("fail_count", 0) for r in results),
+        "total_skip": sum(r.get("skip_count", 0) for r in results),
+        "total_fallback": sum(r.get("fallback_count", 0) for r in results),
+        "comparison": {
+            "fastest_model_id": fastest.get("model_id", "") if fastest else "",
+            "best_pass_rate_model_id": best_pass_rate.get("model_id", "") if best_pass_rate else "",
+            "models_with_failures": [
+                r.get("model_id", "?")
+                for r in results
+                if r.get("fail_count", 0) > 0 or r.get("quality_status") == "failed"
+            ],
+            "models_with_fallback": [
+                r.get("model_id", "?") for r in results if r.get("fallback_count", 0) > 0
+            ],
+        },
+        "results": results,
+    }
 
 
 def main() -> None:
@@ -157,17 +205,7 @@ def main() -> None:
         sys.exit(0)
 
     if args.json:
-        summary = {
-            "total_evaluations": len(all_results),
-            "total_cases": sum(r.get("total_cases", 0) for r in all_results),
-            "total_pass": sum(r.get("pass_count", 0) for r in all_results),
-            "total_warn": sum(r.get("warn_count", 0) for r in all_results),
-            "total_fail": sum(r.get("fail_count", 0) for r in all_results),
-            "total_skip": sum(r.get("skip_count", 0) for r in all_results),
-            "total_fallback": sum(r.get("fallback_count", 0) for r in all_results),
-            "results": all_results,
-        }
-        json.dump(summary, sys.stdout, indent=2, ensure_ascii=False)
+        json.dump(_build_json_summary(all_results), sys.stdout, indent=2, ensure_ascii=False)
         print()
     else:
         _display_summary(all_results, verbose=args.verbose)

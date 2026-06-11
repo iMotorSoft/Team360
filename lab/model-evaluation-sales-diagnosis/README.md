@@ -31,11 +31,15 @@ lo invoca como subproceso para cada modelo y agrega metadatos de corrida.
 
 | ID | Provider | Modo | Modelo |
 |----|----------|------|--------|
-| `openai_direct_gpt_5_nano` | OpenAI directo | `openai` | `gpt-5-nano` |
-| `litellm_openai_gpt_5_nano` | LiteLLM → OpenAI | `litellm` | `openai_gpt-5-nano` |
-| `litellm_openai_gpt_4o_mini_2024_07_18` | LiteLLM → OpenAI | `litellm` | `openai_gpt_4o_mini_2024_07_18` |
-| `litellm_qwen3_30b_a3b_thinking_2507` | LiteLLM → OpenRouter | `litellm` | `openrouter_qwen3_30b_a3b_thinking_2507` |
-| `litellm_deepseek_v4_flash` | LiteLLM → OpenRouter | `litellm` | `openrouter_deepseek_4_flash` |
+| `openai_direct_gpt-5-nano` | OpenAI directo | `openai` | `gpt-5-nano` |
+| `openai_gpt-5-nano` | LiteLLM → OpenAI | `litellm` | `openai_gpt-5-nano` |
+| `openai_gpt_4o_mini_2024_07_18` | LiteLLM → OpenAI | `litellm` | `openai_gpt_4o_mini_2024_07_18` |
+| `openrouter_qwen3_30b_a3b_thinking_2507` | LiteLLM → OpenRouter | `litellm` | `openrouter_qwen3_30b_a3b_thinking_2507` |
+| `openrouter_deepseek_4_flash` | LiteLLM → OpenRouter | `litellm` | `openrouter_deepseek_4_flash` |
+
+Los IDs legacy `litellm_*` y `openai_direct_gpt_5_nano` se aceptan como
+aliases de CLI para no romper corridas existentes, pero los IDs canonicos son
+los de la tabla.
 
 ## Modelos excluidos
 
@@ -131,7 +135,7 @@ Requiere backend levantado con `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=lit
 
 ```bash
 uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py \
-  --models litellm_openai_gpt_5_nano,litellm_openai_gpt_4o_mini_2024_07_18,litellm_qwen3_30b_a3b_thinking_2507,litellm_deepseek_v4_flash \
+  --models openai_gpt-5-nano,openai_gpt_4o_mini_2024_07_18,openrouter_qwen3_30b_a3b_thinking_2507,openrouter_deepseek_4_flash \
   --no-write-results
 ```
 
@@ -139,7 +143,7 @@ uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.
 
 ```bash
 uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py \
-  --models litellm_deepseek_v4_flash,litellm_qwen3_30b_a3b_thinking_2507
+  --models openrouter_deepseek_4_flash,openrouter_qwen3_30b_a3b_thinking_2507
 ```
 
 ### Correr con configuración custom
@@ -147,7 +151,7 @@ uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.
 ```bash
 uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py \
   --config lab/model-evaluation-sales-diagnosis/config/run_matrix.example.json \
-  --models litellm_openai_gpt_5_nano \
+  --models openai_gpt-5-nano \
   --output lab/model-evaluation-sales-diagnosis/results/custom_run.jsonl
 ```
 
@@ -198,6 +202,33 @@ lab/model-evaluation-sales-diagnosis/
 - Las env vars sensibles (`TEAM360_OPENAI_KEY`, `LITELLM_API_KEY`, etc.) se usan
   del entorno; no se hardcodean ni se loguean.
 - Usar `--no-write-results` para evitar escritura a disco en entornos compartidos.
+
+## Patrones tomados como referencia de JudaismoEnVivo
+
+Se revisaron los laboratorios `reels_automation/labs/model_benchmark/` y
+`SrvRestAstro_v2/lab/model-candidates-rag/` del proyecto JudaismoEnVivo. Los
+patrones reutilizables para Team360 son:
+
+- CLI con listado de modelos, filtros por modelo y modo dry-run.
+- Catalogo de modelos separado de los scripts.
+- Resultados auditables en JSON/JSONL y resumen tabular posterior.
+- Medicion explicita de duracion/latencia por corrida.
+- Manejo de errores como metadato de resultado, sin abortar toda la matriz.
+- Comparacion agregada por modelo: totales, mejor pass-rate, mas rapido,
+  modelos con fallas y modelos con fallback.
+- Documentacion clara de estructura, prerequisitos, comandos y significado de
+  columnas.
+
+No se trajeron:
+
+- Datasets, prompts, golden answers ni resultados de JudaismoEnVivo.
+- Secrets, nombres de bases, credenciales locales, URLs internas de servicios
+  ajenos o configuracion productiva de otro proyecto.
+- Modelos ajenos al diagnostico de Team360, por ejemplo `gpt5.5-nano`,
+  `gpt5.4-nano`, Whisper, Flux o modelos de imagen/audio.
+- Logica de dominio de reels, halaja, DaisyUI o RAG de JudaismoEnVivo.
+- Llamadas directas nuevas a proveedores desde el lab; Team360 sigue usando el
+  evaluador backend como fuente de verdad.
 
 ## Notas
 
