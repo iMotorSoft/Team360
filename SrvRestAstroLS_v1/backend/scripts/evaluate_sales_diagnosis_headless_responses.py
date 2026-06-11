@@ -144,6 +144,8 @@ class CaseEvaluation:
     matched_expected_claims: list[str] = field(default_factory=list)
     optional_risk_flags: list[str] = field(default_factory=list)
     fallback_detected: bool = False
+    guardrail_fallback_detected: bool = False
+    provider_result_seen: bool = False
     contract_ok: bool = True
 
 
@@ -239,12 +241,23 @@ def _truncate(text: str, limit: int = 240) -> str:
     return text[: limit - 1] + "…"
 
 
+def _redact_sensitive_text(text: str) -> str:
+    text = re.sub(r"sk-[A-Za-z0-9_-]+", "sk-<redacted>", text)
+    text = re.sub(r"Bearer\s+[A-Za-z0-9._~+/=-]+", "Bearer <redacted>", text)
+    text = re.sub(
+        r"(postgresql://[^:\s]+:)[^@\s]+@",
+        r"\1<redacted>@",
+        text,
+        flags=re.IGNORECASE,
+    )
+    return text
+
+
 def _response_preview(body: dict[str, Any]) -> str:
     preview = body.get("response_text")
     if not isinstance(preview, str):
         preview = json.dumps(body, ensure_ascii=False)
-    preview = preview.replace("sk-", "<redacted>")
-    return _truncate(preview)
+    return _truncate(_redact_sensitive_text(preview))
 
 
 def _load_dataset(dataset_path: Path) -> dict[str, Any]:
@@ -396,21 +409,49 @@ def _build_payload(case: dict[str, Any], session_id: str, endpoint: str) -> dict
     }
 
 
-def _response_has_fallback(body: dict[str, Any]) -> bool:
-    if body.get("fallback_applied") is True:
-        return True
+def _find_provider_result_events(body: dict[str, Any]) -> list[dict[str, Any]]:
     events = body.get("events")
     if not isinstance(events, list):
-        return False
+        return []
+    provider_events: list[dict[str, Any]] = []
     for event in events:
         if not isinstance(event, dict):
             continue
         if event.get("event_type") != "team360.llm.provider_result":
             continue
+        provider_events.append(event)
+    return provider_events
+
+
+def _response_has_provider_fallback(body: dict[str, Any]) -> bool:
+    for event in _find_provider_result_events(body):
         payload = event.get("payload")
         if isinstance(payload, dict) and payload.get("response_is_fallback") is True:
             return True
     return False
+
+
+def _response_has_guardrail_fallback(body: dict[str, Any]) -> bool:
+    return body.get("fallback_applied") is True
+
+
+def _sanitize_event(event: dict[str, Any]) -> dict[str, Any]:
+    sanitized: dict[str, Any] = {
+        "event_type": event.get("event_type"),
+        "safe_to_show": event.get("safe_to_show"),
+    }
+    payload = event.get("payload")
+    if isinstance(payload, dict):
+        sanitized_payload: dict[str, Any] = {}
+        for key, value in payload.items():
+            if key == "text":
+                sanitized_payload[key] = "<omitted>"
+            elif isinstance(value, str):
+                sanitized_payload[key] = _truncate(_redact_sensitive_text(value), 160)
+            else:
+                sanitized_payload[key] = value
+        sanitized["payload"] = sanitized_payload
+    return sanitized
 
 
 def _validate_contract(body: dict[str, Any], endpoint: str) -> list[str]:
@@ -457,6 +498,8 @@ def _evaluate_case(
     endpoint: str,
     provider_config: dict[str, Any],
     allow_fallback: bool,
+    fail_on_fallback: bool = False,
+    require_real_llm: bool = False,
 ) -> CaseEvaluation:
     response_text = body.get("response_text", "")
     response_preview = _response_preview(body)
@@ -467,69 +510,71 @@ def _evaluate_case(
     expected_hits = _match_expected_claims(response_text, expected_claims)
     forbidden_hits = _find_forbidden_hits(response_text, forbidden_claims)
     risk_hits = _detect_risk_support(response_text, risk_flags)
-    fallback_detected = _response_has_fallback(body)
+    provider_events = _find_provider_result_events(body)
+    provider_fallback_detected = _response_has_provider_fallback(body)
+    guardrail_fallback_detected = _response_has_guardrail_fallback(body)
     contract_errors = _validate_contract(body, endpoint)
 
-    if contract_errors:
+    def build_result(status: str, reason: str, *, contract_ok: bool = True) -> CaseEvaluation:
         return CaseEvaluation(
             id=case["id"],
             level=case["level"],
             validates=case["validates"],
-            status="FAIL",
-            reason="contract invalid: " + "; ".join(contract_errors),
+            status=status,
+            reason=reason,
             response_preview=response_preview,
             expected_coverage=f"{len(expected_hits)}/{len(expected_claims)}",
             forbidden_hits=forbidden_hits,
             matched_expected_claims=expected_hits,
             optional_risk_flags=risk_hits,
-            fallback_detected=fallback_detected,
+            fallback_detected=provider_fallback_detected,
+            guardrail_fallback_detected=guardrail_fallback_detected,
+            provider_result_seen=bool(provider_events),
+            contract_ok=contract_ok,
+        )
+
+    if contract_errors:
+        return build_result(
+            "FAIL",
+            "contract invalid: " + "; ".join(contract_errors),
             contract_ok=False,
         )
 
-    if body.get("response_type") == "unsafe_blocked":
-        return CaseEvaluation(
-            id=case["id"],
-            level=case["level"],
-            validates=case["validates"],
-            status="FAIL",
-            reason="response blocked by guardrails",
-            response_preview=response_preview,
-            expected_coverage=f"{len(expected_hits)}/{len(expected_claims)}",
-            forbidden_hits=forbidden_hits,
-            matched_expected_claims=expected_hits,
-            optional_risk_flags=risk_hits,
-            fallback_detected=fallback_detected,
+    if require_real_llm and not provider_config["real_llm_expected"]:
+        return build_result(
+            "FAIL",
+            "real LLM required, but selected client env does not request a real LLM provider",
         )
+
+    if (
+        require_real_llm
+        and not provider_events
+        and body.get("response_type") != "unsafe_blocked"
+    ):
+        return build_result(
+            "FAIL",
+            "real LLM required, but provider_result event is missing; "
+            "backend may be running without the expected real LLM envs",
+        )
+
+    if (
+        provider_fallback_detected
+        and not allow_fallback
+        and (provider_config["real_llm_expected"] or fail_on_fallback or require_real_llm)
+    ):
+        return build_result(
+            "FAIL",
+            "real LLM provider_result response_is_fallback=true",
+        )
+
+    if body.get("response_type") == "unsafe_blocked":
+        reason = "response blocked by guardrails"
+        if require_real_llm and not provider_events:
+            reason += "; provider_result event not returned on unsafe_blocked response"
+        return build_result("FAIL", reason)
 
     if forbidden_hits:
-        return CaseEvaluation(
-            id=case["id"],
-            level=case["level"],
-            validates=case["validates"],
-            status="FAIL",
-            reason=f"forbidden claims hit: {', '.join(forbidden_hits)}",
-            response_preview=response_preview,
-            expected_coverage=f"{len(expected_hits)}/{len(expected_claims)}",
-            forbidden_hits=forbidden_hits,
-            matched_expected_claims=expected_hits,
-            optional_risk_flags=risk_hits,
-            fallback_detected=fallback_detected,
-        )
-
-    if provider_config["real_llm_expected"] and fallback_detected and not allow_fallback:
-        return CaseEvaluation(
-            id=case["id"],
-            level=case["level"],
-            validates=case["validates"],
-            status="FAIL",
-            reason="real LLM mode fell back to safe ack or guardrail fallback",
-            response_preview=response_preview,
-            expected_coverage=f"{len(expected_hits)}/{len(expected_claims)}",
-            forbidden_hits=forbidden_hits,
-            matched_expected_claims=expected_hits,
-            optional_risk_flags=risk_hits,
-            fallback_detected=True,
-        )
+        return build_result("FAIL", f"forbidden claims hit: {', '.join(forbidden_hits)}")
 
     response_norm = _normalize_text(response_text)
     has_honesty_cue = any(
@@ -563,32 +608,11 @@ def _evaluate_case(
                 and str(source.get("chunk_id", "")).startswith("dev_doc_")
                 for source in retrieved_sources
             ):
-                return CaseEvaluation(
-                    id=case["id"],
-                    level=case["level"],
-                    validates=case["validates"],
-                    status="FAIL",
-                    reason="real Milvus retrieval leaked fake dev_doc_* sources",
-                    response_preview=response_preview,
-                    expected_coverage=f"{len(expected_hits)}/{len(expected_claims)}",
-                    forbidden_hits=forbidden_hits,
-                    matched_expected_claims=expected_hits,
-                    optional_risk_flags=risk_hits,
-                    fallback_detected=fallback_detected,
+                return build_result(
+                    "FAIL",
+                    "real Milvus retrieval leaked fake dev_doc_* sources",
                 )
-        return CaseEvaluation(
-            id=case["id"],
-            level=case["level"],
-            validates=case["validates"],
-            status=status,
-            reason=reason,
-            response_preview=response_preview,
-            expected_coverage=f"{len(expected_hits)}/{len(expected_claims)}",
-            forbidden_hits=forbidden_hits,
-            matched_expected_claims=expected_hits,
-            optional_risk_flags=risk_hits,
-            fallback_detected=fallback_detected,
-        )
+        return build_result(status, reason)
 
     if response_text.strip() and has_honesty_cue:
         status = "WARN"
@@ -607,33 +631,12 @@ def _evaluate_case(
             and str(source.get("chunk_id", "")).startswith("dev_doc_")
             for source in retrieved_sources
         ):
-            return CaseEvaluation(
-                id=case["id"],
-                level=case["level"],
-                validates=case["validates"],
-                status="FAIL",
-                reason="real Milvus retrieval leaked fake dev_doc_* sources",
-                response_preview=response_preview,
-                expected_coverage=f"{len(expected_hits)}/{len(expected_claims)}",
-                forbidden_hits=forbidden_hits,
-                matched_expected_claims=expected_hits,
-                optional_risk_flags=risk_hits,
-                fallback_detected=fallback_detected,
+            return build_result(
+                "FAIL",
+                "real Milvus retrieval leaked fake dev_doc_* sources",
             )
 
-    return CaseEvaluation(
-        id=case["id"],
-        level=case["level"],
-        validates=case["validates"],
-        status=status,
-        reason=reason,
-        response_preview=response_preview,
-        expected_coverage=f"{len(expected_hits)}/{len(expected_claims)}",
-        forbidden_hits=forbidden_hits,
-        matched_expected_claims=expected_hits,
-        optional_risk_flags=risk_hits,
-        fallback_detected=fallback_detected,
-    )
+    return build_result(status, reason)
 
 
 def _print_case_result(result: CaseEvaluation, verbose: bool) -> None:
@@ -645,10 +648,74 @@ def _print_case_result(result: CaseEvaluation, verbose: bool) -> None:
     if result.optional_risk_flags:
         print(f"  risk flags: {', '.join(result.optional_risk_flags)}")
     if result.fallback_detected:
-        print("  fallback detected: yes")
+        print("  provider_result response_is_fallback: true")
+    elif result.provider_result_seen:
+        print("  provider_result response_is_fallback: false")
+    if result.guardrail_fallback_detected:
+        print("  guardrail fallback_applied: true")
     print(f"  response: {result.response_preview}")
     if verbose and result.matched_expected_claims:
         print(f"  matched claims: {', '.join(result.matched_expected_claims)}")
+
+
+def _print_provider_config(provider_config: dict[str, Any]) -> None:
+    print("Provider config (client env):")
+    print(f"  route_enabled: {provider_config['route_enabled']}")
+    print(f"  state_repository: {provider_config['state_repository'] or '-'}")
+    print(f"  llm_provider: {provider_config['llm_provider']}")
+    print(f"  retrieval_provider: {provider_config['retrieval_provider']}")
+    print(f"  real_llm_expected: {provider_config['real_llm_expected']}")
+    print(f"  real_retrieval_expected: {provider_config['real_retrieval_expected']}")
+    if provider_config["llm_provider"] == "litellm":
+        model_alias = os.environ.get("TEAM360_LITELLM_MODEL_ALIAS", "").strip()
+        has_key = bool(
+            os.environ.get("TEAM360_LITELLM_API_KEY")
+            or os.environ.get("LITELLM_API_KEY")
+            or os.environ.get("LITELLM_MASTER_KEY")
+        )
+        print(f"  TEAM360_LITELLM_BASE_URL configured: {bool(os.environ.get('TEAM360_LITELLM_BASE_URL'))}")
+        print(f"  TEAM360_LITELLM_MODEL_ALIAS: {model_alias or 'openai_gpt-5-nano (default)'}")
+        print(f"  LiteLLM API key configured: {has_key}")
+    if provider_config["llm_provider"] == "openai":
+        print(f"  OpenAI API key configured: {_has_llm_config('openai')}")
+
+
+def _print_debug_request(
+    *,
+    case: dict[str, Any],
+    payload: dict[str, Any],
+    url: str,
+    timeout: float,
+) -> None:
+    print("Request debug:")
+    print("  method: POST")
+    print(f"  url: {url}")
+    print("  headers: Content-Type=application/json")
+    print("  auth headers: none sent by evaluator")
+    print(f"  timeout_seconds: {timeout}")
+    print(f"  case_id: {case['id']}")
+    print(f"  session_id: {payload['session_id']}")
+    print(f"  message: {_truncate(case['question'], 160)}")
+    print(f"  metadata: {json.dumps(payload.get('metadata', {}), ensure_ascii=False, sort_keys=True)}")
+
+
+def _print_events(body: dict[str, Any], *, provider_only: bool) -> None:
+    events = body.get("events")
+    if not isinstance(events, list):
+        print("  events: <missing or invalid>")
+        return
+    label = "Provider events" if provider_only else "Events"
+    print(f"{label}:")
+    matched = 0
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        if provider_only and event.get("event_type") != "team360.llm.provider_result":
+            continue
+        matched += 1
+        print(f"  {json.dumps(_sanitize_event(event), ensure_ascii=False, sort_keys=True)}")
+    if matched == 0:
+        print("  -")
 
 
 def _print_summary(summary: RunSummary) -> None:
@@ -681,9 +748,18 @@ def _run(args: argparse.Namespace) -> int:
     print(f"Dataset: {dataset_path}")
     print(f"Dataset suite: {dataset.get('test_suite')}")
     print(f"Allow fallback: {args.allow_fallback}")
+    print(f"Fail on fallback: {args.fail_on_fallback}")
     print(f"Fail on warn: {args.fail_on_warn}")
+    print(f"Require real LLM: {args.require_real_llm}")
     print(f"Verbose: {args.verbose}")
+    print(f"Single case: {args.single_case or '-'}")
+    _print_provider_config(provider_config)
     print()
+
+    if args.require_real_llm and not provider_config["real_llm_expected"]:
+        print("FAIL: --require-real-llm was set, but client env selects a non-real LLM provider.")
+        print(f"LLM provider: {provider_config['llm_provider']}")
+        return 1
 
     if should_skip:
         print("SKIP: endpoint/provider mode is not ready.")
@@ -692,6 +768,12 @@ def _run(args: argparse.Namespace) -> int:
         return 0
 
     cases = dataset["cases"]
+    if args.single_case:
+        cases = [case for case in cases if case.get("id") == args.single_case]
+        if not cases:
+            print(f"FAIL: --single-case {args.single_case!r} was not found in dataset.")
+            return 1
+
     summary = RunSummary(total=len(cases))
     any_fail = False
     any_warn = False
@@ -700,6 +782,14 @@ def _run(args: argparse.Namespace) -> int:
         session_id = f"headless_{case['id']}_{uuid4().hex[:10]}"
         payload = _build_payload(case, session_id, endpoint_mode)
         url = f"{args.base_url}{endpoint_path}"
+        if args.debug_request:
+            _print_debug_request(
+                case=case,
+                payload=payload,
+                url=url,
+                timeout=args.timeout,
+            )
+            print()
         try:
             status_code, body = _request_json("POST", url, payload, timeout=args.timeout)
         except ConnectionError as exc:
@@ -728,6 +818,8 @@ def _run(args: argparse.Namespace) -> int:
             endpoint=endpoint_mode,
             provider_config=provider_config,
             allow_fallback=args.allow_fallback,
+            fail_on_fallback=args.fail_on_fallback,
+            require_real_llm=args.require_real_llm,
         )
         if result.status == "PASS":
             summary.pass_count += 1
@@ -738,6 +830,10 @@ def _run(args: argparse.Namespace) -> int:
             summary.fail_count += 1
             any_fail = True
         _print_case_result(result, args.verbose)
+        if args.print_events:
+            _print_events(body, provider_only=False)
+        elif args.dump_provider_events:
+            _print_events(body, provider_only=True)
         print()
 
     _print_summary(summary)
@@ -781,9 +877,44 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Return exit code 1 if any case is WARN.",
     )
     parser.add_argument(
+        "--fail-on-fallback",
+        action="store_true",
+        help=(
+            "Return FAIL when provider_result response_is_fallback=true. "
+            "Does not treat guardrail fallback_applied as provider fallback."
+        ),
+    )
+    parser.add_argument(
         "--allow-fallback",
         action="store_true",
         help="Do not fail when a real LLM mode falls back to a safe ack.",
+    )
+    parser.add_argument(
+        "--require-real-llm",
+        action="store_true",
+        help=(
+            "Require a real LLM provider in client env and a provider_result event "
+            "in each response; useful to detect a backend started with old envs."
+        ),
+    )
+    parser.add_argument(
+        "--single-case",
+        help="Run only one dataset case by id.",
+    )
+    parser.add_argument(
+        "--debug-request",
+        action="store_true",
+        help="Print endpoint, sanitized request body metadata and timeout per case.",
+    )
+    parser.add_argument(
+        "--print-events",
+        action="store_true",
+        help="Print sanitized runtime events for each response.",
+    )
+    parser.add_argument(
+        "--dump-provider-events",
+        action="store_true",
+        help="Print only sanitized team360.llm.provider_result events.",
     )
     parser.add_argument(
         "--verbose",

@@ -1864,7 +1864,8 @@ Smoke real Milvus queda para Fase 1.9l.
 | 1.9k | Product adapter Milvus retrieval opt-in boundary: `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER`, `_resolve_product_retrieval_provider()`, `MilvusRetrievalProvider` con `_DevFakeEmbeddingProvider`, tests, docs. Smoke real Milvus queda para 1.9l | Committed |
 | 1.9l | Smoke real Milvus para product adapter: script `smoke_sales_diagnosis_runtime_product_adapter_milvus.py`, validacion completa 15/15 con --allow-empty-results, documento | Committed |
 | 1.9m | Milvus schema/corpus alignment: inspector `inspect_sales_diagnosis_milvus_schema.py`, provider alias resolution, real collection `team360_lab_pgvector_benchmark_openai_small_1536`, `knowledge_scope_id`/`embedding_version` alignment, smoke real 16/16 | Implemented (uncommitted) |
-| 1.9n | Headless diagnostic response validation: dataset semantico `sales_diagnosis_headless_questions_v1.json`, evaluator `evaluate_sales_diagnosis_headless_responses.py`, scoring PASS/WARN/FAIL/SKIP sin frontend | Implemented (uncommitted) |
+| 1.9n | Headless diagnostic response validation: dataset semantico `sales_diagnosis_headless_questions_v1.json`, evaluator `evaluate_sales_diagnosis_headless_responses.py`, scoring PASS/WARN/FAIL/SKIP sin frontend | Committed |
+| 1.9p | Diagnose LiteLLM fallback difference: flags diagnosticos del evaluator, separacion provider fallback vs guardrail fallback, evidencia de backend env/token | Implemented (uncommitted) |
 
 ## Fase 1.9l — Product adapter Milvus real smoke
 
@@ -2163,5 +2164,88 @@ TEAM360_MILVUS_HOST=127.0.0.1 \
 - No CRM real.
 - Fake retrieval sigue default.
 - LLM fake sigue default.
+
+## Fase 1.9p — Diagnose LiteLLM fallback difference
+
+### Objetivo
+
+Comparar el path que ya habia pasado con LiteLLM real:
+
+- `scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py`
+
+contra el path headless:
+
+- `scripts/evaluate_sales_diagnosis_headless_responses.py`
+
+para distinguir fallas reales de LiteLLM de WARN/FAIL de calidad, guardrails o
+configuracion del proceso backend.
+
+### Diferencia encontrada
+
+No se reescribio provider ni arquitectura. La comparacion mostro:
+
+1. Smoke y evaluator usan el mismo endpoint por defecto:
+   `POST /api/sales-diagnosis-runtime/turn`.
+2. El evaluator agrega `metadata.source=headless_evaluator`, `case_id`,
+   `dataset` y `endpoint`; no envia Authorization ni API keys.
+3. Las envs pasadas al script evaluator solo aplican al proceso cliente. El
+   backend debe estar reiniciado con:
+   - `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1`
+   - `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test`
+   - `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`
+   - `TEAM360_LITELLM_BASE_URL=http://localhost:4000`
+   - `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano`
+   - token LiteLLM valido en env del backend.
+4. La consola LiteLLM mostro llamadas `401 Unauthorized` previas y luego
+   `200 OK`; eso apunta a token/env anterior o invalido en algun proceso, no a
+   provider roto.
+5. El evaluator mezclaba dos conceptos:
+   - `team360.llm.provider_result.payload.response_is_fallback`: fallback del
+     provider LLM.
+   - `fallback_applied`: fallback de guardrails/runtime.
+6. En `unsafe_blocked`, la route actual devuelve un contrato minimo sin
+   `events`; el evaluator ahora reporta esa falta de evidencia sin inferir
+   fallback LiteLLM.
+
+### Cambios aplicados
+
+`scripts/evaluate_sales_diagnosis_headless_responses.py`:
+
+- agrega `--single-case <id>`;
+- agrega `--debug-request`;
+- agrega `--print-events`;
+- agrega `--dump-provider-events`;
+- agrega `--require-real-llm`;
+- agrega `--fail-on-fallback`;
+- sanitiza eventos antes de imprimirlos;
+- distingue `provider_result.response_is_fallback=true` de
+  `fallback_applied=true`.
+
+`tests/test_sales_diagnosis_headless_evaluator.py`:
+
+- cubre que guardrail fallback no se marque como provider fallback;
+- cubre que provider fallback real falle en modo LLM real;
+- cubre `--require-real-llm`;
+- cubre sanitizacion de eventos y parser de flags diagnosticos.
+
+### Resultado observado
+
+Con backend levantado con LiteLLM real:
+
+- Smoke LiteLLM product adapter: **13/13 passed**,
+  `response_is_fallback=false`.
+- Evaluator single-case `speed_simple_001`: FAIL por guardrails
+  (`unsafe_blocked`) o WARN segun salida LLM; no por
+  `response_is_fallback=true`.
+- Evaluator full LiteLLM/fake: **0 PASS / 9 WARN / 1 FAIL / 0 SKIP** en la
+  corrida observada; los casos con eventos preservados reportaron
+  `provider_result.response_is_fallback=false`.
+- Smoke Milvus real con `TEAM360_MILVUS_HOST=127.0.0.1` y collection/scope
+  alineados: **16/16 passed**, sources reales, sin `dev_doc_*`.
+- Evaluator full LiteLLM/Milvus: **1 PASS / 9 WARN / 0 FAIL / 0 SKIP**; todos
+  los casos con eventos reportaron `provider_result.response_is_fallback=false`.
+
+Los WARN/FAIL restantes pertenecen a calidad/guardrails y quedan como entrada
+para una fase posterior de PromptPolicy/GuardrailPolicy tuning.
 - Milvus sigue opt-in.
 - Product adapter sigue feature-flagged.

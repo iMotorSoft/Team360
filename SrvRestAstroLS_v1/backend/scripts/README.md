@@ -389,6 +389,16 @@ Script:
     habilite OpenAI/LiteLLM/Milvus.
   - `--fail-on-warn` hace fallar la ejecucion si alguna respuesta queda en WARN.
   - `--allow-fallback` evita fallar si un modo real cae en fallback seguro.
+  - `--single-case <id>` ejecuta un solo caso del dataset.
+  - `--debug-request` imprime endpoint, metadata, session_id y timeout sin
+    headers sensibles.
+  - `--print-events` imprime eventos runtime sanitizados.
+  - `--dump-provider-events` imprime solo `team360.llm.provider_result`.
+  - `--require-real-llm` exige env cliente de LLM real y evidencia de provider
+    cuando el contrato HTTP la conserva.
+  - `--fail-on-fallback` falla solo si
+    `provider_result.response_is_fallback=true`; no confunde
+    `fallback_applied=true` de guardrails con fallback del provider LLM.
 
 Dataset:
 
@@ -406,7 +416,44 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
 
 # Evaluacion dev
 uv run python scripts/evaluate_sales_diagnosis_headless_responses.py --endpoint dev
+
+# Diagnostico de un caso con LiteLLM real
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=fake \
+  uv run python scripts/evaluate_sales_diagnosis_headless_responses.py \
+    --single-case speed_simple_001 \
+    --debug-request \
+    --print-events \
+    --require-real-llm
 ```
 
 No activa frontend, SSE productivo, Step-to-Action, lead_capture,
 diagnostic_code, WhatsApp handoff ni CRM real.
+
+### Fase 1.9p — LiteLLM fallback diagnosis
+
+La diferencia entre el smoke LiteLLM y el evaluator headless no era que
+LiteLLM estuviera roto:
+
+- El smoke y el evaluator usan el mismo endpoint por defecto:
+  `POST /api/sales-diagnosis-runtime/turn`.
+- Ambos usan `Content-Type: application/json` y no envian Authorization desde
+  el script cliente; la auth LiteLLM la usa el backend hacia el proxy.
+- Las envs del evaluator no modifican un backend ya levantado. Si el proceso
+  backend fue iniciado con token LiteLLM anterior o invalido, el proxy puede
+  responder 401 y el backend devolvera fallback seguro.
+- Con backend reiniciado con envs correctas, el evaluator muestra
+  `provider_result.response_is_fallback=false` en los casos que preservan
+  eventos.
+- `fallback_applied=true` pertenece a guardrails/runtime y no debe contarse
+  como fallback del provider LiteLLM.
+- En respuestas `unsafe_blocked`, la ruta actual no devuelve `events`; el
+  evaluator lo reporta como brecha de evidencia diagnostica, no como fallback
+  LiteLLM.
+
+Si quedan WARN/FAIL con `response_is_fallback=false`, corresponden a calidad,
+guardrails o PromptPolicy y deben tratarse en una fase posterior.

@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9m — Milvus schema/corpus alignment)
+Ultima actualizacion: 2026-06-11 (Fase 1.9p — Diagnose LiteLLM fallback difference)
 
 ## Directorio de trabajo
 
@@ -1868,3 +1868,48 @@ Incluye estructura inicial para:
 - Se actualizo la documentacion de runtime y scripts con la fase 1.9n.
 - No se toco frontend, Astro, UI, SSE productivo, pgvector, ArangoDB, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
 - Pendiente: ejecutar pytest, evaluar contra endpoints disponibles y validar `git diff --check` + secret scan.
+
+### 2026-06-11 - Fase 1.9p - Diagnose LiteLLM fallback difference
+
+- Se comparo el path que ya pasaba (`scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py`) contra el evaluator headless (`scripts/evaluate_sales_diagnosis_headless_responses.py`).
+- Confirmacion inicial:
+  - rama activa: `feature/console-backend-core`;
+  - worktree inicial limpio;
+  - Fase 1.9n committed en `570fbd7 test(backend): add headless diagnostic response validation`;
+  - no se creo rama nueva;
+  - no se hizo `git add` ni commit.
+- Diferencia encontrada:
+  - smoke y evaluator usan el mismo endpoint por defecto: `POST /api/sales-diagnosis-runtime/turn`;
+  - el evaluator agrega metadata (`source=headless_evaluator`, `case_id`, `dataset`, `endpoint`) pero no envia Authorization ni secretos;
+  - las envs pasadas al evaluator no cambian un backend ya levantado;
+  - la consola LiteLLM mostro llamadas `401 Unauthorized` previas y luego `200 OK`, consistente con token/env anterior o invalido en algun proceso backend;
+  - el evaluator mezclaba `fallback_applied=true` de guardrails/runtime con `team360.llm.provider_result.payload.response_is_fallback=true` del provider LLM.
+- Se corrigio el evaluator para distinguir:
+  - provider fallback real: `provider_result.response_is_fallback=true`;
+  - guardrail/runtime fallback: `fallback_applied=true`.
+- Se agregaron flags diagnosticos seguros:
+  - `--single-case <id>`;
+  - `--debug-request`;
+  - `--print-events`;
+  - `--dump-provider-events`;
+  - `--require-real-llm`;
+  - `--fail-on-fallback`.
+- El modo diagnostico imprime endpoint, provider cliente solicitado, runtime_mode indirecto via respuesta, session_id, metadata, response_type, turn_count, eventos sanitizados y estado PASS/WARN/FAIL sin imprimir API keys, Authorization, DB URL, token Milvus ni token LiteLLM.
+- Observacion de contrato: cuando la route devuelve `unsafe_blocked`, actualmente no conserva `events`; el evaluator lo reporta como falta de evidencia diagnostica y no lo interpreta como fallback LiteLLM.
+- Validacion comparativa ejecutada con backend reiniciado en `127.0.0.1:8018` usando LiteLLM real:
+  - smoke LiteLLM product adapter: **13/13 passed**, `response_is_fallback=false`;
+  - evaluator single-case `speed_simple_001` con `--print-events --require-real-llm --debug-request`: **FAIL por guardrails/unsafe_blocked**, no por provider fallback;
+  - evaluator full LiteLLM/fake con `--dump-provider-events`: **0 PASS / 9 WARN / 1 FAIL / 0 SKIP**; casos con eventos preservados reportaron `provider_result.response_is_fallback=false`;
+  - evaluator full LiteLLM/Milvus con `TEAM360_MILVUS_HOST=127.0.0.1`, collection `team360_lab_pgvector_benchmark_openai_small_1536`, scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b` y embedding version `team360-openai-small-1536-v1`: **1 PASS / 9 WARN / 0 FAIL / 0 SKIP**; todos los casos con eventos reportaron `provider_result.response_is_fallback=false`.
+- Tests ejecutados:
+  - `uv run pytest tests/test_sales_diagnosis_headless_evaluator.py` = **11 passed**.
+  - `uv run pytest tests/test_sales_diagnosis_runtime_route.py` = **42 passed**.
+  - `uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py` = **36 passed**.
+  - `uv run pytest` = **390 passed, 9 skipped**.
+- Smokes de no regresion ejecutados:
+  - `uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --backend-url http://127.0.0.1:8018` = **30/30 passed**.
+  - `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --backend-url http://127.0.0.1:8018 --cleanup` = **30/30 passed**.
+  - `uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py --cleanup` con backend product/Postgres = **22/22 passed**.
+  - `uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py --allow-empty-results` con `TEAM360_MILVUS_HOST=127.0.0.1` y collection/scope/version alineados = **16/16 passed**, sources reales, sin `dev_doc_*`.
+- No se toco frontend, Astro, Svelte, UI, Console, SSE productivo, pgvector, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- Pendiente recomendado: Fase 1.9q para PromptPolicy/GuardrailPolicy tuning si se quiere convertir WARN/FAIL de calidad en PASS sin tocar el diagnostico de fallback.
