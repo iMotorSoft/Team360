@@ -1521,6 +1521,169 @@ Esta fase no implementa ni habilita:
 - WhatsApp handoff;
 - CRM real.
 
+## Fase 1.9f — Product adapter OpenAI direct HTTP smoke
+
+### Script
+
+`scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py`
+
+### Requisitos
+
+- Backend corriendo con:
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1`
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test` (o `postgres`)
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai`
+  - `TEAM360_OPENAI_KEY` o `OPENAI_API_KEY`
+- Puerto default: `8018`
+- Modelo via `TEAM360_OPENAI_MODEL` (default `gpt-5-nano`)
+
+### Skip controlado
+
+Si `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER` no es `openai`
+o faltan las API key envs, el script sale con `exit 0` sin error.
+
+### Validaciones
+
+1. Request valido devuelve 201 con response_text presente.
+2. session_id preservado.
+3. runtime_mode = `product_adapter_skeleton`.
+4. Response contract estable (9 keys esperadas).
+5. No Milvus real (chunks fake `dev_doc_*`).
+6. No stacktrace en errores 400.
+7. No LiteLLM real (sin referencia a litellm en respuestas).
+8. No DB real leak (inmemory_test — sin "postgres" en respuesta).
+9. Provider result event (`team360.llm.provider_result`):
+   - `response_is_fallback` indica si OpenAI respondio realmente o se uso fallback.
+   - Por defecto, falla si detecta fallback (SAFE_ACK_TEXT).
+   - `--allow-fallback` ignora el fallback y pasa igual.
+10. turn_count incrementa (1 → 2).
+
+### Nuevo evento en runtime
+
+En `modules/sales_diagnosis_runtime/runtime.py`, despues de `self._llm.generate()`,
+se agrega un `ProgressiveEvent` con `event_type="team360.llm.provider_result"`
+y payload `{"response_is_fallback": bool}`.
+
+Esto permite distinguir si un provider devolvio texto real o el safe ack
+de fallback sin exponer secrets, stacktrace ni detalles del provider.
+
+### Comando
+
+```bash
+cd backend
+
+# Sin envs -> skip
+uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
+
+# Con envs -> OpenAI real
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+TEAM360_OPENAI_KEY=sk-... \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
+
+# Con allow-fallback
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+TEAM360_OPENAI_KEY=sk-... \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py --allow-fallback
+```
+
+### Casos de la matriz (actualizada)
+
+| # | Route | State | LLM | HTTP | Notas |
+|---|-------|-------|-----|------|-------|
+| A | disabled | — | — | 404 | — |
+| B | enabled | unset | — | 503 | — |
+| C | enabled | inmemory_test | fake | 201 | LLM fake |
+| D | enabled | inmemory_test | openai | 201 | OpenAI opt-in |
+| E | enabled | postgres | fake | 201/503 | PG config |
+| F | enabled | inmemory_test | invalido | 503 | — |
+| G | enabled | inmemory_test | openai (smoke) | 201 | Smoke valida provider_result |
+
+### Lo que no se toco
+
+- No frontend, Astro, Svelte, UI.
+- No SSE productivo.
+- No LiteLLM.
+- No Milvus real.
+- No ArangoDB, pgvector, cross-encoder.
+- No Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- NO se agregaron tests que dependan de OpenAI real.
+- Pytest normal sigue sin network real (363 passed, 9 skipped).
+
+## Fase 1.9g — OpenAI direct real validation
+
+### Resolucion centralizada desde globalVar.py
+
+La API key de OpenAI se resuelve mediante `get_team360_openai_key()` en
+`globalVar.py` con la siguiente prioridad:
+
+1. `OpenAI_Key_JAI_query` (usada por infraestructura JAI)
+2. `TEAM360_OPENAI_KEY`
+3. `OPENAI_API_KEY`
+4. `VERTICE360_OPENAI_KEY`
+
+El modelo se resuelve mediante `get_team360_openai_model()`:
+- `TEAM360_OPENAI_MODEL`
+- Default: `gpt-5-nano`
+
+No es necesario exportar la key en el shell si ya esta configurada en
+`.bashrc`, entorno o `globalVar.py`.
+
+### Estado
+
+La validacion real contra OpenAI con `gpt-5-nano` fue ejecutada y paso:
+
+- `smoke_sales_diagnosis_runtime_product_adapter_openai.py`: **14/14 passed**
+- HTTP 201 con response_text presente.
+- `runtime_mode`: `product_adapter_skeleton`.
+- Contrato de respuesta estable (9 keys).
+- `team360.llm.provider_result` presente con `response_is_fallback=false`.
+- OpenAI respondio realmente (no fallback).
+- No se uso LiteLLM.
+- No se uso Milvus real (chunks `dev_doc_*`).
+- turn_count incrementa (1 → 2).
+
+### Comando
+
+```bash
+cd backend
+
+# Terminal 1:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8018
+
+# Terminal 2:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
+```
+
+Nota: La key y modelo se resuelven desde `globalVar.py`; no es necesario
+pasarlos por shell si ya estan configurados en el entorno.
+
+### Lo que valida el smoke cuando se ejecute con OpenAI real
+
+1. HTTP 201 con response_text presente.
+2. session_id preservado.
+3. runtime_mode = `product_adapter_skeleton`.
+4. Response contract estable (9 keys).
+5. No Milvus real (chunks `dev_doc_*`).
+6. No stacktrace en errores 400.
+7. No LiteLLM real.
+8. No DB leak (inmemory_test).
+9. `team360.llm.provider_result` event con `response_is_fallback=false`.
+10. turn_count incrementa (1 → 2).
+
+### Lo que no se toco
+
+- No frontend, Astro, Svelte, UI.
+- No SSE productivo.
+- No LiteLLM.
+- No Milvus real.
+- No ArangoDB, pgvector, cross-encoder.
+- No Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- No se modifico codigo, runtime, rutas, schemas ni tests existentes.
+
 ### Resumen del bloque 1.9
 
 | Fase | Que agrega | Estado |
@@ -1529,4 +1692,6 @@ Esta fase no implementa ni habilita:
 | 1.9b | State hardening: state repository obligatorio, `SyncPostgresConversationStateRepository`, errores controlados sin secrets | Committed |
 | 1.9c | Smoke HTTP product adapter con Postgres opt-in, cleanup prefijado y validacion de contrato completo | Committed |
 | 1.9d | Release gate: matriz, comandos consolidados, confirmacion de defaults y limites | Committed |
-| 1.9e | Product adapter OpenAI direct opt-in boundary: nueva env `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER`, `_ProductOpenAILLMProvider`, tests, matriz actualizada | Este documento |
+| 1.9e | Product adapter OpenAI direct opt-in boundary: nueva env `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER`, `_ProductOpenAILLMProvider`, tests, matriz actualizada | Committed |
+| 1.9f | Product adapter OpenAI direct HTTP smoke: script, `team360.llm.provider_result` event, --allow-fallback, docs | Committed |
+| 1.9g | OpenAI direct real validation: helpers `get_team360_openai_key()` y `get_team360_openai_model()` en `globalVar.py`, resolucion centralizada con `OpenAI_Key_JAI_query`, smoke real OpenAI **14/14 passed**, `response_is_fallback=false` | Este documento |

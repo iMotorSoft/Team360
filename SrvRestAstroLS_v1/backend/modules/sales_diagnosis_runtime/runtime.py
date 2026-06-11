@@ -158,6 +158,15 @@ class AssistantConversationRuntime:
         context_text = self._prompt_policy.build_turn_prompt(input, state, chunks)
         raw_response = self._llm.generate(input, state, chunks)
 
+        is_fallback = raw_response == SAFE_ACK_TEXT
+        events.append(ProgressiveEvent(
+            event_type="team360.llm.provider_result",
+            payload={
+                "response_is_fallback": is_fallback,
+            },
+            safe_to_show=True,
+        ))
+
         guardrail_result = self._guardrail_policy.evaluate_response(
             raw_response, input, state
         )

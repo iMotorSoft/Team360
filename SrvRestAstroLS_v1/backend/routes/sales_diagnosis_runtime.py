@@ -159,11 +159,18 @@ class _ProductOpenAILLMProvider:
 
     def __init__(self) -> None:
         self._api_key = self._resolve_api_key()
-        self._model = os.environ.get("TEAM360_OPENAI_MODEL", "").strip() or "gpt-5-nano"
+        self._model = self._resolve_model()
         self._prompt_policy = PromptPolicy()
 
     @staticmethod
     def _resolve_api_key() -> str:
+        try:
+            from globalVar import get_team360_openai_key
+            api_key = get_team360_openai_key()
+            if api_key:
+                return api_key
+        except ImportError:
+            pass
         api_key = (
             os.environ.get("TEAM360_OPENAI_KEY")
             or os.environ.get("OPENAI_API_KEY")
@@ -173,10 +180,20 @@ class _ProductOpenAILLMProvider:
                 status_code=HTTP_503_SERVICE_UNAVAILABLE,
                 detail=(
                     f"{PRODUCT_LLM_PROVIDER_ENV}=openai requires "
-                    "TEAM360_OPENAI_KEY or OPENAI_API_KEY."
+                    "an OpenAI API key configured in globalVar.py "
+                    "(OpenAI_Key_JAI_query, TEAM360_OPENAI_KEY "
+                    "or OPENAI_API_KEY)."
                 ),
             )
         return api_key
+
+    @staticmethod
+    def _resolve_model() -> str:
+        try:
+            from globalVar import get_team360_openai_model
+            return get_team360_openai_model()
+        except ImportError:
+            return os.environ.get("TEAM360_OPENAI_MODEL", "").strip() or "gpt-5-nano"
 
     def generate(
         self,

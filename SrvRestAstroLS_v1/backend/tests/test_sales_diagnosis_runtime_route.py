@@ -334,6 +334,7 @@ def test_product_route_rejects_invalid_llm_provider(monkeypatch):
 def test_product_route_openai_missing_api_key_returns_controlled_error(monkeypatch):
     _enable_product_route_with_inmemory_test(monkeypatch)
     monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "openai")
+    monkeypatch.delenv("OpenAI_Key_JAI_query", raising=False)
     monkeypatch.delenv("TEAM360_OPENAI_KEY", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     with _client() as client:
@@ -341,13 +342,14 @@ def test_product_route_openai_missing_api_key_returns_controlled_error(monkeypat
     assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
     detail = resp.json()["detail"]
     assert PRODUCT_LLM_PROVIDER_ENV in detail
-    assert "TEAM360_OPENAI_KEY" in detail
+    assert "globalVar.py" in detail
     assert "Traceback" not in detail
 
 
 def test_product_route_openai_config_error_does_not_leak_secrets(monkeypatch):
     _enable_product_route_with_inmemory_test(monkeypatch)
     monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "openai")
+    monkeypatch.delenv("OpenAI_Key_JAI_query", raising=False)
     monkeypatch.setenv("TEAM360_OPENAI_KEY", "sk-real-test-key-12345")
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
@@ -363,6 +365,7 @@ def test_product_route_openai_config_error_does_not_leak_secrets(monkeypatch):
 def test_product_route_openai_mode_does_not_call_openai_in_unit_tests(monkeypatch):
     _enable_product_route_with_inmemory_test(monkeypatch)
     monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "openai")
+    monkeypatch.delenv("OpenAI_Key_JAI_query", raising=False)
     monkeypatch.setenv("TEAM360_OPENAI_KEY", "sk-test-key")
     called: list[bool] = []
 

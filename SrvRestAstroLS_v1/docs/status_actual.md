@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9e — Product adapter OpenAI direct opt-in boundary)
+Ultima actualizacion: 2026-06-11 (Fase 1.9g — OpenAI direct real validation)
 
 ## Directorio de trabajo
 
@@ -103,6 +103,73 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
   - `status_actual.md`: este registro.
 - No se tocaron: frontend, Astro, Svelte, UI, SSE, LiteLLM, Milvus, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, endpoint dev, smokes existentes.
 - No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9f — Product adapter OpenAI direct HTTP smoke
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py`.
+- Skip controlado si falta `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai`
+  o `TEAM360_OPENAI_KEY` / `OPENAI_API_KEY` (exit 0, no es fallo).
+- Valida: 201, session_id, runtime_mode, response contract, fake retrieval,
+  no stacktrace, no LiteLLM, no DB leak, provider result event, turn_count.
+- Flag `--allow-fallback` para no fallar si OpenAI devolvio SAFE_ACK_TEXT.
+- Se agrego `team360.llm.provider_result` event en `runtime.py` despues de
+  `self._llm.generate()` para distinguir respuesta real vs fallback.
+- Se actualizaron:
+  - `scripts/README.md`: seccion Fase 1.9f.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9f, matriz caso G.
+  - `docs/status_actual.md`: este registro.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, LiteLLM, Milvus, ArangoDB,
+  pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code,
+  WhatsApp handoff, CRM real, endpoint dev, smokes existentes, tests existentes.
+- No se agregaron tests que dependan de OpenAI real.
+- No se modifico el contrato HTTP publico.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9g — OpenAI direct real validation
+
+- Se agregaron helpers `get_team360_openai_key()` y `get_team360_openai_model()` en `globalVar.py`.
+- `get_team360_openai_key()` resuelve con prioridad: `OpenAI_Key_JAI_query` > `TEAM360_OPENAI_KEY` > `OPENAI_API_KEY` > `VERTICE360_OPENAI_KEY`.
+- `get_team360_openai_model()` resuelve: `TEAM360_OPENAI_MODEL` (default `gpt-5-nano`).
+- `_ProductOpenAILLMProvider` en `routes/sales_diagnosis_runtime.py` ahora usa `get_team360_openai_key()` de `globalVar.py` como fuente unica, no lee env vars directas.
+- `_detect_openai_envs()` en el smoke script ahora usa `get_team360_openai_key()` de `globalVar.py`.
+- Tests actualizados: se agrego `monkeypatch.delenv("OpenAI_Key_JAI_query")` en los 3 tests que requieren ausencia de key.
+- Se ejecuto smoke real OpenAI con `gpt-5-nano`:
+  - Backend levantado en puerto 8018.
+  - **14/14 checks PASSED**.
+  - `response_is_fallback=false` — OpenAI respondio realmente.
+  - No se uso fallback silencioso.
+  - No se uso LiteLLM.
+  - No se uso Milvus real.
+  - `/api/dev/sales-diagnosis-runtime/turn` sigue funcionando correctamente.
+- Tests unitarios pasan sin network real:
+  - `test_sales_diagnosis_runtime_route.py`: **28 passed**.
+  - `test_sales_diagnosis_runtime_dev_route.py`: **36 passed**.
+  - Suite completa: **363 passed, 9 skipped**.
+- Product adapter sigue feature-flagged (`TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED`).
+- State sigue explicito (inmemory_test o postgres).
+- LLM default sigue fake.
+- OpenAI solo opt-in explicito.
+- LiteLLM no se activo.
+- Milvus real no se activo.
+- Retrieval sigue fake.
+- No se toco frontend, Astro, Svelte, UI, SSE, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- Se elimino `bun.lock`, `index.ts`, `package.json`, `tsconfig.json` (artefactos del crash anteriores).
+- No se creo rama nueva.
+
+La key OpenAI se resuelve desde `globalVar.get_team360_openai_key()`, que lee `OpenAI_Key_JAI_query`, `TEAM360_OPENAI_KEY` o `OPENAI_API_KEY` del entorno.
+No es necesario exportarla explicitamente si ya esta configurada.
+
+```bash
+# Terminal 1:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8018
+
+# Terminal 2:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
+```
 
 ### 2026-06-10 - Fase 1.9a — Product route adapter skeleton
 

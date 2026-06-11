@@ -51,11 +51,39 @@ FUTURE_OPTIONAL_EMBEDDING_MODEL = os.environ.get("TEAM360_EMBEDDING_MODEL", "tex
 
 FUTURE_OPTIONAL_V360_SOURCE_DB_URL = V360_SOURCE_DB_URL
 FUTURE_OPTIONAL_OPENAI_API_KEY = (
-    os.environ.get("TEAM360_OPENAI_KEY")
+    os.environ.get("OpenAI_Key_JAI_query")
+    or os.environ.get("TEAM360_OPENAI_KEY")
     or os.environ.get("OPENAI_API_KEY")
     or os.environ.get("VERTICE360_OPENAI_KEY")
     or ""
 ).strip()
+
+
+def get_team360_openai_key() -> str:
+    """Return the Team360 OpenAI API key.
+
+    Resolution priority:
+    1. OpenAI_Key_JAI_query (used by JAI infrastructure)
+    2. TEAM360_OPENAI_KEY
+    3. OPENAI_API_KEY
+    4. VERTICE360_OPENAI_KEY
+    """
+    return (
+        os.environ.get("OpenAI_Key_JAI_query", "").strip()
+        or os.environ.get("TEAM360_OPENAI_KEY", "").strip()
+        or os.environ.get("OPENAI_API_KEY", "").strip()
+        or os.environ.get("VERTICE360_OPENAI_KEY", "").strip()
+    )
+
+
+def get_team360_openai_model() -> str:
+    """Return the Team360 OpenAI model name.
+
+    Resolution priority:
+    1. TEAM360_OPENAI_MODEL
+    2. Default: gpt-5-nano
+    """
+    return os.environ.get("TEAM360_OPENAI_MODEL", "").strip() or "gpt-5-nano"
 
 
 def _to_psql_dsn(url: str) -> str:
