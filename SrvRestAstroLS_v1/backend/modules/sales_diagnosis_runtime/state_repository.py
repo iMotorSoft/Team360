@@ -170,6 +170,102 @@ class InMemoryConversationStateRepository:
 
 
 # ---------------------------------------------------------------------------
+# Sync Postgres repository
+# ---------------------------------------------------------------------------
+
+
+class SyncPostgresConversationStateRepositoryError(RuntimeError):
+    """Raised when sync PostgreSQL state persistence is unavailable."""
+
+
+class SyncPostgresConversationStateRepository:
+    """Sync PostgreSQL-backed conversation state repository.
+
+    Uses psycopg 3 sync directly, opens a connection per operation, and does
+    not print or expose DSNs. This is intended for controlled HTTP adapter
+    boundaries while the runtime core remains sync.
+    """
+
+    TABLE_NAME = "sales_diagnosis_conversation_states"
+
+    def __init__(self, dsn: str) -> None:
+        self._dsn = dsn
+
+    def load(self, session_id: str) -> ConversationState | None:
+        import json
+
+        import psycopg
+        from psycopg.rows import dict_row
+
+        try:
+            with psycopg.connect(self._dsn, row_factory=dict_row) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"SELECT state_jsonb FROM {self.TABLE_NAME} "
+                        f"WHERE session_id = %(sid)s",
+                        {"sid": session_id},
+                    )
+                    row = cur.fetchone()
+        except psycopg.Error:
+            raise SyncPostgresConversationStateRepositoryError(
+                "Postgres state repository unavailable. Ensure TEAM360_DB_URL "
+                "or TEAM360_DB_URL_PSQL is configured and migration 007 is applied."
+            ) from None
+        if row is None:
+            return None
+        raw = row["state_jsonb"]
+        if isinstance(raw, str):
+            raw = json.loads(raw)
+        if not isinstance(raw, dict):
+            raise SyncPostgresConversationStateRepositoryError(
+                "Postgres state repository returned an invalid state payload."
+            )
+        return ConversationStateSerializer.from_dict(raw)
+
+    def save(self, state: ConversationState) -> None:
+        import json
+
+        import psycopg
+
+        serialized = ConversationStateSerializer.to_dict(state)
+        try:
+            with psycopg.connect(self._dsn) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"INSERT INTO {self.TABLE_NAME} "
+                        f"(session_id, assistant_instance_code, package_code, "
+                        f"knowledge_scope_code, state_jsonb, "
+                        f"created_at_utc, updated_at_utc) "
+                        f"VALUES (%(session_id)s, %(assistant_instance_code)s, "
+                        f"%(package_code)s, %(knowledge_scope_code)s, "
+                        f"%(state_jsonb)s::jsonb, now(), now()) "
+                        f"ON CONFLICT (session_id) DO UPDATE SET "
+                        f"state_jsonb = EXCLUDED.state_jsonb, "
+                        f"updated_at_utc = now()",
+                        {
+                            "session_id": serialized["session_id"],
+                            "assistant_instance_code": serialized[
+                                "assistant_instance_code"
+                            ],
+                            "package_code": serialized["package_code"],
+                            "knowledge_scope_code": serialized[
+                                "knowledge_scope_code"
+                            ],
+                            "state_jsonb": json.dumps(serialized),
+                        },
+                    )
+                conn.commit()
+        except psycopg.Error:
+            raise SyncPostgresConversationStateRepositoryError(
+                "Postgres state repository unavailable. Ensure TEAM360_DB_URL "
+                "or TEAM360_DB_URL_PSQL is configured and migration 007 is applied."
+            ) from None
+
+    def __repr__(self) -> str:
+        return f"SyncPostgresConversationStateRepository(table={self.TABLE_NAME!r})"
+
+
+# ---------------------------------------------------------------------------
 # Postgres skeleton
 # ---------------------------------------------------------------------------
 

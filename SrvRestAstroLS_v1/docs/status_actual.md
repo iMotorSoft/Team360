@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.9a — Product route adapter skeleton)
+Ultima actualizacion: 2026-06-11 (Fase 1.9c — Product adapter Postgres HTTP smoke)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,47 @@ Ultima actualizacion: 2026-06-10 (Fase 1.9a — Product route adapter skeleton)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-10 - Fase 1.9b — Product adapter state hardening
+
+- Se endurecio `POST /api/sales-diagnosis-runtime/turn` para que no use InMemory silencioso cuando `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1`.
+- Se agrego `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY` como selector obligatorio de state para el adapter.
+- Valores aceptados: `postgres` e `inmemory_test`.
+- `postgres` usa `globalVar.get_team360_db_url_psql()` y `SyncPostgresConversationStateRepository` con SQL encapsulado en `state_repository.py`.
+- `inmemory_test` queda permitido solo de forma explicita para tests/control adapter; no es produccion real.
+- Si falta state repo, es invalido o falta config DB para Postgres, la ruta devuelve HTTP 503 controlado, sin stacktrace ni secrets.
+- Retrieval y LLM siguen fake por default; no se activan Milvus real, LiteLLM real ni OpenAI real por default.
+- El endpoint dev `POST /api/dev/sales-diagnosis-runtime/turn` conserva su comportamiento y defaults.
+- No se toco frontend, Astro, Svelte, UI, SSE productivo, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9c — Product adapter Postgres HTTP smoke
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py`:
+  - Smoke HTTP para el endpoint no-dev `POST /api/sales-diagnosis-runtime/turn` con Postgres state.
+  - Usa solo stdlib (urllib), no levanta servidores.
+  - Default base URL: `http://127.0.0.1:8018` (distinto del dev endpoint para coexistencia).
+  - Si `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED` no esta habilitada, hace skip (exit 0).
+  - Si `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY` no es `postgres`, hace skip (exit 0).
+  - Valida 10 condiciones:
+    1. Request valido devuelve 201 con respuesta segura.
+    2. Response contract estable (9 keys).
+    3. session_id preservado.
+    4. turn_count incrementa (1 → 2).
+    5. runtime_mode = `product_adapter_skeleton`.
+    6. No LLM real (SAFE_ACK_TEXT).
+    7. No Milvus real (chunks fake `dev_doc_*`).
+    8. No stacktrace en errores 400.
+    9. Rechazo de IDs Vera prohibidos.
+    10. No LiteLLM real en respuestas.
+  - Cleanup: `--cleanup` borra solo filas `smoke_product_pg_%` y verifica remaining=0.
+  - No imprime DSN ni credenciales.
+- Se actualizaron:
+  - `scripts/README.md`: nueva entrada con descripcion, validaciones y comando.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9c agregada.
+  - `status_actual.md`: este registro (Fase 1.9c).
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, routes, schemas, tests existentes, endpoint dev, endpoint product adapter, smokes existentes.
+- No se creo rama nueva.
 
 ### 2026-06-10 - Fase 1.9a — Product route adapter skeleton
 

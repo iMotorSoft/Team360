@@ -9,13 +9,16 @@ The route is disabled by default. Enable only for controlled adapter tests:
 
 TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1
 
-Safe defaults when enabled:
-- state: in-memory
+State must be explicit when enabled:
+- TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres
+- TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test
+
+Safe provider defaults when enabled:
 - retrieval: fake
 - LLM: fake
 
-No real PostgreSQL, Milvus, LiteLLM, OpenAI, SSE, Step-to-Action,
-lead_capture, diagnostic_code, WhatsApp handoff or CRM is activated here.
+No Milvus, LiteLLM, OpenAI, SSE, Step-to-Action, lead_capture,
+diagnostic_code, WhatsApp handoff or CRM is activated here.
 """
 
 from __future__ import annotations
@@ -24,7 +27,11 @@ import os
 
 from litestar import post
 from litestar.exceptions import HTTPException
-from litestar.status_codes import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+from litestar.status_codes import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_503_SERVICE_UNAVAILABLE,
+)
 
 from modules.sales_diagnosis_runtime import (
     AssistantConversationRuntime,
@@ -38,6 +45,8 @@ from modules.sales_diagnosis_runtime.errors import (
 )
 from modules.sales_diagnosis_runtime.state_repository import (
     InMemoryConversationStateRepository,
+    SyncPostgresConversationStateRepository,
+    SyncPostgresConversationStateRepositoryError,
 )
 
 from .sales_diagnosis_runtime_dev import (
@@ -55,9 +64,10 @@ from .sales_diagnosis_runtime_schemas import (
 
 
 PRODUCT_ROUTE_ENABLED_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED"
+PRODUCT_STATE_REPOSITORY_ENV = "TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY"
 PRODUCT_RUNTIME_MODE = "product_adapter_skeleton"
 
-_shared_product_inmemory_repo = InMemoryConversationStateRepository()
+_shared_product_inmemory_test_repo = InMemoryConversationStateRepository()
 
 
 def _is_product_route_enabled() -> bool:
@@ -81,11 +91,51 @@ def _ensure_product_route_enabled() -> None:
     )
 
 
+def _resolve_product_postgres_dsn() -> str:
+    from globalVar import get_team360_db_url_psql
+
+    dsn = get_team360_db_url_psql()
+    if not dsn:
+        raise HTTPException(
+            status_code=HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                f"{PRODUCT_STATE_REPOSITORY_ENV}=postgres requires TEAM360_DB_URL "
+                "or TEAM360_DB_URL_PSQL. Configure globalVar.py inputs before "
+                "using the product adapter with Postgres state."
+            ),
+        )
+    return dsn
+
+
+def _resolve_product_state_repository():
+    mode = os.environ.get(PRODUCT_STATE_REPOSITORY_ENV, "").strip().lower()
+    if not mode:
+        raise HTTPException(
+            status_code=HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                f"{PRODUCT_STATE_REPOSITORY_ENV} is required when "
+                f"{PRODUCT_ROUTE_ENABLED_ENV}=1. Use 'postgres' for product "
+                "state or 'inmemory_test' for controlled adapter tests only."
+            ),
+        )
+    if mode == "postgres":
+        return SyncPostgresConversationStateRepository(_resolve_product_postgres_dsn())
+    if mode == "inmemory_test":
+        return _shared_product_inmemory_test_repo
+    raise HTTPException(
+        status_code=HTTP_503_SERVICE_UNAVAILABLE,
+        detail=(
+            f"Invalid {PRODUCT_STATE_REPOSITORY_ENV}={mode!r}. "
+            "Use 'postgres' or 'inmemory_test'."
+        ),
+    )
+
+
 def _build_product_adapter_runtime() -> AssistantConversationRuntime:
     return AssistantConversationRuntime(
         retrieval_provider=_DevFakeRetrievalProvider(),
         llm_provider=_DevFakeLLMProvider(),
-        state_repository=_shared_product_inmemory_repo,
+        state_repository=_resolve_product_state_repository(),
         prompt_policy=PromptPolicy(),
         guardrail_policy=GuardrailPolicy(),
     )
@@ -146,6 +196,11 @@ async def sales_diagnosis_turn(data: ProductTurnRequest) -> dict:
         ).model_dump()
     except InvalidAssistantRuntimeInputError as exc:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(exc))
+    except SyncPostgresConversationStateRepositoryError as exc:
+        raise HTTPException(
+            status_code=HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from None
 
     turn_count = output.next_state.turn_count if output.next_state else 0
 

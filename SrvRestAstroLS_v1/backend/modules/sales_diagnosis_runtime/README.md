@@ -922,7 +922,120 @@ TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
 
 # Terminal 2
 TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
-  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+```
+
+## Fase 1.9c — Product adapter Postgres HTTP smoke
+
+### Alcance
+
+Esta fase agrega un smoke HTTP reproducible para validar el endpoint no-dev
+con Postgres state real:
+
+    POST /api/sales-diagnosis-runtime/turn
+
+No es endpoint final publico, no es MVP y no activa producto comercial.
+
+### Script
+
+`scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py`
+
+Requiere backend corriendo con:
+
+```bash
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres
+```
+
+### Comportamiento
+
+- Si las envs requeridas no estan presentes, el script hace skip (exit 0,
+  no es fallo), con mensaje claro indicando que se necesita configurar.
+- Si las envs estan presentes, valida el contrato HTTP completo del endpoint
+  product adapter contra PostgreSQL real.
+
+### Validaciones del smoke
+
+1. Request valido devuelve 201 con respuesta segura.
+2. Response contract estable (9 keys esperadas).
+3. `session_id` se preserva.
+4. `turn_count` incrementa (1 → 2) en la misma sesion.
+5. `runtime_mode` = `product_adapter_skeleton` en todas las respuestas.
+6. No LLM real: response_text es SAFE_ACK_TEXT, no texto generado por
+   LLM real.
+7. No Milvus real: retrieved_sources son chunks fake con prefijo
+   `dev_doc_*`.
+8. No stacktrace en errores 400.
+9. Rechaza IDs Vera prohibidos (`vera_team360_sales_diagnosis`,
+   `pkg_vera_sales_diagnosis`, `ks_vera_team360_sales_diagnosis`) con
+   HTTP 400.
+10. No LiteLLM real: no aparece referencia a `litellm` en respuestas.
+
+### Cleanup
+
+`--cleanup` flag opcional:
+
+- Borra solo filas con prefijo `smoke_product_pg_%` de la tabla
+  `sales_diagnosis_conversation_states`.
+- No borra sesiones de otros smokes ni datos de sesiones no-smoke.
+- Verifica `remaining_smoke_rows=0` despues del DELETE.
+- Usa `globalVar.get_team360_db_url_psql()` para resolver la DSN.
+- No imprime DSN ni credenciales.
+
+### Requisitos
+
+- Backend corriendo con las envs necesarias.
+- PostgreSQL 18 con migracion 007 aplicada.
+- `TEAM360_DB_URL` o `TEAM360_DB_URL_PSQL` configurada.
+
+### Providers
+
+| Dimension | Default 1.9c | Servicio real por default |
+|-----------|--------------|---------------------------|
+| Retrieval | `fake` | No |
+| LLM | `fake` | No |
+
+No se activa por default:
+
+- Milvus real;
+- LiteLLM real;
+- OpenAI SDK;
+- ArangoDB;
+- pgvector;
+- cross-encoder.
+
+### Capacidades futuras no activadas
+
+Esta fase no implementa ni habilita:
+
+- frontend;
+- Astro;
+- Svelte;
+- UI;
+- SSE productivo;
+- Step-to-Action;
+- lead_capture;
+- diagnostic_code;
+- WhatsApp handoff;
+- CRM real.
+
+### Validacion esperada
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+uv run pytest tests/test_sales_diagnosis_runtime_route.py
+uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py
+uv run pytest
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+
+# Smoke product adapter Postgres (requiere backend con envs configuradas):
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py --cleanup
 ```
 
 Si faltan `TEAM360_LITELLM_BASE_URL` o `TEAM360_LITELLM_API_KEY`, el smoke
@@ -1087,6 +1200,120 @@ uv run pytest
 El smoke HTTP existente sigue apuntando al endpoint interno/dev:
 
 ```bash
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+```
+
+## Fase 1.9b — Product adapter state hardening
+
+### Alcance
+
+Esta fase endurece el adapter no-dev:
+
+`POST /api/sales-diagnosis-runtime/turn`
+
+El endpoint sigue siendo un `product adapter skeleton`. No es endpoint final
+publico, no es MVP y no activa producto comercial.
+
+### Feature flags y state repository
+
+La ruta mantiene la feature flag:
+
+```bash
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1
+```
+
+Cuando la ruta esta deshabilitada responde HTTP 404 controlado.
+
+Cuando la ruta esta habilitada, ahora exige state repository explicito:
+
+```bash
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres
+```
+
+Valores aceptados:
+
+| Valor | Uso | Productivo |
+|-------|-----|------------|
+| `postgres` | Camino recomendado para product adapter con estado persistente | Si, cuando DB y migracion 007 estan configuradas |
+| `inmemory_test` | Pruebas controladas del adapter sin DB real | No |
+
+No existe default silencioso a InMemory cuando la ruta esta habilitada.
+
+Si `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY` falta, es invalida o
+Postgres no esta configurado, la ruta responde HTTP 503 controlado, sin
+stacktrace y sin exponer DSN, usuario, password ni secrets.
+
+### Postgres
+
+`postgres` usa `globalVar.get_team360_db_url_psql()` para resolver la DSN desde:
+
+- `TEAM360_DB_URL`;
+- `TEAM360_DB_URL_PSQL`;
+- fallback documentado de `globalVar.py`.
+
+No se hardcodea DB URL y no se imprime la DSN en logs de aplicacion.
+
+El adapter usa `SyncPostgresConversationStateRepository`, un repositorio sync
+con psycopg 3 directo y SQL encapsulado en `state_repository.py`.
+
+### InMemory test
+
+`inmemory_test` existe solo para tests y smokes controlados del adapter.
+
+Ejemplo:
+
+```bash
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+  uv run pytest tests/test_sales_diagnosis_runtime_route.py
+```
+
+No debe usarse como produccion real.
+
+### Providers
+
+Retrieval y LLM siguen con defaults seguros:
+
+| Dimension | Default 1.9b | Servicio real por default |
+|-----------|--------------|---------------------------|
+| Retrieval | `fake` | No |
+| LLM | `fake` | No |
+
+No se activa por default:
+
+- Milvus real;
+- LiteLLM real;
+- OpenAI SDK;
+- ArangoDB;
+- pgvector;
+- cross-encoder.
+
+### Capacidades futuras no activadas
+
+Esta fase no implementa ni habilita:
+
+- frontend;
+- Astro;
+- Svelte;
+- UI;
+- SSE productivo;
+- Step-to-Action;
+- lead_capture;
+- diagnostic_code;
+- WhatsApp handoff;
+- CRM real.
+
+### Validacion esperada
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+uv run pytest tests/test_sales_diagnosis_runtime_route.py
+uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py
+uv run pytest
 uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
 TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
   uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup

@@ -43,6 +43,8 @@ from modules.sales_diagnosis_runtime.state_repository import (
     ConversationStateSerializer,
     InMemoryConversationStateRepository,
     PostgresConversationStateRepository,
+    SyncPostgresConversationStateRepository,
+    SyncPostgresConversationStateRepositoryError,
 )
 
 __all__ = [
@@ -80,5 +82,7 @@ __all__ = [
     "StateRepository",
     "StateRepositoryError",
     "StateSerializationError",
+    "SyncPostgresConversationStateRepository",
+    "SyncPostgresConversationStateRepositoryError",
     "UnsafeResponseError",
 ]

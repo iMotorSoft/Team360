@@ -11,11 +11,16 @@ from litestar.status_codes import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
+    HTTP_503_SERVICE_UNAVAILABLE,
 )
 from litestar.testing import TestClient
 
 from app import create_app
-from routes.sales_diagnosis_runtime import PRODUCT_ROUTE_ENABLED_ENV
+import routes.sales_diagnosis_runtime as product_routes
+from routes.sales_diagnosis_runtime import (
+    PRODUCT_ROUTE_ENABLED_ENV,
+    PRODUCT_STATE_REPOSITORY_ENV,
+)
 
 
 PRODUCT_TURN_PATH = "/api/sales-diagnosis-runtime/turn"
@@ -43,8 +48,14 @@ def _enable_product_route(monkeypatch) -> None:
     monkeypatch.setenv(PRODUCT_ROUTE_ENABLED_ENV, "1")
 
 
-def test_product_route_disabled_by_default(monkeypatch):
+def _enable_product_route_with_inmemory_test(monkeypatch) -> None:
+    _enable_product_route(monkeypatch)
+    monkeypatch.setenv(PRODUCT_STATE_REPOSITORY_ENV, "inmemory_test")
+
+
+def test_product_route_disabled_by_default_still_returns_404(monkeypatch):
     monkeypatch.delenv(PRODUCT_ROUTE_ENABLED_ENV, raising=False)
+    monkeypatch.delenv(PRODUCT_STATE_REPOSITORY_ENV, raising=False)
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
     assert resp.status_code == HTTP_404_NOT_FOUND
@@ -53,8 +64,102 @@ def test_product_route_disabled_by_default(monkeypatch):
     assert "Traceback" not in body["detail"]
 
 
-def test_product_route_enabled_returns_200_with_safe_response(monkeypatch):
+def test_product_route_enabled_requires_state_repository(monkeypatch):
     _enable_product_route(monkeypatch)
+    monkeypatch.delenv(PRODUCT_STATE_REPOSITORY_ENV, raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    assert PRODUCT_STATE_REPOSITORY_ENV in resp.json()["detail"]
+    assert "inmemory_test" in resp.json()["detail"]
+
+
+def test_product_route_enabled_rejects_invalid_state_repository(monkeypatch):
+    _enable_product_route(monkeypatch)
+    monkeypatch.setenv(PRODUCT_STATE_REPOSITORY_ENV, "inmemory")
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    detail = resp.json()["detail"]
+    assert "Invalid" in detail
+    assert "postgres" in detail
+    assert "inmemory_test" in detail
+
+
+def test_product_route_enabled_accepts_inmemory_test_state_explicitly(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    assert resp.json()["runtime_mode"] == "product_adapter_skeleton"
+
+
+def test_product_route_enabled_does_not_use_inmemory_silently(monkeypatch):
+    _enable_product_route(monkeypatch)
+    monkeypatch.delenv(PRODUCT_STATE_REPOSITORY_ENV, raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    assert resp.json().get("runtime_mode") is None
+
+
+def test_product_route_enabled_postgres_missing_config_returns_controlled_error(monkeypatch):
+    _enable_product_route(monkeypatch)
+    monkeypatch.setenv(PRODUCT_STATE_REPOSITORY_ENV, "postgres")
+
+    def _missing_dsn() -> str:
+        from litestar.exceptions import HTTPException
+
+        raise HTTPException(
+            status_code=HTTP_503_SERVICE_UNAVAILABLE,
+            detail="TEAM360_DB_URL or TEAM360_DB_URL_PSQL is required.",
+        )
+
+    monkeypatch.setattr(product_routes, "_resolve_product_postgres_dsn", _missing_dsn)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    detail = resp.json()["detail"]
+    assert "TEAM360_DB_URL" in detail
+    assert "Traceback" not in detail
+
+
+def test_product_route_error_does_not_expose_stacktrace(monkeypatch):
+    _enable_product_route(monkeypatch)
+    monkeypatch.delenv(PRODUCT_STATE_REPOSITORY_ENV, raising=False)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    assert "Traceback" not in resp.text
+    assert "File \"" not in resp.text
+
+
+def test_product_route_error_does_not_leak_db_url_or_secrets(monkeypatch):
+    _enable_product_route(monkeypatch)
+    monkeypatch.setenv(PRODUCT_STATE_REPOSITORY_ENV, "postgres")
+    monkeypatch.setenv("TEAM360_DB_URL", "not-a-real-dsn-with-sensitive-token")
+
+    def _missing_dsn() -> str:
+        from litestar.exceptions import HTTPException
+
+        raise HTTPException(
+            status_code=HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Postgres state repository is not configured.",
+        )
+
+    monkeypatch.setattr(product_routes, "_resolve_product_postgres_dsn", _missing_dsn)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_503_SERVICE_UNAVAILABLE
+    body_text = resp.text.lower()
+    assert "postgresql://" not in body_text
+    assert "sensitive-token" not in body_text
+    assert "password" not in body_text
+    assert "sk-" not in body_text
+
+
+def test_product_route_with_inmemory_test_returns_safe_response(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
     assert resp.status_code == HTTP_201_CREATED
@@ -68,7 +173,7 @@ def test_product_route_enabled_returns_200_with_safe_response(monkeypatch):
 
 
 def test_product_route_requires_message(monkeypatch):
-    _enable_product_route(monkeypatch)
+    _enable_product_route_with_inmemory_test(monkeypatch)
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload(message=""))
     assert resp.status_code == HTTP_400_BAD_REQUEST
@@ -76,7 +181,7 @@ def test_product_route_requires_message(monkeypatch):
 
 
 def test_product_route_requires_session_id(monkeypatch):
-    _enable_product_route(monkeypatch)
+    _enable_product_route_with_inmemory_test(monkeypatch)
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload(session_id=""))
     assert resp.status_code == HTTP_400_BAD_REQUEST
@@ -84,7 +189,7 @@ def test_product_route_requires_session_id(monkeypatch):
 
 
 def test_product_route_uses_default_codes(monkeypatch):
-    _enable_product_route(monkeypatch)
+    _enable_product_route_with_inmemory_test(monkeypatch)
     payload = {
         "session_id": "prod-default-codes",
         "message": "Hola",
@@ -98,7 +203,7 @@ def test_product_route_uses_default_codes(monkeypatch):
 
 
 def test_product_route_rejects_prohibited_vera_ids(monkeypatch):
-    _enable_product_route(monkeypatch)
+    _enable_product_route_with_inmemory_test(monkeypatch)
     prohibited_fields = {
         "assistant_instance_code": "vera_team360_sales_diagnosis",
         "package_code": "pkg_vera_sales_diagnosis",
@@ -114,7 +219,7 @@ def test_product_route_rejects_prohibited_vera_ids(monkeypatch):
 
 
 def test_product_route_rejects_prohibited_service_code_in_metadata(monkeypatch):
-    _enable_product_route(monkeypatch)
+    _enable_product_route_with_inmemory_test(monkeypatch)
     payload = _default_payload(
         metadata={"channel": "api", "service_code": "svc_vera_sales_diagnosis"}
     )
@@ -125,7 +230,7 @@ def test_product_route_rejects_prohibited_service_code_in_metadata(monkeypatch):
 
 
 def test_product_route_rejects_prohibited_service_code_top_level(monkeypatch):
-    _enable_product_route(monkeypatch)
+    _enable_product_route_with_inmemory_test(monkeypatch)
     payload = _default_payload(service_code="svc_vera_sales_diagnosis")
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=payload)
@@ -134,7 +239,7 @@ def test_product_route_rejects_prohibited_service_code_top_level(monkeypatch):
 
 
 def test_product_route_response_contract_is_stable(monkeypatch):
-    _enable_product_route(monkeypatch)
+    _enable_product_route_with_inmemory_test(monkeypatch)
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
     assert resp.status_code == HTTP_201_CREATED
@@ -153,8 +258,8 @@ def test_product_route_response_contract_is_stable(monkeypatch):
     assert set(body.keys()) == expected_keys
 
 
-def test_product_route_does_not_expose_stacktrace(monkeypatch):
-    _enable_product_route(monkeypatch)
+def test_product_route_validation_error_does_not_expose_stacktrace(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload(session_id="", message=""))
     assert resp.status_code == HTTP_400_BAD_REQUEST
@@ -163,7 +268,7 @@ def test_product_route_does_not_expose_stacktrace(monkeypatch):
 
 
 def test_product_route_does_not_call_real_litellm_by_default(monkeypatch):
-    _enable_product_route(monkeypatch)
+    _enable_product_route_with_inmemory_test(monkeypatch)
     monkeypatch.setenv("TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER", "litellm")
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
@@ -175,7 +280,7 @@ def test_product_route_does_not_call_real_litellm_by_default(monkeypatch):
 
 
 def test_product_route_does_not_call_real_milvus_by_default(monkeypatch):
-    _enable_product_route(monkeypatch)
+    _enable_product_route_with_inmemory_test(monkeypatch)
     monkeypatch.setenv("TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER", "milvus")
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())

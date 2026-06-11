@@ -117,3 +117,62 @@ TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
   TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
     uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
   ```
+
+### Fase 1.9c — Product adapter Postgres HTTP smoke
+
+Script:
+
+- `smoke_sales_diagnosis_runtime_product_adapter_postgres.py`: smoke HTTP para el
+  endpoint no-dev `POST /api/sales-diagnosis-runtime/turn` con
+  `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1` y
+  `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres`.
+
+  Requiere backend corriendo con Postgres opt-in. Usa solo stdlib (urllib).
+  No levanta servidores.
+
+  Si faltan las envs, hace skip con mensaje claro (exit 0, no es fallo).
+
+  Valida:
+  1. Request valido devuelve 201 con respuesta segura.
+  2. Response contract estable (9 keys esperadas).
+  3. session_id preservado entre turnos.
+  4. turn_count incrementa (1 → 2).
+  5. runtime_mode = `product_adapter_skeleton`.
+  6. No LLM real (SAFE_ACK_TEXT, no texto generado por LLM real).
+  7. No Milvus real (chunks fake con prefijo `dev_doc_*`).
+  8. No stacktrace en errores 400.
+  9. Rechazo de IDs Vera prohibidos.
+  10. No LiteLLM real (no referencia a litellm en respuestas).
+
+  Cleanup: `--cleanup` borra solo filas con prefijo `smoke_product_pg_%`
+  de `sales_diagnosis_conversation_states` y verifica remaining=0.
+  No borra sesiones de otros smokes.
+
+  La configuracion DB se resuelve desde `globalVar.get_team360_db_url_psql()`.
+  No imprime DSN ni credenciales.
+
+  ```bash
+  cd backend
+
+  # terminal 1: backend con product adapter habilitado + Postgres
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres \
+    uv run uvicorn app:app --host 127.0.0.1 --port 8018
+
+  # terminal 2: smoke product adapter Postgres
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres \
+    uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py
+
+  # Con cleanup:
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres \
+    uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py --cleanup
+  ```
+
+  Opt-in explicito: requiere ambas envs en el entorno del smoke.
+  Usa PostgreSQL 18 real solo si esta configurado.
+
+  Retrieval y LLM siguen fake por default.
+  No activa frontend, SSE, Step-to-Action, lead_capture, diagnostic_code,
+  WhatsApp handoff ni CRM real.
