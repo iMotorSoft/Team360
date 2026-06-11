@@ -305,3 +305,33 @@ Script:
   Retrieval sigue fake, state debe ser explicito (inmemory_test o postgres).
   No activa frontend, SSE, Step-to-Action, lead_capture, diagnostic_code,
   WhatsApp handoff ni CRM real.
+
+- `smoke_sales_diagnosis_runtime_product_adapter_milvus.py`: smoke HTTP opt-in
+  del product adapter con Milvus retrieval.
+
+  ```
+  # terminal 1: backend con product adapter + Milvus
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+  TEAM360_MILVUS_HOST=127.0.0.1 \
+    uv run uvicorn app:app --host 127.0.0.1 --port 8018
+
+  # terminal 2: smoke Milvus (sin envs -> skip)
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py
+
+  # smoke Milvus (con envs -> real)
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+  TEAM360_MILVUS_HOST=127.0.0.1 \
+    uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py
+
+  # smoke Milvus (con allow-empty-results, sin corpus cargado)
+  TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+  TEAM360_MILVUS_HOST=127.0.0.1 \
+    uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py --allow-empty-results
+  ```
+
+  Revisa conectividad/retrieval path contra Milvus real. Embedding fake
+  1536-dim (no OpenAI, no LiteLLM). Si el corpus no tiene resultados,
+  usar `--allow-empty-results`. No activa frontend, SSE, Step-to-Action,
+  lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.

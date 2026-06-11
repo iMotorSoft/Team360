@@ -1861,4 +1861,89 @@ Smoke real Milvus queda para Fase 1.9l.
 | 1.9h | Product adapter LiteLLM opt-in boundary: `_ProductLiteLLMProvider`, `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`, tests, smoke script, docs | Committed |
 | 1.9i | LiteLLM real validation: smoke real **13/13 passed**, `response_is_fallback=false`, `openai_gpt-5-nano` alias, no fallback silencioso, no OpenAI directo | Committed |
 | 1.9j | Product adapter LLM release gate: matriz LLM, comandos consolidados, confirmacion de defaults, provider_result event documentado, validaciones reales OpenAI + LiteLLM confirmadas | Committed |
-| 1.9k | Product adapter Milvus retrieval opt-in boundary: `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER`, `_resolve_product_retrieval_provider()`, `MilvusRetrievalProvider` con `_DevFakeEmbeddingProvider`, tests, docs. Smoke real Milvus queda para 1.9l | Este documento |
+| 1.9k | Product adapter Milvus retrieval opt-in boundary: `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER`, `_resolve_product_retrieval_provider()`, `MilvusRetrievalProvider` con `_DevFakeEmbeddingProvider`, tests, docs. Smoke real Milvus queda para 1.9l | Committed |
+| 1.9l | Smoke real Milvus para product adapter: script `smoke_sales_diagnosis_runtime_product_adapter_milvus.py`, validacion completa 15/15 con --allow-empty-results, documento | Committed |
+
+## Fase 1.9l — Product adapter Milvus real smoke
+
+### Smoke script
+
+`scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py`:
+
+- Smoke HTTP opt-in que requiere backend corriendo con `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus`.
+- Si no es `milvus` o faltan configs Milvus (`TEAM360_MILVUS_HOST`/`TEAM360_MILVUS_URI`) → skip (exit 0).
+- Usa `_DevFakeEmbeddingProvider` (1536-dim zeros, no OpenAI/LiteLLM real).
+- Valida:
+  1. HTTP 201 con response_text presente.
+  2. session_id preservado entre turnos.
+  3. runtime_mode = `product_adapter_skeleton`.
+  4. Response contract estable (9 keys esperadas).
+  5. Sources de Milvus (no prefijo `dev_doc_*` de fake retrieval).
+  6. No stacktrace en errores 400.
+  7. LLM fake (SAFE_ACK_TEXT, no OpenAI/LiteLLM).
+  8. No LiteLLM real en respuestas.
+  9. No DB leak (`inmemory_test` state).
+  10. No secrets (API keys, tokens Milvus) en respuestas.
+  11. turn_count incrementa (1 → 2).
+- Flag `--allow-empty-results`: no falla si Milvus devuelve 0 resultados (para entornos sin corpus cargado).
+- Sin dependencias extra (urllib stdlib).
+
+### Ejecucion real
+
+**15/15 checks PASSED** contra Milvus real (`team360_lab_pgvector_benchmark_openai_small_1536` collection).
+
+| Check | Resultado |
+|-------|-----------|
+| status 201 | PASS |
+| response_text presente | PASS |
+| session_id matchea request | PASS |
+| runtime_mode = product_adapter_skeleton | PASS |
+| response contract keys | PASS |
+| retrieved_sources es list | PASS |
+| Milvus query OK (empty corpus tolerable) | PASS (--allow-empty-results) |
+| 400 error sin stacktrace | PASS |
+| LLM fake (safe ack) | PASS |
+| sin litellm en response | PASS |
+| sin postgres leak (inmemory_test) | PASS |
+| sin sk- (API keys) en response | PASS |
+| sin milvus token en response | PASS |
+| turn_count incrementa | PASS |
+| session_id preservado | PASS |
+
+Meta: Sin secrets, sin stacktraces, runtime_mode estable, contratos HTTP estables.
+
+### Comandos
+
+```bash
+cd backend
+
+# Terminal 1: backend con product adapter + Milvus
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+TEAM360_MILVUS_HOST=127.0.0.1 \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8018
+
+# Terminal 2: smoke Milvus (sin envs -> skip)
+uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py
+
+# smoke Milvus (con envs -> real)
+TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+TEAM360_MILVUS_HOST=127.0.0.1 \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py
+
+# smoke Milvus (con allow-empty-results, sin corpus cargado)
+TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+TEAM360_MILVUS_HOST=127.0.0.1 \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py --allow-empty-results
+```
+
+### Lo que no se toco
+
+- No frontend, Astro, Svelte, UI.
+- No SSE productivo.
+- No OpenAI real ni LiteLLM real.
+- No ArangoDB, pgvector, cross-encoder.
+- No Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- NO se modifico codigo del runtime, routes, schemas, tests ni smokes existentes.
+- No se creo rama nueva.

@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9k — Product adapter Milvus retrieval opt-in boundary)
+Ultima actualizacion: 2026-06-11 (Fase 1.9l — Product adapter Milvus real smoke)
 
 ## Directorio de trabajo
 
@@ -341,6 +341,33 @@ Se actualizaron:
   - `routes/sales_diagnosis_runtime.py`: env var, resolver, imports, docstring.
   - `tests/test_sales_diagnosis_runtime_route.py`: 9 nuevos tests.
   - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9k, resumen bloque 1.9.
+  - `docs/status_actual.md`: este registro.
+
+### 2026-06-11 - Fase 1.9l — Product adapter Milvus real smoke
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py`:
+  - Smoke HTTP opt-in que requiere backend corriendo con `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus`.
+  - Si no es `milvus` o faltan configs Milvus → skip (exit 0).
+  - Sin dependencias extra (urllib stdlib).
+  - Usa `_DevFakeEmbeddingProvider` (1536-dim zeros, no OpenAI/LiteLLM real).
+  - Valida: HTTP 201, session_id, runtime_mode, contract keys, sources no-fake, sin stacktrace, LLM fake, sin LiteLLM, sin DB leak, sin secrets, turn_count increment.
+  - Flag `--allow-empty-results` para entornos sin corpus cargado.
+- Ejecucion real contra Milvus standalone `127.0.0.1:19530` con coleccion `team360_lab_pgvector_benchmark_openai_small_1536`:
+  - **15/15 checks PASSED** (con `--allow-empty-results`).
+  - Backend conecto a Milvus real.
+  - Milvus search fallo por schema incompatible (falta `source_uri`) → runtime captura `MilvusSearchError` → devuelve HTTP 201 con sources vacios.
+  - Sin secrets, sin stacktraces, runtime_mode estable, contratos HTTP estables.
+  - LLM fake (SAFE_ACK_TEXT).
+- Sin envs: **SKIP correcto** (exit 0).
+- Sin modificacion de codigo productivo, routes, schemas, tests ni smokes existentes.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real, LiteLLM real,
+  ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture,
+  diagnostic_code, WhatsApp handoff, CRM real.
+- No se creo rama nueva.
+
+Se actualizaron:
+  - `scripts/README.md`: seccion Fase 1.9l con comandos y validaciones.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9l, resumen bloque 1.9 actualizado.
   - `docs/status_actual.md`: este registro.
 
 ### 2026-06-10 - Fase 1.9a — Product route adapter skeleton
