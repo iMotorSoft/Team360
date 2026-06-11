@@ -465,6 +465,35 @@ def test_product_route_litellm_mode_does_not_call_litellm_in_unit_tests(monkeypa
     assert body["response_type"] == "final"
 
 
+def test_product_route_litellm_provider_result_contains_model_alias(monkeypatch):
+    """Verifica que provider_result exponga model_alias y llm_provider."""
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    monkeypatch.setenv(PRODUCT_LLM_PROVIDER_ENV, "litellm")
+    monkeypatch.setenv("TEAM360_LITELLM_BASE_URL", "http://localhost:4000")
+    monkeypatch.setenv("TEAM360_LITELLM_API_KEY", "sk-litellm-test-key")
+    monkeypatch.setenv("TEAM360_LITELLM_MODEL_ALIAS", "test_alias_001")
+
+    def _mock_resolve():
+        from routes.sales_diagnosis_runtime_dev import _DevFakeLLMProvider
+        return _DevFakeLLMProvider()
+
+    monkeypatch.setattr(product_routes, "_resolve_product_llm_provider", _mock_resolve)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
+    assert resp.status_code == HTTP_201_CREATED
+    body = resp.json()
+    events = body.get("events", [])
+    provider_events = [e for e in events if e.get("event_type") == "team360.llm.provider_result"]
+    assert len(provider_events) >= 1, "provider_result event expected"
+    payload = provider_events[0].get("payload", {})
+    assert payload.get("llm_provider") == "litellm"
+    assert payload.get("model_alias") == "test_alias_001"
+    assert "response_is_fallback" in payload
+    assert "response_text_length" in payload
+    # No secrets leaked
+    assert "sk-litellm-test-key" not in resp.text.lower()
+
+
 def test_product_route_state_hardening_still_required(monkeypatch):
     _enable_product_route(monkeypatch)
     monkeypatch.delenv(PRODUCT_STATE_REPOSITORY_ENV, raising=False)

@@ -66,6 +66,7 @@ class ModelResult:
     dataset_version: str = ""
     timestamp: str = ""
     litellm_alias: str = ""
+    non_comparable: bool = False
 
 
 def _resolve_project_root() -> Path:
@@ -306,6 +307,7 @@ def _run_single_model(
     output_path: Path,
     run_id: str,
     dataset_version: str,
+    non_comparable: bool = False,
 ) -> ModelResult | None:
     model_id = model["id"]
     provider_mode = model["provider_mode"]
@@ -410,6 +412,7 @@ def _run_single_model(
         dataset_version=dataset_version,
         timestamp=timestamp,
         litellm_alias=litellm_alias,
+        non_comparable=non_comparable,
     )
 
     print(f"done ({elapsed:.1f}s, {total} cases, {passed}/{total} pass)")
@@ -434,6 +437,7 @@ def _run_models(
     output_path: Path,
     run_id: str,
     dataset_version: str,
+    non_comparable: bool = False,
 ) -> list[ModelResult]:
     endpoint = run_matrix.get("endpoint", "product")
     evaluator_args = _build_evaluator_args(run_matrix, endpoint)
@@ -454,6 +458,7 @@ def _run_models(
             output_path=output_path,
             run_id=run_id,
             dataset_version=dataset_version,
+            non_comparable=non_comparable,
         )
         if result is not None:
             results.append(result)
@@ -588,6 +593,11 @@ def main() -> None:
         default=None,
         help="Run ID (default: auto-generated timestamp)",
     )
+    parser.add_argument(
+        "--skip-preflight",
+        action="store_true",
+        help="Skip preflight validation (marks results as non_comparable)",
+    )
 
     args = parser.parse_args()
 
@@ -606,6 +616,44 @@ def main() -> None:
     else:
         requested_models = run_matrix.get("models", [m["id"] for m in models])
     model_filter = _resolve_model_filter(requested_models, models)
+
+    # --- Preflight gate ---
+    skip_preflight = args.skip_preflight
+    preflight_script = (
+        PROJECT_ROOT
+        / "lab/model-evaluation-sales-diagnosis/scripts/preflight_model_evaluation.py"
+    )
+
+    if not skip_preflight and not args.dry_run:
+        print("Running preflight validation...")
+        preflight_env = dict(os.environ)
+        preflight_args = [sys.executable, str(preflight_script), "--check-backend", "--require-real-llm", "--backend-url", run_matrix.get("backend_base_url", "http://127.0.0.1:8018")]
+        litellm_alias = run_matrix.get("litellm_model_alias", "")
+        expected_alias = None
+        for model in models:
+            mid = model["id"]
+            if mid in requested_models or not requested_models:
+                candidate = model.get("litellm_alias", "")
+                if candidate:
+                    expected_alias = candidate
+                    break
+        if expected_alias:
+            preflight_args.extend(["--expected-model-alias", expected_alias])
+        try:
+            p = subprocess.run(preflight_args, capture_output=True, text=True, timeout=60, env=preflight_env, cwd=str(PROJECT_ROOT))
+            p_out = p.stdout + "\n" + p.stderr
+            if p.returncode != 0:
+                print("PREFLIGHT FAILED — benchmark aborted.")
+                print(p_out[-1000:])
+                sys.exit(1)
+            else:
+                print("  Preflight PASSED.")
+                print(p_out[-500:])
+        except subprocess.TimeoutExpired:
+            print("PREFLIGHT TIMEOUT — benchmark aborted.")
+            sys.exit(1)
+
+        non_comparable = skip_preflight or args.dry_run
 
     current_env = dict(os.environ)
     run_id = args.run_id or _gen_run_id()
@@ -627,6 +675,7 @@ def main() -> None:
         output_path=output_path,
         run_id=run_id,
         dataset_version=dataset_version,
+        non_comparable=non_comparable,
     )
 
     if not args.dry_run:

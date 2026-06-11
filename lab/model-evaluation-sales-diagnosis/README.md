@@ -241,3 +241,117 @@ No se trajeron:
 - Resultados reales deben ser sanitizados antes de commitear.
 - Si se generan resultados reales (con LLM real), revisar que no contengan
   información sensible, tokens, DSN, nombres de clientes ni datos internos.
+
+## Preflight: puerta de evidencia
+
+**No correr ni aceptar un benchmark comparativo hasta que el preflight pase.**
+
+El preflight valida dos capas antes de permitir la comparación:
+
+### A. LiteLLM directo
+
+Para cada alias, llama al proxy LiteLLM directamente y verifica:
+
+- HTTP OK
+- Content no vacío
+- `finish_reason` disponible
+- Latencia registrada
+
+```bash
+uv run python lab/model-evaluation-sales-diagnosis/scripts/preflight_model_evaluation.py \
+  --check-litellm-direct \
+  --models openai_gpt_4o_mini_2024_07_18,openrouter_qwen3_30b_a3b_thinking_2507
+```
+
+### B. Backend product adapter
+
+Verifica que el backend levantado esté usando realmente el alias esperado y que
+`provider_result` contenga evidencia de respuesta real.
+
+```bash
+uv run python lab/model-evaluation-sales-diagnosis/scripts/preflight_model_evaluation.py \
+  --check-backend \
+  --expected-model-alias openai_gpt_4o_mini_2024_07_18 \
+  --require-real-llm \
+  --require-real-sources
+```
+
+### Autenticación con LiteLLM proxy
+
+Team360 soporta tres formas de autenticarse contra el proxy LiteLLM, en este orden:
+
+1. `TEAM360_LITELLM_API_KEY` (específica de Team360, recomendada)
+2. `LITELLM_API_KEY` (genérica del ecosistema LiteLLM)
+3. `LITELLM_MASTER_KEY` (fallback — configurada en `general_settings.master_key` del proxy)
+
+Si el proxy LiteLLM está configurado con `master_key`, se puede usar `LITELLM_MASTER_KEY`
+como fallback sin necesidad de exportar `TEAM360_LITELLM_API_KEY` explícitamente.
+
+La resolución está implementada en `get_litellm_api_key()` en
+`modules/automation_diagnosis/litellm_client.py` y el preflight la confirma.
+
+### Comandos esperados
+
+1. **Ver aliases LiteLLM**:
+   ```bash
+   curl http://localhost:4000/models
+   ```
+
+2. **Preflight LiteLLM directo** (sin backend):
+   ```bash
+   uv run python lab/model-evaluation-sales-diagnosis/scripts/preflight_model_evaluation.py \
+     --check-litellm-direct \
+     --models openai_gpt_4o_mini_2024_07_18,openrouter_qwen3_30b_a3b_thinking_2507
+   ```
+
+3. **Backend para un alias específico**:
+   ```bash
+   cd SrvRestAstroLS_v1/backend
+   TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+   TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+   TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+   TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+   TEAM360_LITELLM_MODEL_ALIAS=openai_gpt_4o_mini_2024_07_18 \
+   TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
+   TEAM360_MILVUS_HOST=127.0.0.1 \
+   TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536 \
+   TEAM360_KNOWLEDGE_SCOPE_ID=8b071443-5bd6-4fe4-bbc3-fc2dca179a5b \
+   TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1 \
+   uv run litestar --app app:app run --host 127.0.0.1 --port 8018
+   ```
+
+4. **Preflight backend** (contra backend ya levantado):
+   ```bash
+   uv run python lab/model-evaluation-sales-diagnosis/scripts/preflight_model_evaluation.py \
+     --check-backend \
+     --expected-model-alias openai_gpt_4o_mini_2024_07_18 \
+     --require-real-llm \
+     --require-real-sources
+   ```
+
+5. **Benchmark solo si preflight PASS**:
+   ```bash
+   uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py \
+     --models litellm_openai_gpt_4o_mini_2024_07_18 \
+     --output lab/model-evaluation-sales-diagnosis/results/run_openai_gpt_4o_mini_2024_07_18.jsonl
+   ```
+
+   El runner ejecuta preflight automáticamente. Para saltarlo (solo desarrollo):
+   ```bash
+   uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py \
+     --models litellm_openai_gpt_4o_mini_2024_07_18 \
+     --skip-preflight \
+     --no-write-results
+   ```
+   Los resultados con `--skip-preflight` se marcan como `non_comparable`.
+
+### Qué invalida un benchmark
+
+- Todos los modelos terminan en `SAFE_ACK_TEXT` (fallback).
+- `response_text_length` = 0.
+- Milvus debía estar activo y `retrieved_sources` está vacío o contiene `dev_doc_*`.
+- `model_alias` en `provider_result` no coincide con el alias esperado.
+- `provider_result` no tiene los campos `llm_provider`, `model_alias`, `response_is_fallback`.
+- El preflight reporta FAIL para cualquier modelo del conjunto.
+
+No se puede declarar ganador sin preflight PASS.

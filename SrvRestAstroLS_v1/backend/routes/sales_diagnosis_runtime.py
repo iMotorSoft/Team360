@@ -432,6 +432,18 @@ async def sales_diagnosis_turn(data: ProductTurnRequest) -> dict:
 
     turn_count = output.next_state.turn_count if output.next_state else 0
 
+    llm_provider = os.environ.get(PRODUCT_LLM_PROVIDER_ENV, "").strip().lower() or "fake"
+    model_alias = os.environ.get("TEAM360_LITELLM_MODEL_ALIAS", "")
+    enriched_events: list[dict] = []
+    for event in output.events:
+        d = _event_to_dict(event)
+        if d["event_type"] == "team360.llm.provider_result" and isinstance(d.get("payload"), dict):
+            d["payload"]["llm_provider"] = llm_provider
+            if llm_provider == "litellm" and model_alias:
+                d["payload"]["model_alias"] = model_alias
+            d["payload"]["response_text_length"] = len(output.response_text) if output.response_text else 0
+        enriched_events.append(d)
+
     return ProductTurnResponse(
         session_id=data.session_id,
         response_text=output.response_text,
@@ -440,6 +452,6 @@ async def sales_diagnosis_turn(data: ProductTurnRequest) -> dict:
         guardrail_flags=_guardrail_flags(output),
         retrieved_sources=[_chunk_to_dict(c) for c in output.retrieved_sources],
         turn_count=turn_count,
-        events=[_event_to_dict(e) for e in output.events],
+        events=enriched_events,
         runtime_mode=PRODUCT_RUNTIME_MODE,
     ).model_dump()
