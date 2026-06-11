@@ -1991,3 +1991,26 @@ Incluye estructura inicial para:
 - Secret scan = sin leaks; solo nombres de variables literales, sin valores reales.
 - No se toco frontend, no capacidades futuras activadas, no rama nueva.
 - LLM fake default, retrieval fake default. LiteLLM y Milvus opt-in.
+
+### 2026-06-11 - Lab: Sales Diagnosis model evaluation lab
+
+- Se creo el laboratorio reproducible `lab/model-evaluation-sales-diagnosis/` para comparar modelos LLM sobre el dataset headless del diagnosticador.
+- **No modifica runtime productivo. No modifica product adapter. No modifica PromptPolicy. No modifica GuardrailPolicy. No activa modelos por default. No toca frontend, Console, WhatsApp ni CRM.**
+- Se crearon:
+  - `config/models.json`: 5 modelos candidatos (OpenAI directo gpt-5-nano, LiteLLM/OpenAI gpt-5-nano y gpt-4o-mini, LiteLLM/OpenRouter Qwen 3 30B y DeepSeek V4 Flash).
+  - `config/run_matrix.example.json`: matriz de ejecucion configurable (dataset path, backend URL, endpoint, state, retrieval, LLM provider, modelos, repeats, timeout, output).
+  - `scripts/run_model_evaluation.py`: runner que lee models.json y run_matrix, invoca el evaluador backend como subproceso para cada modelo, captura PASS/WARN/FAIL/SKIP, duracion, fallbacks y escribe JSONL sanitizado en `results/`. Soporta `--dry-run`, `--list-models`, `--models` (subset), `--no-write-results`.
+  - `scripts/summarize_results.py`: lee JSONL/JSON y muestra resumen tabular o JSON con modelo, provider, retrieval, total, PASS, WARN, FAIL, SKIP, fallback count, duracion y promedio por caso.
+  - `datasets/README.md`: documenta como referenciar el dataset canonico.
+  - `results/.gitkeep`: directorio de resultados preparado.
+  - `README.md` del lab: documenta objetivo, diferencia con backend validation, modelos incluidos/excluidos, prerrequisitos, comandos dry-run y reales, estructura, seguridad y notas.
+  - `lab/README.md`: indice raiz de laboratorios actualizado.
+- Validaciones:
+  - `python3 -m py_compile` = OK para ambos scripts.
+  - `uv run pytest` en backend = **398 passed, 9 skipped** (sin regresiones).
+  - `git diff --check` = OK.
+  - Secret scan sobre `lab/`, `SrvRestAstroLS_v1/backend/scripts/`, `status_actual.md`, `lat.md/` = sin leaks en archivos nuevos; solo nombres de variables literales pre-existentes.
+- No se modificaron: product adapter route, policies, evaluator backend, tests productivos, frontend, Console, WhatsApp, CRM, Step-to-Action, lead_capture, diagnostic_code.
+- No se creo rama nueva. Todo en `feature/console-backend-core`.
+- No se uso `feature/sales-diagnosis-runtime-skeleton`.
+- `archive-15ufPC/` no se agrego.

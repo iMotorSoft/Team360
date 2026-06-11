@@ -1,0 +1,22 @@
+{
+  "description": "Matriz de ejecucion para evaluacion de modelos LLM en Sales Diagnosis.",
+  "dataset_path": "../datasets/sales_diagnosis_headless_questions_v1.json",
+  "backend_base_url": "http://127.0.0.1:8018",
+  "endpoint": "product",
+  "state_repository": "inmemory_test",
+  "retrieval_provider": "fake",
+  "llm_provider": "litellm",
+  "models": [
+    "litellm_openai_gpt_5_nano",
+    "litellm_openai_gpt_4o_mini_2024_07_18",
+    "litellm_qwen3_30b_a3b_thinking_2507",
+    "litellm_deepseek_v4_flash"
+  ],
+  "repeats": 1,
+  "timeout": 45,
+  "fail_on_fallback": false,
+  "allow_fallback": true,
+  "require_real_llm": false,
+  "output_path": "",
+  "dataset_version": "sales_diagnosis_headless_response_validation_v1"
+}
