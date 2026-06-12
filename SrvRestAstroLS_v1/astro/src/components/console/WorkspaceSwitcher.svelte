@@ -29,13 +29,13 @@
 </script>
 
 <div>
-  <span class="mb-1.5 block text-slate-400 text-lg capitalize font-semibold"
-    >Workspace activo</span
-  >
+  <span class="mb-1.5 block top-badge-neutral">Workspace activo</span>
   <CustomSelect
     options={workspaceOptions}
     value={consoleContext.activeWorkspace.id}
     ariaLabel="Cambiar workspace activo"
+    isUppercase="capitalize"
+    textSize="1rem"
     onchange={changeWorkspace}
   />
 

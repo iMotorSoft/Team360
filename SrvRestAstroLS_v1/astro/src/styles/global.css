@@ -145,10 +145,8 @@ select {
   border-radius: 0.875rem;
   border: 1px solid rgba(209, 224, 229, 0.7);
   background-color: rgba(226, 236, 240, 0.38);
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   color: #587184;
   cursor: pointer;
   transition:
@@ -166,7 +164,7 @@ select {
 .custom-select-trigger:hover,
 .custom-select-trigger.open {
   background-color: var(--color-base-100);
-  border-color: rgba(113, 196, 198, 0.55);
+  border-color:var(--color-base-300);
 }
 
 .custom-select-trigger:focus-visible {
@@ -200,6 +198,9 @@ select {
   top: calc(100% + 6px);
   left: 0;
   right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
   list-style: none;
   margin: 0;
   padding: 0.35rem;
@@ -246,7 +247,7 @@ select {
 
 /* ── Opción individual ── */
 .custom-select-option {
-  display: block;
+  display: flex;
   width: 100%;
   padding: 0.42rem 0.85rem;
   border-radius: 0.625rem;
@@ -275,8 +276,8 @@ select {
 }
 
 .custom-select-option:hover {
-  background-color: rgba(113, 196, 198, 0.13);
-  color: #168b88;
+  background-color:var(--color-base-200);
+  
 }
 
 .custom-select-option.active {

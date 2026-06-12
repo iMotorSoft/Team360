@@ -32,13 +32,13 @@
 </script>
 
 <div>
-  <span class="mb-1.5 block text-slate-400 text-lg capitalize font-semibold"
-    >Perfil mock / diseño</span
-  >
+  <span class="mb-1.5 block top-badge-neutral">Perfil mock / diseño</span>
   <CustomSelect
     options={profileOptions}
     value={consoleContext.activeProfile}
     ariaLabel="Cambiar perfil mock de diseño"
+    isUppercase="capitalize"
+    textSize="1rem"
     onchange={changeProfile}
   />
 </div>

@@ -17,12 +17,16 @@
     value,
     ariaLabel = "Seleccionar opción",
     centered = false,
+    isUppercase = "uppercase",
+    textSize = "0.9rem",
     onchange,
   }: {
     options: Option[];
     value: string;
     ariaLabel?: string;
     centered?: boolean;
+    isUppercase?: "uppercase" | "capitalize";
+    textSize?: string;
     onchange: (value: string) => void;
   } = $props();
 
@@ -63,6 +67,8 @@
     class="custom-select-trigger"
     class:compact={centered}
     class:open
+    style:text-transform={isUppercase}
+    style:font-size={textSize}
     aria-haspopup="listbox"
     aria-expanded={open}
     aria-label={ariaLabel}

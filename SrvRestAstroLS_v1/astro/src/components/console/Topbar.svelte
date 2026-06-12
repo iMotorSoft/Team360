@@ -46,6 +46,7 @@
         value={consoleContext.locale}
         ariaLabel="Idioma de interfaz"
         centered={true}
+        isUppercase="uppercase"
         onchange={(v) => consoleContext.setLocale(v)}
       />
     </div>
