@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-12 (Fase 1.9t — Cierre de retoma y factibilidad Diagnostico)
+Ultima actualizacion: 2026-06-12 (Fase 1.9u — Analisis de FAIL del benchmark Diagnostico)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,61 @@ Ultima actualizacion: 2026-06-12 (Fase 1.9t — Cierre de retoma y factibilidad 
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-12 - Fase 1.9u — Analisis de FAIL del benchmark Diagnostico
+
+- Se revisaron los FAIL reales de la corrida Sales Diagnosis con product adapter,
+  LiteLLM y Milvus real para:
+  - `openai_gpt-5-nano`;
+  - `requesty_deepseek_4_flash`.
+- Preflight ejecutado antes de repetir casos:
+  - PostgreSQL activo (`team360`, PostgreSQL 18.4);
+  - Milvus 2.6 activo, collection
+    `team360_lab_pgvector_benchmark_openai_small_1536`, 139 filas;
+  - scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`;
+  - embedding version `team360-openai-small-1536-v1`;
+  - `globalVar.py` importable;
+  - LiteLLM activo y aliases registrados;
+  - llamadas minimas reales:
+    `openai_gpt-5-nano` via Responses API y
+    `requesty_deepseek_4_flash` via chat completions.
+- FAIL reproducidos/clasificados:
+  - `openai_gpt-5-nano` / `cost_of_error_008`:
+    `unsafe_blocked` por `forbidden_term_found:sla`; sin fallback provider.
+    Clasificado como `guardrail_policy_gap` + `model_quality_gap` no
+    concluyente. No se relajo guardrail.
+  - `openai_gpt-5-nano` / `low_frequency_015`:
+    `unsafe_blocked` por `planned_extension_misrepresented:whatsapp_handoff`
+    y `unsupported_precio_claim`; sin fallback provider. Clasificado como
+    `guardrail_policy_gap` + `model_quality_gap` no concluyente. No se relajo
+    guardrail.
+  - `requesty_deepseek_4_flash` / `crm_integration_018`:
+    falso positivo del evaluator: la respuesta negaba disponibilidad CRM, pero
+    el matcher marco `crm disponible` y duplico el hit.
+- Fix aplicado solo al evaluator headless:
+  - se agregaron negaciones conservadoras `no tiene`, `no tienen`,
+    `no dispone`, `no esta disponible`;
+  - se deduplican forbidden hits iguales entre patrones globales y del caso.
+- Tests agregados:
+  - negacion `no tiene ... CRM disponible hoy`;
+  - deduplicacion de `crm disponible`.
+- Repeticion minima posterior:
+  - `crm_integration_018` con `requesty_deepseek_4_flash`: PASS,
+    `response_is_fallback=false`, alias correcto y 5 sources reales de Milvus.
+- Se actualizo:
+  - `docs/sales_diagnosis_feasibility_20260612.md` con tabla de FAIL,
+    causa, evidencia y recomendacion;
+  - `lab/model-evaluation-sales-diagnosis/README.md` con regla de analisis de
+    FAIL y fila Requesty en la matriz de modelos.
+- Recomendacion vigente:
+  - mantener `openai_gpt_4o_mini_2024_07_18` como baseline;
+  - mantener `requesty_deepseek_4_flash` como candidato alternativo;
+  - mantener `openai_gpt-5-nano` activo via Responses API, no default hasta
+    repetir casos bloqueados con mejor evidencia de guardrail.
+- No se declaro ganador nuevo.
+- No se cambio default del sistema.
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
 
 ### 2026-06-11 - Fase 1.9m — Milvus schema/corpus alignment for Sales Diagnosis Product Adapter
 

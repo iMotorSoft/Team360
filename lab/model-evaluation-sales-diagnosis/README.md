@@ -36,6 +36,7 @@ lo invoca como subproceso para cada modelo y agrega metadatos de corrida.
 | `openai_gpt_4o_mini_2024_07_18` | LiteLLM → OpenAI | `litellm` | `openai_gpt_4o_mini_2024_07_18` |
 | `openrouter_qwen3_30b_a3b_thinking_2507` | LiteLLM → OpenRouter | `litellm` | `openrouter_qwen3_30b_a3b_thinking_2507` |
 | `openrouter_deepseek_4_flash` | LiteLLM → OpenRouter | `litellm` | `openrouter_deepseek_4_flash` |
+| `requesty_deepseek_4_flash` | LiteLLM → Requesty | `litellm` | `requesty_deepseek_4_flash` |
 
 Los IDs legacy `litellm_*` y `openai_direct_gpt_5_nano` se aceptan como
 aliases de CLI para no romper corridas existentes, pero los IDs canonicos son
@@ -216,6 +217,18 @@ lab/model-evaluation-sales-diagnosis/
 - Las env vars sensibles (`TEAM360_OPENAI_KEY`, `LITELLM_API_KEY`, etc.) se usan
   del entorno; no se hardcodean ni se loguean.
 - Usar `--no-write-results` para evitar escritura a disco en entornos compartidos.
+
+## Analisis de FAIL
+
+El JSONL generado por `run_model_evaluation.py` guarda el resumen agregado por
+modelo, no el detalle de cada caso. Para investigar un FAIL exacto:
+
+1. Ejecutar preflight backend para el alias afectado.
+2. Repetir solo el caso con
+   `scripts/evaluate_sales_diagnosis_headless_responses.py --single-case`.
+3. Usar `--print-events` o `--dump-provider-events` para confirmar
+   `response_is_fallback=false`, alias correcto y sources reales.
+4. Clasificar la causa antes de tocar prompts, policies o dataset.
 
 ## Patrones tomados como referencia de JudaismoEnVivo
 

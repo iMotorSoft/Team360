@@ -86,6 +86,18 @@ def test_forbidden_claim_detection_flags_unnegated_promises():
     assert "garantizamos" in hits or "garantizado" in hits
 
 
+def test_forbidden_claim_detection_honors_no_tiene_negation():
+    text = "Team360 no tiene una integración directa con CRM disponible hoy."
+    hits = evaluator._find_forbidden_hits(text, ["crm disponible"])
+    assert "crm disponible" not in hits
+
+
+def test_forbidden_claim_detection_deduplicates_global_and_case_hits():
+    text = "El CRM disponible ya está listo para usar."
+    hits = evaluator._find_forbidden_hits(text, ["crm disponible"])
+    assert hits.count("crm disponible") == 1
+
+
 def test_case_scoring_pass_warn_fail_paths():
     provider_config = _provider_config()
     case = _sample_case()

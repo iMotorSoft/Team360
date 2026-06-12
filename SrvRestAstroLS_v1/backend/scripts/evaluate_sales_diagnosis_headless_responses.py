@@ -102,6 +102,10 @@ NEGATION_PHRASES = (
     "no contamos",
     "no contamos con",
     "no tenemos",
+    "no tiene",
+    "no tienen",
+    "no dispone",
+    "no esta disponible",
     "no esta",
     "no siempre",
     "todavia no",
@@ -253,14 +257,18 @@ def _phrase_negated(text_norm: str, phrase_norm: str) -> bool:
 def _find_forbidden_hits(text: str, forbidden_claims: list[str]) -> list[str]:
     text_norm = _normalize_text(text)
     hits: list[str] = []
+    seen: set[str] = set()
     for claim in list(GLOBAL_FORBIDDEN_PATTERNS) + list(forbidden_claims):
         claim_norm = _normalize_text(claim)
         if not claim_norm:
+            continue
+        if claim_norm in seen:
             continue
         if claim_norm not in text_norm:
             continue
         if _phrase_negated(text_norm, claim_norm):
             continue
+        seen.add(claim_norm)
         hits.append(claim)
     return hits
 

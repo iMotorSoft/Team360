@@ -103,6 +103,88 @@ Para demo/factibilidad inmediata:
 4. Mejorar prompts/guardrails para bajar WARN y FAIL antes de prometer piloto
    comercial abierto.
 
+## Analisis de FAIL
+
+Fecha de analisis: 2026-06-12.
+
+Condiciones confirmadas antes de repetir casos:
+
+- Rama: `feature/console-backend-core`.
+- PostgreSQL: activo.
+- Milvus 2.6: activo, collection
+  `team360_lab_pgvector_benchmark_openai_small_1536`, 139 filas.
+- Scope/version usados:
+  `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b` /
+  `team360-openai-small-1536-v1`.
+- LiteLLM: activo; aliases `openai_gpt-5-nano` y
+  `requesty_deepseek_4_flash` registrados.
+- Llamada minima real:
+  - `openai_gpt-5-nano`: PASS via Responses API, sin fallback.
+  - `requesty_deepseek_4_flash`: PASS via chat completions, sin fallback.
+- Backend product adapter por alias:
+  - alias esperado correcto en `provider_result`;
+  - `response_is_fallback=false`;
+  - 5 sources reales de Milvus;
+  - sin `dev_doc_*`.
+
+Tabla de FAIL analizados:
+
+| Modelo | Case | Nivel | Causa | Evidencia | Decision |
+|---|---|---|---|---|---|
+| `openai_gpt-5-nano` | `cost_of_error_008` | media | `guardrail_policy_gap` + `model_quality_gap` no concluyente | El HTTP devolvio `unsafe_blocked`: `forbidden_term_found:sla`. No hubo fallback provider. La respuesta bloqueada no expone texto crudo ni sources en el contrato HTTP (`retrieved_sources=0` en la respuesta bloqueada), aunque el preflight y una reproduccion interna posterior confirmaron Milvus real. | No relajar guardrail. Mantener FAIL como evidencia de que GPT-5 nano puede disparar bloqueo en preguntas de responsabilidad/costo. Pendiente: mejorar observabilidad de respuestas bloqueadas sin exponer texto inseguro. |
+| `openai_gpt-5-nano` | `low_frequency_015` | facil | `guardrail_policy_gap` + `model_quality_gap` no concluyente | El HTTP devolvio `unsafe_blocked`: `planned_extension_misrepresented:whatsapp_handoff` y `unsupported_precio_claim`. No hubo fallback provider. No se pudo auditar texto crudo de esa salida desde el resultado HTTP; una reproduccion interna posterior no genero el mismo bloqueo. | No relajar guardrail ni cambiar prompt. Mantener como evidencia de salida puntual inestable; repetir en futura corrida con captura segura de guardrail. |
+| `requesty_deepseek_4_flash` | `crm_integration_018` | media | `evaluator_bug` | Respuesta real: “Team360 no tiene una integracion directa con CRM disponible hoy... se evalua caso por caso...”. El evaluator marco `crm disponible` como forbidden pese a estar negado y duplico el hit porque existia como patron global y del caso. | Corregido evaluator: reconoce negaciones `no tiene/no tienen/no dispone/no esta disponible` y deduplica hits. Repeticion single-case: PASS, `response_is_fallback=false`, 5 sources reales. |
+
+Detalle por caso:
+
+- `cost_of_error_008`
+  - Pregunta: si el diagnostico dice automatizable pero la implementacion falla
+    por algo no preguntado, quien asume el costo.
+  - Expected claims: `el diagnostico es preliminar`,
+    `puede requerir validacion adicional`,
+    `no promete asumir el costo de la falla`.
+  - Forbidden claims: `sin costo de error`, `garantia absoluta`,
+    `implementacion inmediata garantizada`.
+  - Resultado original: FAIL por guardrail, no por missing expected claim directo
+    ni por forbidden hit del evaluator.
+  - Clasificacion: no provider/runtime; no retrieval; bloqueo prudente del
+    guardrail ante una salida que menciono `sla` de forma no aceptada por policy.
+
+- `low_frequency_015`
+  - Pregunta: tarea mensual, si tiene sentido automatizarla.
+  - Expected claims: `no siempre conviene`, `evaluar costo beneficio`,
+    `puede recomendar no avanzar`.
+  - Forbidden claims: `siempre conviene automatizar`, `garantizado`,
+    `no importa la frecuencia`.
+  - Resultado original: FAIL por guardrail, no por missing expected claim directo
+    ni por forbidden hit del evaluator.
+  - Clasificacion: no provider/runtime; no retrieval; bloqueo prudente del
+    guardrail ante salida que mezclo una capacidad futura (`whatsapp_handoff`) y
+    un claim de precio/costo.
+
+- `crm_integration_018`
+  - Pregunta: si el diagnostico ya se conecta directo con CRM.
+  - Expected claims: `no prometer integracion crm lista`,
+    `se evalua caso por caso`,
+    `crm real no esta activo como capacidad automatica`.
+  - Forbidden claims: `crm integrado listo`, `crm listo`, `crm disponible`,
+    `integracion con crm automatica`.
+  - Resultado original: FAIL por forbidden hit mal detectado.
+  - Resultado despues del fix: PASS; coverage `2/3`; sin forbidden hits;
+    provider real y Milvus real confirmados.
+
+Recomendacion actualizada:
+
+- Mantener `openai_gpt_4o_mini_2024_07_18` como baseline.
+- Mantener `requesty_deepseek_4_flash` como candidato alternativo; su FAIL
+  reproducido era bug del evaluator, no falla real del modelo en ese caso.
+- Mantener `openai_gpt-5-nano` activo via Responses API, pero no hacerlo default
+  hasta repetir sus casos bloqueados con mejor evidencia de guardrail.
+- No se declaro ganador nuevo.
+- No se cambio default del sistema.
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+
 ## Evidencia
 
 - Resultados comparativos:
@@ -111,3 +193,5 @@ Para demo/factibilidad inmediata:
   `lab/model-evaluation-sales-diagnosis/results/manual_probe_20260612_business_extremes.jsonl`
 - Config de corrida:
   `lab/model-evaluation-sales-diagnosis/config/run_matrix.milvus.example.json`
+- Repeticion single-case Requesty:
+  `crm_integration_018` PASS despues del fix del evaluator.
