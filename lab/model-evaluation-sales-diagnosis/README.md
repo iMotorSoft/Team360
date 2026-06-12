@@ -155,6 +155,19 @@ uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.
   --output lab/model-evaluation-sales-diagnosis/results/custom_run.jsonl
 ```
 
+### Correr con Milvus real
+
+Requiere backend levantado por alias con `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus`.
+El backend resuelve el alias LiteLLM al iniciar el proceso; para comparar modelos,
+reiniciar el backend por cada `TEAM360_LITELLM_MODEL_ALIAS`.
+
+```bash
+uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py \
+  --config lab/model-evaluation-sales-diagnosis/config/run_matrix.milvus.example.json \
+  --models requesty_deepseek_4_flash \
+  --output lab/model-evaluation-sales-diagnosis/results/run_requesty_milvus.jsonl
+```
+
 ### Resumir resultados
 
 ```bash
@@ -183,7 +196,8 @@ lab/model-evaluation-sales-diagnosis/
 ├── README.md                          # Este archivo
 ├── config/
 │   ├── models.json                    # Catálogo de modelos candidatos
-│   └── run_matrix.example.json        # Configuración de corrida
+│   ├── run_matrix.example.json        # Configuración de corrida
+│   └── run_matrix.milvus.example.json # Configuración con Milvus real
 ├── datasets/
 │   └── README.md                      # Cómo referenciar el dataset
 ├── results/

@@ -624,6 +624,8 @@ def main() -> None:
         / "lab/model-evaluation-sales-diagnosis/scripts/preflight_model_evaluation.py"
     )
 
+    non_comparable = skip_preflight or args.dry_run
+
     if not skip_preflight and not args.dry_run:
         print("Running preflight validation...")
         preflight_env = dict(os.environ)
@@ -652,8 +654,6 @@ def main() -> None:
         except subprocess.TimeoutExpired:
             print("PREFLIGHT TIMEOUT — benchmark aborted.")
             sys.exit(1)
-
-        non_comparable = skip_preflight or args.dry_run
 
     current_env = dict(os.environ)
     run_id = args.run_id or _gen_run_id()

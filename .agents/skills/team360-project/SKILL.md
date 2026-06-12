@@ -152,6 +152,15 @@ Reglas de uso:
 12. No introducir SQLAlchemy/SQLModel/asyncpg como dependencia base sin decisión explícita documentada en `lat.md/postgres-driver-policy.md`.
 13. Mantener SQL en repositories; no escribir SQL en endpoints ni rutas.
 14. No mezclar pools de conexión: Team360 usa `psycopg_pool.AsyncConnectionPool` para `public.*`; LangGraph PostgresSaver usa su pool interno para `langgraph.*`.
+15. Antes de desarrollo, test, smoke, benchmark o prueba que dependa de servicios reales, ejecutar preflight obligatorio (ver `lat.md/service-preflight-methodology.md`):
+   - PostgreSQL activo.
+   - Milvus activo y collection correcta.
+   - LiteLLM activo.
+   - `.bashrc` / env vars accesibles.
+   - `globalVar.py` importable cuando aplique backend config.
+   - Modelo registrado en LiteLLM.
+   - Llamada real minima al modelo validando auth, credito/provider, endpoint y ausencia de fallback silencioso.
+   - Si el preflight falla, no aceptar el benchmark ni interpretar resultados como calidad del modulo.
 
 ## Convenciones para Mercado Libre browser lab
 - `browser/` contiene helpers reutilizables

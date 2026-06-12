@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-10
+Ultima actualizacion: 2026-06-12
 
 ## Estado general
 
@@ -11,6 +11,19 @@ Ultima actualizacion: 2026-06-10
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-12 - Metodologia obligatoria de preflight de servicios
+
+- Se agrego `service-preflight-methodology.md` como invariante estable para
+  desarrollo, tests, smokes, benchmarks y pruebas con servicios reales.
+- Se fijo la regla central: no aceptar benchmarks ni conclusiones de calidad si
+  el preflight falla.
+- El checklist obligatorio cubre PostgreSQL, Milvus, collection correcta,
+  LiteLLM, `.bashrc`/env vars, `globalVar.py`, alias registrado en LiteLLM y
+  llamada real minima al modelo para validar auth/credito/provider/endpoint.
+- Se actualizo `lat.md/lat.md` con la referencia
+  `[[service-preflight-methodology]]`.
+- No se implemento codigo runtime ni migraciones.
 
 ### 2026-06-10 - Ajuste de ownership por rama
 

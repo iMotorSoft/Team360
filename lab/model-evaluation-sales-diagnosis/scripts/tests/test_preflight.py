@@ -58,7 +58,8 @@ def test_resolve_aliases_default():
     assert "openai_gpt_4o_mini_2024_07_18" in aliases
     assert "openrouter_qwen3_30b_a3b_thinking_2507" in aliases
     assert "openrouter_deepseek_4_flash" in aliases
-    assert len(aliases) == 4
+    assert "requesty_deepseek_4_flash" in aliases
+    assert len(aliases) == 5
 
 
 def test_resolve_aliases_custom():

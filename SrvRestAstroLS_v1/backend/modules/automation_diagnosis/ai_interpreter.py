@@ -135,7 +135,7 @@ Respuestas del diagnostico:
 
 Genera interpretacion estructurada para Team360.
 """
-            response = client.chat_completion(
+            response = client.text_completion(
                 self.model,
                 [
                     {"role": "system", "content": SYSTEM_PROMPT},

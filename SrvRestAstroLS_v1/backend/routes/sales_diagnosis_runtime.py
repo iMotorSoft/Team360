@@ -303,7 +303,7 @@ class _ProductLiteLLMProvider:
             {"role": "user", "content": turn_prompt},
         ]
         try:
-            response = self._client.chat_completion(model=model, messages=messages)
+            response = self._client.text_completion(model=model, messages=messages)
             return response.content
         except Exception:
             from modules.sales_diagnosis_runtime.contracts import SAFE_ACK_TEXT

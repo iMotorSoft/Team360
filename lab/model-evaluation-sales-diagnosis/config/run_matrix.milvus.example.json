@@ -1,10 +1,10 @@
 {
-  "description": "Matriz de ejecucion para evaluacion de modelos LLM en Sales Diagnosis.",
+  "description": "Matriz de ejecucion con product adapter + Milvus real para evaluacion de modelos LLM en Sales Diagnosis.",
   "dataset_path": "../../SrvRestAstroLS_v1/backend/tests/fixtures/sales_diagnosis_headless_questions_v1.json",
   "backend_base_url": "http://127.0.0.1:8018",
   "endpoint": "product",
   "state_repository": "inmemory_test",
-  "retrieval_provider": "fake",
+  "retrieval_provider": "milvus",
   "llm_provider": "litellm",
   "models": [
     "openai_gpt-5-nano",
@@ -14,10 +14,10 @@
     "requesty_deepseek_4_flash"
   ],
   "repeats": 1,
-  "timeout": 45,
+  "timeout": 60,
   "fail_on_fallback": false,
   "allow_fallback": true,
-  "require_real_llm": false,
+  "require_real_llm": true,
   "output_path": "",
   "dataset_version": "sales_diagnosis_headless_response_validation_v1"
 }

@@ -17,7 +17,11 @@ from modules.automation_diagnosis.ai_interpreter import (
     MockAIInterpreter,
     build_ai_interpreter,
 )
-from modules.automation_diagnosis.litellm_client import LiteLLMClient, LiteLLMClientError
+from modules.automation_diagnosis.litellm_client import (
+    LiteLLMClient,
+    LiteLLMClientError,
+    should_use_responses_api,
+)
 
 
 class _FakeHTTPResponse:
@@ -114,6 +118,115 @@ def test_litellm_client_handles_successful_response(monkeypatch):
     assert captured["payload"]["metadata"]["workspace_id"] == "ws_test"
     assert captured["headers"]["X-correlation-id"] == "corr_test"
     assert captured["headers"]["X-team360-workspace-id"] == "ws_test"
+
+
+def test_litellm_client_handles_successful_responses_api_response(monkeypatch):
+    captured = {}
+    body = json.dumps(
+        {
+            "id": "resp_test",
+            "model": "openai/gpt-5-nano",
+            "status": "completed",
+            "output_text": "OK",
+            "usage": {"total_tokens": 11},
+        }
+    ).encode("utf-8")
+
+    def fake_urlopen(request, timeout):
+        captured["url"] = request.full_url
+        captured["timeout"] = timeout
+        captured["headers"] = request.headers
+        captured["payload"] = json.loads(request.data.decode("utf-8"))
+        return _FakeHTTPResponse(body)
+
+    monkeypatch.setattr("modules.automation_diagnosis.litellm_client.urllib.request.urlopen", fake_urlopen)
+
+    client = LiteLLMClient(base_url="http://localhost:4000", api_key="test", timeout_seconds=7)
+    response = client.responses_completion(
+        "openai/gpt-5-nano",
+        [
+            {"role": "system", "content": "Sos breve."},
+            {"role": "user", "content": "Responde OK."},
+        ],
+        correlation_id="corr_test",
+        metadata={"workspace_id": "ws_test"},
+    )
+
+    assert response.content == "OK"
+    assert response.model == "openai/gpt-5-nano"
+    assert response.usage == {"total_tokens": 11}
+    assert captured["url"] == "http://localhost:4000/v1/responses"
+    assert captured["timeout"] == 7
+    assert captured["payload"]["model"] == "openai/gpt-5-nano"
+    assert captured["payload"]["instructions"] == "Sos breve."
+    assert captured["payload"]["input"] == "USER:\nResponde OK."
+    assert captured["payload"]["reasoning"] == {"effort": "minimal"}
+    assert captured["payload"]["store"] is False
+    assert captured["headers"]["X-correlation-id"] == "corr_test"
+    assert captured["headers"]["X-team360-workspace-id"] == "ws_test"
+
+
+def test_litellm_client_text_completion_routes_gpt5_nano_to_responses(monkeypatch):
+    captured = {}
+    body = json.dumps({"model": "openai/gpt-5-nano", "output_text": "OK"}).encode("utf-8")
+
+    def fake_urlopen(request, timeout):
+        captured["url"] = request.full_url
+        captured["payload"] = json.loads(request.data.decode("utf-8"))
+        return _FakeHTTPResponse(body)
+
+    monkeypatch.delenv("TEAM360_LITELLM_API_MODE", raising=False)
+    monkeypatch.setattr("modules.automation_diagnosis.litellm_client.urllib.request.urlopen", fake_urlopen)
+
+    client = LiteLLMClient(base_url="http://localhost:4000", api_key="test")
+    response = client.text_completion(
+        "openai_gpt-5-nano",
+        [{"role": "user", "content": "Responde OK."}],
+    )
+
+    assert response.content == "OK"
+    assert captured["url"] == "http://localhost:4000/v1/responses"
+    assert captured["payload"]["model"] == "openai_gpt-5-nano"
+
+
+def test_litellm_client_text_completion_keeps_non_gpt5_nano_on_chat(monkeypatch):
+    captured = {}
+    body = json.dumps(
+        {
+            "model": "requesty_deepseek_4_flash",
+            "choices": [{"message": {"content": "OK"}}],
+        }
+    ).encode("utf-8")
+
+    def fake_urlopen(request, timeout):
+        captured["url"] = request.full_url
+        captured["payload"] = json.loads(request.data.decode("utf-8"))
+        return _FakeHTTPResponse(body)
+
+    monkeypatch.delenv("TEAM360_LITELLM_API_MODE", raising=False)
+    monkeypatch.setattr("modules.automation_diagnosis.litellm_client.urllib.request.urlopen", fake_urlopen)
+
+    client = LiteLLMClient(base_url="http://localhost:4000", api_key="test")
+    response = client.text_completion(
+        "requesty_deepseek_4_flash",
+        [{"role": "user", "content": "Responde OK."}],
+    )
+
+    assert response.content == "OK"
+    assert captured["url"] == "http://localhost:4000/v1/chat/completions"
+    assert captured["payload"]["model"] == "requesty_deepseek_4_flash"
+
+
+def test_litellm_api_mode_override(monkeypatch):
+    monkeypatch.delenv("TEAM360_LITELLM_API_MODE", raising=False)
+    assert should_use_responses_api("openai_gpt-5-nano") is True
+    assert should_use_responses_api("requesty_deepseek_4_flash") is False
+
+    monkeypatch.setenv("TEAM360_LITELLM_API_MODE", "chat")
+    assert should_use_responses_api("openai_gpt-5-nano") is False
+
+    monkeypatch.setenv("TEAM360_LITELLM_API_MODE", "responses")
+    assert should_use_responses_api("requesty_deepseek_4_flash") is True
 
 
 def test_litellm_client_handles_http_error(monkeypatch):

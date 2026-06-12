@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-11 (Fase 1.9r — Headless diagnostic quality expansion)
+Ultima actualizacion: 2026-06-12 (Fase 1.9t — Cierre de retoma y factibilidad Diagnostico)
 
 ## Directorio de trabajo
 
@@ -2049,4 +2049,169 @@ Incluye estructura inicial para:
 - No se modifico runtime productivo, product adapter, PromptPolicy,
   GuardrailPolicy, frontend, Console, WhatsApp, CRM, Step-to-Action,
   lead_capture ni diagnostic_code.
-- Validaciones ejecutadas en el cierre de esta tarea se registran en el resumen final del agente.
+- **NOTA: Tarea interrumpida por cuelgue de sesion.** El bloque de validaciones
+  (tests, smokes, secret scan, git diff) no alcanzo a ejecutarse ni registrarse.
+  Ver punto de retoma abajo.
+
+---
+
+## Punto de retoma — corte por cuelgue de sesion (2026-06-11)
+
+La sesion se interrumpio al finalizar la documentacion del lab de evaluacion de modelos
+(`lab/model-evaluation-sales-diagnosis/`). El codigo del lab esta completo y escrito,
+pero **no se ejecutaron las validaciones finales** sobre los cambios del lab.
+
+### Pendiente inmediato para retomar
+
+1. **Validar laboratorio**:
+   ```bash
+   cd SrvRestAstroLS_v1
+   uv run pytest   # confirmar 398 passed, 9 skipped sin regresiones
+   ```
+2. **Ejecutar dry-run del lab**:
+   ```bash
+   cd SrvRestAstroLS_v1/backend
+   uv run python ../lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py --dry-run --list-models
+   ```
+3. **Verificar secret scan sobre archivos nuevos del lab**:
+   ```bash
+   cd SrvRestAstroLS_v1
+   git diff --name-only --cached | xargs -I{} sh -c 'echo "--- {} ---" && rg -n "(sk-[a-zA-Z0-9]{20,}|sk-proj-|sk-ant-|ghp_|github_pat_|TEAM360_OPENAI_KEY|TEAM360_LITELLM_API_KEY|OpenAI_Key|VERTICE360_OPENAI_KEY)" {} || true'
+   ```
+4. **Verificar `git diff --check`** limpio.
+5. **Cerrar entrada** en `status_actual.md` agregando resultados de validacion.
+
+### Estado base confirmado (pre-cuelgue)
+
+| Metric | Value |
+|--------|-------|
+| Tests | 398 passed, 9 skipped |
+| Rama | `feature/console-backend-core` |
+| Fase activa | Lab de evaluacion de modelos (post-Fase 1.9r) |
+| LLM default | `fake` |
+| Retrieval default | `fake` |
+| Product adapter | Feature-flagged, no expuesto |
+| Frontend/Console | No tocado |
+| Milvus/LiteLLM/OpenAI | Opt-in, no activos por defecto |
+
+---
+
+### 2026-06-12 - Fase 1.9s — LiteLLM Responses routing para GPT-5 nano
+
+- Se retomo la fase colgada con validacion previa de servicios:
+  - PostgreSQL local aceptando conexiones en Docker.
+  - Milvus 2.6 saludable con collection
+    `team360_lab_pgvector_benchmark_openai_small_1536`, 139 filas,
+    scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b` y embedding version
+    `team360-openai-small-1536-v1`.
+  - LiteLLM local vivo en `127.0.0.1:4000`.
+- Se corrigio el lab de evaluacion:
+  - `run_model_evaluation.py` ya inicializa `non_comparable` en dry-run/skip-preflight.
+  - Se agrego `requesty_deepseek_4_flash` al catalogo/matriz/preflight.
+- Se corrigio configuracion local de LiteLLM fuera del repo Team360:
+  - `openai_gpt-5-nano` y `openai/gpt-5-nano` registrados contra proveedor OpenAI.
+  - `requesty_deepseek_4_flash` apuntando a `https://router.requesty.ai/v1`.
+  - `REQUESTY_API_KEY` normalizada en `~/.bashrc` tras detectar duplicacion/salto de linea.
+- Se agrego soporte runtime en Team360:
+  - `LiteLLMClient.responses_completion()` llama `/v1/responses`.
+  - `LiteLLMClient.text_completion()` enruta `openai_gpt-5-nano` y
+    `openai/gpt-5-nano` por Responses API con `reasoning.effort=minimal`.
+  - Los demas aliases siguen usando `/v1/chat/completions`.
+  - `TEAM360_LITELLM_API_MODE=auto|chat|responses` permite override controlado.
+  - Product adapter e `LiteLLMAIInterpreter` usan `text_completion()`.
+- Validaciones reales:
+  - LiteLLM catalogo: `openai_gpt-5-nano`, `openai/gpt-5-nano`,
+    `requesty_deepseek_4_flash`, `openrouter_deepseek_4_flash` y
+    `openai_gpt_4o_mini_2024_07_18` registrados.
+  - `openai_gpt-5-nano` via `/v1/responses`: OK, `status=completed`,
+    `usage_present=yes`.
+  - `requesty_deepseek_4_flash` via `/v1/chat/completions`: OK,
+    `finish_reason=stop`, `usage_present=yes`.
+  - Preflight directo `requesty_deepseek_4_flash`: PASS, latencia ~2450ms.
+  - Product adapter con `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano`:
+    preflight backend PASS, `response_is_fallback=false`, alias correcto.
+- Validaciones automatizadas:
+  - `uv run pytest` en backend: **403 passed, 9 skipped**.
+  - `uv run pytest ../../lab/model-evaluation-sales-diagnosis/scripts/tests/test_preflight.py`:
+    **10 passed**.
+  - `git diff --check`: limpio.
+- Observacion:
+  - El smoke `smoke_sales_diagnosis_runtime_product_adapter_litellm.py`
+    con GPT-5 nano obtuvo 12/13 por `turn_count` en un caso con guardrail/
+    `unsafe_blocked`; el preflight backend confirma que no fue fallback LiteLLM.
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+
+### 2026-06-12 - Fase 1.9t — Cierre de retoma y factibilidad Diagnostico
+
+- Se cerro el punto de retoma de la sesion colgada.
+- Se corrigieron las matrices del lab para apuntar al dataset canonico:
+  `SrvRestAstroLS_v1/backend/tests/fixtures/sales_diagnosis_headless_questions_v1.json`.
+- Se agrego `config/run_matrix.milvus.example.json` para corridas con
+  product adapter + Milvus real.
+- Se ejecuto matriz real secuencial por alias, reiniciando backend por modelo
+  para respetar que `TEAM360_LITELLM_MODEL_ALIAS` se resuelve al inicio.
+- Condiciones de corrida:
+  - endpoint product adapter;
+  - state `inmemory_test`;
+  - LLM LiteLLM real;
+  - retrieval Milvus real;
+  - collection `team360_lab_pgvector_benchmark_openai_small_1536`;
+  - dataset `sales_diagnosis_headless_response_validation_v1`, 25 casos.
+- Resultados comparativos:
+
+| Modelo | PASS | WARN | FAIL | Avg/case | Fallback |
+|---|---:|---:|---:|---:|---:|
+| `openai_gpt_4o_mini_2024_07_18` | 17 | 8 | 0 | 2.0s | 0 |
+| `openai_gpt-5-nano` | 17 | 6 | 2 | 2.8s | 0 |
+| `requesty_deepseek_4_flash` | 17 | 7 | 1 | 4.4s | 0 |
+| `openrouter_deepseek_4_flash` | 16 | 9 | 0 | 7.5s | 0 |
+| `openrouter_qwen3_30b_a3b_thinking_2507` | 11 | 13 | 1 | 13.1s | 0 |
+
+- Se ejecutaron probes manuales con preguntas extremas exactas:
+  - `necesito automatizar la forma que hago tortas`;
+  - `que significa automatizar`;
+  - caso SAP Business One desktop en VM sobre VPN con Visual Basic.
+- Probes manuales con `openai_gpt_4o_mini_2024_07_18`:
+  - 3/3 HTTP 201;
+  - sin fallback;
+  - sources Milvus reales;
+  - latencias: 1.819s a 3.189s.
+- Probes manuales con `requesty_deepseek_4_flash`:
+  - 3/3 HTTP 201;
+  - sin fallback;
+  - sources Milvus reales;
+  - latencias: 4.530s a 6.011s.
+- Se documento la factibilidad tecnica en:
+  `SrvRestAstroLS_v1/docs/sales_diagnosis_feasibility_20260612.md`.
+- Lectura de factibilidad:
+  - Diagnostico es factible como puerta comercial inicial.
+  - `openai_gpt_4o_mini_2024_07_18` queda como baseline estable inmediato.
+  - `requesty_deepseek_4_flash` queda como candidato viable de comparacion
+    velocidad/costo, con buena respuesta tecnica pero un FAIL en dataset.
+  - `openai_gpt-5-nano` queda operativo via Responses API, pero requiere revisar
+    FAIL antes de usarlo como default de diagnostico.
+  - No se debe prometer implementacion automatica completa, SAP directo, bypass
+    de MFA/VPN/permisos, ROI exacto, SLA, precio, WhatsApp handoff,
+    lead_capture, diagnostic_code ni Step-to-Action.
+- Evidencias:
+  - `lab/model-evaluation-sales-diagnosis/results/summary_20260612_milvus_models.json`
+  - `lab/model-evaluation-sales-diagnosis/results/manual_probe_20260612_business_extremes.jsonl`
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+
+### 2026-06-12 - Metodologia transversal de preflight de servicios reales
+
+- Se formalizo como metodologia obligatoria de desarrollo/test/pruebas el
+  preflight previo a cualquier smoke, benchmark o validacion con servicios reales.
+- Se documento el invariante estable en:
+  `lat.md/service-preflight-methodology.md`.
+- Se actualizo el protocolo operativo en:
+  - `.agents/skills/team360-project/SKILL.md`;
+  - `AGENTS.md`.
+- Regla central:
+  - validar PostgreSQL, Milvus, collection correcta, LiteLLM, `.bashrc`/env vars,
+    `globalVar.py`, alias registrado en LiteLLM y llamada real minima al modelo;
+  - si falla el preflight, no aceptar benchmark ni interpretar resultados como
+    evidencia de calidad del modulo.
+- No se modifico runtime productivo, migraciones, frontend, Console ni workers.
