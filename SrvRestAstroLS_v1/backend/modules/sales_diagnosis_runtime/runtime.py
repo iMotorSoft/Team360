@@ -218,7 +218,7 @@ class AssistantConversationRuntime:
     # ------------------------------------------------------------------
 
     def _validate_input(self, input: AssistantTurnInput) -> None:
-        if not input.session_id:
+        if not input.session_id or not input.session_id.strip():
             raise InvalidAssistantRuntimeInputError("session_id is required")
         if not input.assistant_instance_code:
             raise InvalidAssistantRuntimeInputError(

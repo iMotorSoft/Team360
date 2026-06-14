@@ -190,6 +190,14 @@ def test_product_route_requires_session_id(monkeypatch):
     assert "Traceback" not in resp.text
 
 
+def test_product_route_rejects_whitespace_session_id(monkeypatch):
+    _enable_product_route_with_inmemory_test(monkeypatch)
+    with _client() as client:
+        resp = client.post(PRODUCT_TURN_PATH, json=_default_payload(session_id="   "))
+    assert resp.status_code == HTTP_400_BAD_REQUEST
+    assert "Traceback" not in resp.text
+
+
 def test_product_route_uses_default_codes(monkeypatch):
     _enable_product_route_with_inmemory_test(monkeypatch)
     payload = {
