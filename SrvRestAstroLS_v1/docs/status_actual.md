@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-14 (Fase 1.4 — Endpoint hardening: scope, permisos y seguridad)
+Ultima actualizacion: 2026-06-14 (Fase 1.5 — Diagnostic-ready knowledge base debug tool)
 
 ## Directorio de trabajo
 
@@ -1673,3 +1673,25 @@ Incluye estructura inicial para:
 - **Smoke PostgreSQL actualizado**: incluye scope codes en request.
 - Suite completa: **341/341 passed**. Smoke PostgreSQL: **50/50 passed**.
 - Sin frontend, sin upload público, sin Milvus/OpenAI default, sin corpus real.
+
+### 2026-06-14 - Fase 1.5: Diagnostic-ready knowledge base debug tool
+
+- **Package `pkg_sales_diagnosis` auditado:** 9 approved docs listos con `ingestion_status: ready`.
+  - Areas: automatizaciones, ventas, integraciones, seguridad, glosario, objeciones.
+  - Todos con frontmatter completo: `area_key`, `topic_key`, `node_path`, `access_tags`, `risk_level`, `implementation_status`, `commercial_status`.
+  - Documentos referencian `planned_extension` (step-to-action, diagnostic_code, QR, WhatsApp handoff).
+- **Script creado:** `scripts/run_sales_diagnosis_knowledge_base_debug.py`
+  - Flags: `--scan`, `--persist`, `--embed`, `--milvus-index`, `--retrieve-debug`, `--all`.
+  - Parámetros: `--package-code`, `--package-path`, `--knowledge-scope-code`, `--organization-code`, `--workspace-code`, `--top-k`.
+  - `--scan`: usa solo `KnowledgePackageScanner`, sin DB/OpenAI/Milvus.
+  - `--persist`: llama endpoint dev persist con scope codes.
+  - `--embed`: requiere `OPENAI_API_KEY` + `TEAM360_KNOWLEDGE_INGESTION_ENABLE_REAL_EMBEDDINGS=true`.
+  - `--milvus-index`: crea colección temporal `team360_diagnosis_debug_*`, indexa desde PostgreSQL.
+  - `--retrieve-debug`: 8 queries de diagnóstico reales, retrieval vía pgvector `<=>`, incluye señales de riesgo: `planned_extension`, `human_review_required`, `risk_level`.
+  - Guarda reporte en `backend/tmp/sales_diagnosis_knowledge_debug_report.json`.
+  - No imprime secrets (usa `sanitize_dsn` o `get_database_settings`).
+- **Tests contract:** 12 tests en `tests/test_sales_diagnosis_knowledge_base_debug.py`:
+  - Existencia, flags, DB/OpenAI/Milvus env checks, no toca docs branch, queries incluyen security HITL y planned_extension, output incluye node_path/area_key/topic_key/access_tags, no frontend ni diagnosis runtime, masks secrets, scan puro sin servicios externos.
+- Suite completa: **353/353 passed** (341 + 12).
+- Scan smoke: 9/9 approved docs listos.
+- Sin frontend, sin upload público, sin endpoint nuevo, sin Console, sin diagnosis runtime, sin edición de corpus real, sin docs branch.
