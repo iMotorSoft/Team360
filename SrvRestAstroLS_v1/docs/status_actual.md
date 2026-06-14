@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-14 (Fase 1.3e — Internal dev endpoint contract)
+Ultima actualizacion: 2026-06-14 (Fase 1.3f — Controlled DB-backed persist mode)
 
 ## Directorio de trabajo
 
@@ -1509,3 +1509,33 @@ Incluye estructura inicial para:
 - Todos los tests usan `tmp_path` para crear paquetes temporales — no tocan corpus documental real.
 - Validación: 16 nuevos tests, suite completa 250/250 passed.
 - `git diff --check` limpio. Sin frontend, sin Milvus, sin embeddings reales, sin OpenAI, sin SemanticChunker obligatorio, sin manuales/drafts reales, sin docs branch, sin diagnosis runtime, sin upload público.
+
+### 2026-06-14 - Fase 1.3f: Controlled DB-backed persist mode for dev endpoint
+
+- Se reescribió `backend/routes/knowledge_ingestion_dev.py` con soporte `persist` mode completo:
+  - `_run_persist_pipeline()` es función module-level async, diseñada para ser monkeypatcheable en tests (evita dependencia DB real).
+  - Persist mode auto-detecta `organization_code`, `workspace_code`, `knowledge_scope_code` del frontmatter del primer documento ready en el scan.
+  - Reusa `worker.persist_package_documents()` con `chunk_strategy="structural"`, `dry_run=False`, `include_chunks=True`.
+  - Responde con `run_id`, `persisted_document_count`, `persisted_chunk_count`, `errors` del worker.
+  - Resultados de persistencia se mergean con scanner metadata (preserva `node_path`, `status`, `ingestion_status`, `gate_ready`, `persisted`, `document_id` por documento).
+  - Errores del worker se capturan con `try/except` y devuelven como mensajes de error, no stacktraces.
+  - Sin DB configurada → error claro "persist mode requires a database connection: set TEAM360_DB_URL or equivalent".
+  - Sin códigos detectables (org/workspace/scope) → error con mensaje específico.
+- Se actualizaron tests en `test_knowledge_ingestion_dev_route.py`:
+  - Se agregó `import routes.knowledge_ingestion_dev as dev_route` para monkeypatch.
+  - Se eliminó el viejo test `test_post_ingest_persist_mode_returns_error_no_db` (no funcionaba en entornos con `DB_PG_V360_URL` set).
+  - Se reescribió como `test_post_ingest_persist_requires_database_configuration` con `monkeypatch` de `_is_db_configured` → False.
+  - 9 tests nuevos de persist mode (total route tests: 25):
+    - `test_post_ingest_persist_requires_database_configuration`
+    - `test_post_ingest_persist_uses_worker_or_repository`
+    - `test_post_ingest_persist_persists_only_ready_documents_with_fake_repo`
+    - `test_post_ingest_persist_does_not_persist_not_ready_chunks`
+    - `test_post_ingest_persist_reports_gate_errors`
+    - `test_post_ingest_persist_response_contract_is_stable`
+    - `test_post_ingest_persist_does_not_call_openai_or_milvus`
+    - `test_post_ingest_persist_handles_repository_error_without_stacktrace`
+    - `test_post_ingest_persist_preserves_node_path_access_tags_permission_tags`
+    - `test_post_ingest_dry_run_still_works_after_persist_changes`
+  - Helper `_fake_persist_result()` para construir respuestas fake del pipeline.
+- Validación: suite completa 259/259 passed (250 + 9 nuevos).
+- `git diff --check` limpio. Sin DB real para persist mode, sin OpenAI, sin Milvus, sin SemanticChunker, sin frontend, sin manuales/drafts reales, sin diagnóstico productivo.

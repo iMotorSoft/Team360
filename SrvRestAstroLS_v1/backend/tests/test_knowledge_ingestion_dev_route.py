@@ -2,7 +2,7 @@
 
 Tests the /api/dev/knowledge-ingestion/ingest contract:
   - dry_run mode (scan + gate + estimate chunks)
-  - persist mode rejection (no DB available)
+  - persist mode (controlled DB-backed via monkeypatch)
   - path validation and security
   - readiness gate error propagation
   - no OpenAI/Milvus/SemanticChunker calls
@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from litestar.testing import TestClient
 from app import create_app
+import routes.knowledge_ingestion_dev as dev_route
 
 _READY_FRONTMATTER = """\
 ---
@@ -382,7 +383,46 @@ def test_post_ingest_response_contract_is_stable(tmp_path):
         assert "error_messages" in doc
 
 
-def test_post_ingest_persist_mode_returns_error_no_db(tmp_path):
+# ── Persist mode helpers ─────────────────────────────────────────────────────
+
+
+def _fake_persist_result(
+    run_id: str = "run-fake-001",
+    persisted_docs: int = 1,
+    persisted_chunks: int = 3,
+    inserted: int = 1,
+    errors: list[str] | None = None,
+) -> dict:
+    return {
+        "run_id": run_id,
+        "persisted_document_count": persisted_docs,
+        "persisted_chunk_count": persisted_chunks,
+        "inserted_count": inserted,
+        "updated_count": 0,
+        "unchanged_count": 0,
+        "invalid_count": 0,
+        "skipped_count": 0,
+        "total_chunk_count": persisted_chunks,
+        "persist_errors": errors or [],
+        "persist_documents": [
+            {
+                "relative_path": "approved/ready.md",
+                "action": "inserted",
+                "document_id": "doc-fake-001",
+                "chunk_count": persisted_chunks,
+                "persist_status": "inserted",
+                "persist_errors": [],
+            },
+        ],
+    }
+
+
+# ── Persist mode ─────────────────────────────────────────────────────────────
+
+
+def test_post_ingest_persist_requires_database_configuration(monkeypatch, tmp_path):
+    """Without DB config, persist mode returns an error (not stacktrace)."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: False)
     pkg_path = _make_dev_package(
         tmp_path,
         ready_docs=[("ready.md", _READY_FRONTMATTER)],
@@ -400,7 +440,284 @@ def test_post_ingest_persist_mode_returns_error_no_db(tmp_path):
     data = resp.json()
     assert data["ok"] is False
     assert data["mode"] == "persist"
-    assert any("database" in e.lower() for e in data["errors"])
+    assert any("database" in e.lower() for e in data["errors"]), f"errors={data['errors']}"
+
+
+def test_post_ingest_persist_uses_worker_or_repository(monkeypatch, tmp_path):
+    """When DB is available, persist route calls _run_persist_pipeline."""
+    pkg_path = _make_dev_package(
+        tmp_path,
+        ready_docs=[("ready.md", _READY_FRONTMATTER)],
+    )
+    called = False
+
+    async def fake_persist(**kwargs):
+        nonlocal called
+        called = True
+        return _fake_persist_result()
+
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    monkeypatch.setattr(dev_route, "_run_persist_pipeline", fake_persist)
+
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+            },
+        )
+    assert resp.status_code == 200
+    assert called, "_run_persist_pipeline was not called"
+    data = resp.json()
+    assert data["ok"] is True
+    assert data["mode"] == "persist"
+    assert data["run_id"] == "run-fake-001"
+
+
+def test_post_ingest_persist_persists_only_ready_documents_with_fake_repo(monkeypatch, tmp_path):
+    """Only ready documents are persisted; not_ready docs are skipped."""
+    pkg_path = _make_dev_package(
+        tmp_path,
+        ready_docs=[("ready.md", _READY_FRONTMATTER)],
+        not_ready_docs=[("not_ready.md", _NOT_READY_FRONTMATTER)],
+    )
+
+    async def fake_persist(**kwargs):
+        return _fake_persist_result(persisted_docs=1, persisted_chunks=3)
+
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    monkeypatch.setattr(dev_route, "_run_persist_pipeline", fake_persist)
+
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+            },
+        )
+    data = resp.json()
+    assert data["rejected_count"] >= 1
+    assert data["persisted_document_count"] >= 1
+    not_ready_docs = [d for d in data["documents"] if d["gate_ready"] is False]
+    for nd in not_ready_docs:
+        assert nd["persisted"] is False
+        assert nd["chunk_count"] == 0
+
+
+def test_post_ingest_persist_does_not_persist_not_ready_chunks(monkeypatch, tmp_path):
+    """Not-ready documents produce zero chunks in persist mode."""
+    pkg_path = _make_dev_package(
+        tmp_path,
+        ready_docs=[("ready.md", _READY_FRONTMATTER)],
+        not_ready_docs=[("not_ready.md", _NOT_READY_FRONTMATTER)],
+    )
+
+    async def fake_persist(**kwargs):
+        return _fake_persist_result(persisted_docs=1, persisted_chunks=3)
+
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    monkeypatch.setattr(dev_route, "_run_persist_pipeline", fake_persist)
+
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+            },
+        )
+    data = resp.json()
+    not_ready_docs = [d for d in data["documents"] if d["gate_ready"] is False]
+    for nd in not_ready_docs:
+        assert nd["chunk_count"] == 0
+
+
+def test_post_ingest_persist_reports_gate_errors(monkeypatch, tmp_path):
+    """Gate errors propagate in persist mode response."""
+    pkg_path = _make_dev_package(
+        tmp_path,
+        ready_docs=[("ready.md", _READY_FRONTMATTER)],
+        not_ready_docs=[("not_ready.md", _NOT_READY_FRONTMATTER)],
+    )
+
+    async def fake_persist(**kwargs):
+        return _fake_persist_result(persisted_docs=1, persisted_chunks=3)
+
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    monkeypatch.setattr(dev_route, "_run_persist_pipeline", fake_persist)
+
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+            },
+        )
+    data = resp.json()
+    not_ready_docs = [d for d in data["documents"] if d["gate_ready"] is False]
+    assert len(not_ready_docs) >= 1
+    nd = not_ready_docs[0]
+    codes = nd["error_codes"]
+    assert any("not_ready" in c for c in codes)
+
+
+def test_post_ingest_persist_response_contract_is_stable(monkeypatch, tmp_path):
+    """Persist mode response has all expected fields."""
+    pkg_path = _make_dev_package(
+        tmp_path,
+        ready_docs=[("ready.md", _READY_FRONTMATTER)],
+        not_ready_docs=[("not_ready.md", _NOT_READY_FRONTMATTER)],
+    )
+
+    async def fake_persist(**kwargs):
+        return _fake_persist_result()
+
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    monkeypatch.setattr(dev_route, "_run_persist_pipeline", fake_persist)
+
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+            },
+        )
+    assert resp.status_code == 200
+    data = resp.json()
+    for key in ("ok", "mode", "package_code", "document_count", "candidate_count",
+                "ready_count", "rejected_count", "chunk_count", "documents",
+                "errors", "run_id", "persisted_document_count", "persisted_chunk_count"):
+        assert key in data, f"Missing key: {key}"
+    for doc in data["documents"]:
+        for key in ("relative_path", "node_path", "status", "ingestion_status",
+                    "candidate_for_ingestion", "gate_ready", "chunk_count",
+                    "error_codes", "error_messages", "persisted", "document_id"):
+            assert key in doc, f"Missing key in doc: {key}"
+
+
+def test_post_ingest_persist_does_not_call_openai_or_milvus(monkeypatch, tmp_path):
+    """Persist mode uses only scanner + worker + repository, no external AI/Milvus."""
+    pkg_path = _make_dev_package(
+        tmp_path,
+        ready_docs=[("ready.md", _READY_FRONTMATTER)],
+    )
+
+    async def fake_persist(**kwargs):
+        return _fake_persist_result()
+
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    monkeypatch.setattr(dev_route, "_run_persist_pipeline", fake_persist)
+
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+            },
+        )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["chunk_count"] >= 1
+    assert data["persisted_chunk_count"] >= 1
+
+
+def test_post_ingest_persist_handles_repository_error_without_stacktrace(monkeypatch, tmp_path):
+    """Repository errors are caught and returned as error messages, not stacktraces."""
+    pkg_path = _make_dev_package(
+        tmp_path,
+        ready_docs=[("ready.md", _READY_FRONTMATTER)],
+    )
+
+    async def failing_persist(**kwargs):
+        raise RuntimeError("DB connection refused")
+
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    monkeypatch.setattr(dev_route, "_run_persist_pipeline", failing_persist)
+
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+            },
+        )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["ok"] is False
+    assert data["errors"]
+    error_text = " ".join(data["errors"]).lower()
+    assert "failed" in error_text or "error" in error_text
+
+
+def test_post_ingest_persist_preserves_node_path_access_tags_permission_tags(monkeypatch, tmp_path):
+    """Frontmatter metadata survives the persist pipeline."""
+    pkg_path = _make_dev_package(
+        tmp_path,
+        ready_docs=[("ready.md", _READY_FRONTMATTER)],
+    )
+
+    async def fake_persist(**kwargs):
+        return _fake_persist_result()
+
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    monkeypatch.setattr(dev_route, "_run_persist_pipeline", fake_persist)
+
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+            },
+        )
+    data = resp.json()
+    ready_docs = [d for d in data["documents"] if d["gate_ready"] is True]
+    assert len(ready_docs) >= 1
+    rd = ready_docs[0]
+    assert rd["node_path"] == "/finanzas/general"
+    assert rd["status"] == "approved"
+    assert rd["ingestion_status"] == "ready"
+
+
+def test_post_ingest_dry_run_still_works_after_persist_changes(tmp_path):
+    """Adding persist mode did not break existing dry_run behavior."""
+    pkg_path = _make_dev_package(
+        tmp_path,
+        ready_docs=[("ready.md", _READY_FRONTMATTER)],
+        not_ready_docs=[("not_ready.md", _NOT_READY_FRONTMATTER)],
+    )
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "dry_run",
+            },
+        )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["ok"] is True
+    assert data["mode"] == "dry_run"
+    assert data["document_count"] >= 2
+    assert data["rejected_count"] >= 1
+    # Verify run_id and persist fields are absent in dry_run
+    assert data.get("run_id") is None
+    assert data.get("persisted_document_count", 0) == 0
 
 
 def test_route_is_marked_dev_internal(tmp_path):
