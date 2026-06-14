@@ -2,7 +2,7 @@
 
 Objetivo: `knowledge-documents-foundation`
 
-Ultima actualizacion: 2026-06-08
+Ultima actualizacion: 2026-06-14
 
 ## Estado general
 
@@ -10,6 +10,17 @@ Ultima actualizacion: 2026-06-08
 knowledge fuente.
 
 ## Acciones realizadas
+
+### 2026-06-14 - Principio general de factibilidad diagnostica
+
+- Se agrego `diagnostic-feasibility-principle.md` como policy global en estado
+  draft para separar factibilidad tecnica, factibilidad operativa,
+  disponibilidad inmediata, validacion, revision humana y oportunidad futura.
+- Se aclaro que diagnosticar factibilidad no equivale a prometer
+  implementacion, cotizar, inventar paquetes ni activar captura de contacto.
+- No se movieron documentos a `approved/`.
+- No se implemento ingestion runtime, embeddings, ArangoDB, Milvus, pgvector,
+  endpoints ni UI.
 
 ### 2026-06-08 - Estandares base
 

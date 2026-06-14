@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-08
+Ultima actualizacion: 2026-06-14
 
 ## Estado general
 
@@ -11,6 +11,39 @@ Ultima actualizacion: 2026-06-08
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-14 - pkg_sales_diagnosis aplica el principio de factibilidad amplia
+
+- Se consolidaron ocho documentos draft de `pkg_sales_diagnosis` como primer
+  caso concreto de aplicacion del principio de factibilidad diagnostica:
+  package manual, slots/questions, matriz de factibilidad, playbook de
+  respuestas, politica de seguridad/HITL, catalogo de automatizaciones,
+  objeciones comerciales y glosario/referencias cruzadas.
+- Los drafts separan factibilidad tecnica, factibilidad operativa,
+  disponibilidad comercial inmediata, validacion necesaria, revision humana,
+  oportunidad futura y caso no recomendable.
+- La seguridad nativa de cada aplicacion permanece bajo control del usuario:
+  Team360 no debe pedir, guardar, interceptar, automatizar ni evadir MFA, QR,
+  Face ID, codigos, tokens o aprobaciones manuales.
+- Step-to-Action, lead capture, diagnostic_code y WhatsApp handoff quedan como
+  `planned_extension`, no capacidades activas.
+- Los documentos permanecen en `drafts/` con `ingestion_status: not_ready`; no
+  se movio contenido a `approved/`.
+- No se toco backend, runtime, ingestion service, embeddings, Milvus, ArangoDB,
+  pgvector, endpoints ni UI.
+
+### 2026-06-14 - Principio de factibilidad diagnostica
+
+- Se actualizo `knowledge-documents-foundation.md` para registrar como
+  invariante general que los asistentes diagnosticos de Team360 deben separar
+  factibilidad tecnica, factibilidad operativa y disponibilidad comercial
+  inmediata.
+- Se referencio el standard fuente
+  `SrvRestAstroLS_v1/knowledge/_standards/diagnostic-feasibility-principle.md`.
+- Se aclaro que `pkg_sales_diagnosis` aplica el principio como primer paquete
+  concreto, pero no define la regla general.
+- No se implementaron ingestion runtime, embeddings, ArangoDB, Milvus,
+  pgvector, endpoints ni UI.
 
 ### 2026-06-08 - Fundacion documental knowledge multi-package
 

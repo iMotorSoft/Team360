@@ -1,27 +1,39 @@
 ---
 document_code: team360_sales_diagnosis_slots_questions
-document_type: slots_questions_guide
-version: 1
 status: draft
-package_code: pkg_sales_diagnosis
+ingestion_status: not_ready
 knowledge_scope_code: ks_team360_sales_diagnosis
+scope_type: package
+organization_code: team360
+workspace_code: team360_live
+package_code: pkg_sales_diagnosis
 assistant_instance_code: team360_sales_diagnosis
 service_code: svc_sales_diagnosis
+area_key: scoring
+topic_key: slots_questions
+document_type: guide
+visibility: internal
+access_tags:
+  - internal
+  - package:sales_diagnosis
+  - topic:slots
+  - topic:questions
+locale: es
+version: "0.1"
+title: "Guía de slots y preguntas dinámicas para diagnóstico"
+source_type: markdown
+node_path: "/scoring/slots-questions"
+risk_level: medium
+step_to_action_status: planned_extension
 template_code: team360_sales_automation_diagnosis
 client_code:
 client_context: team360_live_public_home
 first_validation_client: team360_live
-source_type: markdown
 level_target:
   - L1
   - L2
-language: es-AR
 owner: Team360
 last_review:
-ingestion_status: not_ready
-access_tags:
-  - soporte
-  - public
 evidence_level: validated_by_source
 evidence_sources:
   - cv_inventory
@@ -47,9 +59,7 @@ related_pilots:
   - team360_live_public_home
 related_clients:
   - team360_live
-risk_level: medium
 supports_step_to_action: false
-step_to_action_status: planned_extension
 step_to_action_type: diagnostic_code_whatsapp_handoff
 preferred_backoffice_model: deepseek_4_flash
 preferred_fast_response_model: gpt_5_nano_low
@@ -89,7 +99,7 @@ documentales, integraciones y flujos con riesgo.
 El objetivo es mejorar la calidad del diagnóstico sin abrumar al
 usuario con preguntas innecesarias. Step-to-Action, lead capture,
 `diagnostic_code` y WhatsApp handoff son capacidades futuras, no parte
-activa del MVP conversacional inicial.
+activa de la etapa inicial de producción conversacional.
 
 ---
 
@@ -103,11 +113,28 @@ Esta guía define:
 - Prioridad de extracción según el contexto detectado.
 - Reglas para no sobrepreguntar al usuario.
 - Criterios para detectar señales futuras de Step-to-Action sin
-  capturar datos personales en el MVP inicial.
+  capturar datos personales en la etapa inicial de producción.
 - Criterios para activar `human_review_required`.
 
 No define implementación técnica ni endpoints. Es una guía
 conversacional y de extracción de contexto para el asistente.
+
+---
+
+## Precedencia documental
+
+- Para seguridad, credenciales, MFA, QR, Face ID, datos sensibles,
+  bloqueo o revisión humana, prevalece
+  [[team360_sales_diagnosis_security_hitl_policy]].
+- Para clasificación de factibilidad, disponibilidad, service_maturity,
+  offer_decision y diagnosis_category, prevalece
+  [[team360_sales_diagnosis_feasibility_availability_matrix]].
+- Para estilo conversacional, prevalece
+  [[team360_sales_diagnosis_response_playbook]].
+- Para precio, garantías, contacto y dudas comerciales, prevalece
+  [[team360_sales_diagnosis_commercial_objections]].
+- Esta guía define información a capturar y no debe contradecir
+  documentos más específicos.
 
 ---
 
@@ -134,9 +161,23 @@ Reglas que el asistente debe seguir en toda interacción:
     el usuario ya pida continuidad comercial, cotización o contacto.
 11. **Separar diagnóstico de venta.** Diagnosticar un proceso no
     significa que Team360 lo implemente como oferta actual.
-12. **No activar lead capture en el MVP inicial.** Registrar señales
+12. **No activar lead capture en la etapa inicial de producción.** Registrar señales
     de continuidad futura, pero no pedir nombre, apellido, WhatsApp,
     email ni empresa durante el diagnóstico.
+13. **No preguntar datos personales al inicio.** Nombre, WhatsApp, email
+    y empresa solo si el usuario pide contacto o ya recibió valor diagnóstico.
+14. **Preguntar primero por datos que cambian la factibilidad.**
+    Antes que datos comerciales, preguntar por: herramienta actual,
+    proceso, volumen, frecuencia, reglas de negocio, datos disponibles,
+    accesos, riesgos y responsables.
+15. **Separar preguntas técnicas de preguntas comerciales.** Las preguntas
+    sobre factibilidad técnica y operativa van primero. Las preguntas
+    comerciales (presupuesto, decisión, plazos) van después del diagnóstico.
+16. **Presupuesto es tardío.** No preguntar presupuesto hasta tener un
+    diagnóstico claro de factibilidad, alcance e impacto potencial.
+17. **Contacto con equipo es posterior al valor diagnóstico.** No ofrecer
+    contacto humano como primera respuesta. Primero dar orientación útil,
+    luego ofrecer derivación si el caso lo requiere.
 
 ### Patrones conversacionales
 
@@ -184,11 +225,11 @@ de entrada. Solo si el contexto lo justifica.
 ## Slots por función y fase
 
 Esta separación evita que el asistente mezcle diagnóstico, clasificación
-y captura comercial. El MVP conversacional solo usa slots de diagnóstico
+y captura comercial. La producción conversacional por etapas solo usa slots de diagnóstico
 y clasificación. Los slots de continuidad comercial quedan como
 capacidad futura.
 
-### A. Slots del MVP conversacional
+### A. Slots de la producción conversacional por etapas
 
 Estos slots ayudan a interpretar texto libre, hacer preguntas mínimas,
 diagnosticar y clasificar. No requieren pedir datos personales.
@@ -213,10 +254,20 @@ diagnosticar y clasificar. No requieren pedir datos personales.
 | `service_maturity` | Declara madurez del servicio. | Inferir sin elevar a core temas futuros o sensibles. |
 | `human_review_required` | Marca necesidad de revisión humana. | Activar por seguridad, datos sensibles, MFA, finanzas o incertidumbre. |
 | `risk_level` | Resume riesgo bajo, medio o alto. | Basar en datos, permisos, criticidad e irreversibilidad. |
+| `technical_feasibility` | Evalúa si el proceso puede automatizarse técnicamente. | Inferir desde proceso, herramienta, API, MFA, accesos. |
+| `operational_feasibility` | Evalúa si el usuario tiene accesos, permisos y datos para la automatización. | Inferir desde acceso_disponible, responsable, riesgo_datos. |
+| `availability_status` | Indica si hay disponibilidad inmediata como paquete/servicio. | Inferir con criterio conservador. |
+| `diagnosis_category` | Categoría del diagnóstico: available_now, feasible_not_packaged, feasible_needs_more_info, special_case_human_review, future_opportunity, not_recommended. | Clasificar después del análisis de factibilidad. |
+| `package_fit` | Grado de correspondencia entre el caso y un paquete existente. | Inferir desde proceso, alcance y madurez del servicio. |
+| `requires_more_info` | Marca si faltan datos técnicos u operativos para validar. | Activar cuando el diagnóstico tenga incertidumbre sobre factibilidad. |
+| `future_opportunity_reason` | Razón por la que el caso es oportunidad futura, no oferta actual. | Registrar solo si diagnosis_category es future_opportunity. |
+| `not_recommended_reason` | Razón por la que el caso no es recomendable. | Registrar solo si diagnosis_category es not_recommended. |
+| `immediate_availability` | Indica si Team360 ofrece el servicio hoy como paquete estándar. | Inferir desde service_maturity y oferta actual. |
+| `validation_needed_reason` | Describe qué información falta para validar factibilidad. | Registrar solo si diagnosis_category es feasible_needs_more_info. |
 
 ### B. Slots de clasificación
 
-Estos slots también pertenecen al MVP conversacional, pero son inferidos
+Estos slots también pertenecen a la producción conversacional por etapas, pero son inferidos
 por el asistente. No se preguntan literalmente como formulario.
 
 | Slot | Función | Regla |
@@ -226,20 +277,30 @@ por el asistente. No se preguntan literalmente como formulario.
 | `service_maturity` | Declara madurez de servicio. | No elevar a core temas futuros o sensibles. |
 | `human_review_required` | Marca necesidad de revisión humana. | Activar por seguridad, datos sensibles, MFA, finanzas o incertidumbre. |
 | `risk_level` | Resume riesgo bajo, medio o alto. | Basar en datos, permisos, criticidad e irreversibilidad. |
+| `technical_feasibility` | Factibilidad técnica del proceso. | Inferir desde API, MFA, accesos, plataforma, estabilidad. |
+| `operational_feasibility` | Factibilidad operativa del proceso. | Inferir desde accesos, permisos, datos disponibles, responsables. |
+| `availability_status` | Disponibilidad inmediata como paquete/servicio. | No asumir disponibilidad sin evidencia de oferta actual. |
+| `diagnosis_category` | Categoría del diagnóstico amplio. | Clasificar después de analizar factibilidad y oferta. |
+| `package_fit` | Correspondencia con paquete existente. | Inferir desde proceso, alcance y madurez. |
+| `requires_more_info` | Faltan datos para validar factibilidad. | Activar ante incertidumbre técnica u operativa. |
+| `immediate_availability` | Team360 ofrece esto hoy. | Solo true si hay paquete o servicio validado. |
+| `validation_needed_reason` | Qué falta para validar el caso. | Describir dato faltante concreto. |
+| `future_opportunity_reason` | Por qué es oportunidad futura. | Registrar solo si aplica. |
+| `not_recommended_reason` | Por qué no se recomienda. | Registrar solo si aplica. |
 
 ### C. Slots futuros de continuidad comercial
 
 Estos slots habilitarán continuidad comercial en una capa posterior.
-No deben pedirse en el MVP conversacional inicial, salvo que el usuario
+No deben pedirse en la etapa inicial de producción conversacional, salvo que el usuario
 pida contacto, presupuesto, propuesta o deje voluntariamente sus datos.
 
 | Slot | Función | Cuándo pedirlo |
 |------|---------|----------------|
-| `nombre` | Identificación mínima futura. | No pedir en MVP; aceptar si el usuario lo ofrece o pide contacto. |
-| `apellido` | Completa identificación futura. | No pedir en MVP; usar solo si se habilita handoff. |
-| `whatsapp_contacto` | Canal futuro de handoff comercial. | No pedir en MVP; solo si el usuario pide WhatsApp/contacto/propuesta. |
-| `email_contacto` | Canal alternativo futuro. | No pedir en MVP; aceptar si el usuario lo prefiere u ofrece. |
-| `empresa` | Contexto comercial futuro opcional. | No pedir en MVP salvo pedido explícito de propuesta. |
+| `nombre` | Identificación mínima futura. | No pedir en etapa inicial; aceptar si el usuario lo ofrece o pide contacto. |
+| `apellido` | Completa identificación futura. | No pedir en etapa inicial; usar solo si se habilita handoff. |
+| `whatsapp_contacto` | Canal futuro de handoff comercial. | No pedir en etapa inicial; solo si el usuario pide WhatsApp/contacto/propuesta. |
+| `email_contacto` | Canal alternativo futuro. | No pedir en etapa inicial; aceptar si el usuario lo prefiere u ofrece. |
+| `empresa` | Contexto comercial futuro opcional. | No pedir en etapa inicial salvo pedido explícito de propuesta. |
 | `diagnostic_code` | Conserva contexto en continuidad futura. | Diseño futuro; no es requerimiento del diagnóstico actual. |
 | `interes_en_diagnostico` | Señal de orientación, propuesta o continuidad. | Inferir; no usar para capturar datos automáticamente. |
 | `siguiente_paso` | Recomienda cierre, piloto, orientación o revisión. | Sí como recomendación textual; no como lead capture. |
@@ -247,7 +308,7 @@ pida contacto, presupuesto, propuesta o deje voluntariamente sus datos.
 **Regla comercial:** si el usuario no quiere dejar datos, el asistente
 debe poder seguir orientando de forma general.
 
-**Regla de MVP:** no pedir nombre, apellido, WhatsApp, email, empresa
+**Regla de producción por etapas:** no pedir nombre, apellido, WhatsApp, email, empresa
 ni datos de contacto durante la fase inicial de diagnóstico. Registrar
 la señal de continuidad futura, pero priorizar diagnóstico útil y
 respuesta clara.
@@ -284,13 +345,23 @@ respuesta clara.
 | `risk_level` | clasificación | Riesgo bajo, medio o alto | criticidad, datos, acceso, irreversibilidad | Ordena límites y revisión humana | Diagnóstico demasiado simple |
 | `presupuesto_aproximado` | continuidad futura | Orden de magnitud o tipo de alcance | "cuánto sale", "tengo presupuesto", "depende el precio", "es caro" | Útil para propuesta futura, no para diagnóstico inicial | Conversación comercial prematura |
 | `interes_en_diagnostico` | continuidad futura | Busca diagnóstico, propuesta o continuidad | "quiero saber si se puede", "necesito un presupuesto" | Define tono y próximo paso | Conversación desalineada |
-| `siguiente_paso` | MVP / futuro | Paso recomendado post-diagnóstico | "¿cómo sigo?", "¿con quién hablo?", "mandame información" | Cierra la respuesta con claridad | Recomendación incompleta |
+| `siguiente_paso` | inicial / futuro | Paso recomendado post-diagnóstico | "¿cómo sigo?", "¿con quién hablo?", "mandame información" | Cierra la respuesta con claridad | Recomendación incompleta |
 | `nombre` | continuidad futura | Nombre del usuario | "me llamo Juan", "soy María" | Handoff futuro si quiere avanzar | No afecta diagnóstico |
 | `apellido` | continuidad futura | Apellido del usuario | el usuario lo ofrece o acepta handoff | Handoff futuro si quiere avanzar | No afecta diagnóstico |
 | `whatsapp_contacto` | continuidad futura | WhatsApp del usuario | "escribime al 11..." | Continuidad futura por WhatsApp | No afecta diagnóstico |
 | `email_contacto` | continuidad futura | Email del usuario | "mandame mail a ..." | Canal alternativo futuro | No afecta diagnóstico |
 | `empresa` | continuidad futura | Empresa del usuario | "tengo un negocio", "trabajo en X" | Contexto comercial futuro opcional | No afecta diagnóstico inicial |
 | `diagnostic_code` | continuidad futura | Código único de diagnóstico | se asignará en capa futura | Continuidad futura sin perder contexto | No afecta diagnóstico inicial |
+| `technical_feasibility` | clasificación | Factibilidad técnica del proceso | API disponible, MFA, plataforma, estabilidad técnica | Determina si es posible técnicamente | Promesa técnica incorrecta |
+| `operational_feasibility` | clasificación | Factibilidad operativa del proceso | accesos, permisos, datos disponibles, responsables | Determina si el usuario puede implementarlo | Promesa de implementación imposible |
+| `availability_status` | clasificación | Disponibilidad como paquete/servicio hoy | madurez del servicio, oferta actual | Evita vender lo no disponible | Expectativa comercial incorrecta |
+| `diagnosis_category` | clasificación | Categoría del diagnóstico amplio | available_now, feasible_not_packaged, feasible_needs_more_info, special_case_human_review, future_opportunity, not_recommended | Clasifica madurez y disponibilidad del caso | Confusión entre factibilidad y venta |
+| `package_fit` | clasificación | Correspondencia con paquete existente | proceso, alcance, oferta actual | Evita forzar un paquete donde no encaja | Diagnóstico forzado |
+| `requires_more_info` | clasificación | Faltan datos para validar | incertidumbre técnica u operativa | Activa flujo de preguntas técnicas | Diagnóstico prematuro |
+| `immediate_availability` | clasificación | Team360 ofrece esto hoy | paquete o servicio validado | Separa oferta actual de oportunidad futura | Promesa de disponibilidad falsa |
+| `validation_needed_reason` | clasificación | Qué falta para validar | dato faltante concreto | Orienta las siguientes preguntas | Preguntas sin dirección |
+| `future_opportunity_reason` | clasificación | Por qué es oportunidad futura | roadmap, madurez, evidencia | Explica por qué no se vende hoy | Promesa de hoja de ruta |
+| `not_recommended_reason` | clasificación | Por qué no se recomienda | riesgo, costo, cumplimiento, impacto | Justifica la recomendación negativa | Recomendación sin fundamento |
 
 ---
 
@@ -696,7 +767,7 @@ pública.
 
 ## Slots de continuidad comercial futura
 
-Estos slots son de diseño futuro. En el MVP conversacional inicial no
+Estos slots son de diseño futuro. En la etapa inicial de producción conversacional no
 se preguntan ni se convierten en formulario. Solo se registran señales
 de continuidad cuando el usuario pide avanzar, cotizar, preparar una
 propuesta o deja voluntariamente sus datos.
@@ -705,11 +776,11 @@ propuesta o deja voluntariamente sus datos.
 
 **Definición:** orden de magnitud del presupuesto disponible.
 
-**Regla de MVP:** no preguntar presupuesto en el diagnóstico inicial.
+**Regla de producción por etapas:** no preguntar presupuesto en el diagnóstico inicial.
 Si el usuario pide precio o cotización, responder con criterio de
 alcance y seguir diagnosticando sin forzar monto.
 
-**Pregunta futura recomendada suave (no activa en MVP inicial):**
+**Pregunta futura recomendada suave (no activa en etapa inicial de producción):**
 "¿Querés que lo pensemos como una prueba chica o como una
 implementación más completa?"
 
@@ -727,7 +798,7 @@ tomarlo como contexto comercial, no como condición para diagnosticar.
 ### nombre, apellido, whatsapp_contacto, email_contacto, empresa, diagnostic_code
 
 **Reglas:**
-- No se piden en el MVP conversacional inicial.
+- No se piden en la etapa inicial de producción conversacional.
 - Solo se aceptan si el usuario los ofrece espontáneamente o pide
   explícitamente contacto, presupuesto o propuesta.
 - En la extensión futura, pedirlos de forma transparente, explicando
@@ -744,18 +815,18 @@ tomarlo como contexto comercial, no como condición para diagnosticar.
 - Si el usuario no quiere dejar datos, seguir orientando de forma
   general.
 
-**Mensaje sugerido futuro, no activo en MVP inicial:**
+**Nota futura no activa en etapa inicial de producción:**
 
-> "Puedo dejar este diagnóstico asociado a un código para que el
-> equipo de Team360 lo revise sin perder el contexto. Si querés
-> avanzar, pasame nombre, apellido y WhatsApp. Email y empresa son
-> opcionales. Si preferís, también puedo seguir orientándote sin
-> tomar tus datos."
+Este bloque no debe usarse como respuesta al usuario en la etapa
+actual. Cuando exista la capa futura de continuidad, cualquier pedido
+de contacto deberá ocurrir solo después de valor diagnóstico o pedido
+explícito del usuario, explicando finalidad, mínimos necesarios y
+opción de continuar sin dejar datos.
 
 **Mensaje de handoff con `diagnostic_code`:**
 
 Este mensaje es de uso futuro. No debe usarse como respuesta normal
-del MVP inicial.
+de la etapa inicial de producción.
 
 > "El código de este diagnóstico es `{diagnostic_code}`. Sirve para
 > retomar la conversación sin que tengas que repetir todo. No hace
@@ -877,7 +948,7 @@ haber contexto de proceso.
 `herramienta_actual`, `frecuencia` o `volumen`.
 
 **Acción:** dar valor antes de pedir datos personales. Primero entender
-alcance. En el MVP inicial no activar handoff; solo registrar señal
+alcance. En la etapa inicial de producción no activar handoff; solo registrar señal
 futura si el usuario insiste en propuesta o contacto.
 
 **Pregunta recomendada:**
@@ -890,7 +961,7 @@ alcance. ¿Qué proceso querés automatizar y hoy dónde lo hacen?"
 plazo o implementación sin diagnóstico.
 
 **Señal futura de Step-to-Action:** después de explicar el criterio,
-si el usuario quiere propuesta o revisión humana. En el MVP inicial,
+si el usuario quiere propuesta o revisión humana. En la etapa inicial de producción,
 no pedir nombre, apellido ni WhatsApp; recomendar el próximo paso de
 forma clara.
 
@@ -947,7 +1018,7 @@ salud, menores, datos legales, financieros o información confidencial.
 
 **Señal futura de Step-to-Action:** cuando el usuario tenga documentos
 identificados y quiera validar alcance. No pedir archivos sensibles ni
-datos de contacto en el MVP inicial.
+datos de contacto en la etapa inicial de producción.
 
 ---
 
@@ -976,7 +1047,7 @@ irreversibles o acceso no documentado.
 
 **Señal futura de Step-to-Action:** si el usuario quiere revisión
 humana o hay impacto sensible. No pedir datos mínimos para handoff en
-el MVP inicial ni datos financieros detallados.
+la etapa inicial de producción ni datos financieros detallados.
 
 ---
 
@@ -1007,8 +1078,8 @@ de terceros sin autorización.
 cuentas.
 
 **Señal futura de Step-to-Action:** registrar continuidad futura si el
-caso tiene valor y requiere revisión humana. No activar handoff en el
-MVP inicial. No pedir contraseñas, tokens ni capturas de sesión.
+caso tiene valor y requiere revisión humana. No activar handoff en la
+etapa inicial de producción. No pedir contraseñas, tokens ni capturas de sesión.
 
 ---
 
@@ -1038,7 +1109,7 @@ confidencial.
 
 **Señal futura de Step-to-Action:** cuando el usuario quiera validar
 un corpus o preparar una prueba. No pedir documentos sensibles ni datos
-de contacto en la conversación pública del MVP.
+de contacto en la conversación pública de la etapa inicial de producción.
 
 ---
 
@@ -1063,8 +1134,8 @@ de contacto en la conversación pública del MVP.
    preguntar por acceso autorizado y tipo de datos.
 
 7. **Si hay intención comercial** (presupuesto, precio,
-   contratar), registrar señal futura de continuidad. No pedir datos
-   de contacto en el MVP inicial salvo pedido explícito del usuario.
+    contratar), registrar señal futura de continuidad. No pedir datos
+    de contacto en la etapa inicial de producción salvo pedido explícito del usuario.
 
 8. **No pedir presupuesto de entrada.** Si el usuario pide precio,
    cambiar la conversación a alcance: prueba chica o implementación
@@ -1075,6 +1146,22 @@ de contacto en la conversación pública del MVP.
 
 10. **No preguntar por datos sensibles en detalle.** Detectar la
     categoría de riesgo alcanza para marcar revisión humana.
+11. **Separar preguntas técnicas de preguntas comerciales.** Las
+    preguntas de factibilidad (herramienta, proceso, volumen, frecuencia,
+    accesos, riesgos) van primero. Las de presupuesto, decisión y contacto
+    van después del diagnóstico.
+12. **No preguntar datos personales al inicio.** Nombre, WhatsApp, email
+    y empresa no se piden durante el diagnóstico inicial. Solo si el
+    usuario pide contacto o ya recibió valor diagnóstico.
+13. **Preguntar primero por datos que cambian la factibilidad.**
+    herramienta actual, proceso, volumen, frecuencia, reglas de negocio,
+    datos disponibles, accesos, riesgos, responsables. Estos determinan
+    si el caso es viable, no si es vendible.
+14. **Presupuesto es tardío.** No preguntar presupuesto hasta tener un
+    diagnóstico claro de factibilidad, alcance e impacto potencial.
+15. **Contacto con equipo es posterior al valor diagnóstico.** No ofrecer
+    contacto humano ni derivación como primera respuesta. Primero dar
+    orientación útil.
 
 ---
 
@@ -1127,11 +1214,11 @@ La decisión de oferta debe ser conservadora. `automatable` no significa
 
 No prometer como core lo que no está validado. Marketplaces, ERP,
 trading, finanzas avanzadas y generación audiovisual no son core actual
-por aparecer como automatizables.
+solo por aparecer como automatizables.
 
 ---
 
-## Referencias cruzadas silenciosas
+## Referencias cruzadas
 
 - Si el usuario menciona **WhatsApp**, revisar seguridad,
   accesos, MFA y canal operativo. No pedir WhatsApp de contacto
@@ -1194,7 +1281,8 @@ Sugerencias para la experiencia conversacional del asistente.
 2. Confirmar la herramienta actual.
 3. Estimar frecuencia o volumen.
 4. Evaluar riesgo del proceso.
-5. Proponer piloto o solución directa.
+5. Evaluar si corresponde piloto controlado, solución validable o
+   revisión humana.
 6. Sugerir próximo paso recomendado; registrar señal futura de
    Step-to-Action si hay intención comercial explícita.
 
@@ -1240,3 +1328,28 @@ legales sensibles o información financiera detallada, activar
 - No demasiado técnico, no demasiado marketinero.
 - Preparado para SemanticChunker: cada sección con contexto
   mínimo propio.
+
+---
+
+## Límites
+
+- Esta guía define slots y preguntas; no define disponibilidad
+  comercial ni autoriza oferta.
+- No autoriza pedir datos personales al inicio del diagnóstico.
+- Los slots de continuidad comercial son futuros y no activan
+  Step-to-Action, lead capture, diagnostic_code ni WhatsApp handoff.
+- No autoriza pedir contraseñas, tokens, códigos, QR, Face ID, MFA ni
+  accesos sensibles.
+- Si hay datos sensibles, finanzas, legal, browser automation, MFA o
+  plataformas críticas, debe prevalecer `human_review_required`.
+- No debe moverse a `approved/` sin revisar que cada pregunta sea
+  necesaria para cambiar el diagnóstico.
+
+---
+
+## Historial de cambios
+
+| Fecha | Cambio | Autor |
+|------|--------|-------|
+| 2026-06-14 | Correcciones pre-approved de metadata, precedencia, slots futuros y límites de captura. | Team360 |
+| 2026-06-13 | Incorporación de slots para diagnóstico amplio de factibilidad técnica y operativa. | Team360 |

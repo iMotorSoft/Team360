@@ -2,7 +2,7 @@
 
 Objetivo: `knowledge-documents-foundation`
 
-Ultima actualizacion: 2026-06-08
+Ultima actualizacion: 2026-06-14
 
 ## Estado general
 
@@ -15,7 +15,46 @@ La estructura separa:
 - knowledge de paquetes concretos en `packages/{package_code}/`;
 - el primer paquete validable `pkg_sales_diagnosis` como caso particular, sin convertir ventas en limite arquitectonico.
 
+`pkg_sales_diagnosis` mantiene ocho documentos draft activos: package manual,
+slots/questions, matriz de factibilidad, playbook de respuestas, politica de
+seguridad, catalogo de automatizaciones, objeciones comerciales y
+glosario/referencias cruzadas.
+
 ## Acciones realizadas
+
+### 2026-06-14 - Correcciones pre-approved en pkg_sales_diagnosis
+
+- Se corrigieron inconsistencias estrategicas, editoriales y de seguridad en
+  los ocho drafts principales de `pkg_sales_diagnosis`.
+- Se mantuvo todo el contenido en `drafts/` con `ingestion_status: not_ready`.
+- Se reforzo que diagnosticar factibilidad no implica prometer
+  implementacion, cotizar, pedir contacto ni activar capacidades futuras.
+- No se toco backend, runtime, ingestion service, embeddings, Milvus, ArangoDB,
+  pgvector, endpoints ni UI.
+
+### 2026-06-14 - Ocho drafts activos en pkg_sales_diagnosis
+
+- Se incorporaron los documentos draft de matriz de factibilidad, playbook de
+  respuestas, politica de seguridad, catalogo de automatizaciones, objeciones
+  comerciales y glosario/referencias cruzadas.
+- Se actualizaron package manual y slots/questions con el principio de
+  diagnostico amplio de factibilidad tecnica y operativa.
+- Los documentos permanecen en `drafts/` con `status: draft` e
+  `ingestion_status: not_ready`.
+- No se movio contenido a `approved/`.
+- No se toco backend, runtime, ingestion service, embeddings, Milvus, ArangoDB,
+  pgvector, endpoints ni UI.
+
+### 2026-06-14 - Standard global de factibilidad diagnostica
+
+- Se agrego el standard `_standards/diagnostic-feasibility-principle.md` para
+  que los asistentes diagnosticos de Team360 evalúen casos fuera y dentro del
+  catalogo inmediato sin convertir factibilidad en promesa comercial.
+- El documento queda como `status: draft` e `ingestion_status: not_ready`.
+- No se promovio contenido a `approved/`.
+- No se activo ingestion service, embeddings, Milvus, ArangoDB, pgvector,
+  endpoints, UI, Step-to-Action, lead capture, diagnostic_code ni WhatsApp
+  handoff.
 
 ### 2026-06-08 - Fundacion documental knowledge
 

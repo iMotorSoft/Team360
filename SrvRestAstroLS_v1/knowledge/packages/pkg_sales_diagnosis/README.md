@@ -163,3 +163,21 @@ Ejemplos iniciales:
 - `drafts/` es para documentos en revisión; `approved/` para documentos listos para ingesta.
 - `exports/pdf/` contiene versiones PDF derivadas; la fuente canónica es el Markdown en `approved/`.
 - `archive/` contiene documentos reemplazados que se conservan como referencia histórica.
+
+## Documentos draft
+
+Documentos actuales en `drafts/` para `pkg_sales_diagnosis`:
+
+| Documento | Propósito |
+|-----------|-----------|
+| `team360_sales_diagnosis_package_manual.md` | Manual del paquete: alcance, oferta, madurez, reglas de conversación y flujo conceptual. |
+| `team360_sales_diagnosis_slots_questions.md` | Guía de slots, preguntas dinámicas y extracción de contexto para el diagnóstico. |
+| `team360_sales_diagnosis_feasibility_availability_matrix.md` | Matriz operativa de factibilidad técnica, operativa y disponibilidad comercial. |
+| `team360_sales_diagnosis_response_playbook.md` | Playbook de respuestas conversacionales por categoría de diagnóstico. |
+| `team360_sales_diagnosis_security_hitl_policy.md` | Política de seguridad, límites y revisión humana para diagnóstico. |
+| `team360_sales_diagnosis_automation_catalog.md` | Catálogo inicial de automatizaciones diagnosticables por tipo de caso. |
+| `team360_sales_diagnosis_commercial_objections.md` | Objeciones y respuestas comerciales responsables. |
+| `team360_sales_diagnosis_glossary_crossrefs.md` | Glosario y referencias cruzadas del paquete. |
+
+Todos los drafts tienen `status: draft` e `ingestion_status: not_ready`.
+No deben moverse a `approved/` sin revisión editorial y validación.

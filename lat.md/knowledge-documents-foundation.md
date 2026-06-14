@@ -126,6 +126,34 @@ not be used as a technical core identifier and must not create `vera_*`
 identifiers in runtime, tests, migrations, workers, scopes or canonical source
 documents.
 
+## Diagnostic Feasibility Principle
+
+Team360 diagnostic assistants must evaluate technical and operational
+feasibility for user-proposed cases when possible, even when the case is not in
+the immediate package catalog.
+
+Feasibility diagnosis is not the same as immediate commercial availability,
+implementation promise, quotation, lead capture or package creation.
+
+The stable documentation standard lives in:
+
+```text
+SrvRestAstroLS_v1/knowledge/_standards/diagnostic-feasibility-principle.md
+```
+
+The standard separates:
+
+- technical feasibility;
+- operational feasibility;
+- immediate commercial availability;
+- need for more information;
+- human review;
+- future opportunity;
+- not recommended or high-risk cases.
+
+`pkg_sales_diagnosis` is the first concrete package where this principle
+applies, but it does not define the general rule.
+
 ## Non-Goals
 
 This foundation does not:

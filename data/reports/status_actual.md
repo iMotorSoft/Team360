@@ -2,13 +2,19 @@
 
 Objetivo: `reportes-y-evidencias`
 
-Ultima actualizacion: 2026-05-28
+Ultima actualizacion: 2026-06-14
 
 ## Estado general
 
 `data/reports/` contiene reportes, evidencias, muestras, snapshots y entregables generados fuera del codigo fuente.
 
 ## Acciones realizadas
+
+### 2026-06-14 - Snapshot creacion de objeciones comerciales para pkg_sales_diagnosis
+
+- Se creo snapshot en `snapshots/session_pkg_sales_diagnosis_commercial_objections_20260614.md`.
+- Documenta la creacion del septimo draft de pkg_sales_diagnosis.
+- Incluye tabla de estado del paquete, archivos actualizados y proximos pasos.
 
 ### 2026-05-28 - Snapshot tecnico automation_diagnosis
 

@@ -9,6 +9,8 @@ del paquete.
 ## Indice
 
 - `authoring-standard.md`: reglas editoriales para escribir documentos fuente.
+- `diagnostic-feasibility-principle.md`: principio general para diagnosticar
+  factibilidad tecnica y operativa sin confundirla con disponibilidad inmediata.
 - `metadata-frontmatter.md`: contrato YAML comun y reglas de campos.
 - `semantic-chunking-l0-l1-l2.md`: preparacion para L0, L1, L2 y SemanticChunker.
 - `curation-lifecycle.md`: ciclo drafts, approved, exports y archive.

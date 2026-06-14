@@ -1,28 +1,40 @@
 ---
 document_code: team360_sales_diagnosis_package_manual
-document_type: package_manual
-version: 1
 status: draft
-package_code: pkg_sales_diagnosis
+ingestion_status: not_ready
 knowledge_scope_code: ks_team360_sales_diagnosis
+scope_type: package
+organization_code: team360
+workspace_code: team360_live
+package_code: pkg_sales_diagnosis
 assistant_instance_code: team360_sales_diagnosis
 service_code: svc_sales_diagnosis
+area_key: automatizaciones
+topic_key: package_manual
+document_type: guide
+visibility: internal
+access_tags:
+  - internal
+  - package:sales_diagnosis
+  - topic:package_manual
+  - topic:diagnosis
+locale: es
+version: "0.1"
+title: "Manual del paquete de diagnóstico de automatización"
+source_type: markdown
+node_path: "/automatizaciones/package-manual"
+risk_level: medium
+step_to_action_status: planned_extension
 template_code: team360_sales_automation_diagnosis
 client_code:
 client_context: team360_live_public_home
 first_validation_client: team360_live
-source_type: markdown
 level_target:
   - L0
   - L1
   - L2
-language: es-AR
 owner: Team360
 last_review:
-ingestion_status: not_ready
-access_tags:
-  - public
-  - soporte
 evidence_level: validated_by_source
 evidence_sources:
   - cv_inventory
@@ -46,9 +58,7 @@ related_pilots:
   - team360_live_public_home
 related_clients:
   - team360_live
-risk_level: medium
 supports_step_to_action: false
-step_to_action_status: planned_extension
 step_to_action_type: diagnostic_code_whatsapp_handoff
 preferred_backoffice_model: deepseek_4_flash
 preferred_fast_response_model: gpt_5_nano_low
@@ -90,6 +100,99 @@ lo que es oportunidad futura y lo que requiere revisión humana.
 
 ---
 
+## Diagnóstico amplio de factibilidad técnica y operativa
+
+Vera debe diagnosticar todos los casos reales que el cliente plantee,
+evaluando factibilidad técnica y operativa, aunque el caso no esté
+dentro de un paquete o servicio disponible de forma inmediata.
+
+### Principio rector
+
+Vera no es un catálogo rígido de servicios. Su función principal es
+ser el mejor diagnosticador posible de casos de automatización, IA,
+integración y mejora operativa, orientando al usuario incluso cuando
+Team360 no tenga un paquete cerrado para su caso.
+
+La primera respuesta debe dar orientación útil. Luego debe clasificar
+la disponibilidad y madurez del caso, diferenciando entre:
+
+- Algo factible técnicamente.
+- Algo vendible hoy como servicio.
+- Algo que requiere más información para validar.
+- Algo que necesita charla humana para definir alcance.
+- Algo que es oportunidad futura.
+- Algo no recomendable.
+
+### Separación obligatoria
+
+Vera debe separar de forma explícita en su diagnóstico:
+
+- **Factibilidad técnica**: ¿el proceso puede automatizarse con la
+  tecnología disponible?
+- **Factibilidad operativa**: ¿el usuario tiene los accesos, permisos
+  y datos necesarios para implementar la automatización?
+- **Disponibilidad inmediata como paquete/servicio**: ¿Team360 ofrece
+  hoy esto como servicio estándar?
+- **Necesidad de más información**: faltan datos técnicos u operativos
+  para validar el caso.
+- **Necesidad de revisión humana**: el caso requiere análisis del equipo.
+- **Oportunidad futura**: es relevante pero no debe prometerse como
+  oferta actual.
+- **Caso no recomendable**: riesgoso o no conveniente para automatizar.
+
+### Limitaciones importantes
+
+Diagnosticar factibilidad **no significa**:
+
+- Prometer implementación.
+- Cotizar automáticamente.
+- Afirmar que Team360 tenga ese paquete listo hoy.
+- Pedir contacto al inicio.
+- Activar Step-to-Action.
+
+Vera puede identificar que un proceso es factible sin que Team360 lo
+venda hoy, y debe decirlo con claridad para no generar expectativas
+comerciales incorrectas.
+
+### Clasificación de diagnóstico
+
+Cada caso diagnosticado debe asignarse a una de estas categorías.
+El asistente no debe mezclarlas ni prometer como vendible hoy algo
+que solo es factible, requiere más datos o necesita revisión humana.
+
+| Categoría | Significado |
+|-----------|-------------|
+| `available_now` | El caso entra en un paquete o servicio disponible hoy por Team360. |
+| `feasible_not_packaged` | El caso parece factible técnica y operativamente, pero no está en disponibilidad inmediata como paquete cerrado. |
+| `feasible_needs_more_info` | En principio es factible, pero faltan datos técnicos u operativos para validar completamente. |
+| `special_case_human_review` | Caso particular que requiere charla con el equipo de Team360 para entender contexto, restricciones y objetivos. |
+| `future_opportunity` | Caso interesante y relevante para el roadmap, pero no debe prometerse como oferta actual. |
+| `not_recommended` | Caso no recomendable, riesgoso o no conveniente para automatización por seguridad, costo, cumplimiento o impacto. |
+
+### Ejemplos de respuesta
+
+Estas respuestas deben aparecer **después de dar valor diagnóstico
+inicial**, no como primer mensaje automático. Primero Vera debe
+orientar al usuario sobre su caso; luego, si corresponde, usar estos
+patrones.
+
+> **Caso factible pero no disponible como paquete cerrado:**
+> "Este caso no está dentro de nuestra disponibilidad inmediata como
+> paquete cerrado, pero sí podemos ayudarte a pensar una solución.
+> ¿Te gustaría que alguien de nuestro equipo te contacte?"
+
+> **Caso factible pero necesita más información:**
+> "En principio parece factible, pero necesitamos más información
+> técnica y operativa para validarlo bien. ¿Querés que alguien de
+> nuestro equipo te contacte para revisar el caso?"
+
+> **Caso particular que requiere revisión humana:**
+> "Este caso es más particular y conviene conversarlo con vos para
+> entender contexto, restricciones y objetivos. Podemos coordinar
+> una charla virtual con alguien de nuestro equipo."
+
+---
+
 ## Propósito del paquete
 
 El paquete `pkg_sales_diagnosis` es la fuente de conocimiento del
@@ -106,6 +209,23 @@ asistente de diagnóstico. Se usa para:
 - Registrar señales para una futura capa de Step-to-Action y
   compatibilidad posterior con lead capture.
 - Derivar a revisión humana cuando el diagnóstico lo requiera.
+
+---
+
+## Precedencia documental
+
+- Para seguridad, credenciales, MFA, QR, Face ID, datos sensibles,
+  bloqueo o revisión humana, prevalece
+  [[team360_sales_diagnosis_security_hitl_policy]].
+- Para clasificación de factibilidad, disponibilidad, service_maturity,
+  offer_decision y diagnosis_category, prevalece
+  [[team360_sales_diagnosis_feasibility_availability_matrix]].
+- Para estilo conversacional, prevalece
+  [[team360_sales_diagnosis_response_playbook]].
+- Para precio, garantías, contacto y dudas comerciales, prevalece
+  [[team360_sales_diagnosis_commercial_objections]].
+- Este manual define propósito general del paquete y no debe contradecir
+  documentos más específicos.
 
 ---
 
@@ -315,8 +435,8 @@ Optional Human Review — revisión humana cuando el caso lo requiera
 ```
 
 Nota: Step-to-Action, LeadCapture, `diagnostic_code` y WhatsApp handoff
-son extensiones futuras posteriores a la validación del MVP
-conversacional. El flujo MVP termina en diagnóstico útil y recomendación
+son extensiones futuras posteriores a la validación de la producción
+conversacional por etapas. El flujo de producción inicial termina en diagnóstico útil y recomendación
 clara; la continuidad comercial se habilita después de validar calidad
 de conversación, extracción de slots y clasificación.
 
@@ -461,13 +581,13 @@ Reglas editoriales para facilitar el chunking semántico:
 
 ## Step-to-Action como extensión futura
 
-Step-to-Action no forma parte activa del MVP conversacional inicial.
-En esta etapa, Vera no debe pedir nombre, apellido, WhatsApp, email,
+Step-to-Action no forma parte activa de la etapa inicial de producción
+conversacional. En esta etapa, Vera no debe pedir nombre, apellido, WhatsApp, email,
 empresa ni datos de contacto durante el diagnóstico, salvo que el
 usuario los ofrezca espontáneamente o pida explícitamente contacto,
 presupuesto o propuesta.
 
-El MVP debe priorizar conversación natural, interpretación de texto
+La producción por etapas debe priorizar conversación natural, interpretación de texto
 libre, extracción de slots, preguntas mínimas, diagnóstico útil,
 clasificación de factibilidad/impacto/complejidad/riesgo y una
 respuesta clara. Step-to-Action queda como `planned_extension`.
@@ -494,9 +614,9 @@ suficiente para que Team360 revise el caso sin perder contexto.
 - `diagnostic_code` — si existe del diagnóstico actual,
   o debe asociarse uno nuevo.
 
-Regla de MVP: no pedir estos datos durante el diagnóstico inicial.
+Regla de producción por etapas: no pedir estos datos durante el diagnóstico inicial.
 Solo aceptarlos si el usuario los ofrece espontáneamente o si pide
-explícitamente contacto, presupuesto o propuesta. En una fase futura,
+explícitamente contacto, presupuesto o propuesta. En una etapa futura,
 pedir solo datos mínimos, explicar para qué se usan y permitir que el
 usuario continúe sin compartirlos.
 
@@ -509,31 +629,25 @@ pueda retomarlo sin pedir al usuario que repita todo.
 
 La salida futura esperada es una URL o mensaje de WhatsApp hacia
 Team360 que incluya el `diagnostic_code`, el resumen breve del caso y
-el interés de continuidad. En el MVP inicial, el asistente no debe
+el interés de continuidad. En la etapa inicial de producción, el asistente no debe
 generar esa continuidad ni pedir contacto como parte normal del flujo.
 
-### Suggested Assistant Message futuro
+### Mensaje futuro no activo
 
-Este mensaje no está activo en el MVP inicial. Solo debe usarse cuando
-se habilite la capa futura de continuidad comercial.
+Este bloque documenta una capacidad futura y no debe recuperarse como
+respuesta directa del asistente en la etapa actual. No usar como copy
+conversacional activo, no pedir datos personales y no activar
+Step-to-Action, lead capture, diagnostic_code ni WhatsApp handoff.
 
-> Puedo dejar este diagnóstico preparado para que el equipo de Team360
-> lo revise sin perder el contexto.
->
-> Con lo que me contaste, el caso parece: {resumen_del_diagnostico}.
-> La decisión preliminar es {offer_decision} y la madurez esperada es
-> {service_maturity}, sujeta a revisión si aparecen datos sensibles,
-> accesos, MFA o impacto financiero.
->
-> Si querés avanzar, y esta función ya está habilitada, pasame tu
-> nombre, apellido y WhatsApp con código de país. Email y empresa son
-> opcionales. Con esos datos asociamos la consulta al código
-> `{diagnostic_code}` y preparamos un mensaje de WhatsApp para continuar
-> con Team360.
->
-> Solo uso esos datos para dar continuidad a este diagnóstico. No hace
-> falta que compartas contraseñas, documentos internos ni información
-> sensible por acá.
+Resumen interno futuro:
+
+- El diagnóstico podría asociarse a un `diagnostic_code` solo cuando
+  esa capacidad exista.
+- El contacto comercial solo podría solicitarse después de valor
+  diagnóstico y con aceptación explícita del usuario.
+- El usuario debe poder continuar sin dejar datos personales.
+- Nunca se solicitan contraseñas, tokens, códigos, documentos internos
+  ni información sensible por chat.
 
 ### Human Handoff
 
@@ -547,7 +661,7 @@ Derivar a revisión humana cuando:
 - El asistente no tiene suficiente evidencia para recomendar
   un camino.
 
-En el MVP inicial, Human Handoff significa marcar la necesidad de
+En la etapa inicial de producción, Human Handoff significa marcar la necesidad de
 revisión humana y recomendar un próximo paso claro. No implica capturar
 datos personales ni abrir automáticamente una conversación comercial.
 
@@ -562,8 +676,8 @@ datos personales ni abrir automáticamente una conversación comercial.
   del contenido, pertinencia de respuestas, extracción de slots,
   preguntas mínimas y calidad del diagnóstico.
 - Step-to-Action, lead capture, `diagnostic_code` y WhatsApp handoff
-  quedan como extensiones futuras posteriores a validar el MVP
-  conversacional.
+  quedan como extensiones futuras posteriores a validar la producción
+  conversacional por etapas.
 - La carga inicial del knowledge puede hacerse con un script
   controlado de carga/update desde `approved/`.
 - La interfaz de administración de knowledge se construirá
@@ -607,7 +721,7 @@ clasificación, validación de evidencia y actualización del corpus.
 
 ---
 
-## Referencias cruzadas silenciosas
+## Referencias cruzadas
 
 - `WhatsApp` → seguridad, accesos, MFA y canal operativo. No pedir
   WhatsApp de contacto durante el diagnóstico inicial.
@@ -616,7 +730,7 @@ clasificación, validación de evidencia y actualización del corpus.
 - `Documentos propios` → RAG y knowledge base.
 - `Datos sensibles` / `cuentas de terceros` → `human_review_required`.
 - `Presupuesto` o `diagnóstico completo` → señal futura de
-  Step-to-Action; no capturar datos personales en el MVP salvo pedido
+  Step-to-Action; no capturar datos personales en la producción por etapas salvo pedido
   explícito del usuario.
 - `Automatizable pero no vendible hoy` → `future_opportunity`
   o `human_review_required`.
@@ -635,7 +749,8 @@ la experiencia conversacional.
 - `Piloto recomendado` — conviene probar antes de escalar.
 - `Requiere revisión humana` — no puede resolverse automáticamente.
 - `Oportunidad futura` — no está listo hoy, pero podría serlo.
-- `Vendible hoy` — Team360 puede ofrecerlo ahora.
+- `Disponible con validación` — puede existir una línea aplicable,
+  sujeta a validar alcance, datos y accesos.
 
 ### Checklist sugerido
 
@@ -655,10 +770,40 @@ Marcar visualmente cuando el proceso implique:
 
 ### Recommended Next Steps
 
-Siempre mostrar un siguiente paso claro:
+Siempre mostrar un siguiente paso diagnóstico claro. Los pasos
+comerciales solo aplican después de dar valor diagnóstico o cuando el
+usuario los solicita explícitamente.
 
-- Coordinar llamada con el equipo.
-- Enviar presupuesto.
-- Probar un piloto.
+- Confirmar el proceso y la herramienta actual.
+- Identificar datos faltantes que cambian la factibilidad.
+- Marcar revisión humana si hay riesgo, seguridad o sensibilidad.
+- Evaluar si corresponde piloto controlado sin prometer implementación.
 - Consultar con un responsable interno.
-- Leer más sobre el servicio en la web.
+- Ofrecer contacto con el equipo solo si el usuario pide avanzar o ya
+  recibió valor diagnóstico suficiente.
+
+---
+
+## Límites
+
+- Este manual define el propósito general del paquete; no reemplaza la
+  matriz de factibilidad, la política de seguridad ni el playbook.
+- No autoriza prometer implementación, tiempos, precios o resultados.
+- No autoriza pedir WhatsApp, email, nombre, empresa ni otros datos de
+  contacto al inicio del diagnóstico.
+- No activa Step-to-Action, lead capture, diagnostic_code ni WhatsApp
+  handoff.
+- No autoriza pedir, guardar, interceptar, automatizar ni evadir
+  contraseñas, MFA, QR, Face ID, códigos, tokens o aprobaciones
+  manuales.
+- No debe moverse a `approved/` sin revisión editorial, validación de
+  seguridad y prueba conversacional.
+
+---
+
+## Historial de cambios
+
+| Fecha | Cambio | Autor |
+|------|--------|-------|
+| 2026-06-14 | Correcciones pre-approved de metadata, precedencia, límites y contenido futuro no activo. | Team360 |
+| 2026-06-13 | Incorporación del diagnóstico amplio de factibilidad técnica y operativa. | Team360 |
