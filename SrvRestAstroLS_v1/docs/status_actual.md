@@ -1439,3 +1439,40 @@ Incluye estructura inicial para:
 - No se hardcodearon secretos reales.
 - Las credenciales de providers/LLM se modelaron como `secret_ref`.
 - `backend/temp1.txt` aparece modificado en el worktree y contiene material sensible o notas internas; no fue tocado en esta etapa.
+
+### 2026-06-14 - Fase 1.3c: Pre-ingestion readiness gate
+
+- Se agregó `check_document_ingestion_readiness()` en `schemas.py` como gate estricto previo a chunking/embedding/indexing.
+- Se agregó `IngestionReadinessGateResult` dataclass con `ready`, `error_codes`, `error_messages`.
+- Se agregó constante `INGESTION_READINESS_ERROR_CODES` con: `document_not_ready`, `ingestion_status_not_ready`, `missing_ingestion_status`, `planned_extension_not_active`.
+- Validaciones del gate: `ingestion_status` ausente → `missing_ingestion_status`; `ingestion_status != "ready"` → `ingestion_status_not_ready`; `status == "draft"` → `document_not_ready`; `extension` no vacío → `planned_extension_not_active`.
+- Integración en `worker.py`: gate se ejecuta en skip block (no candidato) + como validación adicional para candidatos que pasan scanner (catch planned_extension).
+- Gate acepta frontmatter `None` y produce `document_not_ready` con error claro.
+- Scanner sigue reportando draft/not_ready sin fallar (dry-run compatible).
+- Worker rechaza documentos no ready con `action="rejected_by_gate"` y `status=INVALID`.
+- No se crean chunks para documentos rechazados por el gate.
+- 11 tests nuevos (6 pura función + 5 integración worker), total: 138 tests knowledge ingestion, 226 suite completa.
+- No se tocaron manuales/drafts/docs branch/endpoints/Milvus/embeddings/diagnosis runtime.
+
+### 2026-06-14 - Fase 1.3d: Backend-only ingestion pipeline smoke
+
+- Se creó `backend/scripts/smoke_knowledge_ingestion_pipeline.py` como smoke autónomo:
+  - Crea paquete temporal en tmpdir con 2 documentos: approved/ready + draft/not_ready.
+  - Ejecuta scanner → readiness gate → markdown chunking → worker persist (fake DB).
+  - Verifica que ready doc produce chunks y not_ready es rechazado.
+  - Verifica preservación de node_path, area_key, topic_key, access_tags, status, ingestion_status.
+  - Verifica planned_extension rejection con error code claro.
+  - Verifica que no hay embeddings/Milvus en el pipeline.
+  - Usa `_FakeConnection` autónomo (no importa de tests).
+  - Exit code 0 si todo pasa.
+- Se agregó `TestIngestionPipelineSmoke` en `test_knowledge_ingestion.py` con 8 tests:
+  - `test_pipeline_smoke_scans_ready_and_not_ready`: scanner reporta ambos sin fallar.
+  - `test_pipeline_smoke_chunks_only_ready`: solo ready genera chunks.
+  - `test_pipeline_smoke_reports_not_ready_gate_errors`: errores del gate se reportan.
+  - `test_pipeline_smoke_preserves_node_path_and_area_topic`: metadatos preservados.
+  - `test_pipeline_smoke_preserves_access_tags_and_permission_tags`: tags propagados.
+  - `test_pipeline_smoke_does_not_use_embeddings_or_milvus`: sin llamadas a embeddings/Milvus.
+  - `test_pipeline_smoke_planned_extension_not_active`: extension rechazada antes de chunking.
+  - `test_pipeline_smoke_markdown_chunking_before_embedding`: chunking estructural antes de embedding.
+- Validación: 8 nuevos tests + 138 existentes = 146 tests knowledge ingestion; suite completa: 234/234 passed.
+- `git diff --check` limpio. Sin cambios en corpus documental, manuales, drafts, endpoints, Milvus, embeddings reales, SemanticChunker obligatorio, frontend, diagnosis runtime.

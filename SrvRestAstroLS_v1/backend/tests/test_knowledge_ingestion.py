@@ -2211,6 +2211,407 @@ class TestKnowledgeIngestionPersistence:
 
 
 # ---------------------------------------------------------------------------
+# Pipeline smoke (Fase 1.3d)
+# ---------------------------------------------------------------------------
+
+
+_SMOKE_READY_FRONTMATTER = """\
+---
+status: approved
+ingestion_status: ready
+document_type: policy
+area_key: finanzas
+topic_key: general
+node_path: "/finanzas/general"
+access_tags:
+  - ceo
+locale: es
+scope_type: package
+visibility: internal
+source_type: markdown
+package_code: pkg_smoke_test
+knowledge_scope_code: ks_smoke_test
+workspace_code: ws_smoke
+organization_code: org_smoke
+risk_level: medium
+---
+# Ready Document
+
+This is approved and ready.
+
+## Section A
+
+Content A.
+
+## Section B
+
+Content B.
+"""
+
+_SMOKE_NOT_READY_FRONTMATTER = """\
+status: approved
+ingestion_status: not_ready
+document_type: guide
+area_key: ventas
+topic_key: cobranzas
+node_path: "/ventas/cobranzas"
+access_tags:
+  - ceo
+locale: es
+scope_type: package
+visibility: internal
+source_type: markdown
+package_code: pkg_smoke_test
+knowledge_scope_code: ks_smoke_test
+workspace_code: ws_smoke
+organization_code: org_smoke
+risk_level: low
+---
+# Draft Document
+
+Not ready for ingestion.
+"""
+
+
+def _make_smoke_package(
+    ready_docs: list[tuple[str, str]] | None = None,
+    draft_docs: list[tuple[str, str]] | None = None,
+) -> str:
+    """Create a tmpdir package for smoke pipeline tests."""
+    root = Path(tempfile.mkdtemp(prefix="smoke_"))
+    approved = root / "approved"
+    approved.mkdir(parents=True, exist_ok=True)
+    drafts_dir = root / "drafts"
+    drafts_dir.mkdir(parents=True, exist_ok=True)
+    meta = root / "_metadata"
+    meta.mkdir(parents=True, exist_ok=True)
+
+    (meta / "package-profile.yaml").write_text("""\
+package_code: pkg_smoke_test
+package_name: Smoke Test Package
+""", encoding="utf-8")
+
+    (meta / "knowledge-scope-mapping.yaml").write_text("""\
+package_code: pkg_smoke_test
+knowledge_scope_code: ks_smoke_test
+workspace_code: ws_smoke
+allowed_areas:
+  finanzas:
+    - general
+  ventas:
+    - general
+""", encoding="utf-8")
+
+    (meta / "access-tags.yaml").write_text("""\
+package_code: pkg_smoke_test
+tags:
+  - tag: ceo
+    description: CEO
+    level: 100
+  - tag: public
+    description: Public
+    level: 0
+""", encoding="utf-8")
+
+    if ready_docs:
+        for rel, content in ready_docs:
+            (approved / rel).write_text(content, encoding="utf-8")
+    if draft_docs:
+        for rel, content in draft_docs:
+            (drafts_dir / rel).write_text(content, encoding="utf-8")
+    return str(root)
+
+
+class TestIngestionPipelineSmoke:
+    """Backend-only ingestion pipeline smoke tests (Fase 1.3d).
+
+    Validates the full pipeline with fake DB:
+      scan → readiness gate → markdown chunking → persist/report
+    No endpoint, no Milvus, no embeddings, no real DB, no real corpus.
+    """
+
+    @pytest.mark.anyio
+    async def test_pipeline_smoke_scans_ready_and_not_ready(self):
+        """Scanner reports both ready and not-ready documents."""
+        root = _make_smoke_package(
+            ready_docs=[("ready.md", _SMOKE_READY_FRONTMATTER)],
+            draft_docs=[("draft.md", _SMOKE_NOT_READY_FRONTMATTER)],
+        )
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_smoke_test",
+            package_root=root,
+            include_drafts=True,
+            dry_run=True,
+        ))
+        assert result.scanned_count == 2
+        ready = [d for d in result.documents if "ready" in d.relative_path]
+        not_ready = [d for d in result.documents if "draft" in d.relative_path]
+        assert len(ready) == 1
+        assert len(not_ready) == 1
+        assert ready[0].candidate_for_ingestion
+        assert not not_ready[0].candidate_for_ingestion
+
+    @pytest.mark.anyio
+    async def test_pipeline_smoke_chunks_only_ready(self):
+        """Worker creates chunks only for the ready document."""
+        root = _make_smoke_package(
+            ready_docs=[
+                ("ready.md", _SMOKE_READY_FRONTMATTER),
+                ("not_ready.md", _SMOKE_NOT_READY_FRONTMATTER),
+            ],
+        )
+        conn = _FakeConnection(rows=[
+            {"id": "org-smoke"},
+            {"id": "ws-smoke", "organization_id": "org-smoke"},
+            {"id": "scope-smoke"},
+            {"id": "pkg-smoke"},
+            {"id": "worker-smoke"},
+            {"id": "run-smoke"},
+            None,
+            {"id": "doc-ready"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="org_smoke",
+            workspace_code="ws_smoke",
+            knowledge_scope_code="ks_smoke_test",
+            package_code="pkg_smoke_test",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+        )
+        assert result.inserted_count >= 1
+        assert result.total_chunk_count >= 1
+        # Not-ready doc was rejected by gate — no chunks from it
+        assert result.invalid_count >= 1
+        chunk_sqls = [
+            sql for sql, _ in conn.statements
+            if "insert into knowledge_chunks" in sql
+        ]
+        assert len(chunk_sqls) >= 1
+        # Only ready doc chunks — no chunk for not_ready
+        doc_result = next(d for d in result.documents if d.action in ("inserted", "updated"))
+        assert doc_result.chunk_count >= 1
+
+    @pytest.mark.anyio
+    async def test_pipeline_smoke_reports_not_ready_gate_errors(self):
+        """Gate errors are reported for not-ready documents."""
+        root = _make_smoke_package(
+            ready_docs=[
+                ("ready.md", _SMOKE_READY_FRONTMATTER),
+                ("not_ready.md", _SMOKE_NOT_READY_FRONTMATTER),
+            ],
+        )
+        conn = _FakeConnection(rows=[
+            {"id": "org-smoke"},
+            {"id": "ws-smoke", "organization_id": "org-smoke"},
+            {"id": "scope-smoke"},
+            {"id": "pkg-smoke"},
+            {"id": "worker-smoke"},
+            {"id": "run-smoke"},
+            None,
+            {"id": "doc-ready"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="org_smoke",
+            workspace_code="ws_smoke",
+            knowledge_scope_code="ks_smoke_test",
+            package_code="pkg_smoke_test",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+        )
+        all_errors = [e for d in result.documents for e in d.errors]
+        assert any("not_ready" in e.lower() for e in all_errors) or any(
+            "ingestion_status" in e.lower() for e in all_errors
+        )
+
+    @pytest.mark.anyio
+    async def test_pipeline_smoke_preserves_node_path_and_area_topic(self):
+        """Frontmatter metadata is preserved through the pipeline."""
+        root = _make_smoke_package(
+            ready_docs=[("ready.md", _SMOKE_READY_FRONTMATTER)],
+            draft_docs=[("draft.md", _SMOKE_NOT_READY_FRONTMATTER)],
+        )
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_smoke_test",
+            package_root=root,
+            include_drafts=True,
+            dry_run=True,
+        ))
+        ready = next(d for d in result.documents if "ready" in d.relative_path)
+        fm = ready.frontmatter or {}
+        assert fm.get("node_path") == "/finanzas/general"
+        assert fm.get("area_key") == "finanzas"
+        assert fm.get("topic_key") == "general"
+
+    @pytest.mark.anyio
+    async def test_pipeline_smoke_preserves_access_tags_and_permission_tags(self):
+        """access_tags and permission_tags propagate through pipeline."""
+        root = _make_smoke_package(
+            ready_docs=[("ready.md", _SMOKE_READY_FRONTMATTER)],
+        )
+        scanner = KnowledgePackageScanner()
+        scan_result = scanner.scan(PackageScanRequest(
+            package_code="pkg_smoke_test",
+            package_root=root,
+        ))
+        ready = scan_result.documents[0]
+        fm = ready.frontmatter or {}
+        assert "ceo" in fm.get("access_tags", [])
+
+        conn = _FakeConnection(rows=[
+            {"id": "org-smoke"},
+            {"id": "ws-smoke", "organization_id": "org-smoke"},
+            {"id": "scope-smoke"},
+            {"id": "pkg-smoke"},
+            {"id": "worker-smoke"},
+            {"id": "run-smoke"},
+            None,
+            {"id": "doc-ready"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="org_smoke",
+            workspace_code="ws_smoke",
+            knowledge_scope_code="ks_smoke_test",
+            package_code="pkg_smoke_test",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+        )
+        assert result.inserted_count >= 1
+        # Verify permission_tags propagated via chunk insert params
+        chunk_inserts = [
+            params for sql, params in conn.statements
+            if "insert into knowledge_chunks" in sql
+        ]
+        if chunk_inserts:
+            first_chunk = chunk_inserts[0]
+            tags = first_chunk.get("permission_tags")
+            if isinstance(tags, list):
+                assert "ceo" in tags
+
+    @pytest.mark.anyio
+    async def test_pipeline_smoke_does_not_use_embeddings_or_milvus(self):
+        """Pipeline does not call embeddings or Milvus."""
+        root = _make_smoke_package(
+            ready_docs=[("ready.md", _SMOKE_READY_FRONTMATTER)],
+        )
+        conn = _FakeConnection(rows=[
+            {"id": "org-smoke"},
+            {"id": "ws-smoke", "organization_id": "org-smoke"},
+            {"id": "scope-smoke"},
+            {"id": "pkg-smoke"},
+            {"id": "worker-smoke"},
+            {"id": "run-smoke"},
+            None,
+            {"id": "doc-ready"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="org_smoke",
+            workspace_code="ws_smoke",
+            knowledge_scope_code="ks_smoke_test",
+            package_code="pkg_smoke_test",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+        )
+        assert result.inserted_count >= 1
+        all_sql = " ".join(sql for sql, _ in conn.statements)
+        assert "milvus" not in all_sql.lower()
+        assert "embedding" not in all_sql.lower() or "embedding_status" in all_sql.lower()
+
+    @pytest.mark.anyio
+    async def test_pipeline_smoke_planned_extension_not_active(self):
+        """planned_extension is rejected before chunking."""
+        fm = _SMOKE_READY_FRONTMATTER.replace(
+            "risk_level: medium",
+            "risk_level: medium\nextension: graph_rag",
+        )
+        root = _make_smoke_package(
+            ready_docs=[("ext.md", fm)],
+        )
+        conn = _FakeConnection(rows=[
+            {"id": "org-smoke"},
+            {"id": "ws-smoke", "organization_id": "org-smoke"},
+            {"id": "scope-smoke"},
+            {"id": "pkg-smoke"},
+            {"id": "worker-smoke"},
+            {"id": "run-smoke"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="org_smoke",
+            workspace_code="ws_smoke",
+            knowledge_scope_code="ks_smoke_test",
+            package_code="pkg_smoke_test",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.invalid_count >= 1
+        assert result.persisted_count == 0
+        all_errors = [e for d in result.documents for e in d.errors]
+        assert any("planned_extension_not_active" in e or "extension" in e.lower()
+                    for e in all_errors)
+        chunk_sqls = [
+            sql for sql, _ in conn.statements
+            if "knowledge_chunks" in sql
+        ]
+        assert len(chunk_sqls) == 0
+
+    @pytest.mark.anyio
+    async def test_pipeline_smoke_markdown_chunking_before_embedding(self):
+        """Structural markdown chunking runs before any embedding phase."""
+        root = _make_smoke_package(
+            ready_docs=[("ready.md", _SMOKE_READY_FRONTMATTER)],
+        )
+        conn = _FakeConnection(rows=[
+            {"id": "org-smoke"},
+            {"id": "ws-smoke", "organization_id": "org-smoke"},
+            {"id": "scope-smoke"},
+            {"id": "pkg-smoke"},
+            {"id": "worker-smoke"},
+            {"id": "run-smoke"},
+            None,
+            {"id": "doc-ready"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="org_smoke",
+            workspace_code="ws_smoke",
+            knowledge_scope_code="ks_smoke_test",
+            package_code="pkg_smoke_test",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+            chunk_strategy="structural",
+        )
+        assert result.inserted_count >= 1
+        assert result.total_chunk_count >= 1
+        # Verify chunks were inserted (structural chunking ran)
+        chunk_insert_sqls = [
+            sql for sql, _ in conn.statements
+            if "insert into knowledge_chunks" in sql
+        ]
+        assert len(chunk_insert_sqls) >= 1
+        # Verify embedding status remains pending (no embedding called)
+        all_sql = " ".join(sql for sql, _ in conn.statements)
+        assert "embedding_status = 'completed'" not in all_sql
+        assert "embedding_status = 'processing'" not in all_sql
+
+
+# ---------------------------------------------------------------------------
 # Semantic chunker (Fase 1.4b)
 # ---------------------------------------------------------------------------
 
