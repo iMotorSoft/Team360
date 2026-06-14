@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-10 (Fase 1.8 — Sales Diagnosis Assistant Runtime Design)
+Ultima actualizacion: 2026-06-14 (Fase 1.3e — Internal dev endpoint contract)
 
 ## Directorio de trabajo
 
@@ -1476,3 +1476,36 @@ Incluye estructura inicial para:
   - `test_pipeline_smoke_markdown_chunking_before_embedding`: chunking estructural antes de embedding.
 - Validación: 8 nuevos tests + 138 existentes = 146 tests knowledge ingestion; suite completa: 234/234 passed.
 - `git diff --check` limpio. Sin cambios en corpus documental, manuales, drafts, endpoints, Milvus, embeddings reales, SemanticChunker obligatorio, frontend, diagnosis runtime.
+
+### 2026-06-14 - Fase 1.3e: Internal dev endpoint contract
+
+- Se creó `backend/routes/knowledge_ingestion_dev.py` con endpoint interno/dev:
+  - `POST /api/dev/knowledge-ingestion/ingest` con `status_code=200`.
+  - Request: `DevIngestRequest` (Pydantic) con `package_code`, `package_path`, `mode` (dry_run/persist), `include_drafts`, `chunking_strategy`.
+  - Response: `DevIngestResponse` con `ok`, `mode`, `package_code`, `document_count`, `candidate_count`, `ready_count`, `rejected_count`, `chunk_count`, `documents[]`, `errors[]`.
+  - Cada documento en respuesta incluye: `relative_path`, `node_path`, `status`, `ingestion_status`, `candidate_for_ingestion`, `gate_ready`, `chunk_count`, `error_codes`, `error_messages`.
+- Seguridad de path: rechaza `..` traversal antes de `Path.resolve()`, rechaza paths inexistentes o que no son directorios.
+- `dry_run` (default): escanea paquete via `KnowledgePackageScanner`, aplica `check_document_ingestion_readiness()` en cada documento, estima chunks via `chunk_markdown()`. Sin DB, sin OpenAI, sin Milvus, sin SemanticChunker.
+- `persist`: rechazado con error claro ("requires a database connection") — disponible para fase posterior con infraestructura DB.
+- `include_drafts` se pasa al scanner; `chunking_strategy` solo acepta `"markdown"` por ahora.
+- Registrado en `app.py` como `ingest_dev` en `route_handlers`.
+- Se creó `backend/tests/test_knowledge_ingestion_dev_route.py` con 16 tests:
+  - `test_post_ingest_dry_run_returns_scan_summary`
+  - `test_post_ingest_requires_package_code`
+  - `test_post_ingest_requires_package_path`
+  - `test_post_ingest_rejects_invalid_path`
+  - `test_post_ingest_rejects_path_traversal`
+  - `test_post_ingest_rejects_path_that_is_file`
+  - `test_post_ingest_rejects_unknown_mode`
+  - `test_post_ingest_rejects_unknown_chunking_strategy`
+  - `test_post_ingest_reports_not_ready_gate_errors`
+  - `test_post_ingest_does_not_chunk_not_ready_documents`
+  - `test_post_ingest_chunks_ready_documents_with_markdown_chunker`
+  - `test_post_ingest_does_not_call_openai_or_milvus`
+  - `test_post_ingest_does_not_use_semantic_chunker_when_unavailable`
+  - `test_post_ingest_response_contract_is_stable`
+  - `test_post_ingest_persist_mode_returns_error_no_db`
+  - `test_route_is_marked_dev_internal`
+- Todos los tests usan `tmp_path` para crear paquetes temporales — no tocan corpus documental real.
+- Validación: 16 nuevos tests, suite completa 250/250 passed.
+- `git diff --check` limpio. Sin frontend, sin Milvus, sin embeddings reales, sin OpenAI, sin SemanticChunker obligatorio, sin manuales/drafts reales, sin docs branch, sin diagnosis runtime, sin upload público.
