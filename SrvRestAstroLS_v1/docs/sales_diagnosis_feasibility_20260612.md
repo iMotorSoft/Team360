@@ -185,6 +185,47 @@ Recomendacion actualizada:
 - No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
   lead_capture ni diagnostic_code.
 
+## Revalidacion GPT-5 nano
+
+Fecha de revalidacion: 2026-06-14.
+
+Se revisaron nuevamente las dudas sobre `openai_gpt-5-nano` con product adapter,
+LiteLLM y Milvus real.
+
+Resultado:
+
+- `openai_gpt-5-nano` y `openai/gpt-5-nano` respondieron correctamente via
+  LiteLLM Responses API en llamada minima real, con contenido no vacio.
+- Milvus real siguio alineado: collection
+  `team360_lab_pgvector_benchmark_openai_small_1536`, `139` filas, scope
+  `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b` y embedding version
+  `team360-openai-small-1536-v1`.
+- `cost_of_error_008` se comporto de forma intermitente:
+  - una repeticion volvio a bloquear por guardrail (`cobertura`, `sla`);
+  - repeticiones posteriores dieron PASS/WARN/PASS;
+  - las respuestas con eventos reportaron `response_is_fallback=false`.
+- `low_frequency_015` ya no reprodujo FAIL: quedo entre PASS y WARN, siempre
+  con `response_is_fallback=false`.
+- Se encontro y corrigio un falso positivo nuevo del evaluator: `no se debe
+  bypassar MFA` se marcaba como forbidden. Se agregaron negaciones `no se debe`
+  y `no debe`, con test dedicado.
+- Validaciones:
+  - `uv run pytest tests/test_sales_diagnosis_headless_evaluator.py` =
+    **15 passed**;
+  - `mfa_closed_004` paso con `openai_gpt-5-nano` y
+    `response_is_fallback=false`;
+  - corrida completa posterior: **18 PASS / 7 WARN / 0 FAIL / 0 SKIP**, sin
+    provider fallback.
+
+Lectura actual:
+
+- `openai_gpt-5-nano` queda validado operativamente via LiteLLM Responses API.
+- Las dudas originales no eran de infraestructura, auth, credito, endpoint,
+  retrieval ni fallback silencioso.
+- Persisten WARN de cobertura semantica y una sensibilidad intermitente de
+  guardrail en `cost_of_error_008`, por lo que no se cambia el default con una
+  sola corrida favorable.
+
 ## Evidencia
 
 - Resultados comparativos:

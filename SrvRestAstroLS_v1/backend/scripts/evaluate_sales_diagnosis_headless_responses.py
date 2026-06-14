@@ -91,6 +91,8 @@ NEGATION_PHRASES = (
     "no estoy",
     "no podemos",
     "no puedo",
+    "no se debe",
+    "no debe",
     "no garantizamos",
     "no garantizo",
     "no promete",

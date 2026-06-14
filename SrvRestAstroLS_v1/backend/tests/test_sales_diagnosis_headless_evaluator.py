@@ -92,6 +92,12 @@ def test_forbidden_claim_detection_honors_no_tiene_negation():
     assert "crm disponible" not in hits
 
 
+def test_forbidden_claim_detection_honors_no_se_debe_negation():
+    text = "Si el sistema usa MFA, puede quedar bloqueado y no se debe bypassar MFA."
+    hits = evaluator._find_forbidden_hits(text, ["bypassar mfa"])
+    assert "bypassar mfa" not in hits
+
+
 def test_forbidden_claim_detection_deduplicates_global_and_case_hits():
     text = "El CRM disponible ya está listo para usar."
     hits = evaluator._find_forbidden_hits(text, ["crm disponible"])

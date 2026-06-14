@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-12 (Fase 1.9u — Analisis de FAIL del benchmark Diagnostico)
+Ultima actualizacion: 2026-06-14 (Fase 1.9w — Revalidacion GPT-5 nano)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,123 @@ Ultima actualizacion: 2026-06-12 (Fase 1.9u — Analisis de FAIL del benchmark D
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-14 - Fase 1.9w — Revalidacion GPT-5 nano
+
+- Se revisaron las dudas pendientes sobre `openai_gpt-5-nano` para Sales
+  Diagnosis con product adapter, LiteLLM y Milvus real.
+- Dudas previas revisadas:
+  - `cost_of_error_008` habia bloqueado por guardrail con menciones de `sla`;
+  - `low_frequency_015` habia bloqueado por guardrail con mezcla de capacidad
+    futura y claim de costo/precio;
+  - habia que confirmar que no fueran fallas de LiteLLM, auth, endpoint,
+    retrieval ni fallback silencioso.
+- Preflight minimo de modelo:
+  - alias `openai_gpt-5-nano` registrado en `/v1/models`;
+  - alias `openai/gpt-5-nano` registrado en `/v1/models`;
+  - ambos aliases respondieron por `LiteLLMClient.text_completion()` via
+    Responses API con contenido no vacio;
+  - `openai_gpt-5-nano`: `latency_ms=3186`, `total_tokens=65`;
+  - `openai/gpt-5-nano`: `latency_ms=1743`, `total_tokens=65`.
+- Milvus real revalidado:
+  - collection `team360_lab_pgvector_benchmark_openai_small_1536`;
+  - `139` filas;
+  - scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`;
+  - embedding version `team360-openai-small-1536-v1`;
+  - inspector reporto `Result: OK`.
+- Repeticion de casos dudosos con backend local en `127.0.0.1:8018`,
+  `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano` y Milvus real:
+  - primera repeticion:
+    - `cost_of_error_008`: FAIL por `unsafe_blocked`
+      (`forbidden_term_found:cobertura`, `forbidden_term_found:sla`,
+      `unsupported_sla_claim`);
+    - `low_frequency_015`: WARN, `response_is_fallback=false`;
+  - repeticion x3 posterior:
+    - `cost_of_error_008`: PASS / WARN / PASS;
+    - `low_frequency_015`: WARN / PASS / WARN;
+    - todos los casos reportados con `provider_result.response_is_fallback=false`.
+- Se capturo una salida cruda de `cost_of_error_008` antes de guardrail:
+  - 5 sources reales de Milvus;
+  - respuesta cautelosa sobre contrato, responsabilidad, validacion adicional y
+    no garantia de viabilidad;
+  - `GuardrailPolicy().evaluate_response()` paso;
+  - solo marco `max_questions_exceeded:4`.
+- Durante la corrida completa aparecio un FAIL nuevo en `mfa_closed_004` por
+  falso positivo del evaluator: la frase segura `no se debe bypassar MFA`
+  fue marcada como forbidden `bypassar mfa`.
+- Fix aplicado solo al evaluator headless:
+  - se agregaron negaciones conservadoras `no se debe` y `no debe`;
+  - se agrego test para `no se debe bypassar MFA`.
+- Validacion del fix:
+  - `uv run pytest tests/test_sales_diagnosis_headless_evaluator.py` =
+    **15 passed**;
+  - `mfa_closed_004` con `openai_gpt-5-nano`: PASS,
+    `response_is_fallback=false`.
+- Evaluacion headless completa posterior con evaluator corregido:
+  - dataset `sales_diagnosis_headless_response_validation_v1`;
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`;
+  - `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano`;
+  - retrieval Milvus real;
+  - resultado: **18 PASS / 7 WARN / 0 FAIL / 0 SKIP**;
+  - todos los casos reportaron `provider_result.response_is_fallback=false`.
+- Conclusion tecnica:
+  - `openai_gpt-5-nano` queda operativo via LiteLLM Responses API y no muestra
+    fallback provider;
+  - las dudas previas eran mezcla de salida intermitente sensible a guardrail y
+    falsos positivos del evaluator, no falla de infraestructura;
+  - no se cambia default aun con una sola corrida mejorada; recomendado repetir
+    matriz controlada si se quiere promoverlo a baseline.
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+
+### 2026-06-14 - Fase 1.9v — Validacion Requesty DeepSeek V4 Flash
+
+- Se valido operativamente LiteLLM + Requesty + DeepSeek V4 Flash para
+  Team360 usando el alias de proyecto `requesty_deepseek_4_flash`.
+- Preflight ejecutado:
+  - PostgreSQL activo (`team360`, PostgreSQL 18.4);
+  - Milvus activo (`milvus26-standalone` healthy);
+  - collection Milvus
+    `team360_lab_pgvector_benchmark_openai_small_1536` validada con
+    `139` filas, scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b` y embedding
+    version `team360-openai-small-1536-v1`;
+  - LiteLLM activo en `http://127.0.0.1:4000`, version `1.83.14`;
+  - `globalVar.py` importable;
+  - `LITELLM_MASTER_KEY` disponible en env de shell;
+  - alias `requesty_deepseek_4_flash` listado por `/v1/models`.
+- La metadata de LiteLLM para el alias reporto
+  `litellm_model=openai/deepseek/deepseek-v4-flash`.
+- Llamada minima real via `LiteLLMClient.chat_completion()`:
+  - `model=requesty_deepseek_4_flash`;
+  - respuesta no vacia;
+  - `latency_ms=2870`;
+  - `usage.total_tokens=86`;
+  - `usage.cost=0.00001904`.
+- Se confirmo que la llamada operativa recomendada para el proyecto es por
+  alias `requesty_deepseek_4_flash`, no hardcodeando el slug interno.
+- Smoke HTTP del product adapter con LiteLLM real:
+  - backend local levantado en `127.0.0.1:8018`;
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`;
+  - `TEAM360_LITELLM_MODEL_ALIAS=requesty_deepseek_4_flash`;
+  - resultado: **13/13 checks PASSED**;
+  - `LiteLLM responded (not fallback)`.
+- Evaluacion headless puntual con Milvus real:
+  - caso `crm_integration_018`;
+  - resultado: **PASS**;
+  - `provider_result.response_is_fallback=false`;
+  - `model_alias=requesty_deepseek_4_flash`;
+  - `team360.sources.ready` reporto `chunk_count=5`.
+- Evaluacion headless completa con Milvus real y DeepSeek V4 Flash via Requesty:
+  - dataset `sales_diagnosis_headless_response_validation_v1`;
+  - resultado: **15 PASS / 9 WARN / 1 FAIL / 0 SKIP**;
+  - los casos reportados tuvieron `provider_result.response_is_fallback=false`;
+  - el FAIL corresponde a brecha de calidad/evaluator en `legacy_no_api_013`
+    por forbidden hit `garantiza`, no a falla de infraestructura, auth,
+    credito, endpoint ni fallback del provider.
+- No se declaro nuevo default de modelo.
+- No se relajo guardrail ni evaluator.
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
 
 ### 2026-06-12 - Fase 1.9u — Analisis de FAIL del benchmark Diagnostico
 
