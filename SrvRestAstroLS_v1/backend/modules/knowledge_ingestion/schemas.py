@@ -487,3 +487,73 @@ def check_document_ingestion_readiness(
         error_codes=error_codes,
         error_messages=messages,
     )
+
+
+# ---------------------------------------------------------------------------
+# Embedding persistence contract (Fase 1.3h)
+# ---------------------------------------------------------------------------
+
+class EmbeddingStatus:
+    PENDING = "pending"
+    PROCESSING = "processing"
+    READY = "ready"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+
+    VALID_STATUSES = frozenset({PENDING, PROCESSING, READY, FAILED, SKIPPED})
+
+
+@dataclass
+class KnowledgeChunkEmbeddingRecord:
+    chunk_embedding_id: str
+    knowledge_chunk_id: str
+    provider: str
+    model: str
+    embedding_version: str
+    dimensions: int
+    content_hash: str
+    embedding_status: str
+    vector: list[float] | None = None
+    metadata_jsonb: dict[str, Any] = field(default_factory=dict)
+    created_at_utc: str | None = None
+    updated_at_utc: str | None = None
+
+
+@dataclass
+class ChunkEmbeddingUpsertRequest:
+    chunk_id: str
+    provider: str
+    model: str
+    embedding_version: str
+    dimensions: int
+    content_hash: str
+    vector: list[float]
+    embedding_status: str = EmbeddingStatus.READY
+    metadata_jsonb: dict[str, Any] = field(default_factory=dict)
+
+    def validate(self) -> list[str]:
+        errors: list[str] = []
+        if not self.chunk_id:
+            errors.append("chunk_id is required")
+        if not self.provider:
+            errors.append("provider is required")
+        if not self.model:
+            errors.append("model is required")
+        if not self.embedding_version:
+            errors.append("embedding_version is required")
+        if not self.dimensions or self.dimensions < 1:
+            errors.append("dimensions must be > 0")
+        if not self.content_hash:
+            errors.append("content_hash is required")
+        if self.embedding_status not in EmbeddingStatus.VALID_STATUSES:
+            errors.append(
+                f"embedding_status must be one of "
+                f"{sorted(EmbeddingStatus.VALID_STATUSES)}, "
+                f"got {self.embedding_status!r}"
+            )
+        if self.vector is not None and len(self.vector) != self.dimensions:
+            errors.append(
+                f"vector dimensions ({len(self.vector)}) "
+                f"do not match expected ({self.dimensions})"
+            )
+        return errors

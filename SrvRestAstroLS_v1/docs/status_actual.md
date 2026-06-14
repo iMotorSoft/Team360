@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-14 (Fase 1.3f — Controlled DB-backed persist mode)
+Ultima actualizacion: 2026-06-14 (Fase 1.3h — Chunk embedding persistence contract)
 
 ## Directorio de trabajo
 
@@ -1539,3 +1539,63 @@ Incluye estructura inicial para:
   - Helper `_fake_persist_result()` para construir respuestas fake del pipeline.
 - Validación: suite completa 259/259 passed (250 + 9 nuevos).
 - `git diff --check` limpio. Sin DB real para persist mode, sin OpenAI, sin Milvus, sin SemanticChunker, sin frontend, sin manuales/drafts reales, sin diagnóstico productivo.
+
+### 2026-06-14 - Fase 1.3g: PostgreSQL smoke for dev ingestion endpoint
+
+- Se creó `scripts/smoke_knowledge_ingestion_dev_endpoint_postgres.py`:
+  - Usa `TestClient(app)` para llamar endpoint real.
+  - Paquete temporal via `tempfile.mkdtemp()` con prefix `smoke_persist_pkg_`.
+  - Docs ready y not_ready con prefijo `smoke_doc_` en source_uri y node_path.
+  - Usa códigos seed existentes (`team360_live`, `team360_public_site`, `ks_team360_sales_diagnosis`, `pkg_sales_diagnosis`) pero aislado por source_uri único.
+  - `mode=persist` contra PostgreSQL real.
+  - Cleanup por `run_id` + `source_uri`, explícitamente sin `package_code` DELETE amplio.
+  - DB verification directa via `AsyncConnection.connect()` (evita pool hang issue).
+  - No Milvus, no OpenAI, no embeddings reales.
+- Se crearon 15 tests contract en `tests/test_knowledge_ingestion_dev_endpoint_postgres_smoke_contract.py`:
+  - Verifica estructura del script: existe, es Python, importable.
+  - Verifica uso de temp package (no corpus real).
+  - Verifica endpoint POST persist.
+  - Verifica DB config check con error claro.
+  - Verifica `sanitize_dsn` para no imprimir DB URL raw.
+  - Verifica checks de ready/not_ready persistence.
+  - Verifica chunks solo para ready docs.
+  - Verifica no embeddings/Milvus/OpenAI.
+  - Verifica cleanup sin broad `package_code` delete.
+  - Verifica cleanup usa `run_id` y `source_uri`.
+  - Verifica smoke usa namespace real pero controlado.
+- Smoke real contra PostgreSQL: **50/50 passed** (48 funcionales + 2 dinámicos de fuente).
+- Suite completa: **274/274 passed** (259 + 15 contract nuevos).
+- `git diff --check` limpio. Sin DB real, sin Milvus, sin OpenAI, sin manuales/drafts reales.
+
+### 2026-06-14 - Fase 1.3h: Chunk embedding persistence contract
+
+- **Auditoría**: `knowledge_chunk_embeddings` ya existe via migration 003 con pgvector `vector(1536)`, HNSW index, `knowledge_embedding_models` catalog. Repository ya tenía `find_existing_chunk_embedding`, `insert_chunk_embedding`, `search_chunks_by_embedding` (con `<=>` operator). Worker ya tenía `embed_pending_chunks()` y `retrieve_knowledge_chunks()`.
+- **Sin migración nueva** — la tabla existente es la definitiva.
+- **No se modificó endpoint dev** para generar embeddings automáticos.
+- **schemas.py**: agregados:
+  - `EmbeddingStatus` class con constantes `PENDING`, `PROCESSING`, `READY`, `FAILED`, `SKIPPED` y `VALID_STATUSES`.
+  - `KnowledgeChunkEmbeddingRecord` dataclass con `chunk_embedding_id`, `knowledge_chunk_id`, `provider`, `model`, `embedding_version`, `dimensions`, `content_hash`, `embedding_status`, `vector`, `metadata_jsonb`, timestamps.
+  - `ChunkEmbeddingUpsertRequest` dataclass con validación de campos requeridos (chunk_id, provider, model, embedding_version, dimensions>0, content_hash, status válido, vector dimensión consistente).
+- **embedding_provider.py**: agregados:
+  - `__repr__` seguro en `OpenAIEmbeddingProvider` (no expone API key).
+  - `FakeEmbeddingProvider` para tests: devuelve vector unitario normalizado de dimensión configurable (default 1536). Sin llamadas externas.
+- **repository.py**: agregados:
+  - `upsert_chunk_embedding()`: resuelve `embedding_model_id` del catálogo, usa `INSERT ... ON CONFLICT (knowledge_chunk_id, embedding_model_id) DO UPDATE` sobre la tabla existente. Almacena `embedding_version`, `provider`, `model`, `dimensions` en `metadata_jsonb`.
+  - `list_chunk_embeddings_for_run()`: join a través de `knowledge_ingestion_runs` → `knowledge_documents` (por `knowledge_scope_id`) → `knowledge_chunks` → `knowledge_chunk_embeddings`. Retorna lista con chunk_id, document_id, source_uri, chunk_index, provider, model, dimensions, status, content_hash, metadata, timestamps.
+  - Métodos existentes no modificados.
+- **worker.py**: agregado parámetro `include_embeddings: bool = False` en `persist_package_documents()`. Por defecto `False`. Si `True` sin `include_chunks=True`, lanza `ValueError`. Endpoint dev no pasa `include_embeddings`.
+- **Tests**: 36 tests en `tests/test_knowledge_ingestion_embeddings.py`:
+  - `TestEmbeddingStatus`: 7 tests (constantes válidas, cobertura total).
+  - `TestKnowledgeChunkEmbeddingRecord`: 3 tests (preserva chunk_id/model/version/dimensions/status, vector default None, metadata default empty).
+  - `TestChunkEmbeddingUpsertRequest`: 8 tests (validación campos requeridos, dimensiones, status inválido, mismatch vector/dimension).
+  - `TestFakeEmbeddingProvider`: 6 tests (dimensiones default y custom, vector unitario normalizado, multi-text, empty input, repr sin secrets).
+  - `TestOpenAIEmbeddingProviderContract`: 2 tests (repr sin API key, no API call en import/init).
+  - `TestRepositoryEmbeddingMethods`: 4 tests (upsert refiere a tabla existente, usa chunk_id+content_hash, list join correcto, find_embedding_model_id refiere a catálogo).
+  - `TestWorkerEmbeddingDefault`: 2 tests (default False, True requiere include_chunks).
+  - `TestDevEndpointNoEmbeddings`: 2 tests (endpoint no pasa include_embeddings, docstring explicita no real embeddings).
+  - `TestPlannedExtensionNotActivatingEmbeddings`: 1 test (planned_extension no activa embeddings).
+  - `TestNoMilvusInTests`: 1 test (no import Milvus).
+- **Validación**: 36 tests nuevos embedding + 274 existentes = **310/310 passed**.
+- **Smoke PostgreSQL**: 50/50 passed (sin cambios en smoke — endpoint sigue sin generar embeddings).
+- `git diff --check` limpio. Secret scan: sin leaks nuevos.
+- Sin Milvus, sin OpenAI real en tests, sin embeddings automáticos desde endpoint, sin frontend, sin upload público, sin corpus documental real, sin docs branch, sin diagnosis runtime.

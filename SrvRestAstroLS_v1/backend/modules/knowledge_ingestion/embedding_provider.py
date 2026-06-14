@@ -38,6 +38,12 @@ class OpenAIEmbeddingProvider:
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY") or os.environ.get("OpenAI_Key_JAI_query", "")
         self._client = http_client
 
+    def __repr__(self) -> str:
+        return (
+            f"OpenAIEmbeddingProvider(model={self.model!r}, "
+            f"dimensions={self.dimensions})"
+        )
+
     def _get_client(self) -> httpx.Client:
         if self._client is None:
             self._client = httpx.Client(timeout=120.0)
@@ -107,3 +113,33 @@ class OpenAIEmbeddingProvider:
             results.append(embedding)
 
         return results
+
+
+class FakeEmbeddingProvider:
+    """Fake embedding provider for tests.
+
+    Returns deterministic vectors of the configured dimension.
+    Does NOT call any external API.
+    """
+
+    def __init__(
+        self,
+        model: str = OPENAI_DEFAULT_MODEL,
+        dimensions: int = EXPECTED_DIMENSIONS,
+    ) -> None:
+        self.model = model
+        self.dimensions = dimensions
+
+    def __repr__(self) -> str:
+        return (
+            f"FakeEmbeddingProvider(model={self.model!r}, "
+            f"dimensions={self.dimensions})"
+        )
+
+    def embed_texts(self, texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        vector = [1.0 / (i + 1) for i in range(self.dimensions)]
+        norm = sum(x * x for x in vector) ** 0.5
+        vector = [x / norm for x in vector]
+        return [list(vector) for _ in texts]

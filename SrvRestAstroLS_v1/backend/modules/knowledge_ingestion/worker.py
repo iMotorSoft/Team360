@@ -229,6 +229,7 @@ class KnowledgeIngestionWorker:
         dry_run: bool = True,
         include_chunks: bool = False,
         chunk_strategy: str = "structural",
+        include_embeddings: bool = False,
     ) -> PackagePersistResult:
         """Scan a package and persist approved candidates as KnowledgeDocuments.
 
@@ -239,7 +240,14 @@ class KnowledgeIngestionWorker:
           - 'semantic': SemanticChunker via langchain_experimental.
           - 'semantic_with_structural_fallback': try semantic, fall back to
             structural if SemanticChunker unavailable (with warning).
-        """
+
+        include_embeddings (default False): when True, also generates embeddings
+        for persisted chunks. NOT wired by default from any endpoint.
+        Requires include_chunks=True to have chunks to embed."""
+        if include_embeddings and not include_chunks:
+            raise ValueError(
+                "include_embeddings=True requires include_chunks=True"
+            )
         if chunk_strategy not in CHUNK_STRATEGIES:
             raise ValueError(
                 f"Unknown chunk_strategy: {chunk_strategy!r}. "

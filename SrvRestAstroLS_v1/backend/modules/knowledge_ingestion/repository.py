@@ -844,3 +844,121 @@ class KnowledgeIngestionRepository:
             """,
             {"chunk_embedding_id": chunk_embedding_id},
         )
+
+    async def upsert_chunk_embedding(
+        self,
+        conn: AsyncConnection,
+        *,
+        chunk_id: str,
+        provider: str,
+        model: str,
+        embedding_version: str,
+        dimensions: int,
+        content_hash: str,
+        vector: list[float],
+        status: str = "ready",
+        metadata_jsonb: dict[str, Any] | None = None,
+    ) -> str:
+        embedding_model_id = await self.find_embedding_model_id(
+            conn,
+            provider_code=provider,
+            model_code=model,
+            dimensions=dimensions,
+        )
+        if embedding_model_id is None:
+            raise ValueError(
+                f"No active embedding model found for "
+                f"{provider}/{model} ({dimensions}d)"
+            )
+
+        meta = dict(metadata_jsonb or {})
+        meta["embedding_version"] = embedding_version
+        meta["provider"] = provider
+        meta["model"] = model
+        meta["dimensions"] = dimensions
+
+        row = await fetch_one(
+            conn,
+            """
+            insert into knowledge_chunk_embeddings (
+                knowledge_chunk_id,
+                knowledge_scope_id,
+                embedding_model_id,
+                embedding,
+                embedding_status,
+                content_hash,
+                metadata_jsonb,
+                embedded_at_utc
+            )
+            select
+                %(chunk_id)s,
+                kd.knowledge_scope_id,
+                %(embedding_model_id)s,
+                %(vector)s::vector,
+                %(status)s,
+                %(content_hash)s,
+                %(metadata_jsonb)s,
+                now()
+            from knowledge_chunks kc
+            join knowledge_documents kd on kd.id = kc.knowledge_document_id
+            where kc.id = %(chunk_id)s
+            on conflict (knowledge_chunk_id, embedding_model_id)
+            do update set
+                embedding = %(vector)s::vector,
+                embedding_status = %(status)s,
+                content_hash = %(content_hash)s,
+                metadata_jsonb = %(metadata_jsonb)s,
+                embedded_at_utc = now(),
+                updated_at_utc = now()
+            returning chunk_embedding_id::text
+            """,
+            {
+                "chunk_id": chunk_id,
+                "embedding_model_id": embedding_model_id,
+                "vector": vector,
+                "status": status,
+                "content_hash": content_hash,
+                "metadata_jsonb": Jsonb(meta),
+            },
+        )
+        if row is None:
+            raise DatabaseExecutionError("upsert_chunk_embedding returned no row")
+        return row["chunk_embedding_id"]
+
+    async def list_chunk_embeddings_for_run(
+        self,
+        conn: AsyncConnection,
+        run_id: str,
+    ) -> list[dict[str, Any]]:
+        rows = await conn.execute(
+            """
+            select
+                kce.chunk_embedding_id::text,
+                kce.knowledge_chunk_id::text as chunk_id,
+                kc.knowledge_document_id::text as document_id,
+                kd.source_uri,
+                kc.chunk_index,
+                kc.title as chunk_title,
+                kc.content as chunk_content,
+                kem.provider_code as provider,
+                kem.model_code as model,
+                kem.dimension as dimensions,
+                kce.embedding_status,
+                kce.content_hash,
+                kce.metadata_jsonb,
+                kce.embedded_at_utc,
+                kce.created_at_utc,
+                kce.updated_at_utc
+            from knowledge_chunk_embeddings kce
+            join knowledge_chunks kc on kc.id = kce.knowledge_chunk_id
+            join knowledge_documents kd on kd.id = kc.knowledge_document_id
+            join knowledge_embedding_models kem
+                on kem.embedding_model_id = kce.embedding_model_id
+            join knowledge_ingestion_runs kir
+                on kir.knowledge_scope_id = kd.knowledge_scope_id
+            where kir.id = %(run_id)s
+            order by kc.chunk_index
+            """,
+            {"run_id": run_id},
+        )
+        return await rows.fetchall() or []
