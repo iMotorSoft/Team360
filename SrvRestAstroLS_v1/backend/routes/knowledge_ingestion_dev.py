@@ -11,11 +11,19 @@ Modes:
   - persist:          full pipeline with DB persistence via
                       KnowledgeIngestionWorker. Requires a configured
                       database (TEAM360_DB_URL or equivalent).
+
+Scope hardening (Fase 1.4):
+  - organization_code, workspace_code, knowledge_scope_code required for
+    persist mode; optional in dry_run.
+  - Request codes must match frontmatter codes on ready documents.
+  - Forbidden technical identifiers (vera_*) rejected.
+  - access_tags required for persist.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from litestar import post
 from litestar.exceptions import HTTPException
@@ -30,9 +38,17 @@ from modules.knowledge_ingestion.package_scanner import KnowledgePackageScanner
 from modules.knowledge_ingestion.repository import KnowledgeIngestionRepository
 from modules.knowledge_ingestion.schemas import (
     PackageScanRequest,
+    SOURCE_TYPES,
     check_document_ingestion_readiness,
 )
 from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
+
+
+# ── Constants ────────────────────────────────────────────────────────────────
+
+FORBIDDEN_TECHNICAL_PREFIXES = ("vera_",)
+
+ALLOWED_SOURCE_TYPES = frozenset(SOURCE_TYPES)
 
 
 # ── Request / Response schemas ──────────────────────────────────────────────
@@ -50,6 +66,7 @@ class DevIngestDocumentResult(BaseModel):
     error_messages: list[str] = Field(default_factory=list)
     persisted: bool = False
     document_id: str | None = None
+    scope_errors: list[str] = Field(default_factory=list)
 
 
 class DevIngestResponse(BaseModel):
@@ -63,9 +80,12 @@ class DevIngestResponse(BaseModel):
     chunk_count: int = 0
     documents: list[DevIngestDocumentResult] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
+    scope_warnings: list[str] = Field(default_factory=list)
+    scope_errors: list[str] = Field(default_factory=list)
     run_id: str | None = None
     persisted_document_count: int = 0
     persisted_chunk_count: int = 0
+    requested_by: str = "dev_internal"
 
 
 class DevIngestRequest(BaseModel):
@@ -74,6 +94,103 @@ class DevIngestRequest(BaseModel):
     mode: str = "dry_run"
     include_drafts: bool = False
     chunking_strategy: str = "markdown"
+    organization_code: str = ""
+    workspace_code: str = ""
+    knowledge_scope_code: str = ""
+    requested_by: str = "dev_internal"
+    source_type: str = "markdown"
+
+
+# ── Validation helpers ──────────────────────────────────────────────────────
+
+
+def _reject_empty(value: str, name: str) -> None:
+    if not value or not value.strip():
+        raise HTTPException(
+            status_code=422,
+            detail=f"{name} is required",
+        )
+
+
+def _reject_forbidden_technical_id(value: str, name: str) -> None:
+    stripped = value.strip().lower()
+    for prefix in FORBIDDEN_TECHNICAL_PREFIXES:
+        if stripped.startswith(prefix):
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"{name} must not use forbidden technical prefix "
+                    f"'{prefix}': got {value!r}"
+                ),
+            )
+
+
+def _validate_scope_codes(
+    data: DevIngestRequest,
+    mode: str,
+) -> list[str]:
+    warnings: list[str] = []
+
+    if mode == "persist":
+        _reject_empty(data.organization_code, "organization_code")
+        _reject_empty(data.workspace_code, "workspace_code")
+        _reject_empty(data.knowledge_scope_code, "knowledge_scope_code")
+
+    for field, name in [
+        (data.organization_code, "organization_code"),
+        (data.workspace_code, "workspace_code"),
+        (data.knowledge_scope_code, "knowledge_scope_code"),
+        (data.package_code, "package_code"),
+    ]:
+        if field and field.strip():
+            _reject_forbidden_technical_id(field, name)
+
+    if data.source_type not in ALLOWED_SOURCE_TYPES:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"source_type must be one of {sorted(ALLOWED_SOURCE_TYPES)}, "
+                f"got {data.source_type!r}"
+            ),
+        )
+
+    return warnings
+
+
+def _check_document_scope_consistency(
+    doc_index: int,
+    relative_path: str,
+    frontmatter: dict[str, Any],
+    request_org: str,
+    request_ws: str,
+    request_ks: str,
+    request_pkg: str,
+) -> list[str]:
+    errors: list[str] = []
+
+    fm_org = (frontmatter.get("organization_code") or "").strip()
+    fm_ws = (frontmatter.get("workspace_code") or "").strip()
+    fm_ks = (frontmatter.get("knowledge_scope_code") or "").strip()
+    fm_pkg = (frontmatter.get("package_code") or "").strip()
+
+    if request_org and fm_org and request_org != fm_org:
+        errors.append(f"organization_code mismatch: request={request_org!r}, doc={fm_org!r}")
+    if request_ws and fm_ws and request_ws != fm_ws:
+        errors.append(f"workspace_code mismatch: request={request_ws!r}, doc={fm_ws!r}")
+    if request_ks and fm_ks and request_ks != fm_ks:
+        errors.append(f"knowledge_scope_code mismatch: request={request_ks!r}, doc={fm_ks!r}")
+    if request_pkg and fm_pkg and request_pkg != fm_pkg:
+        errors.append(f"package_code mismatch: request={request_pkg!r}, doc={fm_pkg!r}")
+
+    return errors
+
+
+def _check_access_tags(frontmatter: dict[str, Any], relative_path: str) -> list[str]:
+    errors: list[str] = []
+    tags = frontmatter.get("access_tags")
+    if not tags or not isinstance(tags, list) or len(tags) == 0:
+        errors.append(f"access_tags missing or empty in document {relative_path}")
+    return errors
 
 
 # ── Path validation ─────────────────────────────────────────────────────────
@@ -107,11 +224,6 @@ def _validate_ingest_path(package_path: str) -> Path:
 
 
 def _is_db_configured() -> bool:
-    """Check whether a database URL is configured.
-
-    Does NOT open a connection — only checks if settings can be
-    resolved from environment variables.
-    """
     try:
         get_database_settings()
         return True
@@ -128,11 +240,6 @@ async def _run_persist_pipeline(
     knowledge_scope_code: str,
     assistant_instance_code: str | None = None,
 ) -> dict:
-    """Execute the full persist pipeline against a real database.
-
-    Can be monkeypatched in tests to avoid real DB dependency.
-    Returns a dict with keys matching the response contract.
-    """
     settings: DatabaseSettings = get_database_settings()
     pool = create_pool(settings)
     set_pool(pool)
@@ -212,6 +319,9 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
             detail=f"chunking_strategy must be 'markdown', got {data.chunking_strategy!r}",
         )
 
+    # ── Validate scope codes ─────────────────────────────────────────────
+    scope_validation_warnings = _validate_scope_codes(data, mode)
+
     # ── Scan package (shared between modes) ──────────────────────────────
 
     scanner = KnowledgePackageScanner()
@@ -223,17 +333,18 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
     )
     scan_result = scanner.scan(scan_request)
 
-    # ── Per-document readiness gate ──────────────────────────────────────
+    # ── Per-document readiness gate + scope validation ───────────────────
 
     doc_results: list[DevIngestDocumentResult] = []
     total_chunks = 0
     ready_count = 0
     rejected_count = 0
+    scope_errors_list: list[str] = []
+    scope_warnings_list: list[str] = list(scope_validation_warnings)
 
-    # Auto-detect org/workspace/scope codes from first ready document
-    detected_org: str | None = None
-    detected_ws: str | None = None
-    detected_ks: str | None = None
+    detected_org: str | None = data.organization_code.strip() if data.organization_code else None
+    detected_ws: str | None = data.workspace_code.strip() if data.workspace_code else None
+    detected_ks: str | None = data.knowledge_scope_code.strip() if data.knowledge_scope_code else None
 
     for doc in scan_result.documents:
         fm = doc.frontmatter or {}
@@ -242,6 +353,39 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
         node_path = fm.get("node_path")
 
         gate = check_document_ingestion_readiness(fm, doc.relative_path)
+
+        doc_scope_errors: list[str] = []
+        if gate.ready and doc.candidate_for_ingestion and mode == "persist":
+            doc_scope_errors = _check_document_scope_consistency(
+                doc_index=0,
+                relative_path=doc.relative_path,
+                frontmatter=fm,
+                request_org=detected_org or "",
+                request_ws=detected_ws or "",
+                request_ks=detected_ks or "",
+                request_pkg=package_code,
+            )
+            scope_errors_list.extend(doc_scope_errors)
+
+            tag_errors = _check_access_tags(fm, doc.relative_path)
+            doc_scope_errors.extend(tag_errors)
+
+        if gate.ready and doc.candidate_for_ingestion and mode == "dry_run":
+            doc_scope_errors = _check_document_scope_consistency(
+                doc_index=0,
+                relative_path=doc.relative_path,
+                frontmatter=fm,
+                request_org=detected_org or "",
+                request_ws=detected_ws or "",
+                request_ks=detected_ks or "",
+                request_pkg=package_code,
+            )
+            for e in doc_scope_errors:
+                scope_warnings_list.append(f"[dry_run] {e} (scope mismatch)")
+
+            tag_issues = _check_access_tags(fm, doc.relative_path)
+            for e in tag_issues:
+                scope_warnings_list.append(f"[dry_run] {e}")
 
         chunk_count = 0
         if gate.ready and doc.candidate_for_ingestion:
@@ -254,7 +398,7 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
                 except Exception:
                     pass
             else:
-                pass  # chunks counted from persist result
+                pass
 
         if gate.ready:
             ready_count += 1
@@ -275,6 +419,7 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
             chunk_count=chunk_count,
             error_codes=gate.error_codes,
             error_messages=gate.error_messages,
+            scope_errors=doc_scope_errors,
         ))
 
     # ── Persist mode ─────────────────────────────────────────────────────
@@ -286,6 +431,23 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
                 mode="persist",
                 package_code=package_code,
                 errors=["persist mode requires a database connection: set TEAM360_DB_URL or equivalent"],
+                scope_errors=scope_errors_list,
+            )
+
+        if scope_errors_list:
+            return DevIngestResponse(
+                ok=False,
+                mode="persist",
+                package_code=package_code,
+                document_count=len(doc_results),
+                candidate_count=scan_result.candidate_count,
+                ready_count=ready_count,
+                rejected_count=rejected_count,
+                chunk_count=total_chunks,
+                documents=doc_results,
+                errors=["Scope validation failed: persist aborted"],
+                scope_errors=scope_errors_list,
+                scope_warnings=scope_warnings_list,
             )
 
         if not detected_org or not detected_ws or not detected_ks:
@@ -294,8 +456,8 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
                 mode="persist",
                 package_code=package_code,
                 errors=[
-                    "persist mode requires at least one ready document "
-                    "with organization_code, workspace_code, and knowledge_scope_code"
+                    "persist mode requires organization_code, workspace_code, "
+                    "and knowledge_scope_code in request or frontmatter"
                 ],
             )
 
@@ -314,9 +476,10 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
                 mode="persist",
                 package_code=package_code,
                 errors=[f"Persist pipeline failed: {exc}"],
+                scope_errors=scope_errors_list,
             )
 
-        # Merge persist results into doc_results, preserving scanner metadata
+        # Merge persist results into doc_results
         persist_by_path: dict[str, dict] = {}
         for pd in persist_data["persist_documents"]:
             persist_by_path[pd["relative_path"]] = pd
@@ -327,7 +490,7 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
                 dr.persisted = p["action"] in ("inserted", "updated")
                 dr.document_id = p["document_id"]
                 if p["action"] == "unchanged":
-                    dr.persisted = True  # already in DB, counts as persisted
+                    dr.persisted = True
                 dr.chunk_count = p["chunk_count"]
                 if p["persist_errors"]:
                     dr.error_messages.extend(p["persist_errors"])
@@ -345,9 +508,12 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
             chunk_count=total_chunks,
             documents=doc_results,
             errors=persist_data["persist_errors"],
+            scope_warnings=scope_warnings_list,
+            scope_errors=scope_errors_list,
             run_id=persist_data["run_id"],
             persisted_document_count=persist_data["persisted_document_count"],
             persisted_chunk_count=persist_data["persisted_chunk_count"],
+            requested_by=data.requested_by or "dev_internal",
         )
 
     # ── Dry-run mode ─────────────────────────────────────────────────────
@@ -363,4 +529,7 @@ async def ingest_dev(data: DevIngestRequest) -> DevIngestResponse:
         chunk_count=total_chunks,
         documents=doc_results,
         errors=scan_result.errors,
+        scope_warnings=scope_warnings_list,
+        scope_errors=scope_errors_list,
+        requested_by=data.requested_by or "dev_internal",
     )

@@ -309,6 +309,9 @@ def main() -> int:
                     "mode": "persist",
                     "include_drafts": False,
                     "chunking_strategy": "markdown",
+                    "organization_code": SMOKE_ORG_CODE,
+                    "workspace_code": SMOKE_WORKSPACE_CODE,
+                    "knowledge_scope_code": SMOKE_SCOPE_CODE,
                 },
             )
             _check("HTTP 200", resp.status_code == 200, f"got {resp.status_code}")

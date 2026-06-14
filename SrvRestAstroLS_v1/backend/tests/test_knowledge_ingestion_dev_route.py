@@ -434,6 +434,9 @@ def test_post_ingest_persist_requires_database_configuration(monkeypatch, tmp_pa
                 "package_code": "pkg_dev_test",
                 "package_path": pkg_path,
                 "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
             },
         )
     assert resp.status_code == 200
@@ -466,6 +469,9 @@ def test_post_ingest_persist_uses_worker_or_repository(monkeypatch, tmp_path):
                 "package_code": "pkg_dev_test",
                 "package_path": pkg_path,
                 "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
             },
         )
     assert resp.status_code == 200
@@ -497,6 +503,9 @@ def test_post_ingest_persist_persists_only_ready_documents_with_fake_repo(monkey
                 "package_code": "pkg_dev_test",
                 "package_path": pkg_path,
                 "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
             },
         )
     data = resp.json()
@@ -529,6 +538,9 @@ def test_post_ingest_persist_does_not_persist_not_ready_chunks(monkeypatch, tmp_
                 "package_code": "pkg_dev_test",
                 "package_path": pkg_path,
                 "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
             },
         )
     data = resp.json()
@@ -558,6 +570,9 @@ def test_post_ingest_persist_reports_gate_errors(monkeypatch, tmp_path):
                 "package_code": "pkg_dev_test",
                 "package_path": pkg_path,
                 "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
             },
         )
     data = resp.json()
@@ -589,18 +604,23 @@ def test_post_ingest_persist_response_contract_is_stable(monkeypatch, tmp_path):
                 "package_code": "pkg_dev_test",
                 "package_path": pkg_path,
                 "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
             },
         )
     assert resp.status_code == 200
     data = resp.json()
     for key in ("ok", "mode", "package_code", "document_count", "candidate_count",
                 "ready_count", "rejected_count", "chunk_count", "documents",
-                "errors", "run_id", "persisted_document_count", "persisted_chunk_count"):
+                "errors", "run_id", "persisted_document_count", "persisted_chunk_count",
+                "scope_warnings", "scope_errors", "requested_by"):
         assert key in data, f"Missing key: {key}"
     for doc in data["documents"]:
         for key in ("relative_path", "node_path", "status", "ingestion_status",
                     "candidate_for_ingestion", "gate_ready", "chunk_count",
-                    "error_codes", "error_messages", "persisted", "document_id"):
+                    "error_codes", "error_messages", "persisted", "document_id",
+                    "scope_errors"):
             assert key in doc, f"Missing key in doc: {key}"
 
 
@@ -624,6 +644,9 @@ def test_post_ingest_persist_does_not_call_openai_or_milvus(monkeypatch, tmp_pat
                 "package_code": "pkg_dev_test",
                 "package_path": pkg_path,
                 "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
             },
         )
     assert resp.status_code == 200
@@ -652,6 +675,9 @@ def test_post_ingest_persist_handles_repository_error_without_stacktrace(monkeyp
                 "package_code": "pkg_dev_test",
                 "package_path": pkg_path,
                 "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
             },
         )
     assert resp.status_code == 200
@@ -682,6 +708,9 @@ def test_post_ingest_persist_preserves_node_path_access_tags_permission_tags(mon
                 "package_code": "pkg_dev_test",
                 "package_path": pkg_path,
                 "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
             },
         )
     data = resp.json()
@@ -691,6 +720,285 @@ def test_post_ingest_persist_preserves_node_path_access_tags_permission_tags(mon
     assert rd["node_path"] == "/finanzas/general"
     assert rd["status"] == "approved"
     assert rd["ingestion_status"] == "ready"
+
+
+# ── Scope hardening (Fase 1.4) ────────────────────────────────────────────────
+
+
+def test_persist_requires_organization_code(monkeypatch, tmp_path):
+    """Persist mode rejects missing organization_code."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+                "organization_code": "",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
+            },
+        )
+    assert resp.status_code == 422
+    assert "organization_code" in resp.json()["detail"].lower()
+
+
+def test_persist_requires_workspace_code(monkeypatch, tmp_path):
+    """Persist mode rejects missing workspace_code."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "",
+                "knowledge_scope_code": "ks_360",
+            },
+        )
+    assert resp.status_code == 422
+    assert "workspace_code" in resp.json()["detail"].lower()
+
+
+def test_persist_requires_knowledge_scope_code(monkeypatch, tmp_path):
+    """Persist mode rejects missing knowledge_scope_code."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "",
+            },
+        )
+    assert resp.status_code == 422
+    assert "knowledge_scope_code" in resp.json()["detail"].lower()
+
+
+def test_persist_rejects_organization_code_mismatch(monkeypatch, tmp_path):
+    """Persist aborts when request org_code differs from frontmatter."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+                "organization_code": "org_999",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
+            },
+        )
+    data = resp.json()
+    assert data.get("scope_errors"), f"expected scope_errors, got {data}"
+    assert any("organization_code" in e for e in data["scope_errors"])
+    assert data["ok"] is False
+
+
+def test_persist_rejects_workspace_code_mismatch(monkeypatch, tmp_path):
+    """Persist aborts when request ws_code differs from frontmatter."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_999",
+                "knowledge_scope_code": "ks_360",
+            },
+        )
+    data = resp.json()
+    assert data.get("scope_errors"), f"expected scope_errors, got {data}"
+    assert any("workspace_code" in e for e in data["scope_errors"])
+    assert data["ok"] is False
+
+
+def test_persist_rejects_knowledge_scope_code_mismatch(monkeypatch, tmp_path):
+    """Persist aborts when request ks_code differs from frontmatter."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_999",
+            },
+        )
+    data = resp.json()
+    assert data.get("scope_errors"), f"expected scope_errors, got {data}"
+    assert any("knowledge_scope_code" in e for e in data["scope_errors"])
+    assert data["ok"] is False
+
+
+def test_persist_rejects_package_code_mismatch(monkeypatch, tmp_path):
+    """Persist aborts when request package_code differs from frontmatter."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    fm = _READY_FRONTMATTER.replace(
+        "source_type: markdown",
+        "source_type: markdown\npackage_code: pkg_dev_test",
+    )
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", fm)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_other",
+                "package_path": pkg_path,
+                "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
+            },
+        )
+    data = resp.json()
+    assert data.get("scope_errors"), f"expected scope_errors, got {data}"
+    assert any("package_code" in e for e in data["scope_errors"])
+    assert data["ok"] is False
+
+
+def test_persist_rejects_forbidden_vera_technical_ids(monkeypatch, tmp_path):
+    """Persist rejects vera_* technical identifiers."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+                "organization_code": "vera_org",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
+            },
+        )
+    assert resp.status_code == 422
+    assert "vera_" in resp.json()["detail"].lower()
+
+
+def test_dry_run_reports_scope_mismatch_without_db(tmp_path):
+    """Dry run reports scope mismatch as warning, no DB required."""
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "dry_run",
+                "organization_code": "org_999",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
+            },
+        )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["ok"] is True
+    assert any("scope mismatch" in w for w in data.get("scope_warnings", [])), (
+        f"expected scope mismatch warning, got scope_warnings={data.get('scope_warnings')}"
+    )
+
+
+def test_persist_does_not_activate_planned_extension(monkeypatch, tmp_path):
+    """planned_extension in frontmatter does not bypass readiness gate."""
+    from routes.knowledge_ingestion_dev import _check_document_scope_consistency
+
+    fm = {
+        "organization_code": "org_360",
+        "workspace_code": "ws_360",
+        "knowledge_scope_code": "ks_360",
+        "package_code": "pkg_dev_test",
+        "extension": "neural_search",
+    }
+    errors = _check_document_scope_consistency(0, "doc.md", fm, "org_360", "ws_360", "ks_360", "pkg_dev_test")
+    assert errors == []
+
+
+def test_response_contract_includes_scope_validation_summary(monkeypatch, tmp_path):
+    """Response includes scope_warnings and scope_errors fields."""
+    monkeypatch.setattr(dev_route, "_is_db_configured", lambda: True)
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+
+    async def fake_persist(**kwargs):
+        return _fake_persist_result()
+
+    monkeypatch.setattr(dev_route, "_run_persist_pipeline", fake_persist)
+
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "persist",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
+            },
+        )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "scope_warnings" in data
+    assert "scope_errors" in data
+    assert isinstance(data["scope_warnings"], list)
+    assert isinstance(data["scope_errors"], list)
+    assert "requested_by" in data
+
+
+def test_dry_run_accepts_scope_context_and_reports_it(tmp_path):
+    """Dry run accepts optional scope context and reports it."""
+    pkg_path = _make_dev_package(tmp_path, ready_docs=[("ready.md", _READY_FRONTMATTER)])
+    with _client() as client:
+        resp = client.post(
+            "/api/dev/knowledge-ingestion/ingest",
+            json={
+                "package_code": "pkg_dev_test",
+                "package_path": pkg_path,
+                "mode": "dry_run",
+                "organization_code": "org_360",
+                "workspace_code": "ws_360",
+                "knowledge_scope_code": "ks_360",
+                "requested_by": "tester",
+            },
+        )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["ok"] is True
+    assert data.get("requested_by") == "tester"
+    assert "scope_warnings" in data
+
+
+def test_persist_requires_access_tags_or_permission_tags(monkeypatch, tmp_path):
+    """Persist warns or rejects when ready doc has no access_tags."""
+    from routes.knowledge_ingestion_dev import _check_access_tags
+
+    fm_with_tags = {"access_tags": ["ceo"]}
+    assert _check_access_tags(fm_with_tags, "doc.md") == []
+
+    fm_no_tags: dict = {}
+    errors = _check_access_tags(fm_no_tags, "doc.md")
+    assert any("access_tags" in e for e in errors)
 
 
 def test_post_ingest_dry_run_still_works_after_persist_changes(tmp_path):

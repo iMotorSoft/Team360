@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-14 (Fase 1.3i — OpenAI embeddings + Milvus 2.6 indexing smoke)
+Ultima actualizacion: 2026-06-14 (Fase 1.4 — Endpoint hardening: scope, permisos y seguridad)
 
 ## Directorio de trabajo
 
@@ -1648,3 +1648,28 @@ Incluye estructura inicial para:
     PYTHONPATH=. uv run python scripts/smoke_knowledge_ingestion_embeddings_milvus.py
     ```
 - Sin Milvus, sin OpenAI real en tests, sin embeddings automáticos desde endpoint, sin frontend, sin upload público, sin corpus documental real, sin docs branch, sin diagnosis runtime.
+
+### 2026-06-14 - Fase 1.4: Endpoint hardening — scope, permisos y seguridad
+
+- **Endpoint `DevIngestRequest` extendido** con campos obligatorios para persist:
+  - `organization_code` (requerido para persist)
+  - `workspace_code` (requerido para persist)
+  - `knowledge_scope_code` (requerido para persist)
+  - `requested_by` (default `dev_internal`)
+  - `source_type` (default `markdown`, validado contra `SOURCE_TYPES`)
+- **`DevIngestResponse` extendido** con:
+  - `scope_warnings: list[str]` — advertencias de scope (reportadas en dry_run)
+  - `scope_errors: list[str]` — errores de scope (rechazan persist)
+  - `requested_by: str` — quién solicitó la operación
+- **`DevIngestDocumentResult` extendido** con `scope_errors: list[str]` por documento.
+- **Validaciones agregadas:**
+  - `_validate_scope_codes()`: requiere org/ws/ks para persist, rechaza identificadores `vera_*`, valida `source_type`.
+  - `_check_document_scope_consistency()`: compara códigos del request vs frontmatter de documentos ready.
+  - `_check_access_tags()`: verifica que documentos ready tengan `access_tags` no vacío.
+  - `_reject_forbidden_technical_id()`: rechaza prefijos `vera_*` con HTTP 422.
+- **Persist mode**: rechaza scope incompleto, mismatch, falta de access_tags, identificadores prohibidos.
+- **Dry run mode**: scope opcional, mismatch reportado como warning, no aborta.
+- **Tests**: 38 en `test_knowledge_ingestion_dev_route.py` (25 previos + 13 nuevos: scope requerido, mismatch por org/ws/ks/pkg, vera_*, dry_run warning, access_tags, planned_extension, response contract).
+- **Smoke PostgreSQL actualizado**: incluye scope codes en request.
+- Suite completa: **341/341 passed**. Smoke PostgreSQL: **50/50 passed**.
+- Sin frontend, sin upload público, sin Milvus/OpenAI default, sin corpus real.
