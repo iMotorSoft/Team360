@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-14 (Fase 1.3h — Chunk embedding persistence contract)
+Ultima actualizacion: 2026-06-14 (Fase 1.3i — OpenAI embeddings + Milvus 2.6 indexing smoke)
 
 ## Directorio de trabajo
 
@@ -1598,4 +1598,53 @@ Incluye estructura inicial para:
 - **Validación**: 36 tests nuevos embedding + 274 existentes = **310/310 passed**.
 - **Smoke PostgreSQL**: 50/50 passed (sin cambios en smoke — endpoint sigue sin generar embeddings).
 - `git diff --check` limpio. Secret scan: sin leaks nuevos.
+- Sin Milvus, sin OpenAI real en tests, sin embeddings automáticos desde endpoint, sin frontend, sin upload público, sin corpus documental real, sin docs branch, sin diagnosis runtime.
+
+### 2026-06-14 - Fase 1.3i: OpenAI embeddings + Milvus 2.6 indexing smoke
+
+- **Sin cambios en módulos productivos** — solo se agregaron scripts y tests contract.
+- **Sin Milvus module wrapper** — el smoke usa pymilvus inline (patrón de labs existentes).
+- **No se modificó endpoint dev** — sigue sin generar embeddings ni indexar Milvus por defecto.
+- **No se tocó corpus real, frontend, ni diagnosis runtime.**
+- Se creó `scripts/smoke_knowledge_ingestion_embeddings_milvus.py`:
+  - Valida 6 env vars/flags antes de ejecutar:
+    - `TEAM360_DB_URL`
+    - `OPENAI_API_KEY`
+    - `TEAM360_KNOWLEDGE_INGESTION_ENABLE_REAL_EMBEDDINGS=true`
+    - `TEAM360_KNOWLEDGE_INGESTION_ENABLE_MILVUS=true`
+    - `TEAM360_MILVUS_HOST` (o `MILVUS_URI`)
+    - `TEAM360_MILVUS_PORT` (opcional, default 19530)
+  - Usa `sanitize_dsn()` para DB URL, `_sanitize()` para secrets — no imprime API keys ni tokens.
+  - Crea paquete temporal con documento ready y not_ready.
+  - Llama endpoint dev persist (`POST /api/dev/knowledge-ingestion/ingest`) para crear run/docs/chunks.
+  - Genera embeddings reales via `OpenAIEmbeddingProvider` solo para chunks ready.
+  - Persiste embeddings en `knowledge_chunk_embeddings` (PostgreSQL, tabla existente).
+  - Verifica que not_ready NO tiene chunks → NO embeddings.
+  - Crea colección temporal Milvus con prefijo `team360_smoke_<timestamp>`.
+  - Indexa embeddings a Milvus en batches de 100 (HNSW/COSINE).
+  - Busca en Milvus con query relacionada al contenido del documento ready.
+  - Verifica que el resultado contiene el chunk ready esperado (score > 0, node_path smoke, contenido financiero).
+  - Cleanup PostgreSQL: DELETE por source_uri prefix + run_id, no por package_code.
+  - Cleanup Milvus: drop de la colección temporal smoke (nunca borra colección productiva).
+  - Aborta con SKIP exit code 0 si faltan env vars.
+  - Mensaje de error claro listando cada variable faltante.
+- Se crearon 18 tests contract en `tests/test_knowledge_ingestion_embeddings_milvus_smoke_contract.py`:
+  - Verifica existencia, estructura y requerimientos de env/flags.
+  - Verifica que no imprime API key, DB URL, ni Milvus token.
+  - Verifica que usa temp package, no corpus real.
+  - Verifica que cleanup no usa package_code DELETE amplio.
+  - Verifica que Milvus cleanup solo dropea colección smoke, no colección productiva.
+  - Verifica checks de not_ready sin embeddings/vectores.
+  - Verifica checks de búsqueda Milvus.
+  - Todos sin OpenAI/Milvus real.
+- Suite completa: **328/328 passed** (310 previos + 18 contract tests nuevos).
+- Smokes existentes no modificados: PostgreSQL smoke sigue 50/50.
+- `git diff --check` limpio. Secret scan: sin leaks nuevos.
+- **Smoke real OpenAI+Milvus no ejecutado** por falta de `OPENAI_API_KEY` y `TEAM360_MILVUS_HOST` en el entorno.
+  - Comando listo:
+    ```bash
+    TEAM360_KNOWLEDGE_INGESTION_ENABLE_REAL_EMBEDDINGS=true \
+    TEAM360_KNOWLEDGE_INGESTION_ENABLE_MILVUS=true \
+    PYTHONPATH=. uv run python scripts/smoke_knowledge_ingestion_embeddings_milvus.py
+    ```
 - Sin Milvus, sin OpenAI real en tests, sin embeddings automáticos desde endpoint, sin frontend, sin upload público, sin corpus documental real, sin docs branch, sin diagnosis runtime.
