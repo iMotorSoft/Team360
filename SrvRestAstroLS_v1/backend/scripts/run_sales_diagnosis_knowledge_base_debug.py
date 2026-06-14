@@ -92,9 +92,12 @@ def _step(title: str):
 def _check_env(var: str, label: str) -> bool:
     val = os.environ.get(var, "")
     if not val:
-        print(f"  SKIP  {label}: {var} not set")
         return False
     return True
+
+
+def _has_openai_key() -> bool:
+    return bool(os.environ.get("OPENAI_API_KEY") or os.environ.get("OpenAI_Key_JAI_query", ""))
 
 
 # ── Step 1: Scan ─────────────────────────────────────────────────────────────
@@ -198,7 +201,8 @@ def step_persist(package_code: str, package_root: str, org_code: str, ws_code: s
 
 def step_embed(package_code: str, ks_code: str) -> dict:
     _step("EMBED")
-    if not _check_env("OPENAI_API_KEY", "OpenAI"):
+    if not _has_openai_key():
+        print("  SKIP  OPENAI_API_KEY not set")
         return {"error": "OPENAI_API_KEY not set"}
     if os.environ.get(REQUIRED_EMBEDDINGS_FLAG, "").lower() != "true":
         print(f"  SKIP  {REQUIRED_EMBEDDINGS_FLAG}=true required")
@@ -247,12 +251,12 @@ def step_embed(package_code: str, ks_code: str) -> dict:
                 """,
                 (scope_id,),
             )
-            chunks = await pending.fetchall()
-            print(f"  Pending chunks to embed: {len(chunks)}")
-            for chunk in chunks:
-                chunk_id = chunk["chunk_id"]
-                content = chunk["content"]
-                scope_id_val = chunk["scope_id"]
+            rows = await pending.fetchall()
+            print(f"  Pending chunks to embed: {len(rows)}")
+            for chunk_row in rows:
+                chunk_id = chunk_row[0]
+                content = chunk_row[1]
+                scope_id_val = chunk_row[2]
                 try:
                     vec = provider.embed_texts([content])[0]
                     content_hash = hashlib.sha256(content.encode()).hexdigest()
@@ -308,9 +312,9 @@ def step_milvus_index(ks_code: str) -> dict:
         f"http://{os.environ.get('TEAM360_MILVUS_HOST', 'localhost')}"
         f":{os.environ.get('TEAM360_MILVUS_PORT', '19530')}"
     )
-    if not milvus_uri:
-        print("  SKIP  No Milvus URI configured")
-        return {"error": "No Milvus URI"}
+    # Mask secrets in URI display
+    safe_uri = milvus_uri.split("@")[-1] if "@" in milvus_uri else milvus_uri
+    print(f"  Milvus: {safe_uri}")
 
     from pymilvus import DataType, MilvusClient
     from pymilvus.milvus_client.index import IndexParams
@@ -365,18 +369,24 @@ def step_milvus_index(ks_code: str) -> dict:
                          params={"M": 16, "efConstruction": 200})
             client.create_collection(collection_name=coll_name, schema=schema, index_params=ip)
             for i, emb in enumerate(embs):
-                vec = emb["embedding"]
-                if isinstance(vec, memoryview):
-                    vec = list(vec)
+                vec_raw = emb[0]
+                if isinstance(vec_raw, memoryview):
+                    vec = list(vec_raw)
+                elif isinstance(vec_raw, str):
+                    # pgvector column read as string: "[0.1, 0.2, ...]"
+                    import ast
+                    vec = ast.literal_eval(vec_raw)
+                else:
+                    vec = list(vec_raw)
                 client.insert(coll_name, [{
                     "id": i + 1,
-                    "chunk_id": emb["chunk_id"],
-                    "document_id": emb["document_id"],
-                    "knowledge_scope_id": emb["scope_id"],
-                    "embedding_version": emb.get("emb_version") or "",
-                    "content_preview": (emb.get("content") or "")[:2000],
-                    "node_path": emb.get("node_path") or "",
-                    "title": emb.get("title") or "",
+                    "chunk_id": emb[1],
+                    "document_id": emb[2],
+                    "knowledge_scope_id": emb[3],
+                    "embedding_version": emb[7] or "",
+                    "content_preview": (emb[5] or "")[:2000],
+                    "node_path": emb[6] or "",
+                    "title": emb[4] or "",
                     "embedding": vec,
                 }])
                 indexed += 1
@@ -396,7 +406,8 @@ def step_milvus_index(ks_code: str) -> dict:
 
 def step_retrieve_debug(ks_code: str, top_k: int = 5) -> dict:
     _step("RETRIEVE DEBUG")
-    if not _check_env("OPENAI_API_KEY", "OpenAI"):
+    if not _has_openai_key():
+        print("  SKIP  OPENAI_API_KEY not set")
         return {"error": "OPENAI_API_KEY not set"}
     settings = get_database_settings()
     provider = OpenAIEmbeddingProvider()
@@ -443,8 +454,8 @@ def step_retrieve_debug(ks_code: str, top_k: int = 5) -> dict:
                 print(f"    Results: {len(hits)}")
                 query_results: list[dict] = []
                 for hit in hits:
-                    meta = hit.get("metadata_jsonb") or {}
-                    emb_meta = hit.get("emb_meta") or {}
+                    meta = hit[6] or {} if len(hit) > 6 else {}
+                    emb_meta = hit[7] or {} if len(hit) > 7 else {}
                     area_key = meta.get("area_key", "")
                     topic_key = meta.get("topic_key", "")
                     access_tags = meta.get("access_tags", [])
@@ -456,17 +467,18 @@ def step_retrieve_debug(ks_code: str, top_k: int = 5) -> dict:
                         signal_notes.append("planned_extension")
                     if security_hitl:
                         signal_notes.append("human_review_required")
-                    content_preview = (hit.get("content") or "")[:300]
-                    score = round(float(hit["score"]), 6) if hit.get("score") is not None else 0.0
-                    print(f"      [{score:.4f}] {hit.get('source_uri', '?')} / {hit.get('title', '?')[:50]}")
+                    content_preview = (hit[5] or "")[:300] if len(hit) > 5 else ""
+                    score_val = hit[8] if len(hit) > 8 and hit[8] is not None else 0.0
+                    score = round(float(score_val), 6)
+                    print(f"      [{score:.4f}] {hit[1] if len(hit) > 1 else '?'} / {(hit[2] or '?')[:50] if len(hit) > 2 else '?'}")
                     if signal_notes:
                         print(f"        signals: {', '.join(signal_notes)}")
                     query_results.append({
-                        "chunk_id": hit["chunk_id"],
-                        "source_uri": hit.get("source_uri", ""),
-                        "title": hit.get("title", ""),
-                        "node_path": hit.get("node_path", ""),
-                        "chunk_index": hit.get("chunk_index", 0),
+                        "chunk_id": hit[0] if len(hit) > 0 else "",
+                        "source_uri": hit[1] if len(hit) > 1 else "",
+                        "title": hit[2] if len(hit) > 2 else "",
+                        "node_path": hit[3] if len(hit) > 3 else "",
+                        "chunk_index": hit[4] if len(hit) > 4 else 0,
                         "area_key": area_key,
                         "topic_key": topic_key,
                         "access_tags": access_tags,
