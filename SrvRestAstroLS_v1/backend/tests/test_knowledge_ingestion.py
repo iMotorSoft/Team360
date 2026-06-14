@@ -25,6 +25,7 @@ from modules.knowledge_ingestion.schemas import (
     SUPPORTED_LOCALES,
     VISIBILITY_LEVELS,
     IngestionMetadata,
+    check_document_ingestion_readiness,
 )
 from modules.knowledge_ingestion.worker import KnowledgeIngestionWorker
 
@@ -1467,6 +1468,114 @@ class TestKnowledgePackageScanner:
 
 
 # ---------------------------------------------------------------------------
+# Pre-ingestion readiness gate (Fase 1.3c)
+# ---------------------------------------------------------------------------
+
+
+class TestIngestionReadinessGate:
+    """Tests for check_document_ingestion_readiness — pure function."""
+
+    def test_ingestion_status_not_ready_rejected(self):
+        """ingestion_status: not_ready is rejected by the gate."""
+        fm = _VALID_FRONTMATTER.replace(
+            "ingestion_status: ready", "ingestion_status: not_ready"
+        )
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=_make_package_dir([("test.md", fm)]),
+        ))
+        # Scanner reports without failing
+        assert result.candidate_count == 0
+        assert not result.documents[0].candidate_for_ingestion
+        # Gate explicitly rejects
+        gate = check_document_ingestion_readiness(
+            result.documents[0].frontmatter,
+            result.documents[0].relative_path,
+        )
+        assert not gate.ready
+        assert "ingestion_status_not_ready" in gate.error_codes
+
+    def test_missing_ingestion_status_rejected(self):
+        """Missing ingestion_status key is rejected by the gate."""
+        fm = _VALID_FRONTMATTER.replace("\ningestion_status: ready\n", "\n")
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=_make_package_dir([("test.md", fm)]),
+        ))
+        assert result.invalid_count >= 1
+        # Gate explicitly rejects
+        gate = check_document_ingestion_readiness(
+            result.documents[0].frontmatter,
+            result.documents[0].relative_path,
+        )
+        assert not gate.ready
+        assert "missing_ingestion_status" in gate.error_codes
+
+    def test_ingestion_status_ready_allowed(self):
+        """ingestion_status: ready passes the gate."""
+        gate = check_document_ingestion_readiness(
+            {"ingestion_status": "ready", "status": "approved"},
+            "test.md",
+        )
+        assert gate.ready
+        assert gate.error_codes == []
+
+    def test_draft_reported_by_scanner_without_indexing(self):
+        """Draft document is reported by scanner but rejected by gate."""
+        fm = _VALID_FRONTMATTER.replace(
+            "status: approved", "status: draft"
+        ).replace(
+            "ingestion_status: ready", "ingestion_status: not_ready"
+        )
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=_make_package_dir([("test.md", fm)]),
+        ))
+        # Scanner does not fail — it reports
+        assert result.candidate_count == 0
+        assert not result.documents[0].candidate_for_ingestion
+        # Gate rejects
+        gate = check_document_ingestion_readiness(
+            result.documents[0].frontmatter,
+            result.documents[0].relative_path,
+        )
+        assert not gate.ready
+
+    def test_error_includes_path(self):
+        """Gate error messages include the document relative path."""
+        gate = check_document_ingestion_readiness(
+            {"ingestion_status": "not_ready", "status": "approved"},
+            "finanzas/test.md",
+        )
+        assert not gate.ready
+        assert any("finanzas/test.md" in msg for msg in gate.error_messages)
+
+    def test_planned_extension_not_active(self):
+        """Document with a non-standard extension field is rejected."""
+        fm = _VALID_FRONTMATTER.replace(
+            "workspace_code: team360_platform",
+            "workspace_code: team360_platform\nextension: neural_search",
+        )
+        scanner = KnowledgePackageScanner()
+        result = scanner.scan(PackageScanRequest(
+            package_code="pkg_sales_diagnosis",
+            package_root=_make_package_dir([("test.md", fm)]),
+        ))
+        # Scanner may mark as candidate (extension is unknown, not invalid)
+        # Gate explicitly rejects planned extensions
+        gate = check_document_ingestion_readiness(
+            result.documents[0].frontmatter,
+            result.documents[0].relative_path,
+        )
+        assert not gate.ready
+        assert "planned_extension_not_active" in gate.error_codes
+        assert "neural_search" in " ".join(gate.error_messages)
+
+
+# ---------------------------------------------------------------------------
 # Package document persistence (Fase 1.3b)
 # ---------------------------------------------------------------------------
 
@@ -1691,6 +1800,182 @@ class TestKnowledgeIngestionPersistence:
         assert result.persisted_count == 0
         assert result.candidate_count == 0
         assert result.run_id == "run-uuid"
+
+    # ------------------------------------------------------------------
+    # Pre-ingestion readiness gate integration (Fase 1.3c)
+    # ------------------------------------------------------------------
+
+    @pytest.mark.anyio
+    async def test_gate_rejects_not_ready_before_chunking(self):
+        """Worker rejects ingestion_status: not_ready before chunking."""
+        fm = _VALID_FRONTMATTER.replace(
+            "ingestion_status: ready", "ingestion_status: not_ready"
+        )
+        root = _make_package_dir([("test.md", fm)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.skipped_count >= 1
+        assert result.persisted_count == 0
+        # Verify gate error code appears in the result
+        all_errors = [e for d in result.documents for e in d.errors]
+        assert any("ingestion_status_not_ready" in e for e in all_errors) or any(
+            "ingestion_status is 'not_ready'" in e for e in all_errors
+        )
+        # No knowledge_chunks touched
+        chunk_sqls = [
+            sql for sql, _ in conn.statements
+            if "knowledge_chunks" in sql
+        ]
+        assert len(chunk_sqls) == 0
+
+    @pytest.mark.anyio
+    async def test_gate_rejects_missing_ingestion_status(self):
+        """Worker rejects missing ingestion_status before chunking."""
+        fm = _VALID_FRONTMATTER.replace("\ningestion_status: ready\n", "\n")
+        root = _make_package_dir([("test.md", fm)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.invalid_count >= 1
+        assert result.persisted_count == 0
+        all_errors = [e for d in result.documents for e in d.errors]
+        assert any("missing" in e.lower() for e in all_errors)
+        chunk_sqls = [
+            sql for sql, _ in conn.statements
+            if "knowledge_chunks" in sql
+        ]
+        assert len(chunk_sqls) == 0
+
+    @pytest.mark.anyio
+    async def test_gate_allows_ready_approved_with_chunks(self):
+        """ingestion_status: ready, status: approved proceeds to chunking."""
+        root = _make_package_dir([("test.md", _VALID_FRONTMATTER)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+            None,
+            {"id": "doc-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+            include_chunks=True,
+        )
+        assert result.inserted_count == 1
+        assert result.documents[0].chunk_count >= 1
+        chunk_insert_sqls = [
+            sql for sql, _ in conn.statements
+            if "insert into knowledge_chunks" in sql
+        ]
+        assert len(chunk_insert_sqls) >= 1
+
+    @pytest.mark.anyio
+    async def test_gate_error_includes_path(self):
+        """Worker gate error message includes the document path."""
+        fm = _VALID_FRONTMATTER.replace(
+            "ingestion_status: ready", "ingestion_status: not_ready"
+        )
+        root = _make_package_dir([("subdir/test.md", fm)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        all_errors = [e for d in result.documents for e in d.errors]
+        assert any("subdir/test.md" in e for e in all_errors)
+
+    @pytest.mark.anyio
+    async def test_gate_planned_extension_not_active(self):
+        """Worker rejects documents with non-standard extension field."""
+        fm = _VALID_FRONTMATTER.replace(
+            "workspace_code: team360_platform",
+            "workspace_code: team360_platform\nextension: neural_search",
+        )
+        root = _make_package_dir([("test.md", fm)])
+        conn = _FakeConnection(rows=[
+            {"id": "org-uuid"},
+            {"id": "workspace-uuid", "organization_id": "org-uuid"},
+            {"id": "scope-uuid"},
+            {"id": "package-uuid"},
+            {"id": "worker-uuid"},
+            {"id": "run-uuid"},
+        ])
+        worker = KnowledgeIngestionWorker()
+        result = await worker.persist_package_documents(
+            conn=conn,
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            package_root=root,
+            dry_run=False,
+        )
+        assert result.invalid_count >= 1
+        assert result.persisted_count == 0
+        all_errors = [e for d in result.documents for e in d.errors]
+        assert any(
+            "planned_extension_not_active" in e or "extension" in e.lower()
+            for e in all_errors
+        )
+        chunk_sqls = [
+            sql for sql, _ in conn.statements
+            if "knowledge_chunks" in sql
+        ]
+        assert len(chunk_sqls) == 0
 
     @pytest.mark.anyio
     async def test_persist_no_chunks_created(self):

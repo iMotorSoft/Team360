@@ -409,3 +409,81 @@ class PackagePersistResult:
     errors: list[str]
     run_id: str | None = None
     total_chunk_count: int = 0
+
+
+# ---------------------------------------------------------------------------
+# Pre-ingestion readiness gate (Fase 1.3c)
+# ---------------------------------------------------------------------------
+
+INGESTION_READINESS_ERROR_CODES = frozenset({
+    "document_not_ready",
+    "ingestion_status_not_ready",
+    "missing_ingestion_status",
+    "planned_extension_not_active",
+})
+
+
+@dataclass
+class IngestionReadinessGateResult:
+    ready: bool
+    error_codes: list[str]
+    error_messages: list[str]
+
+
+def check_document_ingestion_readiness(
+    frontmatter: dict[str, Any] | None,
+    relative_path: str = "",
+) -> IngestionReadinessGateResult:
+    """Pre-ingestion readiness gate.
+
+    Rejects documents that should not proceed to chunking/embedding/indexing.
+    Stricter than scanner validation: focuses on readiness for actual
+    ingestion pipeline execution. Scanner can report non-ready docs
+    without failing; this gate hard-rejects before pipeline phases.
+    """
+    error_codes: list[str] = []
+    messages: list[str] = []
+
+    if frontmatter is None:
+        error_codes.append("document_not_ready")
+        messages.append(
+            f"Document {relative_path}: missing frontmatter"
+        )
+        return IngestionReadinessGateResult(
+            ready=False, error_codes=error_codes, error_messages=messages,
+        )
+
+    ingestion_status = frontmatter.get("ingestion_status", "")
+    if not ingestion_status:
+        error_codes.append("missing_ingestion_status")
+        messages.append(
+            f"Document {relative_path}: ingestion_status is missing or empty"
+        )
+    elif ingestion_status != "ready":
+        error_codes.append("ingestion_status_not_ready")
+        messages.append(
+            f"Document {relative_path}: ingestion_status is "
+            f"{ingestion_status!r}, expected 'ready'"
+        )
+
+    status = frontmatter.get("status", "")
+    if status == "draft":
+        error_codes.append("document_not_ready")
+        messages.append(
+            f"Document {relative_path}: status is 'draft', "
+            "not ready for ingestion"
+        )
+
+    extension = frontmatter.get("extension", "")
+    if extension:
+        error_codes.append("planned_extension_not_active")
+        messages.append(
+            f"Document {relative_path}: extension {extension!r} "
+            "is not yet active"
+        )
+
+    return IngestionReadinessGateResult(
+        ready=len(error_codes) == 0,
+        error_codes=error_codes,
+        error_messages=messages,
+    )

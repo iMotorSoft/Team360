@@ -61,6 +61,7 @@ from modules.knowledge_ingestion.schemas import (
     PackagePersistResult,
     PackageScanRequest,
     PackageScanResult,
+    check_document_ingestion_readiness,
 )
 
 
@@ -346,17 +347,36 @@ class KnowledgeIngestionWorker:
                 has_errors = False
 
             if not doc.valid or not doc.candidate_for_ingestion:
+                gate_result = check_document_ingestion_readiness(
+                    doc.frontmatter, doc.relative_path,
+                )
+                gate_errors = gate_result.error_messages if not gate_result.ready else []
                 doc_results.append(KnowledgeDocumentPersistenceResult(
                     relative_path=doc.relative_path,
                     status=DocumentUpsertStatus.SKIPPED,
                     action="skipped",
                     warnings=[i.message for i in doc.issues if i.severity == "warning"],
-                    errors=[i.message for i in doc.issues] if has_errors else [],
+                    errors=([i.message for i in doc.issues] if has_errors else []) + gate_errors,
                 ))
                 if has_errors:
                     invalid_count += 1
                 else:
                     skipped_count += 1
+                continue
+
+            # Pre-ingestion readiness gate: reject documents that pass the
+            # scanner's candidate check but fail stricter readiness validation.
+            gate_result = check_document_ingestion_readiness(
+                doc.frontmatter, doc.relative_path,
+            )
+            if not gate_result.ready:
+                doc_results.append(KnowledgeDocumentPersistenceResult(
+                    relative_path=doc.relative_path,
+                    status=DocumentUpsertStatus.INVALID,
+                    action="rejected_by_gate",
+                    errors=gate_result.error_messages,
+                ))
+                invalid_count += 1
                 continue
 
             fm = doc.frontmatter or {}
