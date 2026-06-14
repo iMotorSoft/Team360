@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-14 (Fase 1.9w — Revalidacion GPT-5 nano)
+Ultima actualizacion: 2026-06-14 (Modelo T360 Pack/Task/Diagnostico)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,18 @@ Ultima actualizacion: 2026-06-14 (Fase 1.9w — Revalidacion GPT-5 nano)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-14 - Modelo T360 Pack/Task/Diagnostico
+
+- Se documento en `lat.md/team360-pack-task-diagnosis-model.md` el modelo conceptual y comercial transversal de Team360:
+  - T360 Pack como solucion configurable;
+  - T360 Task como unidad puntual ejecutable;
+  - T360 Pack Flow como automatizacion de punta a punta;
+  - T360 Pack Integrate como pack orientado a conectar sistemas, canales o fuentes de datos;
+  - Diagnostico Team360 como puerta de entrada inteligente.
+- Se fijo que el diagnostico no debe limitarse al catalogo actual ni a ventas: debe entender la necesidad real y clasificar si la solucion esta disponible hoy, es configurable/armable, requiere desarrollo o no conviene vender todavia.
+- Se enlazo el nuevo invariante desde `lat.md/lat.md` y desde `lat.md/team360-global-orchestration.md`.
+- No se implemento codigo, no se tocaron migraciones, endpoints, frontend, Console, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni `knowledge/`.
 
 ### 2026-06-14 - Fase 1.9w — Revalidacion GPT-5 nano
 

@@ -5,6 +5,7 @@ This directory defines high-level concepts, business logic, architecture decisio
 It is managed as a `lat.md` documentation layer: source code can anchor to these definitions with `@lat` comments and `[[...]]` references.
 
 - [[team360-global-orchestration]] — mapa global de ramas, frentes activos, reglas de coordinación y estado transversal de Team360.
+- [[team360-pack-task-diagnosis-model]] — modelo conceptual de T360 Packs, Tasks, Pack Flows, Pack Integrate y alcance del Diagnostico Team360.
 - [[team360-platform]] — Product thesis, control plane, auditability and ERP AI Workflow Layer positioning.
 - [[multi-package-workers]] — Workspace, automation packages, package workers, worker configs, credentials and customer interaction boundaries.
 - [[knowledge-rag-graphrag]] — Knowledge scopes, RAG/GraphRAG retrieval modes, document/chunk model and future graph model.

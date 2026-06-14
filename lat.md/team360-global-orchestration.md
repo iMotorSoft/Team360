@@ -136,7 +136,10 @@ Guía:
 - `pkg_sales_diagnosis` es un knowledge package evolutivo.
 - Team360.live será el primer contexto de validación.
 - Vera es nombre comercial visible, no identificador técnico.
+- El modelo funcional/comercial transversal queda definido en `[[team360-pack-task-diagnosis-model]]`: T360 Packs, T360 Tasks, T360 Pack Flows, T360 Pack Integrate y Diagnostico Team360.
 - El diagnóstico no se limita a ventas; ventas es la entrada comercial inicial.
+- El diagnóstico debe entender la necesidad real aunque todavía no exista el Pack o la Task exacta para resolverla.
+- El diagnóstico debe traducir la operación del cliente en una arquitectura posible de solución, no forzarla a un catálogo cerrado.
 - Automatizable no significa vendible hoy.
 - Step-to-Action, lead capture, diagnostic_code y WhatsApp handoff son capacidades futuras.
 - La primera etapa productiva prioriza:

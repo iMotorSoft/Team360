@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-12
+Ultima actualizacion: 2026-06-14
 
 ## Estado general
 
@@ -11,6 +11,17 @@ Ultima actualizacion: 2026-06-12
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-14 - Modelo T360 Pack, Task, Flow, Integrate y Diagnostico
+
+- Se agrego `team360-pack-task-diagnosis-model.md` como invariante conceptual y comercial transversal.
+- Se definieron T360 Pack, T360 Task, T360 Pack Flow, T360 Pack Integrate y modos de ejecucion Scheduled, On-Demand y Event-Driven.
+- Se fijo que el Diagnostico Team360 debe diagnosticar la operacion real del cliente y traducirla en una arquitectura posible de solucion, aunque todavia no exista el Pack o Task exacta.
+- Se documento la clasificacion de resultado: disponible hoy, configurable/armable, requiere desarrollo y no conviene vender todavia.
+- Se reforzo la regla: automatizable no significa vendible hoy.
+- Se actualizo `lat.md/lat.md` con la referencia `[[team360-pack-task-diagnosis-model]]`.
+- Se actualizo `team360-global-orchestration.md` para enlazar el modelo desde decisiones globales de producto.
+- No se implemento codigo, no se tocaron migraciones, runtime, frontend ni `knowledge/`.
 
 ### 2026-06-12 - Metodologia obligatoria de preflight de servicios
 
