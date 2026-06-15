@@ -770,13 +770,15 @@ def generate_report(
 
     if comparison is not None:
         improved = sum(1 for c in comparison if c.get("improved") is True)
-        regressed = sum(1 for c in comparison if c.get("improved") is False)
+        regressed = sum(1 for c in comparison if c.get("not_worse") is False)
+        unchanged = sum(1 for c in comparison
+                        if c.get("improved") is False and c.get("not_worse") is True)
         report["comparison"] = comparison
         report["comparison_summary"] = {
             "total": len(comparison),
             "improved": improved,
             "regressed": regressed,
-            "unchanged": len(comparison) - improved - regressed,
+            "unchanged": unchanged,
         }
 
     if preflight:
