@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-14 (Fase 1.5c — Add diagnostic retrieval gap coverage docs)
+Ultima actualizacion: 2026-06-15 (Fase 1.6 — Knowledge Ingestion retrieval para Sales Diagnosis dev)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,15 @@ Ultima actualizacion: 2026-06-14 (Fase 1.5c — Add diagnostic retrieval gap cov
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-15 - Aclaracion de trabajo paralelo entre ramas
+
+- Se actualizo la regla operativa en `AGENTS.md` y `.agents/skills/team360-project/SKILL.md`.
+- La regla ya no se interpreta como prohibicion absoluta de trabajar en dos ramas en paralelo: se bloquea el paralelo cuando las ramas son dependientes y se permite cuando son independientes.
+- Se definio dependencia como necesidad de codigo, contratos, migraciones, decisiones, documentos tecnicos, runtime, APIs o resultados de otra rama.
+- Se explicito que el trabajo paralelo independiente debe mantener aislamiento operativo: no mezclar cambios en el mismo worktree, no mover cambios entre ramas sin instruccion explicita y preferir worktrees separados cuando aplique.
+- No se toco codigo productivo, frontend, backend runtime, labs, migraciones, DB, endpoints ni `team360_orquestador`.
+- No se hizo checkout, merge, rebase, push, git add ni commit.
 
 ### 2026-06-10 - Aclaracion de ownership por tipo de trabajo y rama
 
@@ -1717,3 +1726,47 @@ Incluye estructura inicial para:
   | MFA/aprobación manual | package manual (0.55) | Nuevo doc seguridad (0.71) |
 - Suite completa: **353/353 passed**
 - Sin drafts tocados, sin docs branch, sin frontend, sin diagnóstico runtime, sin Step-to-Action activo
+
+### 2026-06-15 - Fase 1.6: Connect knowledge ingestion retrieval to sales diagnosis dev runtime
+
+- **Objetivo**: Permitir que el Sales Diagnosis Runtime dev/debug use los chunks reales generados por Knowledge Ingestion como fuente de retrieval, respetando scope.
+- **Provider creado**: `KnowledgeIngestionSalesDiagnosisRetrievalProvider` en `modules/automation_diagnosis/knowledge_retrieval_provider.py`
+  - Implementa `search()` y `scope_debug()` con la misma interfaz que `InMemoryKnowledgeRepository`
+  - Usa PostgreSQL (psycopg sync) + pgvector para retrieval real
+  - Usa OpenAIEmbeddingProvider para generar embeddings de query
+  - Respeta scope: organization_code, workspace_code, knowledge_scope_code, package_code
+  - Recibe scope codes como parámetros de constructor (defaults: team360_live, team360_public_site, ks_team360_sales_diagnosis, pkg_sales_diagnosis)
+  - Fallback seguro: si DB/OpenAI/scope no está disponible, retorna `RetrievedContext` vacío (no crashea)
+- **Feature flag**: `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER=knowledge_ingestion`
+  - Solo se activa con opt-in explícito
+  - Default sigue siendo in-memory fake
+  - Si el flag no está seteado o tiene otro valor, no se activa
+  - Si el provider falla al construirse, fallback silencioso a in-memory
+- **Wiring**: Modificado `AutomationDiagnosisService.__init__()` en `service.py`
+  - Si el flag está activo → construye el provider real como `knowledge_repository`
+  - Si `knowledge_repository` se pasa explícitamente, respeta la inyección (no overridea)
+  - Compatible con todos los tests existentes, defaults, in-memory y postgres mode
+- **Scope obligatorio**: knowledge_scope_code, organization_code, workspace_code, package_code
+- **Fallback seguro**: error de DB/OpenAI/embedding → chunks vacíos, no crashea
+- **Observabilidad**: cada `search()` registra elapsed_ms vía time.time()
+- **Preflight**: el smoke script ejecuta validación antes de queries: DB activa, scope existe, embeddings existen, no dev_doc_*
+- **Tests**: 28 tests en `tests/test_knowledge_retrieval_provider.py`
+  - Feature flag enabled/disabled/wrong value
+  - Provider construido con default/custom params
+  - search() retorna RetrievedContext con/sin datos
+  - search() fallback cuando OpenAI/DB/scope no disponible
+  - search() respeta top_k
+  - scope_debug() con DB disponible/no disponible/scope missing
+  - search() retorna datos reales cuando todo disponible
+  - Service wiring: env override, explicit repo, build failure fallback
+  - No secrets leakage (sanitize, sanitize_dsn)
+- **Smoke contract tests**: 14 tests en `tests/test_smoke_sales_diagnosis_runtime_dev_knowledge_ingestion_retrieval.py`
+  - Script existe, importable, requiere env vars correctas
+  - Tiene preflight, no usa endpoint productivo, no activa features bloqueadas
+  - Verifica RetrievedContext contract, sanitiza secrets
+- **Smoke real**: `scripts/smoke_sales_diagnosis_runtime_dev_knowledge_ingestion_retrieval.py`
+  - Preflight: PostgreSQL, scope, embeddings, no dev_doc_*
+  - 5 queries reales: WhatsApp automation, QR/diagnostic_code, pricing/auto-quote, MFA/aprobación manual, SAP Business One
+  - Verifica: sources > 0, source_uri/node_path presentes, score > 0, no dev_doc_*, top_k respetado
+- **No se tocó**: endpoint productivo, Console, frontend, upload público, Step-to-Action, lead_capture, diagnostic_code activo, WhatsApp handoff, pricing/SLA inventado
+- Suite completa: **395/395 passed** (381 + 14 nuevos smoke contract)

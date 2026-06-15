@@ -11,6 +11,10 @@ from .classifier import classify_session
 from .events import InMemoryEventRecorder
 from .guided_flow import get_guided_flow, required_step_ids
 from .knowledge_connector import InMemoryKnowledgeRepository, build_default_knowledge_repository
+from .knowledge_retrieval_provider import (
+    build_dev_retrieval_provider,
+    is_dev_retrieval_enabled,
+)
 from .lead_output import build_internal_card
 from .repository import InMemoryDiagnosisRepository
 from .result_generator import generate_user_result
@@ -36,7 +40,16 @@ class AutomationDiagnosisService:
         ai_interpreter: AIInterpreterPort | None = None,
     ) -> None:
         self.repository = repository or InMemoryDiagnosisRepository()
-        self.knowledge_repository = knowledge_repository or build_default_knowledge_repository()
+        if knowledge_repository is not None:
+            self.knowledge_repository = knowledge_repository
+        elif is_dev_retrieval_enabled():
+            dev_provider = build_dev_retrieval_provider()
+            if dev_provider is not None:
+                self.knowledge_repository = dev_provider
+            else:
+                self.knowledge_repository = build_default_knowledge_repository()
+        else:
+            self.knowledge_repository = build_default_knowledge_repository()
         self.event_recorder = event_recorder or InMemoryEventRecorder()
         self.ai_interpreter = ai_interpreter or build_ai_interpreter()
 
