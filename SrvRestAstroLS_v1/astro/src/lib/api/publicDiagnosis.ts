@@ -129,7 +129,22 @@ export async function startPublicDiagnosis(request: PublicDiagnosisRequest): Pro
     },
   });
 
-  await saveAnswer(session.id, "process_to_automate", { free_text: text });
+  // Save all guided steps with defaults + user text
+  const defaultAnswers: Array<{ stepId: string; answer: Record<string, unknown> }> = [
+    { stepId: "process_to_automate", answer: { free_text: text } },
+    { stepId: "business_pain", answer: { free_text: "Quiero saber si se puede automatizar para ahorrar tiempo y evitar errores." } },
+    { stepId: "systems_involved", answer: { selected: ["whatsapp", "email", "browser_portal"] } },
+    { stepId: "frequency_volume", answer: { selected: ["daily", "medium_volume"] } },
+    { stepId: "rules_clarity", answer: { selected: ["partially_clear"] } },
+    { stepId: "human_dependency", answer: { selected: ["medium"] } },
+    { stepId: "access_security", answer: { selected: ["password", "email_otp"] } },
+    { stepId: "data_sensitivity", answer: { selected: ["personal_data"] } },
+    { stepId: "expected_result", answer: { free_text: "Que el proceso quede automatizado y funcione sin intervención manual." } },
+    { stepId: "economic_impact", answer: { selected: ["medium"] } },
+  ];
+  for (const { stepId, answer } of defaultAnswers) {
+    await saveAnswer(session.id, stepId, answer);
+  }
 
   // Try real diagnosis via classify with timeout
   try {
