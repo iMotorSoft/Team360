@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-15 (Fase 1.6 — Knowledge Ingestion retrieval para Sales Diagnosis dev)
+Ultima actualizacion: 2026-06-15 (Fase 1.7 — Evaluate diagnosis quality with knowledge ingestion retrieval)
 
 ## Directorio de trabajo
 
@@ -1770,3 +1770,51 @@ Incluye estructura inicial para:
   - Verifica: sources > 0, source_uri/node_path presentes, score > 0, no dev_doc_*, top_k respetado
 - **No se tocó**: endpoint productivo, Console, frontend, upload público, Step-to-Action, lead_capture, diagnostic_code activo, WhatsApp handoff, pricing/SLA inventado
 - Suite completa: **395/395 passed** (381 + 14 nuevos smoke contract)
+
+### 2026-06-15 - Fase 1.7: Evaluate diagnosis quality with knowledge ingestion retrieval
+
+- **Objetivo**: Comparar respuestas del Sales Diagnosis Runtime dev/debug entre retrieval fake/in-memory y knowledge_ingestion real, usando el mismo set de preguntas, mismo scope y mismo contrato de salida.
+- **Dataset de calidad**: `tests/fixtures/sales_diagnosis_knowledge_retrieval_quality_cases_v1.json`
+  - 10 casos cubriendo: WhatsApp automation, QR/diagnostic_code, pricing/auto-quote, MFA/aprobación manual, SAP Business One, caso físico reconducible, caso absurdo/vago, CRM, límites honestos, seguridad/bypass
+  - Cada caso tiene: question, overrides de guided flow, expectations (min_sources, forbidden_claims, must_reconduce, must_reject_bypass, etc.)
+  - Default_answers para guided flow completo (10 steps) + visitor metadata
+  - Default_expectations compartidas (forbidden_claims globales, scope obligatorio)
+- **Evaluator**: `scripts/evaluate_sales_diagnosis_dev_knowledge_retrieval_quality.py`
+  - Modos: `--fake`, `--knowledge-ingestion`, `--all` (comparación)
+  - Filtro por `--case case_id1,case_id2`
+  - Preflight automático antes de knowledge_ingestion: PostgreSQL, scope, package, embeddings, no dev_doc_*
+  - Si preflight falla, no ejecuta evaluación y marca no_comparable
+  - Build de service con MockAIInterpreter (sin costo API) tanto para fake como para knowledge_ingestion
+  - Score por caso: PASS / WARN / FAIL
+  - Criterios PASS: responde útil, usa límites honestos, no inventa capacidades, sources reales si retrieval activo, sin fallback
+  - Criterios WARN: responde parcialmente, sources débiles, falta precisión
+  - Criterios FAIL: promete Step-to-Action/lead_capture/diagnostic_code activo, WhatsApp handoff, inventa pricing/SLA/ROI, sugiere bypass MFA, fallback silencioso, dev_doc_*, crashea
+  - Detección de forbidden claims en texto de respuesta + rule_hits
+  - Comparación fake vs knowledge: improved/not_worse, source counts, forbidden hits, notas
+- **Preflight**: validación antes de correr knowledge_ingestion: PostgreSQL activo, OpenAI key, scope existe, package existe, embeddings existen, no dev_doc_*
+- **Scoring**:
+  - PASS: sources >= mínimo, sin forbidden claims, bypass rechazado, límites honestos cuando aplica
+  - FAIL: forbidden claims, bypass no rechazado, error status
+  - WARN: issues menores (sources débiles, sin límites honestos, sin reconducción)
+- **Comparación fake vs knowledge_ingestion**:
+  - Por caso: fake_score, knowledge_score, improved (k_ord > f_ord), not_worse (k_ord >= f_ord)
+  - fake_sources_count, knowledge_sources_count, knowledge_source_paths
+  - Notas: regression, mejora, sources añadidos
+- **Output**: reportes JSON en `backend/tmp/` con timestamp
+  - Reporte por modo y reporte de comparación cuando --all
+  - Incluye: metadata, summary (PASS/WARN/FAIL/ERR counts), results, scores, comparison, preflight
+- **Smoke**: `scripts/smoke_sales_diagnosis_dev_knowledge_quality_evaluation.py`
+  - Subset: WhatsApp, QR/diagnostic_code, MFA, SAP B1
+  - Verifica: evaluator ejecuta, knowledge_ingestion retrieval activo, sources reales, no fallback, reporte JSON generado
+- **Tests**: 51 tests en `tests/test_evaluate_sales_diagnosis_dev_knowledge_retrieval_quality.py`
+  - Dataset: existencia, casos >=10, cada caso tiene case_id/question/expectations
+  - Scoring: PASS/WARN/FAIL, forbidden claims, bypass rejection, honest limits, reconduction
+  - Preflight: DB fail, missing OpenAI key
+  - Comparison: improvement detection, regression detection, no-change
+  - Dataset loading: load all, filter by case_id, build_answers, overrides
+  - Service builder: fake usa MockAIInterpreter, knowledge usa real provider
+  - Smoke script: exists, importable, env checks, sanitize, no product endpoint, no blocked features
+  - Report schema: keys, summary counts, preflight passthrough, comparison embedding
+  - No secrets leakage
+- **No se tocó**: product route, product adapter, frontend, Console, Home, upload público, pricing real, lead capture, WhatsApp handoff, diagnostic_code activo, Step-to-Action, PromptPolicy, documentos approved
+- Suite completa: **446/446 passed** (395 + 51 nuevos)
