@@ -1,5 +1,6 @@
 ---
 import BrandMark from "../components/marketing/BrandMark.astro";
+import Team360Logo from "../components/marketing/Team360Logo.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -20,13 +21,21 @@ const { title, description } = Astro.props;
     <title>{title}</title>
   </head>
   <body class="min-h-screen bg-[#f3f7f7] text-[#203c55] antialiased">
-    <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#102d4f] focus:shadow-lg" href="#contenido">
+    <a
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#102d4f] focus:shadow-lg"
+      href="#contenido"
+    >
       Saltar al contenido
     </a>
     <header class="border-b border-[#dce6eb] bg-[#fbfcfa]/90">
-      <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
-        <BrandMark />
-        <a class="text-xs font-bold text-[#168b88] transition hover:text-[#102d4f] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#168b88]" href="/">
+      <div
+        class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8"
+      >
+        <Team360Logo />
+        <a
+          class="text-base font-bold text-[#168b88] transition hover:text-[#102d4f] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#168b88]"
+          href="/"
+        >
           Volver a team360.live
         </a>
       </div>

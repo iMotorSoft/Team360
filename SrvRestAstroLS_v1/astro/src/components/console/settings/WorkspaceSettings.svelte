@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SectionHeader, StatusBadge } from "../../ui";
+  import { Card, SectionHeader, StatusBadge } from "../../ui";
   import { integrations } from "../../../lib/mock";
   import { consoleContext } from "../../../stores/consoleContext.svelte";
 
@@ -14,7 +14,7 @@
   />
 
   <div class="mt-7 grid gap-5 xl:grid-cols-2">
-    <article class="rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6">
+    <Card variant="flat-large">
       <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Contexto operativo</p>
       <dl class="mt-5 space-y-3 text-sm">
         <div class="flex justify-between gap-3 border-b border-[#edf1f2] pb-3"><dt class="text-[#78909f]">Organización</dt><dd class="font-bold text-[#31536b]">{consoleContext.activeOrganization.name}</dd></div>
@@ -23,9 +23,9 @@
         <div class="flex justify-between gap-3 border-b border-[#edf1f2] pb-3"><dt class="text-[#78909f]">Idioma</dt><dd class="font-bold uppercase text-[#31536b]">{consoleContext.locale}</dd></div>
         <div class="flex justify-between gap-3"><dt class="text-[#78909f]">Dirección</dt><dd class="font-bold uppercase text-[#31536b]">{consoleContext.direction}</dd></div>
       </dl>
-    </article>
+    </Card>
 
-    <article class="rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6">
+    <Card variant="flat-large">
       <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Módulos habilitados</p>
       <div class="mt-4 flex flex-wrap gap-2">
         {#each consoleContext.bootstrap.enabledModules as module}
@@ -33,9 +33,9 @@
         {/each}
       </div>
       <p class="mt-5 text-xs leading-5 text-[#78909f]">Visibilidad mock para diseño. El backend deberá calcular módulos y permisos efectivos.</p>
-    </article>
+    </Card>
 
-    <article class="rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6">
+    <Card variant="flat-large">
       <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Servicios contratados</p>
       <div class="mt-4 space-y-3">
         {#each consoleContext.contractedServices as service}
@@ -50,9 +50,9 @@
           <p class="rounded-xl bg-[#f8fbfa] p-4 text-xs text-[#78909f]">No hay servicios contratados en este workspace.</p>
         {/each}
       </div>
-    </article>
+    </Card>
 
-    <article class="rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6">
+    <Card variant="flat-large">
       <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Integraciones previstas</p>
       <div class="mt-4 space-y-3">
         {#each workspaceIntegrations as integration}
@@ -67,6 +67,6 @@
           <p class="rounded-xl bg-[#f8fbfa] p-4 text-xs text-[#78909f]">Todavía no hay integraciones previstas para este workspace.</p>
         {/each}
       </div>
-    </article>
+    </Card>
   </div>
 </section>

@@ -1,5 +1,5 @@
 ---
-import BrandMark from "./BrandMark.astro";
+import Team360Logo from "./Team360Logo.astro";
 
 interface Props {
   diagnosticHref?: string;
@@ -9,37 +9,69 @@ const { diagnosticHref = "#contacto" } = Astro.props;
 ---
 
 <footer class="bg-[#0d2947] text-white">
-  <div class="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[1.5fr_1fr_1fr] lg:px-10">
+  <div
+    class="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[1.5fr_1fr_1fr] lg:px-10"
+  >
     <div>
-      <BrandMark inverted />
+      <Team360Logo inverted showIcon={false} />
       <p class="mt-5 max-w-md text-sm leading-6 text-white/68">
-        Automatización con IA aplicada a procesos reales de negocio, con implementación gradual,
-        seguimiento y resultados medibles.
+        Automatización con IA aplicada a procesos reales de negocio, con
+        implementación gradual, seguimiento y resultados medibles.
       </p>
     </div>
 
     <div>
-      <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#8be1d8]">Explorar</p>
+      <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#8be1d8]">
+        Explorar
+      </p>
       <ul class="mt-4 space-y-3 text-sm text-white/72">
-        <li><a class="transition hover:text-white" href="#solucion">Qué hacemos</a></li>
-        <li><a class="transition hover:text-white" href="#casos">Casos de uso</a></li>
-        <li><a class="transition hover:text-white" href="#metodo">Nuestro método</a></li>
-        <li><a class="transition hover:text-white" href="#partners">Partners</a></li>
+        <li>
+          <a class="transition hover:text-white" href="#solucion">Qué hacemos</a
+          >
+        </li>
+        <li>
+          <a class="transition hover:text-white" href="#casos">Casos de uso</a>
+        </li>
+        <li>
+          <a class="transition hover:text-white" href="#metodo"
+            >Nuestro método</a
+          >
+        </li>
+        <li>
+          <a class="transition hover:text-white" href="#partners">Partners</a>
+        </li>
       </ul>
     </div>
 
     <div>
-      <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#8be1d8]">Contacto</p>
+      <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#8be1d8]">
+        Contacto
+      </p>
       <ul class="mt-4 space-y-3 text-sm text-white/72">
-        <li><a class="transition hover:text-white" href="mailto:contacto@team360.live">contacto@team360.live</a></li>
-        <li><a class="transition hover:text-white" href="/login">Acceso clientes</a></li>
-        <li><a class="transition hover:text-white" href={diagnosticHref}>Solicitar diagnóstico</a></li>
+        <li>
+          <a
+            class="transition hover:text-white"
+            href="mailto:contacto@team360.live">contacto@team360.live</a
+          >
+        </li>
+        <li>
+          <a class="transition hover:text-white" href="/login"
+            >Acceso clientes</a
+          >
+        </li>
+        <li>
+          <a class="transition hover:text-white" href={diagnosticHref}
+            >Solicitar diagnóstico</a
+          >
+        </li>
       </ul>
     </div>
   </div>
 
   <div class="border-t border-white/10">
-    <div class="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-5 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
+    <div
+      class="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-5 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10"
+    >
       <p>© 2026 Team360. Operaciones inteligentes para empresas.</p>
       <p>Privacidad y términos disponibles próximamente.</p>
     </div>

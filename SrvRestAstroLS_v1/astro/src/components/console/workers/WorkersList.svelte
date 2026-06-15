@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatusBadge } from "../../ui";
+  import { Card, EmptyState, SectionHeader, StatusBadge } from "../../ui";
   import { formatDateTime, formatDuration } from "../../../lib/formatters";
   import { getAccessibleWorkspaceIds, services, workers } from "../../../lib/mock";
   import { consoleContext } from "../../../stores/consoleContext.svelte";
@@ -25,7 +25,7 @@
   {#if consoleContext.bootstrap.uiHints.technicalDepth !== "business"}
     <div class="mt-7 grid gap-4 xl:grid-cols-2">
       {#each visibleWorkers as worker}
-        <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+        <Card variant="flat">
           <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 class="text-sm font-bold text-[#31536b]">{worker.name}</h2>
@@ -41,7 +41,7 @@
             <div><dt class="text-[#91a2ad]">Errores</dt><dd class="mt-1 font-bold text-[#587184]">{worker.errorCount}</dd></div>
             <div><dt class="text-[#91a2ad]">Duración media</dt><dd class="mt-1 font-bold text-[#587184]">{worker.averageDurationSeconds ? formatDuration(worker.averageDurationSeconds, consoleContext.locale) : "Pendiente"}</dd></div>
           </dl>
-        </article>
+        </Card>
       {/each}
       {#if visibleWorkers.length === 0}
         <EmptyState
