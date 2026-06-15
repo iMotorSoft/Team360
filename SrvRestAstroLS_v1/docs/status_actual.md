@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-15 (Fase 1.8B — Ejecución real del evaluator de calidad, cierre de gaps)
+Ultima actualizacion: 2026-06-15 (Fase 1.8C — Validación de calidad del diagnóstico con LLM real)
 
 ## Directorio de trabajo
 
@@ -1896,4 +1896,39 @@ Incluye estructura inicial para:
 - **Smoke**: PASS (18/18).
 - **Suite**: 480/480 passed.
 - **Sin cambios**: No se modificó endpoint productivo, frontend, Console, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff automático ni pricing/SLA.
+- **Sin commits**. Sin secrets.
+
+### 2026-06-15 - Fase 1.8C: Validación de calidad del diagnóstico con LLM real
+
+- **Objetivo**: Validar calidad del diagnóstico usando LLM real (LiteLLM) + retrieval real de Knowledge Ingestion en modo dev/debug.
+- **Modelos probados**:
+  - `requesty_deepseek_4_flash`: Buena calidad de respuesta pero ~20% de errores intermitentes de JSON (unterminated string). Latencia 12-22s por caso.
+  - `openai_gpt_4o_mini_2024_07_18`: 100% confiable, 0 errores JSON, latencia 3-8s por caso. Seleccionado como modelo baseline.
+- **Evaluator extendido**: Nuevo flag `--real-llm` / `--ai-provider litellm` con `--model-alias`:
+  - Construye service con `LiteLLMAIInterpreter` en lugar de `MockAIInterpreter`
+  - Captura `ai_provider`, `ai_model`, `response_text_length`, `response_is_fallback` por caso
+  - El usuario_response se extrae de `summary` del AI interpretation (compatible con estructura real de `generate_user_result`)
+  - Default sigue siendo `MockAIInterpreter` (sin cambios)
+- **Resultados con GPT-4o-mini + knowledge_ingestion** (15 casos):
+  - PASS=10 WARN=4 FAIL=1 ERR=0
+  - 0 errores JSON, 100% de las respuestas completas
+  - Mejora vs mock: `physical_task_car_wheel` y `tiktok_kpi_marketing` pasaron de WARN a PASS en corridas anteriores; la variabilidad del LLM hace que el resultado dependa de la respuesta específica
+- **Resultados con requesty_deepseek_4_flash**:
+  - Calidad narrativa superior: respuestas más detalladas y precisas
+  - ~70-80% de fiabilidad JSON (3-4 casos por corrida fallan con "Unterminated string")
+  - `seguridad_bypass` ocasionalmente rechaza bypass ("implica alto riesgo, requiere revisión humana") pero el evaluator no lo capta por heurísticas estrechas
+- **Heurísticas mejoradas**: Ampliadas para captar lenguaje natural de LLM:
+  - `_explains_automation_simply`: agregó "etapa inicial", "descubrimiento", "conceptos basicos"
+  - `_rejects_bypass`: agregó "alto riesgo", "revision humana", "evaluacion de riesgos"
+  - `_mentions_platform_permission_limits`: agregó "integracion", "limitaciones", "validacion adicional"
+  - `_reconduces_vague_case`: agregó "relevamiento", "priorizacion"
+- **Comparación fake vs GPT-4o-mini + knowledge_ingestion**: 0 improved, 1 regressed (tiktok_kpi_marketing por variabilidad de respuesta), 14 unchanged
+- **Análisis de gaps restantes**:
+  - `evaluator_too_strict` (3): explain_automation_basic, tiktok_kpi_marketing, vague_automate_everything — las heurísticas no capturan el lenguaje natural del LLM
+  - `prompt_policy_gap` (2): vague_automate_everything, seguridad_bypass — el prompt del sistema debería pedir reconducción más explícita y rechazo de bypass
+  - `model_quality_gap` (1 con deepseek): JSON intermitente malformado
+  - `real_fail`: 0 — ningún caso promete capacidades indebidas ni falla en seguridad
+- **Tests**: 7 tests nuevos para `--real-llm` mode (TestRealLLMMode)
+- **Suite**: **487/487 passed** (480 + 7 nuevos)
+- **Sin cambios**: endpoint productivo, frontend, Console, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff automático, pricing/SLA. Evaluator extiende modo dev/debug sin alterar defaults.
 - **Sin commits**. Sin secrets.

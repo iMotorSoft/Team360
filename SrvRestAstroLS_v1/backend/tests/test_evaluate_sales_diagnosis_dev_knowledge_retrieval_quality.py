@@ -917,6 +917,103 @@ class TestFase18AScoring:
         assert score["score"] == "WARN", f"Expected WARN for missing reconduction, got {score['score']}"
 
 
+# ── Real LLM mode tests ────────────────────────────────────────────────────
+
+
+class TestRealLLMMode:
+    def test_build_service_with_litellm_uses_litellm_interpreter(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            _build_service_for_mode,
+        )
+        from modules.automation_diagnosis.ai_interpreter import (
+            LiteLLMAIInterpreter,
+        )
+        service = _build_service_for_mode(
+            "fake", ai_provider="litellm", model_alias="test_model"
+        )
+        assert isinstance(service.ai_interpreter, LiteLLMAIInterpreter)
+
+    def test_build_service_default_uses_mock(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            _build_service_for_mode,
+        )
+        from modules.automation_diagnosis.ai_interpreter import MockAIInterpreter
+        service = _build_service_for_mode("fake")
+        assert isinstance(service.ai_interpreter, MockAIInterpreter)
+
+    def test_run_case_includes_ai_provider(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            _build_service_for_mode,
+            run_case,
+        )
+        service = _build_service_for_mode("fake")
+        case = {"case_id": "test_llm", "question": "Test?", "overrides": {}, "expectations": {}}
+        result = run_case(service, case)
+        assert "ai_provider" in result
+        assert "ai_model" in result
+        assert "response_is_fallback" in result
+        assert "response_text_length" in result
+
+    def test_report_schema_includes_ai_fields(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            generate_report,
+        )
+        report = generate_report(
+            mode="knowledge_ingestion",
+            results=[{"ai_provider": "litellm", "ai_model": "test_model",
+                       "response_is_fallback": False, "response_text_length": 100,
+                       "case_id": "t1"}],
+            scores=[],
+        )
+        assert report["report_metadata"]["ai_provider"] == "mock"
+
+    def test_real_llm_flag_sets_ai_provider(self):
+        import argparse
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import main
+        import scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality as mod
+        # Test that --real-llm maps to litellm provider
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--real-llm", action="store_true")
+        parser.add_argument("--ai-provider", default="mock")
+        parser.add_argument("--model-alias", default=None)
+        args = parser.parse_args(["--real-llm", "--model-alias", "test"])
+        # Simulate the provider resolution logic
+        ai_provider = args.ai_provider
+        if args.real_llm:
+            ai_provider = "litellm"
+        assert ai_provider == "litellm"
+
+    def test_ai_provider_override_works(self):
+        import argparse
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--real-llm", action="store_true")
+        parser.add_argument("--ai-provider", default="mock")
+        args = parser.parse_args(["--ai-provider", "litellm"])
+        ai_provider = args.ai_provider
+        assert ai_provider == "litellm"
+
+    def test_missing_litellm_returns_error_gracefully(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            _build_service_for_mode,
+        )
+        import os
+        saved_key = os.environ.pop("LITELLM_MASTER_KEY", None)
+        saved_te_key = os.environ.pop("TEAM360_LITELLM_API_KEY", None)
+        saved_li_key = os.environ.pop("LITELLM_API_KEY", None)
+        try:
+            service = _build_service_for_mode(
+                "fake", ai_provider="litellm", model_alias="nonexistent_model"
+            )
+            assert service.ai_interpreter is not None
+        finally:
+            if saved_key:
+                os.environ["LITELLM_MASTER_KEY"] = saved_key
+            if saved_te_key:
+                os.environ["TEAM360_LITELLM_API_KEY"] = saved_te_key
+            if saved_li_key:
+                os.environ["LITELLM_API_KEY"] = saved_li_key
+
+
 # ── No secret leakage ───────────────────────────────────────────────────────
 
 

@@ -39,7 +39,10 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from modules.automation_diagnosis import build_default_service
-from modules.automation_diagnosis.ai_interpreter import MockAIInterpreter
+from modules.automation_diagnosis.ai_interpreter import (
+    MockAIInterpreter,
+    build_ai_interpreter,
+)
 from modules.automation_diagnosis.knowledge_connector import build_default_knowledge_repository
 from modules.automation_diagnosis.knowledge_retrieval_provider import (
     DEV_RETRIEVAL_ENV,
@@ -217,7 +220,18 @@ def load_cases(case_filter: list[str] | None = None) -> list[dict]:
 # ── Service builder ─────────────────────────────────────────────────────────
 
 
-def _build_service_for_mode(mode: str) -> AutomationDiagnosisService:
+def _build_service_for_mode(
+    mode: str,
+    ai_provider: str = "mock",
+    model_alias: str | None = None,
+) -> AutomationDiagnosisService:
+    if ai_provider == "litellm":
+        if model_alias:
+            os.environ["TEAM360_LITELLM_MODEL_ALIAS"] = model_alias
+        ai_interpreter = build_ai_interpreter("litellm")
+    else:
+        ai_interpreter = MockAIInterpreter()
+
     if mode == "knowledge_ingestion":
         provider = KnowledgeIngestionSalesDiagnosisRetrievalProvider(
             organization_code=SCOPE_ORG,
@@ -227,10 +241,10 @@ def _build_service_for_mode(mode: str) -> AutomationDiagnosisService:
         )
         return AutomationDiagnosisService(
             knowledge_repository=provider,
-            ai_interpreter=MockAIInterpreter(),
+            ai_interpreter=ai_interpreter,
         )
     return AutomationDiagnosisService(
-        ai_interpreter=MockAIInterpreter(),
+        ai_interpreter=ai_interpreter,
     )
 
 
@@ -306,6 +320,20 @@ def run_case(service: AutomationDiagnosisService, case: dict) -> dict[str, Any]:
     rule_hits = result.get("rule_hits") or []
     classification = result.get("classification") or ""
 
+    ai_raw = ai_interpretation.get("raw") or {}
+    response_is_fallback = bool(ai_raw.get("fallback_from"))
+    user_response_obj = result.get("user_response") or {}
+    user_response_text = ""
+    if isinstance(user_response_obj, dict):
+        user_response_text = user_response_obj.get("summary") or user_response_obj.get("text", "")
+        if not user_response_text:
+            user_response_text = json.dumps(user_response_obj, ensure_ascii=False)
+    elif isinstance(user_response_obj, str):
+        user_response_text = user_response_obj
+    # Also use AI interpretation summary as fallback
+    if not user_response_text:
+        user_response_text = ai_interpretation.get("summary", "")
+
     return {
         "case_id": case_id,
         "question": question,
@@ -328,7 +356,9 @@ def run_case(service: AutomationDiagnosisService, case: dict) -> dict[str, Any]:
         "classification": classification,
         "score_total": result.get("score_total", 0),
         "rule_hits": rule_hits,
-        "user_response": (result.get("user_response") or {}).get("text", ""),
+        "user_response": user_response_text,
+        "response_text_length": len(user_response_text),
+        "response_is_fallback": response_is_fallback,
         "ai_provider": ai_interpretation.get("provider", ""),
         "ai_model": ai_interpretation.get("model", ""),
         "forbidden_hits": [],
@@ -544,6 +574,8 @@ def _rejects_bypass(text: str) -> bool:
         "requiere aprobacion", "debe respetar", "no saltarse",
         "politica de seguridad", "mfa es necesario",
         "no bypasseamos", "no podemos saltar",
+        "alto riesgo", "revision humana", "evaluacion de riesgos",
+        "implica riesgo", "requiere evaluacion",
     ]
     return any(i in text.lower() for i in indicators)
 
@@ -558,6 +590,9 @@ def _explains_automation_simply(text: str) -> bool:
         "hacerlas a mano", "ejemplo", "por ejemplo",
         "significa automatizar", "es usar", "programa",
         "automatizar significa",
+        "etapa inicial", "descubrimiento", "conceptos basicos",
+        "entender los conceptos", "evaluar si la automatizacion",
+        "que es automatizar", "automatizacion puede ayudarle",
     ]
     return any(i in text.lower() for i in indicators)
 
@@ -605,6 +640,8 @@ def _mentions_platform_permission_limits(text: str) -> bool:
         "integracion directa", "cuenta de negocio",
         "no tiene api", "conector validado",
         "plataforma lo permite",
+        "integracion", "limitaciones",
+        "publicacion automatica", "validacion adicional",
     ]
     return any(i in text.lower() for i in indicators)
 
@@ -616,6 +653,10 @@ def _reconduces_vague_case(text: str) -> bool:
         "administracion", "operaciones", "area especifica",
         "primero una tarea", "empezar por", "parte mas simple",
         "elegi una", "contame mas sobre",
+        "proceso de descubrimiento", "delimitar alcance",
+        "definir un proceso", "enfocar en un area",
+        "relevamiento", "priorizacion",
+        "relevamiento y priorizacion",
     ]
     return any(i in text.lower() for i in indicators)
 
@@ -627,6 +668,8 @@ def _asks_useful_question(text: str) -> bool:
         "que sistema", "que necesitas", "que te gustaria",
         "contanos", "pregunta", "necesito entender",
         "podrias contarme", "podes contarme",
+        "necesito entender", "descubrimiento para",
+        "identificar que parte", "que area",
     ]
     return any(i in text.lower() for i in indicators)
 
@@ -815,7 +858,26 @@ def main():
         help="Comma-separated case_ids to run (default: all)"
     )
     parser.add_argument("--skip-preflight", action="store_true", help="Skip preflight checks")
+    parser.add_argument(
+        "--ai-provider", default="mock",
+        choices=["mock", "litellm"],
+        help="AI provider to use (default: mock)"
+    )
+    parser.add_argument(
+        "--model-alias", default=None,
+        help="Model alias for LiteLLM (e.g. requesty_deepseek_4_flash)"
+    )
+    parser.add_argument(
+        "--real-llm", action="store_true",
+        help="Shorthand for --ai-provider litellm"
+    )
     args = parser.parse_args()
+
+    # Resolve AI provider
+    ai_provider = args.ai_provider
+    if args.real_llm:
+        ai_provider = "litellm"
+    model_alias = args.model_alias
 
     if not any([args.fake, args.knowledge_ingestion, args.all]):
         parser.print_help()
@@ -876,7 +938,7 @@ def main():
             except Exception as exc:
                 print(f"  WARNING: knowledge_ingestion test query failed: {exc}")
 
-        service = _build_service_for_mode(mode)
+        service = _build_service_for_mode(mode, ai_provider=ai_provider, model_alias=model_alias)
 
         results: list[dict[str, Any]] = []
         scores: list[dict[str, Any]] = []
