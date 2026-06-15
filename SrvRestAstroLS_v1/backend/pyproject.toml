@@ -19,6 +19,7 @@ dependencies = [
     "psycopg[binary]>=3.2.0",
     "psycopg-pool>=3.2.0",
     "pymilvus>=3.0.0",
+    "pyyaml>=6.0.3",
 ]
 
 [build-system]
@@ -27,6 +28,9 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = []
+lab = [
+    "langchain-experimental>=0.4.1",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["modules", "routes", "models", "services", "middleware", "db"]

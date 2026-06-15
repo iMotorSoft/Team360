@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-15 (Fase 1.8E — Handoff documental de Knowledge Ingestion + Diagnosis Quality)
+Ultima actualizacion: 2026-06-15 (Ajuste de dependencias backend para Knowledge Ingestion y lab semantico)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,19 @@ Ultima actualizacion: 2026-06-15 (Fase 1.8E — Handoff documental de Knowledge 
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-15 - Ajuste de dependencias backend para Knowledge Ingestion y lab semantico
+
+- Se reviso `SrvRestAstroLS_v1/backend/pyproject.toml` contra imports reales de `modules/`, `routes/`, `scripts/` y `tests/`.
+- Se declaro `PyYAML` como dependencia directa porque `modules/knowledge_ingestion/package_scanner.py` importa `yaml` para leer metadata y frontmatter de paquetes knowledge.
+- Se agrego el grupo opcional `lab` con `langchain-experimental` para habilitar `modules/knowledge_ingestion/semantic_chunker.py` cuando se ejecute chunking semantico experimental.
+- Se mantuvo `langchain-experimental` fuera de dependencias base para preservar el comportamiento default actual: el chunker semantico no esta disponible salvo que se sincronice explicitamente el grupo `lab`.
+- Validaciones ejecutadas:
+  - `uv sync --frozen`
+  - `uv sync --frozen --group lab` + import de `langchain_experimental`
+  - `uv sync --frozen --no-group lab`
+  - `uv run pytest tests/test_knowledge_ingestion.py tests/test_knowledge_ingestion_dev_route.py tests/test_knowledge_ingestion_embeddings.py` = 220 passed
+- No se tocaron endpoints productivos, migraciones, DB, frontend, Console, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff automatico ni CRM real.
 
 ### 2026-06-15 - Aclaracion de trabajo paralelo entre ramas
 
