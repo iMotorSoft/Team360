@@ -7,12 +7,25 @@ import "../styles/marketing.css";
 interface Props {
   title?: string;
   description?: string;
+  diagnosticHref?: string;
+  headerCtaHref?: string;
+  headerCtaLabel?: string;
+  headerCtaMobileLabel?: string;
+  footerDiagnosticHref?: string;
 }
 
 const {
   title = "Team360 | Automatización con IA para procesos reales",
   description = "Team360 ayuda a empresas a diagnosticar, implementar y medir automatizaciones con IA aplicadas a procesos reales de negocio.",
+  diagnosticHref,
+  headerCtaHref,
+  headerCtaLabel,
+  headerCtaMobileLabel,
+  footerDiagnosticHref,
 } = Astro.props;
+
+const resolvedHeaderCtaHref = headerCtaHref ?? diagnosticHref ?? "#vera";
+const resolvedFooterDiagnosticHref = footerDiagnosticHref ?? diagnosticHref ?? "#contacto";
 ---
 
 <!doctype html>
@@ -31,8 +44,12 @@ const {
     <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#102d4f] focus:shadow-lg" href="#contenido">
       Saltar al contenido
     </a>
-    <MarketingHeader />
+    <MarketingHeader
+      ctaHref={resolvedHeaderCtaHref}
+      ctaLabel={headerCtaLabel}
+      ctaMobileLabel={headerCtaMobileLabel}
+    />
     <slot />
-    <MarketingFooter />
+    <MarketingFooter diagnosticHref={resolvedFooterDiagnosticHref} />
   </body>
 </html>

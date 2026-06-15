@@ -1,6 +1,18 @@
 ---
 import LinkButton from "../ui/LinkButton.astro";
 import BrandMark from "./BrandMark.astro";
+
+interface Props {
+  ctaHref?: string;
+  ctaLabel?: string;
+  ctaMobileLabel?: string;
+}
+
+const {
+  ctaHref = "#vera",
+  ctaLabel = "Hablar con Vera",
+  ctaMobileLabel = ctaLabel,
+} = Astro.props;
 ---
 
 <header class="sticky top-0 z-50 border-b border-[#dce6eb]/75 bg-[#fbfcfa]/90 backdrop-blur-xl">
@@ -21,7 +33,10 @@ import BrandMark from "./BrandMark.astro";
       >
         Acceso clientes
       </a>
-      <LinkButton href="#vera" class="min-h-10 px-4 text-sm sm:px-5">Hablar con Vera</LinkButton>
+      <LinkButton href={ctaHref} class="min-h-10 px-4 text-sm sm:px-5">
+        <span class="sm:hidden">{ctaMobileLabel}</span>
+        <span class="hidden sm:inline">{ctaLabel}</span>
+      </LinkButton>
     </div>
   </div>
 </header>

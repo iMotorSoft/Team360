@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-14 (Modelo T360 Pack/Task/Diagnostico)
+Ultima actualizacion: 2026-06-15 (Promocion de Home premium /t360 a console-backend-core)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,17 @@ Ultima actualizacion: 2026-06-14 (Modelo T360 Pack/Task/Diagnostico)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-15 - Promocion de Home premium /t360 a console-backend-core
+
+- Se traslado la pagina publica premium `/t360` desde `ux/team360-console-design-handoff` hacia `feature/console-backend-core` como paso de integracion hacia produccion.
+- Se agrego el asset visual `SrvRestAstroLS_v1/astro/public/assets/team360-t360-hero.png`.
+- Se adapto `PublicMarketingLayout.astro` para permitir CTA/header/footer configurables sin romper el comportamiento por defecto de la Home actual.
+- Se adapto `MarketingHeader.astro` para aceptar `ctaHref`, `ctaLabel` y `ctaMobileLabel`; por defecto conserva `Hablar con Vera` hacia `#vera`.
+- Se adapto `MarketingFooter.astro` para aceptar `diagnosticHref`; por defecto conserva `#contacto`.
+- En `/t360`, el CTA superior queda como `Solicitar diagnostico` / `Diagnostico` y apunta al card conversacional `#diagnostico`.
+- Validacion: `pnpm check` = 0 errors, 0 warnings, 0 hints; `pnpm build` OK y genero `/t360/index.html`.
+- No se implemento backend real para el diagnosticador, lead_capture, Step-to-Action, diagnostic_code, WhatsApp handoff automatico ni CRM real.
 
 ### 2026-06-14 - Modelo T360 Pack/Task/Diagnostico
 
