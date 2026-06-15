@@ -1,5 +1,6 @@
 <script lang="ts">
   import { PUBLIC_DIAGNOSIS_CONTEXT, startPublicDiagnosis } from "../../lib/api/publicDiagnosis";
+  import type { PublicDiagnosisResponse } from "../../lib/api/publicDiagnosis";
 
   type EntryState = "idle" | "submitting" | "response" | "error";
 
@@ -14,6 +15,7 @@
   let responseMessage = $state("");
   let errorMessage = $state("");
   let visitorAnonymousId = $state("");
+  let lastResponse = $state<PublicDiagnosisResponse | null>(null);
 
   const canSubmit = $derived(text.trim().length > 0 && state !== "submitting");
   const mailHref = $derived.by(() => {
@@ -46,6 +48,7 @@
     state = "idle";
     errorMessage = "";
     responseMessage = "";
+    lastResponse = null;
   }
 
   async function handleSubmit(event: SubmitEvent) {
@@ -59,6 +62,7 @@
     state = "submitting";
     errorMessage = "";
     responseMessage = "";
+    lastResponse = null;
 
     try {
       const result = await startPublicDiagnosis({
@@ -67,11 +71,57 @@
         visitorAnonymousId: ensureVisitorAnonymousId(),
       });
       responseMessage = result.message;
+      lastResponse = result;
       state = "response";
     } catch {
       errorMessage = "No pudimos iniciar el diagnóstico automático ahora. Podés contactarnos y enviarnos este resumen.";
       state = "error";
     }
+  }
+
+  const CLASSIFICATION_LABELS: Record<string, string> = {
+    standard_package: "Paquete estándar",
+    operational_automation: "Automatización operativa",
+    consulting_required: "Requiere consultoría",
+    not_recommended: "No recomendado ahora",
+  };
+
+  const MODE_LABELS: Record<string, string> = {
+    read_only: "Solo consulta",
+    assisted: "Con supervisión humana",
+    approval_required: "Requiere aprobación",
+    execution: "Automatizable",
+    blocked: "No recomendado",
+  };
+
+  const PRIORITY_LABELS: Record<string, string> = {
+    "90": "Alta factibilidad",
+    "80": "Buena factibilidad",
+    "70": "Factibilidad media",
+    "60": "Factibilidad media",
+    "50": "Factibilidad baja",
+    "40": "Factibilidad baja",
+    "30": "Factibilidad baja",
+    "20": "Complejo",
+    "10": "Complejo",
+    "0": "Muy complejo",
+  };
+
+  function scoreLabel(score: number): string {
+    return PRIORITY_LABELS[String(Math.floor(score / 10) * 10)] ?? `Puntaje: ${score}`;
+  }
+
+  function classificationLabel(key: string): string {
+    return CLASSIFICATION_LABELS[key] ?? key;
+  }
+
+  function modeLabel(key: string): string {
+    return MODE_LABELS[key] ?? key;
+  }
+
+  function formatRiskFlags(flags: string[]): string {
+    if (!flags || flags.length === 0) return "Sin riesgos relevantes.";
+    return flags.slice(0, 4).join(" · ");
   }
 </script>
 
@@ -144,11 +194,36 @@
 
       {#if state === "response"}
         <div class="mt-5 rounded-2xl border border-[#bfe5df] bg-[#effaf8] p-4" data-testid="public-vera-response">
-          <p class="text-sm font-bold text-[#126d6b]">Vera respondió</p>
-          <p class="mt-2 text-sm leading-6 text-[#476275]">{responseMessage}</p>
-          <p class="mt-3 text-xs leading-5 text-[#6d8290]">
-            Todavía no capturamos datos de contacto ni generamos un resultado final. Podés solicitar una revisión y enviar este resumen al equipo.
-          </p>
+              {#if lastResponse?.diagnosis_real}
+            <div class="flex items-center gap-2">
+              <p class="text-sm font-bold text-[#126d6b]">Diagnóstico</p>
+              <span class="rounded-full bg-[#21b99f]/15 px-2 py-0.5 text-[0.65rem] font-bold text-[#126d6b]">En línea</span>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-1.5">
+              {#if lastResponse.classification}
+                <span class="rounded-full bg-[#102d4f]/10 px-2.5 py-1 text-[0.7rem] font-semibold text-[#102d4f]">{classificationLabel(lastResponse.classification)}</span>
+              {/if}
+              {#if lastResponse.score_total !== undefined}
+                <span class="rounded-full bg-[#168b88]/10 px-2.5 py-1 text-[0.7rem] font-semibold text-[#168b88]">{scoreLabel(lastResponse.score_total)}</span>
+              {/if}
+              {#if lastResponse.automation_mode}
+                <span class="rounded-full bg-[#102d4f]/10 px-2.5 py-1 text-[0.7rem] font-semibold text-[#102d4f]">{modeLabel(lastResponse.automation_mode)}</span>
+              {/if}
+            </div>
+            {#if lastResponse.risk_flags && lastResponse.risk_flags.length > 0}
+              <p class="mt-3 text-xs font-semibold text-[#8f6b2a]">Riesgos destacados: {formatRiskFlags(lastResponse.risk_flags)}</p>
+            {/if}
+            <p class="mt-2 whitespace-pre-line text-sm leading-6 text-[#476275]">{responseMessage}</p>
+            <p class="mt-3 text-xs leading-5 text-[#6d8290]">
+              Este es un diagnóstico inicial de orientación. No ejecuta acciones, no crea leads, no confirma por WhatsApp y no deriva datos sin autorización.
+            </p>
+          {:else}
+            <p class="text-sm font-bold text-[#126d6b]">Vera respondió</p>
+            <p class="mt-2 text-sm leading-6 text-[#476275]">{responseMessage}</p>
+            <p class="mt-3 text-xs leading-5 text-[#6d8290]">
+              Todavía no capturamos datos de contacto ni generamos un resultado final. Podés solicitar una revisión y enviar este resumen al equipo.
+            </p>
+          {/if}
         </div>
       {:else if state === "error"}
         <div class="mt-5 rounded-2xl border border-[#f3c7c7] bg-[#fff7f7] p-4" data-testid="public-vera-error">

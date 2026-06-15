@@ -1,4 +1,10 @@
-import { saveAnswer, startSession, type DiagnosisSession } from "./diagnosis";
+import {
+  classifySession,
+  saveAnswer,
+  startSession,
+  type DiagnosisResult,
+  type DiagnosisSession,
+} from "./diagnosis";
 
 export const PUBLIC_DIAGNOSIS_CONTEXT = {
   assistant_instance_code: "team360_sales_diagnosis",
@@ -22,6 +28,14 @@ export interface PublicDiagnosisRequest {
 export interface PublicDiagnosisResponse {
   session: DiagnosisSession;
   message: string;
+  /** Real diagnosis result when classify succeeded */
+  classification?: string;
+  score_total?: number;
+  automation_mode?: string;
+  risk_flags?: string[];
+  requires_human_approval?: boolean;
+  /** True when classify was called successfully */
+  diagnosis_real: boolean;
 }
 
 function buildPreliminaryMessage(text: string): string {
@@ -34,6 +48,61 @@ function buildPreliminaryMessage(text: string): string {
     "Para avanzar sin convertir esto en un formulario, el siguiente paso es revisar qué sistemas participan, dónde se pierde seguimiento y qué parte conviene automatizar primero.",
   ].join(" ");
 }
+
+function buildDiagnosisMessage(result: DiagnosisResult): string {
+  const lines: string[] = [];
+
+  const summary =
+    typeof result.user_response === "object" && result.user_response !== null
+      ? (result.user_response as Record<string, unknown>).summary ?? ""
+      : "";
+
+  if (summary) {
+    lines.push(`📋 ${String(summary)}`);
+    lines.push("");
+  }
+
+  const CLASSIFICATION_LABELS: Record<string, string> = {
+    standard_package: "Viable para paquete estándar",
+    operational_automation: "Viable como automatización operativa",
+    consulting_required: "Requiere diagnóstico consultivo previo",
+    not_recommended: "No conviene automatizar directamente en esta etapa",
+  };
+  const MODE_LABELS: Record<string, string> = {
+    read_only: "Solo consulta / lectura",
+    assisted: "Asistido con supervisión humana",
+    approval_required: "Requiere aprobación humana antes de ejecutar",
+    execution: "Ejecución automatizada posible",
+    blocked: "No recomendado automatizar",
+  };
+  lines.push(`**Clasificación:** ${CLASSIFICATION_LABELS[result.classification] ?? result.classification}`);
+  lines.push(`**Puntaje de factibilidad:** ${result.score_total}/100`);
+  lines.push(`**Modo de automatización:** ${MODE_LABELS[result.automation_mode] ?? result.automation_mode}`);
+
+  lines.push("");
+  lines.push("**Riesgos detectados:**");
+  if (result.risk_flags.length > 0) {
+    for (const risk of result.risk_flags) {
+      lines.push(`  • ${risk}`);
+    }
+  } else {
+    lines.push("  Sin riesgos relevantes.");
+  }
+
+  if (result.requires_human_approval) {
+    lines.push("");
+    lines.push("⚠️ Este caso requiere revisión humana antes de automatizar.");
+  }
+
+  lines.push("");
+  lines.push("**Próximo paso:** Podés solicitar una revisión con el equipo o comenzar un diagnóstico guiado.");
+  lines.push("");
+  lines.push("*Este es un diagnóstico inicial de orientación. No ejecuta acciones, no crea leads, no confirma por WhatsApp y no deriva datos sin autorización.*");
+
+  return lines.join("\n");
+}
+
+const DEFAULT_CLASSIFY_TIMEOUT_MS = 45_000;
 
 export async function startPublicDiagnosis(request: PublicDiagnosisRequest): Promise<PublicDiagnosisResponse> {
   const text = request.text.trim();
@@ -62,8 +131,30 @@ export async function startPublicDiagnosis(request: PublicDiagnosisRequest): Pro
 
   await saveAnswer(session.id, "process_to_automate", { free_text: text });
 
-  return {
-    session,
-    message: buildPreliminaryMessage(text),
-  };
+  // Try real diagnosis via classify with timeout
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), DEFAULT_CLASSIFY_TIMEOUT_MS);
+
+    const result = await classifySession(session.id);
+    clearTimeout(timeoutId);
+
+    return {
+      session,
+      message: buildDiagnosisMessage(result),
+      classification: result.classification,
+      score_total: result.score_total,
+      automation_mode: result.automation_mode,
+      risk_flags: result.risk_flags,
+      requires_human_approval: result.requires_human_approval,
+      diagnosis_real: true,
+    };
+  } catch {
+    // Fallback to preliminary message if classify fails
+    return {
+      session,
+      message: buildPreliminaryMessage(text),
+      diagnosis_real: false,
+    };
+  }
 }
