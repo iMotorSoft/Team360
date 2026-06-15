@@ -1,5 +1,6 @@
 ---
 import PublicMarketingLayout from "../layouts/PublicMarketingLayout.astro";
+import PublicVeraEntry from "../components/diagnosis/PublicVeraEntry.svelte";
 
 const solutions = [
   {
@@ -17,8 +18,8 @@ const solutions = [
   {
     title: "Sales KPI",
     tag: "Ventas con visibilidad",
-    text: "CRM, Meta Ads, leads, seguimiento comercial y reportes para entender qué pasa antes de perder oportunidades.",
-    items: ["CRM Review", "Lead Summary", "Ads KPI", "Sales Report"],
+    text: "Leads, campañas, datos comerciales disponibles, seguimiento y reportes para entender qué pasa antes de perder oportunidades.",
+    items: ["CRM Signals", "Lead Summary", "Ads KPI", "Sales Report"],
   },
   {
     title: "Knowledge Operations",
@@ -30,14 +31,14 @@ const solutions = [
     title: "Backoffice Validation",
     tag: "Control operativo",
     text: "Archivos, documentos, conciliaciones, validación y revisión asistida para tareas administrativas repetitivas.",
-    items: ["Upload Files", "Parse Document", "Match Records", "Control Report"],
+    items: ["File Intake", "Parse Document", "Match Records", "Control Report"],
   },
 ];
 
 const tasks = [
   ["Leer un email", "Detecta intención, adjuntos y próximos pasos."],
   ["Recibir WhatsApp", "Ordena la consulta y conserva contexto."],
-  ["Consultar una base", "Busca datos reales antes de responder."],
+  ["Consultar una base", "Busca datos disponibles cuando existe integración y permiso."],
   ["Preparar respuesta", "Redacta una salida revisable por el equipo."],
   ["Generar reporte", "Convierte movimientos y métricas en resumen claro."],
   ["Validar archivos", "Cruza documentos y señala diferencias."],
@@ -61,8 +62,8 @@ const objections = [
 <PublicMarketingLayout
   title="Team360 | Diagnóstico y automatización para operaciones reales"
   description="Team360 diagnostica procesos desordenados y arma soluciones con comunicación, contenido, ventas, conocimiento y backoffice."
-  diagnosticHref="#diagnostico"
-  headerCtaLabel="Probar diagnóstico"
+  diagnosticHref="#vera"
+  headerCtaLabel="Ver diagnóstico inicial"
   headerCtaMobileLabel="Diagnóstico"
 >
   <main id="contenido" class="bg-[#f8faf7]">
@@ -91,8 +92,8 @@ const objections = [
             Diagnosticamos, armamos el plan y conectamos cada pieza sin sumar carga a tu equipo.
           </p>
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a class="btn min-h-12 rounded-lg border-0 bg-[#44d6b2] px-6 text-sm font-bold text-[#092a2a] hover:bg-[#7ae8ce]" href="#diagnostico">
-              Probar diagnóstico
+            <a class="btn min-h-12 rounded-lg border-0 bg-[#44d6b2] px-6 text-sm font-bold text-[#092a2a] hover:bg-[#7ae8ce]" href="#vera">
+              Empezar diagnóstico
             </a>
             <a class="btn min-h-12 rounded-lg border border-white/24 bg-white/10 px-6 text-sm font-bold text-white hover:bg-white/18" href="#solucion">
               Ver soluciones
@@ -105,14 +106,14 @@ const objections = [
           <div class="flex items-center justify-between gap-4">
             <div>
               <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Contanos la situación</p>
-              <h2 class="mt-2 text-xl font-semibold leading-tight text-[#102d4f] sm:text-2xl">Recibí un diagnóstico</h2>
+              <h2 class="mt-2 text-xl font-semibold leading-tight text-[#102d4f] sm:text-2xl">Recibí un diagnóstico inicial</h2>
             </div>
             <span class="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#e6f7f4] px-3 py-2 text-xs font-bold text-[#168b88]">
               <span class="relative flex size-2">
                 <span class="absolute inline-flex h-full w-full rounded-full bg-[#21b99f] opacity-75 motion-safe:animate-ping"></span>
                 <span class="relative inline-flex size-2 rounded-full bg-[#21b99f]"></span>
               </span>
-              Activo
+              Orientación
             </span>
           </div>
           <div class="mt-5 rounded-xl border border-[#dcebea] bg-white/72 p-3">
@@ -130,17 +131,17 @@ const objections = [
             placeholder="Ej: recibimos muchos WhatsApp, nadie sabe quién respondió y después tengo que armar reportes manualmente."
           ></textarea>
           <div class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <button
-              type="button"
+            <a
+              href="#metodo"
               class="btn min-h-11 rounded-lg border-0 bg-[#102d4f] px-5 text-sm font-bold text-white hover:bg-[#1a4266]"
             >
-              Enviar situación
-            </button>
+              Ver salida esperada
+            </a>
             <p class="text-xs leading-5 text-[#667b86] sm:max-w-xs">
-              La conversación avanza hasta una síntesis útil. Para profundizar, se puede dejar un contacto sin compromiso.
+              Este campo no envía datos todavía. Muestra cómo empieza una orientación controlada antes de pedir contacto.
             </p>
           </div>
-          <p class="mt-5 text-sm font-semibold text-[#102d4f]">Después de la conversación recibís:</p>
+          <p class="mt-5 text-sm font-semibold text-[#102d4f]">El diagnóstico inicial debe devolver:</p>
           <div class="mt-3 grid gap-2 sm:grid-cols-3">
             <div class="rounded-xl bg-[#edf8f5] p-3">
               <p class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">Tipo</p>
@@ -156,7 +157,7 @@ const objections = [
             </div>
           </div>
           <p class="mt-4 text-xs leading-5 text-[#667b86]">
-            Este es un diagnóstico inicial de orientación. No genera confirmación automática ni deriva datos sin tu autorización.
+            Este es un diagnóstico inicial de orientación. No ejecuta acciones, no crea leads, no confirma por WhatsApp y no deriva datos sin autorización.
           </p>
         </div>
       </div>
@@ -282,8 +283,8 @@ const objections = [
             <p class="mt-5 text-base leading-7 text-[#5e7382]">
               En vez de decir "sí, se puede", Team360 separa factibilidad, prioridad, riesgo y próximo paso.
             </p>
-            <a class="btn mt-7 min-h-12 rounded-lg border-0 bg-[#102d4f] px-6 text-sm font-bold text-white hover:bg-[#1a4266]" href="#diagnostico">
-              Probar el diagnóstico
+            <a class="btn mt-7 min-h-12 rounded-lg border-0 bg-[#102d4f] px-6 text-sm font-bold text-white hover:bg-[#1a4266]" href="#vera">
+              Ver diagnóstico inicial
             </a>
           </div>
           <div class="grid gap-3">
@@ -302,6 +303,8 @@ const objections = [
         </div>
       </div>
     </section>
+
+    <PublicVeraEntry client:load />
 
     <section id="partners" class="scroll-mt-24 bg-[#eff7f4] py-16 sm:py-20">
       <div class="mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:px-10">
@@ -356,18 +359,18 @@ const objections = [
                 Contanos qué operación querés ordenar y te devolvemos un primer mapa de solución.
               </h2>
               <p class="mt-5 max-w-2xl text-base leading-7 text-white/68">
-                El diagnóstico puede orientar aunque todavía no exista el Pack o la Task exacta. Si requiere integración o desarrollo, también debe decirlo.
+                El diagnóstico puede orientar aunque todavía no exista el Pack o la Task exacta. Si requiere integración o desarrollo, debe decirlo sin ejecutarlo desde esta Home.
               </p>
             </div>
             <div class="flex flex-col justify-end gap-3">
-              <a class="btn min-h-12 rounded-lg border-0 bg-[#44d6b2] px-6 text-sm font-bold text-[#092a2a] hover:bg-[#7ae8ce]" href="#diagnostico">
-                Hacer diagnóstico
+            <a class="btn min-h-12 rounded-lg border-0 bg-[#44d6b2] px-6 text-sm font-bold text-[#092a2a] hover:bg-[#7ae8ce]" href="#vera">
+                Ver diagnóstico inicial
               </a>
-              <a class="btn min-h-12 rounded-lg border border-white/18 bg-white/[0.08] px-6 text-sm font-bold text-white hover:bg-white/[0.14]" href="#diagnostico">
-                Volver al diagnosticador
+              <a class="btn min-h-12 rounded-lg border border-white/18 bg-white/[0.08] px-6 text-sm font-bold text-white hover:bg-white/[0.14]" href="#vera">
+                Volver al diagnóstico inicial
               </a>
               <p class="text-xs leading-5 text-white/50">
-                La toma de datos aparece después de entregar una síntesis valiosa, no antes.
+                La toma de datos se agrega solo con autorización explícita y después de entregar una síntesis valiosa.
               </p>
             </div>
           </div>

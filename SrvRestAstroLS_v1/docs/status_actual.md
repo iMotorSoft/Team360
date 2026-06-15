@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-15 (Revisión comercial/copy de Home premium /t360)
+Ultima actualizacion: 2026-06-15 (Preparacion Build Production / Public Home Release /t360)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,16 @@ Ultima actualizacion: 2026-06-15 (Revisión comercial/copy de Home premium /t360
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-15 - Preparacion Build Production / Public Home Release /t360
+
+- Se reviso la Home publica `/t360` como base de salida productiva sin conectar runtime real.
+- Se ajusto el CTA principal de `Probar diagnostico` a `Ver diagnostico inicial` para no prometer una accion productiva conectada.
+- Se reemplazo la accion visual `Enviar situacion` por `Ver salida esperada`, apuntando a la seccion de metodo.
+- Se explicito que el campo del diagnostico no envia datos todavia y que la orientacion no ejecuta acciones.
+- Se reforzo que el diagnostico inicial no crea leads, no confirma por WhatsApp y no deriva datos sin autorizacion.
+- Se suavizaron referencias a CRM, bases y archivos para presentarlas como datos/canales disponibles con permisos o integracion, no como integraciones activas garantizadas.
+- No se tocaron Console interna, Knowledge Ingestion, endpoints productivos, runtime real, Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff automatico.
 
 ### 2026-06-15 - Promocion de Home premium /t360 a console-backend-core
 
