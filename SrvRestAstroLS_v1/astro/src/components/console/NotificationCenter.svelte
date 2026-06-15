@@ -1,5 +1,6 @@
 <script lang="ts">
   import { StatusBadge } from "../ui";
+  import AlertCard from "./alerts/AlertCard.svelte";
   import { formatDateTime } from "../../lib/formatters";
   import { getMockWorkspaceContext } from "../../lib/mock";
   import { consoleContext } from "../../stores/consoleContext.svelte";
@@ -46,17 +47,7 @@
       </div>
       <div class="max-h-80 space-y-1 overflow-y-auto p-3">
         {#each alerts as alert}
-          <article class="rounded-xl p-3 transition hover:bg-base-100">
-            <div class="flex items-center justify-between gap-3">
-              <StatusBadge status={alert.severity} />
-              <span class="text-base text-[#8a9ba6]"
-                >{formatDateTime(alert.createdAt, consoleContext.locale)}</span
-              >
-            </div>
-            <p class="mt-2 text-lg font-semibold leading-5 text-[#36566f]">
-              {alert.title}
-            </p>
-          </article>
+          <AlertCard {alert} noCard={true} />
         {:else}
           <p class="px-3 py-6 text-center text-lg text-[#78909f]">
             Sin alertas abiertas en este workspace.

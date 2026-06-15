@@ -9,6 +9,7 @@
     StatusBadge,
     Tabs,
   } from "../../ui";
+  import AlertCard from "../alerts/AlertCard.svelte";
   import {
     formatDate,
     formatDateTime,
@@ -244,18 +245,13 @@
     {:else if activeTab === "alerts"}
       <div class="mt-6 space-y-3">
         {#each serviceAlerts as alert}
-          <Card variant="flat">
-            <div class="flex flex-wrap gap-2">
-              <StatusBadge status={alert.severity} />
-              <StatusBadge status={alert.status} />
-            </div>
-            <p class="mt-3 text-base font-bold text-[#31536b]">{alert.title}</p>
-            <p
-              class="mt-3 rounded-xl bg-[#f8fbfa] px-3 py-2.5 text-sm font-semibold leading-5 text-[#668092]"
-            >
-              Acción sugerida: {alert.suggestedAction}
-            </p>
-          </Card>
+          <AlertCard
+            alert={alert}
+            cardVariant="flat"
+            showStatus={true}
+            showAction={true}
+            showDate={false}
+          />
         {:else}
           <EmptyState
             title="No hay alertas registradas."

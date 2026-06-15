@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card, SectionHeader, StatusBadge } from "../../ui";
+  import AlertCard from "./AlertCard.svelte";
   import { formatDateTime } from "../../../lib/formatters";
   import {
     alerts,
@@ -70,37 +71,14 @@
         </p>
         <div class="mt-3 space-y-3">
           {#each visibleAlerts.filter(({ type }) => type === section.type) as alert}
-            <Card variant="flat">
-              <div
-                class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-              >
-                <div>
-                  <div class="flex flex-wrap gap-2">
-                    <StatusBadge status={alert.severity} />
-                    <StatusBadge status={alert.status} />
-                  </div>
-                  <h3 class="mt-3 font-bold text-[#31536b]">
-                    {alert.title}
-                  </h3>
-                  <p class="mt-2 leading-5 text-[#78909f]">
-                    {serviceName(alert.serviceId)} · {getWorkspaceName(
-                      alert.workspaceId,
-                    )}
-                  </p>
-                </div>
-                <span class="text-[#91a2ad]"
-                  >{formatDateTime(
-                    alert.createdAt,
-                    consoleContext.locale,
-                  )}</span
-                >
-              </div>
-              <p
-                class="mt-4 rounded-xl bg-[#f8fbfa] px-3 py-2.5 font-semibold leading-5 text-[#668092]"
-              >
-                Acción sugerida: {alert.suggestedAction}
-              </p>
-            </Card>
+            <AlertCard
+              alert={alert}
+              cardVariant="flat"
+              showStatus={true}
+              showService={true}
+              showWorkspace={true}
+              showAction={true}
+            />
           {:else}
             <p
               class="rounded-2xl border border-dashed border-[#d7e3e5] bg-white/60 p-4 text-xs text-[#8396a2]"

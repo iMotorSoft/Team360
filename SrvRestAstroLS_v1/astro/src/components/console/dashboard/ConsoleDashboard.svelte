@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Badge, Card, StatusBadge } from "../../ui";
-  import { formatDate, formatDateTime } from "../../../lib/formatters";
+  import AlertCard from "../alerts/AlertCard.svelte";
   import {
     buildConsoleRoute,
     deriveConsoleAudience,
@@ -291,17 +291,7 @@
       <h2 class="title-h2">Prioridades visibles</h2>
       <div class="mt-5 space-y-3">
         {#each (audience === "client" ? context.alerts : visibleAlerts).slice(0, 4) as alert}
-          <Card variant="light">
-            <div class="flex items-center justify-between gap-3">
-              <StatusBadge status={alert.severity} />
-              <span class="text-sm text-[#7c909b]"
-                >{formatDateTime(alert.createdAt, consoleContext.locale)}</span
-              >
-            </div>
-            <p class="mt-2 text-base font-semibold leading-5 text-[#284c67]">
-              {alert.title}
-            </p>
-          </Card>
+          <AlertCard {alert} cardVariant="light" />
         {:else}
           <p
             class="rounded-2xl border border-white/10 bg-white/[0.07] p-4 text-base leading-5 text-white/70"
@@ -333,8 +323,10 @@
               class="flex items-center justify-between gap-3 px-3 py-3"
             >
               <div>
-                <p class="text-sm font-bold text-[#36566f]">{run.workerName}</p>
-                <p class="mt-1 text-sm text-[#8a9ba6]">{run.summary}</p>
+                <p class="text-lg font-bold text-[#36566f]">
+                  {run.workerName}
+                </p>
+                <p class="mt-1 text-base text-[#8a9ba6]">{run.summary}</p>
               </div>
               <StatusBadge status={run.status} />
             </Card>
@@ -343,18 +335,12 @@
           {#each context.tasks
             .filter(({ status }) => status !== "completed")
             .slice(0, 4) as task}
-            <Card
-              variant="mini"
-              class="flex items-center justify-between gap-3 px-3 py-3"
-            >
-              <div>
-                <p class="text-base font-bold text-[#36566f]">{task.title}</p>
-                <p class="mt-1 text-base text-[#8a9ba6]">
-                  Vence: {formatDate(task.dueDate, consoleContext.locale)}
-                </p>
-              </div>
-              <StatusBadge status={task.status} />
-            </Card>
+            <AlertCard
+              alert={{ kind: "task", ...task }}
+              cardVariant="flat"
+              showDate={false}
+              showStatus
+            />
           {:else}
             <p class="rounded-xl bg-[#f4f8f8] p-4 text-base text-[#718793]">
               No hay tareas pendientes en este workspace.
@@ -369,16 +355,12 @@
       <h2 class="title-h2">Reportes recientes</h2>
       <div class="mt-5 space-y-2">
         {#each (audience === "client" ? context.reports : visibleReports).slice(0, 4) as report}
-          <Card
-            variant="mini"
-            class="flex items-center justify-between gap-3 px-3 py-3"
-          >
-            <div>
-              <p class="text-lg font-bold text-[#36566f]">{report.title}</p>
-              <p class="mt-1 text-lg text-[#8a9ba6]">{report.period}</p>
-            </div>
-            <StatusBadge status={report.status} />
-          </Card>
+          <AlertCard
+            alert={{ kind: "report", ...report }}
+            cardVariant="mini"
+            layout="compact"
+            showDate={false}
+          />
         {:else}
           <p class="rounded-xl bg-[#f4f8f8] p-4 text-base text-[#718793]">
             Todavía no hay reportes disponibles.

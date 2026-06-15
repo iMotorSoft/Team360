@@ -1,6 +1,7 @@
 <script lang="ts">
   import { BRAND } from "../global.js";
   import { Badge, Card } from "../ui";
+  import AlertCard from "./alerts/AlertCard.svelte";
   import { formatDate, formatDateTime } from "../../lib/formatters";
   import {
     getMockWorkspaceContext,
@@ -552,23 +553,12 @@
   {:else if view === "alerts"}
     <div class="mt-7 space-y-3">
       {#each context.alerts as alert}
-        <Card variant="flat">
-          <div class="flex items-center justify-between gap-3">
-            <Badge
-              variant={statusVariant(alert.severity)}
-              class="h-auto px-2 py-1 text-[0.62rem]">{alert.severity}</Badge
-            >
-            <span class="text-xs text-[#91a2ad]"
-              >{formatDateTime(alert.createdAt, consoleContext.locale)}</span
-            >
-          </div>
-          <p class="mt-3 text-sm font-bold text-[#31536b]">{alert.title}</p>
-          <p class="mt-2 text-xs text-[#78909f]">
-            Estado: {statusLabel(alert.status)} · Servicio: {serviceForId(
-              alert.serviceId,
-            )?.name}
-          </p>
-        </Card>
+        <AlertCard
+          alert={alert}
+          cardVariant="flat"
+          showStatus={true}
+          showService={true}
+        />
       {:else}
         <p
           class="rounded-2xl border border-[#dce8e8] bg-white p-5 text-sm text-[#718793]"
