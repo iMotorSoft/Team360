@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-15 (Promocion de Home premium /t360 a console-backend-core)
+Ultima actualizacion: 2026-06-15 (Revisión comercial/copy de Home premium /t360)
 
 ## Directorio de trabajo
 
@@ -2410,3 +2410,20 @@ pero **no se ejecutaron las validaciones finales** sobre los cambios del lab.
   - si falla el preflight, no aceptar benchmark ni interpretar resultados como
     evidencia de calidad del modulo.
 - No se modifico runtime productivo, migraciones, frontend, Console ni workers.
+
+### 2026-06-15 - Revision comercial/copy de Home premium /t360
+
+- **Objetivo**: Revisar copy completo de /t360, alinear narrativa con los principios Team360 (diagnóstico antes que promesa, automatización por etapas, límites honestos), y preparar espacio visual para el diagnosticador sin conectarlo.
+- **Cambios en `t360.astro`**:
+  - **Hero**: "automatizadas" → "automatizadas por etapas" para evitar promesa absoluta.
+  - **Disclaimer diagnóstico**: "No crea lead automático ni handoff por WhatsApp todavía" → "No genera confirmación automática ni deriva datos sin tu autorización" (mensaje más amigable para el usuario, no técnico).
+  - **Contacto**: "Para el diagnóstico completo, se pedirán datos de contacto" → "Para profundizar, se puede dejar un contacto sin compromiso" (clarifica que no es captura forzada).
+  - **T360 Pack/Task/Pack Flow/Pack Integrate**: definiciones más concretas con ejemplos (registrar consulta, clasificar pedido, generar reporte, secuencia ordenada paso a paso, conexión según permisos y factibilidad técnica).
+  - **Header CTA**: unificado a "Probar diagnóstico" (antes "Solicitar diagnóstico" en header y "Probar diagnóstico" en hero).
+- **Validaciones**:
+  - `pnpm check`: 0 errors, 0 warnings, 0 hints.
+  - `pnpm build`: 136 pages generadas (incluye /t360/index.html y /index.html).
+  - `git diff --check`: OK.
+  - Secret scan: sin secretos.
+- **No se tocó**: runtime, frontend home existente, Console, Knowledge Ingestion, LiteLLM, endpoint productivo, header/footer/layout (solo t360.astro).
+- **No se activó**: Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff. Sin commits.
