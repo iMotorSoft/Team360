@@ -62,6 +62,9 @@ SMOKE_CASES = [
     ("qr_diagnostic_code", "¿Puedo usar un QR para que el cliente empiece el diagnóstico?"),
     ("mfa_aprobacion_manual", "¿Se puede automatizar si el sistema pide MFA o aprobación humana?"),
     ("sap_business_one", "Tengo SAP Business One desktop en una VM por VPN. ¿Se puede automatizar?"),
+    ("explain_automation_basic", "No sé qué es automatizar."),
+    ("physical_task_car_wheel", "¿Puedo automatizar cambiar una rueda de auto?"),
+    ("tiktok_kpi_marketing", "Necesito publicar en TikTok y tener KPI."),
 ]
 
 

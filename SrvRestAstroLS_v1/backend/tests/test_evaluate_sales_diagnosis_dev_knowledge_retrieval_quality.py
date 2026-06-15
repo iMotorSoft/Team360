@@ -533,6 +533,390 @@ def test_forbidden_patterns_defined():
     assert "step-to-action" in FORBIDDEN_PATTERNS
 
 
+# ── Fase 1.8A quality signal tests ──────────────────────────────────────────
+
+
+class TestFase18ASignals:
+    def _import_signals(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            _explains_automation_simply,
+            _reframes_physical_to_digital,
+            _promises_physical_solution,
+            _mentions_kpi_orientation,
+            _mentions_platform_permission_limits,
+            _reconduces_vague_case,
+            _asks_useful_question,
+            _detects_digitalization_opportunity,
+            _promises_whatsapp_handoff_ready,
+        )
+        return (
+            _explains_automation_simply,
+            _reframes_physical_to_digital,
+            _promises_physical_solution,
+            _mentions_kpi_orientation,
+            _mentions_platform_permission_limits,
+            _reconduces_vague_case,
+            _asks_useful_question,
+            _detects_digitalization_opportunity,
+            _promises_whatsapp_handoff_ready,
+        )
+
+    def _get_signals(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            _explains_automation_simply,
+            _reframes_physical_to_digital,
+            _promises_physical_solution,
+            _mentions_kpi_orientation,
+            _mentions_platform_permission_limits,
+            _reconduces_vague_case,
+            _asks_useful_question,
+            _detects_digitalization_opportunity,
+            _promises_whatsapp_handoff_ready,
+        )
+        return (
+            _explains_automation_simply,
+            _reframes_physical_to_digital,
+            _promises_physical_solution,
+            _mentions_kpi_orientation,
+            _mentions_platform_permission_limits,
+            _reconduces_vague_case,
+            _asks_useful_question,
+            _detects_digitalization_opportunity,
+            _promises_whatsapp_handoff_ready,
+        )
+
+    def test_explain_automation_simply_positive(self):
+        s = self._get_signals()
+        assert s[0]("Automatizar significa usar software para que una tarea repetitiva se haga sola.")
+        assert s[0]("Por ejemplo, en lugar de hacerlo a mano cada vez, un programa lo hace automaticamente.")
+
+    def test_explain_automation_simply_negative(self):
+        s = self._get_signals()
+        assert not s[0]("El proceso es automatizable mediante integracion de APIs.")
+        assert not s[0]("")
+
+    def test_reframes_physical_to_digital_positive(self):
+        s = self._get_signals()
+        assert s[1]("No realizamos la accion fisica, pero podemos automatizar la coordinacion alrededor.")
+        assert s[1]("Podemos ayudarte con el registro de incidentes y el seguimiento del estado.")
+
+    def test_reframes_physical_to_digital_negative(self):
+        s = self._get_signals()
+        assert not s[1]("Si, podemos cambiar la rueda automaticamente.")
+
+    def test_promises_physical_solution_positive(self):
+        s = self._get_signals()
+        assert s[2]("Tenemos un robot que cambia la rueda por ti.")
+        assert s[2]("Podemos reparar automaticamente.")
+
+    def test_promises_physical_solution_negative(self):
+        s = self._get_signals()
+        assert not s[2]("No hacemos tareas fisicas, solo procesos digitales.")
+
+    def test_mentions_kpi_orientation_positive(self):
+        s = self._get_signals()
+        assert s[3]("Podemos ayudarte con KPIs como visualizaciones, alcance y metricas.")
+        assert s[3]("Tablero de metricas con reportes automaticos.")
+
+    def test_mentions_kpi_orientation_negative(self):
+        s = self._get_signals()
+        assert not s[3]("Automatizamos la publicacion en redes.")
+
+    def test_mentions_platform_limits_positive(self):
+        s = self._get_signals()
+        assert s[4]("Depende de los permisos y la API de la plataforma.")
+        assert s[4]("Si la plataforma tiene API disponible y tenes acceso.")
+
+    def test_mentions_platform_limits_negative(self):
+        s = self._get_signals()
+        assert not s[4]("Publicamos automaticamente en cualquier red.")
+
+    def test_reconduces_vague_case_positive(self):
+        s = self._get_signals()
+        assert s[5]("Podemos empezar por un area especifica. Elegi una: ventas, atencion, marketing.")
+        assert s[5]("Contame mas sobre que parte de tu negocio queres automatizar primero.")
+
+    def test_reconduces_vague_case_negative(self):
+        s = self._get_signals()
+        assert not s[5]("Automatizamos todo tu negocio sin preguntas.")
+
+    def test_asks_useful_question_positive(self):
+        s = self._get_signals()
+        assert s[6]("Contame que tarea concreta te gustaria automatizar.")
+        assert s[6]("Podes contarme mas sobre tu proceso actual?")
+
+    def test_asks_useful_question_negative(self):
+        s = self._get_signals()
+        assert not s[6]("")
+
+    def test_detects_digitalization_opportunity_positive(self):
+        s = self._get_signals()
+        assert s[7]("Podemos ayudarte a digitalizar tus registros.")
+        assert s[7]("Podemos capturar la informacion que llega por WhatsApp y ordenarla.")
+
+    def test_detects_digitalization_opportunity_negative(self):
+        s = self._get_signals()
+        assert not s[7]("Deberias comprar un software.")
+
+    def test_promises_whatsapp_handoff_ready_positive(self):
+        s = self._get_signals()
+        assert s[8]("El WhatsApp handoff automatico ya esta listo y funcionando.")
+        assert s[8]("WhatsApp handoff activo")
+
+    def test_promises_whatsapp_handoff_ready_negative(self):
+        s = self._get_signals()
+        assert not s[8]("La integracion con WhatsApp requiere configuracion previa.")
+        assert not s[8]("Actualmente el envio automatico no esta disponible.")
+
+
+# ── Dataset v2 tests ────────────────────────────────────────────────────────
+
+
+class TestDatasetV2:
+    def test_dataset_has_5_new_cases(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            load_cases,
+        )
+        cases = load_cases()
+        case_ids = [c["case_id"] for c in cases]
+        assert "explain_automation_basic" in case_ids, "Missing new case"
+        assert "physical_task_car_wheel" in case_ids, "Missing new case"
+        assert "tiktok_kpi_marketing" in case_ids, "Missing new case"
+        assert "vague_automate_everything" in case_ids, "Missing new case"
+        assert "manual_process_to_digital" in case_ids, "Missing new case"
+
+    def test_dataset_has_15_cases_total(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            load_cases,
+        )
+        cases = load_cases()
+        assert len(cases) >= 15, f"Expected >=15 cases, got {len(cases)}"
+
+    def test_new_cases_have_question(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            load_cases,
+        )
+        cases = load_cases()
+        new_ids = [
+            "explain_automation_basic", "physical_task_car_wheel",
+            "tiktok_kpi_marketing", "vague_automate_everything",
+            "manual_process_to_digital",
+        ]
+        for case in cases:
+            if case["case_id"] in new_ids:
+                assert len(case["question"]) > 10, f"Short question in {case['case_id']}"
+
+    def test_explain_case_has_must_explain_simple(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            load_cases,
+        )
+        cases = load_cases()
+        c = [c for c in cases if c["case_id"] == "explain_automation_basic"][0]
+        assert c["expectations"].get("must_explain_simple") is True
+
+    def test_physical_case_has_must_reconduce_physical(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            load_cases,
+        )
+        cases = load_cases()
+        c = [c for c in cases if c["case_id"] == "physical_task_car_wheel"][0]
+        assert c["expectations"].get("must_reconduce_physical") is True
+        assert c["expectations"].get("must_not_promise_physical") is True
+
+    def test_tiktok_case_has_must_marketing_kpi(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            load_cases,
+        )
+        cases = load_cases()
+        c = [c for c in cases if c["case_id"] == "tiktok_kpi_marketing"][0]
+        assert c["expectations"].get("must_marketing_kpi") is True
+        assert c["expectations"].get("must_mention_platform_limits") is True
+
+    def test_vague_case_has_must_reconduce_vague(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            load_cases,
+        )
+        cases = load_cases()
+        c = [c for c in cases if c["case_id"] == "vague_automate_everything"][0]
+        assert c["expectations"].get("must_reconduce_vague") is True
+        assert c["expectations"].get("must_ask_useful_question") is True
+
+    def test_manual_case_has_digitalization_flag(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            load_cases,
+        )
+        cases = load_cases()
+        c = [c for c in cases if c["case_id"] == "manual_process_to_digital"][0]
+        assert c["expectations"].get("must_detect_digitalization_opportunity") is True
+        assert c["expectations"].get("must_not_promise_whatsapp_handoff_ready") is True
+
+    def test_new_cases_filter_by_id(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            load_cases,
+        )
+        cases = load_cases(case_filter=["explain_automation_basic", "tiktok_kpi_marketing"])
+        assert len(cases) == 2
+
+    def test_smoke_includes_new_cases(self):
+        from tests.test_evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            TestSmokeScript,
+        )
+        source = TestSmokeScript.SMOKE_SCRIPT.read_text(encoding="utf-8")
+        assert "explain_automation_basic" in source
+        assert "physical_task_car_wheel" in source
+        assert "tiktok_kpi_marketing" in source
+
+
+# ── Fase 1.8A scoring integration tests ─────────────────────────────────────
+
+
+class TestFase18AScoring:
+    def _import_scoring(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            score_result,
+        )
+        return score_result
+
+    def test_explain_case_pass_with_simple_explanation(self):
+        fn = self._import_scoring()
+        case = {
+            "case_id": "explain_automation_basic",
+            "expectations": {
+                "must_explain_simple": True,
+                "must_have_sources": True,
+                "min_sources": 1,
+                "forbidden_claims": [],
+            },
+            "overrides": {},
+        }
+        result = {
+            "case_id": "explain_automation_basic",
+            "status": "completed",
+            "retrieval": {"sources_count": 2, "chunks": [{"source_uri": "doc.md", "node_path": "/t", "title": "T", "score": 0.8, "chunk_id": "c1"}]},
+            "forbidden_hits": [],
+            "user_response": "Automatizar significa usar software para que una tarea repetitiva se haga sola. Por ejemplo, en lugar de enviar un reporte a mano cada semana, el sistema lo genera solo.",
+            "rule_hits": [],
+        }
+        score = fn(result, case)
+        assert score["score"] == "PASS", f"Expected PASS, got {score['score']}: {score.get('issues')}"
+
+    def test_explain_case_warn_without_simple_explanation(self):
+        fn = self._import_scoring()
+        case = {
+            "case_id": "explain_automation_basic",
+            "expectations": {
+                "must_explain_simple": True,
+                "must_have_sources": True,
+                "min_sources": 1,
+                "forbidden_claims": [],
+            },
+            "overrides": {},
+        }
+        result = {
+            "case_id": "explain_automation_basic",
+            "status": "completed",
+            "retrieval": {"sources_count": 2, "chunks": [{"source_uri": "doc.md", "node_path": "/t", "title": "T", "score": 0.8, "chunk_id": "c1"}]},
+            "forbidden_hits": [],
+            "user_response": "El proceso es automatizable con integraciones API.",
+            "rule_hits": [],
+        }
+        score = fn(result, case)
+        assert score["score"] == "WARN", f"Expected WARN for missing explanation, got {score['score']}"
+
+    def test_physical_case_fail_with_physical_promise(self):
+        fn = self._import_scoring()
+        case = {
+            "case_id": "physical_task_car_wheel",
+            "expectations": {
+                "must_not_promise_physical": True,
+                "must_have_sources": True,
+                "min_sources": 1,
+                "forbidden_claims": [],
+            },
+            "overrides": {},
+        }
+        result = {
+            "case_id": "physical_task_car_wheel",
+            "status": "completed",
+            "retrieval": {"sources_count": 2, "chunks": [{"source_uri": "doc.md", "node_path": "/t", "title": "T", "score": 0.8, "chunk_id": "c1"}]},
+            "forbidden_hits": [],
+            "user_response": "Tenemos un robot que puede cambiar la rueda por ti.",
+            "rule_hits": [],
+        }
+        score = fn(result, case)
+        assert score["score"] == "FAIL", f"Expected FAIL for physical promise, got {score['score']}"
+
+    def test_marketing_case_warn_without_kpi(self):
+        fn = self._import_scoring()
+        case = {
+            "case_id": "tiktok_kpi_marketing",
+            "expectations": {
+                "must_marketing_kpi": True,
+                "must_have_sources": True,
+                "min_sources": 1,
+                "forbidden_claims": [],
+            },
+            "overrides": {},
+        }
+        result = {
+            "case_id": "tiktok_kpi_marketing",
+            "status": "completed",
+            "retrieval": {"sources_count": 2, "chunks": [{"source_uri": "doc.md", "node_path": "/t", "title": "T", "score": 0.8, "chunk_id": "c1"}]},
+            "forbidden_hits": [],
+            "user_response": "Publicamos automaticamente en TikTok.",
+            "rule_hits": [],
+        }
+        score = fn(result, case)
+        assert score["score"] == "WARN", f"Expected WARN for missing KPI, got {score['score']}"
+
+    def test_whatsapp_handoff_promise_fail(self):
+        fn = self._import_scoring()
+        case = {
+            "case_id": "manual_process_to_digital",
+            "expectations": {
+                "must_not_promise_whatsapp_handoff_ready": True,
+                "must_have_sources": True,
+                "min_sources": 1,
+                "forbidden_claims": [],
+            },
+            "overrides": {},
+        }
+        result = {
+            "case_id": "manual_process_to_digital",
+            "status": "completed",
+            "retrieval": {"sources_count": 2, "chunks": [{"source_uri": "doc.md", "node_path": "/t", "title": "T", "score": 0.8, "chunk_id": "c1"}]},
+            "forbidden_hits": [],
+            "user_response": "El WhatsApp handoff automatico ya esta listo y activo.",
+            "rule_hits": [],
+        }
+        score = fn(result, case)
+        assert score["score"] == "FAIL", f"Expected FAIL for handoff promise, got {score['score']}"
+
+    def test_vague_case_warn_without_reconduction(self):
+        fn = self._import_scoring()
+        case = {
+            "case_id": "vague_automate_everything",
+            "expectations": {
+                "must_reconduce_vague": True,
+                "must_ask_useful_question": True,
+                "must_have_sources": False,
+                "min_sources": 0,
+                "forbidden_claims": [],
+            },
+            "overrides": {},
+        }
+        result = {
+            "case_id": "vague_automate_everything",
+            "status": "completed",
+            "retrieval": {"sources_count": 0, "chunks": []},
+            "forbidden_hits": [],
+            "user_response": "Automatizamos todo tu negocio.",
+            "rule_hits": [],
+        }
+        score = fn(result, case)
+        assert score["score"] == "WARN", f"Expected WARN for missing reconduction, got {score['score']}"
+
+
 # ── No secret leakage ───────────────────────────────────────────────────────
 
 

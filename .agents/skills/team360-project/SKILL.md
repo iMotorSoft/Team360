@@ -48,6 +48,13 @@ Frases equivalentes incluyen `trabajamos con ...`, `vamos a ...` y `pasemos a ..
 - Las ramas de UX/diseno quedan para mocks, referencias visuales, Home premium, prototipos estaticos y handoff para disenadores. No deben mezclarse con runtime funcional.
 - Antes de avanzar con una tarea, clasificarla como lab/investigacion, desarrollo funcional o UX/mock. Si cambia de categoria, cambiar tambien la rama/base de trabajo.
 
+### Trabajo paralelo entre ramas
+
+- No trabajar en paralelo sobre dos ramas cuando una depende de la otra. Si una tarea necesita codigo, contratos, migraciones, decisiones, documentos tecnicos, runtime, APIs o resultados de otra rama, primero cerrar, validar o integrar la rama base/dependencia.
+- Se puede trabajar en paralelo cuando las ramas son independientes: objetivos separados, sin dependencia funcional o documental, sin archivos compartidos relevantes y sin necesidad de integrar el resultado de una para avanzar con la otra.
+- Si aparece dependencia durante el trabajo, pausar el paralelo y reclasificar la tarea contra la rama/base correcta antes de seguir.
+- Mantener aislamiento operativo: no mezclar cambios de distintas ramas en el mismo worktree, no mover cambios entre ramas sin instruccion explicita y preferir worktrees separados cuando el trabajo paralelo sea real.
+
 ### Protocolo seguro para cambiar de rama
 1. Ejecutar `git status --short` y `git branch --show-current`.
 2. Si hay cualquier cambio pendiente (`M`, `A`, `D`, `??`, `UU` u otro), detenerse. Reportar rama actual, cambios pendientes, rama destino solicitada y recomendación. No ejecutar checkout.

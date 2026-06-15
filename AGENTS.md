@@ -23,6 +23,13 @@ Convencion operativa de ramas:
 - `Objetivo: desarrollo` dentro de `SrvRestAstroLS_v1/docs/status_actual.md` describe el tipo de bitacora tecnica; para trabajo Git corresponde usar `feature/console-backend-core`.
 - No crear una rama local llamada `desarrollo`.
 
+Regla de trabajo paralelo entre ramas:
+
+- No trabajar en paralelo sobre dos ramas cuando una depende de la otra. Si una tarea necesita codigo, contratos, migraciones, decisiones, documentos tecnicos, runtime, APIs o resultados de otra rama, primero cerrar, validar o integrar la rama base/dependencia.
+- Se puede trabajar en paralelo cuando las ramas son independientes: objetivos separados, sin dependencia funcional o documental, sin archivos compartidos relevantes y sin necesidad de integrar el resultado de una para avanzar con la otra.
+- Si aparece dependencia durante el trabajo, pausar el paralelo y reclasificar la tarea contra la rama/base correcta antes de seguir.
+- Mantener aislamiento operativo: no mezclar cambios de distintas ramas en el mismo worktree, no mover cambios entre ramas sin instruccion explicita y preferir worktrees separados cuando el trabajo paralelo sea real.
+
 Separacion documental:
 
 - Comercial / negocio / producto / reportes no tecnicos: `docs/` y `data/reports/`

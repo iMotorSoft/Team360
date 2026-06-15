@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-15 (Fase 1.7 — Evaluate diagnosis quality with knowledge ingestion retrieval)
+Ultima actualizacion: 2026-06-15 (Fase 1.8A — Refine diagnosis quality cases for practical automation gaps)
 
 ## Directorio de trabajo
 
@@ -1818,3 +1818,37 @@ Incluye estructura inicial para:
   - No secrets leakage
 - **No se tocó**: product route, product adapter, frontend, Console, Home, upload público, pricing real, lead capture, WhatsApp handoff, diagnostic_code activo, Step-to-Action, PromptPolicy, documentos approved
 - Suite completa: **446/446 passed** (395 + 51 nuevos)
+
+### 2026-06-15 - Fase 1.8A: Refine diagnosis quality cases for practical automation gaps
+
+- **Objetivo**: Mejorar la calidad de respuestas del diagnóstico frente a casos prácticos: usuarios que no saben qué es automatizar, tareas físicas, marketing/KPI, pedidos vagos, procesos manuales en papel.
+- **Dataset ampliado**: `tests/fixtures/sales_diagnosis_knowledge_retrieval_quality_cases_v1.json` → version 2, 15 casos totales (10 originales + 5 nuevos):
+  - `explain_automation_basic`: "No sé qué es automatizar." (debe explicar simple, con ejemplos)
+  - `physical_task_car_wheel`: "¿Puedo automatizar cambiar una rueda de auto?" (debe reconducir a procesos digitales alrededor)
+  - `tiktok_kpi_marketing`: "Necesito publicar en TikTok y tener KPI." (debe separar planificación/métricas/publicación, mencionar límites de API/permisos)
+  - `vague_automate_everything`: "Quiero automatizar todo." (debe pedir área específica, reconducir a algo práctico)
+  - `manual_process_to_digital`: "Hago todo en papel y por WhatsApp, ¿qué se puede automatizar?" (debe detectar oportunidad de digitalización)
+- **Nuevos knowledge docs approved** (3 docs):
+  - `automatizaciones/que-es-automatizar.md`: Explicación simple de automatización con ejemplos cotidianos
+  - `industrias/procesos-fisicos-vs-digitales.md`: Límite entre tarea física y procesos digitales alrededor
+  - `industrias/marketing-redes-kpi.md`: Automatización parcial en marketing, KPI, límites por API/permisos
+- **Evaluator mejorado**: 9 nuevas señales de calidad en `score_result()`:
+  - `must_explain_simple`: detecta si la respuesta explica automatización en lenguaje simple
+  - `must_reconduce_physical`: detecta reconducción físico→digital
+  - `must_not_promise_physical`: detecta promesa de solución física/robot
+  - `must_marketing_kpi`: detecta orientación a KPI/metricas
+  - `must_mention_platform_limits`: detecta mención de API/permisos/límites de plataforma
+  - `must_reconduce_vague`: detecta reconducción de caso vago a área específica
+  - `must_ask_useful_question`: detecta si la respuesta pregunta algo útil
+  - `must_detect_digitalization_opportunity`: detecta si sugiere digitalización para procesos manuales
+  - `must_not_promise_whatsapp_handoff_ready`: detecta si afirma incorrectamente que WhatsApp handoff está listo
+  - `forbidden_bad_tone`: detecta tono técnico/inapropiado
+- **Scoring mejorado**: las nuevas señales generan `issues` (no solo warnings), lo que baja la calificación a WARN si falta calidad esperada
+- **Smoke actualizado**: cubre 3 casos nuevos (explain_automation_basic, physical_task_car_wheel, tiktok_kpi_marketing)
+- **Tests**: 34 tests nuevos (85 total en `test_evaluate_sales_diagnosis_dev_knowledge_retrieval_quality.py`):
+  - Dataset V2: 5 nuevos casos presentes, 15 casos totales, expectations correctas
+  - 9 señales de calidad: positivo/negativo para cada helper
+  - Score integration: PASS con explicación simple, WARN sin ella, FAIL con promesa física/handoff
+  - Smoke incluye nuevos casos
+- **No se tocó**: product route, frontend, Console, Step-to-Action, lead_capture, WhatsApp handoff como feature activo, pricing/SLA, PromptPolicy (no se requiere porque MockAIInterpreter no usa prompt)
+- Suite completa: **480/480 passed** (446 + 34 nuevos)

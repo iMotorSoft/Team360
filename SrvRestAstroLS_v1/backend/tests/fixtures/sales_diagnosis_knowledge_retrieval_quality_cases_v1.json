@@ -1,8 +1,13 @@
 {
   "_meta": {
-    "version": 1,
-    "description": "Sales Diagnosis Knowledge Retrieval Quality evaluation cases for Fase 1.7",
+    "version": 2,
+    "description": "Sales Diagnosis Knowledge Retrieval Quality evaluation cases for Fase 1.7 + 1.8A",
     "created": "2026-06-15",
+    "updated": "2026-06-15",
+    "changelog": [
+      "v1: Initial 10 cases (Fase 1.7)",
+      "v2: Added 5 new cases: explain_automation_basic, physical_task_car_wheel, tiktok_kpi_marketing, vague_automate_everything, manual_process_to_digital (Fase 1.8A)"
+    ],
     "purpose": "Compare fake/in-memory vs knowledge_ingestion retrieval quality",
     "status": "dev/debug"
   },
@@ -189,6 +194,115 @@
         "expected_topics": ["seguridad", "mfa"],
         "must_reject_bypass": true,
         "forbidden_claims": ["bypass MFA", "bypass permisos"]
+      }
+    },
+    {
+      "case_id": "explain_automation_basic",
+      "label": "Explicar qué es automatizar",
+      "question": "No sé qué es automatizar.",
+      "overrides": {
+        "business_pain": {"free_text": "No entiendo bien qué significa automatizar. Escuché que puede ayudar pero no sé por dónde empezar."},
+        "systems_involved": {"selected": ["other"], "free_text": "No uso sistemas, quiero entender primero"},
+        "rules_clarity": {"selected": ["unknown"]},
+        "human_dependency": {"selected": ["medium"]},
+        "access_security": {"selected": ["password"]},
+        "data_sensitivity": {"selected": ["public"]},
+        "expected_result": {"free_text": "Entender qué es automatizar y si me sirve."},
+        "economic_impact": {"selected": ["low"]}
+      },
+      "expectations": {
+        "min_sources": 1,
+        "must_have_sources": true,
+        "must_explain_simple": true,
+        "forbidden_claims": ["Step-to-Action activo", "diagnostic_code activo", "WhatsApp handoff automático"],
+        "forbidden_bad_tone": ["demasiado técnico", "burla"]
+      }
+    },
+    {
+      "case_id": "physical_task_car_wheel",
+      "label": "Tarea física: cambiar rueda",
+      "question": "¿Puedo automatizar cambiar una rueda de auto?",
+      "overrides": {
+        "business_pain": {"free_text": "Cada vez que pincho una rueda tengo que coordinar todo manualmente."},
+        "systems_involved": {"selected": ["other"], "free_text": "Whatsapp, teléfono, papel"},
+        "rules_clarity": {"selected": ["mostly_manual"]},
+        "human_dependency": {"selected": ["high"]},
+        "access_security": {"selected": ["password"]},
+        "data_sensitivity": {"selected": ["public"]},
+        "expected_result": {"free_text": "Que el cambio de rueda se haga solo."},
+        "economic_impact": {"selected": ["low"]}
+      },
+      "expectations": {
+        "min_sources": 1,
+        "must_have_sources": true,
+        "must_reconduce_physical": true,
+        "must_not_promise_physical": true,
+        "forbidden_claims": ["robot físico", "cambiar rueda automáticamente", "solución física", "Step-to-Action activo"]
+      }
+    },
+    {
+      "case_id": "tiktok_kpi_marketing",
+      "label": "TikTok y KPI",
+      "question": "Necesito publicar en TikTok y tener KPI.",
+      "overrides": {
+        "systems_involved": {"selected": ["browser_portal"], "free_text": "TikTok, Instagram, planilla Excel"},
+        "rules_clarity": {"selected": ["partially_clear"]},
+        "human_dependency": {"selected": ["medium"]},
+        "access_security": {"selected": ["password", "role_permissions"]},
+        "data_sensitivity": {"selected": ["public", "personal_data"]},
+        "expected_result": {"free_text": "Tener un calendario de publicaciones y ver métricas automáticamente."},
+        "economic_impact": {"selected": ["medium"]}
+      },
+      "expectations": {
+        "min_sources": 1,
+        "must_have_sources": true,
+        "must_marketing_kpi": true,
+        "must_mention_platform_limits": true,
+        "forbidden_claims": ["TikTok posting garantizado", "KPI exacto garantizado", "ROI garantizado", "SLA garantizado", "pricing garantizado"]
+      }
+    },
+    {
+      "case_id": "vague_automate_everything",
+      "label": "Vago: automatizar todo",
+      "question": "Quiero automatizar todo.",
+      "overrides": {
+        "business_pain": {"free_text": "No sé bien, quiero automatizar todo lo que se pueda."},
+        "systems_involved": {"selected": ["other"], "free_text": "No sé qué sistemas tengo"},
+        "rules_clarity": {"selected": ["unknown"]},
+        "human_dependency": {"selected": ["medium"]},
+        "access_security": {"selected": ["password"]},
+        "data_sensitivity": {"selected": ["public"]},
+        "expected_result": {"free_text": "Automatizar todo."},
+        "economic_impact": {"selected": ["medium"]}
+      },
+      "expectations": {
+        "min_sources": 0,
+        "must_have_sources": false,
+        "must_reconduce_vague": true,
+        "must_ask_useful_question": true,
+        "forbidden_claims": ["automatización total disponible", "Step-to-Action activo"]
+      }
+    },
+    {
+      "case_id": "manual_process_to_digital",
+      "label": "Proceso manual a digital",
+      "question": "Hago todo en papel y por WhatsApp, ¿qué se puede automatizar?",
+      "overrides": {
+        "business_pain": {"free_text": "Todo está en papel, pierdo tiempo buscando información."},
+        "systems_involved": {"selected": ["whatsapp", "email"], "free_text": "WhatsApp, papel, cuaderno"},
+        "rules_clarity": {"selected": ["partially_clear"]},
+        "human_dependency": {"selected": ["high"]},
+        "access_security": {"selected": ["password"]},
+        "data_sensitivity": {"selected": ["personal_data"]},
+        "expected_result": {"free_text": "Digitalizar todo para no perder información."},
+        "economic_impact": {"selected": ["medium"]}
+      },
+      "expectations": {
+        "min_sources": 1,
+        "must_have_sources": true,
+        "must_detect_digitalization_opportunity": true,
+        "must_not_promise_whatsapp_handoff_ready": true,
+        "forbidden_claims": ["WhatsApp handoff automático activo", "diagnostic_code activo"]
       }
     }
   ]
