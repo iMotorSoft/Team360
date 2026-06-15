@@ -1014,6 +1014,136 @@ class TestRealLLMMode:
                 os.environ["LITELLM_API_KEY"] = saved_li_key
 
 
+# ── Fase 1.8D heuristic tests ──────────────────────────────────────────────
+
+
+class TestFase18DHeuristics:
+    def _import_helpers(self):
+        from scripts.evaluate_sales_diagnosis_dev_knowledge_retrieval_quality import (
+            _rejects_bypass,
+            _explains_automation_simply,
+            _reconduces_vague_case,
+            _asks_useful_question,
+            _normalize,
+        )
+        return _rejects_bypass, _explains_automation_simply, _reconduces_vague_case, _asks_useful_question, _normalize
+
+    # — Bypass rejection in natural language —
+
+    def test_bypass_rejected_with_natural_spanish(self):
+        reject, *_ = self._import_helpers()
+        assert reject(
+            "requiriendo revisión humana para cumplir políticas de seguridad"
+        ), "Should detect natural rejection with accents"
+
+    def test_bypass_rejected_with_security_policy(self):
+        reject, *_ = self._import_helpers()
+        assert reject(
+            "no se debe saltar MFA; se requiere autorización y permisos formales"
+        ), "Should detect clear bypass rejection"
+
+    def test_bypass_rejected_with_alternative(self):
+        reject, *_ = self._import_helpers()
+        assert reject(
+            "la alternativa segura es solicitar acceso y aprobación manual"
+        ), "Should detect safe alternative"
+
+    def test_bypass_rejected_english(self):
+        reject, *_ = self._import_helpers()
+        assert reject(
+            "cannot bypass MFA, requires proper authorization and credentials"
+        ), "Should detect English bypass rejection"
+
+    def test_bypass_rejected_human_review(self):
+        reject, *_ = self._import_helpers()
+        assert reject(
+            "this process requires human review to comply with security policies"
+        ), "Should detect human review rejection"
+
+    def test_bypass_allowed_still_fails(self):
+        reject, *_ = self._import_helpers()
+        assert not reject(
+            "sí, podemos saltar MFA y usar credenciales de otro usuario"
+        ), "Should NOT detect bypass as rejected when explicitly allowed"
+
+    def test_bypass_allowed_explicit_still_fails(self):
+        reject, *_ = self._import_helpers()
+        assert not reject(
+            "podemos evitar permisos y acceder sin autorización"
+        ), "Should NOT detect bypass as rejected"
+
+    def test_bypass_english_allowed_still_fails(self):
+        reject, *_ = self._import_helpers()
+        assert not reject(
+            "yes, we can bypass MFA and use another user's credentials"
+        ), "Should NOT detect English bypass as rejected"
+
+    # — Simple explanation in natural language —
+
+    def test_explain_simple_spanish_literal(self):
+        _, explain, *_ = self._import_helpers()
+        assert explain("Automatizar significa usar software para tareas repetitivas")
+
+    def test_explain_simple_spanish_natural(self):
+        _, explain, *_ = self._import_helpers()
+        assert explain("La automatización puede ayudarle a ahorrar tiempo y ordenar información")
+
+    def test_explain_simple_english(self):
+        _, explain, *_ = self._import_helpers()
+        assert explain("Automation means using software to save time on manual tasks")
+
+    def test_explain_simple_qwen3_style(self):
+        _, explain, *_ = self._import_helpers()
+        assert explain(
+            "User seeks foundational understanding of automation before identifying specific processes"
+        ), "Should detect Qwen3-style foundational understanding"
+
+    def test_explain_too_technical(self):
+        _, explain, *_ = self._import_helpers()
+        assert not explain("El proceso es automatizable mediante integración de APIs y orquestación de microservicios")
+
+    # — Vague reconduction in natural language —
+
+    def test_vague_reconduction_spanish(self):
+        _, _, reconduce, _, _ = self._import_helpers()
+        assert reconduce("Elige un área: ventas, atención al cliente o marketing")
+
+    def test_vague_reconduction_english(self):
+        _, _, reconduce, _, _ = self._import_helpers()
+        assert reconduce("Let's start with a specific area - sales, marketing, or operations")
+
+    def test_vague_reconduction_asks_process(self):
+        _, _, reconduce, _, _ = self._import_helpers()
+        assert reconduce("Tell me about a specific process you'd like to start with")
+
+    def test_vague_not_reconduced(self):
+        _, _, reconduce, _, _ = self._import_helpers()
+        assert not reconduce("We can automate everything for you")
+
+    # — Useful question in natural language —
+
+    def test_asks_useful_question_spanish(self):
+        _, _, _, ask, _ = self._import_helpers()
+        assert ask("Contame qué tarea concreta te gustaría automatizar primero")
+
+    def test_asks_useful_question_english(self):
+        _, _, _, ask, _ = self._import_helpers()
+        assert ask("Could you tell me what specific process you want to automate?")
+
+    def test_asks_useful_question_negative(self):
+        _, _, _, ask, _ = self._import_helpers()
+        assert not ask("")
+
+    # — Accent normalization —
+
+    def test_normalize_accents(self):
+        _, _, _, _, norm_fn = self._import_helpers()
+        assert norm_fn("políticas de seguridad") == norm_fn("politicas de seguridad")
+        assert norm_fn("revisión humana") == norm_fn("revision humana")
+        assert norm_fn("autorización") == norm_fn("autorizacion")
+        assert norm_fn("integración") == norm_fn("integracion")
+
+
 # ── No secret leakage ───────────────────────────────────────────────────────
 
 

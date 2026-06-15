@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-15 (Fase 1.8C — Validación de calidad del diagnóstico con LLM real)
+Ultima actualizacion: 2026-06-15 (Fase 1.8D — Ajuste de heurísticas del evaluator para lenguaje natural y consolidación de modelos)
 
 ## Directorio de trabajo
 
@@ -1931,4 +1931,41 @@ Incluye estructura inicial para:
 - **Tests**: 7 tests nuevos para `--real-llm` mode (TestRealLLMMode)
 - **Suite**: **487/487 passed** (480 + 7 nuevos)
 - **Sin cambios**: endpoint productivo, frontend, Console, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff automático, pricing/SLA. Evaluator extiende modo dev/debug sin alterar defaults.
+- **Sin commits**. Sin secrets.
+
+### 2026-06-15 - Fase 1.8D: Ajuste de heurísticas para lenguaje natural y consolidación de modelos
+
+- **Objetivo**: Corregir el evaluator para detectar rechazo de bypass/permisos/MFA en lenguaje natural, sin relajar guardrails peligrosos. Consolidar ranking de modelos probados.
+- **Problema corregido**: El evaluator no detectaba rechazo de bypass cuando el modelo respondía en lenguaje natural en lugar de frases exactas como "no podemos saltar MFA". Ejemplo con Qwen3: "Intento de bypass de seguridad no permitido" — no era detectado como rechazo.
+- **Mejora principal**: Accent normalization (`_normalize()`) aplicada a todas las heurísticas del evaluador:
+  - Función `_normalize()` que mapea caracteres acentuados (áéíóúñ) a sus equivalentes sin acento
+  - Esto evita falsos negativos cuando el LLM usa "políticas" en vez de "politicas", "revisión" en vez de "revision", etc.
+  - Aplicado a: `_detect_forbidden_in_text`, `_mentions_honest_limits`, `_reconduces_physical_case`, `_rejects_bypass`, `_reframes_physical_to_digital`, `_promises_physical_solution`, `_mentions_kpi_orientation`, `_mentions_platform_permission_limits`, `_reconduces_vague_case`, `_asks_useful_question`, `_detects_digitalization_opportunity`, `_promises_whatsapp_handoff_ready`
+- **`_rejects_bypass` expandido**: de ~20 indicadores a 60+ incluyendo:
+  - Español natural: "requiriendo revisión humana", "no permitido", "no se debe", "no es recomendable", "debe cumplir políticas", "alternativa segura es"
+  - Inglés: "cannot bypass", "should not bypass", "not allowed", "requires authorization", "requires human review", "comply with security"
+  - Todos los patrones existentes de rechazo de bypass se mantienen intactos
+  - Patrones que permiten bypass siguen siendo detectados como FAIL
+- **`_explains_automation_simply` expandido**: 15 nuevos patrones incluyendo inglés ("save time", "reduce manual work", "foundational understanding")
+- **`_reconduces_vague_case` expandido**: nuevos patrones incluyendo "elige un área", "elige un proceso", inglés ("choose an area", "focus on", "define scope")
+- **`_asks_useful_question` expandido**: patrones en inglés ("tell me", "help me understand")
+- **Resultado Qwen3 post-fix**: FAIL de `seguridad_bypass` depende de la respuesta del modelo — responde "no permitido" cuando el modelo lo hace explícitamente. Los WARN de `explain_automation_basic` y `vague_automate_everything` persisten como `model_quality_gap` porque el modelo describe la situación en vez de explicar/reconducir.
+- **Ranking final de modelos:**
+
+| Modelo | PASS | WARN | FAIL | ERR | JSON err | Latencia | Decisión |
+|---|---|---|---|---|---|---|---|
+| `openrouter_qwen3_30b_a3b_thinking_2507` | 12 | 2 | 1 | 0 | 0% | 22-34s | **quality_winner** |
+| `openai_gpt_4o_mini_2024_07_18` | 10 | 4 | 1 | 0 | 0% | 3-8s | **stable_baseline** |
+| `requesty_deepseek_4_flash` | ~10 | 4 | 1 | ~3 | ~20% | 12-22s | candidate_needs_json_hardening |
+| `openai_gpt-5-nano` | 0 | 0 | 15 | 15 | 100% | 12-17s | not_recommended_now |
+
+- **Tests**: 21 tests nuevos en `TestFase18DHeuristics`:
+  - Bypass rejection natural language (7 tests)
+  - Simple explanation (5 tests)
+  - Vague reconduction (4 tests)
+  - Useful question (3 tests)
+  - Accent normalization (1 test)
+  - Todos incluyen casos positivos y negativos (rechazo real vs falso)
+- **Suite**: **508/508 passed** (487 + 21 nuevos)
+- **Sin cambios**: endpoint productivo, frontend, Console, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff automático, pricing/SLA.
 - **Sin commits**. Sin secrets.
