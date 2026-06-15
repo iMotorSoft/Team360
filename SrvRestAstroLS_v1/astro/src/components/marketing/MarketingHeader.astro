@@ -1,6 +1,12 @@
 ---
 import LinkButton from "../ui/LinkButton.astro";
 import Team360Logo from "./Team360Logo.astro";
+
+interface Props {
+  diagnosticHref?: string;
+}
+
+const { diagnosticHref = "#contacto" } = Astro.props;
 ---
 
 <header
@@ -34,7 +40,7 @@ import Team360Logo from "./Team360Logo.astro";
         <span class="hidden sm:inline">Acceso clientes</span>
       </a>
       <LinkButton
-        href="#contacto"
+        href={diagnosticHref}
         size="large"
         class="px-3 text-xs sm:px-8 sm:text-lg"
       >

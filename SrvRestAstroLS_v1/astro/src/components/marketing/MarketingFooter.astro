@@ -1,5 +1,11 @@
 ---
 import Team360Logo from "./Team360Logo.astro";
+
+interface Props {
+  diagnosticHref?: string;
+}
+
+const { diagnosticHref = "#contacto" } = Astro.props;
 ---
 
 <footer class="bg-[#0d2947] text-white">
@@ -54,7 +60,7 @@ import Team360Logo from "./Team360Logo.astro";
           >
         </li>
         <li>
-          <a class="transition hover:text-white" href="#contacto"
+          <a class="transition hover:text-white" href={diagnosticHref}
             >Solicitar diagnóstico</a
           >
         </li>
