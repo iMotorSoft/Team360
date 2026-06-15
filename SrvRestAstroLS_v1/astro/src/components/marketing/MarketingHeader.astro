@@ -1,6 +1,12 @@
 ---
 import LinkButton from "../ui/LinkButton.astro";
 import BrandMark from "./BrandMark.astro";
+
+interface Props {
+  diagnosticHref?: string;
+}
+
+const { diagnosticHref = "#contacto" } = Astro.props;
 ---
 
 <header class="sticky top-0 z-50 border-b border-[#dce6eb]/75 bg-[#fbfcfa]/90 backdrop-blur-xl">
@@ -23,7 +29,7 @@ import BrandMark from "./BrandMark.astro";
         <span class="sm:hidden">Consola</span>
         <span class="hidden sm:inline">Acceso clientes</span>
       </a>
-      <LinkButton href="#contacto" class="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
+      <LinkButton href={diagnosticHref} class="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
         <span class="sm:hidden">Diagnóstico</span>
         <span class="hidden sm:inline">Solicitar diagnóstico</span>
       </LinkButton>

@@ -1,5 +1,11 @@
 ---
 import BrandMark from "./BrandMark.astro";
+
+interface Props {
+  diagnosticHref?: string;
+}
+
+const { diagnosticHref = "#contacto" } = Astro.props;
 ---
 
 <footer class="bg-[#0d2947] text-white">
@@ -27,7 +33,7 @@ import BrandMark from "./BrandMark.astro";
       <ul class="mt-4 space-y-3 text-sm text-white/72">
         <li><a class="transition hover:text-white" href="mailto:contacto@team360.live">contacto@team360.live</a></li>
         <li><a class="transition hover:text-white" href="/login">Acceso clientes</a></li>
-        <li><a class="transition hover:text-white" href="#contacto">Solicitar diagnóstico</a></li>
+        <li><a class="transition hover:text-white" href={diagnosticHref}>Solicitar diagnóstico</a></li>
       </ul>
     </div>
   </div>
