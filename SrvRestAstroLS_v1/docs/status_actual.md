@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-15 (Fase 1.8D — Ajuste de heurísticas del evaluator para lenguaje natural y consolidación de modelos)
+Ultima actualizacion: 2026-06-15 (Fase 1.8E — Handoff documental de Knowledge Ingestion + Diagnosis Quality)
 
 ## Directorio de trabajo
 
@@ -1968,4 +1968,24 @@ Incluye estructura inicial para:
   - Todos incluyen casos positivos y negativos (rechazo real vs falso)
 - **Suite**: **508/508 passed** (487 + 21 nuevos)
 - **Sin cambios**: endpoint productivo, frontend, Console, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff automático, pricing/SLA.
+- **Sin commits**. Sin secrets.
+
+### 2026-06-15 - Fase 1.8E: Cierre documental y handoff técnico
+
+- **Objetivo**: Convertir la evidencia técnica acumulada (Fases 1.6–1.8D) en un handoff documental claro para Sales Diagnosis Runtime, Home premium y narrativa comercial del diagnóstico.
+- **Documento de handoff creado**: `SrvRestAstroLS_v1/docs/sales_diagnosis_knowledge_retrieval_quality_handoff_20260612.md`
+  - **A. Estado general**: qué está validado (dev/debug), qué sigue siendo dev/debug, tabla de capacidades NO activas.
+  - **B. Knowledge Base**: 14 approved docs, 183 chunks embeddizados, PostgreSQL source of truth, tabla de docs clave por área.
+  - **C. Retrieval**: provider, feature flag, scopes obligatorios, cómo activar, preflight obligatorio.
+  - **D. Evaluator**: dataset de 15 casos, señales de calidad (positivas y prohibidas), modos de ejecución.
+  - **E. Resultados**: mock vs LLM real por caso, análisis de los 6 casos más importantes.
+  - **F. Ranking de modelos**: Qwen3 (quality_winner), GPT-4o-mini (stable_baseline), DeepSeek (needs_json_hardening), GPT-5-nano (not_recommended).
+  - **G. Recomendación actual**: por contexto (calidad/confiabilidad/costo).
+  - **H. Límites explícitos**: tabla de capacidades no activas con lo que el sistema debe decir.
+  - **I. Criterios para siguiente fase**: modelo, integración product adapter, endurecimiento JSON, preflight, guardrails, migración controlada.
+  - **J. Handoff para Home premium**: cómo usar el diagnóstico como puerta conversacional, qué comunicar y qué NO prometer, flujo técnico sugerido.
+  - **K. Referencias técnicas**: paths de todos los recursos relevantes.
+- **Sin código nuevo**: fase puramente documental.
+- **Suite**: 508/508 passed.
+- **Sin cambios**: endpoint productivo, frontend, Console, features bloqueadas.
 - **Sin commits**. Sin secrets.
