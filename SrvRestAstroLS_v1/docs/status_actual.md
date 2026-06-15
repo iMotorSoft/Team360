@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-14 (Fase 1.5 — Diagnostic-ready knowledge base debug tool)
+Ultima actualizacion: 2026-06-14 (Fase 1.5c — Add diagnostic retrieval gap coverage docs)
 
 ## Directorio de trabajo
 
@@ -1695,3 +1695,25 @@ Incluye estructura inicial para:
 - Suite completa: **353/353 passed** (341 + 12).
 - Scan smoke: 9/9 approved docs listos.
 - Sin frontend, sin upload público, sin endpoint nuevo, sin Console, sin diagnosis runtime, sin edición de corpus real, sin docs branch.
+
+### 2026-06-14 - Fase 1.5c: Add diagnostic retrieval gap coverage docs
+
+- **Gaps detectados por retrieval debug (Fase 1.5b)**:
+  1. QR codes / diagnostic_code — no había documento específico
+  2. Auto-quote / pricing / SLA — no había documento específico
+- **Docs creados**:
+  - `knowledge/packages/pkg_sales_diagnosis/approved/seguridad/codigos-qr-mfa-y-validaciones-sensibles.md`
+    - 8 chunks, cubre QR, MFA, Face ID, tokens, OTP, diagnostic_code, human_review_required
+  - `knowledge/packages/pkg_sales_diagnosis/approved/ventas/cotizacion-precios-y-limites-comerciales.md`
+    - 8 chunks, cubre precio, cotización, auto-quote, SLA, planned_extension, revisión comercial
+- **Frontmatter**: compatible con scanner existente, access_tags corregidos según `_metadata/access-tags.yaml`
+- **Scan**: 11/11 approved docs listos (9 previos + 2 nuevos)
+- **Full pipeline ejecutado**: persist → embed → Milvus (158 vectores) → retrieve debug
+- **Retrieval mejora**:
+  | Query | Antes | Después |
+  |---|---|---|
+  | QR/QR codes | WhatsApp docs (0.51) | Nuevo doc seguridad (0.65) |
+  | Auto-quote | anti-overpromise (0.46) | Nuevo doc ventas (0.52) |
+  | MFA/aprobación manual | package manual (0.55) | Nuevo doc seguridad (0.71) |
+- Suite completa: **353/353 passed**
+- Sin drafts tocados, sin docs branch, sin frontend, sin diagnóstico runtime, sin Step-to-Action activo

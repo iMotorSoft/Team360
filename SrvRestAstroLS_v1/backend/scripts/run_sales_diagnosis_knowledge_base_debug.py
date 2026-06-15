@@ -287,6 +287,7 @@ def step_embed(package_code: str, ks_code: str) -> dict:
                     embedded_count += 1
                 except Exception as exc:
                     errors.append(f"chunk {chunk_id[:8]}: {exc}")
+            await conn.commit()
         finally:
             await conn.close()
 
