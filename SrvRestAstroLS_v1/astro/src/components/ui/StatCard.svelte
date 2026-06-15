@@ -21,8 +21,8 @@
   >
     {value}
   </p>
-  {#if trend}<p class="mt-2 text-xs font-bold text-[#168b88]">{trend}</p>{/if}
-  {#if description}<p class="mt-2 text-xs leading-5 text-[#82939d]">
+  {#if trend}<p class="mt-2 text-base font-bold text-[#168b88]">{trend}</p>{/if}
+  {#if description}<p class="mt-2 text-base leading-5 text-[#82939d]">
       {description}
     </p>{/if}
 </Card>
