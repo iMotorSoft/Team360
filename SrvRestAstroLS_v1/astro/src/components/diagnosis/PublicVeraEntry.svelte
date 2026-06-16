@@ -94,6 +94,26 @@
     blocked: "No recomendado",
   };
 
+  const RISK_FLAG_LABELS: Record<string, string> = {
+    browser_automation_candidate: "Posible automatización mediante navegador",
+    human_review_likely: "Probable revisión humana",
+    rules_partially_clear: "Reglas parcialmente definidas",
+    sensitive_data: "Puede involucrar datos sensibles",
+    validate_mfa: "Requiere validar autenticación multifactor",
+    high_human_dependency: "Alta dependencia de intervención humana",
+    multiple_systems: "Involucra múltiples sistemas",
+    manual_process: "Proceso mayormente manual",
+    compliance_required: "Requiere cumplimiento normativo",
+  };
+
+  function riskFlagLabel(flag: string): string {
+    if (RISK_FLAG_LABELS[flag]) return RISK_FLAG_LABELS[flag];
+    if (flag.includes("_")) {
+      return flag.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    }
+    return flag.trim();
+  }
+
   const PRIORITY_LABELS: Record<string, string> = {
     "90": "Alta factibilidad",
     "80": "Buena factibilidad",
@@ -119,9 +139,14 @@
     return MODE_LABELS[key] ?? key;
   }
 
-  function formatRiskFlags(flags: string[]): string {
-    if (!flags || flags.length === 0) return "Sin riesgos relevantes.";
-    return flags.slice(0, 4).join(" · ");
+  function safeText(text: unknown): string {
+    if (!text || typeof text !== "string") return "";
+    return text
+      .replace(/\*\*(.+?)\*\*/g, "$1")
+      .replace(/\*(.+?)\*/g, "$1")
+      .replace(/^[ \t]*[•\-*]\s*/gm, "")
+      .replace(/^>\s*/gm, "")
+      .trim();
   }
 </script>
 
@@ -194,7 +219,7 @@
 
       {#if state === "response"}
         <div class="mt-5 rounded-2xl border border-[#bfe5df] bg-[#effaf8] p-4" data-testid="public-vera-response">
-              {#if lastResponse?.diagnosis_real}
+          {#if lastResponse?.diagnosis_real}
             <div class="flex items-center gap-2">
               <p class="text-sm font-bold text-[#126d6b]">Diagnóstico</p>
               <span class="rounded-full bg-[#21b99f]/15 px-2 py-0.5 text-[0.65rem] font-bold text-[#126d6b]">En línea</span>
@@ -211,9 +236,18 @@
               {/if}
             </div>
             {#if lastResponse.risk_flags && lastResponse.risk_flags.length > 0}
-              <p class="mt-3 text-xs font-semibold text-[#8f6b2a]">Riesgos destacados: {formatRiskFlags(lastResponse.risk_flags)}</p>
+              <div class="mt-3">
+                <p class="text-xs font-semibold text-[#8f6b2a]">Riesgos a considerar</p>
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  {#each lastResponse.risk_flags.slice(0, 4) as flag}
+                    <span class="rounded-full bg-[#fef3c7] px-2 py-0.5 text-[0.65rem] font-medium text-[#92400e]">{riskFlagLabel(flag)}</span>
+                  {/each}
+                </div>
+              </div>
             {/if}
-            <p class="mt-2 whitespace-pre-line text-sm leading-6 text-[#476275]">{responseMessage}</p>
+            {#if safeText(responseMessage)}
+              <p class="mt-2 whitespace-pre-line text-sm leading-6 text-[#476275]">{safeText(responseMessage)}</p>
+            {/if}
             <p class="mt-3 text-xs leading-5 text-[#6d8290]">
               Este es un diagnóstico inicial de orientación. No ejecuta acciones, no crea leads, no confirma por WhatsApp y no deriva datos sin autorización.
             </p>

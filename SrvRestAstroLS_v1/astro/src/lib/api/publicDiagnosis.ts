@@ -50,56 +50,37 @@ function buildPreliminaryMessage(text: string): string {
 }
 
 function buildDiagnosisMessage(result: DiagnosisResult): string {
-  const lines: string[] = [];
-
   const summary =
     typeof result.user_response === "object" && result.user_response !== null
       ? (result.user_response as Record<string, unknown>).summary ?? ""
       : "";
 
   if (summary) {
-    lines.push(`📋 ${String(summary)}`);
-    lines.push("");
+    return String(summary).trim();
   }
 
-  const CLASSIFICATION_LABELS: Record<string, string> = {
-    standard_package: "Viable para paquete estándar",
-    operational_automation: "Viable como automatización operativa",
-    consulting_required: "Requiere diagnóstico consultivo previo",
-    not_recommended: "No conviene automatizar directamente en esta etapa",
-  };
-  const MODE_LABELS: Record<string, string> = {
-    read_only: "Solo consulta / lectura",
-    assisted: "Asistido con supervisión humana",
-    approval_required: "Requiere aprobación humana antes de ejecutar",
-    execution: "Ejecución automatizada posible",
-    blocked: "No recomendado automatizar",
-  };
-  lines.push(`**Clasificación:** ${CLASSIFICATION_LABELS[result.classification] ?? result.classification}`);
-  lines.push(`**Puntaje de factibilidad:** ${result.score_total}/100`);
-  lines.push(`**Modo de automatización:** ${MODE_LABELS[result.automation_mode] ?? result.automation_mode}`);
+  const parts: string[] = [];
 
-  lines.push("");
-  lines.push("**Riesgos detectados:**");
-  if (result.risk_flags.length > 0) {
-    for (const risk of result.risk_flags) {
-      lines.push(`  • ${risk}`);
+  if (result.score_total !== undefined) {
+    const score = result.score_total;
+    if (score >= 80) {
+      parts.push("El proceso presenta buena factibilidad técnica para automatización.");
+    } else if (score >= 50) {
+      parts.push("El proceso tiene factibilidad parcial. Algunos aspectos requieren análisis adicional.");
+    } else {
+      parts.push("El proceso actual presenta complejidades que pueden requerir un enfoque distinto.");
     }
-  } else {
-    lines.push("  Sin riesgos relevantes.");
   }
 
   if (result.requires_human_approval) {
-    lines.push("");
-    lines.push("⚠️ Este caso requiere revisión humana antes de automatizar.");
+    parts.push("Este caso requiere revisión humana antes de avanzar con una solución automatizada.");
   }
 
-  lines.push("");
-  lines.push("**Próximo paso:** Podés solicitar una revisión con el equipo o comenzar un diagnóstico guiado.");
-  lines.push("");
-  lines.push("*Este es un diagnóstico inicial de orientación. No ejecuta acciones, no crea leads, no confirma por WhatsApp y no deriva datos sin autorización.*");
+  if (parts.length === 0) {
+    return "Recibimos tu consulta. El diagnóstico indica que hay aspectos relevantes a considerar antes de definir una solución.";
+  }
 
-  return lines.join("\n");
+  return parts.join(" ");
 }
 
 const DEFAULT_CLASSIFY_TIMEOUT_MS = 45_000;

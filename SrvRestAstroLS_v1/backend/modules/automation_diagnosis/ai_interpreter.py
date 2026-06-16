@@ -38,6 +38,7 @@ Reglas:
 - No prometas bypass de MFA, anti-bot, hardware keys, biometria o firma fuerte.
 - Identifica sistemas, riesgos, necesidad de aprobacion humana, credenciales y workers probables.
 - Usa el contexto RAG solo como apoyo, no inventes datos.
+- Todos los textos visibles (summary, risks, visible_summary_draft) deben generarse en español.
 
 Formato:
 {
