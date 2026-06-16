@@ -62,10 +62,34 @@ from .diagnosis_schemas import (
 
 
 # ---------------------------------------------------------------------------
-# Shared in-memory state repository for public conversation turns
+# State repository for public conversation turns (PostgreSQL when configured)
 # ---------------------------------------------------------------------------
 
-_public_turn_state = InMemoryConversationStateRepository()
+def _build_public_state_repo():
+    mode = os.environ.get("AUTOMATION_DIAGNOSIS_REPOSITORY", "").strip().lower()
+    if mode == "postgres":
+        from modules.sales_diagnosis_runtime.state_repository import (
+            SyncPostgresConversationStateRepository,
+        )
+        from globalVar import get_team360_db_url_psql
+        dsn = get_team360_db_url_psql()
+        if not dsn:
+            raise RuntimeError(
+                "AUTOMATION_DIAGNOSIS_REPOSITORY=postgres requires a valid "
+                "PostgreSQL DSN. Set TEAM360_DB_URL or TEAM360_DB_URL_PSQL."
+            )
+        return SyncPostgresConversationStateRepository(dsn)
+    if mode == "memory":
+        return InMemoryConversationStateRepository()
+    if mode:
+        raise RuntimeError(
+            f"Unsupported AUTOMATION_DIAGNOSIS_REPOSITORY={mode!r}. "
+            "Use 'postgres' or 'memory'."
+        )
+    return InMemoryConversationStateRepository()
+
+
+_public_turn_state = _build_public_state_repo()
 
 
 # ---------------------------------------------------------------------------
@@ -114,14 +138,66 @@ class _PublicTurnLLMProvider:
 # ---------------------------------------------------------------------------
 
 
+class _PublicLiteLLMEmbeddingProvider:
+    def __init__(self) -> None:
+        raw_url = os.environ.get("TEAM360_LITELLM_BASE_URL", "").strip() or "http://localhost:4000"
+        base = raw_url.rstrip("/")
+        if base.endswith("/v1"):
+            self._base_url = base + "/embeddings"
+        else:
+            self._base_url = base + "/v1/embeddings"
+        self._model = os.environ.get("TEAM360_EMBEDDING_MODEL", "").strip() or "openai_text_embedding_3_small"
+        self._api_key = (
+            os.environ.get("TEAM360_LITELLM_API_KEY")
+            or os.environ.get("LITELLM_API_KEY")
+            or os.environ.get("LITELLM_MASTER_KEY")
+            or ""
+        )
+        self._milvus_mode = os.environ.get("TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER", "").strip().lower() == "milvus"
+
+    def embed_query(self, text: str) -> list[float]:
+        if self._milvus_mode and not self._base_url:
+            raise RuntimeError(
+                "TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER=milvus requires "
+                "TEAM360_LITELLM_BASE_URL for embeddings."
+            )
+        if not self._base_url:
+            return [0.0] * 1536
+        import json
+        import urllib.request
+        headers = {"Content-Type": "application/json"}
+        if self._api_key:
+            headers["Authorization"] = f"Bearer {self._api_key}"
+        data = json.dumps({"model": self._model, "input": text}).encode()
+        req = urllib.request.Request(self._base_url, data=data, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                result = json.loads(resp.read())
+        except Exception as exc:
+            if self._milvus_mode:
+                raise RuntimeError(f"Embedding failed in Milvus mode: {exc}") from exc
+            return [0.0] * 1536
+        embedding = result.get("data", [{}])[0].get("embedding")
+        if not embedding:
+            if self._milvus_mode:
+                raise RuntimeError("Embedding response did not contain a valid embedding vector.")
+            return [0.0] * 1536
+        if len(embedding) != 1536:
+            if self._milvus_mode:
+                raise RuntimeError(
+                    f"Embedding dimension {len(embedding)} != 1536. "
+                    "Expected 1536 for the current Milvus collection."
+                )
+            return [0.0] * 1536
+        return embedding
+
+
 def _build_public_retrieval() -> RetrievalProvider:
     config = MilvusRuntimeConfig.from_env()
     if config.uri or config.host:
-        from .sales_diagnosis_runtime_dev import _DevFakeEmbeddingProvider
-
         return MilvusRetrievalProvider(
             config=config,
-            embedding_provider=_DevFakeEmbeddingProvider(),
+            embedding_provider=_PublicLiteLLMEmbeddingProvider(),
         )
     from modules.sales_diagnosis_runtime.providers import NullRetrievalProvider
 
@@ -351,13 +427,16 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
 
     turn_count = output.next_state.turn_count if output.next_state else 0
 
-    # Persist conversation history in state
+    # Persist conversation history and semantic memory in state
     if output.next_state:
         prev = output.next_state.history_summary or ""
         exchange = f"Usuario: {text}\nVera: {output.response_text}"
         output.next_state.history_summary = (
             f"{prev}\n{exchange}" if prev else exchange
         )
+        # Ensure semantic_memory is initialized
+        if not output.next_state.semantic_memory:
+            output.next_state.semantic_memory = {"diagnosis_status": "gathering"}
         _public_turn_state.save(output.next_state)
 
     return PublicTurnResponse(

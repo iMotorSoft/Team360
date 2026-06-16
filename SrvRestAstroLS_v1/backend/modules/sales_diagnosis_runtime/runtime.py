@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import re
 from typing import Any
 
 from modules.sales_diagnosis_runtime.contracts import (
@@ -12,10 +14,7 @@ from modules.sales_diagnosis_runtime.contracts import (
     RuntimeMetrics,
 )
 from modules.sales_diagnosis_runtime.errors import (
-    GuardrailViolationError,
     InvalidAssistantRuntimeInputError,
-    LLMUnavailableError,
-    RetrievalUnavailableError,
     SalesDiagnosisRuntimeError,
     UnsafeResponseError,
 )
@@ -33,22 +32,42 @@ from modules.sales_diagnosis_runtime.providers import (
 )
 
 
+DIAGNOSIS_REQUEST_PATTERNS = re.compile(
+    r"\b(dame\s*(el\s*)?diagn[oó]stico"
+    r"|qu[eé]\s*(me\s*)?(recomiend[aeá]s?|recomiend[aeá]n|recomend[áa]s)"
+    r"|con\s*esto\s*alcanza"
+    r"|decime\s*qu[eé]\s*(hago|har[ií]as)"
+    r"|qu[eé]\s*automatizar[ií]as|ya\s*est[áa])\b",
+    re.IGNORECASE,
+)
+
+GENERAL_PROBLEM_PATTERNS = re.compile(
+    r"\b(problem|pierd|tard|error|manual|desorden|lento|d[ií]ficil|complej|cuest|sobrecarga|desorganiz|descontrol|desordenad|ca[oó]tico|ineficiente)\b",
+    re.IGNORECASE,
+)
+
+GENERAL_OUTCOME_PATTERNS = re.compile(
+    r"\b(quer[eé]|necesit|automatiz|orden|mejor|aceler|respond|optimiz|agiliz|simplific|digitaliz)\b",
+    re.IGNORECASE,
+)
+
+GENERAL_CHANNEL_PATTERNS = re.compile(
+    r"\b(whatsapp|email|correo|web|sitio|p[aá]gina|facebook|instagram|redes|presencial|local|llamada|tel[eé]fono|chat|app|portal)\b",
+    re.IGNORECASE,
+)
+
+GENERAL_SYSTEM_PATTERNS = re.compile(
+    r"\b(sistema|programa|software|app|aplicaci[oó]n|plataforma|herramienta|base\s*de\s*dato|bd|erp|crm|planilla|excel|sheet)\b",
+    re.IGNORECASE,
+)
+
+GENERAL_APPROVAL_PATTERNS = re.compile(
+    r"\b(aprobaci[oó]n|supervisor|revisa|revisi[oó]n|autoriz|humano|persona\s*revisa|control|validaci[oó]n)\b",
+    re.IGNORECASE,
+)
+
+
 class AssistantConversationRuntime:
-    """Skeleton orchestrator for the sales diagnosis assistant.
-
-    This is an internal runtime skeleton. It does not expose HTTP endpoints,
-    does not call real LLM or Milvus, and does not implement SSE.
-
-    Architecture invariants (from Fase 1.7e):
-    - PostgreSQL 18 is source of truth
-    - Milvus 2.6 is derived vector runtime for conversation
-    - gpt-5-nano low is first intelligent response
-    - Template safe ack does not replace LLM
-    - Guardrails are mandatory before exposing responses
-    - Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff
-      are NOT available
-    """
-
     def __init__(
         self,
         retrieval_provider: RetrievalProvider | None = None,
@@ -77,134 +96,106 @@ class AssistantConversationRuntime:
         events: list[ProgressiveEvent] = []
         metrics = RuntimeMetrics()
 
-        # Emit received event
-        events.append(ProgressiveEvent(
-            event_type="team360.status.received",
-            safe_to_show=True,
-        ))
+        events.append(ProgressiveEvent(event_type="team360.status.received", safe_to_show=True))
 
-        # Load or create conversation state
+        # 1. Load or create conversation state
         state = self._load_or_create_state(input)
 
-        # Emit safe ack (quick progress signal, no LLM)
-        ack_text = self._prompt_policy.build_safe_ack(
-            assistant_instance_code=input.assistant_instance_code,
-            package_code=input.package_code,
-        )
         events.append(ProgressiveEvent(
             event_type="team360.answer.quick_ack",
-            payload={"text": ack_text},
+            payload={"text": self._prompt_policy.build_safe_ack()},
             safe_to_show=True,
         ))
 
-        # Retrieve context (NullRetrievalProvider returns empty)
-        events.append(ProgressiveEvent(
-            event_type="team360.status.retrieval_started",
-            safe_to_show=True,
-        ))
-        chunks: list[RetrievedChunk] = []
-        try:
-            chunks = self._retrieval.retrieve(input, state)
-        except SalesDiagnosisRuntimeError as exc:
-            events.append(ProgressiveEvent(
-                event_type="team360.status.retrieval_failed",
-                payload={"error": str(exc)},
-                safe_to_show=True,
-            ))
-
-        # Evaluate if we have real providers or only null
-        has_real_retrieval = not isinstance(self._retrieval, NullRetrievalProvider)
         has_real_llm = not isinstance(self._llm, NullLLMProvider)
 
-        if not has_real_retrieval:
-            events.append(ProgressiveEvent(
-                event_type="team360.status.retrieval_skipped",
-                payload={"reason": "no_provider_configured"},
-                safe_to_show=True,
-            ))
+        # 2. Mark answered questions from user's current message
+        self._mark_answered_questions(state, input)
 
-        if not has_real_llm:
-            # Skeleton mode: return safe ack as response
-            metrics.time_to_first_ack_ms = 0
-            output = AssistantTurnOutput(
-                response_text=ack_text,
-                response_type="skeleton_ack",
-                asked_questions=[],
-                slots_updated={},
-                retrieved_sources=[],
-                guardrail_result=self._guardrail_policy.evaluate_response(ack_text),
-                events=events,
-                metrics=metrics,
-                next_state=state,
-            )
-            events.append(ProgressiveEvent(
-                event_type="team360.done",
-                payload={"mode": "skeleton_no_llm"},
-                safe_to_show=True,
-            ))
-            self._save_state(state)
-            self._metrics.record_turn(input, output)
-            self._audit.record(input, output)
-            return output
+        # 3. Update semantic memory BEFORE RAG (current message is incorporated now)
+        self._update_semantic_memory(state, input)
 
-        # --- Real provider path (future, not implemented yet) ---
-        # This path is reached only when real LLM/retrieval providers are wired.
+        # 4. Resolve contradictions
+        self._resolve_contradictions(state, input)
+
+        # 5. Decide action: diagnose or gather
+        user_requested = self._is_diagnosis_request(input.user_message, state)
+        should_diagnose = user_requested or self._is_ready_to_diagnose(state)
+
+        # 6. Build retrieval query from UPDATED semantic memory
+        retrieval_query = self._build_retrieval_query(input, state)
+        has_real_retrieval = not isinstance(self._retrieval, NullRetrievalProvider)
+
+        # 7. Run RAG with synthesized query
+        chunks: list[RetrievedChunk] = []
+        if has_real_retrieval and retrieval_query:
+            events.append(ProgressiveEvent(event_type="team360.status.retrieval_started", safe_to_show=True))
+            retrieval_input = self._make_retrieval_input(input, retrieval_query)
+            try:
+                chunks = self._retrieval.retrieve(retrieval_input, state)
+            except SalesDiagnosisRuntimeError as exc:
+                events.append(ProgressiveEvent(
+                    event_type="team360.status.retrieval_failed",
+                    payload={"error": str(exc)},
+                    safe_to_show=True,
+                ))
+
         events.append(ProgressiveEvent(
             event_type="team360.sources.ready",
             payload={"chunk_count": len(chunks)},
             safe_to_show=True,
         ))
 
-        context_text = self._prompt_policy.build_turn_prompt(input, state, chunks)
+        if not has_real_llm:
+            return self._skeleton_response(input, state, events, metrics)
+
+        # 8. Generate response
         raw_response = self._llm.generate(input, state, chunks)
 
         is_fallback = raw_response == SAFE_ACK_TEXT
         events.append(ProgressiveEvent(
             event_type="team360.llm.provider_result",
-            payload={
-                "response_is_fallback": is_fallback,
-            },
+            payload={"response_is_fallback": is_fallback},
             safe_to_show=True,
         ))
 
-        guardrail_result = self._guardrail_policy.evaluate_response(
-            raw_response, input, state
-        )
+        # 9. Guardrail evaluation
+        guardrail_result = self._guardrail_policy.evaluate_response(raw_response, input, state)
 
         if not guardrail_result.passed:
             if guardrail_result.forbidden_claims or guardrail_result.planned_extension_misrepresented:
-                raise UnsafeResponseError(
-                    f"Response blocked by guardrails: {guardrail_result.notes}"
-                )
-            raw_response = self._guardrail_policy.build_fallback_response(
-                reason="guardrail_violation"
-            )
+                raise UnsafeResponseError(f"Response blocked by guardrails: {guardrail_result.notes}")
+            raw_response = self._guardrail_policy.build_fallback_response(reason="guardrail_violation")
 
         events.append(ProgressiveEvent(
-            event_type="team360.answer.final_ready",
-            payload={"text": raw_response},
-            safe_to_show=True,
+            event_type="team360.answer.final_ready", payload={"text": raw_response}, safe_to_show=True,
         ))
         events.append(ProgressiveEvent(
-            event_type="team360.guardrails.applied",
-            payload={"passed": guardrail_result.passed},
-            safe_to_show=True,
+            event_type="team360.guardrails.applied", payload={"passed": guardrail_result.passed}, safe_to_show=True,
         ))
-        events.append(ProgressiveEvent(
-            event_type="team360.done",
-            safe_to_show=True,
-        ))
+
+        # 10. Track questions Vera asks
+        self._track_asked_questions(state, raw_response)
+
+        events.append(ProgressiveEvent(event_type="team360.done", safe_to_show=True))
+
+        if should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
+            state.semantic_memory["diagnosis_status"] = "completed"
 
         output = AssistantTurnOutput(
             response_text=raw_response,
-            response_type="final",
-            asked_questions=[],
-            slots_updated={},
+            response_type="diagnosis" if should_diagnose else "final",
             retrieved_sources=chunks,
             guardrail_result=guardrail_result,
             events=events,
             metrics=metrics,
             next_state=state,
+            turn_decision={
+                "action": "diagnose" if should_diagnose else "reflect_and_ask",
+                "retrieval_query": retrieval_query,
+                "diagnosis_status": state.semantic_memory.get("diagnosis_status", "gathering"),
+                "readiness_reason": "user_requested" if user_requested else self._readiness_reason(state),
+            },
         )
 
         self._save_state(state)
@@ -214,16 +205,236 @@ class AssistantConversationRuntime:
         return output
 
     # ------------------------------------------------------------------
+    # Semantic memory (updated BEFORE RAG)
+    # ------------------------------------------------------------------
+
+    def _update_semantic_memory(self, state: ConversationState, input: AssistantTurnInput) -> None:
+        mem = dict(state.semantic_memory or {})
+        if not mem.get("diagnosis_status"):
+            mem["diagnosis_status"] = "gathering"
+
+        msg = input.user_message
+
+        if not mem.get("business_context"):
+            match = re.search(r"(?:mi\s+)?(negocio|empresa|comercio|tienda|taller|local|profesi[oó]n)\s+(es|de|se\s+dedica|vende|vendo|ofrece|trabajo)", msg, re.IGNORECASE)
+            if match:
+                mem["business_context"] = msg
+
+        if not mem.get("channels"):
+            channels = GENERAL_CHANNEL_PATTERNS.findall(msg)
+            if channels:
+                mem["channels"] = list(dict.fromkeys(c.lower() for c in channels))
+
+        if not mem.get("main_problem"):
+            if GENERAL_PROBLEM_PATTERNS.search(msg):
+                mem["main_problem"] = msg
+
+        if not mem.get("desired_outcome"):
+            if GENERAL_OUTCOME_PATTERNS.search(msg):
+                mem["desired_outcome"] = msg
+
+        if GENERAL_SYSTEM_PATTERNS.search(msg):
+            existing = set(mem.get("systems_and_data_sources", []))
+            systems = re.findall(r"\b(planilla|excel|sheet|sistema|programa|software|app|aplicaci[oó]n|plataforma|herramienta|erp|crm|base de datos|bd)\b", msg, re.IGNORECASE)
+            new_systems = list(dict.fromkeys(s.lower() for s in systems if s.lower() not in existing))
+            if new_systems:
+                mem["systems_and_data_sources"] = mem.get("systems_and_data_sources", []) + new_systems
+
+        if GENERAL_APPROVAL_PATTERNS.search(msg):
+            mem["human_approval"] = msg
+
+        if not mem.get("current_process") and len(msg.split()) >= 5:
+            mem["current_process"] = msg
+
+        state.semantic_memory = mem
+
+    # ------------------------------------------------------------------
+    # Contradiction resolution
+    # ------------------------------------------------------------------
+
+    def _resolve_contradictions(self, state: ConversationState, input: AssistantTurnInput) -> None:
+        mem = state.semantic_memory or {}
+        msg_lower = input.user_message.lower()
+        corrected = False
+
+        correction_phrases = ["en realidad", "no es", "corrección", "correccion", "mejor dicho", "rectifico", "rectificamos", "disculpa", "perdón", "perdon"]
+        is_correction = any(p in msg_lower for p in correction_phrases)
+
+        data_sources = mem.get("systems_and_data_sources", [])
+        new_systems_found = re.findall(r"\b(planilla|excel|sheet|sistema|programa|software|app|erp|crm|base de datos|bd)\b", msg_lower, re.IGNORECASE)
+        new_set = set(s.lower() for s in new_systems_found)
+
+        if "planilla" in msg_lower and ("stock" in msg_lower or "precio" in msg_lower or "precios" in msg_lower):
+            stock_in_msg = "stock" in msg_lower or "inventario" in msg_lower or "existencia" in msg_lower
+            price_in_msg = "precio" in msg_lower or "precios" in msg_lower or "precio" in msg_lower
+
+            if stock_in_msg and "planilla" not in str(data_sources).lower():
+                data_sources.append("planilla")
+                corrected = True
+
+        if "sistema" in msg_lower:
+            mem["systems_and_data_sources"] = list(dict.fromkeys(data_sources + ["sistema"]))
+            corrected = True
+
+        if is_correction:
+            if "stock" in msg_lower or "inventario" in msg_lower:
+                mem["stock_source"] = "sistema" if "sistema" in msg_lower else data_sources[0] if data_sources else "desconocido"
+            if "precio" in msg_lower or "precios" in msg_lower:
+                mem["price_source"] = "planilla" if "planilla" in msg_lower else "sistema" if "sistema" in msg_lower else data_sources[0] if data_sources else "desconocido"
+            contradictions = mem.get("contradictions", [])
+            contradictions.append(f"User corrected in turn {state.turn_count}: {input.user_message[:120]}")
+            mem["contradictions"] = contradictions
+            corrected = True
+
+        if corrected:
+            state.semantic_memory = mem
+
+    # ------------------------------------------------------------------
+    # Diagnosis readiness
+    # ------------------------------------------------------------------
+
+    def _is_ready_to_diagnose(self, state: ConversationState) -> bool:
+        mem = state.semantic_memory or {}
+        status = mem.get("diagnosis_status", "gathering")
+
+        if status in ("requested", "completed", "sufficient"):
+            return True
+
+        has_process = bool(mem.get("current_process") or mem.get("main_problem"))
+        has_channel = bool(mem.get("channels"))
+        has_system = bool(mem.get("systems_and_data_sources"))
+
+        if has_process and has_channel and has_system:
+            mem["diagnosis_status"] = "sufficient"
+            state.semantic_memory = mem
+            return True
+
+        return False
+
+    def _readiness_reason(self, state: ConversationState) -> str:
+        mem = state.semantic_memory or {}
+        parts = []
+        if mem.get("business_context"):
+            parts.append("context")
+        if mem.get("channels"):
+            parts.append("channel")
+        if mem.get("current_process") or mem.get("main_problem"):
+            parts.append("process")
+        if mem.get("systems_and_data_sources"):
+            parts.append("systems")
+        if mem.get("human_approval"):
+            parts.append("approval")
+        return "+".join(parts) if parts else "gathering"
+
+    def _is_diagnosis_request(self, message: str, state: ConversationState) -> bool:
+        if DIAGNOSIS_REQUEST_PATTERNS.search(message):
+            state.semantic_memory["diagnosis_status"] = "requested"
+            return True
+        if state.semantic_memory.get("diagnosis_status") in ("requested", "completed", "sufficient"):
+            return True
+        return False
+
+    # ------------------------------------------------------------------
+    # Retrieval query synthesis
+    # ------------------------------------------------------------------
+
+    def _build_retrieval_query(self, input: AssistantTurnInput, state: ConversationState) -> str:
+        mem = state.semantic_memory or {}
+        parts = [input.user_message]
+        if mem.get("current_process"):
+            parts.append(str(mem["current_process"]))
+        if mem.get("main_problem"):
+            parts.append(str(mem["main_problem"]))
+        query = " ".join(parts)
+        return query[:500]
+
+    @staticmethod
+    def _make_retrieval_input(original: AssistantTurnInput, query: str) -> AssistantTurnInput:
+        from dataclasses import replace
+        return replace(original, user_message=query)
+
+    # ------------------------------------------------------------------
+    # Answered questions tracking
+    # ------------------------------------------------------------------
+
+    def _mark_answered_questions(self, state: ConversationState, input: AssistantTurnInput) -> None:
+        questions = state.asked_questions or []
+        if not questions:
+            return
+        msg_lower = input.user_message.lower()
+        updated = False
+        for q in questions:
+            if q.get("answered"):
+                continue
+            intent = q.get("intent", "")
+            if self._message_answers_intent(msg_lower, intent):
+                q["answered"] = True
+                q["answer_evidence"] = input.user_message[:200]
+                q["answered_turn"] = state.turn_count
+                updated = True
+        if updated:
+            state.asked_questions = questions
+
+    @staticmethod
+    def _message_answers_intent(msg_lower: str, intent: str) -> bool:
+        mapping = {
+            "identify_channel": ["whatsapp", "email", "correo", "web", "sitio", "teléfono", "telefono", "chat", "presencial", "app"],
+            "identify_volume": ["diario", "diaria", "por día", "por dia", "mensual", "semanal", "consulta", "mensaje", "llamada"],
+            "clarify_current_process": ["manual", "excel", "planilla", "sistema", "responde", "responde", "copia", "escribe", "busca", "consulta", "persona", "gestiona"],
+            "identify_data_source": ["planilla", "excel", "sheet", "sistema", "base", "programa", "software", "app", "archivo"],
+            "confirm_human_approval": ["supervisor", "jefe", "revisa", "aprobación", "aprobacion", "persona", "humano", "dueño", "dueña", "gerente", "coordinador"],
+            "clarify_desired_outcome": ["quiero", "necesito", "buscamos", "objetivo", "meta", "automatizar", "ordenar", "mejorar", "acelerar"],
+            "identify_rules": ["regla", "criterio", "política", "politica", "depende", "decide", "según", "segun", "caso"],
+        }
+        keywords = mapping.get(intent, [])
+        return any(k in msg_lower for k in keywords)
+
+    def _track_asked_questions(self, state: ConversationState, response: str) -> None:
+        if "?" not in response:
+            return
+        questions = state.asked_questions or []
+        answered_intents = {q.get("intent", "") for q in questions if q.get("answered")}
+        for line in response.split("\n"):
+            if "?" in line:
+                intent = _classify_question_intent(line)
+                if intent and intent not in answered_intents:
+                    existing = {q.get("intent", "") for q in questions}
+                    if intent not in existing:
+                        questions.append({
+                            "intent": intent,
+                            "question_text": line.strip(),
+                            "turn": state.turn_count,
+                            "answered": False,
+                            "answer_evidence": "",
+                        })
+        state.asked_questions = questions
+
+    # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    def _skeleton_response(self, input, state, events, metrics) -> AssistantTurnOutput:
+        ack = self._prompt_policy.build_safe_ack()
+        output = AssistantTurnOutput(
+            response_text=ack,
+            response_type="skeleton_ack",
+            retrieved_sources=[],
+            guardrail_result=self._guardrail_policy.evaluate_response(ack),
+            events=events,
+            metrics=metrics,
+            next_state=state,
+        )
+        events.append(ProgressiveEvent(event_type="team360.done", payload={"mode": "skeleton_no_llm"}, safe_to_show=True))
+        self._save_state(state)
+        self._metrics.record_turn(input, output)
+        self._audit.record(input, output)
+        return output
 
     def _validate_input(self, input: AssistantTurnInput) -> None:
         if not input.session_id or not input.session_id.strip():
             raise InvalidAssistantRuntimeInputError("session_id is required")
         if not input.assistant_instance_code:
-            raise InvalidAssistantRuntimeInputError(
-                "assistant_instance_code is required"
-            )
+            raise InvalidAssistantRuntimeInputError("assistant_instance_code is required")
         if not input.user_message or not input.user_message.strip():
             raise InvalidAssistantRuntimeInputError("user_message is required")
 
@@ -233,7 +444,7 @@ class AssistantConversationRuntime:
             try:
                 state = self._state_repo.load(input.session_id)
             except SalesDiagnosisRuntimeError:
-                pass  # Fall through to create fresh state
+                pass
         if state is None:
             state = ConversationState(
                 session_id=input.session_id,
@@ -241,6 +452,8 @@ class AssistantConversationRuntime:
                 package_code=input.package_code,
                 knowledge_scope_code=input.knowledge_scope_code,
             )
+        if not state.semantic_memory:
+            state.semantic_memory = {"diagnosis_status": "gathering"}
         state.turn_count += 1
         return state
 
@@ -249,4 +462,24 @@ class AssistantConversationRuntime:
             try:
                 self._state_repo.save(state)
             except SalesDiagnosisRuntimeError:
-                pass  # Non-blocking: don't fail the response for save errors
+                pass
+
+
+QUESTION_INTENT_PATTERNS: list[tuple[str, list[str]]] = [
+    ("identify_channel", ["canal", "whatsapp", "email", "web", "por dónde", "por donde", "por qué medio"]),
+    ("identify_volume", ["cuántos", "cuantas", "volumen", "diariamente", "por día", "por dia", "frecuencia", "cantidad", "cada cuánto"]),
+    ("clarify_current_process", ["cómo gestiona", "como gestiona", "cómo maneja", "como maneja", "cómo hace", "como hace", "proceso actual", "hoy", "actualmente", "cómo lo hacen", "cómo es el proceso"]),
+    ("identify_data_source", ["planilla", "excel", "sistema", "base de datos", "dónde", "donde", "fuente", "dónde está", "donde esta"]),
+    ("confirm_human_approval", ["aprobación", "aprobacion", "supervisor", "revisa", "persona", "humano", "quién", "quien", "quién revisa", "quien revisa"]),
+    ("identify_exception", ["excepción", "excepcion", "caso especial", "particular", "dudoso", "excepcional"]),
+    ("clarify_desired_outcome", ["resultado", "objetivo", "meta", "qué querés", "que queres", "qué esperás", "que esperas"]),
+    ("identify_rules", ["regla", "criterio", "política", "politica", "decide", "cómo sabés", "como sabes", "qué criterio"]),
+]
+
+
+def _classify_question_intent(question: str) -> str:
+    q_lower = question.lower()
+    for intent, keywords in QUESTION_INTENT_PATTERNS:
+        if any(k in q_lower for k in keywords):
+            return intent
+    return f"other:{question[:60]}"

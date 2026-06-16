@@ -58,6 +58,52 @@ class RuntimeMetrics:
 
 
 @dataclass
+class SemanticMemory:
+    business_context: str = ""
+    current_process: str = ""
+    channels: list[str] = field(default_factory=list)
+    main_problem: str = ""
+    desired_outcome: str = ""
+    systems_and_data_sources: list[str] = field(default_factory=list)
+    known_rules: list[str] = field(default_factory=list)
+    human_approval: str = ""
+    exceptions: list[str] = field(default_factory=list)
+    volume: str = ""
+    constraints: list[str] = field(default_factory=list)
+    assumptions: list[str] = field(default_factory=list)
+    confirmed_facts: list[str] = field(default_factory=list)
+    inferred_facts: list[str] = field(default_factory=list)
+    contradictions: list[str] = field(default_factory=list)
+    automation_hypotheses: list[str] = field(default_factory=list)
+    diagnosis_status: str = "gathering"  # gathering | sufficient | requested | completed
+
+
+@dataclass
+class CanonicalQuestion:
+    intent: str
+    question_text: str
+    turn: int = 0
+    answered: bool = False
+    answer_evidence: str = ""
+
+
+@dataclass
+class TurnDecision:
+    action: str = "reflect_and_ask"  # gather | reflect_and_ask | diagnose
+    assistant_message: str = ""
+    updated_case_summary: str = ""
+    confirmed_facts: list[str] = field(default_factory=list)
+    inferred_facts: list[str] = field(default_factory=list)
+    contradictions: list[str] = field(default_factory=list)
+    missing_critical_information: list[str] = field(default_factory=list)
+    next_question: str = ""
+    next_question_intent: str = ""
+    diagnosis: str = ""
+    readiness_reason: str = ""
+    retrieval_query: str = ""
+
+
+@dataclass
 class ConversationState:
     session_id: str
     assistant_instance_code: str
@@ -69,6 +115,8 @@ class ConversationState:
     risk_flags: list[str] = field(default_factory=list)
     last_sources: list[RetrievedChunk] = field(default_factory=list)
     pending_questions: list[str] = field(default_factory=list)
+    semantic_memory: dict[str, Any] = field(default_factory=dict)
+    asked_questions: list[dict[str, Any]] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -98,6 +146,7 @@ class AssistantTurnOutput:
     events: list[ProgressiveEvent] = field(default_factory=list)
     metrics: RuntimeMetrics = field(default_factory=RuntimeMetrics)
     next_state: ConversationState | None = None
+    turn_decision: dict[str, Any] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -121,8 +170,6 @@ PLANNED_EXTENSIONS = frozenset({
 })
 
 FORBIDDEN_TERMS = frozenset({
-    "precio",
-    "precios",
     "plazo",
     "plazos",
     "sla",

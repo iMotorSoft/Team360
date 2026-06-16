@@ -83,6 +83,8 @@ class ConversationStateSerializer:
                 for c in (state.last_sources or [])
             ],
             "pending_questions": list(state.pending_questions),
+            "semantic_memory": dict(state.semantic_memory) if state.semantic_memory else {},
+            "asked_questions": list(state.asked_questions) if state.asked_questions else [],
         }
 
     @staticmethod
@@ -108,6 +110,8 @@ class ConversationStateSerializer:
                 for c in (data.get("last_sources") or [])
             ],
             pending_questions=list(data.get("pending_questions", [])),
+            semantic_memory=dict(data.get("semantic_memory", {})),
+            asked_questions=list(data.get("asked_questions", [])),
         )
 
     # ------------------------------------------------------------------

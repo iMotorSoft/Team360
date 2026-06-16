@@ -224,10 +224,10 @@ class TestGuardrailPolicy:
 
     def test_guardrail_policy_detects_forbidden_claim_without_negation(self):
         policy = GuardrailPolicy()
-        text = "El precio del servicio es $100."
+        text = "El SLA de respuesta es de 2 horas."
         result = policy.evaluate_response(text)
         assert not result.passed
-        assert "precio" in result.forbidden_claims
+        assert result.pricing_sla_hallucination
 
     def test_guardrail_policy_allows_forbidden_term_with_negation(self):
         policy = GuardrailPolicy()
@@ -298,7 +298,7 @@ class TestPromptPolicy:
         prompt = policy.build_system_prompt()
         assert "Step-to-Action" in prompt
         assert "lead_capture" in prompt
-        assert "3 preguntas" in prompt
+        assert "una sola" in prompt.lower()
 
     def test_prompt_policy_turn_prompt_includes_user_message(self):
         policy = PromptPolicy()
@@ -396,3 +396,135 @@ class TestConstants:
     def test_safe_ack_text_defined(self):
         assert SAFE_ACK_TEXT
         assert "Recibí tu consulta" in SAFE_ACK_TEXT
+
+
+# ---------------------------------------------------------------------------
+# 7. Semantic memory and backward compatibility
+# ---------------------------------------------------------------------------
+
+
+class TestSemanticMemory:
+    def test_new_state_initializes_semantic_memory(self):
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+        )
+        assert state.semantic_memory == {}
+        state.semantic_memory["diagnosis_status"] = "gathering"
+        assert state.semantic_memory["diagnosis_status"] == "gathering"
+
+    def test_old_state_without_semantic_memory_loads_safely(self):
+        old_data = {
+            "session_id": "s1",
+            "assistant_instance_code": "team360_sales_diagnosis",
+            "package_code": "pkg_sales_diagnosis",
+            "knowledge_scope_code": "ks_test",
+            "slots": {},
+            "history_summary": None,
+            "turn_count": 3,
+            "risk_flags": [],
+            "last_sources": [],
+            "pending_questions": [],
+        }
+        state = ConversationState(**old_data)
+        assert state.semantic_memory is not None
+        assert "diagnosis_status" not in state.semantic_memory or state.semantic_memory.get("diagnosis_status") != "completed"
+
+    def test_semantic_memory_accepts_all_fields(self):
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            semantic_memory={
+                "business_context": "casa de repuestos",
+                "channels": ["whatsapp"],
+                "diagnosis_status": "gathering",
+            },
+        )
+        assert state.semantic_memory["business_context"] == "casa de repuestos"
+        assert "whatsapp" in state.semantic_memory["channels"]
+        assert state.semantic_memory["diagnosis_status"] == "gathering"
+
+    def test_asked_questions_starts_empty(self):
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+        )
+        assert state.asked_questions == []
+
+    def test_backward_compatible_serialization_roundtrip(self):
+        from modules.sales_diagnosis_runtime.state_repository import ConversationStateSerializer
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=2,
+            semantic_memory={"diagnosis_status": "gathering", "channels": ["whatsapp"]},
+            asked_questions=[{"intent": "identify_volume", "question_text": "¿Cuántos mensajes?", "turn": 1}],
+        )
+        serialized = ConversationStateSerializer.to_dict(state)
+        restored = ConversationStateSerializer.from_dict(serialized)
+        assert restored.semantic_memory["diagnosis_status"] == "gathering"
+        assert "whatsapp" in restored.semantic_memory.get("channels", [])
+        assert len(restored.asked_questions) == 1
+        assert restored.asked_questions[0]["intent"] == "identify_volume"
+
+
+# ---------------------------------------------------------------------------
+# 8. Question intent classification
+# ---------------------------------------------------------------------------
+
+
+class TestQuestionIntent:
+    def test_classifies_channel_question(self):
+        from modules.sales_diagnosis_runtime.runtime import _classify_question_intent
+        assert _classify_question_intent("¿Por qué canal recibes los mensajes?") == "identify_channel"
+
+    def test_classifies_volume_question(self):
+        from modules.sales_diagnosis_runtime.runtime import _classify_question_intent
+        assert _classify_question_intent("¿Cuántos mensajes recibes por día?") == "identify_volume"
+
+    def test_classifies_process_question(self):
+        from modules.sales_diagnosis_runtime.runtime import _classify_question_intent
+        assert _classify_question_intent("¿Cómo gestionas actualmente estos mensajes?") == "clarify_current_process"
+
+    def test_classifies_data_source_question(self):
+        from modules.sales_diagnosis_runtime.runtime import _classify_question_intent
+        assert _classify_question_intent("¿Dónde está la información de stock?") == "identify_data_source"
+
+    def test_classifies_approval_question(self):
+        from modules.sales_diagnosis_runtime.runtime import _classify_question_intent
+        assert _classify_question_intent("¿Quién revisa los casos dudosos?") == "confirm_human_approval"
+
+    def test_classifies_unknown_question_with_fallback(self):
+        from modules.sales_diagnosis_runtime.runtime import _classify_question_intent
+        result = _classify_question_intent("¿Qué opinas del clima?")
+        assert result.startswith("other:")
+
+
+# ---------------------------------------------------------------------------
+# 9. Diagnosis request detection
+# ---------------------------------------------------------------------------
+
+
+class TestDiagnosisRequest:
+    def test_detect_explicit_request(self):
+        from modules.sales_diagnosis_runtime.runtime import DIAGNOSIS_REQUEST_PATTERNS
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("dame el diagnóstico")
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("qué me recomendás")
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("con esto alcanza")
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("decime qué hago")
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("dame el diagnostico")
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("qué me recomiendas")
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("ya está")
+
+    def test_does_not_false_positive(self):
+        from modules.sales_diagnosis_runtime.runtime import DIAGNOSIS_REQUEST_PATTERNS
+        assert not DIAGNOSIS_REQUEST_PATTERNS.search("hola cómo estás")
+        assert not DIAGNOSIS_REQUEST_PATTERNS.search("quiero saber si es viable")

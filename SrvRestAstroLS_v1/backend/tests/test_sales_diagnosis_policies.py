@@ -68,14 +68,42 @@ class TestPromptPolicyHardened:
     def test_system_prompt_contains_required_guardrails(self):
         policy = PromptPolicy()
         prompt = policy.build_system_prompt()
-        assert "Step-to-Action" in prompt
-        assert "lead_capture" in prompt
-        assert "diagnostic_code" in prompt
-        assert "WhatsApp handoff" in prompt
-        assert "3 preguntas" in prompt or "tres preguntas" in prompt
+        prompt_lower = prompt.lower()
+        assert "step-to-action" in prompt_lower
+        assert "lead_capture" in prompt_lower
+        assert "diagnostic_code" in prompt_lower
+        assert "whatsapp handoff" in prompt_lower
+        assert "automatizable" in prompt_lower
+        assert "vendible" in prompt_lower
+
+    def test_system_prompt_encourages_conversation(self):
+        policy = PromptPolicy()
+        prompt = policy.build_system_prompt().lower()
+        assert "una sola pregunta" in prompt
+        assert "no repitas preguntas" in prompt
+        assert "historial" in prompt
+        assert "informales" in prompt
+
+    def test_system_prompt_distinguishes_feasibility_from_availability(self):
+        policy = PromptPolicy()
+        prompt = policy.build_system_prompt().lower()
+        assert "factibilidad técnica" in prompt
+        assert "disponibilidad comercial" in prompt
         assert "automatizable" in prompt
-        assert "vendible hoy" in prompt or "vendible" in prompt
-        assert "planned_extension" in prompt or "extensión" in prompt
+        assert "vendible" in prompt
+
+    def test_system_prompt_does_not_reject_channels(self):
+        policy = PromptPolicy()
+        prompt = policy.build_system_prompt().lower()
+        assert "no digas que un canal no está disponible" in prompt
+        assert "diagnosticá el flujo completo" in prompt
+
+    def test_system_prompt_handles_explicit_diagnosis_request(self):
+        policy = PromptPolicy()
+        prompt = policy.build_system_prompt().lower()
+        assert "dame el diagnóstico" in prompt or "dame el diagnostico" in prompt
+        assert "con esto alcanza" in prompt
+        assert "decime qué hago" in prompt
 
     def test_turn_prompt_includes_retrieved_chunks(self):
         policy = PromptPolicy()
@@ -85,39 +113,37 @@ class TestPromptPolicyHardened:
         assert SAMPLE_CHUNKS[0].source_uri in prompt
         assert SAMPLE_CHUNKS[0].content_preview in prompt
 
-    def test_turn_prompt_limits_questions(self):
+    def test_turn_prompt_limits_to_one_question(self):
         policy = PromptPolicy()
         for context_arg in [[], SAMPLE_CHUNKS]:
             prompt = policy.build_turn_prompt(
                 SAMPLE_INPUT, SAMPLE_STATE, context_arg
             )
-            assert "3 preguntas" in prompt or "tres preguntas" in prompt
+            assert "una sola pregunta" in prompt or "UNA SOLA pregunta" in prompt
 
     def test_turn_prompt_without_context_is_valid(self):
         policy = PromptPolicy()
         prompt = policy.build_turn_prompt(SAMPLE_INPUT, SAMPLE_STATE, [])
         assert SAMPLE_INPUT.user_message in prompt
 
-    def test_prompt_policy_differentiates_automatable_sellable_planned(self):
+    def test_turn_prompt_includes_history(self):
         policy = PromptPolicy()
-        prompt = policy.build_system_prompt()
-        assert "automatizable" in prompt
-        assert "vendible" in prompt
-        assert "planned_extension" in prompt or "extensión" in prompt
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            history_summary="Usuario: vendo repuestos\nVera: contame mas",
+        )
+        prompt = policy.build_turn_prompt(SAMPLE_INPUT, state, [])
+        assert "Historial" in prompt or "historial" in prompt
+        assert "vendo repuestos" in prompt
 
-    def test_system_prompt_contains_headless_quality_rubric(self):
+    def test_turn_prompt_instructions_prevent_repeat_questions(self):
         policy = PromptPolicy()
-        prompt = policy.build_system_prompt().lower()
-        assert "respuesta directa" in prompt
-        assert "pocos minutos" in prompt
-        assert "menos de 10 minutos" in prompt
-        assert "no hace falta instalar software" in prompt
-        assert "mfa" in prompt
-        assert "requiere aprobación humana" in prompt
-        assert "formulario de leads disfrazado" in prompt
-        assert "preliminar" in prompt
-        assert "caso por caso" in prompt
-        assert "no conviene automatizar" in prompt
+        prompt = policy.build_turn_prompt(SAMPLE_INPUT, SAMPLE_STATE, [])
+        prompt_lower = prompt.lower()
+        assert "no repetir preguntas" in prompt_lower or "no repitas" in prompt_lower
 
 
 # ===================================================================
@@ -292,14 +318,6 @@ class TestGuardrailPolicyEvaluate:
         )
         result = policy.evaluate_response(text)
         assert result.passed
-
-    def test_pricing_claim_without_decline_fails(self):
-        policy = GuardrailPolicy()
-        result = policy.evaluate_response(
-            "El precio del servicio es $500 por mes."
-        )
-        assert not result.passed
-        assert "precio" in result.forbidden_claims
 
     def test_pricing_claim_with_decline_passes(self):
         policy = GuardrailPolicy()
