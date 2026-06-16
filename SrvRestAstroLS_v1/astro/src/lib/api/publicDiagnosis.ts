@@ -5,6 +5,7 @@ import {
   type DiagnosisResult,
   type DiagnosisSession,
 } from "./diagnosis";
+import { API_BASE_URL } from "../../components/global.js";
 
 export const PUBLIC_DIAGNOSIS_CONTEXT = {
   assistant_instance_code: "team360_sales_diagnosis",
@@ -36,6 +37,32 @@ export interface PublicDiagnosisResponse {
   requires_human_approval?: boolean;
   /** True when classify was called successfully */
   diagnosis_real: boolean;
+}
+
+export interface TurnRequest {
+  session_id?: string;
+  message: string;
+}
+
+export interface TurnResponse {
+  session_id: string;
+  response_text: string;
+  turn_count: number;
+  is_new: boolean;
+}
+
+export async function sendPublicTurn(request: TurnRequest): Promise<TurnResponse> {
+  const url = `${API_BASE_URL}/diagnosis/turn`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "Error en la comunicación con el servidor");
+    throw new Error(detail);
+  }
+  return res.json();
 }
 
 function buildPreliminaryMessage(text: string): string {

@@ -75,3 +75,16 @@ class PublicLeadRequest(BaseModel):
     cta_type: str = ""
     contact: dict = Field(default_factory=dict)
     consent: bool = False
+
+
+class PublicTurnRequest(BaseModel):
+    session_id: str | None = None
+    message: str
+    locale: str = "es"
+
+
+class PublicTurnResponse(BaseModel):
+    session_id: str
+    response_text: str
+    turn_count: int = 0
+    is_new: bool = False

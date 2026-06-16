@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { PUBLIC_DIAGNOSIS_CONTEXT, startPublicDiagnosis } from "../../lib/api/publicDiagnosis";
-  import type { PublicDiagnosisResponse } from "../../lib/api/publicDiagnosis";
+  import { PUBLIC_DIAGNOSIS_CONTEXT, sendPublicTurn } from "../../lib/api/publicDiagnosis";
 
-  type EntryState = "idle" | "submitting" | "response" | "error";
+  interface ChatMessage {
+    role: "user" | "assistant";
+    text: string;
+  }
 
   const examples = [
     "Recibo leads por WhatsApp y no sé quién los sigue.",
@@ -10,144 +12,66 @@
     "Tengo reportes en Excel que armamos manualmente.",
   ];
 
-  let state = $state<EntryState>("idle");
-  let text = $state("");
-  let responseMessage = $state("");
-  let errorMessage = $state("");
-  let visitorAnonymousId = $state("");
-  let lastResponse = $state<PublicDiagnosisResponse | null>(null);
+  let sessionId = $state<string | null>(null);
+  let messages = $state<ChatMessage[]>([]);
+  let inputText = $state("");
+  let isLoading = $state(false);
+  let chatError = $state("");
 
-  const canSubmit = $derived(text.trim().length > 0 && state !== "submitting");
-  const mailHref = $derived.by(() => {
-    const subject = encodeURIComponent("Solicitar revisión con Vera");
-    const body = encodeURIComponent(`Hola Team360,\n\nQuiero revisar esta oportunidad de automatización:\n\n${text.trim()}\n\nGracias.`);
-    return `mailto:contacto@team360.live?subject=${subject}&body=${body}`;
-  });
-
-  function ensureVisitorAnonymousId(): string {
-    if (visitorAnonymousId) {
-      return visitorAnonymousId;
-    }
-
-    const storageKey = "team360_public_visitor_id";
-    const existing = window.localStorage.getItem(storageKey);
-
-    if (existing) {
-      visitorAnonymousId = existing;
-      return existing;
-    }
-
-    const generated = window.crypto?.randomUUID?.() ?? `anon_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-    window.localStorage.setItem(storageKey, generated);
-    visitorAnonymousId = generated;
-    return generated;
-  }
+  const canSend = $derived(inputText.trim().length > 0 && !isLoading);
 
   function useExample(example: string) {
-    text = example;
-    state = "idle";
-    errorMessage = "";
-    responseMessage = "";
-    lastResponse = null;
+    inputText = example;
   }
 
-  async function handleSubmit(event: SubmitEvent) {
-    event.preventDefault();
+  function scrollToBottom() {
+    requestAnimationFrame(() => {
+      const container = document.querySelector("[data-chat-messages]");
+      if (container) container.scrollTop = container.scrollHeight;
+    });
+  }
 
-    const trimmed = text.trim();
-    if (!trimmed || state === "submitting") {
-      return;
-    }
+  async function sendMessage() {
+    const text = inputText.trim();
+    if (!text || isLoading) return;
 
-    state = "submitting";
-    errorMessage = "";
-    responseMessage = "";
-    lastResponse = null;
+    messages = [...messages, { role: "user", text }];
+    inputText = "";
+    isLoading = true;
+    chatError = "";
+    scrollToBottom();
 
     try {
-      const result = await startPublicDiagnosis({
-        text: trimmed,
-        sourceUrl: window.location.href,
-        visitorAnonymousId: ensureVisitorAnonymousId(),
+      const result = await sendPublicTurn({
+        session_id: sessionId ?? undefined,
+        message: text,
       });
-      responseMessage = result.message;
-      lastResponse = result;
-      state = "response";
+      sessionId = result.session_id;
+      messages = [...messages, { role: "assistant", text: result.response_text }];
     } catch {
-      errorMessage = "No pudimos iniciar el diagnóstico automático ahora. Podés contactarnos y enviarnos este resumen.";
-      state = "error";
+      chatError = "No pudimos procesar tu mensaje ahora. Podés intentar de nuevo o contactarnos por correo.";
+    } finally {
+      isLoading = false;
+      scrollToBottom();
     }
   }
 
-  const CLASSIFICATION_LABELS: Record<string, string> = {
-    standard_package: "Paquete estándar",
-    operational_automation: "Automatización operativa",
-    consulting_required: "Requiere consultoría",
-    not_recommended: "No recomendado ahora",
-  };
-
-  const MODE_LABELS: Record<string, string> = {
-    read_only: "Solo consulta",
-    assisted: "Con supervisión humana",
-    approval_required: "Requiere aprobación",
-    execution: "Automatizable",
-    blocked: "No recomendado",
-  };
-
-  const RISK_FLAG_LABELS: Record<string, string> = {
-    browser_automation_candidate: "Posible automatización mediante navegador",
-    human_review_likely: "Probable revisión humana",
-    rules_partially_clear: "Reglas parcialmente definidas",
-    sensitive_data: "Puede involucrar datos sensibles",
-    validate_mfa: "Requiere validar autenticación multifactor",
-    high_human_dependency: "Alta dependencia de intervención humana",
-    multiple_systems: "Involucra múltiples sistemas",
-    manual_process: "Proceso mayormente manual",
-    compliance_required: "Requiere cumplimiento normativo",
-  };
-
-  function riskFlagLabel(flag: string): string {
-    if (RISK_FLAG_LABELS[flag]) return RISK_FLAG_LABELS[flag];
-    if (flag.includes("_")) {
-      return flag.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-    }
-    return flag.trim();
+  function newConversation() {
+    sessionId = null;
+    messages = [];
+    inputText = "";
+    chatError = "";
   }
 
-  const PRIORITY_LABELS: Record<string, string> = {
-    "90": "Alta factibilidad",
-    "80": "Buena factibilidad",
-    "70": "Factibilidad media",
-    "60": "Factibilidad media",
-    "50": "Factibilidad baja",
-    "40": "Factibilidad baja",
-    "30": "Factibilidad baja",
-    "20": "Complejo",
-    "10": "Complejo",
-    "0": "Muy complejo",
-  };
-
-  function scoreLabel(score: number): string {
-    return PRIORITY_LABELS[String(Math.floor(score / 10) * 10)] ?? `Puntaje: ${score}`;
-  }
-
-  function classificationLabel(key: string): string {
-    return CLASSIFICATION_LABELS[key] ?? key;
-  }
-
-  function modeLabel(key: string): string {
-    return MODE_LABELS[key] ?? key;
-  }
-
-  function safeText(text: unknown): string {
-    if (!text || typeof text !== "string") return "";
-    return text
-      .replace(/\*\*(.+?)\*\*/g, "$1")
-      .replace(/\*(.+?)\*/g, "$1")
-      .replace(/^[ \t]*[•\-*]\s*/gm, "")
-      .replace(/^>\s*/gm, "")
-      .trim();
-  }
+  const mailHref = $derived.by(() => {
+    const subject = encodeURIComponent("Solicitar revisión con Vera");
+    const body = encodeURIComponent(
+      messages.length > 0
+        ? `Conversación con Vera:\n\n${messages.map(m => `${m.role === 'user' ? 'Usuario' : 'Vera'}: ${m.text}`).join("\n")}\n\nGracias.`
+        : "Hola Team360,\n\nQuiero revisar esta oportunidad de automatización.\n\nGracias."
+    );
+    return `mailto:contacto@team360.live?subject=${subject}&body=${body}`;
+  });
 </script>
 
 <section id="vera" class="scroll-mt-24 border-y border-[#dbe7e9] bg-[#f6fbfa] py-20 sm:py-24" data-testid="public-vera-entry">
@@ -177,98 +101,128 @@
       </div>
     </div>
 
-    <form class="rounded-[1.75rem] border border-[#d7e5e7] bg-white p-5 shadow-[0_28px_70px_-58px_rgba(16,45,79,0.72)] sm:p-6" onsubmit={handleSubmit}>
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p class="text-sm font-bold text-[#153854]">Asistente Inteligente Vera</p>
-          <p class="mt-1 text-xs font-semibold text-[#78909f]">{PUBLIC_DIAGNOSIS_CONTEXT.service_code}</p>
+    <div class="rounded-[1.75rem] border border-[#d7e5e7] bg-white p-5 shadow-[0_28px_70px_-58px_rgba(16,45,79,0.72)] sm:p-6">
+      {#if messages.length === 0 && !sessionId}
+        <!-- Initial state: show header + textarea -->
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm font-bold text-[#153854]">Asistente Inteligente Vera</p>
+            <p class="mt-1 text-xs font-semibold text-[#78909f]">{PUBLIC_DIAGNOSIS_CONTEXT.service_code}</p>
+          </div>
+          <span class="inline-flex w-fit rounded-full bg-[#e8f7f5] px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[#168b88]">
+            Conversación
+          </span>
         </div>
-        <span class="inline-flex w-fit rounded-full bg-[#e8f7f5] px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[#168b88]">
-          Texto libre
-        </span>
-      </div>
 
-      <label class="mt-5 block">
-        <span class="sr-only">Resumen del proceso a mejorar</span>
-        <textarea
-          bind:value={text}
-          data-testid="public-vera-text"
-          rows="7"
-          class="min-h-44 w-full resize-y rounded-2xl border border-[#d5e2e5] bg-[#fbfdfc] px-4 py-4 text-base leading-7 text-[#203c55] outline-none transition placeholder:text-[#91a2ad] focus:border-[#168b88] focus:ring-2 focus:ring-[#168b88]/20"
-          placeholder="Ejemplo: recibimos consultas por WhatsApp, email y formularios. Hoy nadie sabe rápido quién respondió, qué lead quedó pendiente y qué campaña trajo cada venta..."
-        ></textarea>
-      </label>
+        <label class="mt-5 block">
+          <span class="sr-only">Mensaje para Vera</span>
+          <textarea
+            bind:value={inputText}
+            data-testid="public-vera-text"
+            rows="5"
+            class="min-h-36 w-full resize-y rounded-2xl border border-[#d5e2e5] bg-[#fbfdfc] px-4 py-4 text-base leading-7 text-[#203c55] outline-none transition placeholder:text-[#91a2ad] focus:border-[#168b88] focus:ring-2 focus:ring-[#168b88]/20"
+            placeholder="Ejemplo: recibimos consultas por WhatsApp, email y formularios. Hoy nadie sabe rápido quién respondió, qué lead quedó pendiente y qué campaña trajo cada venta..."
+          ></textarea>
+        </label>
 
-      <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <button
-          type="submit"
-          data-testid="public-vera-submit"
-          disabled={!canSubmit}
-          class="inline-flex min-h-12 justify-center rounded-full bg-[#168b88] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#126d6b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] disabled:cursor-not-allowed disabled:opacity-45"
-        >
-          {state === "submitting" ? "Analizando..." : "Analizar oportunidad"}
-        </button>
-        <a
-          data-testid="public-vera-mailto"
-          class="inline-flex min-h-12 justify-center rounded-full border border-[#c9dcdd] bg-white px-5 py-3 text-sm font-bold text-[#244966] transition hover:border-[#9fc8c7] hover:bg-[#f7fbfa] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
-          href={mailHref}
-        >
-          Solicitar revisión
-        </a>
-      </div>
-
-      {#if state === "response"}
-        <div class="mt-5 rounded-2xl border border-[#bfe5df] bg-[#effaf8] p-4" data-testid="public-vera-response">
-          {#if lastResponse?.diagnosis_real}
-            <div class="flex items-center gap-2">
-              <p class="text-sm font-bold text-[#126d6b]">Diagnóstico</p>
-              <span class="rounded-full bg-[#21b99f]/15 px-2 py-0.5 text-[0.65rem] font-bold text-[#126d6b]">En línea</span>
-            </div>
-            <div class="mt-2 flex flex-wrap gap-1.5">
-              {#if lastResponse.classification}
-                <span class="rounded-full bg-[#102d4f]/10 px-2.5 py-1 text-[0.7rem] font-semibold text-[#102d4f]">{classificationLabel(lastResponse.classification)}</span>
-              {/if}
-              {#if lastResponse.score_total !== undefined}
-                <span class="rounded-full bg-[#168b88]/10 px-2.5 py-1 text-[0.7rem] font-semibold text-[#168b88]">{scoreLabel(lastResponse.score_total)}</span>
-              {/if}
-              {#if lastResponse.automation_mode}
-                <span class="rounded-full bg-[#102d4f]/10 px-2.5 py-1 text-[0.7rem] font-semibold text-[#102d4f]">{modeLabel(lastResponse.automation_mode)}</span>
-              {/if}
-            </div>
-            {#if lastResponse.risk_flags && lastResponse.risk_flags.length > 0}
-              <div class="mt-3">
-                <p class="text-xs font-semibold text-[#8f6b2a]">Riesgos a considerar</p>
-                <div class="mt-1 flex flex-wrap gap-1.5">
-                  {#each lastResponse.risk_flags.slice(0, 4) as flag}
-                    <span class="rounded-full bg-[#fef3c7] px-2 py-0.5 text-[0.65rem] font-medium text-[#92400e]">{riskFlagLabel(flag)}</span>
-                  {/each}
-                </div>
-              </div>
-            {/if}
-            {#if safeText(responseMessage)}
-              <p class="mt-2 whitespace-pre-line text-sm leading-6 text-[#476275]">{safeText(responseMessage)}</p>
-            {/if}
-            <p class="mt-3 text-xs leading-5 text-[#6d8290]">
-              Este es un diagnóstico inicial de orientación. No ejecuta acciones, no crea leads, no confirma por WhatsApp y no deriva datos sin autorización.
-            </p>
-          {:else}
-            <p class="text-sm font-bold text-[#126d6b]">Vera respondió</p>
-            <p class="mt-2 text-sm leading-6 text-[#476275]">{responseMessage}</p>
-            <p class="mt-3 text-xs leading-5 text-[#6d8290]">
-              Todavía no capturamos datos de contacto ni generamos un resultado final. Podés solicitar una revisión y enviar este resumen al equipo.
-            </p>
-          {/if}
-        </div>
-      {:else if state === "error"}
-        <div class="mt-5 rounded-2xl border border-[#f3c7c7] bg-[#fff7f7] p-4" data-testid="public-vera-error">
-          <p class="text-sm font-bold text-[#991b1b]">No se pudo iniciar ahora</p>
-          <p class="mt-2 text-sm leading-6 text-[#8f3940]">{errorMessage}</p>
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            data-testid="public-vera-submit"
+            disabled={!canSend}
+            class="inline-flex min-h-12 justify-center rounded-full bg-[#168b88] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#126d6b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] disabled:cursor-not-allowed disabled:opacity-45"
+            onclick={sendMessage}
+          >
+            {isLoading ? "Analizando..." : "Enviar"}
+          </button>
+          <a
+            data-testid="public-vera-mailto"
+            class="inline-flex min-h-12 justify-center rounded-full border border-[#c9dcdd] bg-white px-5 py-3 text-sm font-bold text-[#244966] transition hover:border-[#9fc8c7] hover:bg-[#f7fbfa] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
+            href={mailHref}
+          >
+            Solicitar revisión
+          </a>
         </div>
       {:else}
-        <p class="mt-5 text-xs leading-5 text-[#71878e]">
-          La primera respuesta es preliminar. El diagnóstico completo y la captura de lead se habilitan en una etapa posterior.
-        </p>
+        <!-- Chat mode -->
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <p class="text-sm font-bold text-[#153854]">Asistente Inteligente Vera</p>
+            <p class="mt-1 text-xs font-semibold text-[#78909f]">
+              {PUBLIC_DIAGNOSIS_CONTEXT.service_code}
+              {#if sessionId}
+                <span class="ml-1 text-[0.6rem] text-[#91a2ad]">· {sessionId.slice(0, 16)}…</span>
+              {/if}
+            </p>
+          </div>
+          <button
+            type="button"
+            class="rounded-full border border-[#c9dcdd] px-3 py-1.5 text-[0.65rem] font-semibold text-[#476275] transition hover:border-[#9fc8c7] hover:bg-[#f7fbfa]"
+            onclick={newConversation}
+          >
+            Nueva conversación
+          </button>
+        </div>
+
+        <div
+          data-chat-messages
+          class="mt-4 flex max-h-96 flex-col gap-3 overflow-y-auto rounded-2xl border border-[#d5e2e5] bg-[#fbfdfc] p-3"
+        >
+          {#each messages as msg}
+            {#if msg.role === "user"}
+              <div class="self-end max-w-[85%] rounded-2xl rounded-br-sm bg-[#168b88] px-4 py-2.5 text-sm leading-6 text-white">
+                {msg.text}
+              </div>
+            {:else}
+              <div class="self-start max-w-[85%] rounded-2xl rounded-bl-sm border border-[#d5e2e5] bg-white px-4 py-2.5 text-sm leading-6 text-[#203c55]">
+                {msg.text}
+              </div>
+            {/if}
+          {/each}
+          {#if isLoading}
+            <div class="self-start flex items-center gap-2 rounded-2xl rounded-bl-sm border border-[#d5e2e5] bg-white px-4 py-2.5 text-sm text-[#78909f]">
+              <span class="inline-block h-2 w-2 animate-pulse rounded-full bg-[#168b88]"></span>
+              Vera está escribiendo...
+            </div>
+          {/if}
+        </div>
+
+        {#if chatError}
+          <div class="mt-3 rounded-2xl border border-[#f3c7c7] bg-[#fff7f7] p-3 text-sm leading-5 text-[#8f3940]">
+            {chatError}
+          </div>
+        {/if}
+
+        <div class="mt-4 flex gap-2">
+          <textarea
+            bind:value={inputText}
+            data-testid="public-vera-chat-input"
+            rows="2"
+            class="min-h-[3.5rem] flex-1 resize-none rounded-2xl border border-[#d5e2e5] bg-[#fbfdfc] px-4 py-3 text-sm leading-5 text-[#203c55] outline-none transition placeholder:text-[#91a2ad] focus:border-[#168b88] focus:ring-2 focus:ring-[#168b88]/20"
+            placeholder="Escribí tu mensaje..."
+          ></textarea>
+          <button
+            type="button"
+            disabled={!canSend}
+            class="inline-flex min-h-[3.5rem] items-center justify-center rounded-full bg-[#168b88] px-5 text-sm font-bold text-white transition hover:bg-[#126d6b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] disabled:cursor-not-allowed disabled:opacity-45"
+            onclick={sendMessage}
+          >
+            {isLoading ? "..." : "Enviar"}
+          </button>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between">
+          <a
+            class="text-xs font-medium text-[#78909f] underline transition hover:text-[#476275]"
+            href={mailHref}
+          >
+            Solicitar revisión por correo
+          </a>
+          <p class="text-[0.6rem] text-[#91a2ad]">
+            Turno {messages.filter(m => m.role === 'user').length}
+          </p>
+        </div>
       {/if}
-    </form>
+    </div>
   </div>
 </section>

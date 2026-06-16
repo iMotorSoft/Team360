@@ -23,6 +23,7 @@ from routes.diagnosis import (
     public_message,
     public_start,
     public_submit_checklist,
+    public_turn,
 )
 from routes.health import get_health
 from routes.sales_diagnosis_runtime import sales_diagnosis_turn
@@ -72,6 +73,7 @@ def create_app() -> Litestar:
             public_get_session,
             public_submit_checklist,
             public_lead,
+            public_turn,
             sales_diagnosis_turn,
             dev_sales_diagnosis_turn,
         ],

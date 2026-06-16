@@ -265,3 +265,53 @@ def test_public_message_persistence_error_returns_503(monkeypatch):
             json={"session_id": "diag_test", "text": "test"},
         )
     assert response.status_code == 503
+
+
+# ── /api/diagnosis/turn ───────────────────────────────────────────────────
+
+
+def test_public_turn_first_message_creates_session():
+    with _client() as client:
+        response = client.post("/api/diagnosis/turn", json={"message": "Quiero automatizar mi proceso de ventas."})
+    assert response.status_code == 201
+    data = response.json()
+    assert data["session_id"]
+    assert data["is_new"] is True
+    assert data["turn_count"] >= 1
+    assert len(data["response_text"]) > 0
+
+
+def test_public_turn_second_message_reuses_session():
+    with _client() as client:
+        first = client.post("/api/diagnosis/turn", json={"message": "Quiero automatizar mi proceso de ventas."})
+    assert first.status_code == 201
+    sid = first.json()["session_id"]
+
+    with _client() as client:
+        second = client.post("/api/diagnosis/turn", json={"session_id": sid, "message": "El principal problema es el seguimiento de leads."})
+    assert second.status_code == 201
+    data = second.json()
+    assert data["session_id"] == sid
+    assert data["is_new"] is False
+    assert data["turn_count"] >= 2
+    assert len(data["response_text"]) > 0
+
+
+def test_public_turn_empty_message_returns_422():
+    with _client() as client:
+        response = client.post("/api/diagnosis/turn", json={"message": ""})
+    assert response.status_code == 422
+
+
+def test_public_turn_unknown_session_creates_new():
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"session_id": "nonexistent_conv_000000000000", "message": "Hola"},
+        )
+    assert response.status_code == 201
+    data = response.json()
+    # Non-existent session_id should create new state for that ID
+    assert data["session_id"] == "nonexistent_conv_000000000000"
+    assert data["is_new"] is False  # session_id was provided
+    assert data["turn_count"] >= 1
