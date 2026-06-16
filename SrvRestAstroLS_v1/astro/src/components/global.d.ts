@@ -4,8 +4,12 @@ export const APP_PUBLIC_NAME: "Team360 Console";
 export const PUBLIC_SITE_URL: "https://team360.live";
 export const CONSOLE_SITE_URL: "https://console.team360.live";
 
-export const API_BASE_URL: "/api";
-export const AGUI_BASE_URL: "/api/agui";
+export const URL_REST: "http://localhost:7050" | "https://console.team360.live";
+export const getRestBaseUrl: () => string;
+
+export const API_BASE_URL: string;
+export const AGUI_BASE_URL: string;
+export const URL_SSE: string;
 
 export const DEFAULT_LOCALE: "es";
 export const SUPPORTED_LOCALES: readonly ["es", "en", "he"];
@@ -33,4 +37,5 @@ export const ROUTES: Readonly<{
   workspace: (workspaceId: string) => string;
   workspaceServices: (workspaceId: string) => string;
   workspaceReports: (workspaceId: string) => string;
+  workspaceDiagnosis: (workspaceId: string) => string;
 }>;

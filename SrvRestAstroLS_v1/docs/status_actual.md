@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-15 (Preparacion Build Production / Public Home Release /t360)
+Ultima actualizacion: 2026-06-16 (Auditoria URLs frontend e invariante lat.md)
 
 ## Directorio de trabajo
 
@@ -2437,3 +2437,37 @@ pero **no se ejecutaron las validaciones finales** sobre los cambios del lab.
   - Secret scan: sin secretos.
 - **No se tocó**: runtime, frontend home existente, Console, Knowledge Ingestion, LiteLLM, endpoint productivo, header/footer/layout (solo t360.astro).
 - **No se activó**: Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff. Sin commits.
+
+### 2026-06-15 - Migracion global.js a patron Vertice360
+
+- **Objetivo**: Incorporar el patron de `global.js` de Vertice360 (toggle dev/pro, helper centralizado, URL_SSE, regla de unica fuente de verdad para endpoints).
+- **Cambios en `SrvRestAstroLS_v1/astro/src/components/global.js`**:
+  - Se agregaron `URL_REST_DEV` / `URL_REST_PRO` con toggle `IS_REST_PRO`.
+  - Se agrego `getRestBaseUrl()` (helper sin trailing slash).
+  - Se agrego `URL_SSE` derivado de `getRestBaseUrl()`.
+  - `API_BASE_URL` y `AGUI_BASE_URL` ahora se derivan de `getRestBaseUrl()` en lugar de ser strings fijas.
+  - Se agrego comentario de regla: "unica fuente de verdad para endpoint REST — no hardcodear URLs fuera de este archivo".
+- **Cambios en `global.d.ts`**: tipado sincronizado con nuevas exportaciones (`URL_REST`, `getRestBaseUrl`, `URL_SSE`, `workspaceDiagnosis` en ROUTES).
+- **Validacion**: `pnpm check` 0 errors, 0 warnings, 0 hints.
+- **Pendiente revision** (manana): verificar que ningun componente en `src/lib/` ni `src/components/` tenga URLs hardcodeadas o importe `API_BASE_URL` como string fija. Idealmente migrar esos imports a `URL_REST` o `getRestBaseUrl()` desde `global.js`.
+- **Pendiente documentacion**: una vez validado que quede funcionando, documentar las reglas en `lat.md/` como invariante de arquitectura frontend (fuente de verdad, no hardcodear, toggle dev/pro, helper central).
+
+### 2026-06-16 - Auditoria URLs frontend e invariante lat.md
+
+- **Objetivo**: Cerrar los dos pendientes del 15/06: auditar URLs hardcodeadas en frontend y documentar invariante en `lat.md/`.
+- **Auditoria**: se revisaron 33 archivos en `src/lib/` y `src/components/`:
+  - 3 issues corregidos:
+    1. `src/lib/api/diagnosis.ts`: migrado de `const API_BASE = "/api/automation-diagnosis"` a import desde `global.js` (`API_BASE_URL`).
+    2. `MarketingFooter.astro`: migrado de `href="https://console.team360.live/login"` a `CONSOLE_SITE_URL` desde `global.js`.
+    3. `MarketingHeader.astro`: migrado de `href="https://console.team360.live/login"` a `CONSOLE_SITE_URL` desde `global.js`.
+  - 8 archivos ya usaban correctamente imports desde `global.js` (Section B).
+  - 33 archivos estaban limpios sin URLs hardcodeadas (Section C).
+- **Documentacion en lat.md/**: se creo `lat.md/team360-frontend-url-source-of-truth.md` con 5 reglas invariantes:
+  1. `global.js` es la unica fuente de verdad.
+  2. No hardcodear URLs fuera de `global.js`.
+  3. Toggle dev/pro exclusivo via `IS_REST_PRO`.
+  4. API clients en `src/lib/` deben importar desde `global.js`.
+  5. `global.d.ts` debe sincronizarse con `global.js`.
+- Se actualizaron: `lat.md/lat.md` (nueva referencia), `lat.md/status_actual.md`.
+- **Validacion**: `pnpm check` = 0 errors, 0 warnings, 0 hints.
+- **No se toco**: runtime, endpoints, DB, Console, Knowledge Ingestion, LiteLLM, Milvus, Step-to-Action, lead_capture, WhatsApp handoff.

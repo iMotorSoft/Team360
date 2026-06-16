@@ -4,8 +4,20 @@ export const APP_PUBLIC_NAME = "Team360 Console";
 export const PUBLIC_SITE_URL = "https://team360.live";
 export const CONSOLE_SITE_URL = "https://console.team360.live";
 
-export const API_BASE_URL = "/api";
-export const AGUI_BASE_URL = "/api/agui";
+// -- Backend REST endpoint (dev/pro conmutable) --
+// Todos los API clients en src/lib/ deben importar URL_REST desde aquí,
+// no hardcodear URLs. Es la única fuente de verdad para el endpoint REST.
+const URL_REST_DEV = "http://localhost:7050";
+const URL_REST_PRO = "https://console.team360.live";
+const IS_REST_PRO = false; // toggle: cambiar a true para producción
+
+export const URL_REST = IS_REST_PRO ? URL_REST_PRO : URL_REST_DEV;
+
+export const getRestBaseUrl = () => String(URL_REST || "").replace(/\/+$/, "");
+
+export const API_BASE_URL = `${getRestBaseUrl()}/api`;
+export const AGUI_BASE_URL = `${getRestBaseUrl()}/api/agui`;
+export const URL_SSE = `${getRestBaseUrl()}/api/agui/stream`;
 
 export const DEFAULT_LOCALE = "es";
 export const SUPPORTED_LOCALES = ["es", "en", "he"];

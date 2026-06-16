@@ -11,7 +11,7 @@ No inicia servidores, no lee secrets, no imprime API keys.
 Uso:
     # Terminal 1 — backend con LiteLLM:
     TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \\
-      uv run uvicorn app:app --host 127.0.0.1 --port 8000
+      uv run uvicorn app:app --host 127.0.0.1 --port 7050
 
     # Terminal 2 — smoke LiteLLM opt-in:
     TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \\
@@ -29,7 +29,7 @@ from typing import Any
 from uuid import uuid4
 
 
-DEFAULT_BACKEND_URL = "http://127.0.0.1:8000"
+DEFAULT_BACKEND_URL = "http://127.0.0.1:7050"
 ENDPOINT = "/api/dev/sales-diagnosis-runtime/turn"
 UNIQUE_SESSION = f"smoke_dev_litellm_{uuid4().hex[:12]}"
 CHECKS: list[str] = []

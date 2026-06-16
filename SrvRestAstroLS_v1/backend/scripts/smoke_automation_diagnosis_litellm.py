@@ -15,7 +15,7 @@ import urllib.request
 from typing import Any
 
 
-DEFAULT_BACKEND_URL = "http://127.0.0.1:8000"
+DEFAULT_BACKEND_URL = "http://127.0.0.1:7050"
 
 
 ANSWERS: list[tuple[str, dict[str, Any]]] = [

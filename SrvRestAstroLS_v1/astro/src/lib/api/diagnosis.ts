@@ -1,4 +1,6 @@
-const API_BASE = "/api/automation-diagnosis";
+import { API_BASE_URL } from "../../components/global.js";
+
+const API_BASE = `${API_BASE_URL}/automation-diagnosis`;
 
 export interface DiagnosisSession {
   id: string;

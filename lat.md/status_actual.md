@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-14
+Ultima actualizacion: 2026-06-16
 
 ## Estado general
 
@@ -11,6 +11,21 @@ Ultima actualizacion: 2026-06-14
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-16 - Frontend URL source of truth invariant
+
+- Se agrego `team360-frontend-url-source-of-truth.md` como invariante de arquitectura frontend.
+- Se fijaron 5 reglas:
+  1. `global.js` es la unica fuente de verdad para endpoints REST, URLs de site y SSE.
+  2. No hardcodear URLs fuera de `global.js`.
+  3. Toggle dev/pro exclusivo via `IS_REST_PRO` en `global.js`.
+  4. API clients en `src/lib/` deben importar desde `global.js`.
+  5. `global.d.ts` debe sincronizarse con `global.js`.
+- Se auditaron `src/lib/` y `src/components/` (33 archivos limpios, 3 corregidos):
+  - `src/lib/api/diagnosis.ts`: migrado a `API_BASE_URL` desde global.js.
+  - `MarketingFooter.astro` y `MarketingHeader.astro`: migrados a `CONSOLE_SITE_URL` desde global.js.
+- Validacion: `pnpm check` = 0 errors, 0 warnings, 0 hints.
+- Se actualizo `lat.md/lat.md` con referencia `[[team360-frontend-url-source-of-truth]]`.
 
 ### 2026-06-14 - Modelo T360 Pack, Task, Flow, Integrate y Diagnostico
 

@@ -12,14 +12,14 @@ the test sessions from PostgreSQL after the run (``--cleanup`` flag).
 Usage:
     # Terminal 1 — backend (default inmemory):
     cd SrvRestAstroLS_v1/backend
-    uv run uvicorn app:app --host 127.0.0.1 --port 8000
+    uv run uvicorn app:app --host 127.0.0.1 --port 7050
 
     # Terminal 2 — smoke default:
     uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
 
     # Terminal 1 — backend (postgres opt-in):
     TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \\
-      uv run uvicorn app:app --host 127.0.0.1 --port 8000
+      uv run uvicorn app:app --host 127.0.0.1 --port 7050
 
     # Terminal 2 — smoke postgres (same smoke, optional cleanup):
     uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
@@ -37,7 +37,7 @@ from typing import Any
 from uuid import uuid4
 
 
-DEFAULT_BACKEND_URL = "http://127.0.0.1:8000"
+DEFAULT_BACKEND_URL = "http://127.0.0.1:7050"
 ENDPOINT = "/api/dev/sales-diagnosis-runtime/turn"
 UNIQUE_SESSION = f"smoke_dev_{uuid4().hex[:12]}"
 CHECKS: list[str] = []

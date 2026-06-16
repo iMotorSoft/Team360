@@ -1,6 +1,7 @@
 ---
 import LinkButton from "../ui/LinkButton.astro";
 import BrandMark from "./BrandMark.astro";
+import { CONSOLE_SITE_URL } from "../global.js";
 
 interface Props {
   ctaHref?: string;
@@ -29,7 +30,7 @@ const {
     <div class="flex items-center gap-2 sm:gap-3">
       <a
         class="hidden text-sm font-semibold text-[#39536b] transition hover:text-[#102d4f] sm:inline"
-        href="https://console.team360.live/login"
+        href={`${CONSOLE_SITE_URL}/login`}
       >
         Acceso clientes
       </a>

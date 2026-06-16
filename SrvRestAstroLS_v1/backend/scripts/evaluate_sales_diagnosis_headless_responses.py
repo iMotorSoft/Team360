@@ -22,7 +22,7 @@ from typing import Any
 from uuid import uuid4
 
 
-DEFAULT_BACKEND_URL = "http://127.0.0.1:8018"
+DEFAULT_BACKEND_URL = "http://127.0.0.1:7050"
 PRODUCT_ENDPOINT = "/api/sales-diagnosis-runtime/turn"
 DEV_ENDPOINT = "/api/dev/sales-diagnosis-runtime/turn"
 DEFAULT_DATASET = Path(__file__).resolve().parents[1] / "tests/fixtures/sales_diagnosis_headless_questions_v1.json"

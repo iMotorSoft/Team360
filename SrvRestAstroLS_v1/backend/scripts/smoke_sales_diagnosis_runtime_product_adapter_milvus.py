@@ -30,7 +30,7 @@ Uso:
     TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
     TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
     TEAM360_MILVUS_HOST=127.0.0.1 \
-      uv run uvicorn app:app --host 127.0.0.1 --port 8018
+      uv run uvicorn app:app --host 127.0.0.1 --port 7050
 
     # Terminal 2 — smoke Milvus product adapter:
     TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
@@ -53,7 +53,7 @@ from typing import Any
 from uuid import uuid4
 
 
-DEFAULT_BACKEND_URL = "http://127.0.0.1:8018"
+DEFAULT_BACKEND_URL = "http://127.0.0.1:7050"
 ENDPOINT = "/api/sales-diagnosis-runtime/turn"
 UNIQUE_SESSION = f"smoke_product_milvus_{uuid4().hex[:12]}"
 CHECKS: list[str] = []

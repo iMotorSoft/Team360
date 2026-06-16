@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 
 from litestar import Litestar, get
+from litestar.config.cors import CORSConfig
 from litestar.exceptions import HTTPException
 from litestar.status_codes import HTTP_404_NOT_FOUND
 
@@ -76,6 +77,14 @@ def create_app() -> Litestar:
         ],
         on_startup=[_open_db_pool],
         on_shutdown=[_close_db_pool],
+        cors_config=CORSConfig(
+            allow_origins=[
+                "http://localhost:3050",
+                "http://127.0.0.1:3050",
+            ],
+            allow_methods=["*"],
+            allow_headers=["*"],
+        ),
         debug=True,
     )
 
