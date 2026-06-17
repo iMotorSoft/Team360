@@ -335,8 +335,10 @@ class TestRuntimeDecisionPolicy:
 
         assert output.response_type in {"final", "diagnosis"}
         assert output.next_state is not None
-        assert output.next_state.semantic_memory.get("human_approval")
-        assert "descuentos especiales" in output.next_state.semantic_memory.get("human_approval", "")
+        mem = output.next_state.semantic_memory
+        assert mem.get("human_approval") == "conditional"
+        assert "discounts" in mem.get("entities", [])
+        assert "human_approval" in mem or "current_process" in mem
 
 
 # ---------------------------------------------------------------------------

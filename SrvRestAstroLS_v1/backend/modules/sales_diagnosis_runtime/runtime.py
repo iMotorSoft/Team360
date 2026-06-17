@@ -24,6 +24,17 @@ from modules.sales_diagnosis_runtime.errors import (
     SalesDiagnosisRuntimeError,
     UnsafeResponseError,
 )
+from modules.sales_diagnosis_runtime.canonical_patterns import (
+    GENERAL_OUTCOME_PATTERNS,
+    GENERAL_PROBLEM_PATTERNS,
+    extract_approval,
+    extract_channels,
+    extract_entities,
+    extract_systems,
+    extract_volume,
+    is_business_context,
+    is_correction,
+)
 from modules.sales_diagnosis_runtime.intent_classifier import (
     CLASSIFIER_CONFIDENCE_MODERATE,
     CLASSIFIER_CONFIDENCE_STRONG,
@@ -66,30 +77,9 @@ DIAGNOSIS_REQUEST_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
-GENERAL_PROBLEM_PATTERNS = re.compile(
-    r"\b(problem|pierd|tard|error|manual|desorden|lento|d[ií]ficil|complej|cuest|sobrecarga|desorganiz|descontrol|desordenad|ca[oó]tico|ineficiente)\b",
-    re.IGNORECASE,
-)
-
-GENERAL_OUTCOME_PATTERNS = re.compile(
-    r"\b(quer[eé]|necesit|automatiz|orden|mejor|aceler|respond|optimiz|agiliz|simplific|digitaliz)\b",
-    re.IGNORECASE,
-)
-
-GENERAL_CHANNEL_PATTERNS = re.compile(
-    r"\b(whatsapp|email|correo|web|sitio|p[aá]gina|facebook|instagram|redes|presencial|local|llamada|tel[eé]fono|chat|app|portal)\b",
-    re.IGNORECASE,
-)
-
-GENERAL_SYSTEM_PATTERNS = re.compile(
-    r"\b(sistema|programa|software|app|aplicaci[oó]n|plataforma|herramienta|base\s*de\s*dato|bd|erp|crm|planilla|excel|sheet)\b",
-    re.IGNORECASE,
-)
-
-GENERAL_APPROVAL_PATTERNS = re.compile(
-    r"\b(aprobaci[oó]n|supervisor|revisa|revisi[oó]n|autoriz|humano|persona\s*revisa|control|validaci[oó]n)\b",
-    re.IGNORECASE,
-)
+# ---------------------------------------------------------------------------
+# Canonical multilingual extraction is now in canonical_patterns.py
+# ---------------------------------------------------------------------------
 
 
 class AssistantConversationRuntime:
@@ -275,16 +265,59 @@ class AssistantConversationRuntime:
 
         msg = input.user_message
 
+        # Business context — first mention of business type
         if not mem.get("business_context"):
-            match = re.search(r"(?:mi\s+)?(negocio|empresa|comercio|tienda|taller|local|profesi[oó]n)\s+(es|de|se\s+dedica|vende|vendo|ofrece|trabajo)", msg, re.IGNORECASE)
-            if match:
-                mem["business_context"] = msg
+            ctx = is_business_context(msg)
+            if ctx:
+                mem["business_context"] = ctx
 
-        if not mem.get("channels"):
-            channels = GENERAL_CHANNEL_PATTERNS.findall(msg)
-            if channels:
-                mem["channels"] = list(dict.fromkeys(c.lower() for c in channels))
+        # Channels — canonical, multilingual
+        channels = extract_channels(msg)
+        if channels:
+            existing = mem.get("channels", [])
+            for c in channels:
+                if c not in existing:
+                    existing.append(c)
+            mem["channels"] = existing
 
+        # Systems and data sources — canonical, multilingual
+        systems = extract_systems(msg)
+        if systems:
+            existing = mem.get("systems_and_data_sources", [])
+            for s in systems:
+                if s not in existing:
+                    existing.append(s)
+            mem["systems_and_data_sources"] = existing
+
+        # Business entities (inventory, prices, etc.)
+        entities = extract_entities(msg)
+        if entities:
+            existing = mem.get("entities", [])
+            for e in entities:
+                if e not in existing:
+                    existing.append(e)
+            mem["entities"] = existing
+
+        # Approval / human review — canonical
+        approval = extract_approval(msg)
+        if approval:
+            existing = mem.get("human_approval", "")
+            # Only upgrade from '' or 'not_required' to stronger
+            if not existing or existing == "not_required":
+                mem["human_approval"] = approval
+            elif existing == "required" and approval == "conditional":
+                pass  # keep required
+            elif approval == "required":
+                mem["human_approval"] = "required"
+            elif approval == "conditional" and not existing:
+                mem["human_approval"] = "conditional"
+
+        # Volume — canonical
+        volume = extract_volume(msg)
+        if volume:
+            mem["volume"] = volume
+
+        # Problem and outcome — broad heuristic match (keep backward compat)
         if not mem.get("main_problem"):
             if GENERAL_PROBLEM_PATTERNS.search(msg):
                 mem["main_problem"] = msg
@@ -292,16 +325,6 @@ class AssistantConversationRuntime:
         if not mem.get("desired_outcome"):
             if GENERAL_OUTCOME_PATTERNS.search(msg):
                 mem["desired_outcome"] = msg
-
-        if GENERAL_SYSTEM_PATTERNS.search(msg):
-            existing = set(mem.get("systems_and_data_sources", []))
-            systems = re.findall(r"\b(planilla|excel|sheet|sistema|programa|software|app|aplicaci[oó]n|plataforma|herramienta|erp|crm|base de datos|bd)\b", msg, re.IGNORECASE)
-            new_systems = list(dict.fromkeys(s.lower() for s in systems if s.lower() not in existing))
-            if new_systems:
-                mem["systems_and_data_sources"] = mem.get("systems_and_data_sources", []) + new_systems
-
-        if GENERAL_APPROVAL_PATTERNS.search(msg):
-            mem["human_approval"] = msg
 
         if not mem.get("current_process") and len(msg.split()) >= 5:
             mem["current_process"] = msg
@@ -314,37 +337,44 @@ class AssistantConversationRuntime:
 
     def _resolve_contradictions(self, state: ConversationState, input: AssistantTurnInput) -> None:
         mem = state.semantic_memory or {}
-        msg_lower = input.user_message.lower()
+        msg = input.user_message
+        msg_lower = msg.lower()
         corrected = False
 
-        correction_phrases = ["en realidad", "no es", "corrección", "correccion", "mejor dicho", "rectifico", "rectificamos", "disculpa", "perdón", "perdon"]
-        is_correction = any(p in msg_lower for p in correction_phrases)
+        if not is_correction(msg):
+            if corrected:
+                state.semantic_memory = mem
+            return
 
-        data_sources = mem.get("systems_and_data_sources", [])
-        new_systems_found = re.findall(r"\b(planilla|excel|sheet|sistema|programa|software|app|erp|crm|base de datos|bd)\b", msg_lower, re.IGNORECASE)
-        new_set = set(s.lower() for s in new_systems_found)
+        # Detect source replacements: "I said X before, but actually Y" or similar
+        # Extract all canonical systems mentioned in this message
+        new_systems = extract_systems(msg)
+        old_systems = mem.get("systems_and_data_sources", [])
 
-        if "planilla" in msg_lower and ("stock" in msg_lower or "precio" in msg_lower or "precios" in msg_lower):
-            stock_in_msg = "stock" in msg_lower or "inventario" in msg_lower or "existencia" in msg_lower
-            price_in_msg = "precio" in msg_lower or "precios" in msg_lower or "precio" in msg_lower
-
-            if stock_in_msg and "planilla" not in str(data_sources).lower():
-                data_sources.append("planilla")
-                corrected = True
-
-        if "sistema" in msg_lower:
-            mem["systems_and_data_sources"] = list(dict.fromkeys(data_sources + ["sistema"]))
+        # If we found canonical systems in a correction, replace old sources with new
+        if new_systems:
+            mem["systems_and_data_sources"] = new_systems
             corrected = True
 
-        if is_correction:
-            if "stock" in msg_lower or "inventario" in msg_lower:
-                mem["stock_source"] = "sistema" if "sistema" in msg_lower else data_sources[0] if data_sources else "desconocido"
-            if "precio" in msg_lower or "precios" in msg_lower:
-                mem["price_source"] = "planilla" if "planilla" in msg_lower else "sistema" if "sistema" in msg_lower else data_sources[0] if data_sources else "desconocido"
-            contradictions = mem.get("contradictions", [])
-            contradictions.append(f"User corrected in turn {state.turn_count}: {input.user_message[:120]}")
-            mem["contradictions"] = contradictions
+        # Extract all canonical entities in the correction
+        new_entities = extract_entities(msg)
+        if new_entities:
+            mem["entities"] = new_entities
+            # Also check for volume correction (e.g., "not 80, is 120")
+            if "inventory" in new_entities or ("inventory" in old_systems):
+                pass  # entities are already set
+
+        # Volume correction — extract new volume if message contains a number
+        new_volume = extract_volume(msg)
+        if new_volume:
+            mem["volume"] = new_volume
             corrected = True
+
+        # Log the correction
+        contradictions = mem.get("contradictions", [])
+        contradictions.append(f"User corrected in turn {state.turn_count}: {input.user_message[:120]}")
+        mem["contradictions"] = contradictions
+        corrected = True
 
         if corrected:
             state.semantic_memory = mem
