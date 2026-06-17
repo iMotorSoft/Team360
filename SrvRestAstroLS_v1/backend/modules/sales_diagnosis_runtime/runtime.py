@@ -23,6 +23,18 @@ from modules.sales_diagnosis_runtime.errors import (
     SalesDiagnosisRuntimeError,
     UnsafeResponseError,
 )
+from modules.sales_diagnosis_runtime.intent_classifier import (
+    CLASSIFIER_CONFIDENCE_MODERATE,
+    CLASSIFIER_CONFIDENCE_STRONG,
+    HIGH_CONFIDENCE_RULES,
+    IntentClassification,
+    IntentClassifier,
+    IntentScope,
+    IntentSource,
+    IntentStateSummary,
+    IntentType,
+    match_high_confidence,
+)
 from modules.sales_diagnosis_runtime.policies import GuardrailPolicy, PromptPolicy
 from modules.sales_diagnosis_runtime.providers import (
     AuditTrail,
@@ -89,6 +101,7 @@ class AssistantConversationRuntime:
         guardrail_policy: GuardrailPolicy | None = None,
         metrics_recorder: MetricsRecorder | None = None,
         audit_trail: AuditTrail | None = None,
+        intent_classifier: IntentClassifier | None = None,
     ) -> None:
         self._retrieval = retrieval_provider or NullRetrievalProvider()
         self._llm = llm_provider or NullLLMProvider()
@@ -97,6 +110,7 @@ class AssistantConversationRuntime:
         self._guardrail_policy = guardrail_policy or GuardrailPolicy()
         self._metrics = metrics_recorder or NullMetricsRecorder()
         self._audit = audit_trail or NullAuditTrail()
+        self._intent_classifier = intent_classifier
 
     # ------------------------------------------------------------------
     # Public API
@@ -133,9 +147,11 @@ class AssistantConversationRuntime:
         # 4.5 Resolve language
         lang_state = self._resolve_response_language(state, input)
 
-        # 5. Decide action: diagnose or gather
-        user_requested = self._is_diagnosis_request(input.user_message, state)
-        should_diagnose = user_requested and self._is_ready_to_diagnose(state)
+        # 4.6 Classify intent
+        intent = self._classify_intent(state, input)
+
+        # 5. Decide action based on intent + coverage + safety
+        should_diagnose = self._decide_turn(intent, state)
 
         # 6. Build retrieval query from UPDATED semantic memory
         retrieval_query = self._build_retrieval_query(input, state)
@@ -196,6 +212,11 @@ class AssistantConversationRuntime:
 
         if should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
             state.semantic_memory["diagnosis_status"] = "completed"
+        decision_reason = intent.source.value if intent.source != IntentSource.RUNTIME_FALLBACK else self._readiness_reason(state)
+        if intent.intent in (IntentType.REQUEST_DIAGNOSIS, IntentType.STOP_INTERVIEW) and should_diagnose:
+            decision_reason = f"{intent.intent.value}_with_coverage"
+        elif intent.intent == IntentType.REQUEST_DIAGNOSIS and not should_diagnose:
+            decision_reason = f"{intent.intent.value}_missing_critical"
 
         output = AssistantTurnOutput(
             response_text=raw_response,
@@ -209,7 +230,14 @@ class AssistantConversationRuntime:
                 "action": "diagnose" if should_diagnose else "reflect_and_ask",
                 "retrieval_query": retrieval_query,
                 "diagnosis_status": state.semantic_memory.get("diagnosis_status", "gathering"),
-                "readiness_reason": "user_requested" if user_requested and should_diagnose else self._readiness_reason(state),
+                "readiness_reason": decision_reason,
+                "intent": intent.intent.value,
+                "intent_scope": intent.scope.value,
+                "intent_confidence": intent.confidence,
+                "intent_source": intent.source.value,
+                "matched_rule": intent.matched_rule,
+                "classifier_called": intent.source
+                    not in (IntentSource.HIGH_CONFIDENCE_RULE, IntentSource.RUNTIME_FALLBACK),
             },
             language={
                 "initial_language": lang_state.get("initial_language", input.locale),
@@ -432,6 +460,78 @@ class AssistantConversationRuntime:
         return lang_state
 
     # ------------------------------------------------------------------
+    # Intent classification and TurnDecision
+    # ------------------------------------------------------------------
+
+    def _build_intent_state(self, state: ConversationState) -> IntentStateSummary:
+        mem = state.semantic_memory or {}
+        lang = mem.get("language", {})
+        return IntentStateSummary(
+            diagnosis_status=mem.get("diagnosis_status", "gathering"),
+            has_process=bool(mem.get("current_process") or mem.get("main_problem")),
+            has_channels=bool(mem.get("channels")),
+            has_systems=bool(mem.get("systems_and_data_sources")),
+            has_human_approval=bool(mem.get("human_approval")),
+            has_volume=bool(mem.get("volume")),
+            turn_count=state.turn_count,
+            last_question_intent=_last_question_intent(state),
+            current_language=lang.get("current_language", "es"),
+        )
+
+    def _classify_intent(self, state: ConversationState, input: AssistantTurnInput) -> IntentClassification:
+        fast = match_high_confidence(input.user_message)
+        if fast is not None:
+            return fast
+        if self._intent_classifier is not None:
+            summary = self._build_intent_state(state)
+            return self._intent_classifier.classify(input.user_message, summary)
+        return IntentClassification(source=IntentSource.RUNTIME_FALLBACK)
+
+    def _decide_turn(self, intent: IntentClassification, state: ConversationState) -> bool:
+        mem = state.semantic_memory or {}
+        status = mem.get("diagnosis_status", "gathering")
+        if status in ("completed",):
+            return False
+        coverage = self._build_intent_state(state)
+        has_critical = coverage.has_process and coverage.has_channels and coverage.has_systems
+        is_strong = intent.confidence >= CLASSIFIER_CONFIDENCE_STRONG
+        is_moderate = intent.confidence >= CLASSIFIER_CONFIDENCE_MODERATE
+
+        if intent.intent == IntentType.REQUEST_DIAGNOSIS:
+            if intent.scope == IntentScope.GLOBAL:
+                if has_critical or is_strong:
+                    mem["diagnosis_status"] = "sufficient"
+                    state.semantic_memory = mem
+                    return True
+            return False
+
+        if intent.intent == IntentType.STOP_INTERVIEW:
+            if has_critical or is_strong:
+                mem["diagnosis_status"] = "sufficient"
+                state.semantic_memory = mem
+                return True
+            if is_moderate and coverage.has_process:
+                mem["diagnosis_status"] = "sufficient"
+                state.semantic_memory = mem
+                return True
+            return False
+
+        if intent.intent == IntentType.ASK_POINT_QUESTION:
+            return False
+
+        if intent.intent == IntentType.PROVIDE_INFORMATION:
+            if status == "requested" and has_critical:
+                mem["diagnosis_status"] = "sufficient"
+                state.semantic_memory = mem
+                return True
+            return False
+
+        if intent.intent == IntentType.CORRECT_PREVIOUS_INFORMATION:
+            return False
+
+        return False
+
+    # ------------------------------------------------------------------
     # Diagnosis readiness
     # ------------------------------------------------------------------
 
@@ -625,6 +725,14 @@ def _classify_question_intent(question: str) -> str:
         if any(k in q_lower for k in keywords):
             return intent
     return f"other:{question[:60]}"
+
+
+def _last_question_intent(state: ConversationState) -> str:
+    questions = state.asked_questions or []
+    if not questions:
+        return ""
+    last = questions[-1]
+    return last.get("intent", "")
 
 
 def _hebrew_char_ratio(text: str) -> float:

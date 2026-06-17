@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-16 (Auditoria URLs frontend e invariante lat.md)
+Ultima actualizacion: 2026-06-17 (Smoke multidioma real `/t360`)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,51 @@ Ultima actualizacion: 2026-06-16 (Auditoria URLs frontend e invariante lat.md)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-17 - Smoke multidioma real `/t360`
+
+- Se valido desde navegador real automatizado con Playwright Chromium la ruta
+  publica `http://127.0.0.1:3050/t360` contra el backend real
+  `POST /api/diagnosis/turn` en `127.0.0.1:7050`.
+- Se comprobaron sesiones iniciales en espanol, ingles y hebreo, recarga de
+  pestana con `sessionStorage`, cambio explicito de idioma a espanol,
+  preservacion de preferencia ante mensaje corto, mensajes mixtos,
+  terminos tecnicos y aislamiento entre sesiones ingles/hebreo.
+- Se corrigio `PublicVeraEntry.svelte` para persistir tambien
+  `initial_language` dentro de `team360.vera.session.v1`; antes quedaba vacio
+  aunque el backend ya lo devolvia correctamente.
+- Se corrigio `_PublicTurnLLMProvider` para pasar el idioma preferido al
+  `system prompt` de LiteLLM; antes el `turn prompt` podia pedir ingles pero el
+  `system prompt` quedaba en espanol por defecto.
+- Se corrigio `public_turn` para que un `UnsafeResponseError` no exponga
+  detalles internos de guardrail al usuario; ahora responde con fallback seguro
+  en el idioma de la sesion y conserva metadata basica de idioma.
+- PostgreSQL confirmo persistencia en `sales_diagnosis_conversation_states`
+  con `state_jsonb.semantic_memory.language` y `turn_count` separados por
+  sesion.
+- Validaciones ejecutadas: `pytest tests/test_sales_diagnosis_policies.py -q`,
+  `pytest tests/test_sales_diagnosis_runtime_contracts.py -q`, `pnpm check`,
+  `git diff --check`, escaneo basico de secretos y smoke Playwright real.
+- No se modifico arquitectura, Milvus, LiteLLM, modelo, streaming, estilos,
+  Markdown, Console ni telemetria general.
+
+### 2026-06-17 - Documentacion de politica operativa `/t360`
+
+- Se documento en `lat.md/team360-runtime-operational-policy.md` la politica
+  operativa validada para la experiencia publica de Vera:
+  `/t360 -> Backend Litestar -> PostgreSQL 18 -> Milvus 2.6 -> LiteLLM -> GPT-5.4 Nano`.
+- Se fijo como ruta principal el backend en `127.0.0.1:7050`, frontend Astro
+  en `127.0.0.1:3050`, LiteLLM en `http://localhost:4000/v1`, alias
+  `openai_gpt-5-nano`, upstream `openai/gpt-5.4-nano` y modo API `chat`.
+- Se registro la coleccion Milvus productiva
+  `team360_sales_diagnosis_knowledge_v1` y la tabla PostgreSQL
+  `sales_diagnosis_conversation_states`.
+- Se dejo explicitada la politica de secretos: no documentar DSN con password,
+  master keys ni claves upstream; usar solo DSN sanitizada.
+- Se documento la inconsistencia conocida: `global.js` es la fuente efectiva de
+  `/t360`, mientras `astro.config.mjs` conserva proxy `/api` hacia `8000`
+  para otros flujos relativos.
+- No se modifico codigo productivo, frontend, migraciones, modelo ni LiteLLM.
 
 ### 2026-06-15 - Preparacion Build Production / Public Home Release /t360
 

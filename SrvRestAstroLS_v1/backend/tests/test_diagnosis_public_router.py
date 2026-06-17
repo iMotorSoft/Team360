@@ -6,6 +6,8 @@ Does NOT test business logic (already covered in test_automation_diagnosis.py).
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from litestar.testing import TestClient
 
 from app import create_app
@@ -13,6 +15,9 @@ from modules.automation_diagnosis.ai_interpreter import AIInterpretationError
 from modules.automation_diagnosis.postgres_service import AutomationDiagnosisPersistenceError
 import routes.automation_diagnosis as auto_routes
 import routes.diagnosis as diagnosis_routes
+
+if TYPE_CHECKING:
+    from modules.sales_diagnosis_runtime import AssistantConversationRuntime
 
 _PRELUDE = "Entendí que querés analizar este proceso:"
 
@@ -315,3 +320,185 @@ def test_public_turn_unknown_session_creates_new():
     assert data["session_id"] == "nonexistent_conv_000000000000"
     assert data["is_new"] is False  # session_id was provided
     assert data["turn_count"] >= 1
+
+
+# ── Point 1: Classifier injection on public route ─────────────────────────
+
+
+def _make_runtime_with(intent_classifier=None):
+    """Build a minimal runtime with a fake LLM provider to avoid skeleton path,
+    and optionally a custom intent classifier."""
+    from modules.sales_diagnosis_runtime import AssistantConversationRuntime
+
+    class _FakeLLMForTest:
+        def generate(self, input, state, context):
+            return "I understand your situation. Let me analyze what I have so far."
+
+    return AssistantConversationRuntime(
+        llm_provider=_FakeLLMForTest(),
+        intent_classifier=intent_classifier,
+    )
+
+
+def test_public_turn_has_classifier_injected(monkeypatch):
+    """Verify the public route builds a runtime with an intent_classifier.
+    Uses a custom classifier to confirm it is called for ambiguous messages."""
+    from modules.sales_diagnosis_runtime.intent_classifier import (
+        IntentClassification,
+        IntentSource,
+        IntentType,
+        IntentScope,
+    )
+    from modules.sales_diagnosis_runtime.intent_classifier import IntentStateSummary
+
+    call_log: list[str] = []
+
+    class CheckClassifier:
+        def classify(self, message: str, summary: IntentStateSummary) -> IntentClassification:
+            call_log.append(message)
+            return IntentClassification(
+                intent=IntentType.PROVIDE_INFORMATION,
+                scope=IntentScope.NOT_APPLICABLE,
+                confidence=0.95,
+                source=IntentSource.AI_CLASSIFIER,
+            )
+
+    monkeypatch.setattr(
+        "routes.diagnosis._build_public_turn_runtime",
+        lambda: _make_runtime_with(CheckClassifier()),
+    )
+
+    # Use a message that does NOT match any high-confidence rule
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"message": "We receive customer inquiries from many different channels every day"},
+        )
+    assert response.status_code == 201
+    assert len(call_log) > 0, "Intent classifier was never called for ambiguous message"
+    assert "customer inquiries" in call_log[0]
+
+
+# ── Point 2: Public metadata contract ────────────────────────────────────
+
+
+def test_public_turn_response_includes_turn_decision(monkeypatch):
+    """Verify PublicTurnResponse includes turn_decision with metadata."""
+    from modules.sales_diagnosis_runtime.intent_classifier import (
+        IntentClassification,
+        IntentSource,
+        IntentType,
+        IntentScope,
+    )
+    from modules.sales_diagnosis_runtime.intent_classifier import IntentStateSummary
+
+    class FixedClassifier:
+        def classify(self, message: str, summary: IntentStateSummary) -> IntentClassification:
+            return IntentClassification(
+                intent=IntentType.REQUEST_DIAGNOSIS,
+                scope=IntentScope.GLOBAL,
+                confidence=0.94,
+                source=IntentSource.AI_CLASSIFIER,
+                matched_rule=None,
+            )
+
+    monkeypatch.setattr(
+        "routes.diagnosis._build_public_turn_runtime",
+        lambda: _make_runtime_with(FixedClassifier()),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"message": "We want to centralize our customer support across WhatsApp and email"},
+        )
+    assert response.status_code == 201
+    data = response.json()
+
+    # Presence
+    assert "turn_decision" in data, "Response missing turn_decision"
+    td = data["turn_decision"]
+    assert td is not None, "turn_decision is None"
+
+    # Shape — at minimum these keys must exist
+    for key in ("action", "intent", "intent_scope", "intent_confidence",
+                "intent_source", "diagnosis_status", "readiness_reason",
+                "classifier_called", "matched_rule"):
+        assert key in td, f"turn_decision missing key {key}"
+
+    # Values
+    assert td["intent"] == "request_diagnosis"
+    assert td["intent_scope"] == "global"
+    assert td["intent_source"] == "ai_classifier"
+    assert td["classifier_called"] is True
+    assert td["matched_rule"] is None
+
+
+def test_public_turn_fast_path_turn_decision():
+    """Fast path (high-confidence rule) should show classifier_called=False."""
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"message": "dame el diagnóstico"},
+        )
+    assert response.status_code == 201
+    data = response.json()
+    td = data.get("turn_decision")
+    assert td is not None, "turn_decision is None"
+    assert td.get("intent") == "request_diagnosis"
+    assert td.get("intent_source") == "high_confidence_rule"
+    assert td.get("classifier_called") is False
+    assert td.get("matched_rule") is not None
+
+
+def test_public_turn_factual_shortcut_turn_decision():
+    """Factual answer (e.g. '80 por día') should be provide_information
+    without calling AI."""
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"message": "80 por día"},
+        )
+    assert response.status_code == 201
+    data = response.json()
+    td = data.get("turn_decision")
+    assert td is not None, "turn_decision is None"
+    assert td.get("intent") == "provide_information"
+    assert td.get("classifier_called") is False
+
+
+# ── Point 12: Classifier fallback never diagnoses ────────────────────────
+
+
+def test_public_turn_classifier_fallback_is_never_diagnose(monkeypatch):
+    """When classifier returns runtime_fallback, turn_decision action
+    should NOT be 'diagnose'."""
+    from modules.sales_diagnosis_runtime.intent_classifier import (
+        IntentClassification,
+        IntentSource,
+    )
+    from modules.sales_diagnosis_runtime.intent_classifier import IntentStateSummary
+
+    class FallbackClassifier:
+        def classify(self, message: str, summary: IntentStateSummary) -> IntentClassification:
+            return IntentClassification(source=IntentSource.RUNTIME_FALLBACK)
+
+    monkeypatch.setattr(
+        "routes.diagnosis._build_public_turn_runtime",
+        lambda: _make_runtime_with(FallbackClassifier()),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"message": "We have 80 inquiries per day from WhatsApp and Gmail. "
+                             "The stock is in the system and prices in a spreadsheet."},
+        )
+    assert response.status_code == 201
+    data = response.json()
+    td = data.get("turn_decision")
+    assert td is not None, "turn_decision is None"
+    assert td.get("action") != "diagnose", (
+        "Fallback classifier should not trigger diagnose"
+    )
+    assert td.get("classifier_called") is False

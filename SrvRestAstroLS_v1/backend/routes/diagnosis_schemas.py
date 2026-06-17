@@ -89,3 +89,4 @@ class PublicTurnResponse(BaseModel):
     turn_count: int = 0
     is_new: bool = False
     language: dict | None = None
+    turn_decision: dict | None = None

@@ -30,6 +30,7 @@ from modules.sales_diagnosis_runtime import (
     GuardrailPolicy,
     PromptPolicy,
 )
+from modules.sales_diagnosis_runtime.intent_classifier import LiteLLMIntentClassifier
 from modules.sales_diagnosis_runtime.contracts import (
     SAFE_ACK_TEXT,
     SALES_DIAGNOSIS_INSTANCE_CODE,
@@ -224,6 +225,7 @@ def _build_public_turn_runtime() -> AssistantConversationRuntime:
         state_repository=_public_turn_state,
         prompt_policy=PromptPolicy(),
         guardrail_policy=GuardrailPolicy(),
+        intent_classifier=LiteLLMIntentClassifier(),
     )
 
 
@@ -477,4 +479,5 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
         turn_count=turn_count,
         is_new=is_new,
         language=output.language,
+        turn_decision=output.turn_decision,
     )

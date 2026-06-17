@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-16
+Ultima actualizacion: 2026-06-17
 
 ## Estado general
 
@@ -11,6 +11,24 @@ Ultima actualizacion: 2026-06-16
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-17 - Politica operativa runtime publico Vera
+
+- Se agrego `team360-runtime-operational-policy.md` como invariante estable para
+  la experiencia publica `/t360` y el endpoint `POST /api/diagnosis/turn`.
+- Se documento el flujo validado: Astro/Svelte -> Litestar -> PostgreSQL 18 ->
+  Milvus 2.6 -> LiteLLM -> `openai_gpt-5-nano` -> `openai/gpt-5.4-nano`.
+- Se fijaron puertos operativos, variables de entorno conceptuales, coleccion
+  Milvus `team360_sales_diagnosis_knowledge_v1`, modo LiteLLM
+  `chat`, endpoint base `http://localhost:4000/v1` y regla de no usar OpenAI
+  directo como ruta principal.
+- Se documento que `global.js` es fuente efectiva de `/t360` y que el proxy
+  Astro hacia `8000` es una inconsistencia conocida pendiente de unificacion.
+- Se reforzaron las reglas de secretos: no imprimir DSN con password, master
+  keys ni claves upstream; usar `postgresql://administrator:***@localhost:5432/team360`
+  como representacion sanitizada.
+- Se actualizo `lat.md/lat.md` con la referencia
+  `[[team360-runtime-operational-policy]]`.
 
 ### 2026-06-16 - Frontend URL source of truth invariant
 
