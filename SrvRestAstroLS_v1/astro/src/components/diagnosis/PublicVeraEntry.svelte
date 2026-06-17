@@ -1,5 +1,6 @@
 <script lang="ts">
   import { PUBLIC_DIAGNOSIS_CONTEXT, sendPublicTurn } from "../../lib/api/publicDiagnosis";
+  import { loadPublicVeraSession, savePublicVeraSession, clearPublicVeraSession } from "../../lib/publicVeraSession";
 
   interface ChatMessage {
     role: "user" | "assistant";
@@ -17,8 +18,35 @@
   let inputText = $state("");
   let isLoading = $state(false);
   let chatError = $state("");
+  let currentLocale = $state<string>(PUBLIC_DIAGNOSIS_CONTEXT.locale);
 
   const canSend = $derived(inputText.trim().length > 0 && !isLoading);
+
+  function restoreSession() {
+    const session = loadPublicVeraSession();
+    if (session.session_id) {
+      sessionId = session.session_id;
+    }
+    if (session.preferred_response_language) {
+      currentLocale = session.preferred_response_language;
+    }
+  }
+
+  function persistSession(langInfo: Record<string, unknown> | null | undefined) {
+    const session = loadPublicVeraSession();
+    savePublicVeraSession({
+      session_id: sessionId,
+      initial_language: (langInfo as any)?.initial_language || session.initial_language || currentLocale,
+      current_language: (langInfo as any)?.current_language || currentLocale,
+      preferred_response_language: (langInfo as any)?.preferred_response_language || currentLocale,
+      explicit_language_preference: Boolean((langInfo as any)?.explicit_language_preference),
+    });
+    if (langInfo && typeof (langInfo as any).preferred_response_language === "string") {
+      currentLocale = (langInfo as any).preferred_response_language;
+    }
+  }
+
+  restoreSession();
 
   function useExample(example: string) {
     inputText = example;
@@ -45,9 +73,11 @@
       const result = await sendPublicTurn({
         session_id: sessionId ?? undefined,
         message: text,
+        locale: currentLocale,
       });
       sessionId = result.session_id;
       messages = [...messages, { role: "assistant", text: result.response_text }];
+      persistSession(result.language);
     } catch {
       chatError = "No pudimos procesar tu mensaje ahora. Podés intentar de nuevo o contactarnos por correo.";
     } finally {
@@ -61,6 +91,7 @@
     messages = [];
     inputText = "";
     chatError = "";
+    clearPublicVeraSession();
   }
 
   const mailHref = $derived.by(() => {

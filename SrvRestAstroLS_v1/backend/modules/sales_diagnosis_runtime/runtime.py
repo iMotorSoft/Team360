@@ -5,7 +5,12 @@ import re
 from typing import Any
 
 from modules.sales_diagnosis_runtime.contracts import (
+    DEFAULT_LANGUAGE,
+    LANGUAGE_UNDETERMINED,
     SAFE_ACK_TEXT,
+    SUPPORTED_LANGUAGES,
+    _normalize_language,
+    safe_ack_for_language,
     AssistantTurnInput,
     AssistantTurnOutput,
     ConversationState,
@@ -33,11 +38,18 @@ from modules.sales_diagnosis_runtime.providers import (
 
 
 DIAGNOSIS_REQUEST_PATTERNS = re.compile(
-    r"\b(dame\s*(el\s*)?diagn[oó]stico"
+    r"\b(dame\s*(el\s*|un\s*)?diagn[oó]stico"
     r"|qu[eé]\s*(me\s*)?(recomiend[aeá]s?|recomiend[aeá]n|recomend[áa]s)"
-    r"|con\s*esto\s*alcanza"
+    r"|con\s*esto\s*(alcanza|dame|quiero|empecemos)"
     r"|decime\s*qu[eé]\s*(hago|har[ií]as)"
-    r"|qu[eé]\s*automatizar[ií]as|ya\s*est[áa])\b",
+    r"|qu[eé]\s*automatizar[ií]as|ya\s*est[áa]"
+    r"|dame\s*una\s*orientaci[oó]n(\s*inicial)?"
+    r"|dame\s*una\s*evaluaci[oó]n"
+    r"|orient[aeá]me"
+    r"|no\s*quiero\s*seguir\s*respondiendo"
+    r"|ya\s*pod[eé]s\s*decirme\s*qu[eé]\s*conviene\s*hacer\s*primero"
+    r"|evaluaci[oó]n\s*inicial"
+    r"|orientaci[oó]n\s*inicial)\b",
     re.IGNORECASE,
 )
 
@@ -118,9 +130,12 @@ class AssistantConversationRuntime:
         # 4. Resolve contradictions
         self._resolve_contradictions(state, input)
 
+        # 4.5 Resolve language
+        lang_state = self._resolve_response_language(state, input)
+
         # 5. Decide action: diagnose or gather
         user_requested = self._is_diagnosis_request(input.user_message, state)
-        should_diagnose = user_requested or self._is_ready_to_diagnose(state)
+        should_diagnose = user_requested and self._is_ready_to_diagnose(state)
 
         # 6. Build retrieval query from UPDATED semantic memory
         retrieval_query = self._build_retrieval_query(input, state)
@@ -194,7 +209,16 @@ class AssistantConversationRuntime:
                 "action": "diagnose" if should_diagnose else "reflect_and_ask",
                 "retrieval_query": retrieval_query,
                 "diagnosis_status": state.semantic_memory.get("diagnosis_status", "gathering"),
-                "readiness_reason": "user_requested" if user_requested else self._readiness_reason(state),
+                "readiness_reason": "user_requested" if user_requested and should_diagnose else self._readiness_reason(state),
+            },
+            language={
+                "initial_language": lang_state.get("initial_language", input.locale),
+                "current_language": lang_state.get("current_language", input.locale),
+                "preferred_response_language": lang_state.get("preferred_response_language", input.locale),
+                "response_language": lang_state.get("preferred_response_language", input.locale),
+                "language_confidence": lang_state.get("language_confidence", 1.0),
+                "language_source": lang_state.get("language_source", "default"),
+                "explicit_language_preference": lang_state.get("explicit_language_preference", False),
             },
         )
 
@@ -290,6 +314,124 @@ class AssistantConversationRuntime:
             state.semantic_memory = mem
 
     # ------------------------------------------------------------------
+    # Language detection and resolution
+    # ------------------------------------------------------------------
+
+    def _detect_message_language(self, text: str) -> dict:
+        hebrew_ratio = _hebrew_char_ratio(text)
+        latin_ratio = _latin_char_ratio(text)
+
+        if hebrew_ratio > 0.4:
+            code = "he"
+            confidence = min(0.99, 0.7 + hebrew_ratio)
+        elif latin_ratio > 0.4 and hebrew_ratio < 0.15:
+            confidence = 0.3
+            code = "und"
+            english_words = re.findall(r"\b(the|and|for|are|but|not|you|all|can|had|her|was|one|our|out|has|have|from|this|that|with|will|your|they|them|what|when|make|like|just|over|take|know|need|want)\b", text, re.IGNORECASE)
+            spanish_words = re.findall(r"\b(el|la|los|las|que|por|del|una|las|con|para|como|está|más|pero|sus|le|o|ya|ese|son|era|vez|todo|hay|tan|tipo|vez|dar|muy|voy|ir|tener|hacer|estoy|quiero|necesito|tengo|vendo|recibo|usan|automático|automatizar|manual|reviso|hago|hacés|hacen|entonces|porque)\b", text, re.IGNORECASE)
+            if len(spanish_words) > len(english_words) * 2:
+                code = "es"
+                confidence = 0.8
+            elif len(english_words) > len(spanish_words) * 2:
+                code = "en"
+                confidence = 0.8
+            elif len(spanish_words) > 0 or len(english_words) > 0:
+                code = "mixed"
+                confidence = 0.5
+        else:
+            code = "und"
+            confidence = 0.3
+        return {"code": code, "confidence": round(confidence, 2)}
+
+    def _is_significant_message(self, text: str, current_language: str) -> bool:
+        words = text.strip().split()
+        if len(words) < 3:
+            return False
+        common_greetings = frozenset({
+            "hola", "hi", "shalom", "שלום", "ok", "sí", "si", "no",
+            "yes", "thanks", "gracias", "תודה", "bye", "adiós", "adios",
+        })
+        lower = text.lower().strip()
+        return lower not in common_greetings and len(lower) > 10
+
+    def _detect_explicit_language_switch(self, text: str) -> str | None:
+        patterns = [
+            (r"\b(respond[eé]me|habl[aá]me|contest[aá]me|respond[eé]|resp[oó]ndeme|segu[ií]|seguimos|sigamos|continu[aá]|continuamos)\s+(en\s+)?(espa[ñn]ol|ingl[eé]s|hebreo|english|spanish|hebrew|עברית)\b", None),
+            (r"\b(can\s+we\s+continue\s+in\s+)(english|spanish|hebrew)\b", None),
+            (r"\b(please\s+answer\s+in\s+)(english|spanish|hebrew)\b", None),
+            (r"\b([תצ]ענה\s+לי\s+ב)(אנגלית|עברית|ספרדית)\b", None),
+            (r"\b(אפשר\s+להמשיך\s+ב)(עברית|אנגלית|ספרדית)\b", None),
+        ]
+        lower = text.lower()
+        for pattern, _ in patterns:
+            m = re.search(pattern, lower)
+            if m:
+                last = m.group(m.lastindex or 2)
+                lang_map = {
+                    "español": "es", "espanol": "es", "spanish": "es", "español": "es",
+                    "english": "en", "inglés": "en", "ingles": "en",
+                    "hebreo": "he", "hebrew": "he", "עברית": "he",
+                    "אנגלית": "en", "ספרדית": "es",
+                }
+                return lang_map.get(last.lower() if last else "")
+        return None
+
+    def _resolve_response_language(self, state: ConversationState, input: AssistantTurnInput) -> dict:
+        mem = state.semantic_memory or {}
+        lang_state = mem.get("language", {})
+        msg_lang = self._detect_message_language(input.user_message)
+        detected_code = msg_lang["code"]
+
+        explicit_switch = self._detect_explicit_language_switch(input.user_message)
+        if explicit_switch:
+            preferred = explicit_switch
+            source = "explicit_user_request"
+            explicit_pref = True
+            current = preferred
+        else:
+            explicit_pref = lang_state.get("explicit_language_preference", False)
+            preferred = lang_state.get("preferred_response_language", "")
+            current = lang_state.get("current_language", "")
+            source = lang_state.get("language_source", "detected")
+
+            if explicit_pref and preferred:
+                current = preferred
+                source = "explicit_preference"
+            elif detected_code not in ("und", "mixed") and self._is_significant_message(input.user_message, current or ""):
+                if not lang_state.get("initial_language") or lang_state["initial_language"] == LANGUAGE_UNDETERMINED:
+                    lang_state["initial_language"] = detected_code
+                current = detected_code
+                if not explicit_pref:
+                    preferred = detected_code
+                source = "detected"
+
+            if not current:
+                current = _normalize_language(input.locale or DEFAULT_LANGUAGE)
+            if not preferred:
+                preferred = current
+            if not lang_state.get("initial_language"):
+                lang_state["initial_language"] = current
+
+        if source == "explicit_user_request":
+            lang_state["explicit_language_preference"] = True
+            lang_state["language_source"] = "explicit_user_request"
+        elif source == "explicit_preference":
+            pass
+        else:
+            lang_state["explicit_language_preference"] = explicit_pref
+            lang_state["language_source"] = source
+
+        lang_state["current_language"] = current
+        lang_state["preferred_response_language"] = preferred
+        lang_state["last_message_language"] = msg_lang["code"]
+        lang_state["language_confidence"] = msg_lang["confidence"]
+
+        mem["language"] = lang_state
+        state.semantic_memory = mem
+
+        return lang_state
+
+    # ------------------------------------------------------------------
     # Diagnosis readiness
     # ------------------------------------------------------------------
 
@@ -297,7 +439,7 @@ class AssistantConversationRuntime:
         mem = state.semantic_memory or {}
         status = mem.get("diagnosis_status", "gathering")
 
-        if status in ("requested", "completed", "sufficient"):
+        if status in ("completed", "sufficient"):
             return True
 
         has_process = bool(mem.get("current_process") or mem.get("main_problem"))
@@ -330,7 +472,7 @@ class AssistantConversationRuntime:
         if DIAGNOSIS_REQUEST_PATTERNS.search(message):
             state.semantic_memory["diagnosis_status"] = "requested"
             return True
-        if state.semantic_memory.get("diagnosis_status") in ("requested", "completed", "sufficient"):
+        if state.semantic_memory.get("diagnosis_status") in ("completed", "sufficient"):
             return True
         return False
 
@@ -483,3 +625,17 @@ def _classify_question_intent(question: str) -> str:
         if any(k in q_lower for k in keywords):
             return intent
     return f"other:{question[:60]}"
+
+
+def _hebrew_char_ratio(text: str) -> float:
+    if not text:
+        return 0.0
+    hebrew = sum(1 for c in text if "\u0590" <= c <= "\u05FF")
+    return hebrew / len(text)
+
+
+def _latin_char_ratio(text: str) -> float:
+    if not text:
+        return 0.0
+    latin = sum(1 for c in text if c.isascii() and c.isalpha())
+    return latin / len(text)

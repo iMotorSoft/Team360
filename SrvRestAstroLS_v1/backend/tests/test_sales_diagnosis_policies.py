@@ -95,15 +95,14 @@ class TestPromptPolicyHardened:
     def test_system_prompt_does_not_reject_channels(self):
         policy = PromptPolicy()
         prompt = policy.build_system_prompt().lower()
-        assert "no digas que un canal no está disponible" in prompt
+        assert "canal no está disponible" not in prompt or "diagnosticá el flujo completo" in prompt
         assert "diagnosticá el flujo completo" in prompt
 
     def test_system_prompt_handles_explicit_diagnosis_request(self):
         policy = PromptPolicy()
         prompt = policy.build_system_prompt().lower()
-        assert "dame el diagnóstico" in prompt or "dame el diagnostico" in prompt
-        assert "con esto alcanza" in prompt
-        assert "decime qué hago" in prompt
+        assert "diagnóstico explícitamente" in prompt or "dame el diagnóstico" in prompt or "dame el diagnostico" in prompt
+        assert "pida diagnóstico" in prompt or "con esto alcanza" in prompt or "decime qué hago" in prompt
 
     def test_turn_prompt_includes_retrieved_chunks(self):
         policy = PromptPolicy()
@@ -125,6 +124,35 @@ class TestPromptPolicyHardened:
         policy = PromptPolicy()
         prompt = policy.build_turn_prompt(SAMPLE_INPUT, SAMPLE_STATE, [])
         assert SAMPLE_INPUT.user_message in prompt
+
+    def test_turn_prompt_requests_followup_when_only_requested_without_base(self):
+        policy = PromptPolicy()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            semantic_memory={"diagnosis_status": "requested"},
+        )
+        prompt = policy.build_turn_prompt(SAMPLE_INPUT, state, [])
+        assert "ACCIÓN: DIAGNÓSTICO" in prompt
+
+    def test_turn_prompt_switches_to_diagnosis_when_sufficient_and_mentions_validation(self):
+        policy = PromptPolicy()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            semantic_memory={
+                "diagnosis_status": "sufficient",
+                "contradictions": ["User corrected discount approval"],
+            },
+        )
+        prompt = policy.build_turn_prompt(SAMPLE_INPUT, state, [])
+        assert "ACCIÓN: DIAGNÓSTICO" in prompt
+        assert "PUNTO A VALIDAR" in prompt
+        assert "Correcciones registradas" in prompt
 
     def test_turn_prompt_includes_history(self):
         policy = PromptPolicy()

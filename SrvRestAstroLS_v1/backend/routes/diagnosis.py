@@ -35,6 +35,7 @@ from modules.sales_diagnosis_runtime.contracts import (
     SALES_DIAGNOSIS_INSTANCE_CODE,
     SALES_DIAGNOSIS_PACKAGE_CODE,
     SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE,
+    safe_ack_for_language,
 )
 from modules.sales_diagnosis_runtime.contracts import ConversationState, RetrievedChunk
 from modules.sales_diagnosis_runtime.errors import (
@@ -116,9 +117,16 @@ class _PublicTurnLLMProvider:
             return "Gracias por tu mensaje. Estoy procesando la información para orientarte. ¿Podés contarme más detalles sobre el proceso que querés mejorar?"
         try:
             client = LiteLLMClient(base_url=self._base_url)
+            lang_info = (state.semantic_memory or {}).get("language", {})
+            response_language = (
+                lang_info.get("preferred_response_language")
+                or lang_info.get("current_language")
+                or input.locale
+            )
             system = self._prompt_policy.build_system_prompt(
                 assistant_instance_code=input.assistant_instance_code,
                 package_code=input.package_code,
+                response_language=response_language,
             )
             turn = self._prompt_policy.build_turn_prompt(input, state, context)
             response = client.text_completion(
@@ -410,17 +418,41 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
         knowledge_scope_code=SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE,
         user_message=text,
         channel="web",
+        locale=data.locale,
         metadata={"source": "t360"},
     )
 
     try:
         output = runtime.handle_turn(input_)
-    except UnsafeResponseError as exc:
+    except UnsafeResponseError:
+        lang_state: dict = {}
+        turn_count = 0
+        try:
+            saved_state = _public_turn_state.load(session_id)
+            if saved_state:
+                turn_count = saved_state.turn_count
+                lang_state = (saved_state.semantic_memory or {}).get("language", {})
+        except Exception:
+            lang_state = {}
+        response_language = (
+            lang_state.get("preferred_response_language")
+            or lang_state.get("current_language")
+            or data.locale
+        )
         return PublicTurnResponse(
             session_id=session_id,
-            response_text=str(exc),
-            turn_count=0,
+            response_text=safe_ack_for_language(response_language),
+            turn_count=turn_count,
             is_new=is_new,
+            language={
+                "initial_language": lang_state.get("initial_language", response_language),
+                "current_language": response_language,
+                "preferred_response_language": response_language,
+                "response_language": response_language,
+                "language_confidence": lang_state.get("language_confidence", 1.0),
+                "language_source": lang_state.get("language_source", "fallback"),
+                "explicit_language_preference": lang_state.get("explicit_language_preference", False),
+            },
         )
     except InvalidAssistantRuntimeInputError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
@@ -444,4 +476,5 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
         response_text=output.response_text,
         turn_count=turn_count,
         is_new=is_new,
+        language=output.language,
     )

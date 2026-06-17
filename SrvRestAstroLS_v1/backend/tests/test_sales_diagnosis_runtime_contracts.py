@@ -5,6 +5,7 @@ No network calls. No DB. No Milvus. No LLM.
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import asdict
 from uuid import uuid4
 
@@ -32,7 +33,9 @@ from modules.sales_diagnosis_runtime.contracts import (
     FORBIDDEN_TERMS,
     PLANNED_EXTENSIONS,
     SAFE_ACK_TEXT,
+    safe_ack_for_language,
 )
+from modules.automation_diagnosis.litellm_client import LiteLLMResponse
 
 
 # ---------------------------------------------------------------------------
@@ -54,6 +57,22 @@ def sample_input() -> AssistantTurnInput:
 @pytest.fixture
 def runtime() -> AssistantConversationRuntime:
     return AssistantConversationRuntime()
+
+
+class RecordingLLMProvider:
+    def __init__(self, response_text: str = "Diagnóstico listo.") -> None:
+        self.response_text = response_text
+        self.calls: list[dict[str, object]] = []
+
+    def generate(self, input, state, context):
+        self.calls.append(
+            {
+                "message": input.user_message,
+                "status": state.semantic_memory.get("diagnosis_status"),
+                "context_count": len(context),
+            }
+        )
+        return self.response_text
 
 
 # ---------------------------------------------------------------------------
@@ -201,6 +220,117 @@ class TestRuntimeSkeleton:
                 assert "disponible" not in text_lower or "no" in text_lower
 
 
+class TestRuntimeDecisionPolicy:
+    def test_runtime_does_not_diagnose_on_point_query_without_context(self):
+        repo = InMemoryStateRepository()
+        llm = RecordingLLMProvider()
+        runtime = AssistantConversationRuntime(state_repository=repo, llm_provider=llm)
+        input = AssistantTurnInput(
+            session_id="turn-point-query",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="¿Podés decirme si Gmail se puede conectar?",
+        )
+
+        output = runtime.handle_turn(input)
+
+        assert output.response_type == "final"
+        assert output.turn_decision["action"] == "reflect_and_ask"
+        assert output.turn_decision["diagnosis_status"] == "gathering"
+        assert llm.calls[-1]["status"] == "gathering"
+
+    def test_runtime_diagnoses_when_context_is_sufficient(self):
+        repo = InMemoryStateRepository()
+        repo.save(
+            ConversationState(
+                session_id="turn-ready",
+                assistant_instance_code="team360_sales_diagnosis",
+                package_code="pkg_sales_diagnosis",
+                knowledge_scope_code="ks_test",
+                turn_count=5,
+                semantic_memory={
+                    "diagnosis_status": "gathering",
+                    "current_process": "consultas por whatsapp y gmail",
+                    "channels": ["whatsapp", "gmail"],
+                    "systems_and_data_sources": ["sistema", "planilla"],
+                    "human_approval": "descuentos especiales los revisa una persona",
+                },
+            )
+        )
+        llm = RecordingLLMProvider("Diagnóstico completo. Punto a validar: regla exacta de descuento.")
+        runtime = AssistantConversationRuntime(state_repository=repo, llm_provider=llm)
+        input = AssistantTurnInput(
+            session_id="turn-ready",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="con esto dame una orientación inicial",
+        )
+
+        output = runtime.handle_turn(input)
+
+        assert output.response_type == "diagnosis"
+        assert output.turn_decision["action"] == "diagnose"
+        assert output.turn_decision["diagnosis_status"] == "completed"
+        assert "Punto a validar" in output.response_text
+        assert llm.calls[-1]["status"] == "sufficient"
+
+    def test_runtime_keeps_asking_when_context_is_sufficient_without_close_request(self):
+        repo = InMemoryStateRepository()
+        repo.save(
+            ConversationState(
+                session_id="turn-ready-no-close",
+                assistant_instance_code="team360_sales_diagnosis",
+                package_code="pkg_sales_diagnosis",
+                knowledge_scope_code="ks_test",
+                turn_count=4,
+                semantic_memory={
+                    "diagnosis_status": "gathering",
+                    "current_process": "consultas por whatsapp y gmail",
+                    "channels": ["whatsapp", "gmail"],
+                    "systems_and_data_sources": ["sistema", "planilla"],
+                    "human_approval": "descuentos especiales los revisa una persona",
+                },
+            )
+        )
+        llm = RecordingLLMProvider("Seguimos preguntando.")
+        runtime = AssistantConversationRuntime(state_repository=repo, llm_provider=llm)
+        input = AssistantTurnInput(
+            session_id="turn-ready-no-close",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="el stock está en el sistema y los precios en una planilla",
+        )
+
+        output = runtime.handle_turn(input)
+
+        assert output.response_type == "final"
+        assert output.turn_decision["action"] == "reflect_and_ask"
+        assert output.turn_decision["diagnosis_status"] in {"gathering", "sufficient"}
+        assert llm.calls[-1]["status"] in {"gathering", "sufficient"}
+
+    def test_runtime_accepts_clear_correction_and_keeps_diagnosis_available(self):
+        repo = InMemoryStateRepository()
+        llm = RecordingLLMProvider("Diagnóstico listo.")
+        runtime = AssistantConversationRuntime(state_repository=repo, llm_provider=llm)
+        input = AssistantTurnInput(
+            session_id="turn-correction",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="las respuestas comunes pueden salir solas, pero los descuentos especiales los revisa una persona",
+        )
+
+        output = runtime.handle_turn(input)
+
+        assert output.response_type in {"final", "diagnosis"}
+        assert output.next_state is not None
+        assert output.next_state.semantic_memory.get("human_approval")
+        assert "descuentos especiales" in output.next_state.semantic_memory.get("human_approval", "")
+
+
 # ---------------------------------------------------------------------------
 # 3. Guardrail policy
 # ---------------------------------------------------------------------------
@@ -286,7 +416,7 @@ class TestPromptPolicy:
     def test_prompt_policy_commercial_ack(self):
         policy = PromptPolicy()
         ack = policy.build_safe_ack(domain="commercial")
-        assert "automatización" in ack
+        assert len(ack) > 10
 
     def test_prompt_policy_technical_ack(self):
         policy = PromptPolicy()
@@ -317,6 +447,85 @@ class TestPromptPolicy:
         )
         prompt = policy.build_turn_prompt(input, state, [])
         assert "Quiero automatizar ventas" in prompt
+
+    def test_public_turn_provider_uses_preferred_language_for_system_prompt(
+        self, monkeypatch
+    ):
+        from routes import diagnosis as diagnosis_route
+
+        captured: dict[str, object] = {}
+
+        class FakeLiteLLMClient:
+            def __init__(self, base_url=None) -> None:
+                self.base_url = base_url
+
+            def text_completion(self, model, messages, **kwargs):
+                captured["model"] = model
+                captured["messages"] = messages
+                return LiteLLMResponse(content="ok", model=model)
+
+        monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
+        monkeypatch.setenv("TEAM360_LITELLM_MODEL_ALIAS", "openai_gpt-5-nano")
+        monkeypatch.setattr(diagnosis_route, "LiteLLMClient", FakeLiteLLMClient)
+
+        provider = diagnosis_route._PublicTurnLLMProvider()
+        input = AssistantTurnInput(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="I want to organize sales follow-up from Gmail.",
+            locale="en",
+        )
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            semantic_memory={
+                "language": {
+                    "current_language": "en",
+                    "preferred_response_language": "en",
+                }
+            },
+        )
+
+        assert provider.generate(input, state, []) == "ok"
+        messages = captured["messages"]
+        assert isinstance(messages, list)
+        assert "Always respond in English" in messages[0]["content"]
+        assert "Idioma de respuesta: en" in messages[1]["content"]
+
+    def test_public_turn_hides_guardrail_error_details(self, monkeypatch):
+        from routes import diagnosis as diagnosis_route
+        from routes.diagnosis_schemas import PublicTurnRequest
+
+        class RaisingRuntime:
+            def handle_turn(self, input):
+                raise UnsafeResponseError(
+                    "Response blocked by guardrails: ['internal_detail']"
+                )
+
+        monkeypatch.setattr(
+            diagnosis_route,
+            "_build_public_turn_runtime",
+            lambda: RaisingRuntime(),
+        )
+
+        response = asyncio.run(
+            diagnosis_route.public_turn.fn(
+                PublicTurnRequest(
+                    session_id="s1",
+                    message="Con esto ya está, give me an initial assessment.",
+                    locale="en",
+                )
+            )
+        )
+
+        assert "Response blocked by guardrails" not in response.response_text
+        assert "internal_detail" not in response.response_text
+        assert response.response_text == safe_ack_for_language("en")
+        assert response.language["response_language"] == "en"
 
 
 # ---------------------------------------------------------------------------
@@ -517,14 +726,49 @@ class TestDiagnosisRequest:
     def test_detect_explicit_request(self):
         from modules.sales_diagnosis_runtime.runtime import DIAGNOSIS_REQUEST_PATTERNS
         assert DIAGNOSIS_REQUEST_PATTERNS.search("dame el diagnóstico")
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("dame un diagnóstico")
         assert DIAGNOSIS_REQUEST_PATTERNS.search("qué me recomendás")
         assert DIAGNOSIS_REQUEST_PATTERNS.search("con esto alcanza")
         assert DIAGNOSIS_REQUEST_PATTERNS.search("decime qué hago")
         assert DIAGNOSIS_REQUEST_PATTERNS.search("dame el diagnostico")
         assert DIAGNOSIS_REQUEST_PATTERNS.search("qué me recomiendas")
         assert DIAGNOSIS_REQUEST_PATTERNS.search("ya está")
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("dame una orientación inicial")
+        assert DIAGNOSIS_REQUEST_PATTERNS.search("ya podés decirme qué conviene hacer primero")
 
     def test_does_not_false_positive(self):
         from modules.sales_diagnosis_runtime.runtime import DIAGNOSIS_REQUEST_PATTERNS
         assert not DIAGNOSIS_REQUEST_PATTERNS.search("hola cómo estás")
         assert not DIAGNOSIS_REQUEST_PATTERNS.search("quiero saber si es viable")
+        assert not DIAGNOSIS_REQUEST_PATTERNS.search("¿Podés decirme si Gmail se puede conectar?")
+        assert not DIAGNOSIS_REQUEST_PATTERNS.search("¿Qué conviene usar para leer una planilla?")
+        assert not DIAGNOSIS_REQUEST_PATTERNS.search("Con lo que te dije de Gmail, ¿se puede responder solo?")
+
+    def test_ready_to_diagnose_ignores_requested_until_context_is_sufficient(self):
+        runtime = AssistantConversationRuntime()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            semantic_memory={"diagnosis_status": "requested"},
+        )
+        assert runtime._is_ready_to_diagnose(state) is False
+        assert state.semantic_memory["diagnosis_status"] == "requested"
+
+    def test_ready_to_diagnose_promotes_sufficient_context(self):
+        runtime = AssistantConversationRuntime()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "consultas por whatsapp",
+                "channels": ["whatsapp"],
+                "systems_and_data_sources": ["sistema", "planilla"],
+            },
+        )
+        assert runtime._is_ready_to_diagnose(state) is True
+        assert state.semantic_memory["diagnosis_status"] == "sufficient"

@@ -124,6 +124,22 @@ class ConversationState:
 # ---------------------------------------------------------------------------
 
 
+SUPPORTED_LANGUAGES: frozenset[str] = frozenset({"es", "en", "he"})
+DEFAULT_LANGUAGE: str = "es"
+LANGUAGE_UNDETERMINED: str = "und"
+
+
+def _is_supported_language(code: str) -> bool:
+    return code in SUPPORTED_LANGUAGES
+
+
+def _normalize_language(code: str | None) -> str:
+    if not code:
+        return DEFAULT_LANGUAGE
+    c = code.strip().lower()[:2]
+    return c if _is_supported_language(c) else DEFAULT_LANGUAGE
+
+
 @dataclass
 class AssistantTurnInput:
     session_id: str
@@ -133,6 +149,7 @@ class AssistantTurnInput:
     user_message: str
     channel: str = "web"
     metadata: dict[str, Any] = field(default_factory=dict)
+    locale: str = DEFAULT_LANGUAGE
 
 
 @dataclass
@@ -147,6 +164,7 @@ class AssistantTurnOutput:
     metrics: RuntimeMetrics = field(default_factory=RuntimeMetrics)
     next_state: ConversationState | None = None
     turn_decision: dict[str, Any] | None = None
+    language: dict[str, Any] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -157,10 +175,27 @@ SALES_DIAGNOSIS_INSTANCE_CODE = "team360_sales_diagnosis"
 SALES_DIAGNOSIS_PACKAGE_CODE = "pkg_sales_diagnosis"
 SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE = "ks_team360_sales_diagnosis"
 
-SAFE_ACK_TEXT = (
-    "Recibí tu consulta. Estoy revisando el contexto disponible "
-    "para orientarte sin prometer capacidades no confirmadas."
-)
+SAFE_ACK_TEXTS: dict[str, str] = {
+    "es": (
+        "Recibí tu consulta. Estoy revisando el contexto disponible "
+        "para orientarte sin prometer capacidades no confirmadas."
+    ),
+    "en": (
+        "I received your message. I am reviewing the available context "
+        "to guide you without promising unconfirmed capabilities."
+    ),
+    "he": (
+        "קיבלתי את ההודעה שלך. אני בודק את ההקשר הזמין "
+        "כדי להנחות אותך מבלי להבטיח יכולות לא מאושרות."
+    ),
+}
+
+SAFE_ACK_TEXT = SAFE_ACK_TEXTS["es"]
+
+
+def safe_ack_for_language(lang: str | None = None) -> str:
+    code = _normalize_language(lang)
+    return SAFE_ACK_TEXTS.get(code, SAFE_ACK_TEXT)
 
 PLANNED_EXTENSIONS = frozenset({
     "step_to_action",

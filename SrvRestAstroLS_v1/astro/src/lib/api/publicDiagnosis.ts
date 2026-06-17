@@ -42,6 +42,17 @@ export interface PublicDiagnosisResponse {
 export interface TurnRequest {
   session_id?: string;
   message: string;
+  locale?: string;
+}
+
+export interface TurnLanguage {
+  initial_language: string;
+  current_language: string;
+  preferred_response_language: string;
+  response_language: string;
+  language_confidence: number;
+  language_source: string;
+  explicit_language_preference: boolean;
 }
 
 export interface TurnResponse {
@@ -49,6 +60,7 @@ export interface TurnResponse {
   response_text: string;
   turn_count: number;
   is_new: boolean;
+  language?: TurnLanguage | null;
 }
 
 export async function sendPublicTurn(request: TurnRequest): Promise<TurnResponse> {

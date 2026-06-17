@@ -93,7 +93,7 @@ TEAM360_SALES_DIAGNOSIS_CONFIG = AssistantInstanceConfig(
     lead_owner="Team360",
     market="direct",
     default_locale="es",
-    supported_locales=("es", "en"),
+    supported_locales=("es", "en", "he"),
     cost_center="team360_direct_sales",
     package_workers=(
         PackageWorkerBinding(
@@ -200,7 +200,7 @@ LEGACY_AUTOMATION_DIAGNOSIS_CONFIG = AssistantInstanceConfig(
     lead_owner="Team360",
     market="internal",
     default_locale="es",
-    supported_locales=("es", "en"),
+    supported_locales=("es", "en", "he"),
     cost_center="team360_internal_lab",
     package_workers=TEAM360_SALES_DIAGNOSIS_CONFIG.package_workers,
     arangodb_scope={**TEAM360_SALES_DIAGNOSIS_CONFIG.arangodb_scope, "physical_collection_per_customer": False},
