@@ -46,9 +46,10 @@ const visibleProfiles = getMockProfiles().filter(({ id }) =>
     <div class="mt-8 grid gap-4 md:grid-cols-2">
       {
         visibleProfiles.map((profile) => (
-          <Card tag="section" variant="large">
+          <Card tag="section" variant="large" class="flex flex-col">
             <p class="top-badge">{profile.label}</p>
             <p class="mt-3 flex-1 details-text">{profile.description}</p>
+            <div class="grow" />
             <div class="mt-5 border-t border-[#edf1f2] pt-4">
               <LinkButton
                 href={buildConsoleRoute(

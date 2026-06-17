@@ -21,7 +21,12 @@
   >
     {value}
   </p>
-  {#if trend}<p class="mt-2 text-base font-bold text-[#168b88]">{trend}</p>{/if}
+  {#if trend}<p class="mt-2 text-base font-bold text-[#168b88]">
+      {trend}
+    </p>
+  {:else}
+    <p class="mt-2 text-base font-bold text-transparent">-</p>
+  {/if}
   {#if description}<p class="mt-2 text-base leading-5 text-[#82939d]">
       {description}
     </p>{/if}

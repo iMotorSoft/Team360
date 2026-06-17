@@ -20,7 +20,7 @@
     {eyebrow}
   </p>
   <h1 class="title-h1">{title}</h1>
-  <p class="mt-3 max-w-3xl details-text">{description}</p>
+  <p class="max-w-3xl details-text">{description}</p>
 </div>
 {#if actions}
   <div class="shrink-0">{@render actions()}</div>

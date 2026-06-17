@@ -96,25 +96,25 @@
           {:else if serviceId}
             <ServiceDetail {serviceId} />
           {:else if view === "home"}
-            <ConsoleDashboard />
+            <ConsoleDashboard /> <!-- Inicio -->
           {:else if view === "services"}
-            <ServicesList />
+            <ServicesList /> <!-- Servicios -->
           {:else if view === "reports"}
-            <ReportsList />
+            <ReportsList /> <!-- Reportes -->
           {:else if view === "alerts"}
-            <AlertsList />
+            <AlertsList /> <!-- Alertas -->
           {:else if view === "tasks"}
-            <TasksList />
+            <TasksList /> <!-- Tareas -->
           {:else if view === "team"}
-            <TeamList />
+            <TeamList /> <!-- Equipo/usuarios -->
           {:else if view === "settings"}
-            <WorkspaceSettings />
+            <WorkspaceSettings /> <!-- Configuración -->
           {:else if view === "workers"}
-            <WorkersList />
+            <WorkersList /> <!-- Workers -->
           {:else if view === "runs"}
-            <RunsList />
+            <RunsList /> <!-- Ejecuciones -->
           {:else}
-            <ConsoleSectionPage {view} />
+            <ConsoleSectionPage {view} /> <!-- Soporte -->
           {/if}
         </main>
 

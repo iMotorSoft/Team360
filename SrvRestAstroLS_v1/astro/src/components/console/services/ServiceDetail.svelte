@@ -102,7 +102,7 @@
 {#if service}
   <section>
     <a
-      class="inline-flex text-sm font-bold text-[#168b88] transition hover:text-[#102d4f]"
+      class="inline-flex text-base font-bold text-[#168b88] transition hover:text-[#102d4f]"
       href={buildConsoleRoute(
         service.workspaceId,
         "services",
@@ -121,7 +121,7 @@
           : service.description}
       >
         {#snippet actions()}
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2 mt-6">
             <StatusBadge status={service.status} />
             <StatusBadge status={service.health} />
           </div>
@@ -136,19 +136,15 @@
     {#if activeTab === "summary"}
       <div class="mt-6 grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
         <Card tag="section" variant="large">
-          <p
-            class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
-          >
-            Cómo funciona
-          </p>
+          <p class="top-badge">Cómo funciona</p>
           <div class="mt-5 space-y-3">
             {#each service.workflowSteps as step, index}
               <div class="flex items-center gap-3 rounded-xl bg-[#f8fbfa] p-3">
                 <span
-                  class="grid size-8 shrink-0 place-items-center rounded-full bg-[#153b5b] text-xs font-bold text-white"
+                  class="grid size-8 shrink-0 place-items-center rounded-full bg-[#153b5b] text-base font-bold text-white"
                   >{index + 1}</span
                 >
-                <p class="text-sm font-semibold text-[#587184]">{step}</p>
+                <p class="text-lg font-semibold text-[#587184]">{step}</p>
               </div>
             {/each}
           </div>
@@ -161,17 +157,13 @@
             >
               Próximo paso
             </p>
-            <p class="mt-3 text-base font-semibold leading-6 text-white/85">
+            <p class="mt-3 text-lg font-semibold leading-6 text-white/85">
               {service.nextStep}
             </p>
           </Card>
           <Card tag="section" variant="flat" rounded="rounded-3xl">
-            <p
-              class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
-            >
-              Contexto
-            </p>
-            <dl class="mt-4 space-y-3 text-base">
+            <p class="top-badge">Contexto</p>
+            <dl class="mt-4 space-y-3 text-lg">
               <div class="flex justify-between gap-3">
                 <dt class="text-[#91a2ad]">Organización</dt>
                 <dd class="font-bold text-[#587184]">
@@ -217,15 +209,15 @@
               class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
             >
               <div>
-                <p class="text-base font-bold text-[#31536b]">{report.title}</p>
-                <p class="mt-1 text-sm text-[#8396a2]">
+                <p class="text-xl font-bold text-[#31536b]">{report.title}</p>
+                <p class="mt-1 text-lg text-[#8396a2]">
                   {report.period} · {report.type}
                 </p>
               </div>
               <StatusBadge status={report.status} />
             </div>
             <Button
-              class="mt-4 h-auto min-h-0 rounded-full px-3 py-1.5 text-sm"
+              class="mt-4 h-auto min-h-0 rounded-full px-3 py-1.5 text-base text-slate-400"
               disabled
               variant="ghost"
             >
@@ -246,7 +238,7 @@
       <div class="mt-6 space-y-3">
         {#each serviceAlerts as alert}
           <AlertCard
-            alert={alert}
+            {alert}
             cardVariant="flat"
             showStatus={true}
             showAction={true}
@@ -268,8 +260,8 @@
             class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
-              <p class="text-base font-bold text-[#31536b]">{task.title}</p>
-              <p class="mt-1 text-sm text-[#8396a2]">
+              <p class="text-lg font-bold text-[#31536b]">{task.title}</p>
+              <p class="mt-1 text-base text-[#8396a2]">
                 {task.assigneeLabel} · vence {formatDate(
                   task.dueDate,
                   consoleContext.locale,
@@ -294,30 +286,26 @@
     {:else if activeTab === "history"}
       <div class="mt-6 grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
         <Card tag="section" variant="flat" rounded="rounded-3xl">
-          <p
-            class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
-          >
-            Actividad reciente
-          </p>
+          <p class="top-badge">Actividad reciente</p>
           <div class="mt-4 space-y-3">
             {#each serviceRuns.slice(0, 4) as run}
               <article
                 class="border-b border-[#edf1f2] pb-3 last:border-0 last:pb-0"
               >
                 <div class="flex items-center justify-between gap-3">
-                  <p class="text-base font-bold text-[#47657b]">
+                  <p class="text-lg font-bold text-[#47657b]">
                     {audience === "client"
                       ? "Actualización del servicio"
                       : run.workerName}
                   </p>
                   <StatusBadge status={run.status} />
                 </div>
-                <p class="mt-2 text-sm leading-5 text-[#8396a2]">
+                <p class="mt-2 text-lg leading-5 text-[#8396a2]">
                   {run.summary}
                 </p>
               </article>
             {:else}
-              <p class="text-sm leading-5 text-[#8396a2]">
+              <p class="text-lg leading-5 text-[#8396a2]">
                 La primera ejecución todavía está pendiente.
               </p>
             {/each}
@@ -329,7 +317,7 @@
           >
             Soporte contextual
           </p>
-          <p class="mt-3 text-base leading-6 text-white/75">
+          <p class="mt-3 text-lg leading-6 text-white/75">
             El equipo puede revisar este servicio con su contexto, alertas y
             tareas visibles sin exponer datos internos innecesarios.
           </p>
@@ -343,34 +331,26 @@
     {:else if activeTab === "configuration"}
       <div class="mt-6 grid gap-5 xl:grid-cols-2">
         <Card tag="section" variant="flat" rounded="rounded-3xl">
-          <p
-            class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
-          >
-            Integraciones visibles
-          </p>
+          <p class="top-badge">Integraciones visibles</p>
           <div class="mt-4 space-y-3">
             {#each service.integrationNames as integration}
               <div
-                class="flex items-center justify-between gap-3 rounded-xl bg-[#f8fbfa] px-3 py-3"
+                class="flex items-center justify-between gap-3 rounded-xl bg-base-200 px-3 py-3"
               >
-                <p class="text-sm font-bold text-[#47657b]">{integration}</p>
+                <p class="text-lg font-bold text-[#47657b]">{integration}</p>
                 <StatusBadge status="review" label="Referencia mock" />
               </div>
             {/each}
           </div>
         </Card>
         <Card tag="section" variant="flat" rounded="rounded-3xl">
-          <p
-            class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
-          >
-            Parámetros delegados
-          </p>
-          <p class="mt-3 text-base leading-5 text-[#78909f]">
+          <p class="top-badge">Parámetros delegados</p>
+          <p class="mt-3 text-lg leading-5 text-[#78909f]">
             Esta vista prepara el diseño de configuración permitida. No guarda
             cambios ni contiene accesos reales.
           </p>
           <Button
-            class="mt-5 h-auto min-h-0 rounded-full border border-[#d5e4e4] px-4 py-2 text-lg"
+            class="mt-5 h-auto min-h-0 rounded-full border border-slate-300 text-slate-400 px-4 py-2 text-lg"
             disabled
             variant="ghost">Edición no disponible en mock</Button
           >
@@ -379,16 +359,12 @@
     {:else if activeTab === "technical"}
       <div class="mt-6 grid gap-5 xl:grid-cols-2">
         <Card tag="section" variant="flat" rounded="rounded-3xl">
-          <p
-            class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
-          >
-            Workers vinculado
-          </p>
+          <p class="top-badge">Workers vinculado</p>
           <div class="mt-4 space-y-3">
             {#each serviceWorkers as worker}
               <article class="rounded-xl bg-[#f8fbfa] px-3 py-3">
                 <div class="flex items-center justify-between gap-3">
-                  <p class="text-sm font-bold text-[#47657b]">{worker.name}</p>
+                  <p class="text-lg font-bold text-[#47657b]">{worker.name}</p>
                   <StatusBadge status={worker.health} />
                 </div>
                 <p class="mt-2 text-sm text-[#91a2ad]">
@@ -401,27 +377,23 @@
                 </p>
               </article>
             {:else}
-              <p class="text-sm text-[#8396a2]">Sin worker mock vinculado.</p>
+              <p class="text-lg text-[#8396a2]">Sin worker mock vinculado.</p>
             {/each}
           </div>
         </Card>
         <Card tag="section" variant="flat" rounded="rounded-3xl">
-          <p
-            class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]"
-          >
-            Runs resumidos
-          </p>
+          <p class="top-badge">Runs resumidos</p>
           <div class="mt-4 space-y-3">
             {#each serviceRuns.slice(0, 4) as run}
               <article class="rounded-xl bg-[#f8fbfa] px-3 py-3">
                 <div class="flex items-center justify-between gap-3">
-                  <p class="text-sm font-bold text-[#47657b]">{run.id}</p>
+                  <p class="text-lg font-bold text-[#47657b]">{run.id}</p>
                   <StatusBadge status={run.health} />
                 </div>
                 <p class="mt-2 text-base text-[#91a2ad]">{run.summary}</p>
               </article>
             {:else}
-              <p class="text-sm text-[#8396a2]">Sin runs mock registrados.</p>
+              <p class="text-lg text-[#8396a2]">Sin runs mock registrados.</p>
             {/each}
           </div>
         </Card>
@@ -430,18 +402,16 @@
   </section>
 {:else}
   <Card tag="section" variant="flat" rounded="rounded-3xl" padding="p-6">
-    <p class="text-sm font-bold uppercase tracking-[0.16em] text-[#168b88]">
-      Servicio no disponible
-    </p>
+    <p class="top-badge">Servicio no disponible</p>
     <h1 class="mt-3 text-3xl font-bold tracking-[-0.04em] text-[#173b5b]">
       No puedes consultar este servicio desde el contexto activo.
     </h1>
-    <p class="mt-3 text-base leading-6 text-[#78909f]">
+    <p class="mt-3 text-lg leading-6 text-[#78909f]">
       Vuelve al listado o cambia a un workspace autorizado mediante el selector
       mock.
     </p>
     <a
-      class="mt-5 inline-flex rounded-full bg-[#153b5b] px-4 py-2 text-sm font-bold text-white"
+      class="mt-5 inline-flex rounded-full bg-[#153b5b] px-4 py-2 text-lg font-bold text-white"
       href={buildConsoleRoute(
         consoleContext.activeWorkspace.id,
         "services",

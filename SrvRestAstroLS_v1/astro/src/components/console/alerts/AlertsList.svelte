@@ -66,13 +66,13 @@
         <h2 class="text-3xl font-bold tracking-[-0.03em] text-[#173b5b]">
           {section.title}
         </h2>
-        <p class="mt-1 text-base leading-5 text-[#78909f]">
+        <p class="my-1 details-text">
           {section.description}
         </p>
-        <div class="mt-3 space-y-3">
+        <div class="mt-6 space-y-3">
           {#each visibleAlerts.filter(({ type }) => type === section.type) as alert}
             <AlertCard
-              alert={alert}
+              {alert}
               cardVariant="flat"
               showStatus={true}
               showService={true}
@@ -81,7 +81,7 @@
             />
           {:else}
             <p
-              class="rounded-2xl border border-dashed border-[#d7e3e5] bg-white/60 p-4 text-xs text-[#8396a2]"
+              class="rounded-2xl border border-dashed border-[#d7e3e5] bg-white/60 p-4 text-base text-[#8396a2]"
             >
               Sin alertas de este tipo en el alcance visible.
             </p>

@@ -177,6 +177,26 @@
       ],
     ];
   });
+
+  const pastelColors = [
+    {
+      color: "bg-pink-50/70 border-pink-100",
+    },
+    {
+      color: "bg-blue-50/70 border-blue-100",
+    },
+    {
+      color: "bg-purple-50/70 border-purple-100",
+    },
+    {
+      color: "bg-teal-50/70 border-teal-100",
+    },
+  ];
+
+  function getTabColors(index: number) {
+    const color = pastelColors[index % pastelColors.length];
+    return color.color;
+  }
 </script>
 
 <section>
@@ -222,19 +242,24 @@
     </Badge>
   </div>
 
-  <div class="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-    {#each cards as [label, value, description]}
-      <Card variant="default">
-        <p class="text-sm font-bold uppercase tracking-[0.15em] text-[#78909f]">
-          {label}
-        </p>
-        <p class="mt-4 text-3xl font-bold tracking-[-0.06em] text-[#173b5b]">
-          {value}
-        </p>
-        <p class="mt-2 text-sm leading-5 text-[#82939d]">{description}</p>
-      </Card>
-    {/each}
-  </div>
+  <Card variant="flat-large" class="mt-7">
+    <div class=" grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {#each cards as [label, value, description], i}
+        <div
+          class={`flex flex-col rounded-3xl border p-5 transition-colors ${getTabColors(
+            i,
+          )}`}
+        >
+          <p class="top-badge-neutral">{label}</p>
+          <div class="grow"></div>
+          <p class="mt-4 text-3xl font-bold tracking-[-0.06em] text-[#173b5b]">
+            {value}
+          </p>
+          <p class="mt-2 text-base leading-5 text-[#82939d]">{description}</p>
+        </div>
+      {/each}
+    </div>
+  </Card>
 
   <div class="mt-6 grid gap-5 xl:grid-cols-[1.45fr_0.85fr]">
     <Card tag="section" variant="large">

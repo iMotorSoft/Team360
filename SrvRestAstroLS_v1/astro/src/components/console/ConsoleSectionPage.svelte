@@ -221,15 +221,13 @@
 
 <section>
   <div>
-    <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#168b88]">
+    <p class="top-badge">
       {copy[1]}
     </p>
-    <h1
-      class="mt-2 text-3xl font-bold tracking-[-0.055em] text-[#102d4f] sm:text-4xl"
-    >
+    <h1 class="title-h1">
       {copy[0]}
     </h1>
-    <p class="mt-3 max-w-3xl text-sm leading-6 text-[#69808f]">{copy[2]}</p>
+    <p class="max-w-3xl details-text">{copy[2]}</p>
   </div>
 
   {#if view === "organizations"}
@@ -238,19 +236,20 @@
         <Card variant="flat">
           <div class="flex items-start justify-between gap-3">
             <div>
-              <p class="text-sm font-bold text-[#284c67]">
+              <p class="text-lg font-bold text-[#284c67]">
                 {organization.name}
               </p>
-              <p class="mt-1 text-xs text-[#8396a2]">{organization.type}</p>
+              <p class="mt-1 text-base text-[#8396a2]">{organization.type}</p>
             </div>
             <Badge
               variant={statusVariant(organization.status)}
-              class="h-auto px-2 py-1 text-[0.62rem]"
+              class="h-auto px-2 py-1 text-sm"
               >{statusLabel(organization.status)}</Badge
             >
           </div>
           <div
-            class="mt-5 flex items-center justify-between border-t border-[#edf1f2] pt-3 text-xs text-[#78909f]"
+            class="mt-5 flex items-center justify-between border-t border-[#edf1f2] pt-3
+            text-xbases text-[#78909f]"
           >
             <span>{organization.region}</span>
             <span
@@ -268,36 +267,36 @@
         <Card variant="flat-large">
           <div class="flex items-center justify-between gap-3">
             <div>
-              <p class="text-lg font-bold tracking-[-0.03em] text-[#173b5b]">
+              <p class="text-2xl font-bold text-[#173b5b]">
                 {partner.name}
               </p>
-              <p class="mt-1 text-xs text-[#8396a2]">
+              <p class="mt-1 text-xl text-[#8396a2]">
                 Partner regional · {partner.region}
               </p>
             </div>
             <Badge
               variant={statusVariant(partner.status)}
-              class="h-auto px-2 py-1 text-[0.62rem]"
+              class="h-auto px-2 py-1 text-sm"
               >{statusLabel(partner.status)}</Badge
             >
           </div>
           <div class="mt-5 grid grid-cols-2 gap-3">
             <div class="rounded-2xl bg-[#f3f8f8] p-3">
-              <p class="text-2xl font-bold tracking-[-0.05em] text-[#173b5b]">
+              <p class="text-2xl font-bold text-[#173b5b]">
                 {organizations.filter(
                   ({ parentOrganizationId }) =>
                     parentOrganizationId === partner.id,
                 ).length}
               </p>
-              <p class="mt-1 text-xs text-[#78909f]">Clientes asociados</p>
+              <p class="mt-1 text-base text-[#78909f]">Clientes asociados</p>
             </div>
             <div class="rounded-2xl bg-[#f3f8f8] p-3">
-              <p class="text-2xl font-bold tracking-[-0.05em] text-[#173b5b]">
+              <p class="text-2xl font-bold text-[#173b5b]">
                 {workspaces.filter(
                   ({ organizationId }) => organizationId === partner.id,
                 ).length}
               </p>
-              <p class="mt-1 text-xs text-[#78909f]">Workspaces propios</p>
+              <p class="mt-1 text-base text-[#78909f]">Workspaces propios</p>
             </div>
           </div>
         </Card>
@@ -309,8 +308,8 @@
         <Card variant="flat" padding="p-4">
           <div class="flex items-start justify-between gap-3">
             <div>
-              <h2 class="text-sm font-bold text-[#31536b]">{client.name}</h2>
-              <p class="mt-1 text-xs text-[#8396a2]">{client.region}</p>
+              <h2 class="text-lg font-bold text-[#31536b]">{client.name}</h2>
+              <p class="mt-1 text-base text-[#8396a2]">{client.region}</p>
             </div>
             <Badge
               variant={statusVariant(client.status)}
@@ -333,10 +332,8 @@
       class="mt-7 hidden overflow-hidden md:block"
     >
       <div class="overflow-x-auto">
-        <table class="w-full min-w-[42rem] text-start text-sm">
-          <thead
-            class="bg-[#f4f8f8] text-[0.65rem] uppercase tracking-[0.15em] text-[#78909f]"
-          >
+        <table class="w-full min-w-[42rem] text-start text-base">
+          <thead class="bg-[#f4f8f8] top-badge-neutral">
             <tr
               ><th class="px-5 py-3 text-start">Cliente</th><th
                 class="px-5 py-3 text-start">Tipo</th
@@ -360,7 +357,7 @@
                 <td class="px-5 py-4"
                   ><Badge
                     variant={statusVariant(client.status)}
-                    class="h-auto px-2 py-1 text-[0.62rem]"
+                    class="h-auto px-2 py-1 text-sm"
                     >{statusLabel(client.status)}</Badge
                   ></td
                 >
@@ -376,18 +373,18 @@
         <Card variant="flat">
           <div class="flex items-start justify-between gap-3">
             <div>
-              <p class="text-sm font-bold text-[#284c67]">{workspace.name}</p>
-              <p class="mt-1 text-xs text-[#8396a2]">
+              <p class="text-xl font-bold text-[#284c67]">{workspace.name}</p>
+              <p class="mt-1 text-base text-[#8396a2]">
                 {organizationForWorkspace(workspace.id)?.name}
               </p>
             </div>
             <Badge
               variant={statusVariant(workspace.status)}
-              class="h-auto px-2 py-1 text-[0.62rem]"
+              class="h-auto px-2 py-1 text-sm"
               >{statusLabel(workspace.status)}</Badge
             >
           </div>
-          <p class="mt-4 text-xs text-[#78909f]">
+          <p class="mt-4 text-base text-[#78909f]">
             {workspace.type} · {workspace.locale.toUpperCase()} · {workspace.direction}
           </p>
         </Card>
@@ -396,29 +393,24 @@
   {:else if view === "services" || view === "client-services"}
     <div class="mt-7 grid gap-4 xl:grid-cols-2">
       {#each view === "client-services" ? clientServices : context.services as service}
-        <Card variant="flat-large">
+        <Card variant="flat-large" class="flex flex-col">
           <div
             class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
           >
             <div>
-              <p
-                class="text-xs font-bold uppercase tracking-[0.14em] text-[#168b88]"
-              >
-                {service.packageName}
-              </p>
+              <p class="top-badge">{service.packageName}</p>
               <h2
-                class="mt-2 text-lg font-bold tracking-[-0.03em] text-[#173b5b]"
+                class="mt-2 text-2xl font-bold tracking-[-0.03em] text-[#173b5b]"
               >
                 {service.name}
               </h2>
-              <p class="mt-2 text-xs leading-5 text-[#78909f]">
+              <p class="mt-2 text-lg leading-5 text-[#78909f]">
                 {service.description}
               </p>
             </div>
             <Badge
               variant={statusVariant(service.health)}
-              class="h-auto w-fit px-2 py-1 text-[0.62rem]"
-              >{service.health}</Badge
+              class="h-auto w-fit px-2 py-1 text-sm">{service.health}</Badge
             >
           </div>
           <div class="mt-5 grid gap-2 sm:grid-cols-2">
@@ -427,17 +419,19 @@
                 <p class="text-lg font-bold tracking-[-0.04em] text-[#214762]">
                   {metric.value}
                 </p>
-                <p class="mt-1 text-[0.68rem] text-[#78909f]">
+                <p class="mt-1 text-sm text-[#78909f]">
                   {metric.label}{metric.trend ? ` · ${metric.trend}` : ""}
                 </p>
               </div>
             {/each}
           </div>
-          <p
-            class="mt-4 border-t border-[#edf1f2] pt-3 text-xs font-semibold leading-5 text-[#668092]"
+          <div class="grow"></div>
+          <div
+            class="mt-4 border-t border-[#edf1f2] pt-3 text-base font-semibold leading-5 text-[#668092]
+            "
           >
             Próximo paso: {service.nextStep}
-          </p>
+          </div>
         </Card>
       {:else}
         <Card tag="p" variant="flat" class="text-sm text-[#718793]"
@@ -527,25 +521,27 @@
         <Card variant="flat">
           <div class="flex items-start justify-between gap-3">
             <div>
-              <p class="text-sm font-bold text-[#284c67]">{report.title}</p>
-              <p class="mt-1 text-xs text-[#8396a2]">
+              <p class="text-lg font-bold text-[#284c67]">{report.title}</p>
+              <p class="mt-1 text-base text-[#8396a2]">
                 {report.period} · {report.type}
               </p>
             </div>
             <Badge
               variant={statusVariant(report.status)}
-              class="h-auto px-2 py-1 text-[0.62rem]"
+              class="h-auto px-2 py-1 text-sm"
               >{statusLabel(report.status)}</Badge
             >
           </div>
-          <p class="mt-5 border-t border-[#edf1f2] pt-3 text-xs text-[#78909f]">
+          <p
+            class="mt-5 border-t border-[#edf1f2] pt-3 text-base text-[#78909f]"
+          >
             {report.generatedAt
               ? `Generado: ${formatDateTime(report.generatedAt, consoleContext.locale)}`
               : "Generación en curso o programada."}
           </p>
         </Card>
       {:else}
-        <Card tag="p" variant="flat" class="text-sm text-[#718793]"
+        <Card tag="p" variant="flat" class="text-base text-[#718793]"
           >Todavía no hay reportes para este workspace.</Card
         >
       {/each}
@@ -554,7 +550,7 @@
     <div class="mt-7 space-y-3">
       {#each context.alerts as alert}
         <AlertCard
-          alert={alert}
+          {alert}
           cardVariant="flat"
           showStatus={true}
           showService={true}
@@ -620,42 +616,41 @@
   {:else if view === "support"}
     <div class="mt-7 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
       <Card tag="section" variant="flat-large">
-        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">
-          Solicitudes recientes
-        </p>
+        <p class="top-badge">Solicitudes recientes</p>
         <div class="mt-4 space-y-3">
           {#each context.tasks.slice(0, 4) as task}
             <article class="rounded-xl border border-[#edf1f2] px-3 py-3">
-              <p class="text-xs font-bold text-[#36566f]">{task.title}</p>
-              <p class="mt-1 text-[0.68rem] text-[#8a9ba6]">
+              <p class="text-lg font-bold text-[#36566f]">{task.title}</p>
+              <p class="mt-1 text-lg text-[#8a9ba6]">
                 Seguimiento contextual · {task.status}
               </p>
             </article>
           {:else}
-            <p class="rounded-xl bg-[#f4f8f8] p-4 text-xs text-[#718793]">
+            <p class="rounded-xl bg-[#f4f8f8] p-4 text-base text-[#718793]">
               No hay solicitudes abiertas.
             </p>
           {/each}
         </div>
       </Card>
-      <section class="rounded-3xl bg-[#123653] p-5 text-white sm:p-6">
-        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#86ddd5]">
+      <Card variant="dark">
+        <p class="text-sm font-bold uppercase tracking-[0.16em] text-teal-300">
           Escalamiento
         </p>
-        <h2 class="mt-3 text-xl font-bold tracking-[-0.035em]">
+        <h2 class="mt-3 text-2xl font-bold tracking-[-0.035em]">
           Soporte Team360
         </h2>
-        <p class="mt-3 text-sm leading-6 text-white/70">
+        <p class="mt-3 text-lg leading-6 text-white/70">
           Comparte el contexto activo, el servicio afectado y la evidencia
           necesaria para acelerar el seguimiento.
         </p>
         <a
-          class="mt-5 inline-flex rounded-full bg-[#72d9cf] px-4 py-2 text-xs font-bold text-[#123653] transition hover:bg-white"
+          class="mt-5 inline-flex rounded-full bg-teal-300 px-4 py-2 text-base
+          font-bold text-[#123653] transition hover:bg-teal-200"
           href={`mailto:${BRAND.supportEmail}`}
         >
           {BRAND.supportEmail}
         </a>
-      </section>
+      </Card>
     </div>
   {:else if view === "settings"}
     <div class="mt-7 grid gap-4 lg:grid-cols-2">
