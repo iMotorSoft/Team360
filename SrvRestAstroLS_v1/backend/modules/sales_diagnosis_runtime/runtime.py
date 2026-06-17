@@ -8,6 +8,7 @@ from modules.sales_diagnosis_runtime.contracts import (
     DEFAULT_LANGUAGE,
     LANGUAGE_UNDETERMINED,
     SAFE_ACK_TEXT,
+    SAFE_ACK_TEXTS,
     SUPPORTED_LANGUAGES,
     _normalize_language,
     safe_ack_for_language,
@@ -183,7 +184,7 @@ class AssistantConversationRuntime:
         # 8. Generate response
         raw_response = self._llm.generate(input, state, chunks)
 
-        is_fallback = raw_response == SAFE_ACK_TEXT
+        is_fallback = raw_response in set(SAFE_ACK_TEXTS.values())
         events.append(ProgressiveEvent(
             event_type="team360.llm.provider_result",
             payload={"response_is_fallback": is_fallback},
@@ -218,6 +219,7 @@ class AssistantConversationRuntime:
         elif intent.intent == IntentType.REQUEST_DIAGNOSIS and not should_diagnose:
             decision_reason = f"{intent.intent.value}_missing_critical"
 
+        model_name = getattr(self._llm, "model_name", None) or ""
         output = AssistantTurnOutput(
             response_text=raw_response,
             response_type="diagnosis" if should_diagnose else "final",
@@ -238,6 +240,12 @@ class AssistantConversationRuntime:
                 "matched_rule": intent.matched_rule,
                 "classifier_called": intent.source
                     not in (IntentSource.HIGH_CONFIDENCE_RULE, IntentSource.RUNTIME_FALLBACK),
+                "generation": {
+                    "status": "fallback" if is_fallback else "success",
+                    "model": model_name,
+                    "fallback_used": is_fallback,
+                    "fallback_reason": "transient_error" if is_fallback else None,
+                },
             },
             language={
                 "initial_language": lang_state.get("initial_language", input.locale),
@@ -665,6 +673,24 @@ class AssistantConversationRuntime:
             events=events,
             metrics=metrics,
             next_state=state,
+            turn_decision={
+                "action": "reflect_and_ask",
+                "retrieval_query": "",
+                "diagnosis_status": "gathering",
+                "readiness_reason": "no_llm",
+                "intent": "",
+                "intent_scope": "",
+                "intent_confidence": 0.0,
+                "intent_source": "unavailable",
+                "matched_rule": None,
+                "classifier_called": False,
+                "generation": {
+                    "status": "unavailable",
+                    "model": "",
+                    "fallback_used": False,
+                    "fallback_reason": "no_llm_provider",
+                },
+            },
         )
         events.append(ProgressiveEvent(event_type="team360.done", payload={"mode": "skeleton_no_llm"}, safe_to_show=True))
         self._save_state(state)

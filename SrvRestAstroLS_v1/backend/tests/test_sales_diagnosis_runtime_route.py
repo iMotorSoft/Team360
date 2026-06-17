@@ -316,7 +316,7 @@ def test_product_route_llm_default_remains_fake(monkeypatch):
     with _client() as client:
         resp = client.post(PRODUCT_TURN_PATH, json=_default_payload())
     assert resp.status_code == HTTP_201_CREATED
-    assert "Recibí tu consulta" in resp.json()["response_text"]
+    assert "Recibí la información" in resp.json()["response_text"]
 
 
 def test_product_route_accepts_explicit_fake_llm_provider(monkeypatch):

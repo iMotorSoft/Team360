@@ -419,7 +419,7 @@ class TestPromptPolicy:
         policy = PromptPolicy()
         ack = policy.build_safe_ack()
         assert ack == SAFE_ACK_TEXT
-        assert "Recibí tu consulta" in ack
+        assert "Recibí la información" in ack
 
     def test_prompt_policy_commercial_ack(self):
         policy = PromptPolicy()
@@ -612,7 +612,7 @@ class TestConstants:
 
     def test_safe_ack_text_defined(self):
         assert SAFE_ACK_TEXT
-        assert "Recibí tu consulta" in SAFE_ACK_TEXT
+        assert "Recibí la información" in SAFE_ACK_TEXT
 
 
 # ---------------------------------------------------------------------------

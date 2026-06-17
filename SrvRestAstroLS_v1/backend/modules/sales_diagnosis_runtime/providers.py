@@ -69,12 +69,18 @@ class LLMProvider(Protocol):
     ) -> str:
         ...
 
+    @property
+    def model_name(self) -> str | None:
+        return None
+
 
 class NullLLMProvider:
     """Skeleton provider that returns the safe ack text.
 
     Used for testing and development before gpt-5-nano integration.
     """
+
+    model_name: str | None = None
 
     def generate(
         self,

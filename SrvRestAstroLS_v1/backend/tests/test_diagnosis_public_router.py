@@ -331,6 +331,7 @@ def _make_runtime_with(intent_classifier=None):
     from modules.sales_diagnosis_runtime import AssistantConversationRuntime
 
     class _FakeLLMForTest:
+        model_name: str | None = "test-model"
         def generate(self, input, state, context):
             return "I understand your situation. Let me analyze what I have so far."
 
@@ -504,6 +505,141 @@ def test_public_turn_classifier_fallback_is_never_diagnose(monkeypatch):
     assert td.get("classifier_called") is False
 
 
+# ── Generation metadata contract ──────────────────────────────────────────
+
+
+def test_generation_metadata_success(monkeypatch):
+    """Successful generation returns status=success, fallback_used=false."""
+    import routes.diagnosis as diagnosis_route
+
+    class _OkClient:
+        def __init__(self, base_url=None, api_key=None, timeout_seconds=None):
+            pass
+        def text_completion(self, model, messages, **kwargs):
+            from modules.automation_diagnosis.litellm_client import LiteLLMResponse
+            return LiteLLMResponse(content="Respuesta real del modelo.", model=model)
+
+    monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
+    monkeypatch.setattr(diagnosis_route, "LiteLLMClient", _OkClient)
+    with _client() as client:
+        resp = client.post("/api/diagnosis/turn", json={"message": "test"})
+    assert resp.status_code == 201
+    gen = resp.json().get("turn_decision", {}).get("generation", {})
+    assert gen.get("status") == "success"
+    assert gen.get("fallback_used") is False
+
+
+def test_generation_metadata_fallback(monkeypatch):
+    """Fallback (timeout) returns status=fallback, fallback_used=true."""
+    import routes.diagnosis as diagnosis_route
+
+    class _TimeoutClient:
+        def __init__(self, base_url=None, api_key=None, timeout_seconds=None):
+            pass
+        def text_completion(self, model, messages, **kwargs):
+            raise TimeoutError("timeout")
+
+    monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
+    monkeypatch.setattr(diagnosis_route, "LiteLLMClient", _TimeoutClient)
+    with _client() as client:
+        resp = client.post("/api/diagnosis/turn", json={"message": "test"})
+    assert resp.status_code == 201
+    gen = resp.json().get("turn_decision", {}).get("generation", {})
+    assert gen.get("status") == "fallback"
+    assert gen.get("fallback_used") is True
+    assert gen.get("fallback_reason") == "transient_error"
+
+
+def test_generation_fallback_localized_es():
+    """Spanish fallback text must be the honest localized version."""
+    from modules.sales_diagnosis_runtime.contracts import SAFE_ACK_TEXT
+    assert "no pude procesarla" in SAFE_ACK_TEXT
+    assert "intentarlo nuevamente" in SAFE_ACK_TEXT
+
+
+def test_generation_fallback_localized_en():
+    """English fallback text must be the honest localized version."""
+    from modules.sales_diagnosis_runtime.contracts import SAFE_ACK_TEXTS
+    text = SAFE_ACK_TEXTS.get("en", "")
+    assert "couldn't fully process" in text
+    assert "try again without losing" in text
+
+
+def test_generation_fallback_localized_he():
+    """Hebrew fallback text must be honest localized version."""
+    from modules.sales_diagnosis_runtime.contracts import SAFE_ACK_TEXTS
+    text = SAFE_ACK_TEXTS.get("he", "")
+    assert "קיבלתי" in text
+    assert "המידע" in text
+
+
+# ── Punto 12: Auth/config error never returns placeholder ──────────────────
+
+
+def test_public_turn_auth_error_no_placeholder(monkeypatch):
+    """Auth error (missing key) returns 503, never SAFE_ACK_TEXT."""
+    from modules.automation_diagnosis.litellm_client import LiteLLMClientError
+
+    class _AuthFailClient:
+        def __init__(self, base_url=None, api_key=None, timeout_seconds=None):
+            raise LiteLLMClientError("API key not configured")
+
+    monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
+    import routes.diagnosis as diagnosis_route
+    monkeypatch.setattr(diagnosis_route, "LiteLLMClient", _AuthFailClient)
+    with _client() as client:
+        resp = client.post("/api/diagnosis/turn", json={"message": "test"})
+    assert resp.status_code == 503
+    # Must NOT return SAFE_ACK_TEXT
+    from modules.sales_diagnosis_runtime.contracts import SAFE_ACK_TEXTS
+    body = resp.text
+    for text in SAFE_ACK_TEXTS.values():
+        assert text[:30] not in body, "Auth error must not return placeholder"
+
+
+# ── Reintento básico (no corrompe sesión) ────────────────────────────────
+
+
+def test_retry_after_timeout_preserves_session(monkeypatch):
+    """After a timeout, same message retry should not corrupt session."""
+    import routes.diagnosis as diagnosis_route
+    from modules.automation_diagnosis.litellm_client import LiteLLMResponse
+
+    call_count: list[int] = [0]
+
+    class _CycleClient:
+        def __init__(self, base_url=None, api_key=None, timeout_seconds=None):
+            pass
+        def text_completion(self, model, messages, **kwargs):
+            idx = call_count[0]
+            call_count[0] += 1
+            if idx == 0:
+                raise TimeoutError("first call timeout")
+            return LiteLLMResponse(content="Respuesta exitosa tras reintento.", model=model)
+
+    monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
+    monkeypatch.setattr(diagnosis_route, "LiteLLMClient", _CycleClient)
+    sid = "retry-test"
+
+    # First call — timeout → fallback
+    with _client() as client:
+        resp1 = client.post("/api/diagnosis/turn", json={"session_id": sid, "message": "Quiero automatizar ventas"})
+    assert resp1.status_code == 201
+    gen1 = resp1.json().get("turn_decision", {}).get("generation", {})
+    assert gen1.get("status") == "fallback", "First call must be fallback"
+
+    # Second call (same session, same message) — success
+    with _client() as client:
+        resp2 = client.post("/api/diagnosis/turn", json={"session_id": sid, "message": "Quiero automatizar ventas"})
+    assert resp2.status_code == 201
+    gen2 = resp2.json().get("turn_decision", {}).get("generation", {})
+    assert gen2.get("status") == "success", "Retry must succeed after timeout"
+    data2 = resp2.json()
+    assert data2["turn_count"] == 2, "Turn count must increment correctly"
+    # Session must not be corrupted
+    assert data2["response_text"] != resp1.json()["response_text"]
+
+
 # ── _PublicTurnLLMProvider: centralized key, default model, no silent fallback ─
 
 
@@ -624,6 +760,10 @@ def test_public_turn_successful_litellm_response(monkeypatch):
     assert response.status_code == 201
     data = response.json()
     assert "modelo" in data["response_text"] or "diagnóstico" in data["response_text"]
-    assert data["response_text"] != "Recibí tu consulta. Estoy revisando el contexto disponible para orientarte sin prometer capacidades no confirmadas."
     td = data.get("turn_decision") or {}
     assert td.get("intent") in ("provide_information", "request_diagnosis")
+    # generation metadata must indicate success
+    gen = td.get("generation") or {}
+    assert gen.get("status") == "success"
+    assert gen.get("fallback_used") is False
+    assert gen.get("fallback_reason") is None

@@ -177,16 +177,16 @@ SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE = "ks_team360_sales_diagnosis"
 
 SAFE_ACK_TEXTS: dict[str, str] = {
     "es": (
-        "Recibí tu consulta. Estoy revisando el contexto disponible "
-        "para orientarte sin prometer capacidades no confirmadas."
+        "Recibí la información, pero no pude procesarla completamente "
+        "en este momento. Podés intentarlo nuevamente sin perder la conversación."
     ),
     "en": (
-        "I received your message. I am reviewing the available context "
-        "to guide you without promising unconfirmed capabilities."
+        "I received the information, but I couldn't fully process it "
+        "right now. You can try again without losing the conversation."
     ),
     "he": (
-        "קיבלתי את ההודעה שלך. אני בודק את ההקשר הזמין "
-        "כדי להנחות אותך מבלי להבטיח יכולות לא מאושרות."
+        "קיבלתי את המידע, אך לא הצלחתי לעבד אותו במלואו "
+        "ברגע זה. תוכל לנסות שוב מבלי לאבד את השיחה."
     ),
 }
 

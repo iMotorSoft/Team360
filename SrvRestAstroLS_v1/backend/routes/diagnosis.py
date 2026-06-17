@@ -37,6 +37,7 @@ from modules.sales_diagnosis_runtime import (
 from modules.sales_diagnosis_runtime.intent_classifier import LiteLLMIntentClassifier
 from modules.sales_diagnosis_runtime.contracts import (
     SAFE_ACK_TEXT,
+    SAFE_ACK_TEXTS,
     SALES_DIAGNOSIS_INSTANCE_CODE,
     SALES_DIAGNOSIS_PACKAGE_CODE,
     SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE,
@@ -104,12 +105,15 @@ _public_turn_state = _build_public_state_repo()
 
 
 class _PublicTurnLLMProvider:
+    model_name: str | None = None
+
     def __init__(self) -> None:
         self._base_url = os.environ.get("TEAM360_LITELLM_BASE_URL", "").strip() or None
         self._model = (
             os.environ.get("TEAM360_LITELLM_MODEL_ALIAS")
             or "openai_gpt-5-nano"
         )
+        self.model_name = self._model
         self._prompt_policy = PromptPolicy()
 
     def generate(
@@ -146,7 +150,7 @@ class _PublicTurnLLMProvider:
         except LiteLLMClientError:
             raise
         except Exception:
-            return SAFE_ACK_TEXT
+            return safe_ack_for_language(response_language)
 
 
 # ---------------------------------------------------------------------------
