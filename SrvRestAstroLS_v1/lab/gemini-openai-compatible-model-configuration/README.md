@@ -221,5 +221,6 @@ Punto de partida tecnico para el benchmark posterior:
 * `gemini-3.5-flash`: usar `reasoning_effort="medium"` como configuracion inicial por ser el default documentado; incluir `minimal` como variante de baja latencia.
 * Para flujos interactivos, activar `stream=True` y medir `time_to_first_visible_text_ms`, no solo latencia total.
 * Evitar `thinking_budget` en Gemini 3.x; usar `reasoning_effort`.
+* No tratar esta corrida unica como conclusion estadistica: el benchmark posterior debe repetir cada configuracion, reportar mediana, percentiles y dispersion, y separar latencia total de tiempo al primer texto visible.
 
 No documentar precios en esta fase.

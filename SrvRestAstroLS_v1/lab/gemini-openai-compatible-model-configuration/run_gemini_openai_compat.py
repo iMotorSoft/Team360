@@ -19,6 +19,7 @@ BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 MODELS = ("gemini-3.1-flash-lite", "gemini-3.5-flash")
 REASONING_EFFORTS = ("minimal", "low", "medium", "high")
 DEFAULT_PROMPT = "Responde with exactly: OK"
+REQUEST_TIMEOUT_SECONDS = 60.0
 DOCUMENTED_DEFAULT_REASONING_EFFORT = {
     "gemini-3.1-flash-lite": "minimal",
     "gemini-3.5-flash": "medium",
@@ -169,7 +170,7 @@ def run_completion(
         )
         return result
 
-    client = OpenAI(api_key=key, base_url=BASE_URL)
+    client = OpenAI(api_key=key, base_url=BASE_URL, timeout=REQUEST_TIMEOUT_SECONDS)
     kwargs = build_request_kwargs(
         model=model,
         reasoning_effort=reasoning_effort,
@@ -288,7 +289,7 @@ def retrieve_model(model: str, *, api_key: str | None = None) -> dict[str, Any]:
         result["error"] = "GEMINI_API_KEY is not set."
         return result
     try:
-        client = OpenAI(api_key=key, base_url=BASE_URL)
+        client = OpenAI(api_key=key, base_url=BASE_URL, timeout=REQUEST_TIMEOUT_SECONDS)
         model_info = client.models.retrieve(model)
         data = object_to_dict(model_info)
         result.update({"success": True, "id": data.get("id"), "metadata": data})
@@ -314,6 +315,7 @@ def main() -> int:
     args = parse_args()
     if args.retrieve_model:
         print(json.dumps(retrieve_model(args.model), indent=2, ensure_ascii=False))
+        return 0
     result = run_completion(
         model=args.model,
         reasoning_effort=args.reasoning_effort,
