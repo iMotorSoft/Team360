@@ -502,3 +502,128 @@ def test_public_turn_classifier_fallback_is_never_diagnose(monkeypatch):
         "Fallback classifier should not trigger diagnose"
     )
     assert td.get("classifier_called") is False
+
+
+# ── _PublicTurnLLMProvider: centralized key, default model, no silent fallback ─
+
+
+def test_public_turn_default_model_is_gpt5_nano(monkeypatch):
+    """Default model should be openai_gpt-5-nano."""
+    from routes.diagnosis import _PublicTurnLLMProvider
+    provider = _PublicTurnLLMProvider()
+    assert provider._model == "openai_gpt-5-nano"
+
+
+def test_public_turn_model_from_env(monkeypatch):
+    """Model should be overridable via TEAM360_LITELLM_MODEL_ALIAS."""
+    monkeypatch.setenv("TEAM360_LITELLM_MODEL_ALIAS", "requesty_deepseek_4_flash")
+    from routes.diagnosis import _PublicTurnLLMProvider
+    provider = _PublicTurnLLMProvider()
+    assert provider._model == "requesty_deepseek_4_flash"
+
+
+def test_public_turn_litellm_client_error_returns_503(monkeypatch):
+    """When LiteLLMClient raises (e.g. missing API key), route returns 503."""
+    from modules.automation_diagnosis.litellm_client import LiteLLMClientError
+
+    class _FailingClient:
+        def __init__(self, base_url=None, api_key=None, timeout_seconds=None):
+            raise LiteLLMClientError("API key not configured")
+
+        def text_completion(self, model, messages, **kwargs):
+            raise RuntimeError("should not reach")
+
+    monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
+    import routes.diagnosis as diagnosis_route
+    monkeypatch.setattr(diagnosis_route, "LiteLLMClient", _FailingClient)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"message": "Quiero automatizar las consultas"},
+        )
+    assert response.status_code == 503
+
+
+def test_public_turn_litellm_http_401_returns_503(monkeypatch):
+    """When LiteLLM returns 401 (bad key), route returns 503."""
+    from modules.automation_diagnosis.litellm_client import LiteLLMClientError
+
+    class _UnauthorizedClient:
+        def __init__(self, base_url=None, api_key=None, timeout_seconds=None):
+            pass
+
+        def text_completion(self, model, messages, **kwargs):
+            raise LiteLLMClientError("LiteLLM HTTP 401: invalid API key")
+
+    monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
+    import routes.diagnosis as diagnosis_route
+    monkeypatch.setattr(diagnosis_route, "LiteLLMClient", _UnauthorizedClient)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"message": "Quiero automatizar las consultas"},
+        )
+    assert response.status_code == 503
+    data = response.json()
+    # Must not expose internal secrets
+    assert "sk-" not in str(data)
+    assert "LiteLLM HTTP 401" in str(data)
+
+
+def test_public_turn_transient_error_falls_back_safely(monkeypatch):
+    """Transient errors (timeout, connection) should return SAFE_ACK_TEXT, not 503."""
+    from routes.diagnosis_schemas import PublicTurnResponse
+
+    class _TimeoutClient:
+        def __init__(self, base_url=None, api_key=None, timeout_seconds=None):
+            pass
+
+        def text_completion(self, model, messages, **kwargs):
+            raise TimeoutError("Connection timed out")
+
+    monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
+    import routes.diagnosis as diagnosis_route
+    monkeypatch.setattr(diagnosis_route, "LiteLLMClient", _TimeoutClient)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"message": "Quiero automatizar las consultas"},
+        )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["response_text"] is not None
+    assert len(data["response_text"]) > 0
+
+
+def test_public_turn_successful_litellm_response(monkeypatch):
+    """Successful LiteLLM call returns content from the model."""
+    import routes.diagnosis as diagnosis_route
+
+    class _SuccessClient:
+        def __init__(self, base_url=None, api_key=None, timeout_seconds=None):
+            pass
+
+        def text_completion(self, model, messages, **kwargs):
+            from modules.automation_diagnosis.litellm_client import LiteLLMResponse
+            return LiteLLMResponse(
+                content="Este es un diagnóstico real generado por el modelo.",
+                model=model,
+            )
+
+    monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
+    monkeypatch.setattr(diagnosis_route, "LiteLLMClient", _SuccessClient)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={"message": "Quiero automatizar las consultas de venta por WhatsApp"},
+        )
+    assert response.status_code == 201
+    data = response.json()
+    assert "modelo" in data["response_text"] or "diagnóstico" in data["response_text"]
+    assert data["response_text"] != "Recibí tu consulta. Estoy revisando el contexto disponible para orientarte sin prometer capacidades no confirmadas."
+    td = data.get("turn_decision") or {}
+    assert td.get("intent") in ("provide_information", "request_diagnosis")

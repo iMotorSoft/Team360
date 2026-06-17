@@ -20,7 +20,11 @@ from litestar.exceptions import HTTPException
 from litestar.status_codes import HTTP_501_NOT_IMPLEMENTED
 
 from modules.automation_diagnosis.ai_interpreter import AIInterpretationError
-from modules.automation_diagnosis.litellm_client import LiteLLMClient
+from modules.automation_diagnosis.litellm_client import (
+    LiteLLMClient,
+    LiteLLMClientError,
+    get_litellm_api_key,
+)
 from modules.automation_diagnosis.postgres_service import (
     AutomationDiagnosisPersistenceError,
 )
@@ -104,7 +108,7 @@ class _PublicTurnLLMProvider:
         self._base_url = os.environ.get("TEAM360_LITELLM_BASE_URL", "").strip() or None
         self._model = (
             os.environ.get("TEAM360_LITELLM_MODEL_ALIAS")
-            or "openrouter_qwen3_30b_a3b_thinking_2507"
+            or "openai_gpt-5-nano"
         )
         self._prompt_policy = PromptPolicy()
 
@@ -116,20 +120,21 @@ class _PublicTurnLLMProvider:
     ) -> str:
         if os.environ.get("TEAM360_AI_PROVIDER", "").strip().lower() != "litellm":
             return "Gracias por tu mensaje. Estoy procesando la información para orientarte. ¿Podés contarme más detalles sobre el proceso que querés mejorar?"
+
+        client = LiteLLMClient(base_url=self._base_url)
+        lang_info = (state.semantic_memory or {}).get("language", {})
+        response_language = (
+            lang_info.get("preferred_response_language")
+            or lang_info.get("current_language")
+            or input.locale
+        )
+        system = self._prompt_policy.build_system_prompt(
+            assistant_instance_code=input.assistant_instance_code,
+            package_code=input.package_code,
+            response_language=response_language,
+        )
+        turn = self._prompt_policy.build_turn_prompt(input, state, context)
         try:
-            client = LiteLLMClient(base_url=self._base_url)
-            lang_info = (state.semantic_memory or {}).get("language", {})
-            response_language = (
-                lang_info.get("preferred_response_language")
-                or lang_info.get("current_language")
-                or input.locale
-            )
-            system = self._prompt_policy.build_system_prompt(
-                assistant_instance_code=input.assistant_instance_code,
-                package_code=input.package_code,
-                response_language=response_language,
-            )
-            turn = self._prompt_policy.build_turn_prompt(input, state, context)
             response = client.text_completion(
                 self._model,
                 [
@@ -138,6 +143,8 @@ class _PublicTurnLLMProvider:
                 ],
             )
             return response.content
+        except LiteLLMClientError:
+            raise
         except Exception:
             return SAFE_ACK_TEXT
 
@@ -426,6 +433,8 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
 
     try:
         output = runtime.handle_turn(input_)
+    except LiteLLMClientError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
     except UnsafeResponseError:
         lang_state: dict = {}
         turn_count = 0
