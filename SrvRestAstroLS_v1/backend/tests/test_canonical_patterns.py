@@ -207,18 +207,18 @@ class TestExtractVolume:
             assert result["unit"] == unit, f"unit: {result['unit']} != {unit}"
 
     def test_spanish(self) -> None:
-        self._check("80 por día", 80, "día")
-        self._check("100 consultas diarias", 100, "dia", "consulta")
-        self._check("60 al mes", 60, "mes")
+        self._check("80 por día", 80, "day")
+        self._check("100 consultas diarias", 100, "day", "consulta")
+        self._check("60 al mes", 60, "month")
 
     def test_english(self) -> None:
         self._check("80 per day", 80, "day")
-        self._check("around 100 inquiries daily", 100, "daily", "inquirie")
+        self._check("around 100 inquiries daily", 100, "day", "inquirie")
         self._check("60 per month", 60, "month")
 
     def test_hebrew(self) -> None:
-        self._check("80 ביום", 80, "יום")
-        self._check("כ-100 פניות ביום", 100, "יום")
+        self._check("80 ביום", 80, "day")
+        self._check("כ-100 פניות ביום", 100, "day")
 
     @pytest.mark.parametrize("msg", [
         "hola",

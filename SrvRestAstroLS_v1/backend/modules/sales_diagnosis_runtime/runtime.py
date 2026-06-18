@@ -30,6 +30,7 @@ from modules.sales_diagnosis_runtime.canonical_patterns import (
     extract_approval,
     extract_channels,
     extract_entities,
+    extract_entity_sources,
     extract_systems,
     extract_volume,
     is_business_context,
@@ -298,6 +299,13 @@ class AssistantConversationRuntime:
                     existing.append(e)
             mem["entities"] = existing
 
+        # Entity-source relationships (e.g., inventory → erp, prices → spreadsheet)
+        entity_sources = extract_entity_sources(msg)
+        if entity_sources:
+            existing = mem.get("entity_sources", {})
+            existing.update(entity_sources)
+            mem["entity_sources"] = existing
+
         # Approval / human review — canonical
         approval = extract_approval(msg)
         if approval:
@@ -338,33 +346,45 @@ class AssistantConversationRuntime:
     def _resolve_contradictions(self, state: ConversationState, input: AssistantTurnInput) -> None:
         mem = state.semantic_memory or {}
         msg = input.user_message
-        msg_lower = msg.lower()
         corrected = False
 
         if not is_correction(msg):
-            if corrected:
-                state.semantic_memory = mem
             return
 
-        # Detect source replacements: "I said X before, but actually Y" or similar
-        # Extract all canonical systems mentioned in this message
-        new_systems = extract_systems(msg)
-        old_systems = mem.get("systems_and_data_sources", [])
-
-        # If we found canonical systems in a correction, replace old sources with new
-        if new_systems:
-            mem["systems_and_data_sources"] = new_systems
+        # --- Entity-source corrections (partial replacement) ---
+        new_entity_sources = extract_entity_sources(msg)
+        existing_sources = mem.get("entity_sources", {})
+        if new_entity_sources:
+            # Only update entity-source pairs found in the correction message
+            for entity, new_source in new_entity_sources.items():
+                existing_sources[entity] = new_source
+            mem["entity_sources"] = existing_sources
             corrected = True
 
-        # Extract all canonical entities in the correction
-        new_entities = extract_entities(msg)
-        if new_entities:
-            mem["entities"] = new_entities
-            # Also check for volume correction (e.g., "not 80, is 120")
-            if "inventory" in new_entities or ("inventory" in old_systems):
-                pass  # entities are already set
+            # Also rebuild systems_and_data_sources from updated entity_sources
+            # to keep both in sync
+            rebuilt_systems = list(dict.fromkeys(existing_sources.values()))
+            if rebuilt_systems:
+                mem["systems_and_data_sources"] = rebuilt_systems
 
-        # Volume correction — extract new volume if message contains a number
+        # Extract systems mentioned (for systems not tied to entities)
+        new_systems = extract_systems(msg)
+        if new_systems and not new_entity_sources:
+            # Only replace if no entity-source mapping was found
+            # (entity_sources is more precise)
+            mem["systems_and_data_sources"] = new_systems
+            corrected = True
+        elif new_systems and new_entity_sources:
+            # Add new systems not already covered by entity_sources
+            existing_sys = set(mem.get("systems_and_data_sources", []))
+            covered = set(existing_sources.values())
+            for sys in new_systems:
+                if sys not in covered and sys not in existing_sys:
+                    existing_sys.add(sys)
+            if existing_sys:
+                mem["systems_and_data_sources"] = list(existing_sys)
+
+        # Volume correction — extract new volume
         new_volume = extract_volume(msg)
         if new_volume:
             mem["volume"] = new_volume

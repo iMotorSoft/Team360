@@ -128,23 +128,24 @@ ENTITY_PATTERNS: dict[str, re.Pattern] = {
 
 # ── Approval / human review ───────────────────────────────────────────────
 
-_HEB_APPROVAL = r"אישור\s+מנהל|בדיקה\s+אנושית"
+_HEB_APPROVAL = r"אישור(?:\s+מנהל)?|בדיקה\s+אנושית"
 
 APPROVAL_CONDITIONAL_PATTERNS: list[re.Pattern] = [
     re.compile(
         r"(?:\b(?:"
-        r"las\s+respuestas\s+comunes\s+(?:pueden\s+)?salir\s+(?:solas|autom[aá]ticamente)"
+        r"las\s+respuestas\s+comunes\s+(?:pueden\s+)?sal(?:ir|en)\s+(?:solas|autom[aá]ticamente)"
         r"|"
         r"common\s+(?:replies|answers)\s+(?:\w+\s+){0,4}automatic"
-        r"|"
-        r"תשובות\s+רגילות\s+יכולות\s+(?:לצאת\s+)?באופן\s+אוטומטי"
-        r")\b)"
+        r")"
+        r"|(?:"
+        r"תשובות\s+רגילות\s+(?:יכולות\s+(?:לצאת\s+)?)?(?:באופן\s+)?אוטומטיות?"
+        r"))"
         r".*?"
         r"(?:(?:\b(?:pero|but)\b)|(?:אבל))"
         r".*?"
         r"(?:(?:\b(?:descuentos?|discounts?)\b)|(?:הנחות?))"
         r".*?"
-        r"(?:(?:\b(?:aprobaci[oó]n|revisa|manager\s+approval|human\s+review)\b)"
+        r"(?:(?:\b(?:aprobaci[oó]n|revisa|manager\s+approval|human\s+review|requires?\s+approval)\b)"
         r"|(?:" + _HEB_APPROVAL + r"))",
         re.IGNORECASE | re.DOTALL,
     ),
@@ -153,13 +154,37 @@ APPROVAL_CONDITIONAL_PATTERNS: list[re.Pattern] = [
 APPROVAL_REQUIRED_PATTERNS: list[re.Pattern] = [
     re.compile(
         r"(?:\b(?:"
-        r"aprobaci[oó]n|supervisor|revisa|revisi[oó]n|"
-        r"autorizaci[oó]n|"       # autorización with accent
+        r"aprobaci[oó]n|aprobad[oó]|"
+        r"supervisor|revisa|revisi[oó]n|"
+        r"autorizaci[oó]n|"
         r"humano|persona\s+revisa|validaci[oó]n|"
-        r"manager\s+approval|human\s+review|requires?\s+approval|needs?\s+review"
+        r"manager\s+approval|human\s+review|requires?\s+approval|needs?\s+review|"
+        r"must\s+be\s+approved|requires?\s+human\s+approval"
         r")\b)"
         r"|(?:" + _HEB_APPROVAL + r")"
-        r"|(?:נדרשת?\s+בדיקה)",
+        r"|(?:"
+        r"נדרשת?\s+בדיקה|"
+        r"דורש(?:ות)?\s+אישור|"
+        r"דרושה?\s+בדיקה"
+        r")",
+        re.IGNORECASE,
+    ),
+]
+
+APPROVAL_NOT_REQUIRED_PATTERNS: list[re.Pattern] = [
+    re.compile(
+        r"(?:\b(?:"
+        r"no\s+requiere\s+aprobaci[oó]n|"
+        r"no\s+necesita\s+revisi[oó]n|"
+        r"no\s+human\s+approval|"
+        r"does\s+not\s+need|"
+        r"does\s+not\s+require|"
+        r"not\s+required"
+        r")\b)"
+        r"|(?:"
+        r"לא\s+נדרש|"
+        r"לא\s+צריך"
+        r")",
         re.IGNORECASE,
     ),
 ]
@@ -174,7 +199,7 @@ VOLUME_PATTERNS: list[re.Pattern] = [
         r"(?P<value>\d+[\.\d]*)\s*"
         r"(?P<unit>consultas?|mensajes?|inquir(?:y|ies)|"
         r"units?|clientes?|leads?|llamadas?|calls?|correos?|emails?|"
-        r"פניות?)?\s*"
+        r"pedidos?|orders?|הזמנות?|פניות?)?\s*"
         r"(?:(?:al|por|per|ל)\s+|(?:\s*ב)?\s*)?"
         r"(?P<period>"
         r"diarias?|diarios?|"
@@ -192,9 +217,9 @@ VOLUME_PATTERNS: list[re.Pattern] = [
 # ── Correction indicators (multilingual) ─────────────────────────────────
 
 CORRECTION_PHRASES: list[re.Pattern] = [
-    re.compile(r"\b(en\s+realidad|mejor\s+dicho|rectifico|correcci[oó]n)", re.IGNORECASE),
-    re.compile(r"\b(actually|correction|i\s+meant|let\s+me\s+correct)", re.IGNORECASE),
-    re.compile(r"\b(בעצם|למעשה|אני\s+מתקן)", re.IGNORECASE),
+    re.compile(r"\b(en\s+realidad|mejor\s+dicho|rectifico|correcci[oó]n|ya\s+no)", re.IGNORECASE),
+    re.compile(r"\b(actually|correction|i\s+meant|let\s+me\s+correct|no\s+longer)", re.IGNORECASE),
+    re.compile(r"\b(בעצם|למעשה|אני\s+מתקן|כבר\s+לא)", re.IGNORECASE),
 ]
 
 # ── Helper: general problem / outcome (keep as-is for backward compat) ───
@@ -244,20 +269,47 @@ def extract_entities(message: str) -> list[str]:
 
 
 def extract_approval(message: str) -> str | None:
-    """Returns 'conditional', 'required', or None.
-    Conditional is checked first because it contains approval terms
-    within a broader conditional pattern."""
+    """Returns 'not_required', 'conditional', 'required', or None.
+    None means 'no approval information found' (don't change existing state).
+    not_required is checked FIRST to prevent negative statements from
+    matching required patterns via substring."""
+
+    for pattern in APPROVAL_NOT_REQUIRED_PATTERNS:
+        if pattern.search(message):
+            return "not_required"
+
     for pattern in APPROVAL_CONDITIONAL_PATTERNS:
         if pattern.search(message):
             return "conditional"
+
     for pattern in APPROVAL_REQUIRED_PATTERNS:
         if pattern.search(message):
             return "required"
     return None
 
 
+PERIOD_CANONICAL: dict[str, str] = {
+    # Spanish → English
+    "día": "day", "dia": "day", "días": "day", "dias": "day", "diaria": "day", "diario": "day",
+    "semana": "week", "semanas": "week",
+    "mes": "month", "meses": "month",
+    "año": "year", "ano": "year", "años": "year", "anos": "year",
+    # English → English (already canonical)
+    "day": "day", "daily": "day",
+    "week": "week", "weekly": "week",
+    "month": "month", "monthly": "month",
+    "year": "year", "yearly": "year",
+    # Hebrew → English
+    "יום": "day",
+    "שבוע": "week",
+    "חודש": "month",
+    "שנה": "year",
+}
+
+
 def extract_volume(message: str) -> dict | None:
-    """Returns {'value': N, 'unit': str|None, 'period': str} or None."""
+    """Returns {'value': N, 'unit': str|None, 'period': str} or None.
+    Period is canonicalized to English (day/week/month/year)."""
     for pattern in VOLUME_PATTERNS:
         m = pattern.search(message)
         if m:
@@ -265,11 +317,12 @@ def extract_volume(message: str) -> dict | None:
                 val = float(m.group("value"))
             except (ValueError, IndexError):
                 continue
-            period = m.group("period") or "day"
-            period = period.lower()[:20]
-            # Normalize plural only for long words (keep "mes" intact)
-            if len(period) > 3 and period.endswith("s"):
-                period = period[:-1]
+            period_raw = (m.group("period") or "day").lower()[:20]
+            # Normalize plural for long words (keep 3-char words like "mes" intact)
+            if len(period_raw) > 3 and period_raw.endswith("s"):
+                period_raw = period_raw[:-1]
+            # Canonicalize to English
+            period = PERIOD_CANONICAL.get(period_raw, period_raw)
             unit = m.group("unit")
             unit = unit.lower().rstrip("s") if unit else None
             return {
@@ -278,6 +331,41 @@ def extract_volume(message: str) -> dict | None:
                 "period": period,
             }
     return None
+
+
+# ── Entity-source relationship ───────────────────────────────────────────
+
+ENTITY_SOURCE_PATTERNS: dict[tuple[str, str], re.Pattern] = {
+    # Patterns that associate an entity with a system.
+    # Hebrew terms matched WITHOUT \b because Hebrew often uses prefixes (ה, ב, ל).
+    # The proximity constraint .{0,50} provides sufficient precision.
+    ("inventory", "erp"): re.compile(
+        r"(?:\b(?:stock|inventario|inventory)\b|(?:מלאי)).{0,50}(?:\b(?:erp)\b)", re.IGNORECASE),
+    ("inventory", "spreadsheet"): re.compile(
+        r"(?:\b(?:stock|inventario|inventory)\b|(?:מלאי)).{0,50}"
+        r"(?:\b(?:planilla|spreadsheet)\b|(?:גיליון))", re.IGNORECASE),
+    ("prices", "spreadsheet"): re.compile(
+        r"(?:\b(?:precios?|prices?|pricing)\b|(?:מחירים?)).{0,50}"
+        r"(?:\b(?:planilla|spreadsheet|excel)\b|(?:גיליון|אקסל))", re.IGNORECASE),
+    ("prices", "crm"): re.compile(
+        r"(?:\b(?:precios?|prices?|pricing)\b|(?:מחירים?)).{0,50}(?:\b(?:crm)\b)", re.IGNORECASE),
+    ("inventory", "system"): re.compile(
+        r"(?:\b(?:stock|inventario|inventory)\b|(?:מלאי)).{0,50}(?:\b(?:sistema|system)\b)", re.IGNORECASE),
+    ("prices", "system"): re.compile(
+        r"(?:\b(?:precios?|prices?|pricing)\b|(?:מחירים?)).{0,50}(?:\b(?:sistema|system)\b)", re.IGNORECASE),
+}
+
+
+def extract_entity_sources(message: str) -> dict[str, str]:
+    """Map entities to their data sources from a message.
+    Returns dict like {'inventory': 'erp', 'prices': 'spreadsheet'}."""
+    result: dict[str, str] = {}
+    for (entity, source), pattern in ENTITY_SOURCE_PATTERNS.items():
+        if pattern.search(message):
+            # Only set if not already mapped (first match wins)
+            if entity not in result:
+                result[entity] = source
+    return result
 
 
 def is_correction(message: str) -> bool:
