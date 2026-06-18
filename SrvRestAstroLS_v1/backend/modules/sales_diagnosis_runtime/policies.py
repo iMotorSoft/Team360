@@ -34,8 +34,15 @@ _SYSTEM_PROMPTS: dict[str, str] = {
         "7. Cada respuesta debe aportar valor: reflejar comprensión, organizar, detectar riesgo.\n"
         "8. Evitá lenguaje de promesa absoluta. Hablá de factibilidad y supuestos.\n"
         "9. Cuando el usuario pida diagnóstico explícitamente, generalo con la info disponible.\n\n"
+         "COMPRENSIÓN CONCEPTUAL:\n"
+        "- Identificá el DOMINIO del problema: seguimiento de leads, atribución de campañas, "
+        "reportes manuales, pedidos, stock, atención al cliente, etc.\n"
+        "- Entendé el proceso actual del usuario ANTES de preguntar.\n"
+        "- No asumas canales, sistemas ni procesos que el usuario no mencionó.\n"
+        "- Cada tipo de problema necesita una PRIMERA PREGUNTA distinta.\n"
+        "- No uses la misma primera pregunta genérica para todos los casos.\n\n"
         "ESTRUCTURA DE LA CONVERSACIÓN:\n"
-        "- Turno 1-2: entender problema, canal y objetivo.\n"
+        "- Turno 1-2: entender problema, dominio conceptual, canal y objetivo.\n"
         "- Turno 2-4: sistemas, datos, volumen, reglas y aprobación humana.\n"
         "- Turno 3-5: preguntar lo estrictamente faltante.\n"
         "- Cuando el usuario lo pida o haya base suficiente: diagnóstico final.\n\n"
@@ -154,7 +161,7 @@ class PromptPolicy:
         parts = [f"Mensaje actual del usuario: {input.user_message}"]
         if context:
             parts.append("")
-            parts.append("Contexto recuperado del knowledge base (como referencia, no es vinculante):")
+            parts.append("CONTEXTO RECUPERADO (conocimiento general, NO son hechos del usuario):")
             for i, c in enumerate(context, 1):
                 src = c.source_uri or ""
                 title = c.title or ""
@@ -164,6 +171,11 @@ class PromptPolicy:
                     meta = f"{meta} — {path}"
                 parts.append(f"{i}. {meta}")
                 parts.append(f"   {c.content_preview or '(sin preview)'}")
+            parts.append("")
+            parts.append("REGLAS:")
+            parts.append("- El contexto recuperado NO describe el caso del usuario.")
+            parts.append("- No uses el contexto como hechos del usuario. Solo como referencia técnica.")
+            parts.append("- Los hechos del usuario provienen exclusivamente de sus mensajes.")
         if state.slots:
             parts.append(f"\nDatos recopilados hasta ahora: {state.slots}")
         if state.history_summary:
@@ -173,7 +185,8 @@ class PromptPolicy:
             parts.append("\nPreguntas que YA hiciste (NO repetir):")
             for i, q in enumerate(asked, 1):
                 text = q.get("question_text", "")[:120] or str(q)[:120]
-                parts.append(f"  {i}. {text}")
+                answered = " [RESPONDIDA]" if q.get("answered") else ""
+                parts.append(f"  {i}. {text}{answered}")
 
         mem_lines = []
         if mem.get("business_context"):
@@ -232,10 +245,14 @@ class PromptPolicy:
         else:
             parts.append(
                 "\nInstrucciones para esta respuesta (ACCIÓN: SEGUIR PREGUNTANDO):\n"
+                "- Primero entendé el DOMINIO CONCEPTUAL del problema del usuario "
+                "(leads, reportes, campañas, pedidos, stock, etc.) antes de preguntar.\n"
+                "- No uses la misma pregunta genérica para problemas distintos.\n"
                 "- Usá el historial completo y la memoria semántica. No repitas preguntas ni temas ya cubiertos.\n"
                 "- Revisá el historial: si ya preguntaste algo y el usuario respondió, "
                 "no lo preguntes de nuevo.\n"
-                "- Hacé UNA SOLA pregunta, específica y que realmente falte.\n"
+                "- Hacé UNA SOLA pregunta, específica y que realmente falte para avanzar "
+                "en el diagnóstico de ESTE problema en particular.\n"
                 "- No preguntes por detalles de implementación (reglas exactas, umbrales, formatos). "
                 "Esos se definen después del diagnóstico.\n"
                 "- Si falta un dato y el usuario preguntó por diagnóstico, "

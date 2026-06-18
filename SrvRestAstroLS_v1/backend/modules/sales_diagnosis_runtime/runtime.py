@@ -352,10 +352,34 @@ class AssistantConversationRuntime:
             if GENERAL_OUTCOME_PATTERNS.search(msg):
                 mem["desired_outcome"] = msg
 
-        if not mem.get("current_process") and len(msg.split()) >= 5:
-            mem["current_process"] = msg
+        process = self._update_current_process(mem.get("current_process", ""), msg)
+        if process:
+            mem["current_process"] = process
 
         state.semantic_memory = mem
+
+    @staticmethod
+    def _update_current_process(existing: str, msg: str) -> str:
+        words = msg.split()
+        if len(words) < 4:
+            return ""
+        # If no existing process, set from this message
+        if not existing:
+            return msg
+        # If existing contains key process words and msg adds new steps,
+        # merge them into a coherent description.
+        existing_lower = existing.lower()
+        msg_lower = msg.lower()
+        process_keywords = {"reporte", "reportes", "excel", "erp", "cruce", "cruza",
+                            "manual", "descarga", "archivo", "sistema", "planilla",
+                            "datos", "carga", "valida", "armado", "formato"}
+        # Msg is about a specific process step — append if not already covered
+        if any(k in msg_lower for k in process_keywords):
+            # Check if this is substantially new info
+            overlap = sum(1 for w in words if w.lower() in existing_lower)
+            if overlap <= len(words) * 0.5:
+                return f"{existing} Luego se {msg_lower.rstrip('.')}."
+        return existing
 
     # ------------------------------------------------------------------
     # Contradiction resolution
@@ -685,27 +709,47 @@ class AssistantConversationRuntime:
             if q.get("answered"):
                 continue
             intent = q.get("intent", "")
+            question_text = (q.get("question_text", "") or "").lower()
+            # Primary: keyword-based intent matching
             if self._message_answers_intent(msg_lower, intent):
                 q["answered"] = True
                 q["answer_evidence"] = input.user_message[:200]
                 q["answered_turn"] = state.turn_count
                 updated = True
+                continue
+            # Fallback: if message contains key terms from the question,
+            # treat it as a direct answer to that question.
+            if question_text and not intent.startswith("identify_"):
+                q_words = {w for w in question_text.split() if len(w) > 3}
+                msg_words = {w for w in msg_lower.split() if len(w) > 3}
+                overlap = q_words & msg_words
+                if len(overlap) >= 2:
+                    q["answered"] = True
+                    q["answer_evidence"] = input.user_message[:200]
+                    q["answered_turn"] = state.turn_count
+                    updated = True
         if updated:
             state.asked_questions = questions
 
     @staticmethod
     def _message_answers_intent(msg_lower: str, intent: str) -> bool:
         mapping = {
-            "identify_channel": ["whatsapp", "email", "correo", "web", "sitio", "teléfono", "telefono", "chat", "presencial", "app"],
-            "identify_volume": ["diario", "diaria", "por día", "por dia", "mensual", "semanal", "consulta", "mensaje", "llamada"],
-            "clarify_current_process": ["manual", "excel", "planilla", "sistema", "responde", "responde", "copia", "escribe", "busca", "consulta", "persona", "gestiona"],
-            "identify_data_source": ["planilla", "excel", "sheet", "sistema", "base", "programa", "software", "app", "archivo"],
-            "confirm_human_approval": ["supervisor", "jefe", "revisa", "aprobación", "aprobacion", "persona", "humano", "dueño", "dueña", "gerente", "coordinador"],
-            "clarify_desired_outcome": ["quiero", "necesito", "buscamos", "objetivo", "meta", "automatizar", "ordenar", "mejorar", "acelerar"],
-            "identify_rules": ["regla", "criterio", "política", "politica", "depende", "decide", "según", "segun", "caso"],
+            "identify_channel": ["whatsapp", "email", "correo", "web", "sitio", "teléfono", "telefono", "chat", "presencial", "app", "gmail", "instagram", "facebook", "portal"],
+            "identify_volume": ["diario", "diaria", "por día", "por dia", "mensual", "semanal", "consulta", "mensaje", "llamada", "50", "60", "80", "100", "120", "150", "200", "300", "500"],
+            "clarify_current_process": ["manual", "excel", "planilla", "sistema", "responde", "copia", "escribe", "busca", "persona", "gestiona", "cruce", "cruza", "descarga", "arma", "armado", "reporte", "reportes", "paso", "proceso", "flujo"],
+            "identify_data_source": ["planilla", "excel", "sheet", "sistema", "base", "programa", "software", "app", "archivo", "erp", "crm", "base de datos", "sql", "api", "web"],
+            "confirm_human_approval": ["supervisor", "jefe", "revisa", "aprobación", "aprobacion", "persona", "humano", "dueño", "dueña", "gerente", "coordinador", "socio", "director"],
+            "clarify_desired_outcome": ["quiero", "necesito", "buscamos", "objetivo", "meta", "automatizar", "ordenar", "mejorar", "acelerar", "optimizar", "digitalizar"],
+            "identify_rules": ["regla", "criterio", "política", "politica", "depende", "decide", "según", "segun", "caso", "si", "cuando", "condición"],
         }
         keywords = mapping.get(intent, [])
-        return any(k in msg_lower for k in keywords)
+        if keywords and any(k in msg_lower for k in keywords):
+            return True
+        # Fallback: for unknown intents (other:...), any response moves the
+        # conversation forward rather than re-asking.
+        if intent.startswith("other:"):
+            return True
+        return False
 
     def _track_asked_questions(self, state: ConversationState, response: str) -> None:
         if "?" not in response:
