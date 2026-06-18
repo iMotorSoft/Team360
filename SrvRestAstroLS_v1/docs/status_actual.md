@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-17 (Smoke multidioma real `/t360`)
+Ultima actualizacion: 2026-06-18 (Validacion end-to-end estructurada `/t360`)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,42 @@ Ultima actualizacion: 2026-06-17 (Smoke multidioma real `/t360`)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-18 - Validacion end-to-end estructurada `/t360`
+
+- Se valido la secuencia publica real:
+  `/t360 -> POST /api/diagnosis/turn -> StructuredDiagnosis v1 -> DiagnosisResult Svelte`.
+- Se endurecio el tipado frontend de `turn_decision` con tipos explicitos
+  `TurnGeneration` y `TurnDecision`, incluyendo el estado real `unavailable`
+  del camino sin LLM.
+- Se localizaron en frontend las frases canonicas deterministicas de
+  `StructuredDiagnosis` para pasos automatizables, intervencion humana,
+  supuestos, puntos a validar y proximo paso, sin traducir heuricamente texto
+  libre generado.
+- Se corrigio el camino no-LiteLLM de `_PublicTurnLLMProvider` para devolver
+  `safe_ack_for_language(response_language)` en vez de una frase fija en
+  espanol.
+- Se agregaron/actualizaron E2E de `/t360` para diagnostico visible,
+  `reflect_and_ask` sin `DiagnosisResult`, `entity_sources`, fallback, HTTP
+  503, ingles, hebreo RTL, mobile y ausencia de codigos internos.
+- Se ejecuto validacion real en navegador con Playwright/Chromium y
+  `agent-browser`, incluyendo conversacion multi-turn, red, consola,
+  `sessionStorage`, reload, desktop/mobile, fallback controlado y 503
+  controlado.
+- Preflight Milvus: el servicio esta activo y la collection
+  `team360_sales_diagnosis_knowledge_v1` existe con schema esperado y 183
+  filas, pero el inspector reporto `MISALIGNED` porque el filtro runtime
+  `ks_team360_sales_diagnosis` no devuelve hits sobre esa collection. No se
+  modifico Milvus ni se regeneraron embeddings.
+- Validaciones ejecutadas:
+  `uv run pytest tests/test_structured_diagnosis.py -q`,
+  `uv run pytest tests/test_diagnosis_public_router.py -q`,
+  `uv run pytest tests/ -q`, `pnpm check`, `pnpm build`,
+  `pnpm exec playwright test e2e/public-vera.spec.ts --project=chromium`,
+  smoke real `T360_REAL_E2E=1` contra `3050/7050` y `git diff --check`.
+- No se implemento SSE, streaming, Step-to-Action, lead capture,
+  diagnostic_code, WhatsApp handoff, pricing, SLA, cambios en Milvus ni
+  cambios de proveedor/modelo/modo API.
 
 ### 2026-06-17 - Smoke multidioma real `/t360`
 

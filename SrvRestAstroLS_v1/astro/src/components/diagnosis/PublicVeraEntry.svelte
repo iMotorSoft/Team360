@@ -1,10 +1,16 @@
 <script lang="ts">
   import { PUBLIC_DIAGNOSIS_CONTEXT, sendPublicTurn } from "../../lib/api/publicDiagnosis";
+  import type { StructuredDiagnosis, TurnDecision, TurnLanguage } from "../../lib/api/publicDiagnosis";
   import { loadPublicVeraSession, savePublicVeraSession, clearPublicVeraSession } from "../../lib/publicVeraSession";
+  import DiagnosisResult from "./DiagnosisResult.svelte";
+  import { sectionTitle, isValidDiagnosis } from "../../lib/api/diagnosisPresentation";
 
   interface ChatMessage {
     role: "user" | "assistant";
     text: string;
+    diagnosis?: StructuredDiagnosis | null;
+    isFallback?: boolean;
+    turnDecision?: TurnDecision | null;
   }
 
   const examples = [
@@ -32,17 +38,17 @@
     }
   }
 
-  function persistSession(langInfo: Record<string, unknown> | null | undefined) {
+  function persistSession(langInfo: TurnLanguage | null | undefined) {
     const session = loadPublicVeraSession();
     savePublicVeraSession({
       session_id: sessionId,
-      initial_language: (langInfo as any)?.initial_language || session.initial_language || currentLocale,
-      current_language: (langInfo as any)?.current_language || currentLocale,
-      preferred_response_language: (langInfo as any)?.preferred_response_language || currentLocale,
-      explicit_language_preference: Boolean((langInfo as any)?.explicit_language_preference),
+      initial_language: langInfo?.initial_language || session.initial_language || currentLocale,
+      current_language: langInfo?.current_language || currentLocale,
+      preferred_response_language: langInfo?.preferred_response_language || currentLocale,
+      explicit_language_preference: Boolean(langInfo?.explicit_language_preference),
     });
-    if (langInfo && typeof (langInfo as any).preferred_response_language === "string") {
-      currentLocale = (langInfo as any).preferred_response_language;
+    if (langInfo?.preferred_response_language) {
+      currentLocale = langInfo.preferred_response_language;
     }
   }
 
@@ -57,6 +63,17 @@
       const container = document.querySelector("[data-chat-messages]");
       if (container) container.scrollTop = container.scrollHeight;
     });
+  }
+
+  function getDiagnosis(diagnosis: StructuredDiagnosis | null | undefined): StructuredDiagnosis | null {
+    if (isValidDiagnosis(diagnosis)) {
+      return diagnosis;
+    }
+    return null;
+  }
+
+  function isGenerationFallback(td: TurnDecision | null | undefined): boolean {
+    return td?.generation?.status === "fallback";
   }
 
   async function sendMessage() {
@@ -76,10 +93,23 @@
         locale: currentLocale,
       });
       sessionId = result.session_id;
-      messages = [...messages, { role: "assistant", text: result.response_text }];
+      const turnDecision = result.turn_decision ?? null;
+      const diagnosis = getDiagnosis(result.diagnosis);
+      const isFallback = isGenerationFallback(turnDecision);
+
+      messages = [
+        ...messages,
+        {
+          role: "assistant",
+          text: result.response_text,
+          diagnosis,
+          isFallback,
+          turnDecision,
+        },
+      ];
       persistSession(result.language);
     } catch {
-      chatError = "No pudimos procesar tu mensaje ahora. Podés intentar de nuevo o contactarnos por correo.";
+      chatError = sectionTitle("error_503", currentLocale);
     } finally {
       isLoading = false;
       scrollToBottom();
@@ -188,6 +218,7 @@
           </div>
           <button
             type="button"
+            data-testid="public-vera-new-conversation"
             class="rounded-full border border-[#c9dcdd] px-3 py-1.5 text-[0.65rem] font-semibold text-[#476275] transition hover:border-[#9fc8c7] hover:bg-[#f7fbfa]"
             onclick={newConversation}
           >
@@ -201,13 +232,22 @@
         >
           {#each messages as msg}
             {#if msg.role === "user"}
-              <div class="self-end max-w-[85%] rounded-2xl rounded-br-sm bg-[#168b88] px-4 py-2.5 text-sm leading-6 text-white">
+              <div data-testid="public-vera-user-message" class="self-end max-w-[85%] rounded-2xl rounded-br-sm bg-[#168b88] px-4 py-2.5 text-sm leading-6 text-white">
                 {msg.text}
               </div>
             {:else}
-              <div class="self-start max-w-[85%] rounded-2xl rounded-bl-sm border border-[#d5e2e5] bg-white px-4 py-2.5 text-sm leading-6 text-[#203c55]">
+              <div data-testid="public-vera-assistant-message" class="self-start max-w-full rounded-2xl rounded-bl-sm border border-[#d5e2e5] bg-white px-4 py-2.5 text-sm leading-6 text-[#203c55]">
                 {msg.text}
               </div>
+              {#if msg.diagnosis}
+                <div class="w-full">
+                  <DiagnosisResult
+                    diagnosis={msg.diagnosis}
+                    isFallback={msg.isFallback ?? false}
+                    locale={currentLocale}
+                  />
+                </div>
+              {/if}
             {/if}
           {/each}
           {#if isLoading}
@@ -219,7 +259,7 @@
         </div>
 
         {#if chatError}
-          <div class="mt-3 rounded-2xl border border-[#f3c7c7] bg-[#fff7f7] p-3 text-sm leading-5 text-[#8f3940]">
+          <div data-testid="public-vera-error" class="mt-3 rounded-2xl border border-[#f3c7c7] bg-[#fff7f7] p-3 text-sm leading-5 text-[#8f3940]">
             {chatError}
           </div>
         {/if}
@@ -234,6 +274,7 @@
           ></textarea>
           <button
             type="button"
+            data-testid="public-vera-chat-submit"
             disabled={!canSend}
             class="inline-flex min-h-[3.5rem] items-center justify-center rounded-full bg-[#168b88] px-5 text-sm font-bold text-white transition hover:bg-[#126d6b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] disabled:cursor-not-allowed disabled:opacity-45"
             onclick={sendMessage}

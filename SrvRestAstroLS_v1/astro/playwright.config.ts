@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const skipWebServer = process.env.PLAYWRIGHT_SKIP_WEBSERVER === "1";
+
 export default defineConfig({
   testDir: "./e2e",
   timeout: 60_000,
@@ -18,12 +20,12 @@ export default defineConfig({
     },
   ],
   use: {
-    baseURL: "http://localhost:4321",
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:4321",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
   },
-  webServer: [
+  webServer: skipWebServer ? undefined : [
     {
       command:
         "cd ../backend && AUTOMATION_DIAGNOSIS_REPOSITORY=memory uv run uvicorn app:app --host 127.0.0.1 --port 8000",

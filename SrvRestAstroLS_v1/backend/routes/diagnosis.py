@@ -122,16 +122,16 @@ class _PublicTurnLLMProvider:
         state: ConversationState,
         context: list[RetrievedChunk],
     ) -> str:
-        if os.environ.get("TEAM360_AI_PROVIDER", "").strip().lower() != "litellm":
-            return "Gracias por tu mensaje. Estoy procesando la información para orientarte. ¿Podés contarme más detalles sobre el proceso que querés mejorar?"
-
-        client = LiteLLMClient(base_url=self._base_url)
         lang_info = (state.semantic_memory or {}).get("language", {})
         response_language = (
             lang_info.get("preferred_response_language")
             or lang_info.get("current_language")
             or input.locale
         )
+        if os.environ.get("TEAM360_AI_PROVIDER", "").strip().lower() != "litellm":
+            return safe_ack_for_language(response_language)
+
+        client = LiteLLMClient(base_url=self._base_url)
         system = self._prompt_policy.build_system_prompt(
             assistant_instance_code=input.assistant_instance_code,
             package_code=input.package_code,

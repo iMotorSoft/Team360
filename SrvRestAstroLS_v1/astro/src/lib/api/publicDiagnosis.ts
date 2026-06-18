@@ -55,13 +55,76 @@ export interface TurnLanguage {
   explicit_language_preference: boolean;
 }
 
+export type TurnGeneration = {
+  status: "success" | "fallback" | "unavailable";
+  model?: string | null;
+  fallback_used: boolean;
+  fallback_reason?: string | null;
+};
+
+export type TurnDecision = {
+  action: "diagnose" | "reflect_and_ask";
+  diagnosis_built?: boolean;
+  diagnosis_status?: "gathering" | "sufficient" | "requested" | "completed";
+  generation?: TurnGeneration | null;
+  retrieval_query?: string;
+  readiness_reason?: string;
+  intent?: string;
+  intent_scope?: string;
+  intent_confidence?: number;
+  intent_source?: string;
+  matched_rule?: string | null;
+  classifier_called?: boolean;
+};
+
 export interface TurnResponse {
   session_id: string;
   response_text: string;
   turn_count: number;
   is_new: boolean;
   language?: TurnLanguage | null;
+  turn_decision?: TurnDecision | null;
+  diagnosis?: StructuredDiagnosis | null;
 }
+
+export type StructuredDiagnosis = {
+  version: string;
+  feasibility:
+    | "high"
+    | "medium"
+    | "low"
+    | "needs_validation"
+    | "not_recommended";
+  automation_mode:
+    | "automatic"
+    | "human_in_the_loop"
+    | "assisted"
+    | "manual_with_automation_support"
+    | "not_recommended";
+  confidence: "high" | "medium" | "low";
+  summary: string | null;
+  channels: string[];
+  systems: string[];
+  entities: string[];
+  entity_sources: Record<string, string>;
+  human_approval:
+    | "required"
+    | "conditional"
+    | "not_required"
+    | "unknown";
+  automatable_steps: string[];
+  human_steps: string[];
+  risks: string[];
+  assumptions: string[];
+  validation_points: string[];
+  next_step: string;
+  availability:
+    | "available_now"
+    | "requires_validation"
+    | "custom_solution"
+    | "not_in_immediate_catalog"
+    | "not_recommended";
+};
 
 export async function sendPublicTurn(request: TurnRequest): Promise<TurnResponse> {
   const url = `${API_BASE_URL}/diagnosis/turn`;
