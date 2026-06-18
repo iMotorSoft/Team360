@@ -2,13 +2,21 @@
 
 Objetivo: `reportes-y-evidencias`
 
-Ultima actualizacion: 2026-05-28
+Ultima actualizacion: 2026-06-18
 
 ## Estado general
 
 `data/reports/` contiene reportes, evidencias, muestras, snapshots y entregables generados fuera del codigo fuente.
 
 ## Acciones realizadas
+
+### 2026-06-18 - Evidencia visual hero preview `/t360`
+
+- Se agregaron capturas de validacion visual en
+  `snapshots/t360-hero-preview-20260618/`.
+- Las capturas documentan desktop, mobile, card preview completo y navegacion
+  del CTA hacia la seccion real de Vera.
+- Se actualizo el status local de `data/reports/snapshots/`.
 
 ### 2026-05-28 - Snapshot tecnico automation_diagnosis
 

@@ -125,6 +125,21 @@ async function sendTurn(page: Page, text: string) {
 }
 
 test.describe("Team360 pública - Vera estructurada", () => {
+  test("hero presenta preview y conecta el CTA con Vera", async ({ page }) => {
+    await page.goto(T360_URL);
+
+    const preview = page.locator("#diagnostico");
+    await expect(preview).toContainText("Vista previa");
+    await expect(preview).toContainText("Ejemplo de orientación inicial");
+
+    const cta = preview.getByRole("link", { name: "Probar diagnóstico en vivo" });
+    await expect(cta).toHaveAttribute("href", "#vera");
+    await expect(page.locator("#vera")).toBeVisible();
+
+    await cta.click();
+    await expect(page.getByTestId("public-vera-entry")).toBeInViewport();
+  });
+
   test("renderiza diagnóstico completo, localizado y sin códigos internos", async ({ page }) => {
     const requests: Record<string, unknown>[] = [];
     await routeDiagnosis(page, async (route, body, count) => {

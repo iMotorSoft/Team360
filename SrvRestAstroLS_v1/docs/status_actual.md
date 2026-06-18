@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-18 (Guia DeepSeek V4 Flash + opencode-browser para agentes)
+Ultima actualizacion: 2026-06-18 (Preview comercial del hero /t360 conectado a Vera)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,33 @@ Ultima actualizacion: 2026-06-18 (Guia DeepSeek V4 Flash + opencode-browser para
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-18 - Preview comercial del hero `/t360` conectado a Vera
+
+- Se ajusto el bloque visual premium del hero de `/t360` para explicitar que
+  es una vista previa, no el formulario interactivo real.
+- Copy aplicado:
+  - etiqueta: `Vista previa`;
+  - titulo: `Ejemplo de orientación inicial`;
+  - texto: `Este ejemplo muestra cómo Vera puede organizar la factibilidad, los puntos a validar y los próximos pasos de tu caso.`;
+  - CTA: `Probar diagnóstico en vivo`.
+- El CTA del preview ahora apunta a `#vera` y lleva a la experiencia real de
+  Vera sin procesar el textarea visual del hero.
+- Se preservo la estructura visual principal: mismo hero, grid, card premium,
+  imagen, fondos, gradientes, bordes, sombras, radius, tipografia general y
+  jerarquia.
+- Se agrego test E2E minimo en `public-vera.spec.ts` para verificar copy del
+  preview, `href="#vera"` y navegacion hacia la seccion Vera.
+- Validaciones ejecutadas:
+  `pnpm check`, `pnpm build`,
+  `pnpm exec playwright test e2e/public-vera.spec.ts --project=chromium`,
+  validacion visual Playwright desktop/mobile en `127.0.0.1:3050/t360` y
+  `git diff --check`.
+- Evidencia visual generada en
+  `data/reports/snapshots/t360-hero-preview-20260618/`.
+- No se tocaron backend, PostgreSQL, Milvus, LiteLLM, `PublicVeraEntry`,
+  `DiagnosisResult`, logica del diagnostico, navegacion general, branding,
+  paleta ni tipografia global.
 
 ### 2026-06-18 - Guia DeepSeek V4 Flash + opencode-browser para agentes
 
