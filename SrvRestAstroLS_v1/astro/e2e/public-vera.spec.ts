@@ -132,6 +132,12 @@ test.describe("Team360 pública - Vera estructurada", () => {
     await expect(preview).toContainText("Vista previa");
     await expect(preview).toContainText("Ejemplo de orientación inicial");
 
+    const textarea = preview.locator("textarea");
+    await expect(textarea).toHaveAttribute("readonly", "");
+    await expect(textarea).toHaveAttribute("aria-readonly", "true");
+    await expect(textarea).toHaveAttribute("tabindex", "-1");
+    await expect(textarea).toContainText("recibimos muchos WhatsApp");
+
     const cta = preview.getByRole("link", { name: "Probar diagnóstico en vivo" });
     await expect(cta).toHaveAttribute("href", "#vera");
     await expect(page.locator("#vera")).toBeVisible();
