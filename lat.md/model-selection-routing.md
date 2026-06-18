@@ -42,6 +42,12 @@ DeepSeek V4 Flash no debe usarse como lector de capturas. Su rol es orquestador 
 2. Modelo barato clasifica y analiza sobre datos estructurados
 3. Captura de pantalla solo como fallback o auditoria visual
 
+Para OpenCode + `opencode-browser`, DeepSeek V4 Flash queda habilitado para
+browser QA dirigido y validacion frontend/backend acotada solo si el prompt
+fija herramientas `browsermcp_*`, snapshots antes/despues de cada cambio,
+restricciones explicitas y punto de detencion. Ver
+[[deepseek-v4-flash-opencode-browser]].
+
 ### Diagnosis assistant (Vera)
 1. LiteLLM con alias `automation_diagnosis_text` para interpretacion
 2. `automation_diagnosis_classifier` para clasificacion barata
@@ -73,6 +79,7 @@ Esto permite cambiar de proveedor o modelo sin modificar codigo.
 
 - [[ai-litellm]] — gateway y adapter
 - [[ai-diagnosis-rag-runtime]] — modelos por defecto para diagnosis
+- [[deepseek-v4-flash-opencode-browser]] — uso validado de DeepSeek V4 Flash con OpenCode + `opencode-browser`
 - `docs/analisis-tecnico/analisis_tecnico_browser_automation_modelos_ai_2026-05-08.md` — analisis browser automation
 - `docs/analisis-tecnico/sap_b1_modelos_vision_costos_automatizacion.md` — analisis SAP B1 vision
 - `docs/analisis-tecnico/team360_ai_diagnostico_stack_arango_milvus_litellm.md` — stack AI diagnostico

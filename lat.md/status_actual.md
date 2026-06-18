@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-17
+Ultima actualizacion: 2026-06-18
 
 ## Estado general
 
@@ -11,6 +11,26 @@ Ultima actualizacion: 2026-06-17
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-18 - Guia DeepSeek V4 Flash + opencode-browser para agentes
+
+- Se agrego `deepseek-v4-flash-opencode-browser.md` como invariante operativo
+  transversal para agentes.
+- Se clasifico el uso validado de DeepSeek V4 Flash con OpenCode +
+  `opencode-browser`: browser QA dirigido, smoke tests, validacion
+  frontend/backend acotada, prompts atomicos, snapshots y punto de detencion.
+- Se documento que `browsermcp_*` debe usarse como herramienta obligatoria
+  durante la fase browser y que terminal, `curl`, HTML directo o Playwright no
+  reemplazan la validacion real de UI.
+- Se agregaron plantillas de prompt para navegacion minima, inspeccion de UI,
+  interaccion basica, envio de mensaje, validacion frontend/backend y smoke
+  repetible sobre `http://127.0.0.1:3050/t360`.
+- Se enlazo el documento desde `lat.md/lat.md` y desde
+  `model-selection-routing.md`.
+- Se actualizaron `AGENTS.md` y `.agents/skills/team360-project/SKILL.md` para
+  que la guia quede visible en el protocolo de agentes.
+- No se modifico codigo productivo, runtime, frontend, backend, DB, Milvus ni
+  LiteLLM.
 
 ### 2026-06-17 - Politica operativa runtime publico Vera
 

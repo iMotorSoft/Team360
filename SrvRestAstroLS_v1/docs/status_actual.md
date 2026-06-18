@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-18 (Resolucion dinamica knowledge_scope_code -> UUID via PostgreSQL)
+Ultima actualizacion: 2026-06-18 (Guia DeepSeek V4 Flash + opencode-browser para agentes)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,23 @@ Ultima actualizacion: 2026-06-18 (Resolucion dinamica knowledge_scope_code -> UU
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-18 - Guia DeepSeek V4 Flash + opencode-browser para agentes
+
+- Se documento y clasifico en `lat.md/deepseek-v4-flash-opencode-browser.md`
+  el uso validado de DeepSeek V4 Flash con OpenCode + `opencode-browser`.
+- La guia queda disponible para agentes desde `lat.md/lat.md`, `AGENTS.md` y
+  `.agents/skills/team360-project/SKILL.md`.
+- Se fijo el patron recomendado: navegar -> snapshot -> referencia actual ->
+  accion -> espera -> nuevo snapshot -> evidencia -> detencion.
+- Se agregaron prompts reutilizables para `/t360`: navegacion minima,
+  inspeccion de UI, seleccion de ejemplo, envio de mensaje, validacion
+  frontend/backend y smoke repetible.
+- Se clasificaron tareas adecuadas para DeepSeek V4 Flash y tareas que conviene
+  reservar para GPT-5.5 o modelo superior.
+- No se ejecuto prueba real ni preflight porque el cambio fue documental; no se
+  modificaron runtime, frontend, backend, DB, Milvus, LiteLLM, migraciones ni
+  tests.
 
 ### 2026-06-18 - Validacion end-to-end estructurada `/t360`
 
