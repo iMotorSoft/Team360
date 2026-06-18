@@ -601,3 +601,44 @@ Acotacion Milvus: la validacion real uso Milvus estandar local
 `milvus26-standalone` (`127.0.0.1:19530`) con MinIO y etcd del stack
 `milvus26-*`. No se configuro token Milvus ni se activo retrieval real por
 default; Milvus sigue siendo opt-in por env.
+
+### Validacion productiva Vera
+
+Runner completo de validacion end-to-end:
+
+```
+cd SrvRestAstroLS_v1/backend
+uv run python scripts/validate_productive_vera_conversation.py
+```
+
+Ejecuta 10 escenarios conversacionales contra el endpoint productivo
+`POST /api/diagnosis/turn`, validando estado PostgreSQL, resolucion dinamica
+de scope, retrieval Milvus, LiteLLM, diagnosis, multilingue y persistencia.
+
+#### Evidencia Milvus detallada
+
+```
+cd SrvRestAstroLS_v1/backend
+uv run python scripts/validate_productive_vera_conversation.py --milvus-evidence
+```
+
+Agrega 6 queries semanticas con embeddings reales contra Milvus, clasificacion
+manual de relevancia, prueba de scope invalido (fail closed) y evidencia de
+retrieval dentro del endpoint productivo.
+
+#### Servicios requeridos
+
+- PostgreSQL 18 activo y migrado
+- Milvus 2.6 standalone con coleccion `team360_sales_diagnosis_knowledge_v1`
+- LiteLLM activo con modelo `openai_gpt-5-nano` y `openai_text_embedding_3_small`
+- Backend Litestar activo en `127.0.0.1:7050`
+
+#### Salida
+
+- Resultados en consola con tabla de estado.
+- Reporte JSON en `data/reports/validation/vera_productive_validation_<timestamp>.json`
+  (archivos timestamped ignorados por Git via `.gitignore` en la raiz del repo).
+- Exit code 0 si todas las assertions pasan, distinto de cero en caso contrario.
+
+El runner no imprime secretos, tokens, embeddings completos ni chunks
+completos innecesarios. No requiere configuracion adicional por env.
