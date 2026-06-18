@@ -31,10 +31,18 @@
   function restoreSession() {
     const session = loadPublicVeraSession();
     if (session.session_id) {
-      sessionId = session.session_id;
+      savePublicVeraSession({
+        session_id: null,
+        initial_language: session.initial_language,
+        current_language: session.current_language,
+        preferred_response_language: session.preferred_response_language,
+        explicit_language_preference: session.explicit_language_preference,
+      });
+      sessionId = null;
     }
-    if (session.preferred_response_language) {
-      currentLocale = session.preferred_response_language;
+    const updated = loadPublicVeraSession();
+    if (updated.preferred_response_language) {
+      currentLocale = updated.preferred_response_language;
     }
   }
 

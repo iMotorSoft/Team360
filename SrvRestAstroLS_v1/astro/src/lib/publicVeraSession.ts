@@ -67,3 +67,18 @@ export function mergePublicVeraSession(partial: Partial<VeraSessionData>): VeraS
   savePublicVeraSession(merged);
   return merged;
 }
+
+export function resetConversationSessionOnPageLoad(): void {
+  if (!isBrowser()) return;
+  try {
+    const stored = loadPublicVeraSession();
+    if (!stored.session_id) return;
+    savePublicVeraSession({
+      session_id: null,
+      initial_language: stored.initial_language,
+      current_language: stored.current_language,
+      preferred_response_language: stored.preferred_response_language,
+      explicit_language_preference: stored.explicit_language_preference,
+    });
+  } catch {}
+}
