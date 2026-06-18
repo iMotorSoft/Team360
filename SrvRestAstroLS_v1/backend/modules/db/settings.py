@@ -26,6 +26,27 @@ def _normalize_psycopg_dsn(url: str) -> str:
     return url
 
 
+def _resolve_global_var_dsn() -> str:
+    """Resolve the runtime DSN from globalVar.py without exposing secrets."""
+    try:
+        import globalVar
+    except Exception:
+        return ""
+
+    resolver = getattr(globalVar, "get_team360_db_url_psql", None)
+    if not callable(resolver):
+        return ""
+
+    try:
+        dsn = str(resolver() or "").strip()
+    except Exception:
+        return ""
+
+    if dsn and _is_postgresql_scheme(dsn):
+        return _normalize_psycopg_dsn(dsn)
+    return ""
+
+
 def sanitize_dsn(dsn: str) -> str:
     """Remove password from a DSN for safe logging.
 
@@ -71,7 +92,7 @@ _DEFAULT_APP_NAME = "team360-backend"
 
 
 def _resolve_dsn() -> str:
-    """Resolve the Team360 DSN from environment variables."""
+    """Resolve the Team360 DSN from env vars, then globalVar.py."""
     team360_url = os.environ.get(_TEAM360_DB_URL_ENV, "").strip()
     if team360_url and _is_postgresql_scheme(team360_url):
         return _normalize_psycopg_dsn(team360_url)
@@ -86,10 +107,14 @@ def _resolve_dsn() -> str:
             _replace_database_name(v360_url, _DEFAULT_TEAM360_DB_NAME)
         )
 
+    global_var_dsn = _resolve_global_var_dsn()
+    if global_var_dsn:
+        return global_var_dsn
+
     msg = (
         f"Cannot resolve DSN: set {_TEAM360_DB_URL_ENV}, "
-        f"{_TEAM360_DB_URL_PSQL_ENV} or {_V360_SOURCE_DB_URL_ENV} "
-        "with a valid PostgreSQL connection string."
+        f"{_TEAM360_DB_URL_PSQL_ENV}, {_V360_SOURCE_DB_URL_ENV} "
+        "or configure globalVar.py with a valid PostgreSQL connection string."
     )
     raise DatabaseConfigurationError(msg)
 
@@ -106,6 +131,7 @@ def get_database_settings(
         1. TEAM360_DB_URL
         2. TEAM360_DB_URL_PSQL
         3. DB_PG_V360_URL (replace database name with 'team360')
+        4. globalVar.get_team360_db_url_psql()
 
     All other parameters fall back to defaults if not provided.
     """

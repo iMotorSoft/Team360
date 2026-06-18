@@ -7,6 +7,7 @@ from modules.db.errors import (
     DatabaseConfigurationError,
     DatabasePoolNotInitializedError,
 )
+import modules.db.settings as db_settings
 from modules.db.pool import create_pool, get_pool, reset_pool_for_tests, set_pool
 from modules.db.settings import DatabaseSettings, get_database_settings, sanitize_dsn
 from modules.db.transaction import fetch_all, fetch_one, transaction
@@ -91,6 +92,32 @@ class TestGetDatabaseSettings:
         settings = get_database_settings()
         assert "team360" in settings.dsn
         assert "v360" not in settings.dsn
+
+    def test_uses_global_var_fallback(self, monkeypatch):
+        monkeypatch.delenv("TEAM360_DB_URL", raising=False)
+        monkeypatch.delenv("TEAM360_DB_URL_PSQL", raising=False)
+        monkeypatch.delenv("DB_PG_V360_URL", raising=False)
+        monkeypatch.setattr(
+            db_settings,
+            "_resolve_global_var_dsn",
+            lambda: "postgresql://u:p@h:5432/team360",
+        )
+
+        settings = get_database_settings()
+
+        assert settings.dsn == "postgresql://u:p@h:5432/team360"
+
+    def test_env_takes_precedence_over_global_var(self, monkeypatch):
+        monkeypatch.setenv("TEAM360_DB_URL", "postgresql://env:p@h:5432/team360")
+        monkeypatch.setattr(
+            db_settings,
+            "_resolve_global_var_dsn",
+            lambda: "postgresql://global:p@h:5432/team360",
+        )
+
+        settings = get_database_settings()
+
+        assert settings.dsn == "postgresql://env:p@h:5432/team360"
 
     def test_raises_when_no_dsn(self, monkeypatch):
         monkeypatch.delenv("TEAM360_DB_URL", raising=False)
