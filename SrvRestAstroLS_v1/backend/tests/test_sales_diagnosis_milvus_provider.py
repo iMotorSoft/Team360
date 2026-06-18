@@ -47,10 +47,13 @@ class FakeMilvusCollection:
         self,
         results: list | None = None,
         schema_fields: list[str] | None = None,
+        query_rows: list[dict[str, Any]] | None = None,
     ) -> None:
         self._results = results or []
+        self._query_rows = query_rows or []
         self.indexes: list[dict[str, Any]] = []
         self.last_search: dict[str, Any] | None = None
+        self.last_query: dict[str, Any] | None = None
         self.schema = (
             type(
                 "FakeSchema",
@@ -68,6 +71,19 @@ class FakeMilvusCollection:
 
     def load(self) -> None:
         pass
+
+    def query(
+        self,
+        expr: str,
+        output_fields: list[str],
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        self.last_query = {
+            "expr": expr,
+            "output_fields": output_fields,
+            "limit": limit,
+        }
+        return self._query_rows
 
     def search(
         self,
@@ -415,7 +431,180 @@ class TestMilvusRetrievalProvider:
 
 
 # ---------------------------------------------------------------------------
-# 3. Configuration
+# 3. UUID discovery and scope filter resolution
+# ---------------------------------------------------------------------------
+
+
+class TestMilvusScopeUUIDDiscovery:
+    """Tests for the UUID discovery mechanism in _build_filters."""
+
+    def test_is_uuid_detects_uuid_format(self):
+        provider = MilvusRetrievalProvider()
+        assert provider._is_uuid("8b071443-5bd6-4fe4-bbc3-fc2dca179a5b")
+        assert provider._is_uuid("00000000-0000-0000-0000-000000000000")
+
+    def test_is_uuid_rejects_codes(self):
+        provider = MilvusRetrievalProvider()
+        assert not provider._is_uuid("ks_team360_sales_diagnosis")
+        assert not provider._is_uuid("pkg_sales_diagnosis")
+        assert not provider._is_uuid("")
+        assert not provider._is_uuid("not-a-uuid")
+
+    def test_discover_scope_uuids_returns_unique_values(self):
+        provider = MilvusRetrievalProvider()
+        collection = FakeMilvusCollection(query_rows=[
+            {"knowledge_scope_id": "uuid-001"},
+            {"knowledge_scope_id": "uuid-001"},
+            {"knowledge_scope_id": "uuid-002"},
+        ])
+        uuids = provider._discover_scope_uuids("knowledge_scope_id", collection)
+        assert sorted(uuids) == sorted(["uuid-001", "uuid-002"])
+
+    def test_discover_scope_uuids_empty_when_no_results(self):
+        provider = MilvusRetrievalProvider()
+        collection = FakeMilvusCollection(query_rows=[])
+        uuids = provider._discover_scope_uuids("knowledge_scope_id", collection)
+        assert uuids == []
+
+    def test_discover_scope_uuids_query_error_returns_empty(self):
+        class BrokenCollection:
+            def query(self, **kwargs):
+                raise RuntimeError("query failed")
+            def load(self):
+                pass
+            indexes = []
+
+        provider = MilvusRetrievalProvider()
+        uuids = provider._discover_scope_uuids("knowledge_scope_id", BrokenCollection())
+        assert uuids == []
+
+    def test_build_filters_discoveries_single_uuid(
+        self, sample_input, default_state, fake_embedding
+    ):
+        """When scope code is provided but collection stores UUIDs with a single
+        value, the discovery mechanism should resolve the code to the UUID."""
+        collection = FakeMilvusCollection(
+            query_rows=[{"knowledge_scope_id": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b"}],
+            schema_fields=[
+                "chunk_id", "document_id", "knowledge_scope_id",
+                "embedding_version", "source_uri", "title", "node_path",
+                "content_preview", "content", "embedding",
+            ],
+        )
+        config = MilvusRuntimeConfig(embedding_version="")
+        provider = MilvusRetrievalProvider(config=config, _client=collection)
+
+        from modules.sales_diagnosis_runtime.milvus_provider import resolve_milvus_field_map
+        field_map = resolve_milvus_field_map(collection, config)
+
+        filters = provider._build_filters(
+            sample_input, default_state, field_map, collection
+        )
+        # Should discover and use the UUID, not the code
+        assert "ks_team360_sales_diagnosis" not in filters
+        assert "8b071443" in filters
+        assert len(collection.last_query or {}) > 0  # discovery query was executed
+
+    def test_build_filters_no_discovery_when_env_var_set(
+        self, sample_input, default_state, fake_embedding
+    ):
+        """When TEAM360_KNOWLEDGE_SCOPE_ID is set in config to a UUID,
+        the env var value should be used directly without discovery."""
+        collection = FakeMilvusCollection(
+            query_rows=[{"knowledge_scope_id": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b"}],
+            schema_fields=[
+                "chunk_id", "document_id", "knowledge_scope_id",
+                "embedding_version", "source_uri", "title", "node_path",
+                "content_preview", "content", "embedding",
+            ],
+        )
+        config = MilvusRuntimeConfig(
+            knowledge_scope_id="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+            embedding_version="",
+        )
+        provider = MilvusRetrievalProvider(config=config, _client=collection)
+
+        from modules.sales_diagnosis_runtime.milvus_provider import resolve_milvus_field_map
+        field_map = resolve_milvus_field_map(collection, config)
+
+        filters = provider._build_filters(
+            sample_input, default_state, field_map, collection
+        )
+        # Should use the env var UUID, not the input code or discovered UUID
+        assert 'knowledge_scope_id == "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"' in filters
+        assert "ks_team360_sales_diagnosis" not in filters
+
+    def test_build_filters_multiple_uuids_does_not_resolve(
+        self, sample_input, default_state, fake_embedding
+    ):
+        """When multiple unique scope UUIDs exist, the discovery should NOT
+        resolve, leaving the original scope code in the filter."""
+        collection = FakeMilvusCollection(
+            query_rows=[
+                {"knowledge_scope_id": "uuid-001"},
+                {"knowledge_scope_id": "uuid-002"},
+            ],
+            schema_fields=[
+                "chunk_id", "document_id", "knowledge_scope_id",
+                "embedding_version", "source_uri", "title", "node_path",
+                "content_preview", "content", "embedding",
+            ],
+        )
+        config = MilvusRuntimeConfig(embedding_version="")
+        provider = MilvusRetrievalProvider(config=config, _client=collection)
+
+        from modules.sales_diagnosis_runtime.milvus_provider import resolve_milvus_field_map
+        field_map = resolve_milvus_field_map(collection, config)
+
+        filters = provider._build_filters(
+            sample_input, default_state, field_map, collection
+        )
+        # Should NOT resolve — original scope code stays
+        assert 'knowledge_scope_id == "ks_team360_sales_diagnosis"' in filters
+
+    def test_build_filters_retrieve_uses_discovery(
+        self, sample_input, default_state, fake_embedding
+    ):
+        """Full retrieve() path should work with UUID discovery."""
+        hit = FakeHit()
+        hit.entity.fields = {
+            "chunk_id": "c1",
+            "document_id": "d1",
+            "knowledge_scope_id": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+            "source_uri": "/test.md",
+            "title": "Test",
+            "node_path": "/test",
+            "content_preview": "preview",
+            "content": "content",
+        }
+        collection = FakeMilvusCollection(
+            results=make_fake_result_set(hit),
+            query_rows=[{"knowledge_scope_id": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b"}],
+            schema_fields=[
+                "chunk_id", "document_id", "knowledge_scope_id",
+                "embedding_version", "source_uri", "title", "node_path",
+                "content_preview", "content", "embedding",
+            ],
+        )
+        config = MilvusRuntimeConfig(embedding_version="")
+        provider = MilvusRetrievalProvider(
+            config=config,
+            embedding_provider=fake_embedding,
+            _client=collection,
+        )
+
+        chunks = provider.retrieve(sample_input, default_state, top_k=5)
+        assert len(chunks) == 1
+        assert chunks[0].knowledge_scope_id == "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b"
+        # The search expr should contain the discovered UUID, not the code
+        assert collection.last_search is not None
+        expr = collection.last_search["expr"]
+        assert "8b071443" in expr
+        assert "ks_team360_sales_diagnosis" not in expr
+
+
+# ---------------------------------------------------------------------------
+# 4. Configuration
 # ---------------------------------------------------------------------------
 
 

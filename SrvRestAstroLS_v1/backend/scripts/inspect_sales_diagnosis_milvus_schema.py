@@ -23,6 +23,7 @@ Optional runtime alignment envs:
 from __future__ import annotations
 
 import os
+import re
 import sys
 from collections import Counter
 from textwrap import shorten
@@ -63,6 +64,16 @@ def _unique_counts(rows: list[dict[str, Any]], field: str) -> Counter[str]:
         for row in rows
         if row.get(field) is not None and str(row.get(field)).strip() != ""
     )
+
+
+_UUID_RE = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+    re.IGNORECASE,
+)
+
+
+def _looks_like_uuid(value: str) -> bool:
+    return bool(_UUID_RE.match(value))
 
 
 def main() -> None:
@@ -215,7 +226,7 @@ def main() -> None:
     try:
         sample_rows = client.query(
             collection_name=collection_name,
-            filter="id >= 0",
+            filter='chunk_id != ""',
             output_fields=[
                 resolved_fields["chunk_id"] or "chunk_id",
                 resolved_fields["document_id"] or "document_id",
@@ -362,13 +373,45 @@ def main() -> None:
             )
 
     print()
+    print("--- Scope UUID Discovery ---")
+    discovered_scope_values = discovered_scope_counts.keys()
+    scope_field_type = "UUID" if all(
+        _looks_like_uuid(v) for v in discovered_scope_values
+    ) else "code" if discovered_scope_values else "unknown"
+    print(f"  field: {field_map.knowledge_scope_field!r}")
+    print(f"  stored values type: {scope_field_type}")
+    print(f"  unique values count: {len(discovered_scope_values)}")
+    if discovered_scope_values:
+        for val in discovered_scope_values:
+            print(f"    - {val}")
+
+    print()
     print("--- Diagnosis ---")
     issues: list[str] = []
+    alignment_status = "ALIGNED"
+
     if field_map.knowledge_scope_field == "knowledge_scope_id":
-        print("  scope field aligned via knowledge_scope_id.")
+        print("  scope field: knowledge_scope_id (UUID)")
+        if discovered_scope_values:
+            if target_scope_for_runtime in discovered_scope_values:
+                print("  scope code matches stored value directly.")
+            elif _looks_like_uuid(target_scope_for_runtime):
+                print("  runtime scope filter is a UUID — direct match.")
+            elif discovered_scope_values and all(
+                _looks_like_uuid(v) for v in discovered_scope_values
+            ):
+                alignment_status = "MISALIGNED_VALUE"
+                issues.append(
+                    f"runtime filter {target_scope_for_runtime!r} is a scope code, "
+                    f"but collection stores UUIDs in knowledge_scope_id. "
+                    f"A UUID discovery step is required for retrieval to work."
+                )
     elif field_map.knowledge_scope_field is None:
+        alignment_status = "MISSING_METADATA"
         issues.append("knowledge_scope field is missing in the current collection schema.")
     else:
+        if target_scope_for_runtime not in discovered_scope_values:
+            alignment_status = "MISALIGNED_FIELD"
         issues.append(
             f"knowledge_scope field resolved to {field_map.knowledge_scope_field!r}, not knowledge_scope_id."
         )
@@ -384,41 +427,50 @@ def main() -> None:
         issues.append("content source is missing and no fallback field was resolved.")
 
     if row_count == 0:
+        alignment_status = "EMPTY_COLLECTION"
         issues.append("collection is empty.")
 
     if not discovered_scope_counts:
+        if alignment_status == "ALIGNED":
+            alignment_status = "MISSING_METADATA"
         issues.append("no rows expose knowledge_scope values.")
-    elif target_scope_for_runtime and target_scope_for_runtime not in discovered_scope_counts:
-        issues.append(
-            f"runtime knowledge_scope filter {target_scope_for_runtime!r} has no matches in the collection."
-        )
 
     if target_version_for_runtime and target_version_for_runtime not in discovered_version_counts:
         issues.append(
             f"runtime embedding_version filter {target_version_for_runtime!r} has no matches in the collection."
         )
 
-    if runtime_count == 0:
+    if runtime_count == 0 and control_count == 0:
+        alignment_status = "SEARCH_FAILED"
         issues.append(
-            "runtime search returned zero results; this is expected only when filters do not match the live corpus."
+            "both runtime and control searches returned zero results; "
+            "the collection cannot be queried correctly."
+        )
+    elif runtime_count == 0 and control_count > 0:
+        if alignment_status == "ALIGNED":
+            alignment_status = "MISALIGNED_VALUE"
+        issues.append(
+            "runtime search returned zero results while control search returned hits; "
+            "the runtime filter does not match the live corpus."
+        )
+    elif control_count == 0:
+        alignment_status = "EMPTY_COLLECTION"
+        issues.append(
+            "control search returned zero results; live corpus was not found."
         )
 
-    if control_count == 0:
-        issues.append(
-            "control search returned zero results; live corpus was not found or the schema cannot be queried correctly."
-        )
-
+    print(f"\n  Alignment status: {alignment_status}")
     if issues:
-        print("  Problems found:")
+        print("  Issues found:")
         for issue in issues:
             print(f"  - {issue}")
         print()
-        print("Result: MISALIGNED")
-        sys.exit(1)
+        print(f"Result: {alignment_status}")
+        sys.exit(1 if alignment_status != "ALIGNED" else 0)
 
     print("  No blocking mismatch detected.")
     print()
-    print("Result: OK")
+    print("Result: ALIGNED")
 
 
 if __name__ == "__main__":

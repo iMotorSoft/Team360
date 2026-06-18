@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -306,7 +307,7 @@ class MilvusRetrievalProvider:
         collection = self._connect()
         field_map = resolve_milvus_field_map(collection, self._config)
         search_params = self._build_search_params(collection)
-        filters = self._build_filters(input, state, field_map)
+        filters = self._build_filters(input, state, field_map, collection)
         k = top_k or self._config.top_k_default
         n = top_n or self._config.top_n_default
 
@@ -383,15 +384,49 @@ class MilvusRetrievalProvider:
             "params": {"nprobe": nprobe},
         }
 
+    _UUID_RE = re.compile(
+        r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        re.IGNORECASE,
+    )
+
+    @staticmethod
+    def _is_uuid(value: str) -> bool:
+        return bool(MilvusRetrievalProvider._UUID_RE.match(value))
+
+    def _discover_scope_uuids(
+        self, field_name: str, collection: Any
+    ) -> list[str]:
+        """Query the collection for unique scope values in the given field.
+
+        Returns a deduplicated list of values found in the collection.
+        Returns empty list on any query error.
+        """
+        try:
+            results = collection.query(
+                expr=f'{field_name} != ""',
+                output_fields=[field_name],
+                limit=500,
+            )
+            seen: set[str] = set()
+            for row in results:
+                val = str(row.get(field_name, "")).strip()
+                if val:
+                    seen.add(val)
+            return list(seen)
+        except Exception:
+            return []
+
     def _build_filters(
         self,
         input: Any,
         state: Any,
         field_map: MilvusFieldMap | None = None,
+        collection: Any = None,
     ) -> str:
         filters: list[str] = []
 
         scope_value = self._config.knowledge_scope_id or ""
+        scope_from_config = bool(scope_value)
         if not scope_value:
             scope_value = getattr(input, "knowledge_scope_code", None) or ""
         if scope_value:
@@ -400,6 +435,30 @@ class MilvusRetrievalProvider:
                 if field_map is not None and field_map.knowledge_scope_field
                 else "knowledge_scope_code"
             )
+            # Schema-aware scope resolution.
+            # When the collection field is 'knowledge_scope_id' (UUID) but the
+            # runtime provides a human-readable scope code (not an explicit
+            # config UUID), discover the actual stored UUID from the collection
+            # to build a valid filter.  This handles the case where the indexer
+            # stores UUIDs in knowledge_scope_id while the runtime operates on
+            # human-readable scope codes.
+            if (
+                not scope_from_config
+                and field_name == "knowledge_scope_id"
+                and not self._is_uuid(scope_value)
+                and collection is not None
+            ):
+                discovered = self._discover_scope_uuids(field_name, collection)
+                if len(discovered) == 1:
+                    scope_value = discovered[0]
+                elif len(discovered) > 1:
+                    import warnings
+                    warnings.warn(
+                        f"Multiple scope UUIDs ({len(discovered)}) found in "
+                        f"field {field_name!r}; cannot resolve code "
+                        f"{scope_value!r} to a single UUID. Filter may "
+                        "return 0 results."
+                    )
             filters.append(f'{field_name} == "{scope_value}"')
 
         if self._config.embedding_version:
