@@ -14,6 +14,9 @@ from modules.sales_diagnosis_runtime.contracts import (
     GuardrailResult,
     RetrievedChunk,
 )
+from modules.sales_diagnosis_runtime.structured_diagnosis import (
+    format_structured_diagnosis_for_prompt,
+)
 
 
 _SYSTEM_PROMPTS: dict[str, str] = {
@@ -200,7 +203,21 @@ class PromptPolicy:
 
         status = mem.get("diagnosis_status", "gathering")
         is_diagnose = status in ("requested", "sufficient", "completed")
-        if is_diagnose:
+        sd = mem.get("last_structured_diagnosis")
+        if is_diagnose and sd:
+            parts.append("")
+            parts.append(format_structured_diagnosis_for_prompt(sd))
+            parts.append(
+                "\nInstrucciones para esta respuesta (ACCIÓN: DIAGNÓSTICO ESTRUCTURADO):\n"
+                "- NO hagas preguntas. El diagnóstico ya fue estructurado internamente.\n"
+                "- Usá el diagnóstico estructurado como fuente de verdad.\n"
+                "- No agregues hechos, canales, sistemas o garantías que no estén en el diagnóstico.\n"
+                "- Distinguí claramente entre HECHOS CONFIRMADOS, SUPUESTOS y PUNTOS A VALIDAR.\n"
+                "- Redactá en lenguaje natural como una orientación para el usuario.\n"
+                "- No preguntes nada nuevo.\n"
+                f"- {LANGUAGE_INSTRUCTIONS.get(response_lang, f'Respond only in {response_lang}.')}"
+            )
+        elif is_diagnose:
             parts.append(
                 "\nInstrucciones para esta respuesta (ACCIÓN: DIAGNÓSTICO):\n"
                 "- NO hagas preguntas. El usuario ya proporcionó información suficiente.\n"

@@ -90,3 +90,4 @@ class PublicTurnResponse(BaseModel):
     is_new: bool = False
     language: dict | None = None
     turn_decision: dict | None = None
+    diagnosis: dict | None = None

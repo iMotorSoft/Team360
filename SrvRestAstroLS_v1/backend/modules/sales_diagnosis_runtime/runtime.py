@@ -49,6 +49,7 @@ from modules.sales_diagnosis_runtime.intent_classifier import (
     match_high_confidence,
 )
 from modules.sales_diagnosis_runtime.policies import GuardrailPolicy, PromptPolicy
+from modules.sales_diagnosis_runtime.structured_diagnosis import build_structured_diagnosis
 from modules.sales_diagnosis_runtime.providers import (
     AuditTrail,
     LLMProvider,
@@ -145,6 +146,16 @@ class AssistantConversationRuntime:
         # 5. Decide action based on intent + coverage + safety
         should_diagnose = self._decide_turn(intent, state)
 
+        # 5.5 Build structured diagnosis (deterministic, no LLM)
+        if should_diagnose:
+            structured_diagnosis = build_structured_diagnosis(state.semantic_memory)
+            state.semantic_memory["last_structured_diagnosis"] = structured_diagnosis
+            diagnosis_built = True
+        else:
+            state.semantic_memory.pop("last_structured_diagnosis", None)
+            structured_diagnosis = None
+            diagnosis_built = False
+
         # 6. Build retrieval query from UPDATED semantic memory
         retrieval_query = self._build_retrieval_query(input, state)
         has_real_retrieval = not isinstance(self._retrieval, NullRetrievalProvider)
@@ -237,6 +248,7 @@ class AssistantConversationRuntime:
                     "fallback_used": is_fallback,
                     "fallback_reason": "transient_error" if is_fallback else None,
                 },
+                "diagnosis_built": diagnosis_built,
             },
             language={
                 "initial_language": lang_state.get("initial_language", input.locale),
@@ -247,6 +259,7 @@ class AssistantConversationRuntime:
                 "language_source": lang_state.get("language_source", "default"),
                 "explicit_language_preference": lang_state.get("explicit_language_preference", False),
             },
+            diagnosis=structured_diagnosis if should_diagnose else None,
         )
 
         self._save_state(state)
@@ -265,6 +278,11 @@ class AssistantConversationRuntime:
             mem["diagnosis_status"] = "gathering"
 
         msg = input.user_message
+
+        # Store raw messages for later pattern scanning
+        messages = mem.get("_messages", [])
+        messages.append(msg)
+        mem["_messages"] = messages
 
         # Business context — first mention of business type
         if not mem.get("business_context"):
@@ -740,7 +758,9 @@ class AssistantConversationRuntime:
                     "fallback_used": False,
                     "fallback_reason": "no_llm_provider",
                 },
+                "diagnosis_built": False,
             },
+            diagnosis=None,
         )
         events.append(ProgressiveEvent(event_type="team360.done", payload={"mode": "skeleton_no_llm"}, safe_to_show=True))
         self._save_state(state)

@@ -468,6 +468,7 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
                 "language_source": lang_state.get("language_source", "fallback"),
                 "explicit_language_preference": lang_state.get("explicit_language_preference", False),
             },
+            diagnosis=None,
         )
     except InvalidAssistantRuntimeInputError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
@@ -493,4 +494,5 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
         is_new=is_new,
         language=output.language,
         turn_decision=output.turn_decision,
+        diagnosis=output.diagnosis,
     )

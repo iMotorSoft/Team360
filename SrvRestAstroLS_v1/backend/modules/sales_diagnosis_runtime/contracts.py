@@ -79,6 +79,30 @@ class SemanticMemory:
 
 
 @dataclass
+class StructuredDiagnosis:
+    feasibility: str = "needs_validation"
+    automation_mode: str = "not_recommended"
+    confidence: str = "low"
+    summary: str | None = None
+    channels: list[str] = field(default_factory=list)
+    systems: list[str] = field(default_factory=list)
+    entities: list[str] = field(default_factory=list)
+    entity_sources: dict[str, str] = field(default_factory=dict)
+    human_approval: str = "unknown"
+    automatable_steps: list[str] = field(default_factory=list)
+    human_steps: list[str] = field(default_factory=list)
+    risks: list[str] = field(default_factory=list)
+    assumptions: list[str] = field(default_factory=list)
+    validation_points: list[str] = field(default_factory=list)
+    next_step: str = ""
+    availability: str = "requires_validation"
+    version: str = "v1"
+
+
+DIAGNOSIS_VERSION = "v1"
+
+
+@dataclass
 class CanonicalQuestion:
     intent: str
     question_text: str
@@ -165,6 +189,7 @@ class AssistantTurnOutput:
     next_state: ConversationState | None = None
     turn_decision: dict[str, Any] | None = None
     language: dict[str, Any] | None = None
+    diagnosis: dict[str, Any] | None = None
 
 
 # ---------------------------------------------------------------------------

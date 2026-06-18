@@ -2,10 +2,12 @@ from modules.sales_diagnosis_runtime.contracts import (
     AssistantTurnInput,
     AssistantTurnOutput,
     ConversationState,
+    DIAGNOSIS_VERSION,
     GuardrailResult,
     ProgressiveEvent,
     RetrievedChunk,
     RuntimeMetrics,
+    StructuredDiagnosis,
 )
 from modules.sales_diagnosis_runtime.embedding_provider import (
     OpenAIQueryEmbeddingProvider,
@@ -46,6 +48,10 @@ from modules.sales_diagnosis_runtime.state_repository import (
     SyncPostgresConversationStateRepository,
     SyncPostgresConversationStateRepositoryError,
 )
+from modules.sales_diagnosis_runtime.structured_diagnosis import (
+    build_structured_diagnosis,
+    format_structured_diagnosis_for_prompt,
+)
 
 __all__ = [
     "AssistantConversationRuntime",
@@ -53,6 +59,7 @@ __all__ = [
     "AssistantTurnOutput",
     "ConversationState",
     "ConversationStateSerializer",
+    "DIAGNOSIS_VERSION",
     "GuardrailPolicy",
     "GuardrailResult",
     "GuardrailViolationError",
@@ -82,7 +89,10 @@ __all__ = [
     "StateRepository",
     "StateRepositoryError",
     "StateSerializationError",
+    "StructuredDiagnosis",
     "SyncPostgresConversationStateRepository",
     "SyncPostgresConversationStateRepositoryError",
     "UnsafeResponseError",
+    "build_structured_diagnosis",
+    "format_structured_diagnosis_for_prompt",
 ]
