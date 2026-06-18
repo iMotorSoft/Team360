@@ -416,6 +416,10 @@ class MilvusRetrievalProvider:
         except Exception:
             return []
 
+    # Debug gate env — when set to "true", mono-scope collection discovery is
+    # permitted as a fallback for development/diagnostic use only.
+    _MONOSCOPE_DISCOVERY_ENV = "TEAM360_MILVUS_ALLOW_MONOSCOPE_DISCOVERY"
+
     def _build_filters(
         self,
         input: Any,
@@ -425,25 +429,33 @@ class MilvusRetrievalProvider:
     ) -> str:
         filters: list[str] = []
 
+        # Priority 1: explicit config UUID (env var TEAM360_KNOWLEDGE_SCOPE_ID).
+        # Used for debugging, infra tests, and administrative scripts only.
         scope_value = self._config.knowledge_scope_id or ""
-        scope_from_config = bool(scope_value)
         if not scope_value:
+            # Priority 2: pre-resolved UUID from PostgreSQL resolver.
+            scope_value = getattr(input, "knowledge_scope_id", None) or ""
+        if not scope_value:
+            # Priority 3: human-readable scope code.
+            # Without a resolver this will fail closed (0 hits) when the
+            # collection stores UUIDs in knowledge_scope_id.
             scope_value = getattr(input, "knowledge_scope_code", None) or ""
+
         if scope_value:
             field_name = (
                 field_map.knowledge_scope_field
                 if field_map is not None and field_map.knowledge_scope_field
                 else "knowledge_scope_code"
             )
-            # Schema-aware scope resolution.
-            # When the collection field is 'knowledge_scope_id' (UUID) but the
-            # runtime provides a human-readable scope code (not an explicit
-            # config UUID), discover the actual stored UUID from the collection
-            # to build a valid filter.  This handles the case where the indexer
-            # stores UUIDs in knowledge_scope_id while the runtime operates on
-            # human-readable scope codes.
+
+            # Mono-scope collection discovery — DEBUG/DIAGNOSTIC ONLY.
+            # Gated behind TEAM360_MILVUS_ALLOW_MONOSCOPE_DISCOVERY=true.
+            # Not used in production. Kept for inspector, tests, and migration.
+            allow_discovery = os.environ.get(
+                self._MONOSCOPE_DISCOVERY_ENV, ""
+            ).strip().lower() == "true"
             if (
-                not scope_from_config
+                allow_discovery
                 and field_name == "knowledge_scope_id"
                 and not self._is_uuid(scope_value)
                 and collection is not None
@@ -459,6 +471,7 @@ class MilvusRetrievalProvider:
                         f"{scope_value!r} to a single UUID. Filter may "
                         "return 0 results."
                     )
+
             filters.append(f'{field_name} == "{scope_value}"')
 
         if self._config.embedding_version:

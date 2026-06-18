@@ -174,6 +174,7 @@ class AssistantTurnInput:
     channel: str = "web"
     metadata: dict[str, Any] = field(default_factory=dict)
     locale: str = DEFAULT_LANGUAGE
+    knowledge_scope_id: str | None = None
 
 
 @dataclass
@@ -199,6 +200,26 @@ class AssistantTurnOutput:
 SALES_DIAGNOSIS_INSTANCE_CODE = "team360_sales_diagnosis"
 SALES_DIAGNOSIS_PACKAGE_CODE = "pkg_sales_diagnosis"
 SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE = "ks_team360_sales_diagnosis"
+SALES_DIAGNOSIS_ORGANIZATION_CODE = "team360_live"
+SALES_DIAGNOSIS_WORKSPACE_CODE = "team360_public_site"
+
+
+@dataclass(frozen=True)
+class KnowledgeScopeContext:
+    """Multi-tenant context for resolving a knowledge scope code to its UUID.
+
+    This is the canonical contract for scope resolution: PostgreSQL resolves the
+    UUID from these four codes; Milvus filters by the resolved UUID only.
+
+    Archives:
+        organization_code is stored in core_workspaces.metadata_jsonb until a
+        dedicated organizations table exists. See migration 005 seed.
+    """
+
+    organization_code: str
+    workspace_code: str
+    package_code: str
+    knowledge_scope_code: str
 
 SAFE_ACK_TEXTS: dict[str, str] = {
     "es": (

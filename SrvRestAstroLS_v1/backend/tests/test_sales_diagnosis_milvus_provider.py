@@ -479,10 +479,11 @@ class TestMilvusScopeUUIDDiscovery:
         assert uuids == []
 
     def test_build_filters_discoveries_single_uuid(
-        self, sample_input, default_state, fake_embedding
+        self, sample_input, default_state, fake_embedding, monkeypatch
     ):
         """When scope code is provided but collection stores UUIDs with a single
         value, the discovery mechanism should resolve the code to the UUID."""
+        monkeypatch.setenv("TEAM360_MILVUS_ALLOW_MONOSCOPE_DISCOVERY", "true")
         collection = FakeMilvusCollection(
             query_rows=[{"knowledge_scope_id": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b"}],
             schema_fields=[
@@ -563,9 +564,10 @@ class TestMilvusScopeUUIDDiscovery:
         assert 'knowledge_scope_id == "ks_team360_sales_diagnosis"' in filters
 
     def test_build_filters_retrieve_uses_discovery(
-        self, sample_input, default_state, fake_embedding
+        self, sample_input, default_state, fake_embedding, monkeypatch
     ):
         """Full retrieve() path should work with UUID discovery."""
+        monkeypatch.setenv("TEAM360_MILVUS_ALLOW_MONOSCOPE_DISCOVERY", "true")
         hit = FakeHit()
         hit.entity.fields = {
             "chunk_id": "c1",

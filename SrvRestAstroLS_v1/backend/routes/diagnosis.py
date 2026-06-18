@@ -38,15 +38,22 @@ from modules.sales_diagnosis_runtime.intent_classifier import LiteLLMIntentClass
 from modules.sales_diagnosis_runtime.contracts import (
     SAFE_ACK_TEXT,
     SAFE_ACK_TEXTS,
+    KnowledgeScopeContext,
     SALES_DIAGNOSIS_INSTANCE_CODE,
+    SALES_DIAGNOSIS_ORGANIZATION_CODE,
     SALES_DIAGNOSIS_PACKAGE_CODE,
     SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE,
+    SALES_DIAGNOSIS_WORKSPACE_CODE,
     safe_ack_for_language,
 )
 from modules.sales_diagnosis_runtime.contracts import ConversationState, RetrievedChunk
 from modules.sales_diagnosis_runtime.errors import (
     InvalidAssistantRuntimeInputError,
     UnsafeResponseError,
+)
+from modules.sales_diagnosis_runtime.knowledge_scope_resolver import (
+    PostgresKnowledgeScopeResolver,
+    ScopeResolutionError,
 )
 from modules.sales_diagnosis_runtime.milvus_provider import (
     MilvusRetrievalProvider,
@@ -97,6 +104,17 @@ def _build_public_state_repo():
 
 
 _public_turn_state = _build_public_state_repo()
+_public_scope_resolver: PostgresKnowledgeScopeResolver | None = None
+
+
+def _get_public_scope_resolver() -> PostgresKnowledgeScopeResolver | None:
+    global _public_scope_resolver
+    if _public_scope_resolver is None:
+        try:
+            _public_scope_resolver = PostgresKnowledgeScopeResolver.from_settings()
+        except Exception:
+            _public_scope_resolver = None
+    return _public_scope_resolver
 
 
 # ---------------------------------------------------------------------------
@@ -424,11 +442,28 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
 
     runtime = _build_public_turn_runtime()
 
+    # Resolve knowledge scope code to UUID via PostgreSQL.
+    # The resolver caches results in-memory for the process lifetime.
+    resolved_scope_id: str | None = None
+    resolver = _get_public_scope_resolver()
+    if resolver is not None:
+        try:
+            ctx = KnowledgeScopeContext(
+                organization_code=SALES_DIAGNOSIS_ORGANIZATION_CODE,
+                workspace_code=SALES_DIAGNOSIS_WORKSPACE_CODE,
+                package_code=SALES_DIAGNOSIS_PACKAGE_CODE,
+                knowledge_scope_code=SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE,
+            )
+            resolved_scope_id = await resolver.resolve_scope_id(ctx)
+        except (ScopeResolutionError, Exception):
+            resolved_scope_id = None
+
     input_ = AssistantTurnInput(
         session_id=session_id,
         assistant_instance_code=SALES_DIAGNOSIS_INSTANCE_CODE,
         package_code=SALES_DIAGNOSIS_PACKAGE_CODE,
         knowledge_scope_code=SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE,
+        knowledge_scope_id=resolved_scope_id,
         user_message=text,
         channel="web",
         locale=data.locale,

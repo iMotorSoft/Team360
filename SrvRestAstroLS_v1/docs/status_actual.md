@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-18 (Validacion end-to-end estructurada `/t360`)
+Ultima actualizacion: 2026-06-18 (Resolucion dinamica knowledge_scope_code -> UUID via PostgreSQL)
 
 ## Directorio de trabajo
 
@@ -49,6 +49,97 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 - No se implemento SSE, streaming, Step-to-Action, lead capture,
   diagnostic_code, WhatsApp handoff, pricing, SLA, cambios en Milvus ni
   cambios de proveedor/modelo/modo API.
+
+### 2026-06-18 - Correccion de desalineamiento retrieval Milvus
+
+- Se corrigio el desalineamiento productivo de retrieval en Milvus 2.6:
+  - Causa raiz: el indexador almacena UUIDs en `knowledge_scope_id` (ej.
+    `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`), pero el runtime filtraba por
+    `knowledge_scope_code` (codigo legible `ks_team360_sales_diagnosis`) sobre
+    ese mismo campo, resultando 0 hits.
+  - La coleccion `team360_sales_diagnosis_knowledge_v1` tiene 183 vectores,
+    todos con el mismo UUID de scope.
+  - Schema: `chunk_id`, `document_id`, `knowledge_scope_id` (UUID),
+    `source_uri`, `title`, `node_path`, `chunk_index`, `content_preview`,
+    `content`, `embedding_version`, `embedding` (FLOAT_VECTOR 1536, COSINE).
+  - No existen campos `knowledge_scope_code`, `package_code`,
+    `organization_code`, `workspace_code` ni `permission_tags`.
+- Correccion implementada en `milvus_provider.py`:
+  - `_build_filters()` ahora descubre el UUID real almacenado cuando recibe un
+    codigo legible (`ks_team360_sales_diagnosis`) y el campo destino es
+    `knowledge_scope_id` con valores UUID.
+  - La discovery solo se activa para valores provenientes de `input`
+    (no de config explicita via `TEAM360_KNOWLEDGE_SCOPE_ID`).
+  - Si la coleccion tiene exactamente 1 UUID unico, lo usa como filtro de scope
+    (compatibilidad con colecciones mono-scope).
+  - Si tiene multiples UUIDs, no resuelve y emite warning (no mezcla scopes).
+  - Si `TEAM360_KNOWLEDGE_SCOPE_ID` esta explicitamente configurado, se usa
+    directamente sin discovery (camino productivo con aislamiento garantizado).
+  - Se agregaron helpers `_is_uuid()` y `_discover_scope_uuids()`.
+- Inspector mejorado (`inspect_sales_diagnosis_milvus_schema.py`):
+  - Estados detallados: `ALIGNED`, `MISALIGNED_FIELD`, `MISALIGNED_VALUE`,
+    `MISSING_METADATA`, `SEARCH_FAILED`, `EMPTY_COLLECTION`.
+  - Reporta tipo de valor almacenado (UUID vs code), cantidad de valores unicos
+    y valores concretos.
+  - Corregido query filter de `id >= 0` a `chunk_id != ""`.
+- Tests agregados (9 nuevos en `TestMilvusScopeUUIDDiscovery`):
+  - `_is_uuid` detecta formato UUID y rechaza codigos.
+  - `_discover_scope_uuids` retorna valores unicos, vacio si no hay resultados,
+    vacio si hay error de query.
+  - `_build_filters` descubre UUID unico, no descubre cuando config tiene env var,
+    no resuelve cuando hay multiples UUIDs.
+  - `retrieve()` usa discovery en el flujo completo.
+- Coleccion no modificada, embeddings no regenerados, no se elimino filtro de
+  scope ni se creo coleccion nueva.
+- Suite completa: 863 passed, 9 skipped (sin regresiones, +9 tests).
+- Inspector sin env: `MISALIGNED_VALUE` (esperado: codigo vs UUID).
+- Inspector con env: `ALIGNED`, 3 hits runtime y control.
+- Queries reales: 6/6 con hits > 0, scope correcto.
+- Runtime integration: OK, dev endpoint sigue funcionando (fake retrieval).
+- Commits: no hubo commit ni push.
+- No se modificaron: frontend, `/t360`, StructuredDiagnosis, intent classifier,
+  LiteLLM, modelo, prompt, conversacion, PostgreSQL schema, embeddings, UI,
+  Playwright.
+
+### 2026-06-18 - Resolucion dinamica knowledge_scope_code → UUID via PostgreSQL
+
+- Se reemplazo la resolucion temporal mono-scope de Milvus por una resolucion
+  dinamica, segura y multi-tenant usando PostgreSQL como fuente de verdad.
+- Flujo implementado:
+  `KnowledgeScopeContext (org/ws/pkg/scope) -> PostgresKnowledgeScopeResolver
+  -> knowledge_scope_id UUID -> Milvus filter -> retrieval aislado`.
+- Contrato `KnowledgeScopeContext` agregado (`contracts.py`):
+  - `organization_code`, `workspace_code`, `package_code`, `knowledge_scope_code`
+  - Se agregaron constantes `SALES_DIAGNOSIS_ORGANIZATION_CODE` y
+    `SALES_DIAGNOSIS_WORKSPACE_CODE`.
+- `AssistantTurnInput.knowledge_scope_id: str | None` agregado para transportar
+  el UUID ya resuelto hacia el provider Milvus.
+- `PostgresKnowledgeScopeResolver` creado en `knowledge_scope_resolver.py`:
+  - Query SQL que resuelve `scope_code` → UUID via `knowledge_scopes` +
+    `core_workspaces`, verificando `organization_code` en `metadata_jsonb`.
+  - Verifica package binding via `knowledge_scope_bindings` + `automation_packages`.
+  - Fallo controlado: contexto invalido → None → 0 retrieval.
+  - Sin pool o conexion → `ScopeResolutionError`.
+  - Resuelve `ks_team360_sales_diagnosis` → `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`.
+- `CachedScopeResolver` wrapper con TTL 300s (negativos 30s), clave
+  compuesta (org/ws/pkg/scope), invalidacion puntual y global.
+- `milvus_provider._build_filters()` refactorizado con prioridad:
+  1. `config.knowledge_scope_id` (debug/scripts)
+  2. `input.knowledge_scope_id` (resuelto por PostgreSQL)
+  3. `input.knowledge_scope_code` (fallback, fail-closed si no es UUID)
+- Mono-scope discovery gated detras de `TEAM360_MILVUS_ALLOW_MONOSCOPE_DISCOVERY=true`
+  (deshabilitado por defecto). Solo disponible para inspector/diagnostico/tests.
+- Integracion `/t360`: `public_turn` en `diagnosis.py` resuelve scope UUID
+  server-side antes de llamar al runtime. El browser no elige scope.
+- Tests agregados:
+  - `test_knowledge_scope_resolver.py`: 20 tests (contexto, resolver, cache,
+    multi-tenant isolation, errores).
+  - Tests de integracion real: PostgreSQL resuelve UUID correcto, Milvus
+    retorna hits con el UUID filtrado.
+- Suite completa: 883 passed, 9 skipped (+20 nuevos tests).
+- No se requiere `TEAM360_KNOWLEDGE_SCOPE_ID` para operacion normal.
+- No se usa discovery mono-scope como camino productivo.
+- No hubo commit ni push.
 
 ### 2026-06-17 - Smoke multidioma real `/t360`
 

@@ -4,6 +4,7 @@ from modules.sales_diagnosis_runtime.contracts import (
     ConversationState,
     DIAGNOSIS_VERSION,
     GuardrailResult,
+    KnowledgeScopeContext,
     ProgressiveEvent,
     RetrievedChunk,
     RuntimeMetrics,
@@ -24,6 +25,12 @@ from modules.sales_diagnosis_runtime.errors import (
     StateRepositoryError,
     StateSerializationError,
     UnsafeResponseError,
+)
+from modules.sales_diagnosis_runtime.knowledge_scope_resolver import (
+    CachedScopeResolver,
+    KnowledgeScopeResolver,
+    PostgresKnowledgeScopeResolver,
+    ScopeResolutionError,
 )
 from modules.sales_diagnosis_runtime.milvus_provider import (
     MilvusRetrievalProvider,
@@ -57,6 +64,7 @@ __all__ = [
     "AssistantConversationRuntime",
     "AssistantTurnInput",
     "AssistantTurnOutput",
+    "CachedScopeResolver",
     "ConversationState",
     "ConversationStateSerializer",
     "DIAGNOSIS_VERSION",
@@ -66,6 +74,8 @@ __all__ = [
     "InMemoryConversationStateRepository",
     "InMemoryStateRepository",
     "InvalidAssistantRuntimeInputError",
+    "KnowledgeScopeContext",
+    "KnowledgeScopeResolver",
     "LLMProvider",
     "LLMUnavailableError",
     "MetricsRecorder",
@@ -77,6 +87,7 @@ __all__ = [
     "NullRetrievalProvider",
     "OpenAIQueryEmbeddingProvider",
     "PostgresConversationStateRepository",
+    "PostgresKnowledgeScopeResolver",
     "ProgressiveEvent",
     "PromptPolicy",
     "QueryEmbeddingConfig",
@@ -86,6 +97,7 @@ __all__ = [
     "RetrievedChunk",
     "RuntimeMetrics",
     "SalesDiagnosisRuntimeError",
+    "ScopeResolutionError",
     "StateRepository",
     "StateRepositoryError",
     "StateSerializationError",
