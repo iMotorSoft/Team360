@@ -483,6 +483,9 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
         metadata={"source": "t360"},
     )
 
+    if data.interaction_response:
+        input_.metadata["interaction_response"] = data.interaction_response
+
     try:
         output = runtime.handle_turn(input_)
     except LiteLLMClientError as exc:

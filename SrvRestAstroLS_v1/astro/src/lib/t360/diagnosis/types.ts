@@ -43,4 +43,11 @@ export type T360InteractionEventDetail =
 export type T360InteractionTurnRequest = {
   message: string;
   display_text: string;
+  interaction_response?: {
+    block_type: "single_choice";
+    action_id: string;
+    option_id: string;
+    value: string;
+    label: string;
+  };
 };

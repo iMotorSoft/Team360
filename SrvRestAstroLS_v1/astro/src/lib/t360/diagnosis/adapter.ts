@@ -25,6 +25,13 @@ export function t360InteractionEventToTurnRequest(
     return {
       message: `Sistema de gestión que uso actualmente: ${option.label}.`,
       display_text: `Seleccioné: ${option.label}`,
+      interaction_response: {
+        block_type: "single_choice",
+        action_id: detail.action_id,
+        option_id: option.option_id,
+        value: option.value,
+        label: option.label,
+      },
     };
   }
 

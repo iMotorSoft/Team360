@@ -43,6 +43,7 @@ export interface TurnRequest {
   session_id?: string;
   message: string;
   locale?: string;
+  interaction_response?: Record<string, unknown>;
 }
 
 export interface TurnLanguage {

@@ -141,6 +141,9 @@ class AssistantConversationRuntime:
         # 3. Update semantic memory BEFORE RAG (current message is incorporated now)
         self._update_semantic_memory(state, input)
 
+        # 3.5 Handle interaction response (structured answer from frontend blocks)
+        self._apply_interaction_response(state, input)
+
         # 4. Resolve contradictions
         self._resolve_contradictions(state, input)
 
@@ -371,6 +374,31 @@ class AssistantConversationRuntime:
             mem["current_process"] = process
 
         state.semantic_memory = mem
+
+    @staticmethod
+    def _apply_interaction_response(state: ConversationState, input: AssistantTurnInput) -> None:
+        resp = (input.metadata or {}).get("interaction_response")
+        if not isinstance(resp, dict):
+            return
+        block_type = resp.get("block_type")
+        if block_type != "single_choice":
+            return
+        value = resp.get("value", "")
+        label = resp.get("label", "")
+        if not value or not label:
+            return
+        valid_options = {"whatsapp_business", "crm", "spreadsheet", "custom_system", "none"}
+        if value not in valid_options:
+            return
+        state.slots["management_system"] = value
+        state.slots["management_system_label"] = label
+        state.slots["management_system_choice_status"] = "answered"
+        mem = state.semantic_memory or {}
+        systems = mem.get("systems_and_data_sources", [])
+        if label not in systems:
+            systems.append(label)
+            mem["systems_and_data_sources"] = systems
+            state.semantic_memory = mem
 
     @staticmethod
     def _update_current_process(existing: str, msg: str) -> str:
@@ -701,7 +729,8 @@ class AssistantConversationRuntime:
     def _build_single_choice_block(
         state: ConversationState,
     ) -> dict[str, object] | None:
-        if state.slots.get("single_choice_shown"):
+        status = state.slots.get("management_system_choice_status", "")
+        if status == "answered":
             return None
         mem = state.semantic_memory or {}
         if state.turn_count < 2:
@@ -712,7 +741,8 @@ class AssistantConversationRuntime:
         has_systems = bool(mem.get("systems_and_data_sources"))
         if has_systems:
             return None
-        state.slots["single_choice_shown"] = True
+        if not status:
+            state.slots["management_system_choice_status"] = "offered"
         return {
             "type": "single_choice",
             "question": "¿Dónde se gestionan hoy esas consultas?",

@@ -81,6 +81,7 @@ class PublicTurnRequest(BaseModel):
     session_id: str | None = None
     message: str
     locale: str = "es"
+    interaction_response: dict | None = None
 
 
 class PublicTurnResponse(BaseModel):

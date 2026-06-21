@@ -93,7 +93,7 @@
     return td?.generation?.status === "fallback";
   }
 
-  async function sendRuntimeMessage(text: string, displayText = text, clearComposer = true) {
+  async function sendRuntimeMessage(text: string, displayText = text, clearComposer = true, interactionResponse?: Record<string, unknown>) {
     const requestText = text.trim();
     const userText = displayText.trim();
     if (!requestText || isLoading) return;
@@ -111,6 +111,7 @@
         session_id: sessionId ?? undefined,
         message: requestText,
         locale: currentLocale,
+        interaction_response: interactionResponse,
       }));
       sessionId = result.session_id;
       const turnDecision = result.turn_decision ?? null;
@@ -169,7 +170,7 @@
     const handler = (event: Event) => {
       if (!(event instanceof CustomEvent) || isLoading) return;
       const turn = t360InteractionEventToTurnRequest(event.detail as T360InteractionEventDetail);
-      void sendRuntimeMessage(turn.message, turn.display_text, false);
+      void sendRuntimeMessage(turn.message, turn.display_text, false, turn.interaction_response as Record<string, unknown> | undefined);
     };
     const target = interactionEventRoot;
     if (!target) return;
