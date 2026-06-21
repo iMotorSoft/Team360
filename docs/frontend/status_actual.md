@@ -2,7 +2,7 @@
 
 Objetivo: `documentacion-tecnica-frontend`
 
-Ultima actualizacion: 2026-05-31
+Ultima actualizacion: 2026-06-01
 
 ## Estado general
 
@@ -11,6 +11,28 @@ Ultima actualizacion: 2026-05-31
 La implementacion operativa vive en `SrvRestAstroLS_v1/astro/`; este directorio mantiene decisiones y referencias tecnicas compartidas.
 
 ## Acciones realizadas
+
+### 2026-06-01 - CTA prominente para cambiar workspace en consola mock
+
+- Se reforzó `Cambiar workspace` como CTA soft-outline full-width con borde, fondo suave, icono reutilizado y tamaño táctil cómodo.
+- La acción mantiene destino `/select-workspace`, preservación de `?profile=` y disponibilidad desktop/mobile.
+- El smoke Chromium CDP ahora valida jerarquía visual mínima además de navegación.
+- No se conectaron backend, auth real, permisos productivos, DB ni AG-UI funcional.
+
+### 2026-06-01 - Salida explícita al selector de workspace en consola mock
+
+- Se agregó `Cambiar workspace` debajo del workspace activo para volver a `/select-workspace` desde cualquier pantalla interna.
+- La acción queda visible en sidebar desktop y drawer mobile, con preservación de `?profile=` para perfiles mock no default.
+- Se extendió el smoke Chromium CDP y se generaron capturas focalizadas desktop/mobile.
+- No se conectaron backend, auth real, permisos productivos, DB ni AG-UI funcional.
+
+### 2026-06-01 - Handoff reproducible para diseño de home y consola mock
+
+- Se dejó el acceso home -> consola mock funcional en local mediante `/login`, visible en desktop y mobile.
+- Se corrigió overflow horizontal del header público en `390px`.
+- Se agregó smoke Chromium CDP sin dependencias nuevas y handoff con capturas regenerables.
+- Se validaron check, build estático con `111` páginas y smoke sobre `18` rutas nombradas y `5` viewports.
+- No se conectaron backend, auth real, permisos productivos, DB ni AG-UI funcional.
 
 ### 2026-05-31 - Revisión UX y preparación de Team360 Console para diseño
 

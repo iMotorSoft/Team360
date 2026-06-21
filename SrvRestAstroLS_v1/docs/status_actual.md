@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-05-31
+Ultima actualizacion: 2026-06-04
 
 ## Directorio de trabajo
 
@@ -13,6 +13,46 @@ Ultima actualizacion: 2026-05-31
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql` y `003_team360_pgvector_knowledge_embeddings.sql`. Tambien existe una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar). El backend Litestar productivo sigue pendiente de integracion.
 
 ## Acciones realizadas
+
+### 2026-06-04 - Ajuste del ancho del sidebar en la consola mock
+
+- Se modificó la medida del sidebar de `18.5rem` a `20rem` en `Sidebar.svelte` para hacerlo un poco más ancho.
+- Se adaptó el espaciado izquierdo del shell de la consola de `lg:ps-[18.5rem]` a `lg:ps-[20rem]` en `AppShell.svelte` para evitar solapamientos con el contenido principal.
+
+### 2026-06-03 - Soporte dinámico para logo (imagen y tamaño) y corrección de casing
+
+- Se corrigió la importación de `Team360Logo.astro` en `MarketingHeader.astro` para usar la capitalización exacta `Team360Logo.astro` (con T mayúscula) en lugar de `team360Logo.astro` para resolver discrepancias de casing en sistemas de archivos.
+- Se agregaron las props `logoSrc` (ruta de la imagen) y `size` ("small" | "medium" | "large" | string de Tailwind) al componente `Team360Logo.astro`, permitiendo configurar la imagen del logo y su tamaño dinámicamente.
+- Se eliminaron nodos hermanos inválidos que causaban errores sintácticos de JSX en el renderizado condicional de `!compact`.
+
+### 2026-06-01 - CTA prominente para cambiar workspace en consola mock
+
+- Se convirtió `Cambiar workspace` de link secundario a acción soft-outline full-width dentro del bloque de workspace activo.
+- El CTA usa fondo suave, borde visible, icono de workspace existente, foco claro y altura táctil cómoda en desktop y drawer mobile.
+- Se reforzó el smoke CDP para validar dimensiones mínimas, borde y fondo además de navegación y preservación de `?profile=`.
+- Se regeneraron capturas focalizadas desktop/mobile y se actualizó el handoff.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones ni AG-UI funcional.
+
+### 2026-06-01 - Salida explícita al selector de workspace en consola mock
+
+- Se agregó `Cambiar workspace` debajo del selector activo del sidebar para volver a `/select-workspace` desde cualquier pantalla interna.
+- El CTA queda visible en desktop y accesible en la parte alta del drawer mobile.
+- Para perfiles mock no default conserva `?profile=` al volver al selector.
+- Se extendió `astro/scripts/design-smoke.mjs` con regresión desktop sobre dashboard, servicios, detalle cliente y dashboard partner, más click mobile desde detalle.
+- Se generaron capturas focalizadas desktop/mobile y se actualizó el handoff de diseño.
+- Se validó con `corepack pnpm check`, `corepack pnpm build` y `corepack pnpm design:smoke`.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones ni AG-UI funcional.
+
+### 2026-06-01 - Handoff reproducible para diseño de home y consola mock
+
+- Se ajustó el acceso público de `team360.live` para que `Acceso clientes` navegue localmente a `/login` y quede visible también en mobile.
+- Se corrigió overflow horizontal del header público en `390px` compactando únicamente el label mobile del CTA comercial.
+- Se agregó `astro/scripts/design-smoke.mjs`, smoke CDP sin dependencias nuevas que usa Chromium local y valida rutas, CTA, tabs, drawer, guardas visuales de cliente final y overflow responsive.
+- Se creó `docs/design-review/team360_design_handoff.md` con rama, ejecución local, rutas mock reales, perfiles, limitaciones y checklist para diseño.
+- Se generaron `16` capturas desktop/mobile en `docs/design-review/screenshots/`.
+- Se validó con `corepack pnpm check`, `corepack pnpm build` y `corepack pnpm design:smoke`.
+- Resultado: `0 errors`, `0 warnings`, `0 hints`; build estático OK con `111` páginas; smoke OK sobre `18` rutas nombradas y `5` viewports.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones ni AG-UI funcional.
 
 ### 2026-05-31 - Revisión UX, consistencia visual y preparación para diseño de Team360 Console
 

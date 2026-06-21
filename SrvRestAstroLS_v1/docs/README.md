@@ -13,6 +13,7 @@ Documentacion transversal del proyecto Team360.
 - `console_services_reports_alerts_mock_phase.md`: pantallas mock concretas de servicios, detalle, reportes, alertas, tareas, equipo, settings, workers y runs para diseño funcional.
 - `console_design_review_inventory.md`: inventario de pantallas, rutas, perfiles y prioridades para revisión visual por diseño.
 - `console_ux_visual_review_phase.md`: auditoría UX y pulido visual de la consola mock, incluyendo responsive, accesibilidad básica y validación de perfiles.
+- `design-review/team360_design_handoff.md`: handoff reproducible para diseño con rutas mock, perfiles, limitaciones y capturas desktop/mobile.
 
 ## Decisiones transversales relacionadas
 

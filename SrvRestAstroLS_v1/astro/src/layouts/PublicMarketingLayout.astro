@@ -7,11 +7,13 @@ import "../styles/marketing.css";
 interface Props {
   title?: string;
   description?: string;
+  diagnosticHref?: string;
 }
 
 const {
   title = "Team360 | Automatización con IA para procesos reales",
   description = "Team360 ayuda a empresas a diagnosticar, implementar y medir automatizaciones con IA aplicadas a procesos reales de negocio.",
+  diagnosticHref = "#contacto",
 } = Astro.props;
 ---
 
@@ -31,8 +33,8 @@ const {
     <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#102d4f] focus:shadow-lg" href="#contenido">
       Saltar al contenido
     </a>
-    <MarketingHeader />
+    <MarketingHeader diagnosticHref={diagnosticHref} />
     <slot />
-    <MarketingFooter />
+    <MarketingFooter diagnosticHref={diagnosticHref} />
   </body>
 </html>

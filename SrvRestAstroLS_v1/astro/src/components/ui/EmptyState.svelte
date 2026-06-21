@@ -26,14 +26,22 @@
   };
 </script>
 
-<section class={`rounded-2xl border border-dashed border-[#d7e3e5] bg-white/70 p-5 ${className}`}>
-  <p class="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-[#168b88]">{eyebrowByVariant[variant]}</p>
-  <h2 class="mt-2 text-sm font-bold text-[#31536b]">{title}</h2>
-  <p class="mt-2 max-w-2xl text-xs leading-5 text-[#78909f]">{description}</p>
+<section
+  class={`flex flex-col items-center justify-center rounded-2xl border-3 border-dashed border-slate-300 bg-slate-50/50 px-6 py-12 text-center ${className}`}
+>
+  <p class="top-badge mb-3">{eyebrowByVariant[variant]}</p>
+  <h2 class="text-xl font-bold text-[#31536b]">{title}</h2>
+  <p class="mt-2 max-w-md text-lg leading-relaxed text-[#78909f]">
+    {description}
+  </p>
   {#if nextStep}
-    <p class="mt-3 text-xs font-semibold leading-5 text-[#587184]">Próximo paso: {nextStep}</p>
+    <p
+      class="mt-4 rounded-lg px-3 py-1.5 text-base border border-slate-300 font-medium text-[#587184]"
+    >
+      Próximo paso: {nextStep}
+    </p>
   {/if}
   {#if actions}
-    <div class="mt-4">{@render actions()}</div>
+    <div class="mt-6">{@render actions()}</div>
   {/if}
 </section>

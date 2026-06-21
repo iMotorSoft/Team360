@@ -1,17 +1,41 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatCard, StatusBadge } from "../../ui";
+  import {
+    Card,
+    EmptyState,
+    SectionHeader,
+    StatCard,
+    StatusBadge,
+  } from "../../ui";
   import { formatDateTime } from "../../../lib/formatters";
-  import { getOrganizationNameForWorkspace, getVisibleServices, getWorkspaceName } from "../../../lib/mock";
-  import { buildServiceDetailRoute, deriveConsoleAudience } from "../../../lib/navigation/derive";
+  import {
+    getOrganizationNameForWorkspace,
+    getVisibleServices,
+    getWorkspaceName,
+  } from "../../../lib/mock";
+  import {
+    buildServiceDetailRoute,
+    deriveConsoleAudience,
+  } from "../../../lib/navigation/derive";
   import { consoleContext } from "../../../stores/consoleContext.svelte";
 
   const audience = $derived(deriveConsoleAudience(consoleContext.bootstrap));
   const visibleServices = $derived.by(() => {
     const services = getVisibleServices(consoleContext.bootstrap);
-    return audience === "client" ? services.filter(({ workspaceId }) => workspaceId === consoleContext.activeWorkspace.id) : services;
+    return audience === "client"
+      ? services.filter(
+          ({ workspaceId }) =>
+            workspaceId === consoleContext.activeWorkspace.id,
+        )
+      : services;
   });
-  const activeServices = $derived(visibleServices.filter(({ status }) => status === "active").length);
-  const attentionServices = $derived(visibleServices.filter(({ health }) => ["warning", "critical", "pending"].includes(health)).length);
+  const activeServices = $derived(
+    visibleServices.filter(({ status }) => status === "active").length,
+  );
+  const attentionServices = $derived(
+    visibleServices.filter(({ health }) =>
+      ["warning", "critical", "pending"].includes(health),
+    ).length,
+  );
 </script>
 
 <section>
@@ -26,57 +50,144 @@
   />
 
   <div class="mt-7 grid gap-3 sm:grid-cols-3">
-    <StatCard label="Servicios visibles" value={String(visibleServices.length)} description="Según perfil y alcance mock." />
-    <StatCard label="Activos" value={String(activeServices)} description="Prestaciones en funcionamiento." />
-    <StatCard label="Con seguimiento" value={String(attentionServices)} description="Requieren revisión o configuración." />
+    <StatCard
+      label="Servicios visibles"
+      value={String(visibleServices.length)}
+      description="Según perfil y alcance mock."
+    />
+    <StatCard
+      label="Activos"
+      value={String(activeServices)}
+      description="Prestaciones en funcionamiento."
+    />
+    <StatCard
+      label="Con seguimiento"
+      value={String(attentionServices)}
+      description="Requieren revisión o configuración."
+    />
   </div>
 
-  <div class="mt-6 grid gap-4 xl:grid-cols-2">
+  <div class="mt-6 grid gap-6">
     {#each visibleServices as service}
-      <article class="rounded-3xl border border-[#e0e8ea] bg-white p-5 shadow-[0_24px_60px_-54px_rgba(16,45,79,0.7)] sm:p-6">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <Card variant="large" class="flex flex-col justify-between">
+        <div>
+          <!-- Cabecera: Títulos y Estado -->
+          <div
+            class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"
+          >
+            <div class="max-w-3xl">
+              <div class="flex flex-wrap items-baseline gap-x-3">
+                <span class="top-badge">
+                  {service.packageName}
+                </span>
+                <span class="text-[#cbd5db]">•</span>
+                <span class="text-base font-semibold text-[#78909f]">
+                  {service.category}
+                </span>
+              </div>
+              <h2
+                class="mt-3 text-3xl font-bold tracking-[-0.035em] text-[#173b5b]"
+              >
+                {service.name}
+              </h2>
+              <p class="mt-3 text-lg leading-relaxed text-[#69808f]">
+                {audience === "client"
+                  ? service.clientSummary
+                  : service.description}
+              </p>
+            </div>
+            <div
+              class="flex shrink-0 flex-col items-start sm:items-end gap-3 mt-4 sm:mt-0"
+            >
+              <div class="flex flex-wrap justify-end gap-2">
+                <StatusBadge status={service.status} />
+                <StatusBadge status={service.health} />
+              </div>
+              <p class="text-base font-medium text-[#91a2ad]">
+                Actualizado: {formatDateTime(
+                  service.lastRunAt,
+                  consoleContext.locale,
+                )}
+              </p>
+            </div>
+          </div>
+
+          <!-- Contexto (si no es cliente) -->
+          {#if audience !== "client"}
+            <div
+              class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-[#edf1f2]
+              bg-[#fcfdfd] px-5 py-4 text-base"
+            >
+              <div class="flex items-center gap-2.5">
+                <span class="text-[#91a2ad]">Organización:</span>
+                <span class="font-bold text-[#47657b]"
+                  >{getOrganizationNameForWorkspace(service.workspaceId)}</span
+                >
+              </div>
+              <div class="hidden h-5 w-px bg-[#edf1f2] sm:block"></div>
+              <div class="flex items-center gap-2.5">
+                <span class="text-[#91a2ad]">Workspace:</span>
+                <span class="font-bold text-[#47657b]"
+                  >{getWorkspaceName(service.workspaceId)}</span
+                >
+              </div>
+            </div>
+          {/if}
+
+          <!-- Métricas -->
+          {#if service.metrics.length > 0}
+            <div class="mt-8 grid gap-4 sm:grid-cols-3">
+              {#each service.metrics.slice(0, 3) as metric}
+                <div
+                  class="rounded-2xl bg-green-100 border border-transparent hover:border-primary/20 p-5 transition-colors
+                  "
+                >
+                  <p class="top-badge">
+                    {metric.label}
+                  </p>
+                  <div class="mt-3 flex items-baseline gap-3">
+                    <p class="text-4xl font-bold tracking-tight text-[#214762]">
+                      {metric.value}
+                    </p>
+                    {#if metric.trend}
+                      <p class="text-lg font-bold text-[#168b88]">
+                        {metric.trend}
+                      </p>
+                    {/if}
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {/if}
+        </div>
+
+        <!-- Footer: Próximo Paso y Acción -->
+        <div
+          class="mt-8 flex flex-col gap-5 border-t border-[#edf1f2] pt-6 sm:flex-row sm:items-center sm:justify-between"
+        >
           <div>
-            <p class="text-[0.68rem] font-bold uppercase tracking-[0.15em] text-[#168b88]">{service.packageName}</p>
-            <h2 class="mt-2 text-lg font-bold tracking-[-0.035em] text-[#173b5b]">{service.name}</h2>
-            <p class="mt-2 text-xs leading-5 text-[#78909f]">
-              {audience === "client" ? service.clientSummary : service.description}
+            <p
+              class="text-sm font-bold uppercase tracking-[0.15em] text-[#91a2ad]"
+            >
+              Próximo paso
+            </p>
+            <p class="mt-1 text-lg font-bold text-[#47657b]">
+              {service.nextStep}
             </p>
           </div>
-          <div class="flex shrink-0 flex-wrap gap-2">
-            <StatusBadge status={service.status} />
-            <StatusBadge status={service.health} />
-          </div>
-        </div>
-
-        <div class="mt-5 grid gap-2 sm:grid-cols-3">
-          {#each service.metrics.slice(0, 3) as metric}
-            <div class="rounded-xl bg-[#f3f8f8] p-3">
-              <p class="text-lg font-bold tracking-[-0.04em] text-[#214762]">{metric.value}</p>
-              <p class="mt-1 text-[0.68rem] leading-4 text-[#78909f]">{metric.label}</p>
-              {#if metric.trend}<p class="mt-1 text-[0.64rem] font-bold text-[#168b88]">{metric.trend}</p>{/if}
-            </div>
-          {/each}
-        </div>
-
-        <dl class="mt-5 grid gap-3 border-t border-[#edf1f2] pt-4 text-xs text-[#78909f] sm:grid-cols-2">
-          <div><dt class="font-bold uppercase tracking-[0.1em] text-[#9aa9b1]">Categoría</dt><dd class="mt-1 font-semibold text-[#587184]">{service.category}</dd></div>
-          <div><dt class="font-bold uppercase tracking-[0.1em] text-[#9aa9b1]">Última ejecución</dt><dd class="mt-1 font-semibold text-[#587184]">{formatDateTime(service.lastRunAt, consoleContext.locale)}</dd></div>
-          {#if audience !== "client"}
-            <div><dt class="font-bold uppercase tracking-[0.1em] text-[#9aa9b1]">Organización</dt><dd class="mt-1 font-semibold text-[#587184]">{getOrganizationNameForWorkspace(service.workspaceId)}</dd></div>
-            <div><dt class="font-bold uppercase tracking-[0.1em] text-[#9aa9b1]">Workspace</dt><dd class="mt-1 font-semibold text-[#587184]">{getWorkspaceName(service.workspaceId)}</dd></div>
-          {/if}
-        </dl>
-
-        <div class="mt-5 flex flex-col gap-3 rounded-2xl bg-[#f8fbfa] p-3.5 sm:flex-row sm:items-center sm:justify-between">
-          <p class="text-xs font-semibold leading-5 text-[#668092]">Próximo paso: {service.nextStep}</p>
           <a
-            class="inline-flex shrink-0 justify-center rounded-full bg-[#153b5b] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#168b88]"
-            href={buildServiceDetailRoute(service.workspaceId, service.id, consoleContext.activeProfile)}
+            class="inline-flex shrink-0 items-center justify-center rounded-full bg-[#153b5b] px-6 py-3
+            text-base font-bold text-white transition hover:bg-[#153b5b]/80"
+            href={buildServiceDetailRoute(
+              service.workspaceId,
+              service.id,
+              consoleContext.activeProfile,
+            )}
           >
             Ver servicio
           </a>
         </div>
-      </article>
+      </Card>
     {/each}
     {#if visibleServices.length === 0}
       <EmptyState

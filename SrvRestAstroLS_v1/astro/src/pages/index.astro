@@ -33,20 +33,53 @@ const steps = [
 ];
 
 const entryPaths = [
-  ["Diagnóstico de Automatización", "Un punto de partida claro para entender qué conviene automatizar, en qué orden y con qué nivel de control."],
-  ["Automatización Inicial", "Una primera implementación acotada para validar el proceso, reducir carga manual y aprender con evidencia."],
-  ["Agente Operativo", "Asistencia aplicada a tareas repetitivas, seguimiento y coordinación dentro de un proceso definido."],
-  ["Reportes Inteligentes", "Información operativa ordenada para revisar resultados, detectar desvíos y decidir con mejor contexto."],
-  ["Plataforma Cliente", "Un espacio privado para consultar servicios, avances, reportes y alertas de forma simple."],
+  [
+    "Diagnóstico de Automatización",
+    "Un punto de partida claro para entender qué conviene automatizar, en qué orden y con qué nivel de control.",
+  ],
+  [
+    "Automatización Inicial",
+    "Una primera implementación acotada para validar el proceso, reducir carga manual y aprender con evidencia.",
+  ],
+  [
+    "Agente Operativo",
+    "Asistencia aplicada a tareas repetitivas, seguimiento y coordinación dentro de un proceso definido.",
+  ],
+  [
+    "Reportes Inteligentes",
+    "Información operativa ordenada para revisar resultados, detectar desvíos y decidir con mejor contexto.",
+  ],
+  [
+    "Plataforma Cliente",
+    "Un espacio privado para consultar servicios, avances, reportes y alertas de forma simple.",
+  ],
 ];
 
 const useCases = [
-  ["Leads, CRM y WhatsApp", "Ordenar consultas, seguimientos y tareas comerciales para que cada oportunidad tenga continuidad."],
-  ["Reportes de gestión", "Transformar datos dispersos en reportes periódicos y tableros claros para dirección."],
-  ["Stock y publicaciones", "Acompañar controles operativos y actualización de información en canales de venta."],
-  ["Extractos y conciliaciones", "Reducir trabajo manual en procesos administrativos repetitivos que requieren revisión."],
-  ["Datos de sistemas existentes", "Recuperar, ordenar y conectar información sin obligar al equipo a empezar de cero."],
-  ["Seguimiento comercial", "Dar visibilidad a pendientes, avances y resultados para sostener una operación más ordenada."],
+  [
+    "Leads, CRM y WhatsApp",
+    "Ordenar consultas, seguimientos y tareas comerciales para que cada oportunidad tenga continuidad.",
+  ],
+  [
+    "Reportes de gestión",
+    "Transformar datos dispersos en reportes periódicos y tableros claros para dirección.",
+  ],
+  [
+    "Stock y publicaciones",
+    "Acompañar controles operativos y actualización de información en canales de venta.",
+  ],
+  [
+    "Extractos y conciliaciones",
+    "Reducir trabajo manual en procesos administrativos repetitivos que requieren revisión.",
+  ],
+  [
+    "Datos de sistemas existentes",
+    "Recuperar, ordenar y conectar información sin obligar al equipo a empezar de cero.",
+  ],
+  [
+    "Seguimiento comercial",
+    "Dar visibilidad a pendientes, avances y resultados para sostener una operación más ordenada.",
+  ],
 ];
 
 const method = [
@@ -62,32 +95,64 @@ const method = [
   <main id="contenido">
     <section class="relative isolate overflow-hidden">
       <div class="marketing-grid absolute inset-0 -z-20 opacity-55"></div>
-      <div class="absolute -left-40 -top-36 -z-10 size-[34rem] rounded-full bg-[#d7f3ee]/70 blur-3xl"></div>
-      <div class="absolute -right-48 top-24 -z-10 size-[32rem] rounded-full bg-[#dbe7f4]/75 blur-3xl"></div>
+      <div
+        class="absolute -left-40 -top-36 -z-10 size-[34rem] rounded-full bg-[#d7f3ee]/70 blur-3xl"
+      >
+      </div>
+      <div
+        class="absolute -right-48 top-24 -z-10 size-[32rem] rounded-full bg-[#dbe7f4]/75 blur-3xl"
+      >
+      </div>
 
-      <div class="mx-auto grid max-w-7xl gap-14 px-5 pb-24 pt-16 sm:px-8 sm:pb-28 sm:pt-20 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-16 lg:px-10 lg:pb-36 lg:pt-28">
+      <div
+        class="mx-auto grid max-w-7xl gap-14 px-5 pb-24 pt-16 sm:px-8 sm:pb-28 sm:pt-20 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-16 lg:px-10 lg:pb-36 lg:pt-28"
+      >
         <div>
-          <Badge variant="info" class="h-auto rounded-full border border-[#b9dfe3] bg-[#effafa] px-3 py-2 text-[0.69rem] font-bold uppercase tracking-[0.15em] text-[#247c82]">
+          <Badge
+            variant="info"
+            class="h-auto rounded-full border border-[#b9dfe3] bg-[#effafa] px-3 py-2 text-xs
+            font-bold uppercase tracking-[0.15em] text-[#247c82]"
+          >
             IA aplicada con criterio de negocio
           </Badge>
-          <h1 class="mt-7 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.07em] text-[#102d4f] sm:text-6xl lg:text-[4.9rem]">
+          <h1
+            class="mt-7 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.07em] text-[#102d4f] sm:text-6xl lg:text-[4.9rem]"
+          >
             Automatización con IA para procesos reales de negocio.
           </h1>
           <p class="mt-7 max-w-2xl text-lg leading-8 text-[#5a6e80] sm:text-xl">
-            Team360 ayuda a empresas a detectar qué tareas conviene automatizar, implementar soluciones
-            por etapas y medir resultados sin transformar la tecnología en una carga para el equipo.
+            Team360 ayuda a empresas a detectar qué tareas conviene automatizar,
+            implementar soluciones por etapas y medir resultados sin transformar
+            la tecnología en una carga para el equipo.
           </p>
           <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-            <LinkButton href="#contacto" size="large" class="px-7">Solicitar diagnóstico</LinkButton>
-            <LinkButton href="#solucion" variant="ghost" size="large" class="border border-[#cfdbdf] bg-white/55 px-7 text-[#244966] hover:bg-white">
+            <LinkButton href="#contacto" size="large" class="px-7"
+              >Solicitar diagnóstico</LinkButton
+            >
+            <LinkButton
+              href="#solucion"
+              variant="ghost"
+              size="large"
+              class="border border-[#cfdbdf] bg-white/55 px-7 text-[#244966] hover:bg-white"
+            >
               Ver cómo funciona
               <span aria-hidden="true">↓</span>
             </LinkButton>
           </div>
-          <div class="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-[#607587]">
-            <span class="inline-flex items-center gap-2"><span class="size-1.5 rounded-full bg-[#28aa9e]"></span> Diagnóstico consultivo</span>
-            <span class="inline-flex items-center gap-2"><span class="size-1.5 rounded-full bg-[#28aa9e]"></span> Pruebas controladas</span>
-            <span class="inline-flex items-center gap-2"><span class="size-1.5 rounded-full bg-[#28aa9e]"></span> Seguimiento medible</span>
+          <div
+            class="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-base font-medium text-[#607587]"
+          >
+            <span class="inline-flex items-center gap-2"
+              ><span class="size-1.5 rounded-full bg-[#28aa9e]"></span> Diagnóstico
+              consultivo</span
+            >
+            <span class="inline-flex items-center gap-2"
+              ><span class="size-1.5 rounded-full bg-[#28aa9e]"></span> Pruebas controladas</span
+            >
+            <span class="inline-flex items-center gap-2"
+              ><span class="size-1.5 rounded-full bg-[#28aa9e]"></span> Seguimiento
+              medible</span
+            >
           </div>
         </div>
 
@@ -104,16 +169,21 @@ const method = [
         />
 
         <div class="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {problems.map((problem) => (
-            <article class="rounded-2xl border border-[#e3eaed] bg-[#fbfcfa] p-5">
-              <div class="flex gap-4">
-                <span class="mt-1 grid size-7 shrink-0 place-items-center rounded-full bg-[#e6f7f4] text-[#168b88]" aria-hidden="true">
-                  <span class="size-2 rounded-full bg-[#2eaaa0]"></span>
-                </span>
-                <p class="text-sm leading-6 text-[#526b7e]">{problem}</p>
-              </div>
-            </article>
-          ))}
+          {
+            problems.map((problem) => (
+              <article class="rounded-2xl border border-[#e3eaed] bg-[#fbfcfa] p-5">
+                <div class="flex gap-4">
+                  <span
+                    class="mt-1 grid size-7 shrink-0 place-items-center rounded-full bg-[#e6f7f4] text-[#168b88]"
+                    aria-hidden="true"
+                  >
+                    <span class="size-2 rounded-full bg-[#2eaaa0]" />
+                  </span>
+                  <p class="text-base leading-6 text-[#526b7e]">{problem}</p>
+                </div>
+              </article>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -127,14 +197,22 @@ const method = [
         />
 
         <div class="mt-14 grid gap-4 lg:grid-cols-3">
-          {steps.map((step) => (
-            <article class="relative overflow-hidden rounded-[1.75rem] border border-[#dde7ea] bg-white p-7 shadow-[0_20px_45px_-40px_rgba(16,45,79,0.55)] sm:p-8">
-              <p class="text-sm font-bold tracking-[0.16em] text-[#168b88]">{step.number}</p>
-              <h3 class="mt-10 text-2xl font-semibold tracking-[-0.04em] text-[#123452]">{step.title}</h3>
-              <p class="mt-4 text-sm leading-7 text-[#607486]">{step.text}</p>
-              <div class="absolute -bottom-6 -right-6 size-24 rounded-full border border-[#d9f2ef] bg-[#effaf8]"></div>
-            </article>
-          ))}
+          {
+            steps.map((step) => (
+              <article class="relative overflow-hidden rounded-[1.75rem] border border-[#dde7ea] bg-white p-7 shadow-[0_20px_45px_-40px_rgba(16,45,79,0.55)] sm:p-8">
+                <p class="text-base font-bold tracking-[0.16em] text-[#168b88]">
+                  {step.number}
+                </p>
+                <h3 class="mt-10 text-2xl font-semibold tracking-[-0.04em] text-[#123452]">
+                  {step.title}
+                </h3>
+                <p class="mt-4 text-base leading-7 text-[#607486]">
+                  {step.text}
+                </p>
+                <div class="absolute -bottom-6 -right-6 size-24 rounded-full border border-[#d9f2ef] bg-[#effaf8]" />
+              </article>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -143,26 +221,46 @@ const method = [
       <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
         <div class="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           <div>
-            <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#8be1d8]">Caminos de entrada</p>
-            <h2 class="mt-4 text-3xl font-semibold leading-tight tracking-[-0.05em] sm:text-4xl">
+            <p
+              class="text-sm font-bold uppercase tracking-[0.2em] text-[#8be1d8]"
+            >
+              Caminos de entrada
+            </p>
+            <h2
+              class="mt-4 text-3xl font-semibold leading-tight tracking-[-0.05em] sm:text-4xl"
+            >
               Empezar bien importa más que empezar grande.
             </h2>
-            <p class="mt-5 max-w-xl text-base leading-7 text-white/68">
-              Cada empresa tiene un punto de partida distinto. Por eso proponemos recorridos claros,
-              con alcance entendible y pruebas controladas antes de ampliar la implementación.
+            <p class="mt-5 max-w-xl text-lg leading-7 text-white/68">
+              Cada empresa tiene un punto de partida distinto. Por eso
+              proponemos recorridos claros, con alcance entendible y pruebas
+              controladas antes de ampliar la implementación.
             </p>
           </div>
 
           <div class="grid gap-3 sm:grid-cols-2">
-            {entryPaths.map(([title, text], index) => (
-              <article class:list={["rounded-2xl border p-5", index === 0 ? "border-[#70d7cd]/50 bg-[#1b4d68]" : "border-white/12 bg-white/[0.055]"]}>
-                <div class="flex items-center justify-between gap-4">
-                  <h3 class="font-semibold tracking-[-0.02em] text-white">{title}</h3>
-                  <span class="text-sm font-bold text-[#8be1d8]">{String(index + 1).padStart(2, "0")}</span>
-                </div>
-                <p class="mt-3 text-sm leading-6 text-white/64">{text}</p>
-              </article>
-            ))}
+            {
+              entryPaths.map(([title, text], index) => (
+                <article
+                  class:list={[
+                    "rounded-2xl border p-5",
+                    index === 0
+                      ? "border-[#70d7cd]/50 bg-[#1b4d68]"
+                      : "border-white/12 bg-white/[0.055]",
+                  ]}
+                >
+                  <div class="flex items-center justify-between gap-4">
+                    <h3 class="font-semibold tracking-[-0.02em] text-white">
+                      {title}
+                    </h3>
+                    <span class="text-base font-bold text-[#8be1d8]">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <p class="mt-3 text-base leading-6 text-white/64">{text}</p>
+                </article>
+              ))
+            }
           </div>
         </div>
       </div>
@@ -178,19 +276,30 @@ const method = [
         />
 
         <div class="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {useCases.map(([title, text], index) => (
-            <article class="group rounded-[1.5rem] border border-[#e0e8eb] bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-[#b9deda] hover:shadow-[0_22px_45px_-36px_rgba(16,45,79,0.55)]">
-              <span class="grid size-11 place-items-center rounded-2xl bg-[#eaf7f5] text-sm font-bold text-[#168b88]">{String(index + 1).padStart(2, "0")}</span>
-              <h3 class="mt-6 text-lg font-semibold tracking-[-0.03em] text-[#153854]">{title}</h3>
-              <p class="mt-3 text-sm leading-6 text-[#637687]">{text}</p>
-            </article>
-          ))}
+          {
+            useCases.map(([title, text], index) => (
+              <article class="group rounded-[1.5rem] border border-[#e0e8eb] bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-[#b9deda] hover:shadow-[0_22px_45px_-36px_rgba(16,45,79,0.55)]">
+                <span class="grid size-11 place-items-center rounded-2xl bg-[#eaf7f5] text-base font-bold text-[#168b88]">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 class="mt-6 text-lg font-semibold tracking-[-0.03em] text-[#153854]">
+                  {title}
+                </h3>
+                <p class="mt-3 text-base leading-6 text-[#637687]">{text}</p>
+              </article>
+            ))
+          }
         </div>
       </div>
     </section>
 
-    <section id="metodo" class="scroll-mt-24 border-y border-[#e2eaec] bg-[#f2f7f7] py-24 sm:py-28">
-      <div class="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:gap-20 lg:px-10">
+    <section
+      id="metodo"
+      class="scroll-mt-24 border-y border-[#e2eaec] bg-[#f2f7f7] py-24 sm:py-28"
+    >
+      <div
+        class="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:gap-20 lg:px-10"
+      >
         <div>
           <SectionHeading
             eyebrow="Confianza por método"
@@ -198,49 +307,87 @@ const method = [
             description="Nuestro enfoque combina tecnología aplicada, criterio operativo y acompañamiento. Evitamos automatizar por automatizar: buscamos mejoras sostenibles para la empresa y su equipo."
           />
           <div class="mt-8">
-            <LinkButton href="#contacto" variant="neutral">Conversemos sobre tu proceso</LinkButton>
+            <LinkButton
+              href="#contacto"
+              variant="neutral"
+              class="h-12 px-3 text-xs sm:px-6 sm:text-lg"
+            >
+              Conversemos sobre tu proceso</LinkButton
+            >
           </div>
         </div>
 
         <ol class="space-y-3">
-          {method.map((item, index) => (
-            <li class="flex items-center gap-4 rounded-2xl border border-[#dce6e8] bg-white/80 p-4 sm:p-5">
-              <span class="grid size-9 shrink-0 place-items-center rounded-full bg-[#102d4f] text-xs font-bold text-white">
-                {index + 1}
-              </span>
-              <span class="text-sm font-medium leading-6 text-[#476275] sm:text-base">{item}</span>
-            </li>
-          ))}
+          {
+            method.map((item, index) => (
+              <li class="flex items-center gap-4 rounded-2xl border border-[#dce6e8] bg-white/80 p-4 sm:p-5">
+                <span class="grid size-9 shrink-0 place-items-center rounded-full bg-[#102d4f] text-sm font-bold text-white">
+                  {index + 1}
+                </span>
+                <span class="text-sm font-medium leading-6 text-[#476275] sm:text-lg">
+                  {item}
+                </span>
+              </li>
+            ))
+          }
         </ol>
       </div>
     </section>
 
     <section class="py-24 sm:py-32">
       <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-        <div class="overflow-hidden rounded-[2rem] border border-[#dfe8ea] bg-white shadow-[0_28px_80px_-58px_rgba(16,45,79,0.6)]">
+        <div
+          class="overflow-hidden rounded-[2rem] border border-[#dfe8ea] bg-white shadow-[0_28px_80px_-58px_rgba(16,45,79,0.6)]"
+        >
           <div class="grid lg:grid-cols-[0.94fr_1.06fr]">
             <div class="bg-[#eaf7f5] p-7 sm:p-10 lg:p-12">
-              <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#168b88]">Más que una conversación con IA</p>
-              <h2 class="mt-4 text-3xl font-semibold leading-tight tracking-[-0.05em] text-[#102d4f] sm:text-4xl">
+              <p
+                class="text-sm font-bold uppercase tracking-[0.2em] text-[#168b88]"
+              >
+                Más que una conversación con IA
+              </p>
+              <h2
+                class="mt-4 text-3xl font-semibold leading-tight tracking-[-0.05em] text-[#102d4f] sm:text-4xl"
+              >
                 Tecnología conectada con la operación.
               </h2>
-              <p class="mt-5 text-base leading-7 text-[#567184]">
-                Una herramienta aislada puede ayudar en una tarea puntual. Team360 busca integrar esa capacidad
-                dentro de procesos comprensibles, con seguimiento y resultados que la empresa pueda revisar.
+              <p class="mt-5 text-lg leading-7 text-[#567184]">
+                Una herramienta aislada puede ayudar en una tarea puntual.
+                Team360 busca integrar esa capacidad dentro de procesos
+                comprensibles, con seguimiento y resultados que la empresa pueda
+                revisar.
               </p>
             </div>
             <div class="grid gap-px bg-[#e1e9eb] sm:grid-cols-2">
-              {[
-                ["Proceso", "Partimos de una necesidad concreta, no de una moda tecnológica."],
-                ["Integración", "Trabajamos sobre tareas y sistemas que ya forman parte del negocio."],
-                ["Trazabilidad", "Ordenamos avances, alertas y resultados para facilitar el seguimiento."],
-                ["Acompañamiento", "La mejora se construye por etapas junto al equipo responsable."],
-              ].map(([title, text]) => (
-                <article class="bg-white p-6 sm:p-7">
-                  <h3 class="font-semibold tracking-[-0.02em] text-[#173b5b]">{title}</h3>
-                  <p class="mt-3 text-sm leading-6 text-[#667989]">{text}</p>
-                </article>
-              ))}
+              {
+                [
+                  [
+                    "Proceso",
+                    "Partimos de una necesidad concreta, no de una moda tecnológica.",
+                  ],
+                  [
+                    "Integración",
+                    "Trabajamos sobre tareas y sistemas que ya forman parte del negocio.",
+                  ],
+                  [
+                    "Trazabilidad",
+                    "Ordenamos avances, alertas y resultados para facilitar el seguimiento.",
+                  ],
+                  [
+                    "Acompañamiento",
+                    "La mejora se construye por etapas junto al equipo responsable.",
+                  ],
+                ].map(([title, text]) => (
+                  <article class="bg-white p-6 sm:p-7">
+                    <h3 class="font-semibold tracking-[-0.02em] text-[#173b5b]">
+                      {title}
+                    </h3>
+                    <p class="mt-3 text-base leading-6 text-[#667989]">
+                      {text}
+                    </p>
+                  </article>
+                ))
+              }
             </div>
           </div>
         </div>
@@ -249,18 +396,33 @@ const method = [
 
     <section id="partners" class="scroll-mt-24 pb-24 sm:pb-32">
       <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-        <div class="relative overflow-hidden rounded-[2rem] bg-[#153b5b] px-7 py-10 text-white sm:px-10 sm:py-12 lg:px-14">
-          <div class="absolute -right-24 -top-28 size-72 rounded-full border border-white/10 bg-[#2b9c99]/20"></div>
+        <div
+          class="relative overflow-hidden rounded-[2rem] bg-[#153b5b] px-7 py-10 text-white sm:px-10 sm:py-12 lg:px-14"
+        >
+          <div
+            class="absolute -right-24 -top-28 size-72 rounded-full border border-white/10 bg-[#2b9c99]/20"
+          >
+          </div>
           <div class="relative max-w-3xl">
-            <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#8be1d8]">Red de partners</p>
-            <h2 class="mt-4 text-3xl font-semibold leading-tight tracking-[-0.05em] sm:text-4xl">
+            <p
+              class="text-base font-bold uppercase tracking-[0.2em] text-[#8be1d8]"
+            >
+              Red de partners
+            </p>
+            <h2
+              class="mt-4 text-3xl font-semibold leading-tight tracking-[-0.05em] sm:text-4xl"
+            >
               Automatización cercana para mercados y comunidades específicas.
             </h2>
             <p class="mt-5 text-base leading-7 text-white/68 sm:text-lg">
-              Team360 está preparado para trabajar con partners que acercan automatización con IA a mercados,
-              comunidades o verticales específicas, con una propuesta profesional y acompañada.
+              Team360 está preparado para trabajar con partners que acercan
+              automatización con IA a mercados, comunidades o verticales
+              específicas, con una propuesta profesional y acompañada.
             </p>
-            <a class="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#9ce7df] transition hover:text-white" href="mailto:contacto@team360.live?subject=Programa%20de%20partners%20Team360">
+            <a
+              class="mt-7 inline-flex items-center gap-2 text-lg font-bold text-[#9ce7df] transition hover:text-white"
+              href="mailto:contacto@team360.live?subject=Programa%20de%20partners%20Team360"
+            >
               Conversar sobre el programa de partners
               <span aria-hidden="true">→</span>
             </a>
@@ -271,13 +433,20 @@ const method = [
 
     <section id="contacto" class="scroll-mt-24 bg-[#e9f5f3] py-20 sm:py-24">
       <div class="mx-auto max-w-4xl px-5 text-center sm:px-8">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#168b88]">Primer paso</p>
-        <h2 class="mt-4 text-4xl font-semibold leading-tight tracking-[-0.06em] text-[#102d4f] sm:text-5xl">
+        <p class="text-sm font-bold uppercase tracking-[0.2em] text-[#168b88]">
+          Primer paso
+        </p>
+        <h2
+          class="mt-4 text-4xl font-semibold leading-tight tracking-[-0.06em] text-[#102d4f] sm:text-5xl"
+        >
           Empezá con un diagnóstico claro.
         </h2>
-        <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#5b7283] sm:text-lg">
-          Contanos qué proceso querés mejorar. Revisamos el punto de partida y conversamos sobre una primera
-          etapa realista, medible y adecuada para tu equipo.
+        <p
+          class="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#5b7283] sm:text-lg"
+        >
+          Contanos qué proceso querés mejorar. Revisamos el punto de partida y
+          conversamos sobre una primera etapa realista, medible y adecuada para
+          tu equipo.
         </p>
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <LinkButton
@@ -287,12 +456,18 @@ const method = [
           >
             Solicitar diagnóstico
           </LinkButton>
-          <LinkButton href="mailto:contacto@team360.live" variant="ghost" size="large" class="border border-[#bfd7d6] bg-white/50 px-8 text-[#244966] hover:bg-white">
+          <LinkButton
+            href="mailto:contacto@team360.live"
+            variant="ghost"
+            size="large"
+            class="border border-[#bfd7d6] bg-white/50 px-8 text-[#244966] hover:bg-white"
+          >
             contacto@team360.live
           </LinkButton>
         </div>
-        <p class="mt-5 text-xs leading-5 text-[#71878e]">
-          En esta primera versión, el contacto se inicia por email. La integración del formulario se incorporará en una etapa posterior.
+        <p class="mt-5 text-sm leading-5 text-[#71878e]">
+          En esta primera versión, el contacto se inicia por email. La
+          integración del formulario se incorporará en una etapa posterior.
         </p>
       </div>
     </section>

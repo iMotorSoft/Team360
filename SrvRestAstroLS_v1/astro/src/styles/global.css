@@ -6,26 +6,26 @@
   default: true;
   prefersdark: false;
   color-scheme: light;
-  --color-base-100: oklch(99% 0.004 255);
-  --color-base-200: oklch(96% 0.008 255);
-  --color-base-300: oklch(92% 0.014 255);
-  --color-base-content: oklch(23% 0.03 255);
-  --color-primary: oklch(56% 0.2 258);
-  --color-primary-content: oklch(98% 0.01 255);
-  --color-secondary: oklch(63% 0.14 203);
-  --color-secondary-content: oklch(98% 0.01 203);
-  --color-accent: oklch(68% 0.16 155);
-  --color-accent-content: oklch(20% 0.04 155);
-  --color-neutral: oklch(38% 0.035 255);
-  --color-neutral-content: oklch(98% 0.01 255);
-  --color-info: oklch(70% 0.14 235);
-  --color-info-content: oklch(20% 0.04 235);
-  --color-success: oklch(68% 0.17 150);
-  --color-success-content: oklch(20% 0.04 150);
-  --color-warning: oklch(80% 0.16 85);
-  --color-warning-content: oklch(24% 0.05 85);
-  --color-error: oklch(64% 0.21 28);
-  --color-error-content: oklch(98% 0.01 28);
+  --color-base-100: rgba(250, 251, 254, 1);       /* blanco azulado muy claro */
+  --color-base-200: rgba(240, 243, 251, 1);       /* gris azulado claro */
+  --color-base-300: rgba(226, 231, 246, 1);       /* gris azulado medio */
+  --color-base-content: #123653;                  /* azul oscuro */
+  --color-primary: #168b88;                       /* verde teal oscuro */
+  --color-primary-content: rgba(247, 249, 254, 1); /* blanco azulado */
+  --color-secondary: rgba(0, 161, 196, 1);        /* cian */
+  --color-secondary-content: rgba(245, 251, 253, 1); /* blanco cian suave */
+  --color-accent: rgba(54, 174, 116, 1);          /* verde */
+  --color-accent-content: rgba(14, 47, 30, 1);    /* verde muy oscuro */
+  --color-neutral: rgba(72, 82, 108, 1);          /* azul grisáceo */
+  --color-neutral-content: rgba(247, 249, 254, 1); /* blanco azulado */
+  --color-info: rgba(44, 162, 218, 1);            /* azul info */
+  --color-info-content: rgba(9, 35, 62, 1);       /* azul marino oscuro */
+  --color-success: rgba(48, 174, 105, 1);         /* verde éxito */
+  --color-success-content: rgba(11, 46, 28, 1);   /* verde oscuro */
+  --color-warning: rgba(215, 186, 18, 1);         /* amarillo */
+  --color-warning-content: rgba(56, 46, 8, 1);    /* marrón amarillento */
+  --color-error: rgba(210, 58, 42, 1);            /* rojo */
+  --color-error-content: rgba(254, 248, 247, 1);  /* blanco cálido */
   --radius-selector: 0.5rem;
   --radius-field: 0.5rem;
   --radius-box: 0.75rem;
@@ -40,6 +40,22 @@
   --color-team360-primary: var(--color-primary);
   --color-team360-secondary: var(--color-secondary);
   --color-team360-surface: var(--color-base-100);
+
+  /* Variables unificadas de diseño para tarjetas y contenedores */
+  --color-card-border: #e0e8ea;
+  --color-card-border-light: #e8eef0;
+  --color-card-border-mini: #edf1f2;
+  --color-card-bg: #ffffff;
+  --color-card-bg-light: #fbfcfb;
+  --color-card-bg-dark: #016B65;
+  --shadow-card-default: 0 18px 45px -42px rgba(16, 45, 79, 0.7);
+  --shadow-card-large: 0 24px 60px -52px rgba(16, 45, 79, 0.65);
+
+  /* Colores semánticos para textos y branding en la consola */
+  --color-console-title: #173b5b;
+  --color-console-subtitle: #31536b;
+  --color-console-muted: #78909f;
+  --color-console-brand: #168b88;
 }
 
 :root {
@@ -75,4 +91,207 @@ select {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.title-h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.title-h2 {
+  margin-top: 0.375rem;
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+
+}
+
+.top-badge {
+  font-size: 0.875rem;
+  /* 14px */
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.17em;
+  color: #168b88;
+}
+.top-badge-neutral {
+  font-size: 0.875rem;
+  /* 14px */
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.17em;
+  color: #78909f;
+}
+
+.details-text {
+  font-size: 1.125rem;
+  color: #587184;
+}
+
+
+/* ═══════════════════════════════════════════════
+   Custom Select / Dropdown — sistema de diseño
+   Usado por: LocalePicker, ProfileSwitcher,
+              WorkspaceSwitcher
+   ═══════════════════════════════════════════════ */
+
+/* ── Contenedor (position: relative) ── */
+.custom-select-wrap {
+  position: relative;
+}
+
+/* ── Botón trigger ── */
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(209, 224, 229, 0.7);
+  background-color: rgba(226, 236, 240, 0.38);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #587184;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+  outline: none;
+}
+
+/* Variante compacta (sin full-width, para el locale del topbar) */
+.custom-select-trigger.compact {
+  width: auto;
+}
+
+.custom-select-trigger:hover,
+.custom-select-trigger.open {
+  background-color: var(--color-base-100);
+  border-color:var(--color-base-300);
+}
+
+.custom-select-trigger:focus-visible {
+  border-color: #71cfc6;
+  box-shadow: 0 0 0 3px rgba(22, 139, 136, 0.15);
+}
+
+/* ── Etiqueta interna (ocupa el espacio disponible) ── */
+.custom-select-label {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Chevron animado ── */
+.custom-select-chevron {
+  flex-shrink: 0;
+  color: #809aaa;
+  transition: transform 200ms ease;
+}
+
+.custom-select-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* ── Lista desplegable — posicionamiento base ── */
+.custom-select-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  background: #ffffff;
+  border: 1px solid rgba(209, 224, 229, 0.8);
+  border-radius: 0.875rem;
+  box-shadow:
+    0 8px 24px -6px rgba(16, 45, 79, 0.12),
+    0 2px 6px -2px rgba(16, 45, 79, 0.06);
+  z-index: 50;
+  animation: custom-select-in 150ms ease forwards;
+}
+
+/* Variante centrada — para el locale del topbar */
+.custom-select-dropdown.centered {
+  left: 50%;
+  right: auto;
+  min-width: 6rem;
+  transform: translateX(-50%);
+  animation: custom-select-in-centered 150ms ease forwards;
+}
+
+@keyframes custom-select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes custom-select-in-centered {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* ── Opción individual ── */
+.custom-select-option {
+  display: flex;
+  width: 100%;
+  padding: 0.42rem 0.85rem;
+  border-radius: 0.625rem;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #4a6578;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    background-color 130ms ease,
+    color 130ms ease;
+}
+
+/* Centrado solo cuando el dropdown está centrado (locale) */
+.custom-select-dropdown.centered .custom-select-option {
+  text-align: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+}
+
+.custom-select-option:hover {
+  background-color:var(--color-base-200);
+  
+}
+
+.custom-select-option.active {
+  background-color: rgba(22, 139, 136, 0.1);
+  color: #016b65;
+}
+
+.custom-select-option:focus-visible {
+  outline: 2px solid #71cfc6;
+  outline-offset: -2px;
 }

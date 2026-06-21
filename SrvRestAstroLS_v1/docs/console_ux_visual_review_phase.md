@@ -1,6 +1,6 @@
 # Team360 Console - Revisión UX y consistencia visual
 
-Fecha: 2026-05-31
+Fecha: 2026-06-01
 
 ## Objetivo
 
@@ -38,6 +38,14 @@ Se agregaron pantallas explícitamente mock:
 
 - acceso de diseño sin formulario ni credenciales;
 - selector de experiencias para Admin Team360, Operador Team360, Partner Admin y Client Admin.
+
+### Salida al selector de workspaces
+
+Las pantallas internas no exponían una forma explícita de volver a `/select-workspace`.
+
+Se agregó `Cambiar workspace` debajo del selector de workspace activo. La acción queda visible en el sidebar desktop y en la parte alta del drawer mobile. Para perfiles mock no default conserva `?profile=` al volver al selector. Este acceso es navegación de diseño, no logout, auth ni autorización productiva.
+
+En la revisión posterior se reforzó su jerarquía visual: ahora es una acción soft-outline full-width, con fondo suave, borde visible, icono de workspace y altura táctil cómoda. Conserva el tono operativo sin confundirse con texto secundario.
 
 ### Perfil Operador Team360
 
@@ -110,6 +118,7 @@ La consola conserva azul profundo, teal, fondos claros, bordes suaves, cards red
 - Capturas locales desktop, laptop, tablet, mobile y RTL: revisadas y eliminadas al cerrar.
 - Medición CDP de `scrollWidth`: sin overflow horizontal en rutas críticas para `1440`, `1280`, `768` y `390`.
 - Perfiles: cliente sin navegación workers/runs y con mensaje de visibilidad limitada por URL directa; operador Team360 con workers/runs resumidos; partner sin red global.
+- Regresión `Cambiar workspace`: validada desde dashboard Team360, servicios Team360, detalle cliente y dashboard partner; click mobile validado desde detalle de servicio.
 - `git diff --check -- SrvRestAstroLS_v1/astro SrvRestAstroLS_v1/docs docs/frontend`: OK.
 - Auditoría acotada de lockfiles, transportes reales, secretos y referencias heredadas: OK.
 
