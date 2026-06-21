@@ -235,8 +235,10 @@ class AssistantConversationRuntime:
         if should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
             state.semantic_memory["diagnosis_status"] = "completed"
 
-        # Build interaction_block: single_choice for missing operational slots
+        # Build interaction_block: single_choice > missing_requirements > next_step_choice
         interaction_block = self._build_single_choice_block(state)
+        if interaction_block is None:
+            interaction_block = self._build_missing_requirements_block(state, should_diagnose)
         if interaction_block is None:
             interaction_block = self._build_next_step_choice_if_ready(should_diagnose, state)
 
@@ -783,6 +785,137 @@ class AssistantConversationRuntime:
         if mem.get("human_approval"):
             parts.append("approval")
         return "+".join(parts) if parts else "gathering"
+
+    @staticmethod
+    def _build_missing_requirements_block(
+        state: ConversationState,
+        should_diagnose: bool,
+    ) -> dict[str, object] | None:
+        mem = state.semantic_memory or {}
+        status = mem.get("diagnosis_status", "gathering")
+        if status in ("completed",):
+            return None
+        if should_diagnose:
+            return None
+        if state.slots.get("management_system_choice_status") not in ("answered",):
+            return None
+
+        reqs: list[dict[str, str]] = []
+
+        channels = mem.get("channels", [])
+        if channels:
+            reqs.append({
+                "id": "channel",
+                "label": "Canal principal",
+                "status": "confirmed",
+                "required_for": "preliminary_diagnosis",
+            })
+        else:
+            reqs.append({
+                "id": "channel",
+                "label": "Canal principal",
+                "status": "missing",
+                "required_for": "preliminary_diagnosis",
+            })
+
+        if state.slots.get("management_system"):
+            reqs.append({
+                "id": "management_system",
+                "label": "Sistema de gestión actual",
+                "status": "confirmed",
+                "required_for": "full_diagnosis",
+            })
+        else:
+            reqs.append({
+                "id": "management_system",
+                "label": "Sistema de gestión actual",
+                "status": "missing",
+                "required_for": "full_diagnosis",
+            })
+
+        has_process = bool(mem.get("current_process") or mem.get("main_problem"))
+        if has_process:
+            reqs.append({
+                "id": "current_process",
+                "label": "Proceso actual descripto",
+                "status": "confirmed",
+                "required_for": "preliminary_diagnosis",
+            })
+        else:
+            reqs.append({
+                "id": "current_process",
+                "label": "Proceso actual",
+                "status": "missing",
+                "required_for": "preliminary_diagnosis",
+            })
+
+        approval = mem.get("human_approval", "")
+        if approval:
+            reqs.append({
+                "id": "approval_rules",
+                "label": "Qué acciones necesitan aprobación humana",
+                "status": "confirmed" if approval in ("required", "conditional") else "partial",
+                "required_for": "implementation",
+            })
+        else:
+            reqs.append({
+                "id": "approval_rules",
+                "label": "Qué acciones necesitan aprobación humana",
+                "status": "missing",
+                "required_for": "implementation",
+            })
+
+        volume = mem.get("volume", "")
+        if volume:
+            reqs.append({
+                "id": "volume",
+                "label": "Volumen aproximado de consultas",
+                "status": "confirmed",
+                "required_for": "full_diagnosis",
+            })
+        else:
+            reqs.append({
+                "id": "volume",
+                "label": "Volumen aproximado de consultas",
+                "status": "missing",
+                "required_for": "full_diagnosis",
+            })
+
+        has_any_confirmed = any(r["status"] == "confirmed" for r in reqs)
+        has_any_missing = any(r["status"] != "confirmed" for r in reqs)
+        if not has_any_confirmed or not has_any_missing:
+            return None
+
+        req_signature = tuple(
+            (r["id"], r["status"]) for r in reqs
+        )
+        last_sig = state.slots.get("missing_requirements_last_signature")
+        if last_sig is not None:
+            last_sig_normalized = tuple(tuple(p) for p in last_sig)
+            if last_sig_normalized == req_signature:
+                return None
+        state.slots["missing_requirements_last_signature"] = [[p[0], p[1]] for p in req_signature]
+
+        return {
+            "type": "missing_requirements",
+            "title": "Qué falta para afinar el diagnóstico",
+            "description": "Ya hay una orientación inicial. Estos datos ayudarían a hacerla más precisa.",
+            "requirements": reqs[:5],
+            "actions": [
+                {
+                    "id": "continue",
+                    "label": "Completar datos",
+                    "intent": "continue_conversation",
+                    "style": "secondary",
+                },
+                {
+                    "id": "show_diagnosis",
+                    "label": "Ver diagnóstico actual",
+                    "intent": "show_current_diagnosis",
+                    "style": "primary",
+                },
+            ],
+        }
 
     def _is_diagnosis_request(self, message: str, state: ConversationState) -> bool:
         if DIAGNOSIS_REQUEST_PATTERNS.search(message):
