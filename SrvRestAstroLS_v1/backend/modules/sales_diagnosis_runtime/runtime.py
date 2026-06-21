@@ -107,6 +107,31 @@ AUTOMATION_GOALS: dict[str, str] = {
     "escalate": "Derivar casos a una persona",
 }
 
+PRODUCT_CATALOG: list[dict[str, Any]] = [
+    {
+        "code": "pack_flow_whatsapp",
+        "name": "T360 Pack Flow — Gestión de WhatsApp",
+        "match_channels": ["whatsapp"],
+        "match_goals": [],
+        "status": "feasible",
+        "summary": "Ordená la recepción, clasificación y respuesta de consultas de WhatsApp.",
+        "reasons": ["Automatiza la recepción de mensajes", "Centraliza las consultas en un solo flujo"],
+        "limitations": ["WhatsApp Business API requiere configuración previa"],
+        "next_step": "Revisar acceso a WhatsApp Business API y definir reglas de derivación.",
+    },
+    {
+        "code": "pack_faq_automation",
+        "name": "T360 Pack — Automatización de consultas frecuentes",
+        "match_channels": [],
+        "match_goals": ["answer_faq"],
+        "status": "feasible",
+        "summary": "Respondé automáticamente preguntas recurrentes sin intervención manual.",
+        "reasons": ["Reduce el tiempo de respuesta en consultas repetitivas"],
+        "limitations": ["Requiere base de conocimiento actualizada"],
+        "next_step": "Identificar las preguntas más frecuentes y preparar las respuestas base.",
+    },
+]
+
 
 class AssistantConversationRuntime:
     def __init__(
@@ -253,6 +278,8 @@ class AssistantConversationRuntime:
             interaction_block = self._build_diagnosis_action_card(
                 state, should_diagnose, structured_diagnosis, intent,
             )
+        if interaction_block is None:
+            interaction_block = self._build_product_fit_card(state, should_diagnose)
         if interaction_block is None:
             interaction_block = self._build_next_step_choice_if_ready(should_diagnose, state)
 
@@ -1037,6 +1064,54 @@ class AssistantConversationRuntime:
                 {
                     "id": "show_current",
                     "label": "Ver diagnóstico actual",
+                    "intent": "show_current_diagnosis",
+                    "style": "primary",
+                },
+            ],
+        }
+
+    @staticmethod
+    def _build_product_fit_card(
+        state: ConversationState,
+        should_diagnose: bool,
+    ) -> dict[str, object] | None:
+        if not should_diagnose:
+            return None
+        mem = state.semantic_memory or {}
+        channels = mem.get("channels", [])
+        goals = state.slots.get("automation_goals", [])
+
+        matched: list[dict[str, Any]] = []
+        for product in PRODUCT_CATALOG:
+            chan_match = not product["match_channels"] or any(c in channels for c in product["match_channels"])
+            goal_match = not product["match_goals"] or any(g in goals for g in product["match_goals"])
+            if chan_match or goal_match:
+                matched.append(product)
+
+        if not matched:
+            return None
+        product = matched[0]
+
+        sig = product["code"]
+        last_sig = state.slots.get("product_fit_card_last_signature")
+        if last_sig == sig:
+            return None
+        state.slots["product_fit_card_last_signature"] = sig
+
+        return {
+            "type": "product_fit_card",
+            "product_code": product["code"],
+            "product_name": product["name"],
+            "fit_score": 75,
+            "status": product["status"],
+            "summary": product["summary"],
+            "good_fit_reasons": product["reasons"],
+            "limitations": product["limitations"],
+            "recommended_next_step": product["next_step"],
+            "actions": [
+                {
+                    "id": "show_diagnosis",
+                    "label": "Ver diagnóstico",
                     "intent": "show_current_diagnosis",
                     "style": "primary",
                 },
