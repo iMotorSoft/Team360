@@ -15,7 +15,7 @@ from litestar.status_codes import (
 )
 from litestar.testing import TestClient
 
-from app import create_app
+from ls_iMotorSoft_Srv01 import create_app
 import routes.sales_diagnosis_runtime as product_routes
 from routes.sales_diagnosis_runtime import (
     PRODUCT_LLM_PROVIDER_ENV,

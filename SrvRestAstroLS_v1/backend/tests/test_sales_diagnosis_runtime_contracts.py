@@ -283,6 +283,25 @@ class TestRuntimeDecisionPolicy:
         assert output.turn_decision["diagnosis_status"] == "completed"
         assert "Punto a validar" in output.response_text
         assert llm.calls[-1]["status"] == "sufficient"
+        assert output.interaction_block == {
+            "type": "next_step_choice",
+            "title": "¿Cómo querés seguir?",
+            "description": "Ya tengo suficiente información para darte una orientación inicial.",
+            "actions": [
+                {
+                    "id": "continue",
+                    "label": "Seguir conversando",
+                    "intent": "continue_conversation",
+                    "style": "secondary",
+                },
+                {
+                    "id": "show_diagnosis",
+                    "label": "Ver diagnóstico",
+                    "intent": "show_current_diagnosis",
+                    "style": "primary",
+                },
+            ],
+        }
 
     def test_runtime_keeps_asking_when_context_is_sufficient_without_close_request(self):
         repo = InMemoryStateRepository()

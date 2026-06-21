@@ -530,4 +530,5 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
         language=output.language,
         turn_decision=output.turn_decision,
         diagnosis=output.diagnosis,
+        interaction_block=output.interaction_block,
     )

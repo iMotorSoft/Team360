@@ -191,6 +191,7 @@ class AssistantTurnOutput:
     turn_decision: dict[str, Any] | None = None
     language: dict[str, Any] | None = None
     diagnosis: dict[str, Any] | None = None
+    interaction_block: dict[str, Any] | None = None
 
 
 # ---------------------------------------------------------------------------

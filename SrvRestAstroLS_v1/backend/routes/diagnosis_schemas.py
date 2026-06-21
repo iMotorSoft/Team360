@@ -91,3 +91,4 @@ class PublicTurnResponse(BaseModel):
     language: dict | None = None
     turn_decision: dict | None = None
     diagnosis: dict | None = None
+    interaction_block: dict | None = None

@@ -222,6 +222,10 @@ class AssistantConversationRuntime:
 
         if should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
             state.semantic_memory["diagnosis_status"] = "completed"
+
+        # Build interaction_block when runtime can offer a choice
+        interaction_block = self._build_next_step_choice_if_ready(should_diagnose, state)
+
         decision_reason = intent.source.value if intent.source != IntentSource.RUNTIME_FALLBACK else self._readiness_reason(state)
         if intent.intent in (IntentType.REQUEST_DIAGNOSIS, IntentType.STOP_INTERVIEW) and should_diagnose:
             decision_reason = f"{intent.intent.value}_with_coverage"
@@ -267,6 +271,7 @@ class AssistantConversationRuntime:
                 "explicit_language_preference": lang_state.get("explicit_language_preference", False),
             },
             diagnosis=structured_diagnosis if should_diagnose else None,
+            interaction_block=interaction_block,
         )
 
         self._save_state(state)
@@ -660,6 +665,36 @@ class AssistantConversationRuntime:
 
         return False
 
+    @staticmethod
+    def _build_next_step_choice_if_ready(
+        should_diagnose: bool,
+        state: ConversationState,
+    ) -> dict[str, object] | None:
+        if not should_diagnose:
+            return None
+        min_turns = 2
+        if state.turn_count < min_turns:
+            return None
+        return {
+            "type": "next_step_choice",
+            "title": "¿Cómo querés seguir?",
+            "description": "Ya tengo suficiente información para darte una orientación inicial.",
+            "actions": [
+                {
+                    "id": "continue",
+                    "label": "Seguir conversando",
+                    "intent": "continue_conversation",
+                    "style": "secondary",
+                },
+                {
+                    "id": "show_diagnosis",
+                    "label": "Ver diagnóstico",
+                    "intent": "show_current_diagnosis",
+                    "style": "primary",
+                },
+            ],
+        }
+
     def _readiness_reason(self, state: ConversationState) -> str:
         mem = state.semantic_memory or {}
         parts = []
@@ -812,6 +847,7 @@ class AssistantConversationRuntime:
                 "diagnosis_built": False,
             },
             diagnosis=None,
+            interaction_block=None,
         )
         events.append(ProgressiveEvent(event_type="team360.done", payload={"mode": "skeleton_no_llm"}, safe_to_show=True))
         self._save_state(state)

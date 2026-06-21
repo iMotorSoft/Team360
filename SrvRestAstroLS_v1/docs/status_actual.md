@@ -77,6 +77,51 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 - No se modificaron backend, runtime Python/Litestar, endpoints, prompts,
   migraciones, DB, Milvus, LiteLLM, iframe, Web Component ni SDK.
 
+### 2026-06-21 - Primer `interaction_block` real (`next_step_choice`) desde backend
+
+- Se identificaron dos gaps que impedian que el backend emitiera
+  `interaction_block`: (1) faltaba el campo en `AssistantTurnOutput` y en
+  `PublicTurnResponse`, (2) faltaba logica en el runtime para construir el
+  bloque cuando `should_diagnose=True`.
+- Se agrego `interaction_block: dict | None = None` a `AssistantTurnOutput`
+  en `contracts.py`.
+- Se agrego `interaction_block: dict | None = None` a `PublicTurnResponse`
+  en `diagnosis_schemas.py`.
+- Se implemento `_build_next_step_choice_if_ready()` en `runtime.py`:
+  emite `next_step_choice` con acciones "Seguir conversando" y "Ver diagnóstico"
+  cuando el runtime decide diagnosticar (`should_diagnose=True` y `turn_count >= 2`).
+- Se paso `output.interaction_block` en el handler `public_turn` de `diagnosis.py`.
+- Se agrego cobertura backend para fijar el contrato del bloque emitido por el
+  runtime y se alinearon tests con el entrypoint vigente
+  `ls_iMotorSoft_Srv01.py`; no se agrego ni se restauro `backend/app.py`.
+- En la suite del endpoint dev se activa `TEAM360_BACKEND_DEBUG=1` solo para la
+  creacion de la app de test, porque esos casos validan detalles controlados de
+  error; el default del backend sigue siendo debug apagado.
+- Se detecto que `should_use_responses_api()` devolvia True para el modelo
+  `openai_gpt-5-nano` causando fallo silencioso (safe ack); se fijo
+  temporalmente con `TEAM360_LITELLM_API_MODE=chat`.
+- Cambios validados con `curl` y Browser MCP en `/t360`: el bloque
+  `next_step_choice` aparece correctamente en turnos donde se construye
+  diagnostico, el renderer Svelte muestra los botones, el adapter traduce
+  eventos correctamente y no hay errores de consola.
+- Validaciones automatizadas ejecutadas:
+  `uv run pytest tests/test_sales_diagnosis_runtime_contracts.py::TestRuntimeDecisionPolicy::test_runtime_diagnoses_when_context_is_sufficient -q`
+  (`1 passed`), `uv run pytest tests/test_diagnosis_public_router.py -q`
+  (`38 passed`) y
+  `uv run pytest tests/test_sales_diagnosis_runtime_route.py tests/test_sales_diagnosis_runtime_dev_route.py -q`
+  (`80 passed`).
+- No se implementaron iframe, Web Component, SDK ni otros bloques
+  (`single_choice`, `multi_choice`, etc.).
+- Archivos modificados:
+  - `SrvRestAstroLS_v1/backend/modules/sales_diagnosis_runtime/contracts.py`
+  - `SrvRestAstroLS_v1/backend/modules/sales_diagnosis_runtime/runtime.py`
+  - `SrvRestAstroLS_v1/backend/routes/diagnosis_schemas.py`
+  - `SrvRestAstroLS_v1/backend/routes/diagnosis.py`
+  - `SrvRestAstroLS_v1/backend/tests/test_sales_diagnosis_runtime_contracts.py`
+  - `SrvRestAstroLS_v1/backend/tests/test_diagnosis_public_router.py`
+  - `SrvRestAstroLS_v1/backend/tests/test_sales_diagnosis_runtime_dev_route.py`
+  - `SrvRestAstroLS_v1/backend/tests/test_sales_diagnosis_runtime_route.py`
+
 ### 2026-06-21 - Arquitectura UX para diagnosticos embebibles
 
 - Se agrego `SrvRestAstroLS_v1/docs/t360_diagnosis_embeddable_ux_architecture.md`

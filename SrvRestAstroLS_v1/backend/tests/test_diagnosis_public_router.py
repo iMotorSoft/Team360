@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from litestar.testing import TestClient
 
-from app import create_app
+from ls_iMotorSoft_Srv01 import create_app
 from modules.automation_diagnosis.ai_interpreter import AIInterpretationError
 from modules.automation_diagnosis.postgres_service import AutomationDiagnosisPersistenceError
 import routes.automation_diagnosis as auto_routes

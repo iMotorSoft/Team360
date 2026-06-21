@@ -10,7 +10,7 @@ import os
 from litestar.status_codes import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from litestar.testing import TestClient
 
-from app import create_app
+from ls_iMotorSoft_Srv01 import create_app
 from routes.sales_diagnosis_runtime_dev import (
     _DEV_LLM_PROVIDER_ENV,
     _DEV_RETRIEVAL_PROVIDER_ENV,
@@ -33,7 +33,16 @@ from modules.sales_diagnosis_runtime.state_repository import (
 
 
 def _client():
-    return TestClient(create_app())
+    previous_debug = os.environ.get("TEAM360_BACKEND_DEBUG")
+    os.environ["TEAM360_BACKEND_DEBUG"] = "1"
+    try:
+        app = create_app()
+    finally:
+        if previous_debug is None:
+            os.environ.pop("TEAM360_BACKEND_DEBUG", None)
+        else:
+            os.environ["TEAM360_BACKEND_DEBUG"] = previous_debug
+    return TestClient(app)
 
 
 DEV_TURN_PATH = "/api/dev/sales-diagnosis-runtime/turn"
