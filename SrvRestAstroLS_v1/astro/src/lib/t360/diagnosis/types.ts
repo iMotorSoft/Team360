@@ -44,10 +44,12 @@ export type T360InteractionTurnRequest = {
   message: string;
   display_text: string;
   interaction_response?: {
-    block_type: "single_choice";
+    block_type: "single_choice" | "multi_choice";
     action_id: string;
-    option_id: string;
-    value: string;
-    label: string;
+    option_id?: string;
+    value?: string;
+    values?: string[];
+    label?: string;
+    labels?: string[];
   };
 };

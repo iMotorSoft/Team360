@@ -35,6 +35,7 @@ export type T360ChoicesSubmittedEvent = {
   selected_options: Array<{
     option_id: string;
     value: string;
+    label: string;
   }>;
 };
 
@@ -114,6 +115,7 @@ export function dispatchChoicesSubmittedEvent(
       selected_options: options.map((option) => ({
         option_id: option.id,
         value: option.value,
+        label: option.label,
       })),
     },
   }));

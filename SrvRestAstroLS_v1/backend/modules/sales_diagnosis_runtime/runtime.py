@@ -99,6 +99,14 @@ MANAGEMENT_SYSTEM_OPTIONS: dict[str, str] = {
     "none": "No se gestiona centralizadamente",
 }
 
+AUTOMATION_GOALS: dict[str, str] = {
+    "answer_faq": "Responder consultas frecuentes",
+    "classify": "Clasificar consultas",
+    "schedule": "Agendar turnos",
+    "remind": "Enviar recordatorios",
+    "escalate": "Derivar casos a una persona",
+}
+
 
 class AssistantConversationRuntime:
     def __init__(
@@ -235,8 +243,10 @@ class AssistantConversationRuntime:
         if should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
             state.semantic_memory["diagnosis_status"] = "completed"
 
-        # Build interaction_block: single_choice > missing_requirements > diagnosis_action_card > next_step_choice
+        # Build interaction_block: single_choice > multi_choice > missing_requirements > diagnosis_action_card > next_step_choice
         interaction_block = self._build_single_choice_block(state)
+        if interaction_block is None:
+            interaction_block = self._build_multi_choice_block(state)
         if interaction_block is None:
             interaction_block = self._build_missing_requirements_block(state, should_diagnose)
         if interaction_block is None:
@@ -396,24 +406,36 @@ class AssistantConversationRuntime:
         if not isinstance(resp, dict):
             return
         block_type = resp.get("block_type")
-        if block_type != "single_choice":
-            return
-        value = resp.get("value", "")
-        if value not in MANAGEMENT_SYSTEM_OPTIONS:
-            return
-        option_id = resp.get("option_id")
-        if option_id is not None and option_id != value:
-            return
-        label = MANAGEMENT_SYSTEM_OPTIONS[value]
-        state.slots["management_system"] = value
-        state.slots["management_system_label"] = label
-        state.slots["management_system_choice_status"] = "answered"
-        mem = state.semantic_memory or {}
-        systems = mem.get("systems_and_data_sources", [])
-        if label not in systems:
-            systems.append(label)
-            mem["systems_and_data_sources"] = systems
-            state.semantic_memory = mem
+        if block_type == "single_choice":
+            value = resp.get("value", "")
+            if value not in MANAGEMENT_SYSTEM_OPTIONS:
+                return
+            option_id = resp.get("option_id")
+            if option_id is not None and option_id != value:
+                return
+            label = MANAGEMENT_SYSTEM_OPTIONS[value]
+            state.slots["management_system"] = value
+            state.slots["management_system_label"] = label
+            state.slots["management_system_choice_status"] = "answered"
+            mem = state.semantic_memory or {}
+            systems = mem.get("systems_and_data_sources", [])
+            if label not in systems:
+                systems.append(label)
+                mem["systems_and_data_sources"] = systems
+                state.semantic_memory = mem
+        elif block_type == "multi_choice":
+            values = resp.get("values", [])
+            if not isinstance(values, list) or not values:
+                return
+            valid = {k for k in AUTOMATION_GOALS}
+            filtered = [v for v in values if v in valid]
+            if not filtered:
+                return
+            labels = resp.get("labels", [])
+            official_labels = [AUTOMATION_GOALS[v] for v in filtered]
+            state.slots["automation_goals"] = filtered
+            state.slots["automation_goals_labels"] = official_labels
+            state.slots["automation_goals_choice_status"] = "answered"
 
     @staticmethod
     def _update_current_process(existing: str, msg: str) -> str:
@@ -789,6 +811,41 @@ class AssistantConversationRuntime:
         if mem.get("human_approval"):
             parts.append("approval")
         return "+".join(parts) if parts else "gathering"
+
+    @staticmethod
+    def _build_multi_choice_block(
+        state: ConversationState,
+    ) -> dict[str, object] | None:
+        status = state.slots.get("automation_goals_choice_status", "")
+        if status == "answered":
+            return None
+        if state.slots.get("management_system_choice_status") not in ("answered",):
+            return None
+        mem = state.semantic_memory or {}
+        if state.turn_count < 3:
+            return None
+        channels = mem.get("channels", [])
+        if not channels:
+            return None
+        if not status:
+            state.slots["automation_goals_choice_status"] = "offered"
+        return {
+            "type": "multi_choice",
+            "question": "¿Qué querés automatizar primero?",
+            "helper_text": "Podés elegir más de una opción.",
+            "min_selected": 1,
+            "max_selected": 3,
+            "options": [
+                {"id": k, "label": v, "value": k}
+                for k, v in AUTOMATION_GOALS.items()
+            ],
+            "submit_action": {
+                "id": "submit_automation_goals",
+                "label": "Continuar",
+                "intent": "submit_choices",
+                "style": "primary",
+            },
+        }
 
     @staticmethod
     def _build_missing_requirements_block(

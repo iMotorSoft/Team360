@@ -36,10 +36,18 @@ export function t360InteractionEventToTurnRequest(
   }
 
   if (detail.type === "t360.choices.submitted") {
-    const label = valuesLabel(selectedValues(detail));
+    const opts = detail.selected_options;
+    const labels = opts.map((o) => o.label).join(", ");
+    const vals = opts.map((o) => o.value);
     return {
-      message: `Selecciono estas opciones: ${label}. Continuá el diagnóstico con esas respuestas.`,
-      display_text: `Seleccioné: ${label}`,
+      message: `Prioridades de automatización: ${vals.join(", ")}.`,
+      display_text: `Seleccioné: ${labels}`,
+      interaction_response: {
+        block_type: "multi_choice",
+        action_id: detail.action_id,
+        values: vals,
+        labels: labels.split(", "),
+      },
     };
   }
 
