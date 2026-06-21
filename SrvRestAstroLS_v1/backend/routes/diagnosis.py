@@ -13,6 +13,7 @@ Reuses the same ``_SERVICE`` instance as
 from __future__ import annotations
 
 import os
+import warnings
 from uuid import uuid4
 
 from litestar import get, post
@@ -80,7 +81,11 @@ from .diagnosis_schemas import (
 # ---------------------------------------------------------------------------
 
 def _build_public_state_repo():
-    mode = os.environ.get("AUTOMATION_DIAGNOSIS_REPOSITORY", "").strip().lower()
+    mode = (
+        os.environ.get("AUTOMATION_DIAGNOSIS_REPOSITORY")
+        or os.environ.get("TEAM360_DIAGNOSIS_STATE_PROVIDER")
+        or ""
+    ).strip().lower()
     if mode == "postgres":
         from modules.sales_diagnosis_runtime.state_repository import (
             SyncPostgresConversationStateRepository,
@@ -94,12 +99,20 @@ def _build_public_state_repo():
             )
         return SyncPostgresConversationStateRepository(dsn)
     if mode == "memory":
+        warnings.warn(
+            "AUTOMATION_DIAGNOSIS_REPOSITORY=memory: conversation state will "
+            "not survive backend restart.",
+        )
         return InMemoryConversationStateRepository()
     if mode:
         raise RuntimeError(
             f"Unsupported AUTOMATION_DIAGNOSIS_REPOSITORY={mode!r}. "
             "Use 'postgres' or 'memory'."
         )
+    warnings.warn(
+        "AUTOMATION_DIAGNOSIS_REPOSITORY not set, defaulting to in-memory. "
+        "Set AUTOMATION_DIAGNOSIS_REPOSITORY=postgres for persistence.",
+    )
     return InMemoryConversationStateRepository()
 
 

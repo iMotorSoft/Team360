@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-21 (Validacion local backend 7050 y Astro 3050)
+Ultima actualizacion: 2026-06-21 (Estabilidad next_step_choice)
 
 ## Directorio de trabajo
 
@@ -116,6 +116,21 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
   - `SrvRestAstroLS_v1/backend/modules/sales_diagnosis_runtime/contracts.py`
   - `SrvRestAstroLS_v1/backend/modules/sales_diagnosis_runtime/runtime.py`
   - `SrvRestAstroLS_v1/backend/routes/diagnosis_schemas.py`
+
+### 2026-06-21 - Prueba de estabilidad `next_step_choice`
+
+- Se probaron los 4 casos obligatorios con Browser MCP y curl multi-turn:
+  - **Caso A (Ver diagnóstico)**: botón presente y clickeable; adapter traduce correctamente a "Dame el diagnóstico actual con la conclusión, factibilidad y próximos pasos."; backend recibe el mensaje; la diagnosis previa permanece visible en el DOM.
+  - **Caso B (Seguir conversando)**: botón presente y clickeable; la conversación continúa con preguntas útiles de Vera; el bloque no reaparece en turnos posteriores.
+  - **Caso C (conclusión directa)**: frases como "Dame el diagnóstico otra vez" no re-emiten el bloque; `_decide_turn` retorna `False` porque `diagnosis_status="completed"`.
+  - **Caso D (reaparición indebida)**: tras "Seguir conversando" + turno adicional, el bloque NO reaparece. La condición `should_diagnose and turn_count >= 2` está correctamente protegida por `_decide_turn` que retorna `False` cuando `status` es `completed`.
+- **Loop**: descartado. El guardrail `if status in ("completed",): return False` en `_decide_turn` previene cualquier re-emisión.
+- **Persistencia PostgreSQL**: no funciona entre reinicios de backend. La tabla `sales_diagnosis_conversation_states` no existe en la base de datos o falla silenciosamente en `save()`/`load()`. No se modificó esquema ni migraciones.
+- **Encontrado**: las variables de entorno exportadas en el shell no se heredan a procesos `nohup` iniciados desde otro shell de herramienta; el backend arrancó sin `TEAM360_LITELLM_API_MODE=chat` causando fallos del modelo Responses API. Se recomienda usar `env VAR=VAL ...` inline en el comando de arranque o escribir un script de inicio.
+- **Frontend**: el bloque permanece visible en el DOM del turno original después de la interacción; los botones no se deshabilitan tras el click. Esto es por diseño (cada mensaje mantiene su propio `interactionBlock`). No hay errores de consola ni doble envío.
+- Sin cambios de código en esta prueba.
+- No se implementaron iframe, Web Component, SDK, postMessage ni otros bloques.
+- Deuda técnica documentada: `interaction_block: dict | None = None` debe migrarse a modelo discriminado en el futuro.
   - `SrvRestAstroLS_v1/backend/routes/diagnosis.py`
   - `SrvRestAstroLS_v1/backend/tests/test_sales_diagnosis_runtime_contracts.py`
   - `SrvRestAstroLS_v1/backend/tests/test_diagnosis_public_router.py`
