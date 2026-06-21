@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-21 (Estabilidad next_step_choice)
+Ultima actualizacion: 2026-06-21 (Cierre dialogo interactivo)
 
 ## Directorio de trabajo
 
@@ -3099,3 +3099,27 @@ pero **no se ejecutaron las validaciones finales** sobre los cambios del lab.
 - Se actualizaron: `lat.md/lat.md` (nueva referencia), `lat.md/status_actual.md`.
 - **Validacion**: `pnpm check` = 0 errors, 0 warnings, 0 hints.
 - **No se toco**: runtime, endpoints, DB, Console, Knowledge Ingestion, LiteLLM, Milvus, Step-to-Action, lead_capture, WhatsApp handoff.
+
+### 2026-06-21 - Cierre dialogo interactivo productivo
+
+- Se completo la primera implementacion del dialogo interactivo con 6 bloques:
+  `single_choice`, `multi_choice`, `missing_requirements`, `next_step_choice`,
+  `diagnosis_action_card` y `product_fit_card`.
+- Prioridad final: single_choice > multi_choice > missing_requirements >
+  diagnosis_action_card > product_fit_card > next_step_choice. Un solo bloque
+  por turno.
+- Todos los bloques tienen catalogos backend, validacion de values, labels
+  oficiales derivados en backend y firmas anti-loop.
+- Persistencia PostgreSQL validada: estado offered/answered, valores
+  seleccionados, labels oficiales y firmas sobreviven reinicio de backend.
+- Playwright: 13 passed, 2 skipped (pre-existing). Backend: 38 passed.
+- Frontend: `pnpm check` 0 errors, `pnpm build` 138 pages.
+- Browser MCP confirma recorrido completo sin errores de consola.
+- `product_fit_card` usa catalogo backend conservador (2 productos), sin
+  pricing, SLA, ROI ni promesas de capacidades no disponibles.
+- Textos en español, sin instrucciones internas ni terminos tecnicos.
+- Contratos transitorios: `interaction_block: dict | None` e
+  `interaction_response: dict | None` se mantienen para compatibilidad.
+- No se implemento iframe, Web Component, SDK ni postMessage. Arquitectura
+  embebible futura preservada en documentacion.
+- Primera salida: pagina propia de Team360 (/t360).

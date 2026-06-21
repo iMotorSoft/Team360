@@ -313,7 +313,7 @@ test.describe("Team360 pública - Vera estructurada", () => {
 
     expect(requests).toHaveLength(2);
     expect(requests[1].session_id).toBe("conv_e2e_interaction_choice");
-    expect(String(requests[1].message)).toContain("whatsapp");
+    expect(String(requests[1].message)).toContain("WhatsApp");
   });
 
   test("renderiza diagnosis_action_card y mantiene transporte fuera del componente", async ({ page }) => {
