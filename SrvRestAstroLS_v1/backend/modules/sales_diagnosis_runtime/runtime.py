@@ -951,7 +951,18 @@ class AssistantConversationRuntime:
         status = status_map.get(diagnosis.get("availability", ""), "feasible")
 
         next_step = (diagnosis.get("next_step") or "").strip()
-        summary = next_step if next_step else "Se puede avanzar con la información recopilada."
+        summary_raw = diagnosis.get("summary") or ""
+        if isinstance(summary_raw, str) and summary_raw.strip() and len(summary_raw) > 10 and summary_raw.strip()[0].isupper():
+            summary = summary_raw.strip()
+        elif next_step and (
+            not next_step.startswith("validate")
+            and not next_step.startswith("design")
+            and not next_step.startswith("evaluate")
+            and not next_step.startswith("define")
+        ):
+            summary = next_step
+        else:
+            summary = "Se puede avanzar con la información recopilada."
 
         return {
             "type": "diagnosis_action_card",
