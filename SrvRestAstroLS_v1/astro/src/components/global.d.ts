@@ -4,7 +4,7 @@ export const APP_PUBLIC_NAME: "Team360 Console";
 export const PUBLIC_SITE_URL: "https://team360.live";
 export const CONSOLE_SITE_URL: "https://console.team360.live";
 
-export const URL_REST: "http://localhost:7050" | "https://console.team360.live";
+export const URL_REST: "http://localhost:7050" | "";
 export const getRestBaseUrl: () => string;
 
 export const API_BASE_URL: string;

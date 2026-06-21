@@ -190,6 +190,7 @@ TEAM360_LITELLM_API_KEY="$LITELLM_MASTER_KEY"
 | API | Chat Completions |
 | Temperature | `0.2` |
 | Additional reasoning | disabled / not required |
+| Responses API lab reasoning | `low` when explicitly testing `openai/gpt-5.4-nano` |
 | Current public streaming | no |
 | State | PostgreSQL |
 | Retrieval | Milvus |
@@ -205,6 +206,18 @@ Do not use as main configuration:
 LiteLLM may have `drop_params: true`, but the backend must still send
 compatible parameters and must not depend on the proxy silently discarding
 incorrect parameters.
+
+Responses API is allowed only for explicit compatibility checks, labs or
+controlled model evaluation outside the public Vera main runtime. In that
+case, when the effective OpenAI upstream is `openai/gpt-5.4-nano`, send:
+
+```json
+{"reasoning": {"effort": "low"}}
+```
+
+Do not use `minimal` for that upstream. This exception does not change the
+validated public `/t360` route: Vera remains on Chat Completions with no
+additional reasoning parameter unless a new runtime decision is documented.
 
 ## Private Backend Configuration
 
@@ -292,16 +305,53 @@ Therefore:
 
 ## Backend Startup
 
-Directory:
+Production directory on the remote host:
 
 ```bash
-cd SrvRestAstroLS_v1/backend
+cd /home/administrator/project/iMotorSoft/ai/Team360/SrvRestAstroLS_v1/backend
 ```
 
-Variables must be prepared from the environment or the existing private
-configuration mechanism.
+Canonical production startup for the current public Vera runtime:
 
-Conceptual execution:
+```bash
+AUTOMATION_DIAGNOSIS_REPOSITORY=postgres \
+TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1 \
+TEAM360_AI_PROVIDER=litellm \
+TEAM360_LITELLM_BASE_URL=http://127.0.0.1:4000 \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER=milvus \
+TEAM360_MILVUS_HOST=127.0.0.1 \
+TEAM360_MILVUS_PORT=19530 \
+TEAM360_MILVUS_COLLECTION=team360_sales_diagnosis_knowledge_v1 \
+TEAM360_DIAGNOSIS_STATE_PROVIDER=postgres \
+TEAM360_PUBLIC_ORGANIZATION_CODE=team360_live \
+TEAM360_PUBLIC_WORKSPACE_CODE=team360_public_site \
+TEAM360_PUBLIC_PACKAGE_CODE=pkg_sales_diagnosis \
+TEAM360_PUBLIC_KNOWLEDGE_SCOPE_CODE=ks_team360_sales_diagnosis \
+uv run uvicorn ls_iMotorSoft_Srv01:app --host 127.0.0.1 --port 7050
+```
+
+Important runtime notes:
+
+- Use `ls_iMotorSoft_Srv01:app` for the deployed production command. `app.py`
+  may exist as a compatibility wrapper, but production currently launches the
+  explicit module above.
+- Do not set `TEAM360_BACKEND_DEBUG` in production. Litestar debug stays off by
+  default; normal scanner paths such as `/api/env` and `/api/config` must return
+  controlled `404 Not Found` responses without traceback noise.
+- `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres` is the effective variable read by
+  the public diagnosis state repository bootstrap. `TEAM360_DIAGNOSIS_STATE_PROVIDER=postgres`
+  is kept as an operational marker/compatibility variable but is not the state
+  switch used by `routes/diagnosis.py`.
+- `TEAM360_EMBEDDING_VERSION` is the effective Milvus embedding-version filter.
+  Do not use `TEAM360_MILVUS_EMBEDDING_VERSION` unless code is changed to read
+  it.
+- `TEAM360_PUBLIC_*` values document the intended public context. The current
+  public turn route still uses the canonical constants and resolver path for
+  `team360_live`, `team360_public_site`, `pkg_sales_diagnosis` and
+  `ks_team360_sales_diagnosis`.
+
+Older conceptual commands may show:
 
 ```bash
 AUTOMATION_DIAGNOSIS_REPOSITORY=postgres \
@@ -318,16 +368,9 @@ TEAM360_EMBEDDING_MODEL=openai_text_embedding_3_small \
 uv run uvicorn app:app --host 127.0.0.1 --port 7050
 ```
 
-The DSN and keys must not be written literally in this command when they are
-already resolved by the environment or `globalVar.py`.
-
-Depending on the active virtual environment, this may also be valid:
-
-```bash
-.venv/bin/uvicorn app:app --host 127.0.0.1 --port 7050
-```
-
-Do not mix startup commands without checking which environment is active.
+Treat those as historical unless the code and deployment command are explicitly
+changed. The DSN and keys must not be written literally in docs or shell
+history when they are already resolved by the environment or `globalVar.py`.
 
 ## Frontend Startup
 
@@ -595,6 +638,9 @@ Do not send:
 ```text
 reasoning_effort
 ```
+
+If the task is an explicit Responses API lab or compatibility check for
+`openai/gpt-5.4-nano`, use `reasoning.effort=low`. Do not use `minimal`.
 
 ### Embeddings fail
 

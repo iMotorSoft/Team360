@@ -28,7 +28,7 @@ export default defineConfig({
   webServer: skipWebServer ? undefined : [
     {
       command:
-        "cd ../backend && AUTOMATION_DIAGNOSIS_REPOSITORY=memory uv run uvicorn app:app --host 127.0.0.1 --port 8000",
+        "cd ../backend && AUTOMATION_DIAGNOSIS_REPOSITORY=memory uv run uvicorn ls_iMotorSoft_Srv01:app --host 127.0.0.1 --port 8000",
       port: 8000,
       timeout: 30_000,
       reuseExistingServer: true,

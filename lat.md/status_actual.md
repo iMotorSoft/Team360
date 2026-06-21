@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-18
+Ultima actualizacion: 2026-06-20
 
 ## Estado general
 
@@ -11,6 +11,31 @@ Ultima actualizacion: 2026-06-18
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-20 - Comando canonico de arranque productivo backend Vera
+
+- Se actualizo `team360-runtime-operational-policy.md` con la linea canonica
+  actual para levantar el backend productivo remoto de Vera:
+  `uv run uvicorn ls_iMotorSoft_Srv01:app --host 127.0.0.1 --port 7050`.
+- Se documento que `TEAM360_BACKEND_DEBUG` no debe definirse en produccion y
+  que Litestar debe quedar con `debug=False` por defecto.
+- Se aclaro la diferencia entre variables efectivas y marcadores operativos:
+  `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres` es el switch real de estado
+  persistido; `TEAM360_EMBEDDING_VERSION` es la variable efectiva para version
+  de embeddings Milvus; `TEAM360_PUBLIC_*` documenta contexto publico esperado.
+- Se dejo explicitado que `/api/env` y `/api/config` son rutas de scanner
+  externas y deben responder `404 Not Found` controlado, sin crear endpoints
+  sensibles ni tracebacks por debug.
+
+### 2026-06-18 - Politica Responses API para GPT-5.4 Nano
+
+- Se aclaro en `team360-runtime-operational-policy.md` que la ruta publica
+  validada de Vera sigue usando Chat Completions sin `reasoning_effort`.
+- Se documento la excepcion para labs, compatibilidad o evaluaciones controladas
+  con Responses API: cuando el upstream efectivo es `openai/gpt-5.4-nano`, el
+  valor operativo de `reasoning.effort` debe ser `low`.
+- Se dejo explicitado que `minimal` no debe usarse para ese upstream y que esta
+  excepcion no cambia la configuracion principal de `/t360`.
 
 ### 2026-06-18 - Guia DeepSeek V4 Flash + opencode-browser para agentes
 

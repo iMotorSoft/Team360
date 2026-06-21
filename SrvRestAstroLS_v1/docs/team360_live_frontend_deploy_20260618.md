@@ -103,19 +103,69 @@ Certbot dejo renovacion automatica programada.
 
 ## Frontend API URL
 
-Para produccion se ajusto `SrvRestAstroLS_v1/astro/src/components/global.js`
-para que `API_BASE_URL` resuelva como ruta relativa:
+Estado actualizado tras la publicacion del build de Astro del 2026-06-18:
+`SrvRestAstroLS_v1/astro/src/components/global.js` usa `URL_REST_PRO` vacio
+para que el backend productivo sea relativo al host publico:
+
+```text
+""
+```
+
+Por lo tanto, `API_BASE_URL` queda resuelto en el bundle como:
 
 ```text
 /api
 ```
 
 Esto evita que el navegador del usuario final intente llamar a
-`http://localhost:7050`.
+`http://localhost:7050`. Tambien evita depender de `console.team360.live` como
+host API mientras ese subdominio no resuelva DNS. El proxy `/api/` de
+`team360.live` sigue siendo el punto preparado para el backend en
+`127.0.0.1:7050`.
 
-## Backend pendiente
+## Backend productivo
 
-No activar backend hasta completar preflight y configuracion privada.
+Directorio remoto:
+
+```bash
+cd /home/administrator/project/iMotorSoft/ai/Team360/SrvRestAstroLS_v1/backend
+```
+
+Linea canonica actual para lanzar el backend publico en `127.0.0.1:7050`:
+
+```bash
+AUTOMATION_DIAGNOSIS_REPOSITORY=postgres \
+TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1 \
+TEAM360_AI_PROVIDER=litellm \
+TEAM360_LITELLM_BASE_URL=http://127.0.0.1:4000 \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER=milvus \
+TEAM360_MILVUS_HOST=127.0.0.1 \
+TEAM360_MILVUS_PORT=19530 \
+TEAM360_MILVUS_COLLECTION=team360_sales_diagnosis_knowledge_v1 \
+TEAM360_DIAGNOSIS_STATE_PROVIDER=postgres \
+TEAM360_PUBLIC_ORGANIZATION_CODE=team360_live \
+TEAM360_PUBLIC_WORKSPACE_CODE=team360_public_site \
+TEAM360_PUBLIC_PACKAGE_CODE=pkg_sales_diagnosis \
+TEAM360_PUBLIC_KNOWLEDGE_SCOPE_CODE=ks_team360_sales_diagnosis \
+uv run uvicorn ls_iMotorSoft_Srv01:app --host 127.0.0.1 --port 7050
+```
+
+No definir `TEAM360_BACKEND_DEBUG` en produccion. El backend debe quedar con
+`debug=False` por defecto; rutas externas de scanner como `/api/env` y
+`/api/config` deben responder `404 Not Found` controlado, sin traceback.
+
+Notas de variables:
+
+- `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres` es el switch efectivo de estado
+  persistido que lee el backend publico.
+- `TEAM360_DIAGNOSIS_STATE_PROVIDER=postgres` queda como marcador operativo de
+  compatibilidad, pero no reemplaza a `AUTOMATION_DIAGNOSIS_REPOSITORY`.
+- `TEAM360_EMBEDDING_VERSION` es la variable efectiva para filtrar version de
+  embeddings en Milvus. No usar `TEAM360_MILVUS_EMBEDDING_VERSION` salvo cambio
+  de codigo.
+- `TEAM360_PUBLIC_*` documenta el contexto publico esperado, aunque el endpoint
+  actual conserva constantes canonicas internas para ese contexto.
 
 La DB remota `team360` ya fue recreada en el contenedor Docker remoto
 `imotorsoft-postgres` desde la DB local de desarrollo. Validacion al cierre:
@@ -126,23 +176,6 @@ La collection remota `JAI_document_embeddings` fue tratada como protegida y no
 fue tocada; mantuvo 3231 entidades antes y despues. La collection productiva
 `team360_sales_diagnosis_knowledge_v1` quedo con 183 entidades y busqueda
 vectorial basica validada.
-
-Variables no secretas recomendadas para `.bashrc`, entorno del servicio o
-archivo privado equivalente:
-
-```bash
-AUTOMATION_DIAGNOSIS_REPOSITORY=postgres
-TEAM360_AI_PROVIDER=litellm
-TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano
-TEAM360_LITELLM_API_MODE=chat
-TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER=milvus
-TEAM360_MILVUS_HOST=127.0.0.1
-TEAM360_MILVUS_PORT=19530
-TEAM360_MILVUS_COLLECTION=team360_sales_diagnosis_knowledge_v1
-TEAM360_KNOWLEDGE_SCOPE_ID=8b071443-5bd6-4fe4-bbc3-fc2dca179a5b
-TEAM360_EMBEDDING_MODEL=openai_text_embedding_3_small
-```
 
 Variables secretas o sensibles que deben venir de entorno privado, no de docs
 ni comandos pegados en historial:

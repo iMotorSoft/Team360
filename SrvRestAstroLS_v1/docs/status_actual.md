@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-20 (Hardening debug y comando backend productivo)
+Ultima actualizacion: 2026-06-20 (Lab interaction_blocks y hardening backend)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,24 @@ Ultima actualizacion: 2026-06-20 (Hardening debug y comando backend productivo)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-20 - Actualizacion operativa del lab `interaction_blocks`
+
+- Se reviso el lab frontend `/t360-interaction-lab` y sus componentes en
+  `SrvRestAstroLS_v1/astro/src/lib/t360/interaction/`.
+- Se agrego `README.md` local para documentar alcance, ruta, eventos DOM
+  emitidos (`t360action`, `t360choice`, `t360choices`), componentes principales
+  y comandos de validacion.
+- Se actualizo `SrvRestAstroLS_v1/astro/playwright.config.ts` para que el
+  webserver de backend use el entrypoint real `ls_iMotorSoft_Srv01:app` en vez
+  de `app:app`, evitando depender de un wrapper no presente en este arbol.
+- Validaciones ejecutadas desde `SrvRestAstroLS_v1/astro`:
+  `corepack pnpm check`, `corepack pnpm build` y
+  `corepack pnpm exec playwright test e2e/t360-interaction-lab.spec.ts --project=chromium`.
+- Resultado: `astro check` sin errores, `astro build` OK y Playwright
+  `1 passed`. Queda un hint preexistente en `e2e/public-vera.spec.ts` por un
+  parametro `page` no usado en un test skipped.
+- No se conecto el lab a backend, DB, Milvus, LiteLLM ni contratos productivos.
 
 ### 2026-06-20 - Hardening debug backend para 404 scanner
 

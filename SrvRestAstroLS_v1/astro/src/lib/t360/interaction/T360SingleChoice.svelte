@@ -1,0 +1,73 @@
+<script lang="ts">
+  import { dispatchActionEvent, dispatchChoiceSelectedEvent } from "./events";
+  import T360ChoiceGroup from "./T360ChoiceGroup.svelte";
+  import type { T360Action, T360SingleChoiceBlock, T360SingleChoiceOption } from "./types";
+
+  let {
+    block,
+    sessionId,
+    disabled = false,
+  }: {
+    block: T360SingleChoiceBlock;
+    sessionId: string;
+    disabled?: boolean;
+  } = $props();
+
+  let selectedId = $state<string | undefined>(undefined);
+  const selectedOption = $derived(block.options.find((option) => option.id === selectedId));
+  const submitAction = $derived<T360Action>(block.submit_action ?? {
+    id: "submit-single-choice",
+    label: "Continuar",
+    style: "primary",
+    intent: "answer_choice",
+  });
+  const canSubmit = $derived(Boolean(selectedOption) || block.required !== true);
+
+  function selectOption(option: T360SingleChoiceOption) {
+    if (disabled) return;
+    selectedId = option.id;
+    dispatchChoiceSelectedEvent(window, sessionId, option);
+  }
+
+  function submit(event: MouseEvent) {
+    if (!canSubmit || !selectedOption) return;
+    dispatchActionEvent(event.currentTarget ?? event.target ?? window, {
+      sessionId,
+      blockType: "single_choice",
+      action: submitAction,
+      payload: {
+        option_id: selectedOption.id,
+        value: selectedOption.value,
+      },
+    });
+  }
+</script>
+
+<section class="card bg-base-100 border border-base-300 shadow-sm" data-testid="t360-block-single_choice">
+  <div class="card-body p-4">
+    <div class="flex flex-col gap-1">
+      <h2 class="text-base font-bold leading-6">{block.question}</h2>
+      {#if block.helper_text}
+        <p class="text-sm leading-6 text-base-content/65">{block.helper_text}</p>
+      {/if}
+    </div>
+
+    <T360ChoiceGroup
+      options={block.options}
+      selectedIds={selectedId ? [selectedId] : []}
+      name={block.question}
+      {disabled}
+      onToggle={selectOption}
+    />
+
+    <button
+      type="button"
+      class="btn btn-sm btn-primary min-h-10 w-full sm:w-auto"
+      disabled={disabled || !canSubmit}
+      data-testid="t360-single-submit"
+      onclick={submit}
+    >
+      {submitAction.label}
+    </button>
+  </div>
+</section>
