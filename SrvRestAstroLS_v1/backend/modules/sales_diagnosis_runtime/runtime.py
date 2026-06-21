@@ -65,6 +65,13 @@ from modules.sales_diagnosis_runtime.providers import (
 
 DIAGNOSIS_REQUEST_PATTERNS = re.compile(
     r"\b(dame\s*(el\s*|un\s*)?diagn[oó]stico"
+    r"|dame\s*(el\s*)?informe"
+    r"|dame\s*((la|una)\s*)?conclusi[oó]n"
+    r"|qu[eé]\s*conclusi[oó]n\s*(ten[eé]s|sac[aá]s)"
+    r"|qu[eé]\s*me\s*d[aá]s\s*como\s*conclusi[oó]n"
+    r"|res[uú]m[íi]me|resum[íi]"
+    r"|mostrame\s*(el\s*)?resultado"
+    r"|ya\s*(con\s*esto|con\s*lo\s*que\s*hay)\s*qu[eé]\s*(me\s*)?dec[íi]s"
     r"|qu[eé]\s*(me\s*)?(recomiend[aeá]s?|recomiend[aeá]n|recomend[áa]s)"
     r"|con\s*esto\s*(alcanza|dame|quiero|empecemos)"
     r"|decime\s*qu[eé]\s*(hago|har[ií]as)"
