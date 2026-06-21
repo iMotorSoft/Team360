@@ -856,6 +856,9 @@ class AssistantConversationRuntime:
             return None
         if not status:
             state.slots["automation_goals_choice_status"] = "offered"
+        elif state.slots.get("multi_choice_shown"):
+            return None
+        state.slots["multi_choice_shown"] = True
         return {
             "type": "multi_choice",
             "question": "¿Qué querés automatizar primero?",
@@ -1075,7 +1078,7 @@ class AssistantConversationRuntime:
         state: ConversationState,
         should_diagnose: bool,
     ) -> dict[str, object] | None:
-        if not should_diagnose:
+        if not should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
             return None
         mem = state.semantic_memory or {}
         channels = mem.get("channels", [])
