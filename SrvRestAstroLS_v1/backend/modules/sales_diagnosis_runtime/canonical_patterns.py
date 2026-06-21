@@ -86,6 +86,10 @@ SYSTEM_PATTERNS: dict[str, re.Pattern] = {
         r"|(?:תוכנה\s+קניינית)",
         re.IGNORECASE,
     ),
+    "custom_system": re.compile(
+        r"(?:\b(?:sistema\s+propio|propio)\b)",
+        re.IGNORECASE,
+    ),
 }
 
 # ── Business entities that users may reference ────────────────────────────
@@ -287,6 +291,73 @@ def is_negated_mention(message: str, canonical: str) -> bool:
     start = max(0, mention_start - 50)
     prefix = message[start:mention_start]
     return bool(NEGATION_PREFIX.search(prefix))
+
+
+CLAUSE_SEPARATORS = re.compile(
+    r"(?:\s*[.;!?]\s+|\s*,\s+(?!\s*y|y\s+)\s*|\s+pero\s+|\s+sino\s+|\s+aunque\s+)"
+    r"|(?:\s+(?:ahora|actualmente|hoy|en\s+cambio|solo)\s+)"
+    r"|(?:\s+(?:sin\s+embargo|no\s+obstante|en\s+realidad)\s+)",
+    re.IGNORECASE,
+)
+
+
+def split_semantic_clauses(message: str) -> list[str]:
+    """Split a message into semantic clauses for independent evaluation."""
+    parts = CLAUSE_SEPARATORS.split(message)
+    result = []
+    for p in parts:
+        p = p.strip()
+        if p and len(p) > 2:
+            result.append(p)
+    if not result:
+        result = [message.strip()]
+    return result
+
+
+def classify_clause(clause: str) -> str:
+    """Classify a clause as current, negated, past, future, hypothetical, or question."""
+    c = clause.strip()
+    if c.startswith("¿") or c.startswith("?"):
+        return "question"
+    if NON_ASSERTIVE_PREFIX.search(c):
+        return "hypothetical"
+    if TEMPORAL_PAST.search(c):
+        return "past"
+    if TEMPORAL_FUTURE.search(c):
+        return "future"
+    if NEGATION_PREFIX.search(c):
+        return "negated"
+    return "current"
+
+
+def extract_current_channels(message: str) -> list[str]:
+    """Extract channels only from current-assertion clauses in a message."""
+    clauses = split_semantic_clauses(message)
+    result: list[str] = []
+    for clause in clauses:
+        cls = classify_clause(clause)
+        if cls != "current":
+            continue
+        found = extract_channels(clause)
+        for c in found:
+            if c not in result:
+                result.append(c)
+    return result
+
+
+def extract_current_systems(message: str) -> list[str]:
+    """Extract systems only from current-assertion clauses in a message."""
+    clauses = split_semantic_clauses(message)
+    result: list[str] = []
+    for clause in clauses:
+        cls = classify_clause(clause)
+        if cls != "current":
+            continue
+        found = extract_systems(clause)
+        for s in found:
+            if s not in result:
+                result.append(s)
+    return result
 
 
 def is_non_assertive_message(message: str) -> bool:
