@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from litestar.testing import TestClient
 
-from app import create_app
+from ls_iMotorSoft_Srv01 import create_app
 from modules.automation_diagnosis.ai_interpreter import AIInterpretationError
 from modules.automation_diagnosis.postgres_service import AutomationDiagnosisPersistenceError
 import routes.automation_diagnosis as automation_diagnosis_routes
@@ -31,6 +31,27 @@ def test_health_root_returns_ok():
     with _client() as client:
         response = client.get("/health")
     assert response.status_code == 200
+
+
+def test_backend_debug_is_disabled_by_default(monkeypatch):
+    monkeypatch.delenv("TEAM360_BACKEND_DEBUG", raising=False)
+
+    assert create_app().debug is False
+
+
+def test_backend_debug_can_be_enabled_explicitly(monkeypatch):
+    monkeypatch.setenv("TEAM360_BACKEND_DEBUG", "1")
+
+    assert create_app().debug is True
+
+
+def test_unknown_scanner_api_paths_return_controlled_404():
+    with _client() as client:
+        for path in ("/api/env", "/api/config"):
+            response = client.get(path)
+
+            assert response.status_code == 404
+            assert response.json()["detail"] == "Not Found"
 
 
 def test_start_session_returns_session_with_default_config():

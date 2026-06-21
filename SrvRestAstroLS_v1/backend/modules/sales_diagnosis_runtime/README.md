@@ -1705,7 +1705,8 @@ No es endpoint final publico, no es MVP y no activa producto comercial.
 - Modelo via `TEAM360_LITELLM_MODEL_ALIAS` (default: `openai_gpt-5-nano`).
 - `LiteLLMClient.text_completion()` enruta automaticamente:
   - `openai_gpt-5-nano` y `openai/gpt-5-nano` → `/v1/responses`
-    con `reasoning.effort=minimal`;
+    con `reasoning.effort=low` cuando el upstream efectivo es
+    `openai/gpt-5.4-nano`;
   - el resto de aliases (`requesty_deepseek_4_flash`,
     `openrouter_deepseek_4_flash`, etc.) → `/v1/chat/completions`.
 - Construye prompts via `PromptPolicy`.

@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-18 (Post-reload session isolation fix)
+Ultima actualizacion: 2026-06-20 (Hardening debug y comando backend productivo)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,109 @@ Ultima actualizacion: 2026-06-18 (Post-reload session isolation fix)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-20 - Hardening debug backend para 404 scanner
+
+- Se reviso el incidente productivo con requests externos a `/api/config` y
+  `/api/env`.
+- Diagnostico: esas rutas no pertenecen al contrato Team360; son probes
+  tipicos buscando configuracion o variables de entorno. Produccion responde
+  `404 Not Found` y `/api/health` responde `200 OK`.
+- Se cambio el entrypoint Litestar para que `debug` quede apagado por defecto
+  y solo pueda activarse explicitamente con `TEAM360_BACKEND_DEBUG`.
+- Se agrego `backend/app.py` como wrapper compatible para `uvicorn app:app`,
+  delegando en `ls_iMotorSoft_Srv01.py` sin duplicar rutas ni configuracion.
+- Se incluyo `app.py` en el build config del backend.
+- Se agregaron tests para validar `debug` por env y 404 controlado en
+  `/api/env` y `/api/config`.
+- Se documento el comando canonico productivo en
+  `lat.md/team360-runtime-operational-policy.md` y en
+  `SrvRestAstroLS_v1/docs/team360_live_frontend_deploy_20260618.md`, usando
+  `uv run uvicorn ls_iMotorSoft_Srv01:app --host 127.0.0.1 --port 7050`.
+- Se aclaro que no debe definirse `TEAM360_BACKEND_DEBUG` en produccion y que
+  `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres` / `TEAM360_EMBEDDING_VERSION` son
+  las variables efectivas para estado persistido y filtro de embeddings.
+- Validacion ejecutada desde `SrvRestAstroLS_v1/backend`:
+  `uv run pytest tests/test_automation_diagnosis_router.py tests/test_diagnosis_public_router.py -q`
+  (`52 passed`).
+- No se crearon endpoints `/api/env` ni `/api/config`; exponerlos seria
+  incorrecto para produccion.
+
+### 2026-06-19 - Base frontend reusable para `interaction_blocks`
+
+- Se creo una base frontend aislada y reusable en Astro/Svelte para renderizar
+  `interaction_blocks` JSON sin HTML dinamico y sin acoplamiento a endpoints
+  backend.
+- Se agregaron contratos TypeScript, eventos DOM internos, guards simples,
+  fixtures locales y componentes Svelte 5 para:
+  `next_step_choice`, `single_choice`, `multi_choice`,
+  `missing_requirements`, `product_fit_card`, `diagnosis_action_card` y
+  `diagnosis summary`.
+- Se creo la ruta lab solo frontend `/t360-interaction-lab` para validar todos
+  los bloques con fixtures locales y log visible de eventos (`t360action`,
+  `t360choice`, `t360choices`).
+- Se agrego test Playwright minimo no invasivo para cargar la ruta lab,
+  verificar los bloques, hacer click en una accion, validar el log de eventos y
+  revisar viewport mobile.
+- Validaciones ejecutadas desde `SrvRestAstroLS_v1/astro`:
+  `corepack pnpm check`, `corepack pnpm build`,
+  `PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:4321 corepack pnpm exec playwright test e2e/t360-interaction-lab.spec.ts --project=chromium`
+  y capturas Playwright desktop/mobile sobre `/t360-interaction-lab`.
+- Nota de alcance: no se tocaron backend, endpoints, migraciones, runtime
+  Python/Litestar, PostgreSQL, Milvus, LiteLLM, contratos productivos backend
+  ni navegacion productiva.
+- No se ejecuto preflight de servicios reales porque la tarea y la validacion
+  fueron estrictamente frontend con fixtures locales.
+
+### 2026-06-18 - Alineacion reasoning GPT-5.4 Nano
+
+- Se corrigio el test unitario de `LiteLLMClient.responses_completion()` para
+  esperar `reasoning.effort=low` en el camino Responses API.
+- Se documento en `lat.md/team360-runtime-operational-policy.md` la regla
+  operativa: Vera publica validada sigue usando Chat Completions sin
+  `reasoning_effort`; solo labs, compatibilidad o evaluaciones controladas con
+  Responses API contra upstream `openai/gpt-5.4-nano` deben enviar
+  `reasoning.effort=low`.
+- Se actualizo tambien `backend/modules/sales_diagnosis_runtime/README.md`, que
+  conservaba la descripcion antigua del valor de reasoning.
+- Se aclaro que `minimal` no debe usarse para ese upstream.
+- Validacion ejecutada:
+  `uv run pytest tests/test_automation_diagnosis_litellm.py -q`
+  (`13 passed`).
+- Smoke publico real ejecutado contra `https://team360.live/api/diagnosis/turn`:
+  - `GET /api/health`: `200 OK`, `time_total=1.416752s`;
+  - turno 1: `201 Created`, `time_total=4.441494s`, modelo reportado
+    `openai_gpt-5-nano`, `fallback_used=false`, accion `reflect_and_ask`;
+  - turno 2 en la misma sesion: `201 Created`, `time_total=7.818726s`,
+    modelo reportado `openai_gpt-5-nano`, `fallback_used=false`, accion
+    `diagnose`, `diagnosis_built=true`, factibilidad `high`.
+- Nota de alcance: desde la API publica se valida alias, respuesta, fallback y
+  latencia end-to-end; el upstream interno `openai/gpt-5.4-nano` se toma de la
+  politica/configuracion LiteLLM vigente, no se expone en el contrato publico.
+- No se modificaron runtime productivo, Milvus, PostgreSQL, LiteLLM, frontend,
+  deploy remoto ni configuracion de servicios.
+
+### 2026-06-18 - Build Astro publicado en remoto
+
+- Se genero un build estatico nuevo de Astro para `team360.live` desde
+  `SrvRestAstroLS_v1/astro`.
+- Se publico el contenido de `SrvRestAstroLS_v1/astro/dist/` en el remoto:
+  `/home/administrator/project/iMotorSoft/ai/Team360/SrvRestAstroLS_v1/astro/dist/`.
+- El build publicado usa `URL_REST_PRO=""`, por lo que la experiencia publica
+  llama al backend como `/api` sobre `team360.live` y no a `localhost`.
+- Validaciones ejecutadas:
+  `pnpm check`, `pnpm build`, busqueda de referencias a `localhost:7050` en
+  `dist/`, `rsync --delete`, `nginx -t`, `curl -I https://team360.live/` y
+  `curl -I https://team360.live/t360/`.
+- Resultado HTTP publico: `/` y `/t360/` respondieron `200 OK` por HTTPS con
+  `Last-Modified` del build nuevo.
+- Nota operativa: `nginx -t` paso; Nginx reporto warnings preexistentes por
+  `server_name` duplicados de otros dominios, sin bloquear la configuracion.
+- Durante la validacion se detecto que `console.team360.live` no resolvia DNS,
+  por lo que no se uso como host API productivo en este build.
+- No se modificaron backend, PostgreSQL, Milvus, LiteLLM, servicios systemd ni
+  configuracion Nginx.
+- No hubo commit ni push.
 
 ### 2026-06-18 - Post-reload session isolation fix en `/t360`
 
@@ -2661,7 +2764,8 @@ pero **no se ejecutaron las validaciones finales** sobre los cambios del lab.
 - Se agrego soporte runtime en Team360:
   - `LiteLLMClient.responses_completion()` llama `/v1/responses`.
   - `LiteLLMClient.text_completion()` enruta `openai_gpt-5-nano` y
-    `openai/gpt-5-nano` por Responses API con `reasoning.effort=minimal`.
+    `openai/gpt-5-nano` por Responses API. Nota vigente al 2026-06-18: si el
+    upstream efectivo es `openai/gpt-5.4-nano`, usar `reasoning.effort=low`.
   - Los demas aliases siguen usando `/v1/chat/completions`.
   - `TEAM360_LITELLM_API_MODE=auto|chat|responses` permite override controlado.
   - Product adapter e `LiteLLMAIInterpreter` usan `text_completion()`.

@@ -160,7 +160,7 @@ def test_litellm_client_handles_successful_responses_api_response(monkeypatch):
     assert captured["payload"]["model"] == "openai/gpt-5-nano"
     assert captured["payload"]["instructions"] == "Sos breve."
     assert captured["payload"]["input"] == "USER:\nResponde OK."
-    assert captured["payload"]["reasoning"] == {"effort": "minimal"}
+    assert captured["payload"]["reasoning"] == {"effort": "low"}
     assert captured["payload"]["store"] is False
     assert captured["headers"]["X-correlation-id"] == "corr_test"
     assert captured["headers"]["X-team360-workspace-id"] == "ws_test"

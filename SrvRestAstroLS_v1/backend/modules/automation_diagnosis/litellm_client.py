@@ -136,7 +136,7 @@ class LiteLLMClient:
         messages: list[dict[str, str]],
         *,
         max_output_tokens: int = 1800,
-        reasoning_effort: str = "minimal",
+        reasoning_effort: str = "low",
         correlation_id: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> LiteLLMResponse:

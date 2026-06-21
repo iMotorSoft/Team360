@@ -10,8 +10,6 @@ import os
 
 from litestar import Litestar, get
 from litestar.config.cors import CORSConfig
-from litestar.exceptions import HTTPException
-from litestar.status_codes import HTTP_404_NOT_FOUND
 
 from modules.db.errors import DatabasePoolNotInitializedError
 from modules.db.pool import close_pool, get_pool, open_pool
@@ -60,6 +58,11 @@ async def _close_db_pool() -> None:
         pass
 
 
+def _backend_debug_enabled() -> bool:
+    value = os.environ.get("TEAM360_BACKEND_DEBUG", "").strip().lower()
+    return value in {"1", "true", "yes", "on", "debug", "development"}
+
+
 def create_app() -> Litestar:
     return Litestar(
         route_handlers=[
@@ -87,7 +90,7 @@ def create_app() -> Litestar:
             allow_methods=["*"],
             allow_headers=["*"],
         ),
-        debug=True,
+        debug=_backend_debug_enabled(),
     )
 
 
