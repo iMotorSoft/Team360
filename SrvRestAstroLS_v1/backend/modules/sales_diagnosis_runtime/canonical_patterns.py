@@ -35,7 +35,7 @@ CHANNEL_PATTERNS: dict[str, re.Pattern] = {
     "whatsapp": _word_or_any("whatsapp", "וואטסאפ"),
     "gmail": _word_or_any("gmail", "ג׳ימייל"),
     "email": re.compile(
-        r"(?:\b(?:email|e-mail|correo|correo electr[oó]nico)\b)"
+        r"(?:\b(?:email|e-mail|correo|correo electr[oó]nico|mail|mails)\b)"
         r"|(?:דואר\s*אלקטרוני|אימייל)",
         re.IGNORECASE,
     ),

@@ -99,6 +99,23 @@ MANAGEMENT_SYSTEM_OPTIONS: dict[str, str] = {
     "none": "No se gestiona centralizadamente",
 }
 
+MANAGEMENT_SYSTEM_OPTIONS_EMAIL: dict[str, str] = {
+    "email_inbox": "Solo en la bandeja de email",
+    "email_folders": "Carpetas o etiquetas del correo",
+    "spreadsheet": "Planilla / Excel",
+    "crm": "CRM o mesa de ayuda",
+    "custom_system": "Sistema propio",
+    "none": "No hay un seguimiento definido",
+}
+
+MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP: dict[str, str] = {
+    "whatsapp_business": "Solo en WhatsApp Business",
+    "crm": "CRM o sistema de gestión",
+    "spreadsheet": "Planilla / Excel",
+    "custom_system": "Sistema propio",
+    "none": "No hay un seguimiento definido",
+}
+
 AUTOMATION_GOALS: dict[str, str] = {
     "answer_faq": "Responder consultas frecuentes",
     "classify": "Clasificar consultas",
@@ -111,7 +128,7 @@ PRODUCT_CATALOG: list[dict[str, Any]] = [
     {
         "code": "pack_flow_whatsapp",
         "name": "T360 Pack Flow — Gestión de WhatsApp",
-        "match_channels": ["whatsapp"],
+        "required_channels": ["whatsapp"],
         "match_goals": [],
         "status": "feasible",
         "summary": "Ordená la recepción, clasificación y respuesta de consultas de WhatsApp.",
@@ -122,7 +139,7 @@ PRODUCT_CATALOG: list[dict[str, Any]] = [
     {
         "code": "pack_faq_automation",
         "name": "T360 Pack — Automatización de consultas frecuentes",
-        "match_channels": [],
+        "required_channels": [],
         "match_goals": ["answer_faq"],
         "status": "feasible",
         "summary": "Respondé automáticamente preguntas recurrentes sin intervención manual.",
@@ -435,12 +452,14 @@ class AssistantConversationRuntime:
         block_type = resp.get("block_type")
         if block_type == "single_choice":
             value = resp.get("value", "")
-            if value not in MANAGEMENT_SYSTEM_OPTIONS:
+            valid_options = set(MANAGEMENT_SYSTEM_OPTIONS) | set(MANAGEMENT_SYSTEM_OPTIONS_EMAIL) | set(MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP)
+            if value not in valid_options:
                 return
             option_id = resp.get("option_id")
             if option_id is not None and option_id != value:
                 return
-            label = MANAGEMENT_SYSTEM_OPTIONS[value]
+            all_options = {**MANAGEMENT_SYSTEM_OPTIONS, **MANAGEMENT_SYSTEM_OPTIONS_EMAIL, **MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP}
+            label = all_options.get(value, value)
             state.slots["management_system"] = value
             state.slots["management_system_label"] = label
             state.slots["management_system_choice_status"] = "answered"
@@ -790,6 +809,14 @@ class AssistantConversationRuntime:
         }
 
     @staticmethod
+    def _get_management_options(channels: list[str]) -> dict[str, str]:
+        if "email" in channels and "whatsapp" not in channels:
+            return MANAGEMENT_SYSTEM_OPTIONS_EMAIL
+        if "whatsapp" in channels and "email" not in channels:
+            return MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP
+        return MANAGEMENT_SYSTEM_OPTIONS
+
+    @staticmethod
     def _build_single_choice_block(
         state: ConversationState,
     ) -> dict[str, object] | None:
@@ -807,14 +834,16 @@ class AssistantConversationRuntime:
             return None
         if not status:
             state.slots["management_system_choice_status"] = "offered"
+        options = AssistantConversationRuntime._get_management_options(channels)
+        channel_label = "emails" if "email" in channels else "consultas"
         return {
             "type": "single_choice",
-            "question": "¿Dónde se gestionan hoy esas consultas?",
-            "helper_text": "Elegí el sistema que mejor describa tu situación actual.",
+            "question": f"¿Dónde se registran y siguen hoy los {channel_label}?",
+            "helper_text": "Elegí la opción que mejor describa tu situación actual.",
             "required": True,
             "options": [
                 {"id": k, "label": v, "value": k}
-                for k, v in MANAGEMENT_SYSTEM_OPTIONS.items()
+                for k, v in options.items()
             ],
             "submit_action": {
                 "id": "submit_management_system",
@@ -1085,10 +1114,13 @@ class AssistantConversationRuntime:
         goals = state.slots.get("automation_goals", [])
 
         matched: list[dict[str, Any]] = []
+        channels_set = set(channels)
         for product in PRODUCT_CATALOG:
-            chan_match = not product["match_channels"] or any(c in channels for c in product["match_channels"])
+            req = product.get("required_channels", [])
+            if req and not channels_set.intersection(req):
+                continue
             goal_match = not product["match_goals"] or any(g in goals for g in product["match_goals"])
-            if chan_match or goal_match:
+            if goal_match:
                 matched.append(product)
 
         if not matched:
