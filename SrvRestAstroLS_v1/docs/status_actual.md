@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-21 (Integracion controlada interaction_blocks en /t360)
+Ultima actualizacion: 2026-06-21 (Validacion local backend 7050 y Astro 3050)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,49 @@ Ultima actualizacion: 2026-06-21 (Integracion controlada interaction_blocks en /
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-21 - Validacion local backend 7050 y Astro 3050
+
+- Se documento la configuracion local completa en
+  `SrvRestAstroLS_v1/docs/team360_local_dev_runtime_config.md`: puertos,
+  variables, resolucion de Postgres por `globalVar.py`, LiteLLM, Milvus,
+  comandos de backend/Astro, preflight, curl y Playwright.
+- Se valido el arranque local de backend en `127.0.0.1:7050` con
+  `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres`, IA via LiteLLM, retrieval Milvus y
+  variables de diagnostico publico configuradas por entorno de sesion.
+- `globalVar.py` resolvio correctamente el DSN de Team360 desde el entorno:
+  DB `team360` en `localhost:5432`; no fue necesario declarar
+  `TEAM360_DB_URL_PSQL` en el comando local.
+- Preflight de servicios reales:
+  PostgreSQL OK, Milvus OK con collection
+  `team360_sales_diagnosis_knowledge_v1`, LiteLLM OK en `127.0.0.1:4000`,
+  alias `openai_gpt-5-nano` registrado y llamada minima al modelo respondida
+  sin fallback.
+- Se verifico `GET http://127.0.0.1:7050/api/health` con `200 OK`.
+- Se ejecutaron dos turnos reales contra
+  `POST http://127.0.0.1:7050/api/diagnosis/turn`: el primer turno creo una
+  sesion nueva y el segundo reutilizo la sesion con `diagnosis_built=true`,
+  modelo reportado `openai_gpt-5-nano` y `fallback_used=false`.
+- Se levanto Astro en `127.0.0.1:3050` y se valido que `/t360` y
+  `/t360-interaction-lab` responden `200 OK`.
+- Configuracion frontend: la fuente de verdad para el endpoint REST de Astro
+  esta en `SrvRestAstroLS_v1/astro/src/components/global.js`; alli
+  `URL_REST_DEV` figura como `http://localhost:7050` para backend de
+  desarrollo.
+- Nota operativa: el build/dev actual estaba usando API relativa por
+  `URL_REST_PRO=""` y el proxy Vite de `astro.config.mjs` mantiene `/api`
+  apuntando a `127.0.0.1:8000`; para esta validacion se uso un forward temporal
+  de sesion `8000 -> 7050` con `socat`, sin persistir cambios de configuracion.
+- Validaciones ejecutadas:
+  `git diff --check`,
+  `corepack pnpm check`,
+  `corepack pnpm build` y
+  `PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:3050 T360_REAL_E2E=1 corepack pnpm exec playwright test e2e/t360-interaction-lab.spec.ts e2e/public-vera.spec.ts --project=chromium`.
+- Resultado: `git diff --check` OK, `pnpm check` OK con hint preexistente por
+  parametro `page` no usado en un test skipped, build OK y Playwright
+  `14 passed`, `1 skipped`.
+- No se modificaron backend, runtime Python/Litestar, endpoints, prompts,
+  migraciones, DB, Milvus, LiteLLM ni configuracion persistente de servicios.
 
 ### 2026-06-21 - Integracion controlada `interaction_blocks` en `/t360`
 
