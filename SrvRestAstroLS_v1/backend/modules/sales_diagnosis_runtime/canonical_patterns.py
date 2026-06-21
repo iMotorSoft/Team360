@@ -35,7 +35,7 @@ CHANNEL_PATTERNS: dict[str, re.Pattern] = {
     "whatsapp": _word_or_any("whatsapp", "וואטסאפ"),
     "gmail": _word_or_any("gmail", "ג׳ימייל"),
     "email": re.compile(
-        r"(?:\b(?:email|e-mail|correo|correo electr[oó]nico|mail|mails)\b)"
+        r"(?:\b(?:email|e-mail|correo|correo electr[oó]nico|mail|mails|emails?)\b)"
         r"|(?:דואר\s*אלקטרוני|אימייל)",
         re.IGNORECASE,
     ),
@@ -249,7 +249,7 @@ GENERAL_OUTCOME_PATTERNS = re.compile(
 
 
 NEGATION_PREFIX = re.compile(
-    r"(?:\b(?:no\s+(?:usamos|tenemos|recibimos|contamos|manejamos|trabajamos|ocupamos)"
+    r"(?:\b(?:no\s+(?:usamos|tenemos|recibimos|contamos|manejamos|trabajamos|ocupamos|es|son|era)"
     r"|nunca|ya\s+no|todav[íi]a\s+no|a[úu]n\s+no|sin\s+(?:usar|tener|contar|un|una)\b"
     r"|no\s+(?:se\s+)?(?:responde|atiende|gestiona|maneja|usa|tiene|recibe)"
     r")\b)",
@@ -263,7 +263,7 @@ NON_ASSERTIVE_PREFIX = re.compile(
 )
 
 TEMPORAL_PAST = re.compile(
-    r"(?:\b(?:antes|antiguamente|sol[íi]amos|sol[íi]a|us[aá]bamos|us[aá]ba"
+    r"(?:\b(?:antes|antiguamente|sol[íi]amos|sol[íi]a|us[aá]bamos|us[aá]ba|dije"
     r"|el\s+a[ñn]o\s+pasado|hace\s+tiempo)\b)",
     re.IGNORECASE,
 )
@@ -294,9 +294,9 @@ def is_negated_mention(message: str, canonical: str) -> bool:
 
 
 CLAUSE_SEPARATORS = re.compile(
-    r"(?:\s*[.;!?]\s+|\s*,\s+(?!\s*y|y\s+)\s*|\s+pero\s+|\s+sino\s+|\s+aunque\s+)"
-    r"|(?:\s+(?:ahora|actualmente|hoy|en\s+cambio|solo)\s+)"
-    r"|(?:\s+(?:sin\s+embargo|no\s+obstante|en\s+realidad)\s+)",
+    r"(?:\s*[.;!?:]\s+|\s*,\s+(?!\s*y|y\s+)\s*|\s+pero\s+|\s+sino\s+|\s+aunque\s+)"
+    r"|(?:\s+(?:ahora|actualmente|hoy|en\s+cambio|solo|en\s+realidad)\s+)"
+    r"|(?:\s+(?:sin\s+embargo|no\s+obstante)\s+)",
     re.IGNORECASE,
 )
 
