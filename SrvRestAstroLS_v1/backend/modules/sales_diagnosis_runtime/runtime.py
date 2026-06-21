@@ -35,6 +35,9 @@ from modules.sales_diagnosis_runtime.canonical_patterns import (
     extract_volume,
     is_business_context,
     is_correction,
+    is_negated_mention,
+    is_non_assertive_message,
+    is_temporal_non_current,
 )
 from modules.sales_diagnosis_runtime.intent_classifier import (
     CLASSIFIER_CONFIDENCE_MODERATE,
@@ -370,29 +373,35 @@ class AssistantConversationRuntime:
         messages.append(msg)
         mem["_messages"] = messages
 
+        # Skip channel/system extraction for non-assertive or temporal-non-current messages
+        skip_semantic = is_non_assertive_message(msg) or is_temporal_non_current(msg)
+
         # Business context — first mention of business type
         if not mem.get("business_context"):
             ctx = is_business_context(msg)
             if ctx:
                 mem["business_context"] = ctx
 
-        # Channels — canonical, multilingual
-        channels = extract_channels(msg)
-        if channels:
-            existing = mem.get("channels", [])
-            for c in channels:
-                if c not in existing:
-                    existing.append(c)
-            mem["channels"] = existing
+        if not skip_semantic:
+            # Channels — canonical, multilingual (filtered by negation)
+            channels = extract_channels(msg)
+            new_channels = [c for c in channels if not is_negated_mention(msg, c)]
+            if new_channels:
+                existing = mem.get("channels", [])
+                for c in new_channels:
+                    if c not in existing:
+                        existing.append(c)
+                mem["channels"] = existing
 
-        # Systems and data sources — canonical, multilingual
-        systems = extract_systems(msg)
-        if systems:
-            existing = mem.get("systems_and_data_sources", [])
-            for s in systems:
-                if s not in existing:
-                    existing.append(s)
-            mem["systems_and_data_sources"] = existing
+            # Systems and data sources — canonical, multilingual (filtered by negation)
+            systems = extract_systems(msg)
+            new_systems = [s for s in systems if not is_negated_mention(msg, s)]
+            if new_systems:
+                existing = mem.get("systems_and_data_sources", [])
+                for s in new_systems:
+                    if s not in existing:
+                        existing.append(s)
+                mem["systems_and_data_sources"] = existing
 
         # Business entities (inventory, prices, etc.)
         entities = extract_entities(msg)

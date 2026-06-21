@@ -244,6 +244,70 @@ GENERAL_OUTCOME_PATTERNS = re.compile(
 # ---------------------------------------------------------------------------
 
 
+NEGATION_PREFIX = re.compile(
+    r"(?:\b(?:no\s+(?:usamos|tenemos|recibimos|contamos|manejamos|trabajamos|ocupamos)"
+    r"|nunca|ya\s+no|todav[íi]a\s+no|a[úu]n\s+no|sin\s+(?:usar|tener|contar|un|una)\b"
+    r"|no\s+(?:se\s+)?(?:responde|atiende|gestiona|maneja|usa|tiene|recibe)"
+    r")\b)",
+    re.IGNORECASE,
+)
+
+NON_ASSERTIVE_PREFIX = re.compile(
+    r"(?:\b(?:tal\s+vez|quiz[aá]s|podr[íi]a|si\s+tuvi[ée]ramos|si\s+us[aá]ramos"
+    r"|por\s+ejemplo|supongamos|digamos|imagin[aá])\b)",
+    re.IGNORECASE,
+)
+
+TEMPORAL_PAST = re.compile(
+    r"(?:\b(?:antes|antiguamente|sol[íi]amos|sol[íi]a|us[aá]bamos|us[aá]ba"
+    r"|el\s+a[ñn]o\s+pasado|hace\s+tiempo)\b)",
+    re.IGNORECASE,
+)
+
+TEMPORAL_FUTURE = re.compile(
+    r"(?:\b(?:en\s+el\s+futuro|m[aá]s\s+adelante|pr[oó]ximamente|vamos\s+a"
+    r"|queremos|pensamos|planeamos|implementaremos|migraremos)\b)",
+    re.IGNORECASE,
+)
+
+ALL_PATTERNS: dict[str, re.Pattern] = {}
+ALL_PATTERNS.update(CHANNEL_PATTERNS)
+ALL_PATTERNS.update(SYSTEM_PATTERNS)
+
+
+def is_negated_mention(message: str, canonical: str) -> bool:
+    """Check if a canonical channel/system term appears negated in the message."""
+    pattern = ALL_PATTERNS.get(canonical)
+    if not pattern:
+        return False
+    m = pattern.search(message)
+    if not m:
+        return False
+    mention_start = m.start()
+    start = max(0, mention_start - 50)
+    prefix = message[start:mention_start]
+    return bool(NEGATION_PREFIX.search(prefix))
+
+
+def is_non_assertive_message(message: str) -> bool:
+    """Check if the entire message is a question, hypothetical, or example."""
+    msg = message.strip()
+    if msg.startswith("¿") or msg.startswith("?"):
+        return True
+    if NON_ASSERTIVE_PREFIX.search(msg):
+        return True
+    return False
+
+
+def is_temporal_non_current(message: str) -> bool:
+    """Check if the message refers to past systems/channels or future plans."""
+    if TEMPORAL_PAST.search(message):
+        return True
+    if TEMPORAL_FUTURE.search(message):
+        return True
+    return False
+
+
 def extract_channels(message: str) -> list[str]:
     found: list[str] = []
     for canonical, pattern in CHANNEL_PATTERNS.items():
