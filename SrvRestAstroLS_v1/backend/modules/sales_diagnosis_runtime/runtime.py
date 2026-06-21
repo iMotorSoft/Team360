@@ -223,8 +223,10 @@ class AssistantConversationRuntime:
         if should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
             state.semantic_memory["diagnosis_status"] = "completed"
 
-        # Build interaction_block when runtime can offer a choice
-        interaction_block = self._build_next_step_choice_if_ready(should_diagnose, state)
+        # Build interaction_block: single_choice for missing operational slots
+        interaction_block = self._build_single_choice_block(state)
+        if interaction_block is None:
+            interaction_block = self._build_next_step_choice_if_ready(should_diagnose, state)
 
         decision_reason = intent.source.value if intent.source != IntentSource.RUNTIME_FALLBACK else self._readiness_reason(state)
         if intent.intent in (IntentType.REQUEST_DIAGNOSIS, IntentType.STOP_INTERVIEW) and should_diagnose:
@@ -693,6 +695,62 @@ class AssistantConversationRuntime:
                     "style": "primary",
                 },
             ],
+        }
+
+    @staticmethod
+    def _build_single_choice_block(
+        state: ConversationState,
+    ) -> dict[str, object] | None:
+        if state.slots.get("single_choice_shown"):
+            return None
+        mem = state.semantic_memory or {}
+        if state.turn_count < 2:
+            return None
+        channels = mem.get("channels", [])
+        if not channels:
+            return None
+        has_systems = bool(mem.get("systems_and_data_sources"))
+        if has_systems:
+            return None
+        state.slots["single_choice_shown"] = True
+        return {
+            "type": "single_choice",
+            "question": "¿Dónde se gestionan hoy esas consultas?",
+            "helper_text": "Elegí el sistema que mejor describa tu situación actual.",
+            "required": True,
+            "options": [
+                {
+                    "id": "whatsapp_business",
+                    "label": "WhatsApp Business",
+                    "value": "whatsapp_business",
+                },
+                {
+                    "id": "crm",
+                    "label": "CRM / Sistema de gestión",
+                    "value": "crm",
+                },
+                {
+                    "id": "spreadsheet",
+                    "label": "Planilla / Excel",
+                    "value": "spreadsheet",
+                },
+                {
+                    "id": "custom_system",
+                    "label": "Sistema propio",
+                    "value": "custom_system",
+                },
+                {
+                    "id": "none",
+                    "label": "No se gestiona centralizadamente",
+                    "value": "none",
+                },
+            ],
+            "submit_action": {
+                "id": "submit_management_system",
+                "label": "Continuar",
+                "intent": "answer_choice",
+                "style": "primary",
+            },
         }
 
     def _readiness_reason(self, state: ConversationState) -> str:

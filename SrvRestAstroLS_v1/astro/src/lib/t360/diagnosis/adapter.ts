@@ -21,10 +21,10 @@ export function t360InteractionEventToTurnRequest(
   detail: T360InteractionEventDetail,
 ): T360InteractionTurnRequest {
   if (detail.type === "t360.choice.submitted") {
-    const value = detail.selected_option.value;
+    const option = detail.selected_option;
     return {
-      message: `Selecciono la opción "${value}". Continuá el diagnóstico con esa respuesta.`,
-      display_text: `Seleccioné: ${value}`,
+      message: `Sistema de gestión que uso actualmente: ${option.label}.`,
+      display_text: `Seleccioné: ${option.label}`,
     };
   }
 

@@ -22,6 +22,7 @@ export type T360ChoiceSelectedEvent = {
   selected_option: {
     option_id: string;
     value: string;
+    label: string;
   };
 };
 
@@ -89,6 +90,7 @@ export function dispatchChoiceSelectedEvent(
       selected_option: {
         option_id: option.id,
         value: option.value,
+        label: option.label,
       },
     },
   }));
