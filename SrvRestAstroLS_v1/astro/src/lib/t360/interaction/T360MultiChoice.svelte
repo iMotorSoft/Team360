@@ -7,10 +7,12 @@
     block,
     sessionId,
     disabled = false,
+    answered = false,
   }: {
     block: T360MultiChoiceBlock;
     sessionId: string;
     disabled?: boolean;
+    answered?: boolean;
   } = $props();
 
   let selectedIds = $state<string[]>([]);
@@ -46,39 +48,49 @@
   }
 </script>
 
-<section class="card bg-base-100 border border-base-300 shadow-sm" data-testid="t360-block-multi_choice">
-  <div class="card-body p-4">
-    <div class="flex flex-col gap-1">
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <h2 class="text-base font-bold leading-6">{block.question}</h2>
-        <span class="badge badge-outline h-auto px-2 py-1 text-xs">{selectionLabel}</span>
-      </div>
-      {#if block.helper_text}
-        <p class="text-sm leading-6 text-base-content/65">{block.helper_text}</p>
-      {/if}
+{#if answered && selectedOptions.length > 0}
+  <section class="card bg-base-100 border border-base-300 shadow-sm" data-testid="t360-block-multi_choice-answered" data-interaction-state="answered">
+    <div class="card-body p-3">
+      <p class="text-xs font-semibold uppercase tracking-wider text-base-content/50">Tu respuesta</p>
+      <p class="text-sm font-semibold leading-5">{selectedOptions.map((o) => o.label).join(" · ")}</p>
     </div>
+  </section>
+{:else}
+  <section class="card bg-base-100 border border-primary/30 shadow-sm" data-testid="t360-block-multi_choice" data-interaction-state="requires-response">
+    <div class="card-body p-4">
+      <div class="flex flex-col gap-1">
+        <span class="badge badge-primary badge-sm mb-1 w-fit px-2 py-1 text-[0.6rem] font-semibold uppercase tracking-wider">Paso necesario</span>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <h2 class="text-base font-bold leading-6">{block.question}</h2>
+          <span class="badge badge-outline h-auto px-2 py-1 text-xs shrink-0">{selectionLabel}</span>
+        </div>
+        {#if block.helper_text}
+          <p class="text-sm leading-6 text-base-content/65">{block.helper_text}</p>
+        {/if}
+      </div>
 
-    <T360ChoiceGroup
-      options={block.options}
-      {selectedIds}
-      multiple
-      name={block.question}
-      {disabled}
-      disabledIds={disabledOptionIds}
-      disabledReason="Máximo seleccionado"
-      onToggle={toggleOption}
-    />
+      <T360ChoiceGroup
+        options={block.options}
+        {selectedIds}
+        multiple
+        name={block.question}
+        {disabled}
+        disabledIds={disabledOptionIds}
+        disabledReason="Máximo seleccionado"
+        onToggle={toggleOption}
+      />
 
-    <p class="text-xs leading-5 text-base-content/55" aria-live="polite">{selectionFeedback}</p>
+      <p class="text-xs leading-5 text-base-content/55" aria-live="polite">{selectionFeedback}</p>
 
-    <button
-      type="button"
-      class="btn btn-sm btn-primary min-h-10 w-full sm:w-auto"
-      disabled={disabled || !canSubmit}
-      data-testid="t360-multi-submit"
-      onclick={submit}
-    >
-      {block.submit_action.label}
-    </button>
-  </div>
-</section>
+      <button
+        type="button"
+        class="btn btn-sm btn-primary min-h-10 w-full sm:w-auto"
+        disabled={disabled || !canSubmit}
+        data-testid="t360-multi-submit"
+        onclick={submit}
+      >
+        {block.submit_action.label}
+      </button>
+    </div>
+  </section>
+{/if}
