@@ -1,14 +1,22 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { PUBLIC_DIAGNOSIS_CONTEXT, sendPublicTurn } from "../../lib/api/publicDiagnosis";
   import type { StructuredDiagnosis, TurnDecision, TurnLanguage } from "../../lib/api/publicDiagnosis";
   import { loadPublicVeraSession, savePublicVeraSession, clearPublicVeraSession } from "../../lib/publicVeraSession";
   import DiagnosisResult from "./DiagnosisResult.svelte";
   import { sectionTitle, isValidDiagnosis } from "../../lib/api/diagnosisPresentation";
+  import T360InteractionRenderer from "../../lib/t360/interaction/T360InteractionRenderer.svelte";
+  import { normalizeT360DiagnosisTurn } from "../../lib/t360/diagnosis/normalizer";
+  import { t360InteractionEventToTurnRequest } from "../../lib/t360/diagnosis/adapter";
+  import type { T360InteractionEventDetail } from "../../lib/t360/diagnosis/types";
 
   interface ChatMessage {
     role: "user" | "assistant";
     text: string;
     diagnosis?: StructuredDiagnosis | null;
+    interactionBlock?: unknown;
+    interactionBlockValid?: boolean;
+    sessionId?: string;
     isFallback?: boolean;
     turnDecision?: TurnDecision | null;
   }
@@ -25,6 +33,7 @@
   let isLoading = $state(false);
   let chatError = $state("");
   let currentLocale = $state<string>(PUBLIC_DIAGNOSIS_CONTEXT.locale);
+  let interactionEventRoot = $state<HTMLElement | undefined>();
 
   const canSend = $derived(inputText.trim().length > 0 && !isLoading);
 
@@ -84,22 +93,25 @@
     return td?.generation?.status === "fallback";
   }
 
-  async function sendMessage() {
-    const text = inputText.trim();
-    if (!text || isLoading) return;
+  async function sendRuntimeMessage(text: string, displayText = text, clearComposer = true) {
+    const requestText = text.trim();
+    const userText = displayText.trim();
+    if (!requestText || isLoading) return;
 
-    messages = [...messages, { role: "user", text }];
-    inputText = "";
+    messages = [...messages, { role: "user", text: userText || requestText }];
+    if (clearComposer) {
+      inputText = "";
+    }
     isLoading = true;
     chatError = "";
     scrollToBottom();
 
     try {
-      const result = await sendPublicTurn({
+      const result = normalizeT360DiagnosisTurn(await sendPublicTurn({
         session_id: sessionId ?? undefined,
-        message: text,
+        message: requestText,
         locale: currentLocale,
-      });
+      }));
       sessionId = result.session_id;
       const turnDecision = result.turn_decision ?? null;
       const diagnosis = getDiagnosis(result.diagnosis);
@@ -109,8 +121,11 @@
         ...messages,
         {
           role: "assistant",
-          text: result.response_text,
+          text: result.assistant_text,
           diagnosis,
+          interactionBlock: result.has_interaction_block_payload ? result.interaction_block : undefined,
+          interactionBlockValid: result.interaction_block_valid,
+          sessionId: result.session_id,
           isFallback,
           turnDecision,
         },
@@ -122,6 +137,13 @@
       isLoading = false;
       scrollToBottom();
     }
+  }
+
+  async function sendMessage() {
+    const text = inputText.trim();
+    if (!text || isLoading) return;
+
+    await sendRuntimeMessage(text);
   }
 
   function newConversation() {
@@ -141,9 +163,27 @@
     );
     return `mailto:contacto@team360.live?subject=${subject}&body=${body}`;
   });
+
+  onMount(() => {
+    const eventNames = ["t360action", "t360choice", "t360choices"];
+    const handler = (event: Event) => {
+      if (!(event instanceof CustomEvent) || isLoading) return;
+      const turn = t360InteractionEventToTurnRequest(event.detail as T360InteractionEventDetail);
+      void sendRuntimeMessage(turn.message, turn.display_text, false);
+    };
+    const target = interactionEventRoot;
+    if (!target) return;
+    eventNames.forEach((eventName) => target.addEventListener(eventName, handler));
+    return () => eventNames.forEach((eventName) => target.removeEventListener(eventName, handler));
+  });
 </script>
 
-<section id="vera" class="scroll-mt-24 border-y border-[#dbe7e9] bg-[#f6fbfa] py-20 sm:py-24" data-testid="public-vera-entry">
+<section
+  id="vera"
+  bind:this={interactionEventRoot}
+  class="scroll-mt-24 border-y border-[#dbe7e9] bg-[#f6fbfa] py-20 sm:py-24"
+  data-testid="public-vera-entry"
+>
   <div class="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start lg:px-10">
     <div>
       <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#168b88]">Diagnóstico abierto</p>
@@ -253,6 +293,19 @@
                     diagnosis={msg.diagnosis}
                     isFallback={msg.isFallback ?? false}
                     locale={currentLocale}
+                  />
+                </div>
+              {/if}
+              {#if msg.interactionBlock !== undefined}
+                <div
+                  class="w-full"
+                  data-testid="public-vera-interaction-block"
+                  data-valid={msg.interactionBlockValid ? "true" : "false"}
+                >
+                  <T360InteractionRenderer
+                    block={msg.interactionBlock}
+                    sessionId={msg.sessionId ?? sessionId ?? ""}
+                    disabled={isLoading}
                   />
                 </div>
               {/if}

@@ -8,9 +8,9 @@ Laboratorio frontend aislado para validar `interaction_blocks` seguros de Team36
 - Usa fixtures locales, sin backend, DB, Milvus ni LiteLLM.
 - Expone la ruta Astro `/t360-interaction-lab`.
 - Emite eventos DOM internos para validar acciones y elecciones:
-  - `t360action`
-  - `t360choice`
-  - `t360choices`
+  - `t360action`: acciones simples con `session_id`, `block_type`, `action_id` e `intent`.
+  - `t360choice`: envio de seleccion simple con `session_id`, `block_type`, `action_id`, `intent` y `selected_option`.
+  - `t360choices`: envio de seleccion multiple con `session_id`, `block_type`, `action_id`, `intent` y `selected_options`.
 
 ## Componentes principales
 
@@ -21,7 +21,7 @@ Laboratorio frontend aislado para validar `interaction_blocks` seguros de Team36
 - `T360MissingRequirements.svelte`: renderiza faltantes del diagnostico.
 - `T360ProductFitCard.svelte`: renderiza encaje de producto/pack.
 - `T360DiagnosisSummary.svelte`: renderiza snapshot de diagnostico.
-- `guards.ts`: normaliza y rechaza payloads invalidos.
+- `guards.ts`: normaliza y rechaza payloads invalidos, incluyendo tipo conocido, IDs no vacios, intents/status conocidos y limites de arrays.
 - `events.ts`: centraliza el contrato de eventos DOM.
 - `fixtures.ts`: contiene muestras locales auditables.
 
@@ -44,5 +44,6 @@ PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:4321 \
 
 ## Regla de integracion
 
-Este lab no define contrato backend productivo. Si un bloque se adopta en Vera o
-Console, migrar primero el contrato a backend/tests y luego conectar la UI.
+Este lab no define contrato backend productivo. Si un bloque se adopta en la
+experiencia publica o Console, migrar primero el contrato a backend/tests y
+luego conectar la UI.

@@ -14,17 +14,23 @@ export type T360InteractionActionEvent = {
 };
 
 export type T360ChoiceSelectedEvent = {
-  type: "t360.choice.selected";
+  type: "t360.choice.submitted";
   session_id: string;
   block_type: "single_choice";
-  option_id: string;
-  value: string;
+  action_id: string;
+  intent: T360Action["intent"];
+  selected_option: {
+    option_id: string;
+    value: string;
+  };
 };
 
 export type T360ChoicesSubmittedEvent = {
   type: "t360.choices.submitted";
   session_id: string;
   block_type: "multi_choice";
+  action_id: string;
+  intent: T360Action["intent"];
   selected_options: Array<{
     option_id: string;
     value: string;
@@ -68,17 +74,22 @@ export function dispatchActionEvent(
 export function dispatchChoiceSelectedEvent(
   target: EventTarget,
   sessionId: string,
+  action: T360Action,
   option: T360SingleChoiceOption,
 ) {
   target.dispatchEvent(new CustomEvent<T360ChoiceSelectedEvent>("t360choice", {
     bubbles: true,
     composed: true,
     detail: {
-      type: "t360.choice.selected",
+      type: "t360.choice.submitted",
       session_id: sessionId,
       block_type: "single_choice",
-      option_id: option.id,
-      value: option.value,
+      action_id: action.id,
+      intent: action.intent,
+      selected_option: {
+        option_id: option.id,
+        value: option.value,
+      },
     },
   }));
 }
@@ -86,6 +97,7 @@ export function dispatchChoiceSelectedEvent(
 export function dispatchChoicesSubmittedEvent(
   target: EventTarget,
   sessionId: string,
+  action: T360Action,
   options: T360SingleChoiceOption[],
 ) {
   target.dispatchEvent(new CustomEvent<T360ChoicesSubmittedEvent>("t360choices", {
@@ -95,6 +107,8 @@ export function dispatchChoicesSubmittedEvent(
       type: "t360.choices.submitted",
       session_id: sessionId,
       block_type: "multi_choice",
+      action_id: action.id,
+      intent: action.intent,
       selected_options: options.map((option) => ({
         option_id: option.id,
         value: option.value,

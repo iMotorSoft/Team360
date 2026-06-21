@@ -33,7 +33,8 @@
 
   function handleAction(event: MouseEvent, action: T360Action) {
     if (disabled || action.disabled) return;
-    dispatchActionEvent(event.currentTarget ?? event.target ?? window, {
+    if (!event.currentTarget) return;
+    dispatchActionEvent(event.currentTarget, {
       sessionId,
       blockType,
       action,

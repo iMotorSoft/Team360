@@ -85,6 +85,7 @@ export interface TurnResponse {
   language?: TurnLanguage | null;
   turn_decision?: TurnDecision | null;
   diagnosis?: StructuredDiagnosis | null;
+  interaction_block?: unknown;
 }
 
 export type StructuredDiagnosis = {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { dispatchActionEvent, dispatchChoiceSelectedEvent } from "./events";
+  import { dispatchChoiceSelectedEvent } from "./events";
   import T360ChoiceGroup from "./T360ChoiceGroup.svelte";
   import type { T360Action, T360SingleChoiceBlock, T360SingleChoiceOption } from "./types";
 
@@ -21,25 +21,17 @@
     style: "primary",
     intent: "answer_choice",
   });
-  const canSubmit = $derived(Boolean(selectedOption) || block.required !== true);
+  const canSubmit = $derived(Boolean(selectedOption));
 
   function selectOption(option: T360SingleChoiceOption) {
     if (disabled) return;
     selectedId = option.id;
-    dispatchChoiceSelectedEvent(window, sessionId, option);
   }
 
   function submit(event: MouseEvent) {
     if (!canSubmit || !selectedOption) return;
-    dispatchActionEvent(event.currentTarget ?? event.target ?? window, {
-      sessionId,
-      blockType: "single_choice",
-      action: submitAction,
-      payload: {
-        option_id: selectedOption.id,
-        value: selectedOption.value,
-      },
-    });
+    if (!event.currentTarget) return;
+    dispatchChoiceSelectedEvent(event.currentTarget, sessionId, submitAction, selectedOption);
   }
 </script>
 
@@ -59,6 +51,10 @@
       {disabled}
       onToggle={selectOption}
     />
+
+    {#if !selectedOption}
+      <p class="text-xs leading-5 text-base-content/55" aria-live="polite">Elegí una opción para continuar.</p>
+    {/if}
 
     <button
       type="button"

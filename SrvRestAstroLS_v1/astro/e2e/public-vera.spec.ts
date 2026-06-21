@@ -54,6 +54,7 @@ function response({
   action = "reflect_and_ask",
   withDiagnosis = false,
   fallback = false,
+  interactionBlock,
 }: {
   sessionId: string;
   turnCount: number;
@@ -62,6 +63,7 @@ function response({
   action?: "diagnose" | "reflect_and_ask";
   withDiagnosis?: boolean;
   fallback?: boolean;
+  interactionBlock?: unknown;
 }) {
   return {
     session_id: sessionId,
@@ -89,6 +91,7 @@ function response({
       },
     },
     diagnosis: withDiagnosis ? diagnosis() : null,
+    ...(interactionBlock !== undefined ? { interaction_block: interactionBlock } : {}),
   };
 }
 
@@ -214,6 +217,170 @@ test.describe("Team360 pública - Vera estructurada", () => {
     await expect(page.getByText("Sí, Gmail puede evaluarse")).toBeVisible();
     await expect(page.getByTestId("diagnosis-result")).toHaveCount(0);
     await expect(page.getByText("Turno 2")).toBeVisible();
+  });
+
+  test("renderiza interaction_block válido y traduce acción a request del runtime", async ({ page }) => {
+    const requests: Record<string, unknown>[] = [];
+    await routeDiagnosis(page, async (route, body, count) => {
+      requests.push(body);
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify(response({
+          sessionId: "conv_e2e_interaction_action",
+          turnCount: count,
+          message: count === 1 ? "Ya tengo una orientación inicial. Elegí cómo querés seguir." : "Con esto ya puedo darte una orientación inicial.",
+          action: count === 1 ? "reflect_and_ask" : "diagnose",
+          withDiagnosis: count > 1,
+          interactionBlock: count === 1
+            ? {
+                type: "next_step_choice",
+                title: "Próximo paso",
+                description: "Podés seguir conversando o ver una orientación preliminar.",
+                actions: [
+                  {
+                    id: "show-current-diagnosis",
+                    label: "Ver diagnóstico",
+                    style: "primary",
+                    intent: "show_current_diagnosis",
+                  },
+                  {
+                    id: "continue-context",
+                    label: "Seguir conversando",
+                    style: "secondary",
+                    intent: "continue_conversation",
+                  },
+                ],
+              }
+            : undefined,
+        })),
+      });
+    });
+
+    await openClean(page);
+    await sendTurn(page, "Quiero saber si puedo automatizar las consultas.");
+    await expect(page.getByTestId("public-vera-interaction-block")).toHaveAttribute("data-valid", "true");
+    await expect(page.getByTestId("t360-block-next_step_choice")).toContainText("Próximo paso");
+
+    await page.getByTestId("t360-action-show-current-diagnosis").dblclick();
+    await expect(page.getByTestId("diagnosis-result")).toBeVisible();
+    await expect(page.getByTestId("public-vera-user-message").last()).toContainText("Ver diagnóstico");
+
+    expect(requests).toHaveLength(2);
+    expect(requests[1].session_id).toBe("conv_e2e_interaction_action");
+    expect(String(requests[1].message)).toContain("diagnóstico actual");
+  });
+
+  test("traduce single_choice enviado desde interaction_block", async ({ page }) => {
+    const requests: Record<string, unknown>[] = [];
+    await routeDiagnosis(page, async (route, body, count) => {
+      requests.push(body);
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify(response({
+          sessionId: "conv_e2e_interaction_choice",
+          turnCount: count,
+          message: count === 1 ? "Elegí el canal principal." : "Tomo WhatsApp como canal principal.",
+          interactionBlock: count === 1
+            ? {
+                type: "single_choice",
+                question: "¿Qué canal concentra más consultas?",
+                helper_text: "Elegí una opción para orientar el diagnóstico.",
+                required: true,
+                options: [
+                  { id: "whatsapp", label: "WhatsApp", value: "whatsapp" },
+                  { id: "email", label: "Email", value: "email" },
+                ],
+                submit_action: {
+                  id: "submit-channel",
+                  label: "Continuar",
+                  style: "primary",
+                  intent: "answer_choice",
+                },
+              }
+            : undefined,
+        })),
+      });
+    });
+
+    await openClean(page);
+    await sendTurn(page, "Quiero diagnosticar el canal principal.");
+    await expect(page.getByTestId("t360-block-single_choice")).toContainText("¿Qué canal concentra más consultas?");
+    await page.getByTestId("t360-option-whatsapp").click();
+    await page.getByTestId("t360-single-submit").click();
+    await expect(page.getByText("Tomo WhatsApp como canal principal.")).toBeVisible();
+
+    expect(requests).toHaveLength(2);
+    expect(requests[1].session_id).toBe("conv_e2e_interaction_choice");
+    expect(String(requests[1].message)).toContain("whatsapp");
+  });
+
+  test("renderiza diagnosis_action_card y mantiene transporte fuera del componente", async ({ page }) => {
+    const requests: Record<string, unknown>[] = [];
+    await routeDiagnosis(page, async (route, body, count) => {
+      requests.push(body);
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify(response({
+          sessionId: "conv_e2e_diagnosis_action_card",
+          turnCount: count,
+          message: count === 1 ? "Ya hay una conclusión operativa para revisar." : "Seguimos con más contexto.",
+          interactionBlock: count === 1
+            ? {
+                type: "diagnosis_action_card",
+                title: "Conclusión preliminar",
+                summary: "El caso parece factible, pero requiere validar la integración.",
+                status: "feasible",
+                confidence: "medium",
+                primary_action: {
+                  id: "continue-context",
+                  label: "Agregar contexto",
+                  style: "primary",
+                  intent: "continue_conversation",
+                },
+              }
+            : undefined,
+        })),
+      });
+    });
+
+    await openClean(page);
+    await sendTurn(page, "Dame una conclusión preliminar.");
+    await expect(page.getByTestId("t360-block-diagnosis_action_card")).toContainText("Conclusión preliminar");
+    await page.getByTestId("t360-action-continue-context").click();
+    await expect(page.getByText("Seguimos con más contexto.")).toBeVisible();
+
+    expect(requests).toHaveLength(2);
+    expect(requests[1].session_id).toBe("conv_e2e_diagnosis_action_card");
+    expect(String(requests[1].message)).toContain("seguir conversando");
+  });
+
+  test("interaction_block inválido muestra fallback seguro y no rompe el chat", async ({ page }) => {
+    await routeDiagnosis(page, async (route, _body, count) => {
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify(response({
+          sessionId: "conv_e2e_invalid_interaction",
+          turnCount: count,
+          message: "Recibí tu mensaje y puedo seguir.",
+          interactionBlock: {
+            type: "single_choice",
+            question: "",
+            options: [{ id: "broken", label: "", value: "broken" }],
+          },
+        })),
+      });
+    });
+
+    await openClean(page);
+    await sendTurn(page, "Quiero probar un bloque inválido.");
+
+    await expect(page.getByTestId("public-vera-interaction-block")).toHaveAttribute("data-valid", "false");
+    await expect(page.getByTestId("t360-block-invalid")).toContainText("No hay interacción disponible");
+    await expect(page.getByTestId("public-vera-chat-input")).toBeEnabled();
   });
 
   test("muestra fallback localizado sin ocultar el diagnóstico", async ({ page }) => {

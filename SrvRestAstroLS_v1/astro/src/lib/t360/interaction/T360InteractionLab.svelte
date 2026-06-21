@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import {
     t360DiagnosisFixture,
+    t360InvalidInteractionBlockFixture,
     t360InteractionBlockFixtures,
     t360InteractionFixtureSessionId,
   } from "./fixtures";
@@ -15,6 +16,7 @@
   };
 
   let eventLog = $state<EventLogEntry[]>([]);
+  let labElement = $state<HTMLDivElement | undefined>();
   let eventCounter = 0;
 
   function pushEvent(name: string, detail: unknown) {
@@ -35,12 +37,18 @@
       pushEvent(event.type, event instanceof CustomEvent ? event.detail : null);
     };
 
-    eventNames.forEach((eventName) => window.addEventListener(eventName, handler));
-    return () => eventNames.forEach((eventName) => window.removeEventListener(eventName, handler));
+    const target = labElement;
+    if (!target) return;
+    eventNames.forEach((eventName) => target.addEventListener(eventName, handler));
+    return () => eventNames.forEach((eventName) => target.removeEventListener(eventName, handler));
   });
 </script>
 
-<div class="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8" data-testid="t360-interaction-lab">
+<div
+  bind:this={labElement}
+  class="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8"
+  data-testid="t360-interaction-lab"
+>
   <header class="flex flex-col gap-2">
     <p class="text-xs font-bold uppercase text-primary">Team360 interaction lab</p>
     <h1 class="text-2xl font-bold leading-tight sm:text-3xl">Interaction blocks</h1>
@@ -56,6 +64,8 @@
       {/each}
 
       <T360DiagnosisSummary diagnosis={t360DiagnosisFixture} sessionId={t360InteractionFixtureSessionId} />
+
+      <T360InteractionRenderer block={t360InvalidInteractionBlockFixture} sessionId={t360InteractionFixtureSessionId} />
     </div>
 
     <aside class="card bg-base-100 border border-base-300 shadow-sm lg:sticky lg:top-4 lg:self-start" data-testid="t360-event-log">

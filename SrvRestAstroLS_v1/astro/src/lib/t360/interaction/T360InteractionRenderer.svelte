@@ -5,14 +5,12 @@
   import T360MultiChoice from "./T360MultiChoice.svelte";
   import T360ProductFitCard from "./T360ProductFitCard.svelte";
   import T360SingleChoice from "./T360SingleChoice.svelte";
-  import type { T360InteractionBlock } from "./types";
-
   let {
     block,
     sessionId,
     disabled = false,
   }: {
-    block?: T360InteractionBlock;
+    block?: unknown;
     sessionId: string;
     disabled?: boolean;
   } = $props();

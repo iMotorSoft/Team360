@@ -272,6 +272,23 @@ export const t360DiagnosisFixture: T360DiagnosisSnapshot = {
   },
 };
 
+export const t360InvalidInteractionBlockFixture: unknown = {
+  type: "single_choice",
+  question: "",
+  options: [
+    {
+      id: "broken",
+      label: "",
+      value: "broken",
+    },
+  ],
+  submit_action: {
+    id: "submit-broken",
+    label: "Enviar",
+    intent: "unknown_intent",
+  },
+};
+
 export const t360AssistantTurnFixture: T360AssistantTurnResponse = {
   assistant_text: "Puedo darte una orientación inicial y marcar qué falta validar.",
   conversation_state: {

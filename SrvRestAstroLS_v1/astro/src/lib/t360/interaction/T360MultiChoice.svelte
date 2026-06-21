@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { dispatchActionEvent, dispatchChoicesSubmittedEvent } from "./events";
+  import { dispatchChoicesSubmittedEvent } from "./events";
   import T360ChoiceGroup from "./T360ChoiceGroup.svelte";
   import type { T360MultiChoiceBlock, T360SingleChoiceOption } from "./types";
 
@@ -15,10 +15,19 @@
 
   let selectedIds = $state<string[]>([]);
   const selectedOptions = $derived(block.options.filter((option) => selectedIds.includes(option.id)));
-  const minSelected = $derived(block.min_selected ?? 0);
+  const minSelected = $derived(block.min_selected ?? 1);
   const maxSelected = $derived(block.max_selected);
   const selectionLabel = $derived(`${selectedIds.length}${maxSelected ? `/${maxSelected}` : ""} seleccionadas`);
   const canSubmit = $derived(selectedIds.length >= minSelected && selectedIds.length > 0);
+  const reachedMax = $derived(Boolean(maxSelected && selectedIds.length >= maxSelected));
+  const disabledOptionIds = $derived(reachedMax
+    ? block.options.filter((option) => !selectedIds.includes(option.id)).map((option) => option.id)
+    : []);
+  const selectionFeedback = $derived(selectedIds.length < minSelected
+    ? `Seleccioná al menos ${minSelected}.`
+    : reachedMax
+      ? "Llegaste al máximo de opciones para este bloque."
+      : "Selección lista para enviar.");
 
   function toggleOption(option: T360SingleChoiceOption) {
     if (disabled) return;
@@ -32,18 +41,8 @@
 
   function submit(event: MouseEvent) {
     if (!canSubmit) return;
-    dispatchChoicesSubmittedEvent(event.currentTarget ?? event.target ?? window, sessionId, selectedOptions);
-    dispatchActionEvent(event.currentTarget ?? event.target ?? window, {
-      sessionId,
-      blockType: "multi_choice",
-      action: block.submit_action,
-      payload: {
-        selected_options: selectedOptions.map((option) => ({
-          option_id: option.id,
-          value: option.value,
-        })),
-      },
-    });
+    if (!event.currentTarget) return;
+    dispatchChoicesSubmittedEvent(event.currentTarget, sessionId, block.submit_action, selectedOptions);
   }
 </script>
 
@@ -65,8 +64,12 @@
       multiple
       name={block.question}
       {disabled}
+      disabledIds={disabledOptionIds}
+      disabledReason="Máximo seleccionado"
       onToggle={toggleOption}
     />
+
+    <p class="text-xs leading-5 text-base-content/55" aria-live="polite">{selectionFeedback}</p>
 
     <button
       type="button"

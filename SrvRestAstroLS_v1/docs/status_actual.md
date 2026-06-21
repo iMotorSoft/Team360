@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-20 (Lab interaction_blocks y hardening backend)
+Ultima actualizacion: 2026-06-21 (Integracion controlada interaction_blocks en /t360)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,68 @@ Ultima actualizacion: 2026-06-20 (Lab interaction_blocks y hardening backend)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-21 - Integracion controlada `interaction_blocks` en `/t360`
+
+- Se agrego una capa frontend-runtime separada en
+  `SrvRestAstroLS_v1/astro/src/lib/t360/diagnosis/` para normalizar respuestas
+  del runtime publico y traducir eventos estructurados del renderer a requests
+  compatibles con `POST /api/diagnosis/turn`.
+- Se integro `T360InteractionRenderer` en `PublicVeraEntry.svelte` de forma
+  gradual: si el backend devuelve `interaction_block`, se renderiza; si no lo
+  devuelve, el flujo actual de texto y `DiagnosisResult` se conserva.
+- Se observo con `curl` que el backend actual responde `session_id`,
+  `response_text`, `turn_count`, `is_new`, `language`, `turn_decision` y
+  `diagnosis`, pero todavia no emite `interaction_block`.
+- Se documento la integracion y la diferencia de contrato en
+  `SrvRestAstroLS_v1/docs/t360_interaction_runtime_integration.md`.
+- Se ampliaron tests Playwright de `/t360` para cubrir `next_step_choice`,
+  `single_choice`, `diagnosis_action_card`, fallback de bloque invalido,
+  error/retry, mobile y smoke real contra backend vivo.
+- No se modificaron backend, runtime Python/Litestar, endpoints, prompts,
+  migraciones, DB, Milvus, LiteLLM, iframe, Web Component ni SDK.
+
+### 2026-06-21 - Arquitectura UX para diagnosticos embebibles
+
+- Se agrego `SrvRestAstroLS_v1/docs/t360_diagnosis_embeddable_ux_architecture.md`
+  como nota tecnica de arquitectura para diagnosticos reutilizables y
+  embebibles.
+- El documento establece que el diagnostico debe evolucionar como capacidad de
+  plataforma reusable, agnostica al dominio y al host, con contrato JSON
+  estructurado, renderer Svelte generico y adaptadores de distribucion.
+- Se documentaron principios de seguridad sin HTML libre, modos iframe/Web
+  Component/SDK, tematizacion, responsive basado en contenedor, eventos
+  publicos interoperables, multitenancy, seguridad para embeds y fases
+  recomendadas.
+- No se modificaron backend, runtime, endpoints, migraciones ni integraciones
+  productivas.
+
+### 2026-06-21 - Revision estricta frontend `interaction_blocks`
+
+- Se reviso la base frontend reusable del lab `/t360-interaction-lab` en
+  `SrvRestAstroLS_v1/astro/src/lib/t360/interaction/`, manteniendo el alcance
+  aislado del backend productivo y sin integrar en `/t360`.
+- Se endurecieron los guards para rechazar payloads mal formados: tipo
+  conocido, strings no vacios, IDs unicos, intents/status conocidos, limites
+  razonables de acciones/opciones/requisitos/listas, bounds de seleccion,
+  `fit_score` 0-100 y fallback seguro ante bloque invalido.
+- Se ajusto el contrato de eventos frontend para emitir payloads minimos con
+  `session_id`, `block_type`, `action_id`, `intent` y opciones seleccionadas,
+  evitando objetos completos y emisiones accidentales al solo cambiar una
+  seleccion visual.
+- Se mejoro accesibilidad/UX de `single_choice` y `multi_choice` usando inputs
+  nativos asociados a labels, foco visible, feedback de seleccion, bloqueo al
+  llegar al maximo y envio unico por accion explicita.
+- Se agrego fixture invalido visible en el lab y se amplio el test Playwright
+  para cubrir render de bloques, seleccion simple, seleccion multiple,
+  fallback invalido, viewport mobile y errores JavaScript de consola.
+- Validaciones ejecutadas desde `SrvRestAstroLS_v1/astro`:
+  `corepack pnpm check`, `corepack pnpm build` y
+  `PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:4321 corepack pnpm exec playwright test e2e/t360-interaction-lab.spec.ts --project=chromium`.
+- Resultado: check OK con hint preexistente en `e2e/public-vera.spec.ts`,
+  build OK, Playwright `1 passed` y `git diff --check` OK.
+- No se levanto backend ni se consultaron endpoints productivos; el lab sigue
+  funcionando con fixtures locales y sin DB, Milvus, LiteLLM ni runtime.
 
 ### 2026-06-20 - Actualizacion operativa del lab `interaction_blocks`
 

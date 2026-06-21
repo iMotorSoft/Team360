@@ -28,7 +28,7 @@
   <div class="card-body p-4">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div class="min-w-0">
-        <p class="text-xs font-semibold uppercase text-base-content/50">Diagnosis summary</p>
+        <p class="text-xs font-semibold uppercase text-base-content/50">Resumen de diagnóstico</p>
         <h2 class="text-base font-bold leading-6">{diagnosis.title ?? "Diagnóstico Team360"}</h2>
       </div>
       <div class="flex shrink-0 flex-wrap gap-2">
@@ -68,6 +68,13 @@
       </div>
     {/if}
 
+    {#if diagnosis.risks?.length}
+      <div class="rounded-box bg-warning/10 p-3">
+        <h3 class="mb-2 text-sm font-semibold">Riesgos</h3>
+        <T360StepList items={diagnosis.risks} />
+      </div>
+    {/if}
+
     {#if diagnosis.suggested_products?.length}
       <div>
         <h3 class="mb-2 text-sm font-semibold">Productos sugeridos</h3>
@@ -89,13 +96,6 @@
             </article>
           {/each}
         </div>
-      </div>
-    {/if}
-
-    {#if diagnosis.risks?.length}
-      <div class="rounded-box bg-warning/10 p-3">
-        <h3 class="mb-2 text-sm font-semibold">Riesgos</h3>
-        <T360StepList items={diagnosis.risks} />
       </div>
     {/if}
   </div>
