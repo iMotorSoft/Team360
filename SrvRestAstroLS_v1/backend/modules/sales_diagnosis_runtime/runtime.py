@@ -235,10 +235,14 @@ class AssistantConversationRuntime:
         if should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
             state.semantic_memory["diagnosis_status"] = "completed"
 
-        # Build interaction_block: single_choice > missing_requirements > next_step_choice
+        # Build interaction_block: single_choice > missing_requirements > diagnosis_action_card > next_step_choice
         interaction_block = self._build_single_choice_block(state)
         if interaction_block is None:
             interaction_block = self._build_missing_requirements_block(state, should_diagnose)
+        if interaction_block is None:
+            interaction_block = self._build_diagnosis_action_card(
+                state, should_diagnose, structured_diagnosis, intent,
+            )
         if interaction_block is None:
             interaction_block = self._build_next_step_choice_if_ready(should_diagnose, state)
 
@@ -910,6 +914,60 @@ class AssistantConversationRuntime:
                 },
                 {
                     "id": "show_diagnosis",
+                    "label": "Ver diagnóstico actual",
+                    "intent": "show_current_diagnosis",
+                    "style": "primary",
+                },
+            ],
+        }
+
+    @staticmethod
+    def _build_diagnosis_action_card(
+        state: ConversationState,
+        should_diagnose: bool,
+        diagnosis: dict[str, Any] | None,
+        intent: Any,
+    ) -> dict[str, object] | None:
+        if not should_diagnose or not diagnosis:
+            return None
+        if intent.intent not in (IntentType.REQUEST_DIAGNOSIS, IntentType.STOP_INTERVIEW):
+            return None
+
+        sig = (diagnosis.get("confidence", ""), diagnosis.get("availability", ""))
+        last_sig = state.slots.get("diagnosis_card_last_signature")
+        if last_sig is not None:
+            last_sig_normalized = tuple(last_sig)
+            if last_sig_normalized == sig:
+                return None
+        state.slots["diagnosis_card_last_signature"] = list(sig)
+
+        status_map: dict[str, str] = {
+            "available_now": "available_today",
+            "requires_validation": "requires_integration",
+            "custom_solution": "requires_integration",
+            "not_in_immediate_catalog": "planned_extension",
+            "not_recommended": "not_recommended",
+        }
+        status = status_map.get(diagnosis.get("availability", ""), "feasible")
+
+        next_step = (diagnosis.get("next_step") or "").strip()
+        summary = next_step if next_step else "Se puede avanzar con la información recopilada."
+
+        return {
+            "type": "diagnosis_action_card",
+            "title": "Diagnóstico preliminar disponible",
+            "summary": summary,
+            "status": status,
+            "confidence": diagnosis.get("confidence", "low"),
+            "primary_action": {
+                "id": "continue_refining",
+                "label": "Afinar diagnóstico",
+                "intent": "continue_conversation",
+                "style": "secondary",
+            },
+            "secondary_actions": [
+                {
+                    "id": "show_current",
                     "label": "Ver diagnóstico actual",
                     "intent": "show_current_diagnosis",
                     "style": "primary",
