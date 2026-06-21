@@ -91,6 +91,15 @@ DIAGNOSIS_REQUEST_PATTERNS = re.compile(
 # ---------------------------------------------------------------------------
 
 
+MANAGEMENT_SYSTEM_OPTIONS: dict[str, str] = {
+    "whatsapp_business": "WhatsApp Business",
+    "crm": "CRM / Sistema de gestión",
+    "spreadsheet": "Planilla / Excel",
+    "custom_system": "Sistema propio",
+    "none": "No se gestiona centralizadamente",
+}
+
+
 class AssistantConversationRuntime:
     def __init__(
         self,
@@ -384,12 +393,12 @@ class AssistantConversationRuntime:
         if block_type != "single_choice":
             return
         value = resp.get("value", "")
-        label = resp.get("label", "")
-        if not value or not label:
+        if value not in MANAGEMENT_SYSTEM_OPTIONS:
             return
-        valid_options = {"whatsapp_business", "crm", "spreadsheet", "custom_system", "none"}
-        if value not in valid_options:
+        option_id = resp.get("option_id")
+        if option_id is not None and option_id != value:
             return
+        label = MANAGEMENT_SYSTEM_OPTIONS[value]
         state.slots["management_system"] = value
         state.slots["management_system_label"] = label
         state.slots["management_system_choice_status"] = "answered"
@@ -749,31 +758,8 @@ class AssistantConversationRuntime:
             "helper_text": "Elegí el sistema que mejor describa tu situación actual.",
             "required": True,
             "options": [
-                {
-                    "id": "whatsapp_business",
-                    "label": "WhatsApp Business",
-                    "value": "whatsapp_business",
-                },
-                {
-                    "id": "crm",
-                    "label": "CRM / Sistema de gestión",
-                    "value": "crm",
-                },
-                {
-                    "id": "spreadsheet",
-                    "label": "Planilla / Excel",
-                    "value": "spreadsheet",
-                },
-                {
-                    "id": "custom_system",
-                    "label": "Sistema propio",
-                    "value": "custom_system",
-                },
-                {
-                    "id": "none",
-                    "label": "No se gestiona centralizadamente",
-                    "value": "none",
-                },
+                {"id": k, "label": v, "value": k}
+                for k, v in MANAGEMENT_SYSTEM_OPTIONS.items()
             ],
             "submit_action": {
                 "id": "submit_management_system",
