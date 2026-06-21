@@ -173,6 +173,212 @@ class TestPromptPolicyHardened:
         prompt_lower = prompt.lower()
         assert "no repetir preguntas" in prompt_lower or "no repitas" in prompt_lower
 
+    # ------------------------------------------------------------------
+    # Proactive pause (offer_pause) tests
+    # ------------------------------------------------------------------
+
+    def test_offer_pause_when_turn_4_with_process_and_channel(self):
+        policy = PromptPolicy()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=4,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "ventas con Kommo y Meta",
+                "channels": ["whatsapp"],
+            },
+        )
+        prompt = policy.build_turn_prompt(SAMPLE_INPUT, state, [])
+        assert "PAUSA Y OFRECER OPCIÓN" in prompt
+        assert "NO hagas una nueva pregunta" in prompt
+        assert "conclusión preliminar" in prompt
+
+    def test_offer_pause_suppressed_when_user_asks_to_continue(self):
+        policy = PromptPolicy()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=4,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "ventas con Kommo y Meta",
+                "channels": ["whatsapp"],
+            },
+        )
+        continue_input = AssistantTurnInput(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="seguí preguntando",
+        )
+        prompt = policy.build_turn_prompt(continue_input, state, [])
+        assert "PAUSA Y OFRECER OPCIÓN" not in prompt
+        assert "SEGUIR PREGUNTANDO" in prompt
+
+    def test_no_offer_pause_when_turn_below_4(self):
+        policy = PromptPolicy()
+        for turn in range(1, 4):
+            state = ConversationState(
+                session_id="s1",
+                assistant_instance_code="team360_sales_diagnosis",
+                package_code="pkg_sales_diagnosis",
+                knowledge_scope_code="ks_test",
+                turn_count=turn,
+                semantic_memory={
+                    "diagnosis_status": "gathering",
+                    "current_process": "ventas",
+                    "channels": ["web"],
+                },
+            )
+            prompt = policy.build_turn_prompt(SAMPLE_INPUT, state, [])
+            assert "PAUSA Y OFRECER OPCIÓN" not in prompt, f"Unexpected pause at turn {turn}"
+
+    def test_no_offer_pause_without_process(self):
+        policy = PromptPolicy()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=5,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "channels": ["web"],
+            },
+        )
+        prompt = policy.build_turn_prompt(SAMPLE_INPUT, state, [])
+        assert "PAUSA Y OFRECER OPCIÓN" not in prompt
+
+    def test_no_offer_pause_without_channel(self):
+        policy = PromptPolicy()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=5,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "ventas con Kommo y Meta",
+            },
+        )
+        prompt = policy.build_turn_prompt(SAMPLE_INPUT, state, [])
+        assert "PAUSA Y OFRECER OPCIÓN" not in prompt
+
+    def test_offer_pause_not_triggered_in_diagnosis_mode(self):
+        policy = PromptPolicy()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=5,
+            semantic_memory={
+                "diagnosis_status": "requested",
+                "current_process": "ventas con Kommo y Meta",
+                "channels": ["whatsapp"],
+            },
+        )
+        prompt = policy.build_turn_prompt(SAMPLE_INPUT, state, [])
+        assert "ACCIÓN: DIAGNÓSTICO" in prompt
+        assert "PAUSA Y OFRECER OPCIÓN" not in prompt
+
+    def test_offer_pause_continue_variants_are_all_detected(self):
+        policy = PromptPolicy()
+        base_state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=4,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "ventas con Kommo y Meta",
+                "channels": ["whatsapp"],
+            },
+        )
+        variants = [
+            "seguí preguntando",
+            "seguí",
+            "más detalle",
+            "afinemos",
+            "preguntame más",
+            "continuá",
+            "quiero seguir respondiendo",
+            "contame más",
+            "dale seguí",
+            "ok seguí",
+            "tell me more",
+            "keep going",
+            "ask me more",
+            "wants more details",
+        ]
+        for msg in variants:
+            inp = AssistantTurnInput(
+                session_id="s1",
+                assistant_instance_code="team360_sales_diagnosis",
+                package_code="pkg_sales_diagnosis",
+                knowledge_scope_code="ks_test",
+                user_message=msg,
+            )
+            prompt = policy.build_turn_prompt(inp, base_state, [])
+            assert "PAUSA Y OFRECER OPCIÓN" not in prompt, f"Failed for: {msg}"
+            assert "SEGUIR PREGUNTANDO" in prompt, f"Expected ask variant for: {msg}"
+
+    def test_offer_pause_kommo_meta_full_scenario(self):
+        """Simulate Kommo + Meta + ROAS + Excel conversation."""
+        policy = PromptPolicy()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=5,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "ventas con Kommo y Meta, ROAS, ventas/pedidos cargados manualmente en Excel",
+                "channels": ["kommo", "meta", "whatsapp"],
+                "systems_and_data_sources": ["excel"],
+                "entities": ["roas", "sales", "kpi"],
+                "human_approval": "required",
+            },
+        )
+        prompt = policy.build_turn_prompt(SAMPLE_INPUT, state, [])
+        assert "PAUSA Y OFRECER OPCIÓN" in prompt
+        assert "NO hagas una nueva pregunta" in prompt
+        assert "conclusión preliminar" in prompt
+
+    def test_offer_pause_continue_in_english(self):
+        policy = PromptPolicy()
+        state = ConversationState(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=4,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "automating sales",
+                "channels": ["email"],
+            },
+        )
+        continue_input = AssistantTurnInput(
+            session_id="s1",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="ask me more",
+        )
+        prompt = policy.build_turn_prompt(continue_input, state, [])
+        assert "PAUSA Y OFRECER OPCIÓN" not in prompt
+        assert "SEGUIR PREGUNTANDO" in prompt
+
 
 # ===================================================================
 # GuardrailPolicy — individual capability checks

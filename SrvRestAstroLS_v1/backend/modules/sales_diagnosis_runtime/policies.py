@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from modules.sales_diagnosis_runtime.contracts import (
@@ -289,41 +290,85 @@ class PromptPolicy:
             mem = state.semantic_memory or {}
             has_process = bool(mem.get("current_process") or mem.get("main_problem"))
             has_channel = bool(mem.get("channels"))
-            has_critical = has_process and has_channel
-            offer_pause = turn_count >= 4 and has_critical
-            parts.append(
-                "\nInstrucciones para esta respuesta (ACCIÓN: SEGUIR PREGUNTANDO):\n"
-                "- Primero entendé el DOMINIO CONCEPTUAL del problema del usuario "
-                "(leads, reportes, campañas, pedidos, stock, etc.) antes de preguntar.\n"
-                "- No uses la misma pregunta genérica para problemas distintos.\n"
-                "- Usá el historial completo y la memoria semántica. No repitas preguntas ni temas ya cubiertos.\n"
-                "- Revisá el historial: si ya preguntaste algo y el usuario respondió, "
-                "no lo preguntes de nuevo.\n"
-                "- Hacé UNA SOLA pregunta, específica y que realmente falte para avanzar "
-                "en el diagnóstico de ESTE problema en particular.\n"
-                "- Las preguntas deben ser OPERATIVAS, no técnicas. "
-                "Preguntá sobre el FLUJO REAL: quién hace qué, con qué frecuencia, dónde registra. "
-                "Evitá preguntar por API, webhook, estructura de datos o integración síncrona.\n"
-                "- No preguntes por detalles de implementación (reglas exactas, umbrales, formatos). "
-                "Esos se definen después del diagnóstico.\n"
-                "- Si falta un dato y el usuario preguntó por diagnóstico, "
-                "explicá brevemente por qué necesitás ese dato.\n"
-                "- Respuesta corta. Un párrafo chico, una pregunta.\n"
-                f"- {LANGUAGE_INSTRUCTIONS.get(response_lang, f'Respond only in {response_lang}.')}"
+            has_system = bool(mem.get("systems_and_data_sources"))
+            has_entity = bool(mem.get("entities"))
+            has_volume = bool(mem.get("volume"))
+            has_approval = bool(mem.get("human_approval"))
+            has_enough = has_process and (
+                has_channel or has_system or has_entity or has_volume or has_approval
             )
-            if has_critical and turn_count == 2:
+            offer_pause = turn_count >= 4 and has_enough
+
+            user_wants_continue = bool(
+                re.search(
+                    r"\b(segu[ií]\s*preguntando"
+                    r"|segu[ií]"
+                    r"|m[aá]s\s*detalle"
+                    r"|afinemos|afin[eé]mos"
+                    r"|pregunt[aá]me\s*m[aá]s"
+                    r"|continu[aá]|continuemos"
+                    r"|dale\s*(segu[ií]|pregunt[aá])"
+                    r"|ok\s*(segu[ií]|pregunt[aá])"
+                    r"|s[ií]\s*(segu[ií]|pregunt[aá])"
+                    r"|quiero\s*(seguir\s*respondiendo|contestar\s*m[aá]s)"
+                    r"|h[aá]blame\s*m[aá]s"
+                    r"|contame\s*m[aá]s"
+                    r"|decime\s*m[aá]s"
+                    r"|wants?\s*(more\s*)?(details?|questions?|to\s*continue)"
+                    r"|keep\s*(going|asking|talking)"
+                    r"|ask\s*me\s*more"
+                    r"|continue|let\s*\'?s\s*(continue|go\s*deeper)"
+                    r"|tell\s*me\s*more)\b",
+                    input.user_message,
+                    re.IGNORECASE,
+                )
+            )
+
+            if offer_pause and not user_wants_continue:
+                parts.append(
+                    "\nInstrucciones para esta respuesta (ACCIÓN: PAUSA Y OFRECER OPCIÓN):\n"
+                    "- NO hagas una nueva pregunta.\n"
+                    "- Hacé un resumen breve de lo entendido hasta ahora.\n"
+                    "- Ofrecé elegir entre: (a) recibir una conclusión preliminar ahora, "
+                    "o (b) seguir con una o dos preguntas más para afinar.\n"
+                    "- Texto breve, sin párrafos largos.\n"
+                    "- Ejemplo: "
+                    "'Ya tengo una primera lectura: [resumen de 1 línea]. "
+                    "¿Te parece si te doy una conclusión preliminar ahora "
+                    "o preferís que te haga una pregunta más para afinar?'\n"
+                    "- Si el usuario ya dio información sustancial "
+                    "(herramientas, KPI, fuente de datos, modo actual), "
+                    "mencionala en el resumen para mostrar comprensión.\n"
+                    "- No preguntes nada nuevo.\n"
+                    "- No te disculpes ni digas 'perdón' o 'disculpa'.\n"
+                    f"- {LANGUAGE_INSTRUCTIONS.get(response_lang, f'Respond only in {response_lang}.')}"
+                )
+            else:
+                parts.append(
+                    "\nInstrucciones para esta respuesta (ACCIÓN: SEGUIR PREGUNTANDO):\n"
+                    "- Primero entendé el DOMINIO CONCEPTUAL del problema del usuario "
+                    "(leads, reportes, campañas, pedidos, stock, etc.) antes de preguntar.\n"
+                    "- No uses la misma pregunta genérica para problemas distintos.\n"
+                    "- Usá el historial completo y la memoria semántica. No repitas preguntas ni temas ya cubiertos.\n"
+                    "- Revisá el historial: si ya preguntaste algo y el usuario respondió, "
+                    "no lo preguntes de nuevo.\n"
+                    "- Hacé UNA SOLA pregunta, específica y que realmente falte para avanzar "
+                    "en el diagnóstico de ESTE problema en particular.\n"
+                    "- Las preguntas deben ser OPERATIVAS, no técnicas. "
+                    "Preguntá sobre el FLUJO REAL: quién hace qué, con qué frecuencia, dónde registra. "
+                    "Evitá preguntar por API, webhook, estructura de datos o integración síncrona.\n"
+                    "- No preguntes por detalles de implementación (reglas exactas, umbrales, formatos). "
+                    "Esos se definen después del diagnóstico.\n"
+                    "- Si falta un dato y el usuario preguntó por diagnóstico, "
+                    "explicá brevemente por qué necesitás ese dato.\n"
+                    "- Respuesta corta. Un párrafo chico, una pregunta.\n"
+                    f"- {LANGUAGE_INSTRUCTIONS.get(response_lang, f'Respond only in {response_lang}.')}"
+                )
+            if has_enough and turn_count == 2 and not (offer_pause and not user_wants_continue):
                 parts.append(
                     "\nNota adicional: ya tenés proceso + canal. "
                     "Podés ofrecer diagnóstico preliminar si el usuario parece interesado "
                     "o si preguntó por resultado."
-                )
-            if offer_pause:
-                parts.append(
-                    "\nNota adicional: ya hay varios turnos de conversación con datos mínimos "
-                    "(proceso + canal). "
-                    "No hagas otra pregunta. En lugar de eso, ofrecé: "
-                    "'Ya tenemos suficiente para una primera conclusión. "
-                    "¿Querés verla ahora o seguimos afinando?'"
                 )
         return "\n".join(parts)
 
