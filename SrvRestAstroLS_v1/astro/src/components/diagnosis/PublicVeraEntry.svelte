@@ -7,6 +7,7 @@
   import { sectionTitle, isValidDiagnosis } from "../../lib/api/diagnosisPresentation";
   import T360InteractionRenderer from "../../lib/t360/interaction/T360InteractionRenderer.svelte";
   import { normalizeT360DiagnosisTurn } from "../../lib/t360/diagnosis/normalizer";
+  import { renderMarkdown } from "../../lib/t360/diagnosis/markdown";
   import { t360InteractionEventToTurnRequest } from "../../lib/t360/diagnosis/adapter";
   import type { T360InteractionEventDetail } from "../../lib/t360/diagnosis/types";
 
@@ -294,8 +295,8 @@
               {@const displayText = (msg.diagnosis && msg.interactionBlock !== undefined)
                 ? stripDiagnosisMarkdown(msg.text)
                 : msg.text}
-              <div data-testid="public-vera-assistant-message" class="self-start max-w-full rounded-2xl rounded-bl-sm border border-[#d5e2e5] bg-white px-4 py-2.5 text-sm leading-6 text-[#203c55]">
-                {displayText}
+              <div data-testid="public-vera-assistant-message" class="self-start max-w-full rounded-2xl rounded-bl-sm border border-[#d5e2e5] bg-white px-4 py-2.5 text-sm leading-6 text-[#203c55] [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-0.5 [&_p]:mb-2 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_a]:underline [&_a]:text-[#168b88] [&_code]:rounded [&_code]:bg-[#f0f4f5] [&_code]:px-1 [&_code]:text-xs">
+                {@html renderMarkdown(displayText)}
               </div>
               {#if msg.diagnosis}
                 <div class="w-full">
