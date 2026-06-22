@@ -10,6 +10,7 @@
   import { renderMarkdown } from "../../lib/t360/diagnosis/markdown";
   import { t360InteractionEventToTurnRequest } from "../../lib/t360/diagnosis/adapter";
   import type { T360InteractionEventDetail } from "../../lib/t360/diagnosis/types";
+  import type { T360MissingRequirement } from "../../lib/t360/interaction/types";
 
   interface ChatMessage {
     role: "user" | "assistant";
@@ -92,6 +93,22 @@
 
   function isGenerationFallback(td: TurnDecision | null | undefined): boolean {
     return td?.generation?.status === "fallback";
+  }
+
+  function isMissingRequirementsBlock(block: unknown): block is { type: "missing_requirements"; requirements: T360MissingRequirement[] } {
+    return (
+      typeof block === "object" &&
+      block !== null &&
+      (block as Record<string, unknown>).type === "missing_requirements" &&
+      Array.isArray((block as Record<string, unknown>).requirements)
+    );
+  }
+
+  function extractCompactRequirements(block: unknown): T360MissingRequirement[] {
+    if (isMissingRequirementsBlock(block)) {
+      return block.requirements;
+    }
+    return [];
   }
 
   function stripDiagnosisMarkdown(text: string): string {
@@ -304,10 +321,11 @@
                     diagnosis={msg.diagnosis}
                     isFallback={msg.isFallback ?? false}
                     locale={currentLocale}
+                    compactMissingRequirements={extractCompactRequirements(msg.interactionBlock)}
                   />
                 </div>
               {/if}
-              {#if msg.interactionBlock !== undefined}
+              {#if msg.interactionBlock !== undefined && !(isMissingRequirementsBlock(msg.interactionBlock) && msg.diagnosis)}
                 <div
                   class="w-full"
                   data-testid="public-vera-interaction-block"

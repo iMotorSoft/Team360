@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { StructuredDiagnosis } from "../../lib/api/publicDiagnosis";
+  import type { T360MissingRequirement } from "../../lib/t360/interaction/types";
   import {
     formatFeasibility,
     formatAutomationMode,
@@ -21,14 +22,24 @@
     langAttr,
   } from "../../lib/api/diagnosisPresentation";
 
+  const requiredForLabels: Record<T360MissingRequirement["required_for"], string> = {
+    preliminary_diagnosis: "Diagnóstico preliminar",
+    full_diagnosis: "Diagnóstico completo",
+    implementation: "Implementación",
+    pricing: "Pricing",
+    handoff: "Handoff",
+  };
+
   let {
     diagnosis,
     isFallback,
     locale = "es",
+    compactMissingRequirements = [],
   }: {
     diagnosis: StructuredDiagnosis;
     isFallback?: boolean;
     locale?: string;
+    compactMissingRequirements?: T360MissingRequirement[];
   } = $props();
 
   const dir = $derived(directionForLocale(locale));
@@ -228,6 +239,35 @@
           </li>
         {/each}
       </ul>
+    </div>
+  {/if}
+
+  <!-- Compact missing requirements -->
+  {#if compactMissingRequirements.length > 0}
+    <div>
+      <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
+        {sectionTitle("validation_points", locale)}
+      </p>
+      <div class="mt-2 flex flex-col gap-2">
+        {#each compactMissingRequirements as req}
+          <div class="flex items-start gap-2 rounded-lg border border-[#d5e2e5] bg-white p-2.5">
+            <span
+              class="mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[0.6rem] font-bold uppercase leading-4 {req.status === 'missing' ? 'bg-[#fce4e0] text-[#b84a2c]' : req.status === 'partial' ? 'bg-[#fff3d6] text-[#996e1a]' : 'bg-[#dff0ed] text-[#168b88]'}"
+            >
+              {req.status === "missing" ? "Falta" : req.status === "partial" ? "Parcial" : "Confirmado"}
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm leading-5 text-[#203c55]">{req.label}</p>
+              {#if req.description}
+                <p class="mt-0.5 text-xs leading-4 text-[#6d8290]">{req.description}</p>
+              {/if}
+            </div>
+            <span class="mt-0.5 shrink-0 rounded border border-[#cde0df] px-1.5 py-0.5 text-[0.58rem] font-medium text-[#5b7283]">
+              {requiredForLabels[req.required_for]}
+            </span>
+          </div>
+        {/each}
+      </div>
     </div>
   {/if}
 
