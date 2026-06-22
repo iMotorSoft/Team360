@@ -56,6 +56,19 @@
 
   const entityLinks = $derived(formatEntitySources(diagnosis.entity_sources, locale));
   const hasEntitySources = $derived(Object.keys(diagnosis.entity_sources).length > 0);
+
+  let expanded = $state(false);
+
+  const hasExpandableContent = $derived(
+    diagnosis.automatable_steps.length > 0 ||
+    diagnosis.human_steps.length > 0 ||
+    diagnosis.human_approval === "required" ||
+    diagnosis.human_approval === "conditional" ||
+    diagnosis.risks.length > 0 ||
+    diagnosis.assumptions.length > 0 ||
+    diagnosis.validation_points.length > 0 ||
+    compactMissingRequirements.length > 0
+  );
 </script>
 
 {#if isFallback}
@@ -121,47 +134,6 @@
     </p>
   </div>
 
-  <!-- Automatable steps -->
-  {#if diagnosis.automatable_steps.length > 0}
-    <div>
-      <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
-        {sectionTitle("what_can_automate", locale)}
-      </p>
-      <ul class="mt-2 space-y-1.5">
-        {#each diagnosis.automatable_steps as step}
-          <li class="flex items-start gap-2 text-sm leading-5 text-[#203c55]">
-            <span class="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-[#168b88]/10 text-[0.55rem] font-bold text-[#168b88]">✓</span>
-            <span class="min-w-0 break-words">{formatAutomatableStep(step, locale)}</span>
-          </li>
-        {/each}
-      </ul>
-    </div>
-  {/if}
-
-  <!-- Human steps -->
-  {#if diagnosis.human_steps.length > 0 || diagnosis.human_approval === "required" || diagnosis.human_approval === "conditional"}
-    <div>
-      <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
-        {sectionTitle("human_intervention", locale)}
-      </p>
-      {#if diagnosis.human_approval === "required" || diagnosis.human_approval === "conditional"}
-        <p class="mt-1 text-sm font-medium text-[#203c55]">
-          {formatHumanApproval(diagnosis.human_approval, locale)}
-        </p>
-      {/if}
-      {#if diagnosis.human_steps.length > 0}
-        <ul class="mt-2 space-y-1.5">
-          {#each diagnosis.human_steps as step}
-            <li class="flex items-start gap-2 text-sm leading-5 text-[#203c55]">
-              <span class="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-[#e8c184]/20 text-[0.55rem] font-bold text-[#b87d2c]">!</span>
-              <span class="min-w-0 break-words">{formatHumanStep(step, locale)}</span>
-            </li>
-          {/each}
-        </ul>
-      {/if}
-    </div>
-  {/if}
-
   <!-- Channels and systems -->
   {#if diagnosis.channels.length > 0 || diagnosis.systems.length > 0 || hasEntitySources}
     <div>
@@ -200,83 +172,142 @@
     </div>
   {/if}
 
-  <!-- Risks -->
-  {#if diagnosis.risks.length > 0}
-    <div>
-      <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#c07830]">
-        {sectionTitle("risks", locale)}
-      </p>
-      <ul class="mt-2 space-y-1.5">
-        {#each diagnosis.risks as risk}
-          <li class="flex items-start gap-2 text-sm leading-5 text-[#5f4a28]">
-            <span class="mt-0.5 shrink-0 text-[#c07830]">⚠</span>
-            {formatRisk(risk, locale)}
-          </li>
-        {/each}
-      </ul>
-    </div>
-  {/if}
-
-  <!-- Assumptions -->
-  {#if diagnosis.assumptions.length > 0}
-    <div>
-      <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#6d8290]">
-        {sectionTitle("assumptions", locale)}
-      </p>
-      <ul class="mt-2 space-y-1.5">
-        {#each diagnosis.assumptions as assumption}
-          <li class="flex items-start gap-2 text-sm leading-5 italic text-[#5f7481]">
-            <span class="mt-1.5 shrink-0 text-[#91a2ad]">·</span>
-            <span class="min-w-0 break-words">{formatAssumption(assumption, locale)}</span>
-          </li>
-        {/each}
-      </ul>
-    </div>
-  {/if}
-
-  <!-- Validation points -->
-  {#if diagnosis.validation_points.length > 0}
-    <div>
-      <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
-        {sectionTitle("validation_points", locale)}
-      </p>
-      <ul class="mt-2 space-y-1.5">
-        {#each diagnosis.validation_points as vp}
-          <li class="flex items-start gap-2 text-sm leading-5 text-[#203c55]">
-            <span class="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full border border-[#168b88] text-[0.55rem] font-bold text-[#168b88]">?</span>
-            <span class="min-w-0 break-words">{formatValidationPoint(vp, locale)}</span>
-          </li>
-        {/each}
-      </ul>
-    </div>
-  {/if}
-
-  <!-- Compact missing requirements -->
-  {#if compactMissingRequirements.length > 0}
-    <div>
-      <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
-        {sectionTitle("validation_points", locale)}
-      </p>
-      <div class="mt-2 flex flex-col gap-2">
-        {#each compactMissingRequirements as req}
-          <div class="flex items-start gap-2 rounded-lg border border-[#d5e2e5] bg-white p-2.5">
-            <span
-              class="mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[0.6rem] font-bold uppercase leading-4 {req.status === 'missing' ? 'bg-[#fce4e0] text-[#b84a2c]' : req.status === 'partial' ? 'bg-[#fff3d6] text-[#996e1a]' : 'bg-[#dff0ed] text-[#168b88]'}"
-            >
-              {req.status === "missing" ? "Falta" : req.status === "partial" ? "Parcial" : "Confirmado"}
-            </span>
-            <div class="min-w-0 flex-1">
-              <p class="text-sm leading-5 text-[#203c55]">{req.label}</p>
-              {#if req.description}
-                <p class="mt-0.5 text-xs leading-4 text-[#6d8290]">{req.description}</p>
-              {/if}
-            </div>
-            <span class="mt-0.5 shrink-0 rounded border border-[#cde0df] px-1.5 py-0.5 text-[0.58rem] font-medium text-[#5b7283]">
-              {requiredForLabels[req.required_for]}
-            </span>
-          </div>
-        {/each}
+  <!-- Expandable detail section -->
+  {#if expanded}
+    <!-- Automatable steps -->
+    {#if diagnosis.automatable_steps.length > 0}
+      <div>
+        <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
+          {sectionTitle("what_can_automate", locale)}
+        </p>
+        <ul class="mt-2 space-y-1.5">
+          {#each diagnosis.automatable_steps as step}
+            <li class="flex items-start gap-2 text-sm leading-5 text-[#203c55]">
+              <span class="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-[#168b88]/10 text-[0.55rem] font-bold text-[#168b88]">✓</span>
+              <span class="min-w-0 break-words">{formatAutomatableStep(step, locale)}</span>
+            </li>
+          {/each}
+        </ul>
       </div>
+    {/if}
+
+    <!-- Human steps -->
+    {#if diagnosis.human_steps.length > 0 || diagnosis.human_approval === "required" || diagnosis.human_approval === "conditional"}
+      <div>
+        <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
+          {sectionTitle("human_intervention", locale)}
+        </p>
+        {#if diagnosis.human_approval === "required" || diagnosis.human_approval === "conditional"}
+          <p class="mt-1 text-sm font-medium text-[#203c55]">
+            {formatHumanApproval(diagnosis.human_approval, locale)}
+          </p>
+        {/if}
+        {#if diagnosis.human_steps.length > 0}
+          <ul class="mt-2 space-y-1.5">
+            {#each diagnosis.human_steps as step}
+              <li class="flex items-start gap-2 text-sm leading-5 text-[#203c55]">
+                <span class="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-[#e8c184]/20 text-[0.55rem] font-bold text-[#b87d2c]">!</span>
+                <span class="min-w-0 break-words">{formatHumanStep(step, locale)}</span>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
+    {/if}
+
+    <!-- Risks -->
+    {#if diagnosis.risks.length > 0}
+      <div>
+        <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#c07830]">
+          {sectionTitle("risks", locale)}
+        </p>
+        <ul class="mt-2 space-y-1.5">
+          {#each diagnosis.risks as risk}
+            <li class="flex items-start gap-2 text-sm leading-5 text-[#5f4a28]">
+              <span class="mt-0.5 shrink-0 text-[#c07830]">⚠</span>
+              {formatRisk(risk, locale)}
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
+    <!-- Assumptions -->
+    {#if diagnosis.assumptions.length > 0}
+      <div>
+        <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#6d8290]">
+          {sectionTitle("assumptions", locale)}
+        </p>
+        <ul class="mt-2 space-y-1.5">
+          {#each diagnosis.assumptions as assumption}
+            <li class="flex items-start gap-2 text-sm leading-5 italic text-[#5f7481]">
+              <span class="mt-1.5 shrink-0 text-[#91a2ad]">·</span>
+              <span class="min-w-0 break-words">{formatAssumption(assumption, locale)}</span>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
+    <!-- Validation points -->
+    {#if diagnosis.validation_points.length > 0}
+      <div>
+        <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
+          {sectionTitle("validation_points", locale)}
+        </p>
+        <ul class="mt-2 space-y-1.5">
+          {#each diagnosis.validation_points as vp}
+            <li class="flex items-start gap-2 text-sm leading-5 text-[#203c55]">
+              <span class="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full border border-[#168b88] text-[0.55rem] font-bold text-[#168b88]">?</span>
+              <span class="min-w-0 break-words">{formatValidationPoint(vp, locale)}</span>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
+    <!-- Compact missing requirements -->
+    {#if compactMissingRequirements.length > 0}
+      <div>
+        <p class="text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
+          {sectionTitle("validation_points", locale)}
+        </p>
+        <div class="mt-2 flex flex-col gap-2">
+          {#each compactMissingRequirements as req}
+            <div class="flex items-start gap-2 rounded-lg border border-[#d5e2e5] bg-white p-2.5">
+              <span
+                class="mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[0.6rem] font-bold uppercase leading-4 {req.status === 'missing' ? 'bg-[#fce4e0] text-[#b84a2c]' : req.status === 'partial' ? 'bg-[#fff3d6] text-[#996e1a]' : 'bg-[#dff0ed] text-[#168b88]'}"
+              >
+                {req.status === "missing" ? "Falta" : req.status === "partial" ? "Parcial" : "Confirmado"}
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm leading-5 text-[#203c55]">{req.label}</p>
+                {#if req.description}
+                  <p class="mt-0.5 text-xs leading-4 text-[#6d8290]">{req.description}</p>
+                {/if}
+              </div>
+              <span class="mt-0.5 shrink-0 rounded border border-[#cde0df] px-1.5 py-0.5 text-[0.58rem] font-medium text-[#5b7283]">
+                {requiredForLabels[req.required_for]}
+              </span>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
+  {/if}
+
+  <!-- Expand toggle -->
+  {#if hasExpandableContent}
+    <div class="flex justify-center">
+      <button
+        type="button"
+        class="inline-flex items-center gap-1.5 rounded-full border border-[#c0dcd7] bg-white px-4 py-2 text-[0.68rem] font-semibold text-[#168b88] transition hover:bg-[#f0f8f7]"
+        onclick={() => expanded = !expanded}
+        aria-expanded={expanded}
+      >
+        {expanded ? "Cerrar detalle" : "Ver detalle"}
+        <span class="text-[0.5rem]">{expanded ? "▲" : "▼"}</span>
+      </button>
     </div>
   {/if}
 
