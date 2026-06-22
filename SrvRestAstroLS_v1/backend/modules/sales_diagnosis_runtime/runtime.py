@@ -215,6 +215,29 @@ class AssistantConversationRuntime:
         # 5. Decide action based on intent + coverage + safety
         should_diagnose = self._decide_turn(intent, state)
 
+        # 5.2 Decide if proactive pause should be offered (independent of diagnosis)
+        should_pause = self._should_offer_pause(state, input)
+        if should_pause:
+            state.slots["pause_offered"] = True
+            state.semantic_memory["_runtime_pause"] = True
+
+        # Clear runtime pause flag if not actively pausing (prevent stale signal in prompt)
+        if not should_pause:
+            state.semantic_memory.pop("_runtime_pause", None)
+
+        # If user chose continue from pause, mark it
+        if self._is_user_continuing(input.user_message) and state.slots.get("pause_offered"):
+            state.slots["pause_consumed"] = True
+            state.slots["pause_semantic_snapshot"] = {
+                "channels": list(state.semantic_memory.get("channels", [])),
+                "systems_and_data_sources": list(state.semantic_memory.get("systems_and_data_sources", [])),
+                "entities": list(state.semantic_memory.get("entities", [])),
+                "human_approval": state.semantic_memory.get("human_approval", ""),
+                "volume": state.semantic_memory.get("volume", ""),
+                "current_process": state.semantic_memory.get("current_process", ""),
+                "main_problem": state.semantic_memory.get("main_problem", ""),
+            }
+
         # 5.5 Build structured diagnosis (deterministic, no LLM)
         if should_diagnose:
             structured_diagnosis = build_structured_diagnosis(state.semantic_memory)
@@ -299,6 +322,8 @@ class AssistantConversationRuntime:
             interaction_block = self._build_product_fit_card(state, should_diagnose)
         if interaction_block is None:
             interaction_block = self._build_next_step_choice_if_ready(should_diagnose, state)
+        if interaction_block is None:
+            interaction_block = self._build_pause_block(should_pause, state)
 
         decision_reason = intent.source.value if intent.source != IntentSource.RUNTIME_FALLBACK else self._readiness_reason(state)
         if intent.intent in (IntentType.REQUEST_DIAGNOSIS, IntentType.STOP_INTERVIEW) and should_diagnose:
@@ -486,7 +511,7 @@ class AssistantConversationRuntime:
     @staticmethod
     def _update_current_process(existing: str, msg: str) -> str:
         words = msg.split()
-        if len(words) < 4:
+        if len(words) < 3:
             return ""
         # If no existing process, set from this message
         if not existing:
@@ -497,7 +522,9 @@ class AssistantConversationRuntime:
         msg_lower = msg.lower()
         process_keywords = {"reporte", "reportes", "excel", "erp", "cruce", "cruza",
                             "manual", "descarga", "archivo", "sistema", "planilla",
-                            "datos", "carga", "valida", "armado", "formato"}
+                            "datos", "carga", "valida", "armado", "formato",
+                            "tiktok", "venta", "ventas", "estado", "responsable",
+                            "producto", "fecha", "nombre", "columna", "kanban"}
         # Msg is about a specific process step — append if not already covered
         if any(k in msg_lower for k in process_keywords):
             # Check if this is substantially new info
@@ -778,6 +805,106 @@ class AssistantConversationRuntime:
 
         return False
 
+    def _should_offer_pause(self, state: ConversationState, input: AssistantTurnInput) -> bool:
+        """Deterministic: should we offer a pause with next_step_choice block?
+
+        Unlike _is_ready_to_diagnose which requires strict process+channel+system,
+        this method uses a broader heuristic to decide when to proactively pause
+        and offer the user a choice between preliminary diagnosis or continuing.
+
+        Conditions:
+        - turn_count >= 3
+        - Has at least process or channel or system context
+        - At least 2 memory dimensions are populated
+        - Pause not already offered, or if offered then new info appeared
+        - User didn't explicitly say continue
+        - Not in diagnose mode already
+        """
+        mem = state.semantic_memory or {}
+        status = mem.get("diagnosis_status", "gathering")
+
+        # Already diagnosing — no need to pause
+        if status in ("completed", "sufficient", "requested"):
+            return False
+
+        # Need at least a few turns
+        if state.turn_count < 3:
+            return False
+
+        has_process = bool(mem.get("current_process") or mem.get("main_problem"))
+        has_channel = bool(mem.get("channels"))
+        has_system = bool(mem.get("systems_and_data_sources"))
+        has_entity = bool(mem.get("entities"))
+        has_approval = bool(mem.get("human_approval"))
+        has_volume = bool(mem.get("volume"))
+
+        # Need at least some factual context
+        if not (has_process or has_channel or has_system):
+            return False
+
+        # Count populated memory dimensions (broad heuristic)
+        dims = sum(1 for d in [has_process, has_channel, has_system,
+                               has_entity, has_approval, has_volume])
+        if dims < 2:
+            return False
+
+        # User chose to continue — allow re-offer only if substantial new info
+        if state.slots.get("pause_consumed"):
+            if not self._has_new_info_since_pause(state):
+                return False
+
+        # User explicitly asked to continue in this message
+        if self._is_user_continuing(input.user_message):
+            return False
+
+        # Check anti-loop: if pause was already offered, don't re-offer
+        # unless new info has appeared since last offer
+        if state.slots.get("pause_offered") and not state.slots.get("pause_consumed"):
+            return False
+
+        return True
+
+    @staticmethod
+    def _is_user_continuing(message: str) -> bool:
+        return bool(re.search(
+            r"\b(segu[ií]\s*preguntando"
+            r"|segu[ií]"
+            r"|seguir(\s*conversando|\s*respondiendo|)"
+            r"|m[aá]s\s*detalle"
+            r"|afinemos|afin[eé]mos"
+            r"|pregunt[aá]me\s*m[aá]s"
+            r"|continu[aá]|continuemos"
+            r"|dale\s*(segu[ií]|pregunt[aá]|seguir)"
+            r"|ok\s*(segu[ií]|pregunt[aá]|seguir)"
+            r"|s[ií]\s*(segu[ií]|pregunt[aá]|seguir)"
+            r"|quiero\s*(seguir\s*respondiendo|contestar\s*m[aá]s)"
+            r"|h[aá]blame\s*m[aá]s"
+            r"|contame\s*m[aá]s"
+            r"|decime\s*m[aá]s"
+            r"|wants?\s*(more\s*)?(details?|questions?|to\s*continue)"
+            r"|keep\s*(going|asking|talking)"
+            r"|ask\s*me\s*more"
+            r"|continue|let\s*\'?s\s*(continue|go\s*deeper)"
+            r"|tell\s*me\s*more)\b",
+            message,
+            re.IGNORECASE,
+        ))
+
+    @staticmethod
+    def _has_new_info_since_pause(state: ConversationState) -> bool:
+        """Check if new semantic info has appeared since the pause was consumed."""
+        mem = state.semantic_memory or {}
+        pause_snapshot = state.slots.get("pause_semantic_snapshot", {})
+        if not pause_snapshot:
+            return False
+        for key in ("channels", "systems_and_data_sources", "entities",
+                    "human_approval", "volume", "current_process", "main_problem"):
+            old = pause_snapshot.get(key)
+            new = mem.get(key)
+            if old != new:
+                return True
+        return False
+
     @staticmethod
     def _build_next_step_choice_if_ready(
         should_diagnose: bool,
@@ -787,6 +914,35 @@ class AssistantConversationRuntime:
             return None
         min_turns = 2
         if state.turn_count < min_turns:
+            return None
+        return {
+            "type": "next_step_choice",
+            "title": "¿Cómo querés seguir?",
+            "description": "Ya tengo suficiente información para darte una orientación inicial.",
+            "actions": [
+                {
+                    "id": "continue",
+                    "label": "Seguir conversando",
+                    "intent": "continue_conversation",
+                    "style": "secondary",
+                },
+                {
+                    "id": "show_diagnosis",
+                    "label": "Ver diagnóstico",
+                    "intent": "show_current_diagnosis",
+                    "style": "primary",
+                },
+            ],
+        }
+
+    @staticmethod
+    def _build_pause_block(
+        should_pause: bool,
+        state: ConversationState,
+    ) -> dict[str, object] | None:
+        if not should_pause:
+            return None
+        if state.turn_count < 3:
             return None
         return {
             "type": "next_step_choice",

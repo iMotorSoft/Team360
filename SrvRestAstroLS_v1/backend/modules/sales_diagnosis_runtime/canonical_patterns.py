@@ -42,6 +42,9 @@ CHANNEL_PATTERNS: dict[str, re.Pattern] = {
     "telegram": _word("telegram"),
     "facebook": _word("facebook"),
     "instagram": _word("instagram"),
+    "tiktok": _word("tiktok"),
+    "meta": _word("meta"),
+    "kommo": _word("kommo"),
     "web": re.compile(
         r"(?:\b(?:web|sitio|p[aá]gina|website|intranet)\b)"
         r"|(?:אתר|אינטרנט)",

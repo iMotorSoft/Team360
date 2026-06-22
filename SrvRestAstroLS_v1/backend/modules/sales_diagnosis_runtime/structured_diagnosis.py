@@ -324,7 +324,9 @@ def _build_risks(
         risks.append("sensitive_decision")
         risks.append("financial_or_reputational_risk")
 
-    if "spreadsheet" in entity_sources.values() or "spreadsheet" in systems:
+    prices_from_entity_sources = entity_sources.get("prices") == "spreadsheet"
+    prices_in_text = bool(re.search(r"\b(?:prices?|precios?|precio|pricing|price)\b", all_text_lower))
+    if prices_from_entity_sources or (("spreadsheet" in entity_sources.values() or "spreadsheet" in systems) and prices_in_text):
         risks.append("stale_price_data")
 
     if not has_closed_software and not has_mfa and not has_sensitive_decision:

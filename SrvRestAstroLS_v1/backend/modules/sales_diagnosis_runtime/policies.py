@@ -297,19 +297,21 @@ class PromptPolicy:
             has_enough = has_process and (
                 has_channel or has_system or has_entity or has_volume or has_approval
             )
-            offer_pause = turn_count >= 4 and has_enough
+            runtime_pause = bool(mem.get("_runtime_pause"))
+            offer_pause = (turn_count >= 4 and has_enough) or runtime_pause
 
             user_wants_continue = bool(
                 re.search(
                     r"\b(segu[ií]\s*preguntando"
                     r"|segu[ií]"
+                    r"|seguir(\s*conversando|\s*respondiendo|)"
                     r"|m[aá]s\s*detalle"
                     r"|afinemos|afin[eé]mos"
                     r"|pregunt[aá]me\s*m[aá]s"
                     r"|continu[aá]|continuemos"
-                    r"|dale\s*(segu[ií]|pregunt[aá])"
-                    r"|ok\s*(segu[ií]|pregunt[aá])"
-                    r"|s[ií]\s*(segu[ií]|pregunt[aá])"
+                    r"|dale\s*(segu[ií]|pregunt[aá]|seguir)"
+                    r"|ok\s*(segu[ií]|pregunt[aá]|seguir)"
+                    r"|s[ií]\s*(segu[ií]|pregunt[aá]|seguir)"
                     r"|quiero\s*(seguir\s*respondiendo|contestar\s*m[aá]s)"
                     r"|h[aá]blame\s*m[aá]s"
                     r"|contame\s*m[aá]s"

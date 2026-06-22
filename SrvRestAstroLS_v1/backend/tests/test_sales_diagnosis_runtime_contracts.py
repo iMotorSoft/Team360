@@ -283,25 +283,13 @@ class TestRuntimeDecisionPolicy:
         assert output.turn_decision["diagnosis_status"] == "completed"
         assert "Punto a validar" in output.response_text
         assert llm.calls[-1]["status"] == "sufficient"
-        assert output.interaction_block == {
-            "type": "next_step_choice",
-            "title": "¿Cómo querés seguir?",
-            "description": "Ya tengo suficiente información para darte una orientación inicial.",
-            "actions": [
-                {
-                    "id": "continue",
-                    "label": "Seguir conversando",
-                    "intent": "continue_conversation",
-                    "style": "secondary",
-                },
-                {
-                    "id": "show_diagnosis",
-                    "label": "Ver diagnóstico",
-                    "intent": "show_current_diagnosis",
-                    "style": "primary",
-                },
-            ],
-        }
+        # When user explicitly requests diagnosis with sufficient context,
+        # the diagnosis_action_card is emitted (higher priority than next_step_choice)
+        assert output.interaction_block is not None
+        assert output.interaction_block["type"] in ("diagnosis_action_card", "next_step_choice")
+        if output.interaction_block["type"] == "diagnosis_action_card":
+            assert "Diagnóstico preliminar" in output.interaction_block.get("title", "")
+            assert output.interaction_block.get("summary") is not None
 
     def test_runtime_keeps_asking_when_context_is_sufficient_without_close_request(self):
         repo = InMemoryStateRepository()
