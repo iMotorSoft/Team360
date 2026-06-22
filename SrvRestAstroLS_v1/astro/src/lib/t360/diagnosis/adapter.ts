@@ -3,20 +3,6 @@ import type {
   T360InteractionTurnRequest,
 } from "./types";
 
-function selectedValues(detail: T360InteractionEventDetail): string[] {
-  if (detail.type === "t360.choice.submitted") {
-    return [detail.selected_option.value];
-  }
-  if (detail.type === "t360.choices.submitted") {
-    return detail.selected_options.map((option) => option.value);
-  }
-  return [];
-}
-
-function valuesLabel(values: string[]): string {
-  return values.filter(Boolean).join(", ");
-}
-
 export function t360InteractionEventToTurnRequest(
   detail: T360InteractionEventDetail,
 ): T360InteractionTurnRequest {
@@ -24,7 +10,7 @@ export function t360InteractionEventToTurnRequest(
     const option = detail.selected_option;
     return {
       message: `Sistema de gestión que uso actualmente: ${option.label}.`,
-      display_text: `Seleccioné: ${option.label}`,
+      display_text: `${option.label}`,
       interaction_response: {
         block_type: "single_choice",
         action_id: detail.action_id,
@@ -41,7 +27,7 @@ export function t360InteractionEventToTurnRequest(
     const vals = opts.map((o) => o.value);
     return {
       message: `Prioridades de automatización: ${vals.join(", ")}.`,
-      display_text: `Seleccioné: ${labels}`,
+      display_text: `${labels}`,
       interaction_response: {
         block_type: "multi_choice",
         action_id: detail.action_id,

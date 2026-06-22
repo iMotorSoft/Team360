@@ -93,6 +93,12 @@
     return td?.generation?.status === "fallback";
   }
 
+  function stripDiagnosisMarkdown(text: string): string {
+    const idx = text.search(/\n#{1,3}\s/);
+    if (idx === -1) return text;
+    return text.slice(0, idx).trim();
+  }
+
   async function sendRuntimeMessage(text: string, displayText = text, clearComposer = true, interactionResponse?: Record<string, unknown>) {
     const requestText = text.trim();
     const userText = displayText.trim();
@@ -285,8 +291,11 @@
                 {msg.text}
               </div>
             {:else}
+              {@const displayText = (msg.diagnosis && msg.interactionBlock !== undefined)
+                ? stripDiagnosisMarkdown(msg.text)
+                : msg.text}
               <div data-testid="public-vera-assistant-message" class="self-start max-w-full rounded-2xl rounded-bl-sm border border-[#d5e2e5] bg-white px-4 py-2.5 text-sm leading-6 text-[#203c55]">
-                {msg.text}
+                {displayText}
               </div>
               {#if msg.diagnosis}
                 <div class="w-full">
