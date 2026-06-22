@@ -32,7 +32,7 @@ Valores relevantes:
 ```js
 const URL_REST_DEV = "http://localhost:7050";
 const URL_REST_PRO = "";
-const IS_REST_PRO = true;
+const IS_REST_PRO = false;
 
 export const URL_REST = IS_REST_PRO ? URL_REST_PRO : URL_REST_DEV;
 export const API_BASE_URL = `${getRestBaseUrl()}/api`;
@@ -43,16 +43,22 @@ export const URL_SSE = `${getRestBaseUrl()}/api/agui/stream`;
 Regla operativa:
 
 - `URL_REST_DEV` debe apuntar al backend local en `http://localhost:7050`.
-- `URL_REST_PRO=""` hace que el frontend use rutas relativas como `/api`.
+- En desarrollo local, Browser MCP y Playwright real de `/t360`,
+  `IS_REST_PRO=false` es el modo esperado.
+- `URL_REST_PRO=""` con `IS_REST_PRO=true` hace que el frontend use rutas
+  relativas como `/api`; solo debe usarse si existe proxy/reverse proxy
+  explicito hacia el backend esperado.
 - Los clientes frontend deben importar desde `components/global.js` y no
   hardcodear URLs.
+- No corregir conectividad de `/t360` tocando `astro.config.mjs`, API clients,
+  componentes Svelte ni URLs hardcodeadas. El punto de control es `global.js`.
 
 Nota actual:
 
-`astro.config.mjs` todavia tiene un proxy Vite de desarrollo `/api` hacia
-`http://127.0.0.1:8000`. Si `IS_REST_PRO=true` en dev, el navegador usa `/api`
-relativo y ese proxy entra en juego. Para una validacion local con backend en
-`7050`, hay dos opciones:
+Si `IS_REST_PRO=true` en dev, el navegador usa `/api` relativo. Ese modo no
+valida directamente contra `7050` salvo que exista un proxy o un forward
+temporal de sesion. Para una validacion local con backend en `7050`, hay dos
+opciones:
 
 1. Usar `URL_REST_DEV` con el toggle dev correspondiente.
 2. Usar un forward temporal de sesion `8000 -> 7050`, sin persistirlo.

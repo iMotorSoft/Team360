@@ -39,8 +39,12 @@ Antes de usar Browser MCP:
 2. verificar que Astro responde en `127.0.0.1:3050`;
 3. confirmar que la URL objetivo abre desde Astro, normalmente
    `http://127.0.0.1:3050/t360`;
-4. si la prueba usa runtime real, cumplir `[[service-preflight-methodology]]`;
-5. dejar claro si se reinicio backend, Astro o ambos para la prueba.
+4. confirmar que `SrvRestAstroLS_v1/astro/src/components/global.js` apunta al
+   backend local mediante `IS_REST_PRO=false` y
+   `URL_REST_DEV="http://localhost:7050"`, salvo que el prompt pida
+   explicitamente probar modo relativo `/api`;
+5. si la prueba usa runtime real, cumplir `[[service-preflight-methodology]]`;
+6. dejar claro si se reinicio backend, Astro o ambos para la prueba.
 
 No validar Browser MCP contra `4321`, `8000`, HTML directo, `curl`, lectura de
 archivos, Playwright o rutas sueltas salvo que el objetivo lo pida

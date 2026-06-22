@@ -12,6 +12,19 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 
 ## Acciones realizadas
 
+### 2026-06-22 - Refuerzo de `global.js` como control de conectividad
+
+- Se reforzo `team360-frontend-url-source-of-truth.md` para aclarar que
+  `global.js` es el unico punto de control de conectividad frontend/backend.
+- Para desarrollo local, Browser MCP, Playwright real de `/t360` y validacion
+  contra backend `7050`, `IS_REST_PRO` debe estar en `false` y `URL_REST_DEV`
+  debe apuntar a `http://localhost:7050`.
+- Se dejo explicitado que `IS_REST_PRO=true` con `URL_REST_PRO=""` usa rutas
+  relativas `/api` y solo es valido si existe proxy/reverse proxy documentado.
+- Se agrego la regla de no corregir conectividad de `/t360` tocando
+  `astro.config.mjs`, API clients, componentes Svelte ni URLs hardcodeadas salvo
+  instruccion explicita.
+
 ### 2026-06-22 - Politica general de Browser MCP
 
 - Se agrego `browser-mcp-validation-policy.md` como regla operativa estable

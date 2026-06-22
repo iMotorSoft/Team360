@@ -7,9 +7,12 @@ export const CONSOLE_SITE_URL = "https://console.team360.live";
 // -- Backend REST endpoint (dev/pro conmutable) --
 // Todos los API clients en src/lib/ deben importar URL_REST desde aquí,
 // no hardcodear URLs. Es la única fuente de verdad para el endpoint REST.
+// Desarrollo local / Browser MCP sobre /t360: IS_REST_PRO debe quedar false
+// para usar el backend local en 7050. Producción con URL_REST_PRO="" requiere
+// reverse proxy /api configurado en el host público.
 const URL_REST_DEV = "http://localhost:7050";
 const URL_REST_PRO = "";
-const IS_REST_PRO = true; // toggle: cambiar a true para producción
+const IS_REST_PRO = false; // toggle: cambiar a true para producción
 
 export const URL_REST = IS_REST_PRO ? URL_REST_PRO : URL_REST_DEV;
 

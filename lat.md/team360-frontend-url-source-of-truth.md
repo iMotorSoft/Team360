@@ -32,6 +32,30 @@ Toda URL debe construirse importando `URL_REST`, `getRestBaseUrl()`, `API_BASE_U
 
 El toggle `IS_REST_PRO` en `global.js` controla si el frontend apunta al backend de desarrollo o producción. No debe replicarse este toggle en otros archivos.
 
+Para desarrollo local, Browser MCP, Playwright real de `/t360` y validaciones
+contra backend en `7050`, `IS_REST_PRO` debe estar en `false` y
+`URL_REST_DEV` debe apuntar a:
+
+```text
+http://localhost:7050
+```
+
+Con `IS_REST_PRO=false`, los clientes frontend resuelven:
+
+```text
+http://localhost:7050/api
+```
+
+Si `IS_REST_PRO=true` y `URL_REST_PRO=""`, el frontend usa rutas relativas
+como `/api`. Ese modo solo es valido cuando existe un reverse proxy/proxy
+explicito que resuelve `/api` hacia el backend esperado. En local no debe usarse
+para validar `/t360` salvo que el prompt pida y documente explicitamente el
+proxy o `socat` correspondiente.
+
+Regla operativa: no corregir conectividad de `/t360` modificando
+`astro.config.mjs`, API clients, componentes Svelte o URLs hardcodeadas. El
+punto de control para dev/pro es `global.js`.
+
 ### 4. Los API clients en `src/lib/` deben importar desde `global.js`
 
 Todos los módulos en `src/lib/api/` deben importar `API_BASE_URL` o `URL_REST` desde `global.js`. Ningún API client debe definir su propio prefix.

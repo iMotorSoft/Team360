@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-22 (Regla Browser MCP)
+Ultima actualizacion: 2026-06-22 (Regla global.js)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,22 @@ Ultima actualizacion: 2026-06-22 (Regla Browser MCP)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-22 - Refuerzo de `global.js` para `/t360`
+
+- Se reforzo la regla operativa de conectividad frontend/backend:
+  `SrvRestAstroLS_v1/astro/src/components/global.js` es la unica fuente de
+  verdad para resolver el backend REST desde el frontend.
+- Para desarrollo local, Browser MCP y Playwright real de `/t360`, el modo
+  esperado es `IS_REST_PRO=false` con `URL_REST_DEV="http://localhost:7050"`.
+- Se documento que `IS_REST_PRO=true` con `URL_REST_PRO=""` usa `/api`
+  relativo y solo debe validarse si hay proxy/reverse proxy o `socat`
+  explicitamente preparado.
+- Se agrego la regla de no arreglar conectividad de `/t360` modificando
+  `astro.config.mjs`, API clients, componentes Svelte ni URLs hardcodeadas salvo
+  instruccion explicita.
+- No se modifico la configuracion de `astro.config.mjs` como parte de esta
+  documentacion.
 
 ### 2026-06-22 - Regla operativa Browser MCP
 
