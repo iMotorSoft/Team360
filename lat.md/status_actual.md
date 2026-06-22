@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-20
+Ultima actualizacion: 2026-06-22
 
 ## Estado general
 
@@ -11,6 +11,21 @@ Ultima actualizacion: 2026-06-20
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-22 - Politica general de Browser MCP
+
+- Se agrego `browser-mcp-validation-policy.md` como regla operativa estable
+  para validaciones Browser MCP / `opencode-browser` sobre Team360.
+- Se fijo como precondicion que backend Litestar responda en `127.0.0.1:7050`
+  y Astro en `127.0.0.1:3050` antes de iniciar la fase browser.
+- Se autorizo bajar y volver a levantar solo los procesos locales de backend y
+  Astro cuando sea necesario para validar contra el estado correcto; no aplica a
+  PostgreSQL, Milvus ni LiteLLM salvo pedido explicito.
+- Se documento que cualquier falla de Browser MCP obliga a detener la prueba,
+  reportar el paso/error/estado de servidores y no reemplazar la validacion con
+  terminal, `curl`, Playwright, HTML o lectura de codigo sin autorizacion.
+- Se agrego la referencia `[[browser-mcp-validation-policy]]` al indice
+  `lat.md/lat.md`.
 
 ### 2026-06-20 - Comando canonico de arranque productivo backend Vera
 

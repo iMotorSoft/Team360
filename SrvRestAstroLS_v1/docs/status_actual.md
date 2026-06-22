@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-21 (Cierre dialogo interactivo)
+Ultima actualizacion: 2026-06-22 (Regla Browser MCP)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,25 @@ Ultima actualizacion: 2026-06-21 (Cierre dialogo interactivo)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-22 - Regla operativa Browser MCP
+
+- Se documento `lat.md/browser-mcp-validation-policy.md` como regla general
+  para validaciones Browser MCP / `opencode-browser`.
+- La regla exige que antes de navegar respondan backend Litestar en
+  `127.0.0.1:7050` y Astro en `127.0.0.1:3050`, usando normalmente
+  `http://127.0.0.1:3050/t360` como URL real de validacion.
+- Se dejo explicito que el agente puede bajar y volver a levantar solo backend
+  y Astro locales cuando no respondan, queden viejos o el entorno sea ambiguo.
+  No autoriza reiniciar PostgreSQL, Milvus ni LiteLLM salvo pedido explicito.
+- Se fijo que si Browser MCP falla, la prueba debe detenerse y avisar el paso,
+  error, URL, estado de servidores y evidencia disponible; no se puede
+  reemplazar por terminal, `curl`, Playwright, HTML ni lectura de codigo sin
+  autorizacion.
+- Se actualizo `lat.md/deepseek-v4-flash-opencode-browser.md` para enlazar y
+  respetar esta regla general.
+- No se modifico frontend, backend, DB, Milvus, LiteLLM ni configuracion
+  productiva.
 
 ### 2026-06-21 - Validacion local backend 7050 y Astro 3050
 

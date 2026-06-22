@@ -115,6 +115,7 @@ Reglas rapidas:
 - No tocar `team360_orquestador` salvo que el objetivo lo pida.
 - No mezclar browser lab de Mercado Libre con AG-UI o frontend salvo que el objetivo lo pida.
 - Preferir cambios chicos, claros y reversibles.
+- Para validaciones Browser MCP / `opencode-browser`, usar `lat.md/browser-mcp-validation-policy.md`: antes de navegar deben responder backend `127.0.0.1:7050` y Astro `127.0.0.1:3050`; el agente puede bajar/subir esos dos servidores locales si hace falta; si Browser MCP falla, detener la prueba y avisar, sin reemplazarla por terminal, `curl`, Playwright, HTML o lectura de codigo salvo autorizacion explicita.
 - Para QA browser dirigido con DeepSeek V4 Flash en OpenCode + `opencode-browser`, usar `lat.md/deepseek-v4-flash-opencode-browser.md`: fase browser atomica, herramientas `browsermcp_*`, snapshots antes/despues, no reemplazar navegador con terminal, evidencia explicita y detencion obligatoria.
 - Antes de desarrollo, test, smoke, benchmark o prueba con servicios reales, ejecutar preflight obligatorio: PostgreSQL activo, Milvus activo y collection correcta, LiteLLM activo, `.bashrc`/env vars accesibles, `globalVar.py` importable cuando aplique, modelo registrado en LiteLLM y llamada real minima al modelo validando auth/credito/provider/endpoint/sin fallback silencioso. Si falla, no aceptar benchmark ni interpretar resultados como calidad del modulo. Ver `lat.md/service-preflight-methodology.md`.
 - Actualizar `SrvRestAstroLS_v1/docs/status_actual.md` al cerrar tareas tecnicas importantes.

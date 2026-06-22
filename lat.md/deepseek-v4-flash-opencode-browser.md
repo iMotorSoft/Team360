@@ -112,6 +112,7 @@ herramienta obligatoria
 
 ## Reglas obligatorias
 
+- Antes de iniciar Browser MCP sobre Team360, aplicar `[[browser-mcp-validation-policy]]`: backend `127.0.0.1:7050` y Astro `127.0.0.1:3050` deben estar levantados; el agente puede bajar/subir esos dos servidores locales si hace falta; si Browser MCP falla, la prueba se detiene y se informa.
 - Para navegar e interactuar con paginas, usar herramientas `browsermcp_*` del plugin `opencode-browser`.
 - No usar `curl`, `wget`, Playwright desde terminal ni lectura directa del HTML como reemplazo del navegador.
 - Ejecutar snapshot antes de interactuar.
@@ -383,7 +384,9 @@ Reglas:
 - No reutilizar referencias viejas.
 - Para backend se permite terminal, logs y PostgreSQL de solo lectura.
 - No modificar archivos.
-- No reiniciar servicios.
+- No reiniciar PostgreSQL, Milvus ni LiteLLM salvo pedido explicito.
+- Se permite bajar y volver a levantar backend y Astro locales si no responden
+  en `7050/3050`, quedaron viejos o el entorno es ambiguo.
 - No ejecutar migraciones.
 - No hacer commits.
 - No mostrar secretos.
@@ -408,7 +411,9 @@ Reglas:
 - No reutilices referencias viejas despues de que cambie la pagina.
 - Para backend puedes usar terminal, logs y consultas PostgreSQL de solo lectura.
 - No modifiques archivos.
-- No reinicies servicios.
+- No reinicies PostgreSQL, Milvus ni LiteLLM salvo pedido explicito.
+- Puedes bajar y volver a levantar backend y Astro locales si no responden en
+  `7050/3050`, quedaron viejos o el entorno es ambiguo.
 - No ejecutes migraciones.
 - No hagas commits.
 - No muestres secretos.
@@ -755,5 +760,6 @@ confiabilidad depende principalmente de la disciplina del prompt.
 ## Referencias
 
 - [[model-selection-routing]]
+- [[browser-mcp-validation-policy]]
 - [[team360-runtime-operational-policy]]
 - [[service-preflight-methodology]]
