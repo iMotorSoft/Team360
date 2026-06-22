@@ -184,6 +184,14 @@ test.describe("Team360 pública - Vera estructurada", () => {
     expect(await result.getByText("ERP", { exact: true }).count()).toBeGreaterThan(0);
     await expect(result.getByText("Precios", { exact: true })).toBeVisible();
     expect(await result.getByText("Planilla", { exact: true }).count()).toBeGreaterThan(0);
+    // Expand detail to access collapsed sections
+    try {
+      await page.getByText("Ver detalle", { exact: false }).first().click({ timeout: 2000 });
+      await page.waitForTimeout(300);
+    } catch {
+      // detail button may not exist
+    }
+
     await expect(result).toContainText("aprobar excepciones o acciones sensibles");
     await expect(result).toContainText("Los datos pueden estar desactualizados");
     await expect(result).toContainText("confirmar método de integración de ERP para Stock");
