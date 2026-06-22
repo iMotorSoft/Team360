@@ -115,6 +115,12 @@
     };
   }
 
+  function isProductFitBlock(block: unknown): block is import("../../lib/t360/interaction/types").T360ProductFitCardBlock {
+    if (typeof block !== "object" || block === null) return false;
+    const b = block as Record<string, unknown>;
+    return b.type === "product_fit_card" && typeof b.product_code === "string" && typeof b.product_name === "string";
+  }
+
   function isMissingRequirementsBlock(block: unknown): block is { type: "missing_requirements"; requirements: T360MissingRequirement[] } {
     return (
       typeof block === "object" &&
@@ -347,10 +353,11 @@
                     actionBlockType={extracted.blockType as import("../../lib/t360/interaction/types").T360InteractionKind}
                     actionSessionId={msg.sessionId ?? sessionId ?? ""}
                     actionDisabled={isLoading}
+                    productFitData={isProductFitBlock(msg.interactionBlock) ? msg.interactionBlock : null}
                   />
                 </div>
               {/if}
-              {#if msg.interactionBlock !== undefined && !(isMissingRequirementsBlock(msg.interactionBlock) && msg.diagnosis) && !(isActionCardBlock(msg.interactionBlock) && msg.diagnosis)}
+              {#if msg.interactionBlock !== undefined && !(isMissingRequirementsBlock(msg.interactionBlock) && msg.diagnosis) && !(isActionCardBlock(msg.interactionBlock) && msg.diagnosis) && !(isProductFitBlock(msg.interactionBlock) && msg.diagnosis)}
                 <div
                   class="w-full"
                   data-testid="public-vera-interaction-block"

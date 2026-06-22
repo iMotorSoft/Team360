@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { StructuredDiagnosis } from "../../lib/api/publicDiagnosis";
-  import type { T360MissingRequirement, T360Action, T360InteractionKind } from "../../lib/t360/interaction/types";
+  import type { T360MissingRequirement, T360Action, T360InteractionKind, T360ProductFitCardBlock } from "../../lib/t360/interaction/types";
   import T360ActionButtons from "../../lib/t360/interaction/T360ActionButtons.svelte";
+  import T360StatusBadge from "../../lib/t360/interaction/T360StatusBadge.svelte";
   import {
     formatFeasibility,
     formatAutomationMode,
@@ -40,6 +41,7 @@
     actionBlockType = "diagnosis_action_card" as T360InteractionKind,
     actionSessionId = "",
     actionDisabled = false,
+    productFitData = null,
   }: {
     diagnosis: StructuredDiagnosis;
     isFallback?: boolean;
@@ -49,6 +51,7 @@
     actionBlockType?: T360InteractionKind;
     actionSessionId?: string;
     actionDisabled?: boolean;
+    productFitData?: T360ProductFitCardBlock | null;
   } = $props();
 
   const dir = $derived(directionForLocale(locale));
@@ -58,6 +61,7 @@
   const hasEntitySources = $derived(Object.keys(diagnosis.entity_sources).length > 0);
 
   let expanded = $state(false);
+  let productFitOpen = $state(false);
 
   const hasExpandableContent = $derived(
     diagnosis.automatable_steps.length > 0 ||
@@ -308,6 +312,89 @@
         {expanded ? "Cerrar detalle" : "Ver detalle"}
         <span class="text-[0.5rem]">{expanded ? "▲" : "▼"}</span>
       </button>
+    </div>
+  {/if}
+
+  <!-- Compact product fit -->
+  {#if productFitData}
+    <div class="rounded-xl border border-[#cde0df] bg-white p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]">Posible encaje</p>
+          <h3 class="mt-1 text-sm font-semibold leading-5 text-[#102d4f]">{productFitData.product_name}</h3>
+        </div>
+        <div class="flex shrink-0 flex-wrap items-center gap-1.5">
+          <T360StatusBadge status={productFitData.status} compact />
+          {#if typeof productFitData.fit_score === "number"}
+            <span class="rounded border border-[#cde0df] px-1.5 py-0.5 text-[0.6rem] font-semibold text-[#168b88]">{productFitData.fit_score}%</span>
+          {/if}
+        </div>
+      </div>
+      <p class="mt-2 text-sm leading-5 text-[#5b7283]">{productFitData.summary}</p>
+
+      {#if productFitOpen}
+        {#if productFitData.good_fit_reasons?.length}
+          <div class="mt-3 rounded-lg bg-[#dff0ed]/50 p-3">
+            <p class="text-xs font-bold uppercase tracking-[0.12em] text-[#168b88]">Por qué encaja</p>
+            <ul class="mt-1.5 space-y-1">
+              {#each productFitData.good_fit_reasons as reason}
+                <li class="flex items-start gap-1.5 text-sm leading-5 text-[#203c55]">
+                  <span class="mt-0.5 shrink-0 text-[#168b88]">✓</span>
+                  <span class="min-w-0 break-words">{reason}</span>
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+        {#if productFitData.limitations?.length}
+          <div class="mt-2 rounded-lg bg-[#fff3d6]/50 p-3">
+            <p class="text-xs font-bold uppercase tracking-[0.12em] text-[#996e1a]">Limitaciones a validar</p>
+            <ul class="mt-1.5 space-y-1">
+              {#each productFitData.limitations as limitation}
+                <li class="flex items-start gap-1.5 text-sm leading-5 text-[#5f4a28]">
+                  <span class="mt-0.5 shrink-0 text-[#996e1a]">!</span>
+                  <span class="min-w-0 break-words">{limitation}</span>
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+        {#if productFitData.recommended_next_step}
+          <div class="mt-2 rounded-lg border border-[#d5e2e5] bg-[#f6fbfa] p-3">
+            <p class="text-xs font-bold uppercase tracking-[0.12em] text-[#168b88]">Siguiente paso</p>
+            <p class="mt-1 text-sm leading-5 text-[#203c55]">{productFitData.recommended_next_step}</p>
+          </div>
+        {/if}
+      {:else if productFitData.good_fit_reasons?.length}
+        <button
+          type="button"
+          class="mt-2 text-xs font-semibold text-[#168b88] underline underline-offset-2 transition hover:text-[#126d6b]"
+          onclick={() => productFitOpen = true}
+        >
+          Ver por qué encaja
+        </button>
+      {/if}
+
+      {#if productFitOpen && (productFitData.good_fit_reasons?.length || productFitData.limitations?.length || productFitData.recommended_next_step)}
+        <button
+          type="button"
+          class="mt-2 text-xs font-medium text-[#78909f] underline underline-offset-2 transition hover:text-[#476275]"
+          onclick={() => productFitOpen = false}
+        >
+          Cerrar detalle
+        </button>
+      {/if}
+
+      {#if productFitData.actions?.length}
+        <div class="mt-3 border-t border-[#d5e2e5] pt-3">
+          <T360ActionButtons
+            actions={productFitData.actions}
+            sessionId={actionSessionId}
+            blockType="product_fit_card"
+            disabled={actionDisabled}
+          />
+        </div>
+      {/if}
     </div>
   {/if}
 
