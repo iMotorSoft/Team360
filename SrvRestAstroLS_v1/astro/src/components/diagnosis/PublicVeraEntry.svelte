@@ -95,6 +95,26 @@
     return td?.generation?.status === "fallback";
   }
 
+  function isActionCardBlock(block: unknown): block is { type: "next_step_choice" | "diagnosis_action_card"; actions?: unknown[]; primary_action?: unknown; secondary_actions?: unknown[] } {
+    if (typeof block !== "object" || block === null) return false;
+    const b = block as Record<string, unknown>;
+    return b.type === "next_step_choice" || b.type === "diagnosis_action_card";
+  }
+
+  function extractActionButtons(block: unknown, sessionId: string): { actionButtons: unknown[]; blockType: string } {
+    if (!isActionCardBlock(block)) return { actionButtons: [], blockType: "diagnosis_action_card" };
+    const b = block as Record<string, unknown>;
+    if (b.type === "next_step_choice") {
+      return { actionButtons: (b.actions as unknown[]) ?? [], blockType: "next_step_choice" };
+    }
+    const primary = b.primary_action;
+    const secondary = (b.secondary_actions as unknown[]) ?? [];
+    return {
+      actionButtons: primary ? [primary, ...secondary] : secondary,
+      blockType: "diagnosis_action_card",
+    };
+  }
+
   function isMissingRequirementsBlock(block: unknown): block is { type: "missing_requirements"; requirements: T360MissingRequirement[] } {
     return (
       typeof block === "object" &&
@@ -316,16 +336,21 @@
                 {@html renderMarkdown(displayText)}
               </div>
               {#if msg.diagnosis}
+                {@const extracted = extractActionButtons(msg.interactionBlock, msg.sessionId ?? sessionId ?? "")}
                 <div class="w-full">
                   <DiagnosisResult
                     diagnosis={msg.diagnosis}
                     isFallback={msg.isFallback ?? false}
                     locale={currentLocale}
                     compactMissingRequirements={extractCompactRequirements(msg.interactionBlock)}
+                    actionButtons={extracted.actionButtons as import("../../lib/t360/interaction/types").T360Action[]}
+                    actionBlockType={extracted.blockType as import("../../lib/t360/interaction/types").T360InteractionKind}
+                    actionSessionId={msg.sessionId ?? sessionId ?? ""}
+                    actionDisabled={isLoading}
                   />
                 </div>
               {/if}
-              {#if msg.interactionBlock !== undefined && !(isMissingRequirementsBlock(msg.interactionBlock) && msg.diagnosis)}
+              {#if msg.interactionBlock !== undefined && !(isMissingRequirementsBlock(msg.interactionBlock) && msg.diagnosis) && !(isActionCardBlock(msg.interactionBlock) && msg.diagnosis)}
                 <div
                   class="w-full"
                   data-testid="public-vera-interaction-block"

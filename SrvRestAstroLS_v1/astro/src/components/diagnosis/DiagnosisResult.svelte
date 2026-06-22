@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { StructuredDiagnosis } from "../../lib/api/publicDiagnosis";
-  import type { T360MissingRequirement } from "../../lib/t360/interaction/types";
+  import type { T360MissingRequirement, T360Action, T360InteractionKind } from "../../lib/t360/interaction/types";
+  import T360ActionButtons from "../../lib/t360/interaction/T360ActionButtons.svelte";
   import {
     formatFeasibility,
     formatAutomationMode,
@@ -35,11 +36,19 @@
     isFallback,
     locale = "es",
     compactMissingRequirements = [],
+    actionButtons = [],
+    actionBlockType = "diagnosis_action_card" as T360InteractionKind,
+    actionSessionId = "",
+    actionDisabled = false,
   }: {
     diagnosis: StructuredDiagnosis;
     isFallback?: boolean;
     locale?: string;
     compactMissingRequirements?: T360MissingRequirement[];
+    actionButtons?: T360Action[];
+    actionBlockType?: T360InteractionKind;
+    actionSessionId?: string;
+    actionDisabled?: boolean;
   } = $props();
 
   const dir = $derived(directionForLocale(locale));
@@ -280,6 +289,18 @@
       <p class="mt-1.5 text-sm font-semibold leading-6 text-[#102d4f]">
         {formatNextStep(diagnosis.next_step, locale)}
       </p>
+    </div>
+  {/if}
+
+  <!-- Unified action buttons -->
+  {#if actionButtons.length > 0}
+    <div class="border-t border-[#d5e2e5] pt-4">
+      <T360ActionButtons
+        actions={actionButtons}
+        sessionId={actionSessionId}
+        blockType={actionBlockType}
+        disabled={actionDisabled}
+      />
     </div>
   {/if}
 </div>
