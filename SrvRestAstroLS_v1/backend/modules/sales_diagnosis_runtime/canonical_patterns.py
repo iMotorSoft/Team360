@@ -44,7 +44,6 @@ CHANNEL_PATTERNS: dict[str, re.Pattern] = {
     "instagram": _word("instagram"),
     "tiktok": _word("tiktok"),
     "meta": _word("meta"),
-    "kommo": _word("kommo"),
     "web": re.compile(
         r"(?:\b(?:web|sitio|p[aá]gina|website|intranet)\b)"
         r"|(?:אתר|אינטרנט)",
@@ -62,6 +61,7 @@ CHANNEL_PATTERNS: dict[str, re.Pattern] = {
 SYSTEM_PATTERNS: dict[str, re.Pattern] = {
     "erp": _word("erp"),
     "crm": _word("crm"),
+    "kommo": _word("kommo"),
     "spreadsheet": re.compile(
         r"(?:\b(?:planilla|hoja\s*de\s*c[aá]lculo|excel|sheet|spreadsheet|"
         r"google\s*sheet)\b)"

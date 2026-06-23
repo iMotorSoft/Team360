@@ -200,6 +200,9 @@ class AssistantConversationRuntime:
         # 3. Update semantic memory BEFORE RAG (current message is incorporated now)
         self._update_semantic_memory(state, input)
 
+        # 3.2 Auto-answer management system slot from extracted systems
+        self._auto_answer_management_system(state)
+
         # 3.5 Handle interaction response (structured answer from frontend blocks)
         self._apply_interaction_response(state, input)
 
@@ -468,6 +471,30 @@ class AssistantConversationRuntime:
             mem["current_process"] = process
 
         state.semantic_memory = mem
+
+    @staticmethod
+    def _auto_answer_management_system(state: ConversationState) -> None:
+        status = state.slots.get("management_system_choice_status", "")
+        if status == "answered":
+            return
+        mem = state.semantic_memory or {}
+        systems = mem.get("systems_and_data_sources", [])
+        if not systems:
+            return
+        SYSTEM_TO_MGMT_OPTION = {
+            "crm": "crm",
+            "kommo": "crm",
+            "spreadsheet": "spreadsheet",
+            "custom_system": "custom_system",
+            "erp": "crm",
+            "database": "custom_system",
+        }
+        for sys_name in systems:
+            option = SYSTEM_TO_MGMT_OPTION.get(sys_name)
+            if option:
+                state.slots["management_system"] = option
+                state.slots["management_system_choice_status"] = "answered"
+                return
 
     @staticmethod
     def _apply_interaction_response(state: ConversationState, input: AssistantTurnInput) -> None:
