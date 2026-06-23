@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-22 (Regla global.js)
+Ultima actualizacion: 2026-06-22 (Deploy frontend remoto)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,27 @@ Ultima actualizacion: 2026-06-22 (Regla global.js)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-22 - Deploy frontend remoto `team360.live`
+
+- Se genero un build estatico nuevo desde `SrvRestAstroLS_v1/astro` con
+  `pnpm check` y `pnpm build`.
+- Se valido que `dist/` no contiene referencias a `localhost:7050`; el bundle
+  publicado queda en modo productivo relativo `/api` mediante
+  `IS_REST_PRO=true` y `URL_REST_PRO=""`.
+- Se publico el contenido de `SrvRestAstroLS_v1/astro/dist/` por `rsync
+  --delete` al directorio remoto servido por Nginx:
+  `/home/administrator/project/iMotorSoft/ai/Team360/SrvRestAstroLS_v1/astro/dist/`.
+- Se valido `https://team360.live/` con `200 OK`, `Content-Length: 41432` y
+  `Last-Modified` correspondiente al build nuevo.
+- Para comparar local contra remoto se bajo el `astro dev` local que ocupaba
+  `127.0.0.1:3050` y se levanto `pnpm preview --host 127.0.0.1 --port 3050`
+  sobre el build publicado.
+- Validacion browser con `agent-browser`: snapshots de
+  `http://127.0.0.1:3050/` y `https://team360.live/` sin diferencias
+  estructurales observadas; el diff de URLs quedo vacio.
+- Alcance: se valido la carga visual/estatica de la home publica. No se valido
+  el flujo conversacional de Vera ni calidad de API en esta accion.
 
 ### 2026-06-22 - Refuerzo de `global.js` para `/t360`
 

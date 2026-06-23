@@ -36,6 +36,7 @@
   let chatError = $state("");
   let currentLocale = $state<string>(PUBLIC_DIAGNOSIS_CONTEXT.locale);
   let interactionEventRoot = $state<HTMLElement | undefined>();
+  let blockConsumed = $state(false);
 
   const canSend = $derived(inputText.trim().length > 0 && !isLoading);
 
@@ -50,6 +51,7 @@
         explicit_language_preference: session.explicit_language_preference,
       });
       sessionId = null;
+      blockConsumed = false;
     }
     const updated = loadPublicVeraSession();
     if (updated.preferred_response_language) {
@@ -202,6 +204,7 @@
     messages = [];
     inputText = "";
     chatError = "";
+    blockConsumed = false;
     clearPublicVeraSession();
   }
 
@@ -219,6 +222,7 @@
     const eventNames = ["t360action", "t360choice", "t360choices"];
     const handler = (event: Event) => {
       if (!(event instanceof CustomEvent) || isLoading) return;
+      blockConsumed = true;
       const turn = t360InteractionEventToTurnRequest(event.detail as T360InteractionEventDetail);
       void sendRuntimeMessage(turn.message, turn.display_text, false, turn.interaction_response as Record<string, unknown> | undefined);
     };
@@ -352,7 +356,7 @@
                     actionButtons={extracted.actionButtons as import("../../lib/t360/interaction/types").T360Action[]}
                     actionBlockType={extracted.blockType as import("../../lib/t360/interaction/types").T360InteractionKind}
                     actionSessionId={msg.sessionId ?? sessionId ?? ""}
-                    actionDisabled={isLoading}
+                    actionDisabled={isLoading || blockConsumed}
                     productFitData={isProductFitBlock(msg.interactionBlock) ? msg.interactionBlock : null}
                   />
                 </div>
@@ -366,7 +370,7 @@
                   <T360InteractionRenderer
                     block={msg.interactionBlock}
                     sessionId={msg.sessionId ?? sessionId ?? ""}
-                    disabled={isLoading}
+                    disabled={isLoading || blockConsumed}
                   />
                 </div>
               {/if}
