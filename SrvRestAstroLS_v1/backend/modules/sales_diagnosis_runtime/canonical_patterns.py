@@ -62,6 +62,10 @@ SYSTEM_PATTERNS: dict[str, re.Pattern] = {
     "erp": _word("erp"),
     "crm": _word("crm"),
     "kommo": _word("kommo"),
+    "salesforce": re.compile(
+        r"(?:\b(?:salesforce|sales\s+force)\b)",
+        re.IGNORECASE,
+    ),
     "spreadsheet": re.compile(
         r"(?:\b(?:planilla|hoja\s*de\s*c[aá]lculo|excel|sheet|spreadsheet|"
         r"google\s*sheet)\b)"

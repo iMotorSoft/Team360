@@ -484,6 +484,7 @@ class AssistantConversationRuntime:
         SYSTEM_TO_MGMT_OPTION = {
             "crm": "crm",
             "kommo": "crm",
+            "salesforce": "crm",
             "spreadsheet": "spreadsheet",
             "custom_system": "custom_system",
             "erp": "crm",

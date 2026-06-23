@@ -172,6 +172,9 @@ class TestExtractCurrentSystems:
         ("Los WhatsApp llegan a Kommo.", ["kommo"]),
         ("Trabajamos con Kommo.", ["kommo"]),
         ("La disponibilidad la da Kommo.", ["kommo"]),
+        ("Los WhatsApp llegan a Salesforce.", ["salesforce"]),
+        ("Los WhatsApp llegan a Sales Force.", ["salesforce"]),
+        ("Los manejamos en Salesforce CRM.", ["crm", "salesforce"]),
     ])
     def test_systems(self, message, expected):
         result = sorted(extract_current_systems(message))
@@ -212,6 +215,10 @@ class TestCanonicalization:
         ("sistema propio", "custom_system"),
         ("Kommo", "kommo"),
         ("los WhatsApp que llegan a Kommo", "kommo"),
+        ("Salesforce", "salesforce"),
+        ("los WhatsApp que llegan a Salesforce", "salesforce"),
+        ("Sales Force", "salesforce"),
+        ("los WhatsApp que llegan a Sales Force", "salesforce"),
     ])
     def test_system_variants(self, message, canonical_system):
         result = extract_current_systems(message)
@@ -220,3 +227,7 @@ class TestCanonicalization:
     def test_kommo_is_not_a_channel(self):
         result = extract_current_channels("Los WhatsApp llegan a Kommo.")
         assert "kommo" not in result, "Kommo should be a system, not a channel"
+
+    def test_salesforce_is_not_a_channel(self):
+        result = extract_current_channels("Los WhatsApp llegan a Salesforce.")
+        assert "salesforce" not in result, "Salesforce should be a system, not a channel"
