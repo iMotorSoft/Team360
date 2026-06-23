@@ -1,0 +1,383 @@
+---
+import PublicMarketingLayout from "../layouts/PublicMarketingLayout.astro";
+import PublicVeraEntry from "../components/diagnosis/PublicVeraEntry.svelte";
+
+const solutions = [
+  {
+    title: "Communication & Follow-up",
+    tag: "Atención y continuidad",
+    text: "WhatsApp, Telegram, email, calendario, respuestas asistidas y seguimiento para que ninguna consulta quede perdida.",
+    items: ["WhatsApp In", "Email Reader", "Follow-up Reminder", "Response Draft"],
+  },
+  {
+    title: "Social Content",
+    tag: "Contenido que aprende",
+    text: "Reels, publicaciones, copies, reglas de marca y métricas para transformar ideas en piezas listas para revisar.",
+    items: ["Reel Brief", "Post Copy", "Brand QA", "Meta Metrics"],
+  },
+  {
+    title: "Sales KPI",
+    tag: "Ventas con visibilidad",
+    text: "Leads, campañas, datos comerciales disponibles, seguimiento y reportes para entender qué pasa antes de perder oportunidades.",
+    items: ["CRM Signals", "Lead Summary", "Ads KPI", "Sales Report"],
+  },
+  {
+    title: "Knowledge Operations",
+    tag: "Conocimiento usable",
+    text: "Carga, curación y validación de información empresarial para que los asistentes respondan mejor y con límites claros.",
+    items: ["Load Knowledge", "Validate FAQ", "Detect Gaps", "Answer Test"],
+  },
+  {
+    title: "Backoffice Validation",
+    tag: "Control operativo",
+    text: "Archivos, documentos, conciliaciones, validación y revisión asistida para tareas administrativas repetitivas.",
+    items: ["File Intake", "Parse Document", "Match Records", "Control Report"],
+  },
+];
+
+const tasks = [
+  ["Leer un email", "Detecta intención, adjuntos y próximos pasos."],
+  ["Recibir WhatsApp", "Ordena la consulta y conserva contexto."],
+  ["Consultar una base", "Busca datos disponibles cuando existe integración y permiso."],
+  ["Preparar respuesta", "Redacta una salida revisable por el equipo."],
+  ["Generar reporte", "Convierte movimientos y métricas en resumen claro."],
+  ["Validar archivos", "Cruza documentos y señala diferencias."],
+];
+
+const model = [
+  ["T360 Pack", "Una solución configurable para una necesidad concreta: atención al cliente, administración, ventas o contenido."],
+  ["T360 Task", "Una acción puntual: registrar una consulta, enviar una respuesta, clasificar un pedido, actualizar un estado o generar un reporte."],
+  ["T360 Pack Flow", "Una secuencia ordenada de Tasks que convierte un proceso en un flujo operativo claro, paso a paso."],
+  ["T360 Pack Integrate", "Conexión con herramientas, sistemas o canales existentes, según permisos y factibilidad técnica."],
+];
+
+const objections = [
+  ["¿Necesito saber de tecnología?", "No. El diagnóstico parte de cómo trabaja tu equipo hoy y traduce el problema a un plan claro."],
+  ["¿Esto reemplaza a mi equipo?", "No. Team360 reduce carga repetitiva y conserva revisión humana donde hay criterio, riesgo o decisión comercial."],
+  ["¿Tengo que cambiar mis sistemas?", "No necesariamente. Primero vemos qué datos y canales ya existen; después definimos si conviene integrar, importar o empezar manualmente."],
+  ["¿Todo queda automatizado desde el día uno?", "No prometemos eso. Priorizamos una primera mejora útil, medible y segura antes de ampliar el alcance."],
+];
+---
+
+<PublicMarketingLayout
+  title="Team360 | Diagnóstico y automatización para operaciones reales"
+  description="Team360 diagnostica procesos desordenados y arma soluciones con comunicación, contenido, ventas, conocimiento y backoffice."
+  diagnosticHref="#vera"
+  headerCtaLabel="Ver diagnóstico inicial"
+  headerCtaMobileLabel="Diagnóstico"
+>
+  <main id="contenido" class="bg-[#f8faf7]">
+    <section class="relative isolate min-h-[88svh] overflow-hidden bg-[#0f2632] text-white">
+      <img
+        src="/assets/team360-t360-hero.png"
+        alt=""
+        class="absolute inset-0 -z-20 h-full w-full object-cover object-[62%_center]"
+        loading="eager"
+      />
+      <div class="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(8,21,28,0.94)_0%,rgba(8,21,28,0.78)_36%,rgba(8,21,28,0.34)_72%,rgba(8,21,28,0.18)_100%)]"></div>
+      <div class="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-[#f8faf7] via-[#f8faf7]/35 to-transparent"></div>
+
+      <div class="mx-auto grid max-w-7xl gap-8 px-5 pb-8 pt-16 sm:px-8 sm:pt-20 lg:grid-cols-[0.88fr_1.12fr] lg:px-10 lg:pb-10 lg:pt-24">
+        <div class="flex min-h-[52svh] flex-col justify-center">
+          <p class="max-w-max rounded-full border border-white/18 bg-white/10 px-3 py-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-[#a7f1df] backdrop-blur">
+            Diagnóstico Team360
+          </p>
+          <h1 class="mt-6 max-w-2xl text-5xl font-semibold leading-[0.96] text-white sm:text-6xl lg:text-[5.3rem]">
+            Team360
+          </h1>
+          <p class="mt-6 max-w-2xl text-xl leading-8 text-white/86 sm:text-2xl">
+            Transformamos procesos desordenados en operaciones claras, automatizadas por etapas y medibles.
+          </p>
+          <p class="mt-5 max-w-2xl text-base leading-7 text-white/68 sm:text-lg">
+            Diagnosticamos, armamos el plan y conectamos cada pieza sin sumar carga a tu equipo.
+          </p>
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a class="btn min-h-12 rounded-lg border-0 bg-[#44d6b2] px-6 text-sm font-bold text-[#092a2a] hover:bg-[#7ae8ce]" href="#vera">
+              Empezar diagnóstico
+            </a>
+            <a class="btn min-h-12 rounded-lg border border-white/24 bg-white/10 px-6 text-sm font-bold text-white hover:bg-white/18" href="#solucion">
+              Ver soluciones
+            </a>
+          </div>
+        </div>
+
+        <div id="diagnostico" class="relative scroll-mt-24 self-end overflow-hidden rounded-2xl border border-white/16 bg-[#f7fbf8]/94 p-4 text-[#19364a] shadow-[0_24px_80px_-48px_rgba(0,0,0,0.75)] backdrop-blur sm:p-5 lg:mb-8">
+          <div class="pointer-events-none absolute inset-x-5 top-0 h-px animate-pulse bg-gradient-to-r from-transparent via-[#44d6b2] to-transparent"></div>
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Vista previa</p>
+              <h2 class="mt-2 text-xl font-semibold leading-tight text-[#102d4f] sm:text-2xl">Ejemplo de orientación inicial</h2>
+            </div>
+            <span class="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#e6f7f4] px-3 py-2 text-xs font-bold text-[#168b88]">
+              <span class="relative flex size-2">
+                <span class="absolute inline-flex h-full w-full rounded-full bg-[#21b99f] opacity-75 motion-safe:animate-ping"></span>
+                <span class="relative inline-flex size-2 rounded-full bg-[#21b99f]"></span>
+              </span>
+              Orientación
+            </span>
+          </div>
+          <div class="mt-5 rounded-xl border border-[#dcebea] bg-white/72 p-3">
+            <p class="text-xs font-bold uppercase tracking-[0.14em] text-[#168b88]">Vera organiza</p>
+            <p class="mt-2 text-sm leading-6 text-[#425d6d]">
+              Este ejemplo muestra cómo Vera puede organizar la factibilidad, los puntos a validar y los próximos pasos de tu caso.
+            </p>
+          </div>
+          <label class="mt-5 block text-sm font-semibold text-[#324f64]" for="diagnosis-problem">
+            Caso de ejemplo
+          </label>
+          <textarea
+            id="diagnosis-problem"
+            class="textarea mt-2 min-h-28 w-full resize-none rounded-xl border-[#cbdcdd] bg-white text-sm leading-6 text-[#1f3d52] cursor-default"
+            readonly
+            aria-readonly="true"
+            tabindex="-1"
+          >Ej: recibimos muchos WhatsApp, nadie sabe quién respondió y después tengo que armar reportes manualmente.</textarea>
+          <div class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <a
+              href="#vera"
+              class="btn min-h-11 rounded-lg border-0 bg-[#102d4f] px-5 text-sm font-bold text-white hover:bg-[#1a4266]"
+            >
+              Probar diagnóstico en vivo
+            </a>
+            <p class="text-xs leading-5 text-[#667b86] sm:max-w-xs">
+              Usá la sección de Vera para escribir tu caso y recibir una orientación conectada.
+            </p>
+          </div>
+          <p class="mt-5 text-sm font-semibold text-[#102d4f]">El diagnóstico inicial debe devolver:</p>
+          <div class="mt-3 grid gap-2 sm:grid-cols-3">
+            <div class="rounded-xl bg-[#edf8f5] p-3">
+              <p class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">Tipo</p>
+              <p class="mt-1 text-sm font-semibold text-[#173b52]">Qué se puede automatizar</p>
+            </div>
+            <div class="rounded-xl bg-[#f2f5fb] p-3">
+              <p class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#506c9a]">Necesita</p>
+              <p class="mt-1 text-sm font-semibold text-[#173b52]">Canales, datos o integración</p>
+            </div>
+            <div class="rounded-xl bg-[#fff4de] p-3">
+              <p class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#9a6a18]">Síntesis</p>
+              <p class="mt-1 text-sm font-semibold text-[#173b52]">Qué conviene hacer ahora</p>
+            </div>
+          </div>
+          <p class="mt-4 text-xs leading-5 text-[#667b86]">
+            Este es un ejemplo de orientación inicial. No ejecuta acciones, no crea leads, no confirma por WhatsApp y no deriva datos sin autorización.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-y border-[#dde8e7] bg-white py-16 sm:py-20">
+      <div class="mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:px-10">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]">Antes / Después</p>
+          <h2 class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl">
+            Del desorden operativo a un plan que se puede ejecutar.
+          </h2>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <div class="rounded-2xl border border-[#ead9d0] bg-[#fff8f3] p-5">
+            <p class="text-sm font-bold text-[#9a4f2a]">Antes</p>
+            <ul class="mt-4 space-y-3 text-sm leading-6 text-[#6b5a52]">
+              <li>Mensajes repartidos entre canales.</li>
+              <li>Reportes armados a mano y tarde.</li>
+              <li>Decisiones sin datos claros.</li>
+              <li>IA usada como herramienta suelta.</li>
+            </ul>
+          </div>
+          <div class="rounded-2xl border border-[#cfe5df] bg-[#f1fbf7] p-5">
+            <p class="text-sm font-bold text-[#168b88]">Después</p>
+            <ul class="mt-4 space-y-3 text-sm leading-6 text-[#355c58]">
+              <li>Canales ordenados por intención y prioridad.</li>
+              <li>Tasks medibles dentro de un flujo claro.</li>
+              <li>Integraciones pensadas según necesidad real.</li>
+              <li>Diagnóstico primero, automatización después.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="solucion" class="scroll-mt-24 py-20 sm:py-28">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+        <div class="max-w-3xl">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]">Soluciones principales</p>
+          <h2 class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-5xl">
+            No vendemos piezas técnicas. Resolvemos dolores comerciales claros.
+          </h2>
+          <p class="mt-5 text-base leading-7 text-[#5e7382] sm:text-lg">
+            Team360 detecta qué parte de la operación necesita comunicación, contenido, datos, ventas,
+            conocimiento o validación de backoffice, y arma una solución con el alcance correcto.
+          </p>
+        </div>
+
+        <div class="mt-12 grid gap-4 lg:grid-cols-5">
+          {solutions.map((solution, index) => (
+            <article class:list={["rounded-2xl border p-5 shadow-[0_24px_60px_-54px_rgba(16,45,79,0.7)]", index === 0 ? "border-[#95d9d0] bg-[#eaf8f4] lg:col-span-2" : "border-[#dfe8e9] bg-white lg:col-span-1"]}>
+              <p class="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">{solution.tag}</p>
+              <h3 class="mt-3 text-xl font-semibold leading-tight text-[#102d4f]">{solution.title}</h3>
+              <p class="mt-3 text-sm leading-6 text-[#5f7481]">{solution.text}</p>
+              <div class="mt-5 flex flex-wrap gap-2">
+                {solution.items.map((item) => (
+                  <span class="rounded-full border border-[#d4e5e3] bg-white/80 px-3 py-1 text-[0.72rem] font-semibold text-[#456372]">{item}</span>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="casos" class="scroll-mt-24 bg-[#102d4f] py-20 text-white sm:py-24">
+      <div class="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[0.72fr_1.28fr] lg:px-10">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#8be1d8]">Tasks simples</p>
+          <h2 class="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
+            Cada mejora empieza por una acción concreta.
+          </h2>
+          <p class="mt-5 text-base leading-7 text-white/68">
+            Una Task no es una promesa abstracta. Es una pieza puntual que puede entrar en un Pack o en un Flow.
+          </p>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {tasks.map(([title, text]) => (
+            <article class="rounded-2xl border border-white/12 bg-white/[0.065] p-5">
+              <h3 class="text-lg font-semibold text-white">{title}</h3>
+              <p class="mt-3 text-sm leading-6 text-white/62">{text}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="py-20 sm:py-28">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+        <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]">Lógica Team360</p>
+            <h2 class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl">
+              Diagnosticar primero. Configurar después. Automatizar con criterio.
+            </h2>
+            <p class="mt-5 text-base leading-7 text-[#5e7382]">
+              El diagnóstico no obliga al cliente a entrar en un catálogo cerrado. Primero entiende la operación;
+              después traduce esa necesidad en Packs, Tasks, Flows e Integraciones posibles.
+            </p>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2">
+            {model.map(([title, text], index) => (
+              <article class="rounded-2xl border border-[#dfe8e9] bg-white p-5">
+                <span class="grid size-9 place-items-center rounded-lg bg-[#e7f7f4] text-xs font-bold text-[#168b88]">{index + 1}</span>
+                <h3 class="mt-4 text-lg font-semibold text-[#102d4f]">{title}</h3>
+                <p class="mt-3 text-sm leading-6 text-[#637784]">{text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="metodo" class="scroll-mt-24 border-y border-[#dfe8e9] bg-white py-20 sm:py-24">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+        <div class="grid gap-10 lg:grid-cols-[0.76fr_1.24fr]">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]">Prueba de método</p>
+            <h2 class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl">
+              Cómo se ve un diagnóstico útil.
+            </h2>
+            <p class="mt-5 text-base leading-7 text-[#5e7382]">
+              En vez de decir "sí, se puede", Team360 separa factibilidad, prioridad, riesgo y próximo paso.
+            </p>
+            <a class="btn mt-7 min-h-12 rounded-lg border-0 bg-[#102d4f] px-6 text-sm font-bold text-white hover:bg-[#1a4266]" href="#vera">
+              Ver diagnóstico inicial
+            </a>
+          </div>
+          <div class="grid gap-3">
+            {[
+              ["1. Entender", "Qué canal entra, quién responde, qué datos faltan y cuánto volumen existe."],
+              ["2. Clasificar", "Disponible hoy, configurable, requiere desarrollo o no conviene vender todavía."],
+              ["3. Diseñar", "Qué Pack, Tasks, Flow o Integración forman una primera solución razonable."],
+              ["4. Medir", "Qué resultado tiene que verse: menos demora, menos errores, más seguimiento o mejor reporte."],
+            ].map(([title, text]) => (
+              <article class="rounded-2xl border border-[#dfe8e9] bg-[#f8faf7] p-5 sm:flex sm:items-center sm:gap-5">
+                <h3 class="min-w-32 text-lg font-semibold text-[#102d4f]">{title}</h3>
+                <p class="mt-2 text-sm leading-6 text-[#637784] sm:mt-0">{text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <PublicVeraEntry client:load />
+
+    <section id="partners" class="scroll-mt-24 bg-[#eff7f4] py-16 sm:py-20">
+      <div class="mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:px-10">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]">Equipos y partners</p>
+          <h2 class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl">
+            Una misma lógica para ventas, operación, administración y contenido.
+          </h2>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-3">
+          {[
+            ["Equipo interno", "Ordenar tareas repetitivas sin cambiar toda la operación."],
+            ["Área comercial", "Medir seguimiento, leads y campañas con mejor contexto."],
+            ["Partner operativo", "Diagnosticar clientes y armar soluciones por alcance."],
+          ].map(([title, text]) => (
+            <article class="rounded-2xl border border-[#d6e6e1] bg-white p-5">
+              <h3 class="text-lg font-semibold text-[#102d4f]">{title}</h3>
+              <p class="mt-3 text-sm leading-6 text-[#637784]">{text}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="scroll-mt-24 py-20 sm:py-28">
+      <div class="mx-auto max-w-5xl px-5 sm:px-8 lg:px-10">
+        <div class="text-center">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]">Preguntas frecuentes</p>
+          <h2 class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl">Objeciones normales antes de automatizar.</h2>
+        </div>
+        <div class="mt-10 divide-y divide-[#dfe8e9] overflow-hidden rounded-2xl border border-[#dfe8e9] bg-white">
+          {objections.map(([question, answer]) => (
+            <details class="group p-5 open:bg-[#f6fbf8] sm:p-6">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-base font-semibold text-[#102d4f]">
+                {question}
+                <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-[#e8f6f3] text-[#168b88] transition group-open:rotate-45">+</span>
+              </summary>
+              <p class="mt-4 max-w-3xl text-sm leading-6 text-[#637784]">{answer}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto" class="scroll-mt-24 bg-[#f0f6f4] pb-24 pt-20 sm:pb-28">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+        <div class="overflow-hidden rounded-2xl bg-[#102d4f] text-white shadow-[0_34px_90px_-60px_rgba(16,45,79,0.8)]">
+          <div class="grid gap-8 p-6 sm:p-9 lg:grid-cols-[1fr_0.72fr] lg:p-12">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#8be1d8]">Siguiente paso</p>
+              <h2 class="mt-3 max-w-3xl text-3xl font-semibold leading-tight sm:text-5xl">
+                Contanos qué operación querés ordenar y te devolvemos un primer mapa de solución.
+              </h2>
+              <p class="mt-5 max-w-2xl text-base leading-7 text-white/68">
+                El diagnóstico puede orientar aunque todavía no exista el Pack o la Task exacta. Si requiere integración o desarrollo, debe decirlo sin ejecutarlo desde esta Home.
+              </p>
+            </div>
+            <div class="flex flex-col justify-end gap-3">
+            <a class="btn min-h-12 rounded-lg border-0 bg-[#44d6b2] px-6 text-sm font-bold text-[#092a2a] hover:bg-[#7ae8ce]" href="#vera">
+                Ver diagnóstico inicial
+              </a>
+              <a class="btn min-h-12 rounded-lg border border-white/18 bg-white/[0.08] px-6 text-sm font-bold text-white hover:bg-white/[0.14]" href="#vera">
+                Volver al diagnóstico inicial
+              </a>
+              <p class="text-xs leading-5 text-white/50">
+                La toma de datos se agrega solo con autorización explícita y después de entregar una síntesis valiosa.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</PublicMarketingLayout>
