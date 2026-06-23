@@ -206,6 +206,9 @@ class AssistantConversationRuntime:
         # 3.5 Handle interaction response (structured answer from frontend blocks)
         self._apply_interaction_response(state, input)
 
+        # 3.6 Resolve active blocks from free-text user message
+        self._resolve_block_from_text(state, input)
+
         # 4. Resolve contradictions
         self._resolve_contradictions(state, input)
 
@@ -495,6 +498,86 @@ class AssistantConversationRuntime:
             if option:
                 state.slots["management_system"] = option
                 state.slots["management_system_choice_status"] = "answered"
+                return
+
+    @staticmethod
+    def _resolve_block_from_text(state: ConversationState, input: AssistantTurnInput) -> None:
+        msg = input.user_message.strip().lower()
+        if not msg:
+            return
+
+        # Single choice resolution
+        sc_status = state.slots.get("management_system_choice_status", "")
+        if sc_status not in ("answered",):
+            TEXT_TO_SINGLE_CHOICE = {
+                "en excel": "spreadsheet",
+                "planilla": "spreadsheet",
+                "excel": "spreadsheet",
+                "en una planilla": "spreadsheet",
+                "crm": "crm",
+                "en crm": "crm",
+                "en salesforce": "crm",
+                "salesforce": "crm",
+                "en kommo": "crm",
+                "kommo": "crm",
+                "sistema propio": "custom_system",
+                "propio": "custom_system",
+                "whatsapp business": "whatsapp_business",
+                "en whatsapp": "whatsapp_business",
+                "no gestionamos": "none",
+                "no hay seguimiento": "none",
+                "ninguno": "none",
+            }
+            for text_pattern, option_value in TEXT_TO_SINGLE_CHOICE.items():
+                if text_pattern in msg:
+                    all_options = {}
+                    for d in [MANAGEMENT_SYSTEM_OPTIONS, MANAGEMENT_SYSTEM_OPTIONS_EMAIL, MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP]:
+                        all_options.update(d)
+                    label = all_options.get(option_value, option_value)
+                    state.slots["management_system"] = option_value
+                    state.slots["management_system_label"] = label
+                    state.slots["management_system_choice_status"] = "answered"
+                    mem = state.semantic_memory or {}
+                    systems = mem.get("systems_and_data_sources", [])
+                    if label not in systems:
+                        systems.append(label)
+                        mem["systems_and_data_sources"] = systems
+                        state.semantic_memory = mem
+                    return
+
+            # If text doesn't match and single_choice is active, don't guess
+            return
+
+        # Multi choice resolution
+        mc_status = state.slots.get("automation_goals_choice_status", "")
+        if mc_status not in ("answered",):
+            TEXT_TO_MULTI_CHOICE = {
+                "responder": "answer_faq",
+                "respuesta": "answer_faq",
+                "consultar stock": "answer_faq",
+                "clasificar": "classify",
+                "turno": "schedule",
+                "recordatorio": "remind",
+                "derivar": "escalate",
+                "excepción": "escalate",
+                "excepciones": "escalate",
+                "revisión humana": "escalate",
+                "humana": "escalate",
+                "todo": "*",
+            }
+            matched_values = []
+            for text_pattern, opt_val in TEXT_TO_MULTI_CHOICE.items():
+                if text_pattern in msg:
+                    if opt_val == "*":
+                        matched_values = list(AUTOMATION_GOALS.keys())
+                        break
+                    if opt_val not in matched_values:
+                        matched_values.append(opt_val)
+            if matched_values:
+                labels = [AUTOMATION_GOALS.get(v, v) for v in matched_values]
+                state.slots["automation_goals"] = matched_values
+                state.slots["automation_goals_labels"] = labels
+                state.slots["automation_goals_choice_status"] = "answered"
                 return
 
     @staticmethod
