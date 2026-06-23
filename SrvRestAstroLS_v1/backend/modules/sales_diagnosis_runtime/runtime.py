@@ -221,7 +221,6 @@ class AssistantConversationRuntime:
         # 5.2 Decide if proactive pause should be offered (independent of diagnosis)
         should_pause = self._should_offer_pause(state, input)
         if should_pause:
-            state.slots["pause_offered"] = True
             state.semantic_memory["_runtime_pause"] = True
 
         # Clear runtime pause flag if not actively pausing (prevent stale signal in prompt)
@@ -311,10 +310,15 @@ class AssistantConversationRuntime:
         if should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
             state.semantic_memory["diagnosis_status"] = "completed"
 
-        # Build interaction_block: single_choice > multi_choice > missing_requirements > diagnosis_action_card > next_step_choice
+        # Build interaction_block: single_choice > multi_choice > pause/choice > missing_requirements > cards
         interaction_block = self._build_single_choice_block(state)
         if interaction_block is None:
             interaction_block = self._build_multi_choice_block(state)
+        if interaction_block is None:
+            if should_pause:
+                interaction_block = self._build_pause_block(should_pause, state)
+        if interaction_block is None:
+            interaction_block = self._build_next_step_choice_if_ready(should_diagnose, state)
         if interaction_block is None:
             interaction_block = self._build_missing_requirements_block(state, should_diagnose)
         if interaction_block is None:
@@ -323,10 +327,6 @@ class AssistantConversationRuntime:
             )
         if interaction_block is None:
             interaction_block = self._build_product_fit_card(state, should_diagnose)
-        if interaction_block is None:
-            interaction_block = self._build_next_step_choice_if_ready(should_diagnose, state)
-        if interaction_block is None:
-            interaction_block = self._build_pause_block(should_pause, state)
 
         decision_reason = intent.source.value if intent.source != IntentSource.RUNTIME_FALLBACK else self._readiness_reason(state)
         if intent.intent in (IntentType.REQUEST_DIAGNOSIS, IntentType.STOP_INTERVIEW) and should_diagnose:
@@ -971,6 +971,7 @@ class AssistantConversationRuntime:
             return None
         if state.turn_count < 3:
             return None
+        state.slots["pause_offered"] = True
         return {
             "type": "next_step_choice",
             "title": "¿Cómo querés seguir?",
