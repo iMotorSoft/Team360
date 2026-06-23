@@ -169,6 +169,9 @@ class TestExtractCurrentSystems:
         ("No tenemos CRM ni planilla; usamos sistema propio.", ["custom_system"]),
         ("Antes dije CRM, pero usamos sistema propio.", ["custom_system"]),
         ("No, me equivoqué: no usamos planilla, usamos CRM.", ["crm"]),
+        ("Los WhatsApp llegan a Kommo.", ["kommo"]),
+        ("Trabajamos con Kommo.", ["kommo"]),
+        ("La disponibilidad la da Kommo.", ["kommo"]),
     ])
     def test_systems(self, message, expected):
         result = sorted(extract_current_systems(message))
@@ -207,7 +210,13 @@ class TestCanonicalization:
         ("planilla", "spreadsheet"),
         ("excel", "spreadsheet"),
         ("sistema propio", "custom_system"),
+        ("Kommo", "kommo"),
+        ("los WhatsApp que llegan a Kommo", "kommo"),
     ])
     def test_system_variants(self, message, canonical_system):
         result = extract_current_systems(message)
         assert canonical_system in result, f"{message!r} should map to {canonical_system}"
+
+    def test_kommo_is_not_a_channel(self):
+        result = extract_current_channels("Los WhatsApp llegan a Kommo.")
+        assert "kommo" not in result, "Kommo should be a system, not a channel"
