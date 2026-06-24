@@ -21,9 +21,9 @@ const {
   class="sticky top-0 z-50 border-b border-[#dce6eb]/75 bg-[#fbfcfa]/90 backdrop-blur-xl"
 >
   <div
-    class="mx-auto flex max-w-8xl items-center justify-around gap-6 px-5 py-4 sm:px-8 lg:px-10"
+    class="mx-auto flex max-w-8xl items-center justify-between md:justify-around gap-6 px-5 py-2.5 sm:py-4 sm:px-8 lg:px-10"
   >
-    <Team360Logo compact />
+    <Team360Logo compact size="size-12 md:size-18" />
 
     <nav
       class="hidden items-center gap-8 text-lg font-medium text-[#526579] lg:flex"
@@ -48,8 +48,8 @@ const {
       </a>
       <LinkButton
         href={ctaHref}
-        size="large"
-        class="px-3 text-sm sm:px-8 sm:text-lg"
+        size="default"
+        class="btn-sm md:btn-lg text-xs sm:px-8 sm:text-lg"
       >
         <span class="sm:hidden">{ctaMobileLabel}</span>
         <span class="hidden sm:inline">{ctaLabel}</span>
