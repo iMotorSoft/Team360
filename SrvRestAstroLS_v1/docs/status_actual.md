@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-24 (Politica rsync backend)
+Ultima actualizacion: 2026-06-24 (Politica root cause)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,40 @@ Ultima actualizacion: 2026-06-24 (Politica rsync backend)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-24 - Politica root cause para bugs manuales
+
+- Se documento en `lat.md/team360-root-cause-debugging-policy.md` la politica
+  para investigar bugs no triviales, especialmente cuando la prueba manual
+  encuentra problemas aunque los tests existentes pasen.
+- La politica obliga a registrar sintoma, entorno, base URL, HEAD, session ID,
+  requests/responses, errores 5xx, consola, duplicados y estado DOM cuando
+  aplique, antes de editar codigo.
+- Se establecio que todo bug manual repetible debe avanzar por reproduccion,
+  hipotesis de causa raiz, evidencia, fix minimo, test de regresion y
+  validacion final.
+- Se conecto la politica con Browser MCP, Playwright, pytest, preflight de
+  servicios reales y politicas de deploy por rsync.
+- Se descarto instalar gstack `/investigate`; solo se adopto el metodo como
+  regla Team360.
+- No se modifico codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni
+  configuracion de servicios.
+
+### 2026-06-24 - Politica Mermaid para diagramas
+
+- Se documento en `lat.md/team360-mermaid-diagram-policy.md` la politica
+  canonica para diagramas tecnicos de Team360.
+- Mermaid queda como fuente de verdad versionable en Git para arquitectura,
+  politicas, flujos de runtime, validaciones y deploys.
+- SVG, PNG, PDF y Excalidraw quedan clasificados como derivados opcionales, no
+  como fuente principal de una decision tecnica.
+- No se instalo Mermaid globalmente ni se agregaron dependencias al proyecto; si
+  en el futuro se requiere render automatico o CI, debera instalarse localmente
+  y versionarse como dependencia de desarrollo.
+- Se descarto adoptar el skill gstack `/diagram` completo por sus automatismos
+  externos; solo se tomo la practica de fuente textual revisable.
+- No se modifico codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni
+  configuracion de servicios.
 
 ### 2026-06-24 - Politica rsync para deploy backend
 

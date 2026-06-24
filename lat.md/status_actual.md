@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-24
+Ultima actualizacion: 2026-06-24 (Politica root cause)
 
 ## Estado general
 
@@ -11,6 +11,41 @@ Ultima actualizacion: 2026-06-24
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-24 - Politica root cause para bugs manuales
+
+- Se agrego `team360-root-cause-debugging-policy.md` como invariante operativo
+  para investigar bugs no triviales de Team360.
+- La politica adapta el concepto util de gstack `/investigate`: no corregir sin
+  causa raiz verificable, reproducir el sintoma, formular una hipotesis
+  explicita, confirmar evidencia, aplicar fix minimo y convertir el caso en
+  regresion backend/Playwright cuando corresponda.
+- Se documento su uso obligatorio para bugs que aparecen en prueba manual
+  aunque los tests pasen, diferencias local/produccion, interaction blocks,
+  touch mobile, requests duplicados, persistencia, fallback de modelo y deploys.
+- Se fijo la regla de tres hipotesis: si tres hipotesis verificadas fallan, se
+  detiene el parcheo y se reporta posible problema de arquitectura, contrato,
+  estado persistido o entorno.
+- Se enlazo desde `lat.md/lat.md`, `AGENTS.md` y
+  `.agents/skills/team360-project/SKILL.md`.
+- No se instalo gstack, no se adopto su skill completo y no se modifico codigo
+  productivo, frontend, backend, DB, Milvus, LiteLLM ni servicios.
+
+### 2026-06-24 - Politica Mermaid para diagramas
+
+- Se agrego `team360-mermaid-diagram-policy.md` como invariante documental para
+  diagramas tecnicos de Team360.
+- Se definio Mermaid como fuente canonica versionable en Git, embebida en
+  Markdown o en archivos `.mmd` cuando el diagrama sea largo o reutilizable.
+- Se establecio que SVG, PNG, PDF y Excalidraw son artefactos derivados
+  opcionales, no fuente de verdad tecnica.
+- Se dejo explicito que Team360 no requiere instalacion global de Mermaid y que
+  cualquier render automatico futuro debe versionarse localmente en el proyecto.
+- Se tomo de gstack `/diagram` solo el concepto de fuente textual revisable y
+  renders derivados, sin adoptar su skill completo, telemetry, estado global,
+  hooks, routing, browse daemon ni commits automaticos.
+- Se actualizaron `lat.md/lat.md`, `AGENTS.md` y
+  `.agents/skills/team360-project/SKILL.md`.
 
 ### 2026-06-24 - Politica rsync para deploy backend
 
