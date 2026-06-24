@@ -2,6 +2,19 @@ import { expect, test } from "@playwright/test";
 
 test.use({ hasTouch: true, viewport: { width: 393, height: 852 } });
 
+type SequentialBlockAudit = {
+  index: number;
+  blockType: string;
+  interactionState: string | null;
+  consumed: boolean;
+  answered: boolean;
+  disabledButtons: string[];
+  pointerEvents: string[];
+  loading: boolean;
+  requestCountBefore: number;
+  requestCountAfter: number;
+};
+
 test.describe("Vera mobile — sequential blocks lifecycle", () => {
   test.setTimeout(300000);
 
