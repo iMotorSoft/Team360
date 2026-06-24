@@ -14,6 +14,30 @@ Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctame
 
 ## Acciones realizadas
 
+### 2026-06-24 - Correccion bugs interaccion Vera (telefono/Planilla)
+
+- **Fix copy**: "los consultas" -> "las consultas" en `runtime.py:1109`.
+- **Fix pause/multi_choice simultaneo**: `_should_offer_pause` ahora retorna
+  `False` cuando multi_choice esta pendiente o es elegible, eliminando la
+  competencia entre bloque multi_choice y texto de pausa de Vera.
+- **Fix "1,2 preguntas mas"**: Se agrego patron regex `\d+\s*[,;.\-]?\s*\d*\s*preguntas?\s*m[áa]s`
+  a `_is_user_continuing` (runtime y policies), permitiendo detectar "1,2 preguntas mas"
+  como intencion de continuar.
+- **Fix dedup Planilla / Excel**: Se agrego `_normalize_systems()` que convierte
+  claves canonicas ("spreadsheet") a etiquetas publicas ("Planilla / Excel") y
+  elimina duplicados conceptuales en `systems_and_data_sources`. Se aplica en
+  `_apply_interaction_response`, `_resolve_block_from_text` y
+  `_update_semantic_memory`.
+- **Fix frontend `answered` state**: Se agrego prop `consumed` en
+  `T360InteractionRenderer` que se pasa como `answered` a choice components,
+  permitiendo que bloques resueltos muestren estado visual "respondido".
+- **E2E nuevo**: `public-vera-phone-problems-interaction-priority.spec.ts` con
+  5 tests que cubren copy corregido, single_choice click, multi_choice click,
+  exclusion mutua de bloques y dedup Planilla/Excel.
+- **Regresiones**: 18/18 tests E2E pasan (email-orders, kommo, salesforce,
+  new-conversation, adversarial, social-meta, phone-problems).
+- **Backend**: 964 tests pasan, 0 fallos (2 pre-existentes en test_db_module).
+
 ### 2026-06-22 - Deploy frontend remoto `team360.live`
 
 - Se genero un build estatico nuevo desde `SrvRestAstroLS_v1/astro` con
