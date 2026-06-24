@@ -371,6 +371,7 @@
                     block={msg.interactionBlock}
                     sessionId={msg.sessionId ?? sessionId ?? ""}
                     disabled={isLoading || blockConsumed}
+                    consumed={blockConsumed}
                   />
                 </div>
               {/if}

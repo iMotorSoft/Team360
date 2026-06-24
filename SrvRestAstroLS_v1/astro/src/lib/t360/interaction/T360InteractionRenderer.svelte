@@ -9,10 +9,12 @@
     block,
     sessionId,
     disabled = false,
+    consumed = false,
   }: {
     block?: unknown;
     sessionId: string;
     disabled?: boolean;
+    consumed?: boolean;
   } = $props();
 
   const safeBlock = $derived(normalizeT360InteractionBlock(block));
@@ -27,9 +29,9 @@
 {:else if safeBlock.type === "next_step_choice"}
   <T360ActionCard block={safeBlock} {sessionId} {disabled} />
 {:else if safeBlock.type === "single_choice"}
-  <T360SingleChoice block={safeBlock} {sessionId} {disabled} />
+  <T360SingleChoice block={safeBlock} {sessionId} {disabled} answered={consumed} />
 {:else if safeBlock.type === "multi_choice"}
-  <T360MultiChoice block={safeBlock} {sessionId} {disabled} />
+  <T360MultiChoice block={safeBlock} {sessionId} {disabled} answered={consumed} />
 {:else if safeBlock.type === "missing_requirements"}
   <T360MissingRequirements block={safeBlock} {sessionId} {disabled} />
 {:else if safeBlock.type === "product_fit_card"}
