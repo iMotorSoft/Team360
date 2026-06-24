@@ -2,13 +2,26 @@
 
 Objetivo: `decisiones-arquitectura`
 
-Ultima actualizacion: 2026-05-31
+Ultima actualizacion: 2026-06-24
 
 ## Estado general
 
 `docs/adr/` contiene versiones breves y trazables de decisiones de arquitectura de Team360.
 
 ## Acciones realizadas
+
+### 2026-06-24 - ADR-006 plantilla base para nuevos proyectos
+
+- Se creo `ADR-006-new-project-bootstrap-template.md`.
+- Se registro la decision de reutilizar la estructura operativa/documental de
+  Team360 como plantilla base para nuevos proyectos.
+- Se enlazo la plantilla ejecutable `docs/templates/project-structure-template.md`.
+- Se agrego el criterio de adopcion parcial de herramientas externas: tomar
+  conceptos de gstack `/diagram` y `/investigate` sin adoptar gstack como
+  dependencia.
+- Se distinguio `docs/adr/` como decision historica y `lat.md/` como
+  invariante vivo.
+- Se actualizo `docs/adr/README.md`.
 
 ### 2026-05-31 - ADR-005 pnpm, Tailwind CSS 4, DaisyUI 5 y wrappers UI
 
@@ -45,6 +58,8 @@ Ultima actualizacion: 2026-05-31
 
 ## Validacion
 
+- Para `ADR-006-new-project-bootstrap-template.md` se ejecuto
+  `git diff --check` sin errores de whitespace.
 - El ADR enlaza la guia extensa de producto y UX y la arquitectura viva correspondiente.
 
 ## Pendientes recomendados

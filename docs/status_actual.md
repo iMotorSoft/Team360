@@ -2,13 +2,29 @@
 
 Objetivo: `documentacion-no-tecnica`
 
-Ultima actualizacion: 2026-06-04
+Ultima actualizacion: 2026-06-24
 
 ## Estado general
 
 `docs/` contiene documentacion no tecnica de runtime: negocio, estrategia, analisis tecnico no operativo, insumos de clientes, presentaciones, decisiones UX, ADRs y plantillas.
 
 ## Acciones realizadas
+
+### 2026-06-24 - Plantilla replicable para proyectos nuevos
+
+- Se agrego `docs/adr/ADR-006-new-project-bootstrap-template.md` para registrar
+  la decision de reutilizar la estructura operativa/documental de Team360 en
+  proyectos nuevos.
+- Se agrego `docs/templates/project-structure-template.md` como plantilla
+  ejecutable de bootstrap.
+- Se completo una barrida general de faltantes para proyectos nuevos:
+  Mermaid/gstack como concepto adoptado parcialmente, root cause debugging,
+  evidencia PASS/FAIL, secretos, dependencias globales vs locales, laboratorio,
+  deploy, DB runtime, modelos/fallback y relacion ADR vs `lat.md`.
+- Se actualizaron `docs/README.md`, `docs/adr/README.md`,
+  `docs/adr/status_actual.md` y `docs/templates/status_actual.md`.
+- No se modifico codigo productivo, runtime, backend, frontend, DB, Milvus,
+  LiteLLM ni politicas de despliegue.
 
 ### 2026-06-04 - Analisis tecnico del stack AI para diagnostico de automatizacion
 
@@ -104,6 +120,8 @@ Ultima actualizacion: 2026-06-04
 
 ## Validacion
 
+- Para la plantilla replicable de proyectos nuevos se ejecuto `git diff --check`
+  sin errores de whitespace.
 - Se verifico que `docs/ux/` y `docs/adr/` tienen `README.md` y `status_actual.md`.
 - Se verifico que `docs/clients/` y `docs/presentaciones/` tienen `status_actual.md`.
 - Se verifico que el nuevo documento queda bajo `docs/analisis-tecnico/`.
