@@ -56,6 +56,10 @@ Team360 adopta una plantilla replicable para nuevos proyectos basada en:
 18. Politica de laboratorio tecnico reproducible.
 19. Politicas de deploy explicitas antes de automatizar despliegues.
 20. Politica de modelo/alias/fallback cuando el proyecto use IA.
+21. LiteStar/Litestar como servidor Python por defecto para nuevos proyectos
+    iMotorSoft.
+22. `ls_iMotorSoft_Srv01.py` como entrypoint backend canonico; `app.py` no es
+    el archivo principal por defecto.
 
 La plantilla ejecutable vive en:
 
@@ -131,11 +135,25 @@ Cada proyecto nuevo debe reemplazar:
 - herramienta de deploy;
 - politica de secretos;
 - politica de dependencias;
+- framework backend Python;
+- entrypoint backend;
 - aliases/modelos AI si aplica;
 - criterios PASS/FAIL propios.
 
 No se deben copiar rutas, dominios, secrets, nombres comerciales ni decisiones
 de Team360 que pertenezcan solo a este producto.
+
+Para proyectos iMotorSoft nuevos, el default recomendado es:
+
+```text
+Backend Python: LiteStar/Litestar
+Entrypoint: backend/ls_iMotorSoft_Srv01.py
+Objeto ASGI interno: app
+Launcher: uvicorn ls_iMotorSoft_Srv01:app
+```
+
+FastAPI o `backend/app.py` solo deben aparecer como excepcion documentada por
+un ADR propio del proyecto.
 
 ## Referencias
 

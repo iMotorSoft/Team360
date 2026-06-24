@@ -10,6 +10,16 @@ Ultima actualizacion: 2026-06-24
 
 ## Acciones realizadas
 
+### 2026-06-24 - Default LiteStar para proyectos nuevos
+
+- Se actualizo `project-structure-template.md` para declarar que los proyectos
+  nuevos iMotorSoft usan LiteStar/Litestar como servidor Python por defecto.
+- Se agrego `ls_iMotorSoft_Srv01.py` como entrypoint backend canonico en la
+  estructura base.
+- Se dejo explicito que `app.py` no es el archivo principal por defecto y que
+  FastAPI solo aplica como excepcion documentada por ADR.
+- No se modifico `status_actual_template.md`.
+
 ### 2026-06-24 - Plantilla de estructura para proyectos nuevos
 
 - Se agrego `project-structure-template.md` como plantilla reutilizable para
@@ -30,6 +40,7 @@ Ultima actualizacion: 2026-06-24
 
 ## Validacion
 
+- Se corrigio la plantilla reusable sin modificar codigo runtime.
 - Se agrego una plantilla nueva sin modificar `status_actual_template.md`.
 - Se ejecuto `git diff --check` sin errores de whitespace.
 

@@ -10,6 +10,19 @@ Ultima actualizacion: 2026-06-24
 
 ## Acciones realizadas
 
+### 2026-06-24 - Correccion LiteStar en plantilla para proyectos nuevos
+
+- Se corrigio la documentacion reusable de bootstrap para proyectos nuevos:
+  LiteStar/Litestar queda como servidor Python por defecto de iMotorSoft.
+- Se agrego `ls_iMotorSoft_Srv01.py` como entrypoint backend canonico.
+- Se aclaro que `app.py` no es el archivo principal por defecto y que FastAPI
+  solo aplica como excepcion documentada por ADR propio.
+- Se actualizaron `docs/adr/ADR-006-new-project-bootstrap-template.md`,
+  `docs/templates/project-structure-template.md`, `docs/README.md`,
+  `docs/adr/status_actual.md` y `docs/templates/status_actual.md`.
+- No se modifico codigo productivo, runtime, backend, frontend, DB, Milvus,
+  LiteLLM ni politicas de despliegue.
+
 ### 2026-06-24 - Plantilla replicable para proyectos nuevos
 
 - Se agrego `docs/adr/ADR-006-new-project-bootstrap-template.md` para registrar
@@ -120,6 +133,8 @@ Ultima actualizacion: 2026-06-24
 
 ## Validacion
 
+- Para la correccion LiteStar/entrypoint se ejecuto `git diff --check` sin
+  errores de whitespace.
 - Para la plantilla replicable de proyectos nuevos se ejecuto `git diff --check`
   sin errores de whitespace.
 - Se verifico que `docs/ux/` y `docs/adr/` tienen `README.md` y `status_actual.md`.

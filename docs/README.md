@@ -27,7 +27,7 @@ Documentacion raiz del proyecto Team360 para material no tecnico de runtime.
 - `frontend/team360-package-manager-and-ui-policy.md`: politica obligatoria de pnpm, Tailwind CSS 4 + DaisyUI 5 CSS-first y wrappers UI Team360.
 - `adr/ADR-005-team360-pnpm-tailwind4-daisyui5-ui-policy.md`: ADR resumido de package manager y capa UI frontend.
 - `adr/ADR-006-new-project-bootstrap-template.md`: ADR para reutilizar la estructura operativa/documental de Team360 en proyectos nuevos, incluyendo criterios de adopcion parcial de herramientas externas como gstack.
-- `templates/project-structure-template.md`: plantilla ejecutable para crear nuevos proyectos con `AGENTS.md`, skill local, `lat.md`, status locales, Mermaid como fuente canonica, root cause debugging, Playwright, preflight, evidencia PASS/FAIL, secretos, dependencias y politicas base.
+- `templates/project-structure-template.md`: plantilla ejecutable para crear nuevos proyectos con `AGENTS.md`, skill local, `lat.md`, status locales, LiteStar/Litestar como backend Python default, `ls_iMotorSoft_Srv01.py` como entrypoint backend, Mermaid como fuente canonica, root cause debugging, Playwright, preflight, evidencia PASS/FAIL, secretos, dependencias y politicas base.
 - `analisis-tecnico/team360_ai_diagnostico_stack_arango_milvus_litellm.md`: factibilidad y stack propuesto para asistente de venta y diagnostico de automatizacion con ArangoDB, Milvus, LiteLLM, AG-UI y SSE.
 
 ## Reportes y evidencias

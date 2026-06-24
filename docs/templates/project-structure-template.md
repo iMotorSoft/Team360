@@ -17,6 +17,7 @@ Esta plantilla es un punto de partida. Antes de usarla, reemplazar:
 {DB_STACK}
 {AI_GATEWAY}
 {DEPLOY_TARGET}
+{PYTHON_ENTRYPOINT}  # default iMotorSoft: ls_iMotorSoft_Srv01.py
 ```
 
 ## Estructura base
@@ -42,6 +43,7 @@ Esta plantilla es un punto de partida. Antes de usarla, reemplazar:
 │   └── lab-policy.md
 ├── {APP_DIR}/
 │   ├── backend/
+│   │   ├── ls_iMotorSoft_Srv01.py
 │   │   ├── modules/
 │   │   ├── routes/
 │   │   ├── tests/
@@ -208,6 +210,54 @@ Regla:
 "desarrollo", "dev" o "backend" apuntan a la rama funcional viva.
 No crear una rama local llamada desarrollo.
 ```
+
+## Backend Python por defecto
+
+Para proyectos nuevos de iMotorSoft, el servidor Python por defecto es
+LiteStar/Litestar.
+
+Regla:
+
+```text
+Framework backend Python default: LiteStar.
+Archivo principal backend default: ls_iMotorSoft_Srv01.py.
+No usar app.py como entrypoint principal del proyecto.
+```
+
+El nombre `app` puede usarse como objeto ASGI interno porque mantiene
+compatibilidad con Uvicorn, tooling ASGI y ejemplos del ecosistema:
+
+```python
+from litestar import Litestar, get
+
+
+@get("/api/health")
+async def health() -> dict:
+    return {
+        "status": "ok",
+        "service": "{PROJECT_SLUG}",
+    }
+
+
+app = Litestar(route_handlers=[health])
+```
+
+Launcher local conceptual:
+
+```bash
+uvicorn ls_iMotorSoft_Srv01:app --host 127.0.0.1 --port {BACKEND_PORT}
+```
+
+Reglas:
+
+- `ls_iMotorSoft_Srv01.py` es el entrypoint canonico para proyectos nuevos
+  iMotorSoft salvo ADR explicito que defina otro nombre.
+- `app.py` no debe crearse como archivo principal ni como fuente de verdad del
+  servidor.
+- Un wrapper de compatibilidad `app.py` solo es aceptable si una herramienta
+  externa lo exige, y debe delegar sin duplicar rutas ni configuracion.
+- FastAPI no es el default de proyectos nuevos; solo se usa si un ADR propio
+  justifica la excepcion.
 
 ## Politicas a crear en `lat.md/`
 
@@ -602,9 +652,11 @@ data/reports/README.md
 14. Definir servicios reales y preflight.
 15. Definir modelo/alias/fallback si hay IA.
 16. Agregar Playwright desde el inicio si hay frontend.
-17. Definir comandos oficiales de backend y frontend.
-18. Definir politica de deploy antes del primer despliegue.
-19. Crear `lab/` con reglas de experimentos reproducibles.
+17. Definir LiteStar/Litestar como backend Python default o documentar ADR de excepcion.
+18. Definir `ls_iMotorSoft_Srv01.py` como entrypoint backend default o documentar ADR de excepcion.
+19. Definir comandos oficiales de backend y frontend.
+20. Definir politica de deploy antes del primer despliegue.
+21. Crear `lab/` con reglas de experimentos reproducibles.
 
 ## Criterio de cierre del bootstrap
 

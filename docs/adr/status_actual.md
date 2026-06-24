@@ -10,6 +10,16 @@ Ultima actualizacion: 2026-06-24
 
 ## Acciones realizadas
 
+### 2026-06-24 - ADR-006 default LiteStar y entrypoint backend
+
+- Se actualizo `ADR-006-new-project-bootstrap-template.md` para registrar que
+  los proyectos nuevos iMotorSoft usan LiteStar/Litestar como servidor Python
+  por defecto.
+- Se registro `ls_iMotorSoft_Srv01.py` como entrypoint backend canonico para
+  proyectos nuevos.
+- Se aclaro que `backend/app.py` y FastAPI solo deben aparecer como excepcion
+  documentada por ADR propio del proyecto.
+
 ### 2026-06-24 - ADR-006 plantilla base para nuevos proyectos
 
 - Se creo `ADR-006-new-project-bootstrap-template.md`.
@@ -58,6 +68,8 @@ Ultima actualizacion: 2026-06-24
 
 ## Validacion
 
+- Para la actualizacion LiteStar/entrypoint se ejecuto `git diff --check` sin
+  errores de whitespace.
 - Para `ADR-006-new-project-bootstrap-template.md` se ejecuto
   `git diff --check` sin errores de whitespace.
 - El ADR enlaza la guia extensa de producto y UX y la arquitectura viva correspondiente.
