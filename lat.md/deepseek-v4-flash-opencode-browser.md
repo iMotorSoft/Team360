@@ -112,9 +112,10 @@ herramienta obligatoria
 
 ## Reglas obligatorias
 
-- Antes de iniciar Browser MCP sobre Team360, aplicar `[[browser-mcp-validation-policy]]`: backend `127.0.0.1:7050` y Astro `127.0.0.1:3050` deben estar levantados; el agente puede bajar/subir esos dos servidores locales si hace falta; si Browser MCP falla, la prueba se detiene y se informa.
+- Antes de iniciar Browser MCP sobre Team360, aplicar `[[browser-mcp-validation-policy]]`: Playwright + Chromium es el gate E2E oficial; Browser MCP / `opencode-browser` es evidencia exploratoria y de diagnostico visual; backend `127.0.0.1:7050` y Astro `127.0.0.1:3050` deben estar levantados cuando se prueba local; si Browser MCP falla, la prueba se detiene y se informa.
 - Para navegar e interactuar con paginas, usar herramientas `browsermcp_*` del plugin `opencode-browser`.
 - No usar `curl`, `wget`, Playwright desde terminal ni lectura directa del HTML como reemplazo del navegador.
+- No declarar cerrada una fase, regresion o validacion productiva solo con Browser MCP; confirmar con Playwright cuando el resultado deba quedar como PASS reproducible.
 - Ejecutar snapshot antes de interactuar.
 - Usar referencias actuales del snapshot para click, fill o inspeccion.
 - Ejecutar nuevo snapshot despues de cada accion que cambie la interfaz.

@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-22
+Ultima actualizacion: 2026-06-24
 
 ## Estado general
 
@@ -11,6 +11,67 @@ Ultima actualizacion: 2026-06-22
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-24 - Politica rsync para deploy backend
+
+- Se agrego `team360-backend-rsync-deploy-policy.md` como invariante operativo
+  para publicar el backend de Team360 por `rsync`.
+- La politica fija el flujo canonico: validar rama/HEAD, distinguir HEAD vs
+  worktree, comparar con origin, ejecutar tests backend, validar SSH/destino,
+  preservar `.env*` y `.venv`, crear backup remoto, revisar dry-run con
+  `--delete`, ejecutar rsync real y verificar archivos remotos.
+- Se establecio que el procedimiento no reinicia automaticamente el backend ni
+  toca `tmux`, `systemctl`, Nginx, frontend, PostgreSQL, Milvus ni LiteLLM; el
+  reinicio productivo queda como paso manual posterior en `tmux`.
+- Se documento que la aprobacion requiere health remoto/interno, smoke con
+  modelo real y `fallback_used=false`, smoke conversacional, 0 errores 5xx,
+  0 requests duplicados y Playwright productivo.
+- Se actualizaron `lat.md/lat.md`, `AGENTS.md`,
+  `.agents/skills/team360-project/SKILL.md` y
+  `team360-runtime-operational-policy.md` para enlazar la politica.
+- No se ejecuto deploy ni se modifico produccion, backend runtime, frontend,
+  DB, Milvus, LiteLLM, Nginx ni tmux.
+
+### 2026-06-24 - Politica rsync para deploy frontend Astro
+
+- Se agrego `team360-frontend-rsync-deploy-policy.md` como invariante
+  operativo para publicar el frontend Astro de `team360.live` por `rsync`.
+- La politica fija el flujo canonico: build productivo, validacion local,
+  backup remoto, dry-run, rsync real, verificacion de assets servidos y smoke
+  productivo.
+- Se documento el destino remoto oficial, la obligacion de conservar la barra
+  final en `.../astro/dist/`, el uso obligatorio de `--delete`, la revision del
+  dry-run y la condicion `dist local = dist remoto = assets servidos por
+  team360.live`.
+- Se establecio que un rsync exitoso no prueba el despliegue: el cierre requiere
+  `IS_REST_PRO=true`, `pnpm check`, build limpio, fix presente en source y
+  `dist`, backup, metadata intacta, Playwright productivo, smoke UX y 0 errores
+  criticos.
+- Se actualizaron `lat.md/lat.md`, `AGENTS.md`,
+  `.agents/skills/team360-project/SKILL.md` y la nota historica
+  `SrvRestAstroLS_v1/docs/team360_live_frontend_deploy_20260618.md`.
+- No se ejecuto deploy ni se modifico produccion, backend, DB, Milvus, LiteLLM
+  ni Nginx.
+
+### 2026-06-24 - Politica de validacion de navegador
+
+- Se amplio `browser-mcp-validation-policy.md` para convertirlo en la politica
+  unica de validacion de navegador de Team360.
+- Se fijo Playwright + Chromium como gate E2E oficial para regresiones, flujos
+  completos, interaction blocks, validaciones productivas y cierres de fase.
+- Se reclasifico Browser MCP / `opencode-browser` como herramienta exploratoria
+  y de diagnostico visual: ayuda a descubrir, reproducir e inspeccionar, pero
+  no reemplaza Playwright como evidencia de PASS reproducible.
+- Se documentaron launchers oficiales (`backend-dev.sh`, `astro-dev.sh`),
+  configuracion local con `IS_REST_PRO=false`, variables estandar de
+  Playwright, reglas para produccion, build productivo, pruebas moviles tactiles
+  y evidencia minima ante PASS/fallo.
+- Se actualizo el indice `lat.md/lat.md`, la guia
+  `deepseek-v4-flash-opencode-browser.md`, `AGENTS.md` y el skill propio
+  `.agents/skills/team360-project/SKILL.md` para que los agentes carguen la
+  nueva jerarquia: Playwright demuestra, Browser MCP explora.
+- No se modifico codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni
+  configuracion de servicios.
 
 ### 2026-06-22 - Refuerzo de `global.js` como control de conectividad
 

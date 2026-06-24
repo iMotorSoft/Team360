@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-22 (Deploy frontend remoto)
+Ultima actualizacion: 2026-06-24 (Politica rsync backend)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,67 @@ Ultima actualizacion: 2026-06-22 (Deploy frontend remoto)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-24 - Politica rsync para deploy backend
+
+- Se documento en `lat.md/team360-backend-rsync-deploy-policy.md` la politica
+  canonica para desplegar el backend de Team360 por `rsync`.
+- La politica define el flujo completo: validar rama/HEAD, declarar worktree y
+  commits no pusheados, correr tests backend relevantes, validar SSH y destino,
+  comprobar sensibles sin leer secretos, crear backup remoto, revisar dry-run,
+  ejecutar rsync real y verificar archivos remotos.
+- Se fijaron exclusiones obligatorias para proteger `.env*`, `.venv`, caches y
+  bytecode; `--delete` solo es aceptable con destino validado, backup creado,
+  dry-run revisado y sensibles excluidos.
+- Se dejo explicito que el deploy backend no debe tocar frontend, `astro/dist`,
+  Nginx, PostgreSQL, Milvus, LiteLLM, backups, uploads, `.env` ni `.venv`, y
+  que no debe reiniciar automaticamente procesos ni `tmux`.
+- La aprobacion posterior requiere reinicio manual en `tmux`, health remoto e
+  interno, smoke con modelo real y `fallback_used=false`, smoke conversacional,
+  Playwright productivo, 0 errores 5xx y 0 requests duplicados.
+- Se enlazo desde `AGENTS.md`, `.agents/skills/team360-project/SKILL.md`,
+  `lat.md/lat.md` y `lat.md/team360-runtime-operational-policy.md`.
+- No se ejecuto deploy ni se modifico produccion, backend runtime, frontend,
+  DB, Milvus, LiteLLM, Nginx ni tmux.
+
+### 2026-06-24 - Politica rsync para deploy frontend Astro
+
+- Se documento en `lat.md/team360-frontend-rsync-deploy-policy.md` la politica
+  canonica para desplegar el frontend Astro de `team360.live` por `rsync`.
+- La politica define el flujo completo: verificar Git y `IS_REST_PRO=true`,
+  ejecutar `pnpm check`, limpiar y regenerar `dist`, comprobar que el fix este
+  en source y build, validar SSH/destino/Nginx, crear backup remoto, revisar
+  dry-run, ejecutar rsync real, comparar assets local vs produccion, validar
+  metadata y cerrar con Playwright productivo + smoke UX.
+- Se fijo que la ruta remota oficial es
+  `administrator@imotorsoft.com:/home/administrator/project/iMotorSoft/ai/Team360/SrvRestAstroLS_v1/astro/dist/`
+  y que la barra final debe conservarse para evitar `astro/dist/dist/`.
+- Se dejo explicito que `--delete` es obligatorio solo porque el destino debe
+  contener exclusivamente el build estatico, y que no se deben reiniciar
+  backend, PostgreSQL, Milvus, LiteLLM ni Nginx en un deploy estatico normal.
+- Se actualizo el documento historico
+  `team360_live_frontend_deploy_20260618.md` para apuntar a la nueva politica
+  canonica, y se enlazo desde `AGENTS.md`, el skill propio y `lat.md/lat.md`.
+- No se ejecuto deploy ni se modifico produccion, backend, DB, Milvus, LiteLLM
+  ni Nginx.
+
+### 2026-06-24 - Politica de validacion de navegador
+
+- Se documento en `lat.md/browser-mcp-validation-policy.md` la politica unica
+  de validacion de navegador para Team360.
+- Playwright + Chromium queda como gate E2E oficial para cerrar regresiones,
+  flujos completos, interaction blocks, produccion y fases de navegador.
+- Browser MCP / `opencode-browser` queda como herramienta exploratoria y de
+  diagnostico visual; no reemplaza Playwright para declarar PASS reproducible.
+- La politica fija launchers oficiales (`backend-dev.sh`, `astro-dev.sh`),
+  `IS_REST_PRO=false` para validacion local, variables estandar de Playwright,
+  reglas para produccion, build productivo, pruebas moviles tactiles,
+  regresiones minimas y evidencia minima ante PASS/fallo.
+- Se actualizaron referencias operativas en `AGENTS.md`,
+  `.agents/skills/team360-project/SKILL.md`, `lat.md/lat.md` y
+  `lat.md/deepseek-v4-flash-opencode-browser.md`.
+- No se modifico codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni
+  configuracion de servicios.
 
 ### 2026-06-24 - Correccion bugs interaccion Vera (telefono/Planilla)
 

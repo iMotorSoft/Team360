@@ -142,20 +142,23 @@ Reglas de uso:
 4. No mezclar probes/browser con AG-UI, rutas o frontend salvo que el objetivo lo pida.
 5. Preferir cambios chicos, claros y reversibles.
 6. Para conectividad frontend/backend de `/t360`, `SrvRestAstroLS_v1/astro/src/components/global.js` es la unica fuente de verdad: en desarrollo local y Browser MCP debe usarse `IS_REST_PRO=false` con `URL_REST_DEV=http://localhost:7050`; no corregir rutas tocando `astro.config.mjs`, API clients, componentes Svelte ni URLs hardcodeadas salvo instruccion explicita.
-7. Para validaciones Browser MCP / `opencode-browser`, seguir `lat.md/browser-mcp-validation-policy.md`: antes de navegar deben responder backend `127.0.0.1:7050` y Astro `127.0.0.1:3050`; el agente puede bajar/subir esos dos servidores locales si hace falta; si Browser MCP falla, detener la prueba y avisar, sin reemplazarla por terminal, `curl`, Playwright, HTML o lectura de codigo salvo autorizacion explicita.
-8. Para QA browser dirigido con DeepSeek V4 Flash en OpenCode + `opencode-browser`, seguir `lat.md/deepseek-v4-flash-opencode-browser.md`: usar `browsermcp_*`, snapshots antes/despues, fase browser atomica, no reemplazar navegador con terminal y detenerse tras la evidencia pedida.
-9. Mantener compatibilidad con ejecución tipo:
+7. Para validaciones de navegador, Playwright + Chromium es el gate E2E oficial; Browser MCP / `opencode-browser` es exploratorio y de diagnostico visual, no reemplaza Playwright para cerrar fases, regresiones o produccion. Ver `lat.md/browser-mcp-validation-policy.md`.
+8. Para validaciones Browser MCP / `opencode-browser`, seguir `lat.md/browser-mcp-validation-policy.md`: antes de navegar deben responder backend `127.0.0.1:7050` y Astro `127.0.0.1:3050`; el agente puede bajar/subir esos dos servidores locales si hace falta; si Browser MCP falla, detener la prueba y avisar, sin reemplazarla por terminal, `curl`, Playwright, HTML o lectura de codigo salvo autorizacion explicita.
+9. Para despliegue frontend Astro de `team360.live` por `rsync`, seguir `lat.md/team360-frontend-rsync-deploy-policy.md`: verificar `IS_REST_PRO=true`, build limpio, fix en source y `dist`, backup remoto, dry-run revisado, rsync real, assets local=produccion y Playwright productivo antes de declarar PASS.
+10. Para despliegue backend de Team360 por `rsync`, seguir `lat.md/team360-backend-rsync-deploy-policy.md`: validar rama/HEAD, tests backend, exclusiones `.env*`/`.venv`, backup remoto, dry-run revisado, rsync real, preservar sensibles, no reiniciar automaticamente, esperar reinicio manual en `tmux`, health y smoke modelo real sin fallback antes de aprobar.
+11. Para QA browser dirigido con DeepSeek V4 Flash en OpenCode + `opencode-browser`, seguir `lat.md/deepseek-v4-flash-opencode-browser.md`: usar `browsermcp_*`, snapshots antes/despues, fase browser atomica, no reemplazar navegador con terminal y detenerse tras la evidencia pedida.
+12. Mantener compatibilidad con ejecución tipo:
    - `python -m modules.messaging.providers.mercadolibre.probes.smoke_login`
    - `python -m modules.messaging.providers.mercadolibre.probes.smoke_inbox`
-10. No hacer scraping complejo en fases de smoke/probe.
-11. Si la validación requiere intervención humana, dejarlo explícito.
-12. No instalar dependencias ni ejecutar comandos destructivos salvo pedido explícito.
-13. Respetar la estrategia de environment parity del backend con Vertice360, más extras necesarios como Playwright.
-14. Antes de crear acceso DB runtime, usar `psycopg 3 async` directo como estándar (ver `lat.md/postgres-driver-policy.md`).
-15. No introducir SQLAlchemy/SQLModel/asyncpg como dependencia base sin decisión explícita documentada en `lat.md/postgres-driver-policy.md`.
-16. Mantener SQL en repositories; no escribir SQL en endpoints ni rutas.
-17. No mezclar pools de conexión: Team360 usa `psycopg_pool.AsyncConnectionPool` para `public.*`; LangGraph PostgresSaver usa su pool interno para `langgraph.*`.
-18. Antes de desarrollo, test, smoke, benchmark o prueba que dependa de servicios reales, ejecutar preflight obligatorio (ver `lat.md/service-preflight-methodology.md`):
+13. No hacer scraping complejo en fases de smoke/probe.
+14. Si la validación requiere intervención humana, dejarlo explícito.
+15. No instalar dependencias ni ejecutar comandos destructivos salvo pedido explícito.
+16. Respetar la estrategia de environment parity del backend con Vertice360, más extras necesarios como Playwright.
+17. Antes de crear acceso DB runtime, usar `psycopg 3 async` directo como estándar (ver `lat.md/postgres-driver-policy.md`).
+18. No introducir SQLAlchemy/SQLModel/asyncpg como dependencia base sin decisión explícita documentada en `lat.md/postgres-driver-policy.md`.
+19. Mantener SQL en repositories; no escribir SQL en endpoints ni rutas.
+20. No mezclar pools de conexión: Team360 usa `psycopg_pool.AsyncConnectionPool` para `public.*`; LangGraph PostgresSaver usa su pool interno para `langgraph.*`.
+21. Antes de desarrollo, test, smoke, benchmark o prueba que dependa de servicios reales, ejecutar preflight obligatorio (ver `lat.md/service-preflight-methodology.md`):
    - PostgreSQL activo.
    - Milvus activo y collection correcta.
    - LiteLLM activo.

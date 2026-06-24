@@ -1,5 +1,10 @@
 # Deploy frontend Team360 Live - 2026-06-18
 
+Nota operativa: la politica canonica vigente para despliegues posteriores del
+frontend Astro de `team360.live` por `rsync` esta en
+`../../lat.md/team360-frontend-rsync-deploy-policy.md`. Este documento conserva
+el detalle historico del despliegue inicial, Nginx, TLS y backend productivo.
+
 ## Alcance aplicado
 
 Produccion inicial queda limitada al frontend estatico de Astro servido por

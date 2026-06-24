@@ -7,6 +7,12 @@ It is an architecture invariant. Agents must read and follow it before changing
 or validating the public diagnosis runtime, backend startup, frontend startup,
 LiteLLM model routing, Milvus retrieval or PostgreSQL state persistence.
 
+For publishing backend code changes to the remote host with `rsync`, follow
+`[[team360-backend-rsync-deploy-policy]]`. The rsync deploy procedure is
+separate from the runtime startup policy: it must not restart backend services
+automatically, and production approval still requires manual tmux restart,
+health, real model smoke without fallback and Playwright production checks.
+
 ## Active Architecture
 
 The validated public Vera flow is:
