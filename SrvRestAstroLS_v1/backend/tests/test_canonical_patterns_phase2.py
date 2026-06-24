@@ -238,8 +238,8 @@ class TestPartialCorrections:
         assert "erp" in mem.get("systems_and_data_sources", []), (
             f"ERP not in systems after turn 1: {mem.get('systems_and_data_sources')}"
         )
-        assert "spreadsheet" in mem.get("systems_and_data_sources", []), (
-            f"Spreadsheet not in systems after turn 1"
+        assert "Planilla / Excel" in mem.get("systems_and_data_sources", []), (
+            f"Planilla / Excel not in systems after turn 1"
         )
 
         # Turn 2: Correct prices → CRM (not spreadsheet)

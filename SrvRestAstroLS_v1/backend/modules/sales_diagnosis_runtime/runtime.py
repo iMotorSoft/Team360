@@ -116,6 +116,11 @@ MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP: dict[str, str] = {
     "none": "No hay un seguimiento definido",
 }
 
+# Combined reverse map: canonical key -> display label (for dedup)
+_MANAGEMENT_KEY_TO_LABEL: dict[str, str] = {}
+for _d in [MANAGEMENT_SYSTEM_OPTIONS, MANAGEMENT_SYSTEM_OPTIONS_EMAIL, MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP]:
+    _MANAGEMENT_KEY_TO_LABEL.update(_d)
+
 AUTOMATION_GOALS: dict[str, str] = {
     "answer_faq": "Responder consultas frecuentes",
     "classify": "Clasificar consultas",
@@ -473,7 +478,24 @@ class AssistantConversationRuntime:
         if process:
             mem["current_process"] = process
 
+        # Normalize systems_and_data_sources: deduplicate canonical keys and labels
+        mem["systems_and_data_sources"] = self._normalize_systems(mem.get("systems_and_data_sources", []))
+
         state.semantic_memory = mem
+
+    @staticmethod
+    def _normalize_systems(systems: list[str]) -> list[str]:
+        """Deduplicate systems list: if a canonical key has a known display
+        label, emit the label instead. If both key and label exist, keep only
+        the label. Preserves order of first occurrence."""
+        seen_labels: set[str] = set()
+        result: list[str] = []
+        for item in systems:
+            label = _MANAGEMENT_KEY_TO_LABEL.get(item, item)
+            if label not in seen_labels:
+                seen_labels.add(label)
+                result.append(label)
+        return result
 
     @staticmethod
     def _auto_answer_management_system(state: ConversationState) -> None:
@@ -539,7 +561,7 @@ class AssistantConversationRuntime:
                     state.slots["management_system_choice_status"] = "answered"
                     mem = state.semantic_memory or {}
                     systems = mem.get("systems_and_data_sources", [])
-                    if label not in systems:
+                    if label not in systems and option_value not in systems:
                         systems.append(label)
                         mem["systems_and_data_sources"] = systems
                         state.semantic_memory = mem
@@ -601,7 +623,7 @@ class AssistantConversationRuntime:
             state.slots["management_system_choice_status"] = "answered"
             mem = state.semantic_memory or {}
             systems = mem.get("systems_and_data_sources", [])
-            if label not in systems:
+            if label not in systems and value not in systems:
                 systems.append(label)
                 mem["systems_and_data_sources"] = systems
                 state.semantic_memory = mem
@@ -973,6 +995,21 @@ class AssistantConversationRuntime:
         if state.slots.get("pause_offered") and not state.slots.get("pause_consumed"):
             return False
 
+        # ── Exclusión mutua con multi_choice ────────────────────────────
+        # Si multi_choice está pendiente (offered pero no answered),
+        # no ofrecer pausa por texto — competirían bloque y texto.
+        if state.slots.get("automation_goals_choice_status") == "offered":
+            return False
+
+        # Si single_choice fue respondido y multi_choice no fue ofrecido
+        # ni respondido, multi_choice se emitirá como bloque esta ronda
+        # (a menos que ya haya datos para diagnosticar).
+        # No ofrecer pausa por texto para evitar duplicación.
+        mc_status = state.slots.get("automation_goals_choice_status", "")
+        if state.slots.get("management_system_choice_status") == "answered" and mc_status not in ("answered", "offered"):
+            if not self._is_ready_to_diagnose(state) and mem.get("channels", []):
+                return False
+
         return True
 
     @staticmethod
@@ -992,6 +1029,9 @@ class AssistantConversationRuntime:
             r"|h[aá]blame\s*m[aá]s"
             r"|contame\s*m[aá]s"
             r"|decime\s*m[aá]s"
+            r"|\d+\s*[,;.\-]?\s*\d*\s*preguntas?\s*m[aá]s"
+            r"|unas?\s*preguntas?\s*m[aá]s"
+            r"|un\s*par\s*de\s*preguntas?\s*m[aá]s"
             r"|wants?\s*(more\s*)?(details?|questions?|to\s*continue)"
             r"|keep\s*(going|asking|talking)"
             r"|ask\s*me\s*more"
@@ -1104,9 +1144,10 @@ class AssistantConversationRuntime:
             state.slots["management_system_choice_status"] = "offered"
         options = AssistantConversationRuntime._get_management_options(channels)
         channel_label = "emails" if "email" in channels else "consultas"
+        article = "los " if "email" in channels else "las "
         return {
             "type": "single_choice",
-            "question": f"¿Dónde se registran y siguen hoy los {channel_label}?",
+            "question": f"¿Dónde se registran y siguen hoy {article}{channel_label}?",
             "helper_text": "Elegí la opción que mejor describa tu situación actual.",
             "required": True,
             "options": [
