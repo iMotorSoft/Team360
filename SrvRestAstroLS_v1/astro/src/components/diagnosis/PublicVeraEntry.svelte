@@ -36,7 +36,7 @@
   let chatError = $state("");
   let currentLocale = $state<string>(PUBLIC_DIAGNOSIS_CONTEXT.locale);
   let interactionEventRoot = $state<HTMLElement | undefined>();
-  let blockConsumed = $state(false);
+  let consumedByMsgIdx = $state<Record<number, boolean>>({});
 
   const canSend = $derived(inputText.trim().length > 0 && !isLoading);
 
@@ -51,7 +51,6 @@
         explicit_language_preference: session.explicit_language_preference,
       });
       sessionId = null;
-      blockConsumed = false;
     }
     const updated = loadPublicVeraSession();
     if (updated.preferred_response_language) {
@@ -204,7 +203,7 @@
     messages = [];
     inputText = "";
     chatError = "";
-    blockConsumed = false;
+    consumedByMsgIdx = {};
     clearPublicVeraSession();
   }
 
@@ -222,7 +221,19 @@
     const eventNames = ["t360action", "t360choice", "t360choices"];
     const handler = (event: Event) => {
       if (!(event instanceof CustomEvent) || isLoading) return;
-      blockConsumed = true;
+
+      // Mark the last assistant message with an interaction block as consumed.
+      // This ensures per-block consumed state (not global), so a new block
+      // arriving in a subsequent message starts with consumed=false.
+      for (let i = messages.length - 1; i >= 0; i--) {
+        const m = messages[i];
+        if (m.role === "assistant" && m.interactionBlock !== undefined) {
+          if (consumedByMsgIdx[i]) return; // Already consumed — ignore
+          consumedByMsgIdx = { ...consumedByMsgIdx, [i]: true };
+          break;
+        }
+      }
+
       const turn = t360InteractionEventToTurnRequest(event.detail as T360InteractionEventDetail);
       void sendRuntimeMessage(turn.message, turn.display_text, false, turn.interaction_response as Record<string, unknown> | undefined);
     };
@@ -333,7 +344,7 @@
           data-chat-messages
           class="mt-4 flex max-h-96 flex-col gap-3 overflow-y-auto rounded-2xl border border-[#d5e2e5] bg-[#fbfdfc] p-3"
         >
-          {#each messages as msg}
+          {#each messages as msg, i}
             {#if msg.role === "user"}
               <div data-testid="public-vera-user-message" class="self-end max-w-[85%] rounded-2xl rounded-br-sm bg-[#168b88] px-4 py-2.5 text-sm leading-6 text-white">
                 {msg.text}
@@ -356,7 +367,7 @@
                     actionButtons={extracted.actionButtons as import("../../lib/t360/interaction/types").T360Action[]}
                     actionBlockType={extracted.blockType as import("../../lib/t360/interaction/types").T360InteractionKind}
                     actionSessionId={msg.sessionId ?? sessionId ?? ""}
-                    actionDisabled={isLoading || blockConsumed}
+                    actionDisabled={isLoading || (consumedByMsgIdx[i] ?? false)}
                     productFitData={isProductFitBlock(msg.interactionBlock) ? msg.interactionBlock : null}
                   />
                 </div>
@@ -370,8 +381,8 @@
                   <T360InteractionRenderer
                     block={msg.interactionBlock}
                     sessionId={msg.sessionId ?? sessionId ?? ""}
-                    disabled={isLoading || blockConsumed}
-                    consumed={blockConsumed}
+                    disabled={isLoading || (consumedByMsgIdx[i] ?? false)}
+                    consumed={consumedByMsgIdx[i] ?? false}
                   />
                 </div>
               {/if}
