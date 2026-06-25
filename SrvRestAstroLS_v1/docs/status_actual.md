@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-25 (Contexto componentes Diagnosticador embeddable)
+Ultima actualizacion: 2026-06-25 (Cierre documental Fase 1 DiagnosticadorCore)
 
 ## Directorio de trabajo
 
@@ -3366,3 +3366,64 @@ pero **no se ejecutaron las validaciones finales** sobre los cambios del lab.
 - No se implemento iframe, Web Component, SDK ni postMessage. Arquitectura
   embebible futura preservada en documentacion.
 - Primera salida: pagina propia de Team360 (/t360).
+
+### 2026-06-25 — Fase 1 DiagnosticadorCore extraccion mecanica (cierre documental)
+
+Implementacion:
+- Se creo `lib/t360/diagnosticador/DiagnosticadorCore.svelte` (400 lineas)
+  extrayendo el nucleo conversacional de `PublicVeraEntry.svelte` (de 447 a 75
+  lineas), segun `lat.md/diagnosticador-embeddable-component-architecture.md`.
+- `PublicVeraEntry.svelte` quedo como adapter publico de `/t360#vera`: conserva
+  `section#vera`, layout comercial, titulos, ejemplos, mailto y monta el Core.
+- `DiagnosticadorCore.svelte` contiene: estado conversacional, persistencia de
+  sesion, llamadas API, render de mensajes/`DiagnosisResult`/`T360InteractionRenderer`,
+  eventos de interaccion, input, loading, error y contador de turnos.
+- Props: `assistantName` (string), `mailtoHref` (string), bindables
+  `sessionId`, `messages`, `inputText`, `turnDisplayName`.
+- No se movio `interaction/`, `diagnosis/`, `global.js`, `publicVeraSession.ts`,
+  `ConsoleDiagnosis`, backend ni endpoints.
+- Deuda arquitectonica documentada: storage key fija
+  `team360.vera.session.v1`, `PUBLIC_DIAGNOSIS_CONTEXT` hardcodeado,
+  dependencia de `global.js` via `publicDiagnosis.ts`, mailto renderizado en el
+  Core (datos desde el adapter).
+
+Validacion estatica:
+- `pnpm check`: 0 errors, 0 warnings, 3 hints (preexistentes en E2E)
+- `pnpm build`: 139 pages, sin errores
+- `git diff --check`: OK
+
+Validacion runtime real (backend-dev.sh + astro-dev.sh, PostgreSQL/Milvus/LiteLLM
+operativos):
+- Backend `127.0.0.1:7050` health OK, modelo `openai_gpt-5-nano`,
+  `fallback_used=false` en turnos reales
+- Astro `127.0.0.1:3050` sirviendo `/t360` OK
+- Smoke curl: dos turnos reales contra `POST /api/diagnosis/turn` con respuesta
+  AI real y sesion preservada
+
+BrowserMCP:
+- Conexion exitosa, navegacion a `/t360#vera` validada
+- Click en ejemplo, envio de mensaje, respuesta real de Vera verificada
+- Mailto con conversacion completa, sin errores de consola
+
+Playwright (35 tests observados, servidores externos, `PLAYWRIGHT_SKIP_WEBSERVER=1`):
+- `33-34 passed` segun corrida, `2 skipped` (pre-existentes), `0-1 flaky`
+- `public-vera.spec.ts`: 12/12 passed (mocked, cobertura estructural)
+- `public-vera-new-conversation.spec.ts`: 1/1 passed
+- `public-vera-kommo.spec.ts`, `salesforce.spec.ts`, `email-orders-definitive.spec.ts`: passed
+- `public-vera-adversarial.spec.ts`: 12/12 passed
+- `public-vera-phone-problems-interaction-priority.spec.ts`: 5/5 passed
+- `public-vera-mobile-sequential-blocks.spec.ts`: unico test flaky.
+  `repeat-each=5` obtuvo aproximadamente 80% pass (4/5, 1/5). Dos modos de
+  fallo observados: (a) el backend no emite `single_choice` en ese turno
+  (respuesta valida `reflect_and_ask`), (b) `elementFromPoint` en Chromium
+  headless devuelve elemento inesperado. No se encontro evidencia de regresion
+  atribuible a la extraccion. No hubo comparacion baseline contra el commit
+  anterior.
+- Ninguna regresion atribuible a la extraccion fue detectada.
+
+Servicios permanentes no operados: PostgreSQL, Milvus, LiteLLM.
+Sin commit, sin push, sin cambios en backend, endpoints, tests ni
+configuracion.
+
+Estado:
+FASE 1 CERRADA — RUNTIME Y BROWSERMCP VALIDADOS, CON E2E MOVIL FLAKY DOCUMENTADO

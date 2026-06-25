@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-25 (Contexto componentes Diagnosticador embeddable)
+Ultima actualizacion: 2026-06-25 (Cierre documental Fase 1 DiagnosticadorCore)
 
 ## Estado general
 
@@ -524,6 +524,30 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
 - Se agrego referencia `[[team360-frontend-base]]` en `lat.md/lat.md`.
 - La documentacion completa de la base frontend queda en `docs/frontend/` y `docs/adr/ADR-004/`.
 - No se implemento codigo, rutas, componentes ni migraciones.
+
+### 2026-06-25 — Fase 1 extraccion mecanica de DiagnosticadorCore (cierre)
+
+- Se implemento la Fase 1 descrita en `diagnosticador-embeddable-component-architecture.md`:
+  extraccion mecanica del nucleo conversacional desde `PublicVeraEntry.svelte` hacia
+  `DiagnosticadorCore.svelte` en `src/lib/t360/diagnosticador/`.
+- `PublicVeraEntry.svelte` quedo como adapter publico con `section#vera`, layout
+  comercial, ejemplos y mailto. El Core contiene el chat operativo, estado,
+  persistencia, eventos y render conversacional.
+- La implementacion respeta las restricciones documentadas: no se creo workspace,
+  /packages, Web Component, iframe ni npm. No se movieron interaction blocks ni
+  `ConsoleDiagnosis`. No se modifico backend, endpoints, `global.js` ni
+  `publicVeraSession.ts`.
+- Validacion estatica: `pnpm check` 0 errores, `pnpm build` OK (139 pages),
+  `git diff --check` OK.
+- Runtime real validado: backend `127.0.0.1:7050` (LiteLLM, Milvus, PostgreSQL),
+  modelo `openai_gpt-5-nano`, `fallback_used=false`. BrowserMCP validado sin
+  errores de consola.
+- Playwright: 35 tests observados, 33-34 passed segun corrida, 2 skipped. Unico
+  test flaky: `public-vera-mobile-sequential-blocks` (~80% pass en 5 corridas).
+  Sin regresion atribuible a la extraccion.
+- Estado de cierre: FASE 1 CERRADA — RUNTIME Y BROWSERMCP VALIDADOS,
+  CON E2E MOVIL FLAKY DOCUMENTADO.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
 
 ## Pendientes recomendados
 
