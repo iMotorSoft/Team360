@@ -53,6 +53,7 @@ from modules.sales_diagnosis_runtime.errors import (
     InvalidAssistantRuntimeInputError,
     UnsafeResponseError,
 )
+from modules.automation_diagnosis.assistant_instances import get_assistant_instance_config
 from modules.automation_diagnosis.litellm_client import LiteLLMClient
 from modules.sales_diagnosis_runtime.milvus_provider import (
     MilvusRetrievalProvider,
@@ -143,6 +144,14 @@ class _DevUnsafeFakeLLMProvider:
         return _UNSAFE_RESPONSE
 
 
+def _resolve_dev_display_name(instance_code: str) -> str:
+    try:
+        config = get_assistant_instance_config(instance_code)
+        return config.assistant_display_name or "Diagnosticador"
+    except ValueError:
+        return "Diagnosticador"
+
+
 class _DevLiteLLMProvider:
     """LiteLLM provider for dev endpoint via LiteLLM proxy.
 
@@ -186,9 +195,11 @@ class _DevLiteLLMProvider:
         state: ConversationState,
         context: list[RetrievedChunk],
     ) -> str:
+        display_name = _resolve_dev_display_name(input.assistant_instance_code)
         system_prompt = self._prompt_policy.build_system_prompt(
             assistant_instance_code=input.assistant_instance_code,
             package_code=input.package_code,
+            assistant_display_name=display_name,
         )
         turn_prompt = self._prompt_policy.build_turn_prompt(input, state, context)
         model = (

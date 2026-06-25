@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-24 (Politica root cause)
+Ultima actualizacion: 2026-06-25 (Contexto componentes Diagnosticador embeddable)
 
 ## Estado general
 
@@ -11,6 +11,50 @@ Ultima actualizacion: 2026-06-24 (Politica root cause)
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-25 - Contexto componentes Diagnosticador embeddable
+
+- Se agrego `diagnosticador-embeddable-component-architecture.md` como fuente
+  canonica para el atajo `contexto componentes`.
+- El documento consolida la decision de mantener inicialmente el Core dentro de
+  `SrvRestAstroLS_v1/astro/src/lib/t360`, sin crear `/packages`, workspace raiz
+  ni paquetes npm prematuros.
+- Se documento la extraccion progresiva de `DiagnosticadorCore.svelte`, el rol
+  de `PublicVeraEntry.svelte` como adapter de Home, la separacion de
+  `ConsoleDiagnosis.svelte`, estado conversacional, eventos publicos `t360:*`,
+  estilos encapsulados y reglas para futuros productos, variantes, interaction
+  blocks, adapters y paquetes.
+- Se enlazo el nuevo documento desde `lat.md/lat.md`, `AGENTS.md`,
+  `.agents/skills/team360-project/SKILL.md` y el antecedente UX embeddable.
+- No se modifico codigo productivo, componentes, configs, dependencias,
+  servicios, DB, Milvus, LiteLLM ni workspaces.
+
+### 2026-06-25 - Playwright como navegador sobre runtime real
+
+- Se reforzo `browser-mcp-validation-policy.md` para que todo test local de
+  paginas, componentes hidratados o E2E real lea esta politica antes de
+  ejecutarse.
+- Se fijo como regla obligatoria que `backend-dev.sh` y `astro-dev.sh` son los
+  responsables de levantar/bajar el runtime local real.
+- Se dejo explicito que Playwright debe automatizar Chromium contra ese runtime
+  con `PLAYWRIGHT_SKIP_WEBSERVER=1`, sin levantar su `webServer` automatico ni
+  usar proxy/puertos paralelos salvo justificacion explicita.
+- Se actualizaron `AGENTS.md` y `.agents/skills/team360-project/SKILL.md` para
+  que esta regla se lea al iniciar sesiones y antes de validaciones de paginas
+  o end-to-end.
+- No se modifico codigo productivo, backend, frontend runtime, DB, Milvus,
+  LiteLLM ni configuracion de servicios.
+
+### 2026-06-24 - Mapa de conocimiento Mermaid
+
+- Se agrego `team360-knowledge-map.md` como arbol de conocimiento navegable
+  para `lat.md/` usando Mermaid `mindmap`.
+- El mapa organiza las referencias canonicas por orquestacion global, modelo de
+  producto, runtime, knowledge e IA, workers, persistencia, Console/frontend,
+  seguridad, validacion, deploy y documentacion viva.
+- Se enlazo el nuevo documento desde `lat.md/lat.md`.
+- No se instalaron dependencias, no se genero render derivado y no se modifico
+  codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni servicios.
 
 ### 2026-06-24 - Politica root cause para bugs manuales
 

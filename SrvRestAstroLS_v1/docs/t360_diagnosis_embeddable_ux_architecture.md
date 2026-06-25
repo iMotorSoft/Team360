@@ -1,5 +1,10 @@
 # Team360 — Arquitectura UX para diagnósticos reutilizables y embebibles
 
+> Fuente canonica vigente: `lat.md/diagnosticador-embeddable-component-architecture.md`.
+> Este documento queda como antecedente UX/embeddable ampliado. Para decisiones
+> de estructura, paquetes, estilos, eventos y extraccion progresiva del Core,
+> usar primero la referencia LAT.
+
 ## 1. Propósito
 
 Team360 no debe tratar el diagnóstico como una experiencia exclusiva de la Home pública ni como una funcionalidad específica de Vera.

@@ -21,6 +21,7 @@ from litestar.exceptions import HTTPException
 from litestar.status_codes import HTTP_501_NOT_IMPLEMENTED
 
 from modules.automation_diagnosis.ai_interpreter import AIInterpretationError
+from modules.automation_diagnosis.assistant_instances import get_assistant_instance_config
 from modules.automation_diagnosis.litellm_client import (
     LiteLLMClient,
     LiteLLMClientError,
@@ -162,11 +163,13 @@ class _PublicTurnLLMProvider:
         if os.environ.get("TEAM360_AI_PROVIDER", "").strip().lower() != "litellm":
             return safe_ack_for_language(response_language)
 
+        display_name = _resolve_turn_display_name(input.assistant_instance_code)
         client = LiteLLMClient(base_url=self._base_url)
         system = self._prompt_policy.build_system_prompt(
             assistant_instance_code=input.assistant_instance_code,
             package_code=input.package_code,
             response_language=response_language,
+            assistant_display_name=display_name,
         )
         turn = self._prompt_policy.build_turn_prompt(input, state, context)
         try:
@@ -279,7 +282,7 @@ def _service():
     return _get_auto_service()
 
 
-def _build_preliminary_message(text: str, display_name: str = "Vera") -> str:
+def _build_preliminary_message(text: str, display_name: str = "Diagnosticador") -> str:
     normalized = text.strip()
     short = normalized[:160] + "..." if len(normalized) > 160 else normalized
     return (
@@ -292,7 +295,14 @@ def _build_preliminary_message(text: str, display_name: str = "Vera") -> str:
 
 def _resolve_display_name(payload: dict) -> str:
     visitor = payload.get("visitor") or {}
-    return visitor.get("assistant_display_name") or "Vera"
+    return visitor.get("assistant_display_name") or "Diagnosticador"
+
+def _resolve_turn_display_name(instance_code: str = SALES_DIAGNOSIS_INSTANCE_CODE) -> str:
+    try:
+        config = get_assistant_instance_config(instance_code)
+        return config.assistant_display_name or "Diagnosticador"
+    except ValueError:
+        return "Diagnosticador"
 
 
 @post("/api/diagnosis/start")
@@ -302,7 +312,7 @@ async def public_start(data: PublicStartRequest) -> dict:
     visitor_meta = {
         "source_channel": data.source_channel or "home_public",
         "site_channel": data.site_channel or "team360.live",
-        "assistant_display_name": data.assistant_display_name or "Vera",
+        "assistant_display_name": data.assistant_display_name or "Diagnosticador",
         "lead_owner": data.lead_owner or "team360_live",
         "service_code": data.service_code or "svc_sales_diagnosis",
         "package_code": data.package_code or "pkg_sales_diagnosis",
@@ -328,7 +338,7 @@ async def public_start(data: PublicStartRequest) -> dict:
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
 
-    display_name = data.assistant_display_name or "Vera"
+    display_name = result.get("assistant_display_name") or data.assistant_display_name or "Diagnosticador"
 
     response: dict = {
         "session_id": result["id"],
@@ -454,6 +464,7 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
     session_id = data.session_id or f"conv_{uuid4().hex[:12]}"
 
     runtime = _build_public_turn_runtime()
+    display_name = _resolve_turn_display_name(SALES_DIAGNOSIS_INSTANCE_CODE)
 
     # Resolve knowledge scope code to UUID via PostgreSQL.
     # The resolver caches results in-memory for the process lifetime.
@@ -508,6 +519,7 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
         return PublicTurnResponse(
             session_id=session_id,
             response_text=safe_ack_for_language(response_language),
+            assistant_display_name=display_name,
             turn_count=turn_count,
             is_new=is_new,
             language={
@@ -529,7 +541,7 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
     # Persist conversation history and semantic memory in state
     if output.next_state:
         prev = output.next_state.history_summary or ""
-        exchange = f"Usuario: {text}\nVera: {output.response_text}"
+        exchange = f"Usuario: {text}\n{display_name}: {output.response_text}"
         output.next_state.history_summary = (
             f"{prev}\n{exchange}" if prev else exchange
         )
@@ -541,6 +553,7 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
     return PublicTurnResponse(
         session_id=session_id,
         response_text=output.response_text,
+        assistant_display_name=display_name,
         turn_count=turn_count,
         is_new=is_new,
         language=output.language,

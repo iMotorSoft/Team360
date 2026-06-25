@@ -87,6 +87,7 @@ class PublicTurnRequest(BaseModel):
 class PublicTurnResponse(BaseModel):
     session_id: str
     response_text: str
+    assistant_display_name: str = "Diagnosticador"
     turn_count: int = 0
     is_new: bool = False
     language: dict | None = None

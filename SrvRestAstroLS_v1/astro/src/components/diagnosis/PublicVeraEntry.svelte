@@ -29,6 +29,8 @@
     "Tengo reportes en Excel que armamos manualmente.",
   ];
 
+  let { assistantName = "Diagnosticador" }: { assistantName?: string } = $props();
+
   let sessionId = $state<string | null>(null);
   let messages = $state<ChatMessage[]>([]);
   let inputText = $state("");
@@ -37,6 +39,9 @@
   let currentLocale = $state<string>(PUBLIC_DIAGNOSIS_CONTEXT.locale);
   let interactionEventRoot = $state<HTMLElement | undefined>();
   let consumedByMsgIdx = $state<Record<number, boolean>>({});
+  let turnDisplayName = $state<string>("");
+
+  const assistantDisplayName = $derived(turnDisplayName || assistantName);
 
   const canSend = $derived(inputText.trim().length > 0 && !isLoading);
 
@@ -165,6 +170,9 @@
         interaction_response: interactionResponse,
       }));
       sessionId = result.session_id;
+      if (result.assistant_display_name) {
+        turnDisplayName = result.assistant_display_name;
+      }
       const turnDecision = result.turn_decision ?? null;
       const diagnosis = getDiagnosis(result.diagnosis);
       const isFallback = isGenerationFallback(turnDecision);
@@ -184,7 +192,7 @@
       ];
       persistSession(result.language);
     } catch {
-      chatError = sectionTitle("error_503", currentLocale);
+      chatError = sectionTitle("error_503", currentLocale, { name: assistantDisplayName });
     } finally {
       isLoading = false;
       scrollToBottom();
@@ -208,10 +216,11 @@
   }
 
   const mailHref = $derived.by(() => {
-    const subject = encodeURIComponent("Solicitar revisión con Vera");
+    const label = assistantDisplayName;
+    const subject = encodeURIComponent(`Solicitar revisión con ${label}`);
     const body = encodeURIComponent(
       messages.length > 0
-        ? `Conversación con Vera:\n\n${messages.map(m => `${m.role === 'user' ? 'Usuario' : 'Vera'}: ${m.text}`).join("\n")}\n\nGracias.`
+        ? `Conversación con ${label}:\n\n${messages.map(m => `${m.role === 'user' ? 'Usuario' : label}: ${m.text}`).join("\n")}\n\nGracias.`
         : "Hola Team360,\n\nQuiero revisar esta oportunidad de automatización.\n\nGracias."
     );
     return `mailto:contacto@team360.live?subject=${subject}&body=${body}`;
@@ -254,7 +263,7 @@
     <div>
       <p class="text-xs font-bold uppercase tracking-[0.2em] text-[#168b88]">Diagnóstico abierto</p>
       <h2 class="mt-4 text-4xl font-semibold leading-tight tracking-[-0.06em] text-[#102d4f] sm:text-5xl">
-        Hablá con Vera
+        Hablá con {assistantDisplayName}
       </h2>
       <p class="mt-5 max-w-xl text-base leading-7 text-[#5b7283] sm:text-lg">
         Contanos qué proceso querés mejorar o automatizar.
@@ -281,7 +290,7 @@
         <!-- Initial state: show header + textarea -->
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p class="text-sm font-bold text-[#153854]">Asistente Inteligente Vera</p>
+            <p class="text-sm font-bold text-[#153854]">{assistantDisplayName}</p>
             <p class="mt-1 text-xs font-semibold text-[#78909f]">{PUBLIC_DIAGNOSIS_CONTEXT.service_code}</p>
           </div>
           <span class="inline-flex w-fit rounded-full bg-[#e8f7f5] px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[#168b88]">
@@ -290,7 +299,7 @@
         </div>
 
         <label class="mt-5 block">
-          <span class="sr-only">Mensaje para Vera</span>
+          <span class="sr-only">Mensaje para {assistantDisplayName}</span>
           <textarea
             bind:value={inputText}
             data-testid="public-vera-text"
@@ -322,7 +331,7 @@
         <!-- Chat mode -->
         <div class="flex items-center justify-between gap-2">
           <div>
-            <p class="text-sm font-bold text-[#153854]">Asistente Inteligente Vera</p>
+            <p class="text-sm font-bold text-[#153854]">{assistantDisplayName}</p>
             <p class="mt-1 text-xs font-semibold text-[#78909f]">
               {PUBLIC_DIAGNOSIS_CONTEXT.service_code}
               {#if sessionId}
@@ -391,7 +400,7 @@
           {#if isLoading}
             <div class="self-start flex items-center gap-2 rounded-2xl rounded-bl-sm border border-[#d5e2e5] bg-white px-4 py-2.5 text-sm text-[#78909f]">
               <span class="inline-block h-2 w-2 animate-pulse rounded-full bg-[#168b88]"></span>
-              Vera está escribiendo...
+              {assistantDisplayName} está escribiendo...
             </div>
           {/if}
         </div>

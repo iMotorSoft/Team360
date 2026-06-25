@@ -9,7 +9,6 @@ import { API_BASE_URL } from "../../components/global.js";
 
 export const PUBLIC_DIAGNOSIS_CONTEXT = {
   assistant_instance_code: "team360_sales_diagnosis",
-  assistant_display_name: "Vera",
   source_channel: "home_public",
   site_channel: "team360.live",
   locale: "es",
@@ -204,7 +203,6 @@ export async function startPublicDiagnosis(request: PublicDiagnosisRequest): Pro
       anonymous_id: request.visitorAnonymousId,
       source_channel: PUBLIC_DIAGNOSIS_CONTEXT.source_channel,
       site_channel: PUBLIC_DIAGNOSIS_CONTEXT.site_channel,
-      assistant_display_name: PUBLIC_DIAGNOSIS_CONTEXT.assistant_display_name,
       lead_owner: PUBLIC_DIAGNOSIS_CONTEXT.lead_owner,
       service_code: PUBLIC_DIAGNOSIS_CONTEXT.service_code,
       package_code: PUBLIC_DIAGNOSIS_CONTEXT.package_code,

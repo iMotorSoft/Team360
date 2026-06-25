@@ -13,6 +13,7 @@ import type { T360InteractionBlock } from "../interaction/types";
 export type T360DiagnosisBackendTurnResponse = {
   session_id: string;
   response_text: string;
+  assistant_display_name?: string;
   turn_count: number;
   is_new: boolean;
   language?: TurnLanguage | null;
@@ -24,6 +25,7 @@ export type T360DiagnosisBackendTurnResponse = {
 export type T360NormalizedDiagnosisTurn = {
   session_id: string;
   assistant_text: string;
+  assistant_display_name?: string;
   turn_count: number;
   is_new: boolean;
   language?: TurnLanguage | null;

@@ -22,11 +22,16 @@ const VALID_CLASSIFICATIONS = [
   "not_recommended",
 ];
 
+const UI_READY_TIMEOUT_MS = 30_000;
+const REAL_RUNTIME_TIMEOUT_MS = 120_000;
+
 test.describe("Diagnosis E2E - flujo completo", () => {
   test("usuario completa diagnostico y ve resultado", async ({ page }) => {
+    test.setTimeout(180_000);
+
     await page.goto(DIAGNOSIS_URL);
 
-    await expect(page.getByRole("heading", { name: "Asistente de venta y diagnóstico" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Diagnosticador" })).toBeVisible();
     const diagnosisRoot = page.getByTestId("diagnosis-root");
     await expect(diagnosisRoot).toBeVisible();
     await expect(diagnosisRoot).toHaveAttribute("data-hydrated", "true");
@@ -35,7 +40,7 @@ test.describe("Diagnosis E2E - flujo completo", () => {
     await page.getByTestId("btn-start-diagnosis").click();
 
     const questionCard = page.getByTestId("question-card");
-    await expect(questionCard).toBeVisible({ timeout: 10_000 });
+    await expect(questionCard).toBeVisible({ timeout: UI_READY_TIMEOUT_MS });
     await expect(questionCard).toHaveAttribute("data-step-id", ANSWERS[0].id);
 
     for (let i = 0; i < ANSWERS.length; i++) {
@@ -57,11 +62,11 @@ test.describe("Diagnosis E2E - flujo completo", () => {
       await nextButton.click();
 
       if (nextAnswer) {
-        await expect(questionCard).toHaveAttribute("data-step-id", nextAnswer.id, { timeout: 10_000 });
+        await expect(questionCard).toHaveAttribute("data-step-id", nextAnswer.id, { timeout: UI_READY_TIMEOUT_MS });
       }
     }
 
-    await expect(page.getByTestId("diagnosis-result")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId("diagnosis-result")).toBeVisible({ timeout: REAL_RUNTIME_TIMEOUT_MS });
 
     const classification = page.getByTestId("result-classification");
     await expect(classification).toBeVisible();

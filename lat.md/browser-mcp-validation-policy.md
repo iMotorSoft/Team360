@@ -148,6 +148,45 @@ Backend y Astro deben levantarse con los scripts oficiales del proyecto:
 No iniciar manualmente Uvicorn o Astro con comandos alternativos salvo que el
 launcher falle y se este diagnosticando ese fallo.
 
+## Regla obligatoria para tests de paginas y E2E locales
+
+Antes de probar paginas, componentes hidratados, flujos de usuario o tests
+end-to-end locales, leer esta politica.
+
+Para validaciones locales de paginas reales, los scripts `.sh` son los unicos
+responsables de levantar y bajar el runtime:
+
+```text
+backend-dev.sh -> backend real en 127.0.0.1:7050
+astro-dev.sh   -> Astro real en 127.0.0.1:3050
+```
+
+Playwright no debe levantar servidores para estos casos. Playwright debe usarse
+solo como automatizador de navegador:
+
+```text
+Playwright abre Chromium, navega, interactua, observa red/DOM y valida.
+No levanta backend.
+No levanta Astro.
+No inventa otro puerto.
+No usa un proxy paralelo.
+```
+
+El `webServer` automatico de `playwright.config.ts` no representa el runtime
+real de Team360 para `/t360`, paginas publicas o Console conectada. Usarlo para
+cerrar funcionalidad real puede validar contra puertos, proxy o configuracion
+distintos del entorno objetivo.
+
+Por defecto, todo test local de pagina o E2E real debe ejecutarse con:
+
+```bash
+PLAYWRIGHT_SKIP_WEBSERVER=1
+```
+
+Si una prueba necesita usar el `webServer` automatico de Playwright, el agente
+debe explicarlo antes de ejecutarla y dejar claro que no esta validando el
+runtime real levantado por `backend-dev.sh` y `astro-dev.sh`.
+
 Servicios permanentes:
 
 ```text
@@ -218,6 +257,9 @@ Astro, porque Astro ya esta corriendo mediante:
 ```bash
 ./astro-dev.sh
 ```
+
+Esta variable es obligatoria para validar paginas reales locales y evitar el
+webserver/proxy paralelo de Playwright.
 
 `PLAYWRIGHT_BASE_URL` define la URL usada por tests que navegan con rutas
 relativas:

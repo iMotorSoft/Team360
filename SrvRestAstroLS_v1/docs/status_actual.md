@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-24 (Politica root cause)
+Ultima actualizacion: 2026-06-25 (Contexto componentes Diagnosticador embeddable)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,74 @@ Ultima actualizacion: 2026-06-24 (Politica root cause)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-25 - Contexto componentes Diagnosticador embeddable
+
+- Se documento en `lat.md/diagnosticador-embeddable-component-architecture.md`
+  la arquitectura canonica para el futuro Diagnosticador embeddable sin iframe.
+- Se dejo establecido que la primera etapa usa el namespace existente
+  `SrvRestAstroLS_v1/astro/src/lib/t360`, sin crear workspace raiz, `/packages`
+  ni publicacion npm.
+- Se agrego el atajo operativo `contexto componentes` en `AGENTS.md` y
+  `.agents/skills/team360-project/SKILL.md` para que futuros agentes lean esa
+  referencia antes de analizar o tocar componentes, paquetes, estilos,
+  interaction blocks, adapters, E2E o estructura frontend del Diagnosticador.
+- Se marco `SrvRestAstroLS_v1/docs/t360_diagnosis_embeddable_ux_architecture.md`
+  como antecedente UX, dejando la referencia LAT como fuente principal para
+  decisiones de estructura y evolucion.
+- No se modifico codigo productivo, componentes, configs, dependencias,
+  servicios, PostgreSQL, Milvus, LiteLLM, migraciones ni workspaces.
+
+### 2026-06-25 - Regla E2E local sobre runtime real
+
+- Se documento como politica operativa que los tests locales de paginas,
+  componentes hidratados y E2E reales deben usar `backend-dev.sh` y
+  `astro-dev.sh` para levantar/bajar el runtime.
+- Se fijo que Playwright debe usarse como automatizador de navegador con
+  `PLAYWRIGHT_SKIP_WEBSERVER=1`, no como launcher de backend/Astro mediante
+  `webServer` automatico cuando se valida funcionalidad real de Team360.
+- Se actualizaron `lat.md/browser-mcp-validation-policy.md`, `AGENTS.md`,
+  `.agents/skills/team360-project/SKILL.md` y `lat.md/status_actual.md`.
+- No se modifico funcionalidad productiva, prompts, arquitectura, DB, Milvus,
+  LiteLLM ni servicios.
+
+### 2026-06-25 - Nombre configurable del asistente
+
+- Se implemento `assistant_display_name` como campo dinamico en toda la pila.
+- **Backend**: `AutomationDiagnosisService.start_session()` ahora incluye
+  `assistant_display_name` en la respuesta, resuelto desde `AssistantInstanceConfig`.
+- **Backend**: `POST /api/diagnosis/turn` incluye `assistant_display_name` en la
+  respuesta, resuelto via `get_assistant_instance_config()`.
+- **Backend**: Fallback unificado a `"Diagnosticador"` cuando no hay config.
+- **HTTP schemas**: `PublicTurnResponse.assistant_display_name` agregado con
+  default `"Diagnosticador"`.
+- **Frontend API**: `DiagnosisSession.assistant_display_name` tipado en TypeScript.
+- **ConsoleDiagnosis.svelte**: nueva prop `assistantName` con fallback
+  `"Diagnosticador"`, usa nombre del backend via session.
+- **PublicVeraEntry.svelte**: eliminados ~12 hardcoded `"Vera"`, usa nombre
+  dinamico desde la respuesta de turn o prop fallback.
+- **publicDiagnosis.ts**: eliminado `assistant_display_name: "Vera"` hardcodeado
+  de `PUBLIC_DIAGNOSIS_CONTEXT`.
+- **diagnosisPresentation.ts**: `sectionTitle()` acepta `params` para
+  interpolacion de nombre; `error_503` usa `{name}` placeholder.
+- **Pages Astro**: `t360.astro`, `index.astro`, `indexa.astro`, `indexb.astro`
+  pasan `assistantName="Vera"` a `PublicVeraEntry`.
+- **Tests**: asserts de `assistant_display_name` en
+  `test_automation_diagnosis.py` y `test_automation_diagnosis_router.py`.
+- **No se modifico**: DB, migraciones, `assistant_instance_id`, workers,
+  knowledge scopes, prompts LLM, LiteLLM, Milvus, ni documentacion de marketing.
+- Validacion: 986 backend tests pass, `pnpm check` 0 errores, `pnpm build` OK.
+
+### 2026-06-24 - Mapa de conocimiento Mermaid en `lat.md`
+
+- Se documento `lat.md/team360-knowledge-map.md` como arbol de conocimiento
+  Mermaid para navegar las referencias canonicas de arquitectura viva.
+- El mapa cubre orquestacion, producto, runtime, knowledge e IA, workers,
+  persistencia, Console/frontend, seguridad, validacion, deploy y documentacion
+  viva.
+- Se enlazo desde `lat.md/lat.md` y se actualizo `lat.md/status_actual.md`.
+- No se modifico codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni
+  configuracion de servicios.
 
 ### 2026-06-24 - Politica root cause para bugs manuales
 

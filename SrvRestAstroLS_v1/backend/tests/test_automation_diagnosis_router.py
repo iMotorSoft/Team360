@@ -65,6 +65,7 @@ def test_start_session_returns_session_with_default_config():
     assert data["organization_id"] == "org_team360"
     assert data["workspace_id"] == "team360_public_site"
     assert data["assistant_instance_id"] == "team360_sales_diagnosis"
+    assert data["assistant_display_name"] == "Vera"
     assert data["automation_package_id"] == "pkg_sales_diagnosis"
     assert data["knowledge_scope_id"] == "ks_team360_sales_diagnosis"
     assert data["site_channel"] == "team360.live"
@@ -185,6 +186,7 @@ def test_start_session_minimal_payload():
     assert response.status_code == 201
     data = response.json()
     assert data["assistant_instance_id"] == "team360_sales_diagnosis"
+    assert data["assistant_display_name"] == "Vera"
     assert data["locale"] == "es"
 
 

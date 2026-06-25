@@ -47,6 +47,7 @@ def test_default_session_uses_team360_direct_package_installation():
     assert started["organization_id"] == "org_team360"
     assert started["workspace_id"] == "team360_public_site"
     assert started["assistant_instance_id"] == "team360_sales_diagnosis"
+    assert started["assistant_display_name"] == "Vera"
     assert started["automation_package_id"] == "pkg_sales_diagnosis"
     assert started["knowledge_scope_id"] == "ks_team360_sales_diagnosis"
     assert started["site_channel"] == "team360.live"
@@ -166,3 +167,31 @@ def test_not_recommended_fixture_classification():
     assert result["automation_mode"] == "blocked"
     assert "bypass_mfa" in result["blocked_actions"]
     assert "hard_security_stop" in result["risk_flags"]
+
+
+class TestAssistantDisplayName:
+    """assistant_display_name from AssistantInstanceConfig reaches start_session."""
+
+    def test_team360_returns_vera(self):
+        service = AutomationDiagnosisService(ai_interpreter=MockAIInterpreter())
+        started = service.start_session({"source_url": "https://team360.live"})
+        assert started["assistant_display_name"] == "Vera"
+        assert started["assistant_instance_id"] == "team360_sales_diagnosis"
+
+    def test_assistant_instance_id_stable_under_different_names(self):
+        """Different configs must have different assistant_instance_id but
+        the same session structure."""
+        service = AutomationDiagnosisService(ai_interpreter=MockAIInterpreter())
+        team360 = service.start_session({"assistant_instance_id": "team360_sales_diagnosis"})
+        legacy = service.start_session({"assistant_instance_id": "automation_diagnosis_default"})
+        assert team360["assistant_instance_id"] == "team360_sales_diagnosis"
+        assert legacy["assistant_instance_id"] == "automation_diagnosis_default"
+        assert team360["assistant_display_name"] == "Vera"
+        assert legacy["assistant_display_name"] == ""  # no commercial name set
+        assert team360["assistant_instance_id"] != legacy["assistant_instance_id"]
+
+    def test_unknown_instance_fallback_name(self):
+        """Unknown assistant_instance_id raises ValueError before display_name."""
+        service = AutomationDiagnosisService(ai_interpreter=MockAIInterpreter())
+        with pytest.raises(ValueError, match="Unknown assistant_instance_id"):
+            service.start_session({"assistant_instance_id": "cliente_inexistente"})

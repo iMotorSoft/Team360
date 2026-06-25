@@ -20,9 +20,9 @@ from modules.sales_diagnosis_runtime.structured_diagnosis import (
 )
 
 
-_SYSTEM_PROMPTS: dict[str, str] = {
+_SYSTEM_PROMPT_TEMPLATES: dict[str, str] = {
     "es": (
-        "Sos Vera, asistente de diagnóstico de automatización de Team360.\n\n"
+        "Sos {name}, asistente de diagnóstico de automatización de Team360.\n\n"
         "Tu objetivo es mantener una conversación natural para entender el proceso del usuario "
         "y generar un diagnóstico útil al final.\n\n"
         "REGLAS DE CONVERSACIÓN:\n"
@@ -107,7 +107,7 @@ _SYSTEM_PROMPTS: dict[str, str] = {
         "Respondé siempre en español claro y natural."
     ),
     "en": (
-        "You are Vera, an automation diagnosis assistant for Team360.\n\n"
+        "You are {name}, an automation diagnosis assistant for Team360.\n\n"
         "Your goal is to have a natural conversation to understand the user's process "
         "and generate a useful diagnosis at the end.\n\n"
         "CONVERSATION RULES:\n"
@@ -143,7 +143,7 @@ _SYSTEM_PROMPTS: dict[str, str] = {
         "Always respond in English, clear and natural."
     ),
     "he": (
-        "את ורה, עוזרת אבחון אוטומציה של Team360.\n\n"
+        "את {name}, עוזרת אבחון אוטומציה של Team360.\n\n"
         "המטרה שלך היא לנהל שיחה טבעית כדי להבין את התהליך של המשתמש "
         "וליצור אבחון שימושי בסוף.\n\n"
         "כללי שיחה:\n"
@@ -181,15 +181,23 @@ _SYSTEM_PROMPTS: dict[str, str] = {
 }
 
 
+def _build_system_prompt(name: str, lang: str) -> str:
+    effective_name = name.strip() or "Diagnosticador"
+    template = _SYSTEM_PROMPT_TEMPLATES.get(lang, _SYSTEM_PROMPT_TEMPLATES[DEFAULT_LANGUAGE])
+    return template.replace("{name}", effective_name)
+
+
 class PromptPolicy:
     def build_system_prompt(
         self,
         assistant_instance_code: str = "",
         package_code: str = "",
         response_language: str = "",
+        assistant_display_name: str = "Diagnosticador",
     ) -> str:
         lang = response_language or DEFAULT_LANGUAGE
-        return _SYSTEM_PROMPTS.get(lang, _SYSTEM_PROMPTS[DEFAULT_LANGUAGE])
+        name = assistant_display_name.strip() or "Diagnosticador"
+        return _build_system_prompt(name, lang)
 
     def build_turn_prompt(
         self,

@@ -91,7 +91,9 @@ class AutomationDiagnosisService:
                 "package_worker_ids": session.package_worker_ids,
             },
         )
-        return self.get_session(session.id)
+        result = self.get_session(session.id)
+        result["assistant_display_name"] = config.assistant_display_name
+        return result
 
     def get_session(self, session_id: str) -> dict[str, Any]:
         session = self.repository.get_session(session_id)

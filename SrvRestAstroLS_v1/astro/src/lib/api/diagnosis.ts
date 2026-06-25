@@ -7,6 +7,7 @@ export interface DiagnosisSession {
   organization_id: string;
   workspace_id: string;
   assistant_instance_id: string;
+  assistant_display_name?: string;
   automation_package_id: string;
   knowledge_scope_id: string;
   source_url: string;

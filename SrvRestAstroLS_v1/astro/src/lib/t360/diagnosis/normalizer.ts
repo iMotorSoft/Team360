@@ -21,6 +21,7 @@ export function normalizeT360DiagnosisTurn(
   return {
     session_id: response.session_id,
     assistant_text: response.response_text,
+    assistant_display_name: response.assistant_display_name,
     turn_count: response.turn_count,
     is_new: response.is_new,
     language: response.language,

@@ -365,14 +365,20 @@ export const SECTION_TITLES: Record<string, LocalizedText> = {
   next_step: { es: "Próximo paso", en: "Next step", he: "הצעד הבא" },
   availability: { es: "Disponibilidad", en: "Availability", he: "זמינות" },
   fallback_note: { es: "Nota: la respuesta automática no pudo generarse por un problema temporal. La orientación estructurada está disponible.", en: "Note: the automatic response could not be generated due to a temporary issue. The structured assessment is still available.", he: "הערה: לא ניתן היה ליצור את התשובה האוטומטית עקב בעיה זמנית. ההכוונה המבנית עדיין זמינה." },
-  error_503: { es: "Vera no está disponible en este momento. La conversación no se perdió; podés volver a intentarlo.", en: "Vera is not available right now. The conversation was not lost; you can try again.", he: "ורה לא זמינה כרגע. השיחה לא אבדה; תוכל לנסות שוב." },
+  error_503: { es: "{name} no está disponible en este momento. La conversación no se perdió; podés volver a intentarlo.", en: "{name} is not available right now. The conversation was not lost; you can try again.", he: "{name} לא זמין כרגע. השיחה לא אבדה; תוכל לנסות שוב." },
 };
 
-export function sectionTitle(key: string, locale: string): string {
+export function sectionTitle(key: string, locale: string, params?: Record<string, string>): string {
   const entry = SECTION_TITLES[key];
   if (!entry) return key;
   const normalizedLocale = normalizeLocale(locale);
-  return entry[normalizedLocale] || entry.es || key;
+  let text = entry[normalizedLocale] || entry.es || key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      text = text.replace(`{${k}}`, v);
+    }
+  }
+  return text;
 }
 
 // ---------------------------------------------------------------------------

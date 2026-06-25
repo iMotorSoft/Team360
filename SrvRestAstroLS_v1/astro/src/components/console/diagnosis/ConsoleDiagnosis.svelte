@@ -11,6 +11,8 @@
     type DiagnosisResult,
   } from "../../../lib/api/diagnosis";
 
+  let { assistantName = "Diagnosticador" }: { assistantName?: string } = $props();
+
   type FlowState = "idle" | "starting" | "answering" | "classifying" | "result" | "error";
 
   let state = $state<FlowState>("idle");
@@ -22,6 +24,8 @@
 
   let textInput = $state("");
   let selectedOptions = $state<string[]>([]);
+
+  const displayName = $derived(session?.assistant_display_name || assistantName);
 
   const currentStep = $derived(GUIDED_STEPS[currentStepIndex]);
   const totalSteps = GUIDED_STEPS.length;
@@ -139,7 +143,7 @@
     </p>
     <h1 class="mt-2 text-3xl font-bold tracking-[-0.055em] text-[#102d4f] sm:text-4xl">
       {state === "idle"
-        ? "Asistente de venta y diagnóstico"
+        ? displayName
         : state === "starting"
           ? "Iniciando..."
           : state === "error"
@@ -272,7 +276,7 @@
       <Card class="p-8 text-center">
         <Loading />
         <p class="mt-4 text-sm font-bold text-[#31536b]">Analizando respuestas...</p>
-        <p class="mt-2 text-xs text-[#8396a2]">El asistente está procesando el diagnóstico.</p>
+        <p class="mt-2 text-xs text-[#8396a2]">{displayName} está procesando el diagnóstico.</p>
       </Card>
     </div>
 

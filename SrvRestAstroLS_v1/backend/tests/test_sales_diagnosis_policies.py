@@ -707,3 +707,48 @@ class TestGuardrailPolicyNegation:
     def test_negation_detected_with_todavia_no(self):
         text = "Esa funcionalidad todavía no está disponible."
         assert GuardrailPolicy._has_near_negation(text, "funcionalidad")
+
+
+class TestAssistantDisplayNameInPrompt:
+    """assistant_display_name must propagate to the system prompt."""
+
+    def test_team360_vera(self):
+        prompt = PromptPolicy().build_system_prompt(assistant_display_name="Vera")
+        assert "Sos Vera" in prompt or "You are Vera" in prompt or "את ורה" in prompt
+        assert "Diagnosticador" not in prompt
+
+    def test_cliente_clara(self):
+        prompt = PromptPolicy().build_system_prompt(assistant_display_name="Clara")
+        assert "Sos Clara" in prompt or "You are Clara" in prompt or "את Clara" in prompt
+
+    def test_comercial(self):
+        prompt = PromptPolicy().build_system_prompt(assistant_display_name="Asistente Comercial")
+        assert "Sos Asistente Comercial" in prompt or "You are Asistente Comercial" in prompt
+
+    def test_empty_fallback_diagnosticador(self):
+        prompt = PromptPolicy().build_system_prompt(assistant_display_name="")
+        assert "Diagnosticador" in prompt
+
+    def test_whitespace_fallback_diagnosticador(self):
+        prompt = PromptPolicy().build_system_prompt(assistant_display_name="   ")
+        assert "Diagnosticador" in prompt
+
+    def test_default_fallback_diagnosticador(self):
+        prompt = PromptPolicy().build_system_prompt()
+        assert "Diagnosticador" in prompt
+
+    def test_assistant_instance_id_not_in_prompt(self):
+        prompt = PromptPolicy().build_system_prompt(assistant_display_name="Vera")
+        assert "team360_sales_diagnosis" not in prompt
+
+    def test_spanish_prompt_uses_name(self):
+        prompt = PromptPolicy().build_system_prompt(assistant_display_name="Clara", response_language="es")
+        assert "Sos Clara" in prompt
+
+    def test_english_prompt_uses_name(self):
+        prompt = PromptPolicy().build_system_prompt(assistant_display_name="Clara", response_language="en")
+        assert "You are Clara" in prompt
+
+    def test_hebrew_prompt_uses_name(self):
+        prompt = PromptPolicy().build_system_prompt(assistant_display_name="מוריה", response_language="he")
+        assert "מוריה" in prompt
