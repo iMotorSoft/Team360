@@ -1,5 +1,6 @@
 <script lang="ts">
   import DiagnosticadorCore from "../../lib/t360/diagnosticador/DiagnosticadorCore.svelte";
+  import { DEFAULT_SESSION_STORAGE_KEY } from "../../lib/t360/diagnosticador/config/defaults";
 
   let { assistantName = "Diagnosticador" }: { assistantName?: string } = $props();
 
@@ -69,6 +70,8 @@
       bind:inputText
       bind:turnDisplayName
       {assistantName}
+      assistantInstanceId="team360_sales_diagnosis"
+      sessionStorageKey={DEFAULT_SESSION_STORAGE_KEY}
       mailtoHref={mailHref}
     />
   </div>

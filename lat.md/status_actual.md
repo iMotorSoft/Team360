@@ -549,6 +549,25 @@ Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, 
   CON E2E MOVIL FLAKY DOCUMENTADO.
 - Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
 
+### 2026-06-25 — Fase 2 Configuracion y sesion extraibles
+
+- Se implemento configuracion minima tipada en `config/types.ts` y
+  `config/defaults.ts` dentro de `diagnosticador/`.
+- Se extrajo `state/session.ts` como modulo de sesion configurable (key por
+  parametro, SSR-safe, compatible con el formato historico).
+- `publicVeraSession.ts` paso a ser wrapper delgado sobre `state/session.ts`;
+  su API publica no cambio.
+- `DiagnosticadorCore.svelte` recibe `sessionStorageKey` y `assistantInstanceId`
+  como props configurables. El Core ya no conoce key fija.
+- `PublicVeraEntry.svelte` explicita la identidad de Vera:
+  `assistantInstanceId="team360_sales_diagnosis"` y
+  `sessionStorageKey="team360.vera.session.v1"` via constante.
+- Validacion estatica: `pnpm check` 0 errores, `pnpm build` 139 pages.
+- Playwright: 28 tests, todos pasan. Sin regresiones.
+- Sin commit, sin cambios en backend, endpoints, tests ni config global.
+- Estado de cierre: FASE 2 IMPLEMENTADA Y VALIDADA.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
+
 ## Pendientes recomendados
 
 - Agregar nuevos documentos lat.md solo para conceptos estables de plataforma.

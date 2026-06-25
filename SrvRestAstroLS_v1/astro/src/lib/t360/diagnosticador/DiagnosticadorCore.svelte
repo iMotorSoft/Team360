@@ -2,7 +2,8 @@
   import { onMount } from "svelte";
   import { PUBLIC_DIAGNOSIS_CONTEXT, sendPublicTurn } from "../../api/publicDiagnosis";
   import type { StructuredDiagnosis, TurnDecision, TurnLanguage } from "../../api/publicDiagnosis";
-  import { loadPublicVeraSession, savePublicVeraSession, clearPublicVeraSession } from "../../publicVeraSession";
+  import { loadSession, saveSession, clearSession } from "./state/session";
+  import { DEFAULT_SESSION_STORAGE_KEY } from "./config/defaults";
   import DiagnosisResult from "../../../components/diagnosis/DiagnosisResult.svelte";
   import { sectionTitle, isValidDiagnosis } from "../../api/diagnosisPresentation";
   import T360InteractionRenderer from "../interaction/T360InteractionRenderer.svelte";
@@ -25,6 +26,8 @@
 
   let {
     assistantName = "Diagnosticador",
+    assistantInstanceId = "team360_sales_diagnosis",
+    sessionStorageKey = DEFAULT_SESSION_STORAGE_KEY,
     mailtoHref = "",
     sessionId = $bindable(null),
     messages = $bindable([]),
@@ -32,6 +35,8 @@
     turnDisplayName = $bindable(""),
   }: {
     assistantName?: string;
+    assistantInstanceId?: string;
+    sessionStorageKey?: string;
     mailtoHref?: string;
     sessionId?: string | null;
     messages?: ChatMessage[];
@@ -49,9 +54,9 @@
   const canSend = $derived(inputText.trim().length > 0 && !isLoading);
 
   function restoreSession() {
-    const session = loadPublicVeraSession();
+    const session = loadSession(sessionStorageKey);
     if (session.session_id) {
-      savePublicVeraSession({
+      saveSession(sessionStorageKey, {
         session_id: null,
         initial_language: session.initial_language,
         current_language: session.current_language,
@@ -60,15 +65,15 @@
       });
       sessionId = null;
     }
-    const updated = loadPublicVeraSession();
+    const updated = loadSession(sessionStorageKey);
     if (updated.preferred_response_language) {
       currentLocale = updated.preferred_response_language;
     }
   }
 
   function persistSession(langInfo: TurnLanguage | null | undefined) {
-    const session = loadPublicVeraSession();
-    savePublicVeraSession({
+    const session = loadSession(sessionStorageKey);
+    saveSession(sessionStorageKey, {
       session_id: sessionId,
       initial_language: langInfo?.initial_language || session.initial_language || currentLocale,
       current_language: langInfo?.current_language || currentLocale,
@@ -211,7 +216,7 @@
     inputText = "";
     chatError = "";
     consumedByMsgIdx = {};
-    clearPublicVeraSession();
+    clearSession(sessionStorageKey);
   }
 
   onMount(() => {

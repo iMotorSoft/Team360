@@ -3427,3 +3427,49 @@ configuracion.
 
 Estado:
 FASE 1 CERRADA — RUNTIME Y BROWSERMCP VALIDADOS, CON E2E MOVIL FLAKY DOCUMENTADO
+
+### 2026-06-25 — Fase 2 Configuracion y sesion extraibles
+
+Implementacion:
+- Se creo `config/types.ts` con `DiagnosticadorSessionData` como tipo canonico
+  de sesion desacoplado de Vera.
+- Se creo `config/defaults.ts` con constantes: `DEFAULT_ASSISTANT_NAME`,
+  `DEFAULT_ASSISTANT_INSTANCE_ID`, `DEFAULT_SESSION_STORAGE_KEY`.
+- Se creo `state/session.ts` como modulo de sesion configurable: `loadSession`,
+  `saveSession`, `clearSession`, `mergeSession`, `resetConversationOnPageLoad`.
+  Las funciones reciben `storageKey` como primer parametro, son SSR-safe y
+  preservan el formato de datos historico.
+- `publicVeraSession.ts` se convirtio en wrapper delgado que reexporta desde
+  `state/session.ts` usando `DEFAULT_SESSION_STORAGE_KEY`. La API publica
+  (`loadPublicVeraSession`, `savePublicVeraSession`, etc.) se mantiene identica.
+- `DiagnosticadorCore.svelte` ahora recibe `sessionStorageKey` (prop con default
+  `DEFAULT_SESSION_STORAGE_KEY`) y `assistantInstanceId` (prop con default
+  `"team360_sales_diagnosis"`). El Core ya no conoce una key fija ni importa
+  `publicVeraSession.ts` directamente.
+- `PublicVeraEntry.svelte` como adapter explicita la identidad de Vera:
+  `assistantInstanceId="team360_sales_diagnosis"` y
+  `sessionStorageKey={DEFAULT_SESSION_STORAGE_KEY}`.
+- La key historica `team360.vera.session.v1` queda definida exclusivamente en
+  `config/defaults.ts`. Ningun otro archivo la hardcodea.
+- No se modifico `global.js`, `PUBLIC_DIAGNOSIS_CONTEXT`, `ConsoleDiagnosis`,
+  `lib/t360/diagnosis/`, `lib/t360/interaction/`, backend ni endpoints.
+
+Validacion estatica:
+- `pnpm check`: 0 errors, 0 warnings, 3 hints (preexistentes)
+- `pnpm build`: 139 pages, sin errores
+- `git diff --check`: OK
+
+Playwright (28 tests, servidores externos, `PLAYWRIGHT_SKIP_WEBSERVER=1`):
+- `public-vera.spec.ts`: 12/12 passed (2 skipped pre-existing)
+- `public-vera-new-conversation.spec.ts`: 1/1 passed
+- `public-vera-kommo.spec.ts`, `salesforce.spec.ts`, `email-orders-definitive.spec.ts`: passed
+- `public-vera-adversarial.spec.ts`: 12/12 passed
+- Sesion y nueva conversacion validados con backend real
+- Sin regresiones atribuibles a la Fase 2
+
+Servicios permanentes no operados: PostgreSQL, Milvus, LiteLLM.
+Sin commit, sin push, sin cambios en backend, endpoints, tests ni
+configuracion global.
+
+Estado:
+FASE 2 IMPLEMENTADA Y VALIDADA
