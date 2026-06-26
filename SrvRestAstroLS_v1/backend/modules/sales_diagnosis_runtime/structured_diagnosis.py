@@ -61,6 +61,7 @@ def _build(semantic_memory: dict[str, Any]) -> StructuredDiagnosis:
     channels = mem.get("channels", [])
     systems = mem.get("systems_and_data_sources", [])
     entities = mem.get("entities", [])
+    language = (mem.get("language") or {}).get("preferred_response_language", "es")
     entity_sources = mem.get("entity_sources", {})
     human_approval = mem.get("human_approval", "")
 
@@ -121,6 +122,7 @@ def _build(semantic_memory: dict[str, Any]) -> StructuredDiagnosis:
     next_step = _build_next_step(
         has_closed_software, has_mfa, has_sensitive_decision, has_industrial,
         systems, human_approval, channels,
+        current_process, main_problem, desired_outcome, language,
     )
 
     return StructuredDiagnosis(
@@ -415,21 +417,104 @@ def _build_next_step(
     systems: list[str],
     human_approval: str,
     channels: list[str],
+    current_process: str = "",
+    main_problem: str = "",
+    desired_outcome: str = "",
+    language: str = "es",
 ) -> str:
+    is_es = language == "es"
+    is_en = language == "en"
+    is_he = language == "he"
+
+    # Helper: short multilingual templates
+    def t(es: str, en: str, he: str) -> str:
+        if is_he: return he
+        if is_en: return en
+        return es
+
+    def and_join(items: list[str], lang: str) -> str:
+        if lang == "he":
+            return " ו".join(items)
+        elif lang == "en":
+            return " and ".join(items)
+        return " y ".join(items)
+
+    approval_needed = human_approval in ("required", "conditional")
+
     if has_closed_software:
-        return "validate software integration options (API, data export, RPA, local agent)"
+        return t(
+            "Validar opciones de integración con el software (API, exportación de datos, RPA, agente local).",
+            "Validate software integration options (API, data export, RPA, local agent).",
+            "יש לאמת אפשרויות אינטגרציה עם התוכנה (API, ייצוא נתונים, RPA, סוכן מקומי).",
+        )
     if has_mfa:
-        return "design automation flow around native MFA control with user approval step"
+        return t(
+            "Diseñar el flujo de automatización respetando el control nativo de MFA con paso de aprobación del usuario.",
+            "Design automation flow around native MFA control with user approval step.",
+            "לתכנן את זרימת האוטומציה תוך כיבוד בקרת ה-MFA המקורית עם שלב אישור משתמש.",
+        )
     if has_sensitive_decision:
-        return "define approval thresholds and exception handling rules before automation"
+        return t(
+            "Definir umbrales de aprobación y reglas de excepción antes de automatizar.",
+            "Define approval thresholds and exception handling rules before automation.",
+            "להגדיר רף אישור וכללי חריגה לפני אוטומציה.",
+        )
     if has_industrial:
-        return "evaluate industrial platform compatibility and integration requirements"
+        return t(
+            "Evaluar la compatibilidad con la plataforma industrial y los requisitos de integración.",
+            "Evaluate industrial platform compatibility and integration requirements.",
+            "להעריך תאימות לפלטפורמה תעשייתית ודרישות אינטגרציה.",
+        )
 
-    channel_part = " and ".join(channels) if channels else "inquiry"
-    system_part = " and ".join(systems) if systems else "system"
-    approval_part = " with approval rules" if human_approval in ("required", "conditional") else ""
+    approval_text = (
+        t(" con reglas de aprobación", " with approval rules", " עם כללי אישור")
+        if approval_needed else ""
+    )
 
-    return f"validate {system_part} access, then design the {channel_part} response flow{approval_part}"
+    if systems:
+        system_names = and_join(systems, language)
+        if channels:
+            channel_names = and_join(channels, language)
+            return t(
+                f"Validar el acceso a {system_names} y definir el flujo de {channel_names}{approval_text}.",
+                f"Validate access to {system_names} and define the {channel_names} flow{approval_text}.",
+                f"לוודא גישה ל{system_names} ולהגדיר את זרימת ה{channel_names}{approval_text}.",
+            )
+        return t(
+            f"Validar el acceso a {system_names} y definir las reglas de comparación{approval_text}.",
+            f"Validate access to {system_names} and define comparison rules{approval_text}.",
+            f"לוודא גישה ל{system_names} ולהגדיר את כללי ההשוואה{approval_text}.",
+        )
+
+    if channels:
+        channel_names = and_join(channels, language)
+        return t(
+            f"Validar el acceso a los datos necesarios y definir el flujo de {channel_names}{approval_text}.",
+            f"Validate access to the required data and define the {channel_names} flow{approval_text}.",
+            f"לוודא גישה לנתונים הדרושים ולהגדיר את זרימת ה{channel_names}{approval_text}.",
+        )
+
+    # Fallback: use process/problem/outcome text to identify domain entities
+    context_text = (desired_outcome or main_problem or current_process or "").strip()
+    if context_text:
+        words = context_text.split()
+        skip_words = {"tengo", "quiero", "necesito", "el", "la", "los", "las", "de", "del",
+                      "en", "un", "una", "y", "que", "con", "para", "por", "es", "son",
+                      "a", "o", "su", "sus", "se", "no", "lo", "como", "cómo"}
+        key_terms = [w for w in words if w.lower() not in skip_words and len(w) > 2]
+        if key_terms:
+            topic = " ".join(key_terms[:6])
+            if is_he:
+                return f"לוודא כיצד מתקבלים הנתונים ({topic}) ולהגדיר כללים לאיתור ובדיקת פערים{approval_text}."
+            if is_en:
+                return f"Validate how data is obtained ({topic}) and define rules for detecting and reviewing discrepancies{approval_text}."
+            return f"Validar cómo se obtienen los datos ({topic}) y definir las reglas para detectar y revisar diferencias{approval_text}."
+
+    return t(
+        f"Validar el acceso a los sistemas y fuentes de datos involucrados y definir cómo se detectan y revisan las diferencias{approval_text}.",
+        f"Validate access to the relevant systems and data sources, then define how discrepancies are detected and reviewed{approval_text}.",
+        f"לוודא גישה למערכות ומקורות הנתונים הרלוונטיים ולהגדיר כיצד מתגלים ונבדקים הפערים{approval_text}.",
+    )
 
 
 # ---------------------------------------------------------------------------

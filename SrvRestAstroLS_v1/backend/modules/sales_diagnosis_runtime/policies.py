@@ -268,19 +268,37 @@ class PromptPolicy:
         status = mem.get("diagnosis_status", "gathering")
         is_diagnose = status in ("requested", "sufficient", "completed")
         sd = mem.get("last_structured_diagnosis")
+        continuation_active = mem.get("_continuation_active", False)
         if is_diagnose and sd:
             parts.append("")
             parts.append(format_structured_diagnosis_for_prompt(sd))
-            parts.append(
-                "\nInstrucciones para esta respuesta (ACCIÓN: DIAGNÓSTICO ESTRUCTURADO):\n"
-                "- NO hagas preguntas. El diagnóstico ya fue estructurado internamente.\n"
-                "- Usá el diagnóstico estructurado como fuente de verdad.\n"
-                "- No agregues hechos, canales, sistemas o garantías que no estén en el diagnóstico.\n"
-                "- Distinguí claramente entre HECHOS CONFIRMADOS, SUPUESTOS y PUNTOS A VALIDAR.\n"
-                "- Redactá en lenguaje natural como una orientación para el usuario.\n"
-                "- No preguntes nada nuevo.\n"
-                f"- {LANGUAGE_INSTRUCTIONS.get(response_lang, f'Respond only in {response_lang}.')}"
-            )
+            if continuation_active and status == "completed":
+                options = mem.get("_continuation_options", [])
+                opts_text = ""
+                for opt in options:
+                    opts_text += f"\n- {opt['label']}"
+                parts.append(
+                    "\nInstrucciones para esta respuesta (ACCIÓN: POST-DIAGNÓSTICO - CONTINUACIÓN):\n"
+                    "- El diagnóstico ya fue completado. El usuario quiere seguir explorando.\n"
+                    "- Usá el diagnóstico estructurado como fuente de verdad.\n"
+                    "- Hacé UNA pregunta concreta sobre el próximo paso que le interesa al usuario.\n"
+                    "- Ofrece opciones claras y numeradas para que el usuario pueda elegir.\n"
+                    "- No repetir el diagnóstico completo.\n"
+                    "- No preguntes sobre hechos ya confirmados (SAP, bancos, revisión manual, etc.).\n"
+                    "- Sé específico y conciso.\n"
+                    f"- {LANGUAGE_INSTRUCTIONS.get(response_lang, f'Respond only in {response_lang}.')}"
+                )
+            else:
+                parts.append(
+                    "\nInstrucciones para esta respuesta (ACCIÓN: DIAGNÓSTICO ESTRUCTURADO):\n"
+                    "- NO hagas preguntas. El diagnóstico ya fue estructurado internamente.\n"
+                    "- Usá el diagnóstico estructurado como fuente de verdad.\n"
+                    "- No agregues hechos, canales, sistemas o garantías que no estén en el diagnóstico.\n"
+                    "- Distinguí claramente entre HECHOS CONFIRMADOS, SUPUESTOS y PUNTOS A VALIDAR.\n"
+                    "- Redactá en lenguaje natural como una orientación para el usuario.\n"
+                    "- No preguntes nada nuevo.\n"
+                    f"- {LANGUAGE_INSTRUCTIONS.get(response_lang, f'Respond only in {response_lang}.')}"
+                )
         elif is_diagnose:
             parts.append(
                 "\nInstrucciones para esta respuesta (ACCIÓN: DIAGNÓSTICO):\n"

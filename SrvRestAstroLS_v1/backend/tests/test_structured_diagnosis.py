@@ -19,6 +19,7 @@ from modules.sales_diagnosis_runtime import (
     StructuredDiagnosis,
 )
 from modules.sales_diagnosis_runtime.structured_diagnosis import (
+    _build_next_step,
     _determine_automation_mode,
     _determine_availability,
     _determine_confidence,
@@ -782,3 +783,153 @@ class TestTurnDecisionFlag:
         ))
         td = output.turn_decision or {}
         assert td.get("diagnosis_built") is False
+
+
+# ===================================================================
+# 5. Next step builder (Spanish, contextual)
+# ===================================================================
+
+
+class TestNextStepBuilder:
+    def test_uses_systems_when_available(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=["SAP", "bancos"], human_approval="",
+            channels=[], main_problem="conciliar movimientos",
+        )
+        assert "SAP" in result
+        assert "bancos" in result
+        assert "system" not in result.lower().split("system")[1:] if "system" in result.lower() else True
+
+    def test_uses_channels_when_available(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=[], human_approval="required",
+            channels=["whatsapp", "email"],
+        )
+        assert "whatsapp" in result or "WhatsApp" in result
+
+    def test_extracts_entities_from_context_when_no_systems(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=[], human_approval="",
+            channels=[], desired_outcome="detectar diferencias en SAP y bancos",
+        )
+        assert "SAP" in result or "bancos" in result or "diferencias" in result
+
+    def test_no_internal_labels(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=[], human_approval="",
+            channels=[], current_process="conciliar datos financieros",
+        )
+        assert "system" not in result.lower().split()
+        assert "inquiry" not in result.lower().split()
+
+    def test_spanish_output(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=["SAP"], human_approval="conditional",
+            channels=[], desired_outcome="detectar diferencias",
+        )
+        # Check Spanish keywords
+        assert any(word in result for word in ["Validar", "acceso", "definir", "reglas", "los"])
+
+    def test_approval_part_appears_when_required(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=["SAP"], human_approval="required",
+            channels=[],
+        )
+        assert "aprobación" in result
+
+    def test_no_approval_part_when_not_required(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=["SAP"], human_approval="",
+            channels=[],
+        )
+        assert "aprobación" not in result
+
+    def test_closed_software_branch(self):
+        result = _build_next_step(
+            has_closed_software=True, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=[], human_approval="",
+            channels=[],
+        )
+        assert len(result) > 10
+
+    def test_sensitive_decision_branch(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=True, has_industrial=False,
+            systems=[], human_approval="conditional",
+            channels=[],
+        )
+        assert len(result) > 10
+
+    # Multilingual _build_next_step tests
+    def test_english_next_step_with_systems(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=["SAP", "banks"], human_approval="conditional",
+            channels=[], language="en",
+        )
+        assert "SAP" in result
+        assert "banks" in result
+        assert "approval" in result
+        assert "validate" in result.lower()
+
+    def test_hebrew_next_step_with_systems(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=["SAP"], human_approval="",
+            channels=[], language="he",
+        )
+        assert "SAP" in result
+        assert "לוודא" in result
+
+    def test_english_fallback_with_context(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=[], human_approval="",
+            channels=[], desired_outcome="find discrepancies in SAP",
+            language="en",
+        )
+        assert "SAP" in result or "discrepancies" in result
+        assert "system" not in result.lower().split()
+        assert "inquiry" not in result.lower().split()
+
+    def test_hebrew_fallback_no_systems(self):
+        result = _build_next_step(
+            has_closed_software=False, has_mfa=False,
+            has_sensitive_decision=False, has_industrial=False,
+            systems=[], human_approval="required",
+            channels=[], language="he",
+        )
+        assert "אישור" in result or "כללי" in result
+        assert len(result) > 10
+
+    def test_next_step_no_internal_labels_any_language(self):
+        for lang in ("es", "en", "he"):
+            result = _build_next_step(
+                has_closed_software=False, has_mfa=False,
+                has_sensitive_decision=False, has_industrial=False,
+                systems=[], human_approval="",
+                channels=[],
+                current_process="conciliar datos financieros",
+                language=lang,
+            )
+            assert "system" not in result.lower().split()
+            assert "inquiry" not in result.lower().split()

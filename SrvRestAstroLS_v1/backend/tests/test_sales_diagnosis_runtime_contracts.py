@@ -1074,3 +1074,370 @@ class TestNewDataAndDiagnosisRequest:
         assert not has_volume_question, (
             "Response should not ask for volume again after user provided it"
         )
+
+
+# ===================================================================
+# 8. Post-diagnosis continuation
+# ===================================================================
+
+
+class TestPostDiagnosisContinuation:
+    def test_continuation_activated_when_diagnosis_completes(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-on",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=5,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "conciliar movimientos bancarios",
+                "channels": ["email"],
+                "systems_and_data_sources": ["SAP", "bancos"],
+                "human_approval": "conditional",
+            },
+        ))
+        llm = RecordingLLMProvider("Diagnóstico preliminar. Punto a validar: SAP y bancos.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-on",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="dame una orientación inicial",
+        ))
+        mem = output.next_state.semantic_memory
+        assert mem.get("_continuation_active") is True
+        assert "_continuation_options" in mem
+        assert len(mem["_continuation_options"]) >= 2
+
+    def test_continuation_options_have_knowledge_topics(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-options",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=5,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "conciliar movimientos bancarios",
+                "channels": [],
+                "systems_and_data_sources": [],
+                "human_approval": "",
+            },
+        ))
+        llm = RecordingLLMProvider("Diagnóstico listo.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-options",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="dame una orientación inicial",
+        ))
+        mem = output.next_state.semantic_memory
+        assert "_continuation_options" in mem
+        options = mem["_continuation_options"]
+        # Must have knowledge topics (difference_types, operational_flow, etc.)
+        assert any("difference" in o.get("id", "").lower() or "diferencia" in o.get("id", "").lower()
+                   for o in options)
+
+    def test_number_resolves_option(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-num",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=6,
+            semantic_memory={
+                "diagnosis_status": "completed",
+                "_continuation_active": True,
+                "_continuation_options": [
+                    {"id": "difference_types", "label": "Tipos de diferencias", "topic": "difference_types"},
+                    {"id": "operational_flow", "label": "Flujo operativo", "topic": "operational_flow"},
+                ],
+                "current_process": "conciliar movimientos",
+                "channels": [],
+                "systems_and_data_sources": [],
+                "human_approval": "",
+            },
+        ))
+        llm = RecordingLLMProvider("Te explico los tipos de diferencias.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-num",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="1",
+        ))
+        mem = output.next_state.semantic_memory
+        assert mem.get("_continuation_chosen_label") == "Tipos de diferencias"
+        assert mem.get("_continuation_active") is True
+
+    def test_text_resolves_option(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-text",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=6,
+            semantic_memory={
+                "diagnosis_status": "completed",
+                "_continuation_active": True,
+                "_continuation_options": [
+                    {"id": "difference_types", "label": "Tipos de diferencias", "topic": "difference_types"},
+                    {"id": "operational_flow", "label": "Flujo operativo", "topic": "operational_flow"},
+                ],
+                "current_process": "conciliar movimientos",
+                "channels": [],
+                "systems_and_data_sources": [],
+                "human_approval": "",
+            },
+        ))
+        llm = RecordingLLMProvider("Te explico el flujo operativo.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-text",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="Flujo operativo",
+        ))
+        mem = output.next_state.semantic_memory
+        assert mem.get("_continuation_chosen_label") == "Flujo operativo"
+        assert mem.get("_continuation_active") is True
+
+    def test_normal_message_does_not_activate_continuation_if_not_completed(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-no-act",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=3,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "consultas por whatsapp",
+                "channels": ["whatsapp"],
+                "systems_and_data_sources": ["sistema"],
+                "human_approval": "",
+            },
+        ))
+        llm = RecordingLLMProvider("Cuéntame más.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-no-act",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="seguir conversando",
+        ))
+        mem = output.next_state.semantic_memory
+        assert mem.get("_continuation_active") is not True
+
+    def test_continuation_preserves_last_structured_diagnosis(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-preserve",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=5,
+            semantic_memory={
+                "diagnosis_status": "gathering",
+                "current_process": "conciliar movimientos",
+                "channels": ["email"],
+                "systems_and_data_sources": ["SAP"],
+                "human_approval": "conditional",
+            },
+        ))
+        llm = RecordingLLMProvider("Diagnóstico completo. Punto a validar: regla exacta.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-preserve",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="dame una orientación inicial",
+        ))
+        mem = output.next_state.semantic_memory
+        assert "last_structured_diagnosis" in mem
+
+    def test_continuation_preserves_language_after_one(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-lang",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=6,
+            semantic_memory={
+                "diagnosis_status": "completed",
+                "_continuation_active": True,
+                "_continuation_options": [
+                    {"id": "difference_types", "label": "Tipos de diferencias",
+                     "topic": "difference_types"},
+                    {"id": "operational_flow", "label": "Flujo operativo",
+                     "topic": "operational_flow"},
+                ],
+                "current_process": "conciliar movimientos",
+                "channels": [],
+                "systems_and_data_sources": [],
+                "human_approval": "",
+                "language": {
+                    "initial_language": "en",
+                    "current_language": "en",
+                    "preferred_response_language": "en",
+                    "explicit_language_preference": False,
+                },
+            },
+        ))
+        llm = RecordingLLMProvider("I'll explain the types of discrepancies.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-lang",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="1",
+        ))
+        mem = output.next_state.semantic_memory
+        lang = mem.get("language", {})
+        assert lang.get("preferred_response_language") == "en"
+        assert mem.get("_continuation_chosen_label") == "Tipos de diferencias"
+
+    def test_continuation_en_text_resolves(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-en",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=6,
+            semantic_memory={
+                "diagnosis_status": "completed",
+                "_continuation_active": True,
+                "_continuation_options": [
+                    {"id": "difference_types", "label": "Types of discrepancies",
+                     "topic": "difference_types"},
+                    {"id": "operational_flow", "label": "Operational workflow",
+                     "topic": "operational_flow"},
+                ],
+                "current_process": "reconcile bank transactions",
+                "channels": [],
+                "systems_and_data_sources": [],
+                "human_approval": "",
+                "language": {
+                    "initial_language": "en",
+                    "current_language": "en",
+                    "preferred_response_language": "en",
+                    "explicit_language_preference": False,
+                },
+            },
+        ))
+        llm = RecordingLLMProvider("I'll explain the types of discrepancies.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-en",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="Types of discrepancies",
+        ))
+        mem = output.next_state.semantic_memory
+        assert mem.get("_continuation_chosen_label") == "Types of discrepancies"
+
+    def test_continuation_he_text_resolves(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-he",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=6,
+            semantic_memory={
+                "diagnosis_status": "completed",
+                "_continuation_active": True,
+                "_continuation_options": [
+                    {"id": "difference_types", "label": "סוגי פערים",
+                     "topic": "difference_types"},
+                    {"id": "operational_flow", "label": "תהליך תפעולי",
+                     "topic": "operational_flow"},
+                ],
+                "current_process": "reconcile bank transactions",
+                "channels": [],
+                "systems_and_data_sources": [],
+                "human_approval": "",
+            },
+        ))
+        llm = RecordingLLMProvider("אסביר את סוגי הפערים.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-he",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="סוגי פערים",
+        ))
+        mem = output.next_state.semantic_memory
+        assert mem.get("_continuation_chosen_label") == "סוגי פערים"
+
+    def test_continuation_number_second_option(self):
+        repo = InMemoryStateRepository()
+        repo.save(ConversationState(
+            session_id="cont-2",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            turn_count=6,
+            semantic_memory={
+                "diagnosis_status": "completed",
+                "_continuation_active": True,
+                "_continuation_options": [
+                    {"id": "difference_types", "label": "Tipos de diferencias",
+                     "topic": "difference_types"},
+                    {"id": "operational_flow", "label": "Flujo operativo",
+                     "topic": "operational_flow"},
+                ],
+                "current_process": "conciliar movimientos",
+                "channels": [],
+                "systems_and_data_sources": [],
+                "human_approval": "",
+            },
+        ))
+        llm = RecordingLLMProvider("Te explico el flujo operativo.")
+        runtime = AssistantConversationRuntime(
+            state_repository=repo, llm_provider=llm
+        )
+        output = runtime.handle_turn(AssistantTurnInput(
+            session_id="cont-2",
+            assistant_instance_code="team360_sales_diagnosis",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_test",
+            user_message="segunda",
+        ))
+        mem = output.next_state.semantic_memory
+        assert mem.get("_continuation_chosen_label") == "Flujo operativo"

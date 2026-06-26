@@ -254,8 +254,8 @@ class AssistantConversationRuntime:
             state.semantic_memory["last_structured_diagnosis"] = structured_diagnosis
             diagnosis_built = True
         else:
-            state.semantic_memory.pop("last_structured_diagnosis", None)
-            structured_diagnosis = None
+            # Preserve last_structured_diagnosis so post-diagnosis turns can use it.
+            structured_diagnosis = state.semantic_memory.get("last_structured_diagnosis", None)
             diagnosis_built = False
 
         # 6. Build retrieval query from UPDATED semantic memory
@@ -317,6 +317,17 @@ class AssistantConversationRuntime:
 
         if should_diagnose and state.semantic_memory.get("diagnosis_status") != "completed":
             state.semantic_memory["diagnosis_status"] = "completed"
+            # Activate continuation when diagnosis completes: user can explore next steps.
+            mem = state.semantic_memory
+            if not mem.get("_continuation_active"):
+                mem["_continuation_active"] = True
+                sd = mem.get("last_structured_diagnosis", {}) or {}
+                mem["_continuation_topic"] = "next_steps"
+                lang = (mem.get("language") or {}).get("preferred_response_language", "es")
+                mem["_continuation_options"] = self._build_continuation_options(lang)
+
+        # Resolve post-diagnosis continuation choices (e.g., "1" or "Tipo de diferencias")
+        self._resolve_post_diagnosis_continuation(state, input)
 
         # Build interaction_block: single_choice > multi_choice > pause/choice > missing_requirements > cards
         interaction_block = self._build_single_choice_block(state)
@@ -600,6 +611,82 @@ class AssistantConversationRuntime:
                 state.slots["automation_goals"] = matched_values
                 state.slots["automation_goals_labels"] = labels
                 state.slots["automation_goals_choice_status"] = "answered"
+                return
+
+    @staticmethod
+    def _build_continuation_options(lang: str) -> list[dict[str, str]]:
+        lang_map = {
+            "es": [
+                {"id": "difference_types", "topic": "difference_types",
+                 "label": "Tipos de diferencias"},
+                {"id": "operational_flow", "topic": "operational_flow",
+                 "label": "Flujo operativo"},
+            ],
+            "en": [
+                {"id": "difference_types", "topic": "difference_types",
+                 "label": "Types of discrepancies"},
+                {"id": "operational_flow", "topic": "operational_flow",
+                 "label": "Operational workflow"},
+            ],
+            "he": [
+                {"id": "difference_types", "topic": "difference_types",
+                 "label": "סוגי פערים"},
+                {"id": "operational_flow", "topic": "operational_flow",
+                 "label": "תהליך תפעולי"},
+            ],
+        }
+        return lang_map.get(lang, lang_map["es"])
+
+    @staticmethod
+    def _resolve_post_diagnosis_continuation(state: ConversationState, input: AssistantTurnInput) -> None:
+        mem = state.semantic_memory or {}
+        if not mem.get("_continuation_active"):
+            return
+        chosen_topic = mem.get("_continuation_topic", "")
+        if chosen_topic not in ("next_steps", ""):
+            return
+        options = mem.get("_continuation_options", [])
+        if not options:
+            return
+        msg = input.user_message.strip().lower()
+        if not msg:
+            return
+        msg_clean = msg.rstrip(".,;!?").strip()
+        # Multilingual prefix stripping
+        for prefix in ["opción ", "opcion ", "option ", "אפשרות "]:
+            if msg_clean.startswith(prefix):
+                msg_clean = msg_clean[len(prefix):].strip()
+                break
+        # Multilingual "first option" matching
+        first_keywords = {"1", "primera", "la primera", "primera opción", "primera opcion",
+                          "first", "the first", "first option",
+                          "ראשונה", "הראשונה", "אפשרות ראשונה"}
+        second_keywords = {"2", "segunda", "la segunda", "segunda opción", "segunda opcion",
+                           "second", "the second", "second option",
+                           "שנייה", "השנייה", "אפשרות שנייה"}
+        if msg_clean in first_keywords:
+            chosen = options[0]
+            mem["_continuation_topic"] = chosen["topic"]
+            mem["_continuation_chosen_label"] = chosen["label"]
+            del mem["_continuation_options"]
+            state.semantic_memory = mem
+            return
+        if len(options) > 1 and msg_clean in second_keywords:
+            chosen = options[1]
+            mem["_continuation_topic"] = chosen["topic"]
+            mem["_continuation_chosen_label"] = chosen["label"]
+            del mem["_continuation_options"]
+            state.semantic_memory = mem
+            return
+        # Match by text content against option labels
+        for opt in options:
+            opt_lower = opt["label"].lower()
+            opt_id = opt["id"].lower()
+            if opt_id in msg or any(word in msg for word in opt_lower.split() if len(word) > 3):
+                mem["_continuation_topic"] = opt["topic"]
+                mem["_continuation_chosen_label"] = opt["label"]
+                del mem["_continuation_options"]
+                state.semantic_memory = mem
                 return
 
     @staticmethod
