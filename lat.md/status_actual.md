@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-25 (Cierre documental Fase 1 DiagnosticadorCore)
+Ultima actualizacion: 2026-06-26 (Politica Playwright MCP Server)
 
 ## Estado general
 
@@ -11,6 +11,17 @@ Ultima actualizacion: 2026-06-25 (Cierre documental Fase 1 DiagnosticadorCore)
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-26 - Politica Playwright MCP Server
+
+- Se documento `playwright-mcp-server-policy.md` como herramienta oficial de
+  exploracion visual y reproduccion interactiva asistida.
+- Endpoint local documentado: `http://localhost:8931/mcp`.
+- Playwright CLI continua siendo el gate E2E oficial para cierre reproducible.
+- Se enlazo la politica desde `lat.md/lat.md`, `AGENTS.md` y
+  `.agents/skills/team360-project/SKILL.md`.
+- No se modifico codigo productivo, backend, frontend, tests ni configuracion
+  productiva.
 
 ### 2026-06-25 - Contexto componentes Diagnosticador embeddable
 

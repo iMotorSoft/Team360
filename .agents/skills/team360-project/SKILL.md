@@ -144,25 +144,26 @@ Reglas de uso:
 6. Cuando el usuario escriba `contexto componentes`, leer `lat.md/diagnosticador-embeddable-component-architecture.md` antes de analizar o modificar componentes, paquetes, estilos, interaction blocks, adapters, tests E2E o estructura frontend del Diagnosticador embebible.
 7. Para conectividad frontend/backend de `/t360`, `SrvRestAstroLS_v1/astro/src/components/global.js` es la unica fuente de verdad: en desarrollo local y Browser MCP debe usarse `IS_REST_PRO=false` con `URL_REST_DEV=http://localhost:7050`; no corregir rutas tocando `astro.config.mjs`, API clients, componentes Svelte ni URLs hardcodeadas salvo instruccion explicita.
 8. Para validaciones de navegador, Playwright + Chromium es el gate E2E oficial; Browser MCP / `opencode-browser` es exploratorio y de diagnostico visual, no reemplaza Playwright para cerrar fases, regresiones o produccion. Ver `lat.md/browser-mcp-validation-policy.md`.
-9. Para tests locales de paginas/componentes/E2E reales, leer `lat.md/browser-mcp-validation-policy.md`: levantar/bajar backend y Astro solo con `SrvRestAstroLS_v1/backend-dev.sh` y `SrvRestAstroLS_v1/astro-dev.sh`; Playwright debe automatizar navegador con `PLAYWRIGHT_SKIP_WEBSERVER=1`, no levantar su `webServer` automatico ni usar proxy/puertos paralelos salvo justificacion explicita.
-10. Para validaciones Browser MCP / `opencode-browser`, seguir `lat.md/browser-mcp-validation-policy.md`: antes de navegar deben responder backend `127.0.0.1:7050` y Astro `127.0.0.1:3050`; el agente puede bajar/subir esos dos servidores locales si hace falta; si Browser MCP falla, detener la prueba y avisar, sin reemplazarla por terminal, `curl`, Playwright, HTML o lectura de codigo salvo autorizacion explicita.
-11. Para despliegue frontend Astro de `team360.live` por `rsync`, seguir `lat.md/team360-frontend-rsync-deploy-policy.md`: verificar `IS_REST_PRO=true`, build limpio, fix en source y `dist`, backup remoto, dry-run revisado, rsync real, assets local=produccion y Playwright productivo antes de declarar PASS.
-12. Para despliegue backend de Team360 por `rsync`, seguir `lat.md/team360-backend-rsync-deploy-policy.md`: validar rama/HEAD, tests backend, exclusiones `.env*`/`.venv`, backup remoto, dry-run revisado, rsync real, preservar sensibles, no reiniciar automaticamente, esperar reinicio manual en `tmux`, health y smoke modelo real sin fallback antes de aprobar.
-13. Para diagramas tecnicos, seguir `lat.md/team360-mermaid-diagram-policy.md`: Mermaid es la fuente canonica versionable; renders SVG/PNG/Excalidraw son derivados opcionales; no hay instalacion global obligatoria ni se adopta el skill gstack `/diagram` completo.
-14. Para bugs no triviales, especialmente cuando la prueba manual falla aunque los tests pasen, seguir `lat.md/team360-root-cause-debugging-policy.md`: reproducir, nombrar hipotesis de causa raiz, confirmar evidencia, aplicar fix minimo y agregar regresion backend/Playwright cuando corresponda.
-15. Para QA browser dirigido con DeepSeek V4 Flash en OpenCode + `opencode-browser`, seguir `lat.md/deepseek-v4-flash-opencode-browser.md`: usar `browsermcp_*`, snapshots antes/despues, fase browser atomica, no reemplazar navegador con terminal y detenerse tras la evidencia pedida.
-16. Mantener compatibilidad con ejecución tipo:
+9. Para validaciones visuales y reproduccion interactiva con Playwright MCP Server, leer primero `lat.md/playwright-mcp-server-policy.md`.
+10. Para tests locales de paginas/componentes/E2E reales, leer `lat.md/browser-mcp-validation-policy.md`: levantar/bajar backend y Astro solo con `SrvRestAstroLS_v1/backend-dev.sh` y `SrvRestAstroLS_v1/astro-dev.sh`; Playwright debe automatizar navegador con `PLAYWRIGHT_SKIP_WEBSERVER=1`, no levantar su `webServer` automatico ni usar proxy/puertos paralelos salvo justificacion explicita.
+11. Para validaciones Browser MCP / `opencode-browser`, seguir `lat.md/browser-mcp-validation-policy.md`: antes de navegar deben responder backend `127.0.0.1:7050` y Astro `127.0.0.1:3050`; el agente puede bajar/subir esos dos servidores locales si hace falta; si Browser MCP falla, detener la prueba y avisar, sin reemplazarla por terminal, `curl`, Playwright, HTML o lectura de codigo salvo autorizacion explicita.
+12. Para despliegue frontend Astro de `team360.live` por `rsync`, seguir `lat.md/team360-frontend-rsync-deploy-policy.md`: verificar `IS_REST_PRO=true`, build limpio, fix en source y `dist`, backup remoto, dry-run revisado, rsync real, assets local=produccion y Playwright productivo antes de declarar PASS.
+13. Para despliegue backend de Team360 por `rsync`, seguir `lat.md/team360-backend-rsync-deploy-policy.md`: validar rama/HEAD, tests backend, exclusiones `.env*`/`.venv`, backup remoto, dry-run revisado, rsync real, preservar sensibles, no reiniciar automaticamente, esperar reinicio manual en `tmux`, health y smoke modelo real sin fallback antes de aprobar.
+14. Para diagramas tecnicos, seguir `lat.md/team360-mermaid-diagram-policy.md`: Mermaid es la fuente canonica versionable; renders SVG/PNG/Excalidraw son derivados opcionales; no hay instalacion global obligatoria ni se adopta el skill gstack `/diagram` completo.
+15. Para bugs no triviales, especialmente cuando la prueba manual falla aunque los tests pasen, seguir `lat.md/team360-root-cause-debugging-policy.md`: reproducir, nombrar hipotesis de causa raiz, confirmar evidencia, aplicar fix minimo y agregar regresion backend/Playwright cuando corresponda.
+16. Para QA browser dirigido con DeepSeek V4 Flash en OpenCode + `opencode-browser`, seguir `lat.md/deepseek-v4-flash-opencode-browser.md`: usar `browsermcp_*`, snapshots antes/despues, fase browser atomica, no reemplazar navegador con terminal y detenerse tras la evidencia pedida.
+17. Mantener compatibilidad con ejecución tipo:
    - `python -m modules.messaging.providers.mercadolibre.probes.smoke_login`
    - `python -m modules.messaging.providers.mercadolibre.probes.smoke_inbox`
-17. No hacer scraping complejo en fases de smoke/probe.
-18. Si la validación requiere intervención humana, dejarlo explícito.
-19. No instalar dependencias ni ejecutar comandos destructivos salvo pedido explícito.
-20. Respetar la estrategia de environment parity del backend con Vertice360, más extras necesarios como Playwright.
-21. Antes de crear acceso DB runtime, usar `psycopg 3 async` directo como estándar (ver `lat.md/postgres-driver-policy.md`).
-22. No introducir SQLAlchemy/SQLModel/asyncpg como dependencia base sin decisión explícita documentada en `lat.md/postgres-driver-policy.md`.
-23. Mantener SQL en repositories; no escribir SQL en endpoints ni rutas.
-24. No mezclar pools de conexión: Team360 usa `psycopg_pool.AsyncConnectionPool` para `public.*`; LangGraph PostgresSaver usa su pool interno para `langgraph.*`.
-25. Antes de desarrollo, test, smoke, benchmark o prueba que dependa de servicios reales, ejecutar preflight obligatorio (ver `lat.md/service-preflight-methodology.md`):
+18. No hacer scraping complejo en fases de smoke/probe.
+19. Si la validación requiere intervención humana, dejarlo explícito.
+20. No instalar dependencias ni ejecutar comandos destructivos salvo pedido explícito.
+21. Respetar la estrategia de environment parity del backend con Vertice360, más extras necesarios como Playwright.
+22. Antes de crear acceso DB runtime, usar `psycopg 3 async` directo como estándar (ver `lat.md/postgres-driver-policy.md`).
+23. No introducir SQLAlchemy/SQLModel/asyncpg como dependencia base sin decisión explícita documentada en `lat.md/postgres-driver-policy.md`.
+24. Mantener SQL en repositories; no escribir SQL en endpoints ni rutas.
+25. No mezclar pools de conexión: Team360 usa `psycopg_pool.AsyncConnectionPool` para `public.*`; LangGraph PostgresSaver usa su pool interno para `langgraph.*`.
+26. Antes de desarrollo, test, smoke, benchmark o prueba que dependa de servicios reales, ejecutar preflight obligatorio (ver `lat.md/service-preflight-methodology.md`):
    - PostgreSQL activo.
    - Milvus activo y collection correcta.
    - LiteLLM activo.
