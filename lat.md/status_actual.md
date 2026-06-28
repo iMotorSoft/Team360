@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-26 (Politica Playwright MCP Server)
+Ultima actualizacion: 2026-06-28 (publicDiagnosisContext configurable en DiagnosticadorCore)
 
 ## Estado general
 
@@ -11,6 +11,64 @@ Ultima actualizacion: 2026-06-26 (Politica Playwright MCP Server)
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-06-28 — publicDiagnosisContext configurable en DiagnosticadorCore (Fase 5)
+
+El Core acepta un contexto publico configurable sin alterar el payload historico de Vera.
+
+- Se definio `PublicDiagnosisContext` interface en `config/types.ts`.
+- Se exporto `DEFAULT_PUBLIC_DIAGNOSIS_CONTEXT` en `config/defaults.ts`
+  como re-export de la constante canonica `PUBLIC_DIAGNOSIS_CONTEXT`.
+- `sendPublicTurn` acepta `options.publicDiagnosisContext`; cuando se
+  provee, mergea los campos al body HTTP (`{ ...ctx, ...request }`).
+  Vera (sin contexto) mantiene payload identico.
+- `DiagnosticadorCore` agrega prop `publicDiagnosisContext` con default
+  compatible; lo pasa a `sendPublicTurn`.
+- `DiagnosticadorEmbedLab` pasa `publicDiagnosisContext` explicitamente.
+- Test E2E actualizado: intercepta request y verifica que el body incluya
+  `assistant_instance_code`, `package_code`, `knowledge_scope_code`.
+- Frozen files intactos: `t360.astro`, `PublicVeraEntry.svelte`, `global.js`.
+- Validacion: `pnpm check` 0 errors, `pnpm build` 140 pages, Playwright
+  14/14 pass (lab + Vera + new-conversation). Sin regresiones.
+- Estado: FASE 5 — PUBLIC_DIAGNOSIS_CONTEXT CONFIGURABLE — IMPLEMENTADA Y VALIDADA.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
+
+### 2026-06-28 — apiBaseUrl configurable en DiagnosticadorCore (Fase 4)
+
+El Core permite definir la URL base de la API manteniendo `global.js` como default compatible.
+
+- `sendPublicTurn` en `publicDiagnosis.ts` acepta ahora `options.apiBaseUrl`
+  opcional; default es `API_BASE_URL` de `global.js` (compatible hacia atras).
+- `DiagnosticadorCore.svelte` agrega prop `apiBaseUrl` (default: `API_BASE_URL`);
+  la pasa a `sendPublicTurn` como options.
+- `DiagnosticadorEmbedLab.svelte` pasa `apiBaseUrl={API_BASE_URL}` explicitamente,
+  validando override sin tocar `global.js`.
+- Test E2E actualizado: intercepta request del lab y verifica URL target
+  `http://localhost:7050/api/diagnosis/turn`.
+- Frozen files intactos: `t360.astro`, `PublicVeraEntry.svelte`, `global.js`.
+- Validacion: `pnpm check` 0 errors, `pnpm build` 140 pages, Playwright
+  14/14 pass (lab + Vera + new-conversation). Sin regresiones.
+- Estado: FASE 4 — API_BASE_URL CONFIGURABLE — IMPLEMENTADA Y VALIDADA.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
+
+### 2026-06-28 - Lab embebible DiagnosticadorCore fuera de /t360
+
+El laboratorio valida que el DiagnosticadorCore pueda montarse fuera de Vera con sesion aislada.
+
+- Se creo `DiagnosticadorEmbedLab.svelte` en `src/lib/t360/diagnosticador/`
+  como adapter de laboratorio que monta `DiagnosticadorCore` con configuracion
+  propia (session key aislada `team360.diagnosticador.lab.session.v1`,
+  sin mailto, sin copy comercial).
+- Se creo pagina `/t360-diagnosticador-lab` en `src/pages/` usando `BaseLayout`.
+- Se creo test E2E `diagnosticador-embed-lab.spec.ts` que valida: carga del lab,
+  envio de mensaje real contra backend, key de sessionStorage aislada, no
+  colision con key de Vera, Vera preservada en su pestana original.
+- `t360.astro` no fue modificado. `PublicVeraEntry` no fue modificado.
+- No se creo workspace, package, Web Component ni iframe.
+- Validacion: `pnpm check` 0 errors, `pnpm build` 140 pages, Playwright
+  13/13 + 1/1 lab pass. Sin regresiones en `/t360`.
+- Estado: LAB EMBEBIBLE IMPLEMENTADO Y VALIDADO.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
 
 ### 2026-06-26 - Politica Playwright MCP Server
 

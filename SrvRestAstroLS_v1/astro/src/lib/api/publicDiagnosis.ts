@@ -127,12 +127,17 @@ export type StructuredDiagnosis = {
     | "not_recommended";
 };
 
-export async function sendPublicTurn(request: TurnRequest): Promise<TurnResponse> {
-  const url = `${API_BASE_URL}/diagnosis/turn`;
+import type { PublicDiagnosisContext } from "../t360/diagnosticador/config/types";
+
+export async function sendPublicTurn(request: TurnRequest, options?: { apiBaseUrl?: string; publicDiagnosisContext?: PublicDiagnosisContext }): Promise<TurnResponse> {
+  const baseUrl = options?.apiBaseUrl ?? API_BASE_URL;
+  const ctx = options?.publicDiagnosisContext;
+  const body = ctx ? { ...ctx, ...request } : request;
+  const url = `${baseUrl}/diagnosis/turn`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(request),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => "Error en la comunicación con el servidor");

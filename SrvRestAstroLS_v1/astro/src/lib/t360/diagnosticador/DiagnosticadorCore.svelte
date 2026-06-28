@@ -1,9 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { API_BASE_URL } from "../../../components/global.js";
   import { PUBLIC_DIAGNOSIS_CONTEXT, sendPublicTurn } from "../../api/publicDiagnosis";
   import type { StructuredDiagnosis, TurnDecision, TurnLanguage } from "../../api/publicDiagnosis";
   import { loadSession, saveSession, clearSession } from "./state/session";
-  import { DEFAULT_SESSION_STORAGE_KEY } from "./config/defaults";
+  import { DEFAULT_SESSION_STORAGE_KEY, DEFAULT_PUBLIC_DIAGNOSIS_CONTEXT } from "./config/defaults";
+  import type { PublicDiagnosisContext } from "./config/types";
   import DiagnosisResult from "../../../components/diagnosis/DiagnosisResult.svelte";
   import { sectionTitle, isValidDiagnosis } from "../../api/diagnosisPresentation";
   import T360InteractionRenderer from "../interaction/T360InteractionRenderer.svelte";
@@ -29,6 +31,8 @@
     assistantInstanceId = "team360_sales_diagnosis",
     sessionStorageKey = DEFAULT_SESSION_STORAGE_KEY,
     mailtoHref = "",
+    apiBaseUrl = API_BASE_URL,
+    publicDiagnosisContext = DEFAULT_PUBLIC_DIAGNOSIS_CONTEXT,
     sessionId = $bindable(null),
     messages = $bindable([]),
     inputText = $bindable(""),
@@ -38,6 +42,8 @@
     assistantInstanceId?: string;
     sessionStorageKey?: string;
     mailtoHref?: string;
+    apiBaseUrl?: string;
+    publicDiagnosisContext?: PublicDiagnosisContext;
     sessionId?: string | null;
     messages?: ChatMessage[];
     inputText?: string;
@@ -172,7 +178,7 @@
         message: requestText,
         locale: currentLocale,
         interaction_response: interactionResponse,
-      }));
+      }, { apiBaseUrl, publicDiagnosisContext }));
       sessionId = result.session_id;
       if (result.assistant_display_name) {
         turnDisplayName = result.assistant_display_name;
