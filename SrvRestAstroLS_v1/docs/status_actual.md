@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-28 (AGENTS canonico y status tecnico compacto)
+Ultima actualizacion: 2026-06-28 (Fases 3 a 5 y reorganizacion documental publicadas)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -10,7 +10,7 @@ Este documento es un tablero del estado vigente. La bitacora detallada previa, i
 
 - raiz: `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360`
 - rama funcional actual: `feature/console-backend-core`
-- las Fases 3 a 5 del Diagnosticador embebible quedaron confirmadas en `cdd1b1b`; no mezclar otro agente escritor durante el cierre documental
+- las Fases 3 a 5 del Diagnosticador embebible quedaron confirmadas en `cdd1b1b` y publicadas en `origin/feature/console-backend-core`
 
 ## Estado general
 
@@ -70,12 +70,13 @@ Limites de esta validacion:
 
 - PostgreSQL, Milvus y LiteLLM no fueron operados durante el ultimo bloque;
 - no se ejecuto un preflight productivo completo;
-- el bloque funcional tiene commit local pero todavia no fue publicado;
+- el bloque funcional y la reorganizacion documental fueron confirmados y publicados;
 - los resultados anteriores deben volver a ejecutarse si cambia codigo funcional.
 
 ## Calidad documental y operativa
 
 - `AGENTS.md` es ahora la fuente operativa canonica compartida por Codex, OpenCode y Crush.
+- la reorganizacion de `AGENTS.md`, status compacto e historial quedo confirmada en `8c51dca` y publicada.
 - `.opencode-rules` queda como legado no cargado por la configuracion efectiva de OpenCode; debe retirarse o migrarse en una tarea posterior.
 - `lat check` tiene una deuda preexistente de 129 errores: 110 secciones sin leading paragraph, 10 summaries extensos, 6 links rotos y 3 errores adicionales de indice.
 - `lat search` requiere configurar `LAT_LLM_KEY`, `LAT_LLM_KEY_FILE` o `LAT_LLM_KEY_HELPER`; mientras tanto se usa `lat locate`.
