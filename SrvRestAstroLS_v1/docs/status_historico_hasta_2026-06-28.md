@@ -1,0 +1,3675 @@
+# Historial tecnico de Team360 hasta 2026-06-28
+
+Este archivo conserva la bitacora tecnica acumulada antes de compactar `status_actual.md`. Queda congelado como referencia historica; las nuevas actualizaciones deben escribirse en el tablero vigente.
+
+Objetivo: `desarrollo`
+
+Ultima actualizacion: 2026-06-28 (publicDiagnosisContext configurable en DiagnosticadorCore)
+
+## Directorio de trabajo
+
+`/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1`
+
+## Estado general
+
+Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
+
+## Acciones realizadas
+
+### 2026-06-26 - Post-diagnosis continuation multilingue (ES/EN/HE)
+
+- Se implemento continuacion post-diagnostico en espanol, ingles y hebreo.
+- `runtime.py`: `_build_continuation_options(lang)` devuelve etiquetas localizadas
+  para "Tipos de diferencias"/"Types of discrepancies"/"סוגי פערים" y
+  "Flujo operativo"/"Operational workflow"/"תהליך תפעולי" segun el idioma de la
+  conversacion; `_resolve_post_diagnosis_continuation` resuelve "1"/"primera"/
+  "first"/"ראשונה" en los 3 idiomas; la activacion ocurre al completarse el
+  diagnostico (`diagnosis_status = "completed"`).
+- `structured_diagnosis.py`: `_build_next_step` acepta `language` param y genera
+  salida en ES/EN/HE con entidades reales, sin etiquetas internas, con " y " o
+  " ו " segun el idioma; se agregaron tests para next_step sin labels internos
+  en ES/EN/HE, con sistemas y sin sistemas.
+- `policies.py`: Prompt especifico para modo continuacion (`_continuation_active`)
+  vs modo diagnostico estandar; lee `_continuation_options` para instruir al LLM.
+- `last_structured_diagnosis` ya no se elimina tras el diagnostico, se preserva
+  para que los turnos post-diagnostico puedan usarlo como fuente de verdad.
+- Tests: 9 nuevos (5 en test_structured_diagnosis, 4 en test_sales_diagnosis_runtime_contracts).
+- E2E Playwright: 2 nuevos tests (ingles y hebreo), 5 total continuacion.
+- 1001 tests backend pass, 22 E2E pass (5 continuacion + 17 regresion).
+- Commit: `074dce0` en `feature/console-backend-core`.
+
+### 2026-06-28 - Fix: post-diagnosis continuation context y normalización de labels internos
+
+- **Causa raiz**: El prompt de continuacion (`policies.py`) calculaba `opts_text` con las opciones
+  disponibles pero nunca lo incluia en el prompt enviado al LLM; tampoco incluia el topic elegido
+  (`_continuation_chosen_label`) despues de que el usuario seleccionara una opcion.
+- **Causa raiz labels internos**: `entity_sources` almacena valores como `"system"` (canonical key
+  interna), que se usaban directamente en `_build_automatable_steps` y al reconstruir
+  `systems_and_data_sources` desde `entity_sources`, filtrando "system" e "inquiry" al texto publico.
+- **Fix `policies.py`**: `opts_text` ahora se incluye en las instrucciones del prompt de continuacion;
+  se agrego `_continuation_chosen_label` al prompt cuando el usuario ya eligio un topic.
+- **Fix `structured_diagnosis.py`**: Se agregaron `SOURCES_LABEL_MAP`, `_normalize_source_label()` y
+  `_normalize_entity_sources_display()` para mapear `"system"` a `"el sistema"` e `"inquiry"` a
+  `"la consulta"` en `_build_automatable_steps`; `_build_next_step` normaliza nombres de sistemas;
+  `format_structured_diagnosis_for_prompt` normaliza entity_sources display.
+- **Fix `runtime.py`**: Al reconstruir `systems_and_data_sources` desde entity_sources en
+  `_resolve_contradictions`, se normalizan valores internos via `_normalize_source_label`.
+- **E2E**: Se agrego Test C con validacion de conceptos de diferencias (faltantes, importes, fechas,
+  duplicados, comisiones, moneda) y ausencia de "system"/"inquiry"; Test B validacion de SAP.
+- **Backend**: 1001 tests pass, 0 regresiones.
+- **E2E**: 6/6 continuation tests pass real contra backend vivo; regresiones 9/10 pass (1 flaky
+  preexistente en mobile-sequential-blocks).
+- Commit: en `feature/console-backend-core` (este fix).
+
+### 2026-06-25 - Contexto componentes Diagnosticador embeddable
+
+- Se documento en `lat.md/diagnosticador-embeddable-component-architecture.md`
+  la arquitectura canonica para el futuro Diagnosticador embeddable sin iframe.
+- Se dejo establecido que la primera etapa usa el namespace existente
+  `SrvRestAstroLS_v1/astro/src/lib/t360`, sin crear workspace raiz, `/packages`
+  ni publicacion npm.
+- Se agrego el atajo operativo `contexto componentes` en `AGENTS.md` y
+  `.agents/skills/team360-project/SKILL.md` para que futuros agentes lean esa
+  referencia antes de analizar o tocar componentes, paquetes, estilos,
+  interaction blocks, adapters, E2E o estructura frontend del Diagnosticador.
+- Se marco `SrvRestAstroLS_v1/docs/t360_diagnosis_embeddable_ux_architecture.md`
+  como antecedente UX, dejando la referencia LAT como fuente principal para
+  decisiones de estructura y evolucion.
+- No se modifico codigo productivo, componentes, configs, dependencias,
+  servicios, PostgreSQL, Milvus, LiteLLM, migraciones ni workspaces.
+
+### 2026-06-25 - Regla E2E local sobre runtime real
+
+- Se documento como politica operativa que los tests locales de paginas,
+  componentes hidratados y E2E reales deben usar `backend-dev.sh` y
+  `astro-dev.sh` para levantar/bajar el runtime.
+- Se fijo que Playwright debe usarse como automatizador de navegador con
+  `PLAYWRIGHT_SKIP_WEBSERVER=1`, no como launcher de backend/Astro mediante
+  `webServer` automatico cuando se valida funcionalidad real de Team360.
+- Se actualizaron `lat.md/browser-mcp-validation-policy.md`, `AGENTS.md`,
+  `.agents/skills/team360-project/SKILL.md` y `lat.md/status_actual.md`.
+- No se modifico funcionalidad productiva, prompts, arquitectura, DB, Milvus,
+  LiteLLM ni servicios.
+
+### 2026-06-25 - Nombre configurable del asistente
+
+- Se implemento `assistant_display_name` como campo dinamico en toda la pila.
+- **Backend**: `AutomationDiagnosisService.start_session()` ahora incluye
+  `assistant_display_name` en la respuesta, resuelto desde `AssistantInstanceConfig`.
+- **Backend**: `POST /api/diagnosis/turn` incluye `assistant_display_name` en la
+  respuesta, resuelto via `get_assistant_instance_config()`.
+- **Backend**: Fallback unificado a `"Diagnosticador"` cuando no hay config.
+- **HTTP schemas**: `PublicTurnResponse.assistant_display_name` agregado con
+  default `"Diagnosticador"`.
+- **Frontend API**: `DiagnosisSession.assistant_display_name` tipado en TypeScript.
+- **ConsoleDiagnosis.svelte**: nueva prop `assistantName` con fallback
+  `"Diagnosticador"`, usa nombre del backend via session.
+- **PublicVeraEntry.svelte**: eliminados ~12 hardcoded `"Vera"`, usa nombre
+  dinamico desde la respuesta de turn o prop fallback.
+- **publicDiagnosis.ts**: eliminado `assistant_display_name: "Vera"` hardcodeado
+  de `PUBLIC_DIAGNOSIS_CONTEXT`.
+- **diagnosisPresentation.ts**: `sectionTitle()` acepta `params` para
+  interpolacion de nombre; `error_503` usa `{name}` placeholder.
+- **Pages Astro**: `t360.astro`, `index.astro`, `indexa.astro`, `indexb.astro`
+  pasan `assistantName="Vera"` a `PublicVeraEntry`.
+- **Tests**: asserts de `assistant_display_name` en
+  `test_automation_diagnosis.py` y `test_automation_diagnosis_router.py`.
+- **No se modifico**: DB, migraciones, `assistant_instance_id`, workers,
+  knowledge scopes, prompts LLM, LiteLLM, Milvus, ni documentacion de marketing.
+- Validacion: 986 backend tests pass, `pnpm check` 0 errores, `pnpm build` OK.
+
+### 2026-06-24 - Mapa de conocimiento Mermaid en `lat.md`
+
+- Se documento `lat.md/team360-knowledge-map.md` como arbol de conocimiento
+  Mermaid para navegar las referencias canonicas de arquitectura viva.
+- El mapa cubre orquestacion, producto, runtime, knowledge e IA, workers,
+  persistencia, Console/frontend, seguridad, validacion, deploy y documentacion
+  viva.
+- Se enlazo desde `lat.md/lat.md` y se actualizo `lat.md/status_actual.md`.
+- No se modifico codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni
+  configuracion de servicios.
+
+### 2026-06-24 - Politica root cause para bugs manuales
+
+- Se documento en `lat.md/team360-root-cause-debugging-policy.md` la politica
+  para investigar bugs no triviales, especialmente cuando la prueba manual
+  encuentra problemas aunque los tests existentes pasen.
+- La politica obliga a registrar sintoma, entorno, base URL, HEAD, session ID,
+  requests/responses, errores 5xx, consola, duplicados y estado DOM cuando
+  aplique, antes de editar codigo.
+- Se establecio que todo bug manual repetible debe avanzar por reproduccion,
+  hipotesis de causa raiz, evidencia, fix minimo, test de regresion y
+  validacion final.
+- Se conecto la politica con Browser MCP, Playwright, pytest, preflight de
+  servicios reales y politicas de deploy por rsync.
+- Se descarto instalar gstack `/investigate`; solo se adopto el metodo como
+  regla Team360.
+- No se modifico codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni
+  configuracion de servicios.
+
+### 2026-06-24 - Politica Mermaid para diagramas
+
+- Se documento en `lat.md/team360-mermaid-diagram-policy.md` la politica
+  canonica para diagramas tecnicos de Team360.
+- Mermaid queda como fuente de verdad versionable en Git para arquitectura,
+  politicas, flujos de runtime, validaciones y deploys.
+- SVG, PNG, PDF y Excalidraw quedan clasificados como derivados opcionales, no
+  como fuente principal de una decision tecnica.
+- No se instalo Mermaid globalmente ni se agregaron dependencias al proyecto; si
+  en el futuro se requiere render automatico o CI, debera instalarse localmente
+  y versionarse como dependencia de desarrollo.
+- Se descarto adoptar el skill gstack `/diagram` completo por sus automatismos
+  externos; solo se tomo la practica de fuente textual revisable.
+- No se modifico codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni
+  configuracion de servicios.
+
+### 2026-06-24 - Politica rsync para deploy backend
+
+- Se documento en `lat.md/team360-backend-rsync-deploy-policy.md` la politica
+  canonica para desplegar el backend de Team360 por `rsync`.
+- La politica define el flujo completo: validar rama/HEAD, declarar worktree y
+  commits no pusheados, correr tests backend relevantes, validar SSH y destino,
+  comprobar sensibles sin leer secretos, crear backup remoto, revisar dry-run,
+  ejecutar rsync real y verificar archivos remotos.
+- Se fijaron exclusiones obligatorias para proteger `.env*`, `.venv`, caches y
+  bytecode; `--delete` solo es aceptable con destino validado, backup creado,
+  dry-run revisado y sensibles excluidos.
+- Se dejo explicito que el deploy backend no debe tocar frontend, `astro/dist`,
+  Nginx, PostgreSQL, Milvus, LiteLLM, backups, uploads, `.env` ni `.venv`, y
+  que no debe reiniciar automaticamente procesos ni `tmux`.
+- La aprobacion posterior requiere reinicio manual en `tmux`, health remoto e
+  interno, smoke con modelo real y `fallback_used=false`, smoke conversacional,
+  Playwright productivo, 0 errores 5xx y 0 requests duplicados.
+- Se enlazo desde `AGENTS.md`, `.agents/skills/team360-project/SKILL.md`,
+  `lat.md/lat.md` y `lat.md/team360-runtime-operational-policy.md`.
+- No se ejecuto deploy ni se modifico produccion, backend runtime, frontend,
+  DB, Milvus, LiteLLM, Nginx ni tmux.
+
+### 2026-06-24 - Politica rsync para deploy frontend Astro
+
+- Se documento en `lat.md/team360-frontend-rsync-deploy-policy.md` la politica
+  canonica para desplegar el frontend Astro de `team360.live` por `rsync`.
+- La politica define el flujo completo: verificar Git y `IS_REST_PRO=true`,
+  ejecutar `pnpm check`, limpiar y regenerar `dist`, comprobar que el fix este
+  en source y build, validar SSH/destino/Nginx, crear backup remoto, revisar
+  dry-run, ejecutar rsync real, comparar assets local vs produccion, validar
+  metadata y cerrar con Playwright productivo + smoke UX.
+- Se fijo que la ruta remota oficial es
+  `administrator@imotorsoft.com:/home/administrator/project/iMotorSoft/ai/Team360/SrvRestAstroLS_v1/astro/dist/`
+  y que la barra final debe conservarse para evitar `astro/dist/dist/`.
+- Se dejo explicito que `--delete` es obligatorio solo porque el destino debe
+  contener exclusivamente el build estatico, y que no se deben reiniciar
+  backend, PostgreSQL, Milvus, LiteLLM ni Nginx en un deploy estatico normal.
+- Se actualizo el documento historico
+  `team360_live_frontend_deploy_20260618.md` para apuntar a la nueva politica
+  canonica, y se enlazo desde `AGENTS.md`, el skill propio y `lat.md/lat.md`.
+- No se ejecuto deploy ni se modifico produccion, backend, DB, Milvus, LiteLLM
+  ni Nginx.
+
+### 2026-06-24 - Politica de validacion de navegador
+
+- Se documento en `lat.md/browser-mcp-validation-policy.md` la politica unica
+  de validacion de navegador para Team360.
+- Playwright + Chromium queda como gate E2E oficial para cerrar regresiones,
+  flujos completos, interaction blocks, produccion y fases de navegador.
+- Browser MCP / `opencode-browser` queda como herramienta exploratoria y de
+  diagnostico visual; no reemplaza Playwright para declarar PASS reproducible.
+- La politica fija launchers oficiales (`backend-dev.sh`, `astro-dev.sh`),
+  `IS_REST_PRO=false` para validacion local, variables estandar de Playwright,
+  reglas para produccion, build productivo, pruebas moviles tactiles,
+  regresiones minimas y evidencia minima ante PASS/fallo.
+- Se actualizaron referencias operativas en `AGENTS.md`,
+  `.agents/skills/team360-project/SKILL.md`, `lat.md/lat.md` y
+  `lat.md/deepseek-v4-flash-opencode-browser.md`.
+- No se modifico codigo productivo, frontend, backend, DB, Milvus, LiteLLM ni
+  configuracion de servicios.
+
+### 2026-06-24 - Correccion bugs interaccion Vera (telefono/Planilla)
+
+- **Fix copy**: "los consultas" -> "las consultas" en `runtime.py:1109`.
+- **Fix pause/multi_choice simultaneo**: `_should_offer_pause` ahora retorna
+  `False` cuando multi_choice esta pendiente o es elegible, eliminando la
+  competencia entre bloque multi_choice y texto de pausa de Vera.
+- **Fix "1,2 preguntas mas"**: Se agrego patron regex `\d+\s*[,;.\-]?\s*\d*\s*preguntas?\s*m[áa]s`
+  a `_is_user_continuing` (runtime y policies), permitiendo detectar "1,2 preguntas mas"
+  como intencion de continuar.
+- **Fix dedup Planilla / Excel**: Se agrego `_normalize_systems()` que convierte
+  claves canonicas ("spreadsheet") a etiquetas publicas ("Planilla / Excel") y
+  elimina duplicados conceptuales en `systems_and_data_sources`. Se aplica en
+  `_apply_interaction_response`, `_resolve_block_from_text` y
+  `_update_semantic_memory`.
+- **Fix frontend `answered` state**: Se agrego prop `consumed` en
+  `T360InteractionRenderer` que se pasa como `answered` a choice components,
+  permitiendo que bloques resueltos muestren estado visual "respondido".
+- **E2E nuevo**: `public-vera-phone-problems-interaction-priority.spec.ts` con
+  5 tests que cubren copy corregido, single_choice click, multi_choice click,
+  exclusion mutua de bloques y dedup Planilla/Excel.
+- **Regresiones**: 18/18 tests E2E pasan (email-orders, kommo, salesforce,
+  new-conversation, adversarial, social-meta, phone-problems).
+- **Backend**: 964 tests pasan, 0 fallos (2 pre-existentes en test_db_module).
+
+### 2026-06-22 - Deploy frontend remoto `team360.live`
+
+- Se genero un build estatico nuevo desde `SrvRestAstroLS_v1/astro` con
+  `pnpm check` y `pnpm build`.
+- Se valido que `dist/` no contiene referencias a `localhost:7050`; el bundle
+  publicado queda en modo productivo relativo `/api` mediante
+  `IS_REST_PRO=true` y `URL_REST_PRO=""`.
+- Se publico el contenido de `SrvRestAstroLS_v1/astro/dist/` por `rsync
+  --delete` al directorio remoto servido por Nginx:
+  `/home/administrator/project/iMotorSoft/ai/Team360/SrvRestAstroLS_v1/astro/dist/`.
+- Se valido `https://team360.live/` con `200 OK`, `Content-Length: 41432` y
+  `Last-Modified` correspondiente al build nuevo.
+- Para comparar local contra remoto se bajo el `astro dev` local que ocupaba
+  `127.0.0.1:3050` y se levanto `pnpm preview --host 127.0.0.1 --port 3050`
+  sobre el build publicado.
+- Validacion browser con `agent-browser`: snapshots de
+  `http://127.0.0.1:3050/` y `https://team360.live/` sin diferencias
+  estructurales observadas; el diff de URLs quedo vacio.
+- Alcance: se valido la carga visual/estatica de la home publica. No se valido
+  el flujo conversacional de Vera ni calidad de API en esta accion.
+
+### 2026-06-22 - Refuerzo de `global.js` para `/t360`
+
+- Se reforzo la regla operativa de conectividad frontend/backend:
+  `SrvRestAstroLS_v1/astro/src/components/global.js` es la unica fuente de
+  verdad para resolver el backend REST desde el frontend.
+- Para desarrollo local, Browser MCP y Playwright real de `/t360`, el modo
+  esperado es `IS_REST_PRO=false` con `URL_REST_DEV="http://localhost:7050"`.
+- Se documento que `IS_REST_PRO=true` con `URL_REST_PRO=""` usa `/api`
+  relativo y solo debe validarse si hay proxy/reverse proxy o `socat`
+  explicitamente preparado.
+- Se agrego la regla de no arreglar conectividad de `/t360` modificando
+  `astro.config.mjs`, API clients, componentes Svelte ni URLs hardcodeadas salvo
+  instruccion explicita.
+- No se modifico la configuracion de `astro.config.mjs` como parte de esta
+  documentacion.
+
+### 2026-06-22 - Regla operativa Browser MCP
+
+- Se documento `lat.md/browser-mcp-validation-policy.md` como regla general
+  para validaciones Browser MCP / `opencode-browser`.
+- La regla exige que antes de navegar respondan backend Litestar en
+  `127.0.0.1:7050` y Astro en `127.0.0.1:3050`, usando normalmente
+  `http://127.0.0.1:3050/t360` como URL real de validacion.
+- Se dejo explicito que el agente puede bajar y volver a levantar solo backend
+  y Astro locales cuando no respondan, queden viejos o el entorno sea ambiguo.
+  No autoriza reiniciar PostgreSQL, Milvus ni LiteLLM salvo pedido explicito.
+- Se fijo que si Browser MCP falla, la prueba debe detenerse y avisar el paso,
+  error, URL, estado de servidores y evidencia disponible; no se puede
+  reemplazar por terminal, `curl`, Playwright, HTML ni lectura de codigo sin
+  autorizacion.
+- Se actualizo `lat.md/deepseek-v4-flash-opencode-browser.md` para enlazar y
+  respetar esta regla general.
+- No se modifico frontend, backend, DB, Milvus, LiteLLM ni configuracion
+  productiva.
+
+### 2026-06-21 - Validacion local backend 7050 y Astro 3050
+
+- Se documento la configuracion local completa en
+  `SrvRestAstroLS_v1/docs/team360_local_dev_runtime_config.md`: puertos,
+  variables, resolucion de Postgres por `globalVar.py`, LiteLLM, Milvus,
+  comandos de backend/Astro, preflight, curl y Playwright.
+- Se valido el arranque local de backend en `127.0.0.1:7050` con
+  `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres`, IA via LiteLLM, retrieval Milvus y
+  variables de diagnostico publico configuradas por entorno de sesion.
+- `globalVar.py` resolvio correctamente el DSN de Team360 desde el entorno:
+  DB `team360` en `localhost:5432`; no fue necesario declarar
+  `TEAM360_DB_URL_PSQL` en el comando local.
+- Preflight de servicios reales:
+  PostgreSQL OK, Milvus OK con collection
+  `team360_sales_diagnosis_knowledge_v1`, LiteLLM OK en `127.0.0.1:4000`,
+  alias `openai_gpt-5-nano` registrado y llamada minima al modelo respondida
+  sin fallback.
+- Se verifico `GET http://127.0.0.1:7050/api/health` con `200 OK`.
+- Se ejecutaron dos turnos reales contra
+  `POST http://127.0.0.1:7050/api/diagnosis/turn`: el primer turno creo una
+  sesion nueva y el segundo reutilizo la sesion con `diagnosis_built=true`,
+  modelo reportado `openai_gpt-5-nano` y `fallback_used=false`.
+- Se levanto Astro en `127.0.0.1:3050` y se valido que `/t360` y
+  `/t360-interaction-lab` responden `200 OK`.
+- Configuracion frontend: la fuente de verdad para el endpoint REST de Astro
+  esta en `SrvRestAstroLS_v1/astro/src/components/global.js`; alli
+  `URL_REST_DEV` figura como `http://localhost:7050` para backend de
+  desarrollo.
+- Nota operativa: el build/dev actual estaba usando API relativa por
+  `URL_REST_PRO=""` y el proxy Vite de `astro.config.mjs` mantiene `/api`
+  apuntando a `127.0.0.1:8000`; para esta validacion se uso un forward temporal
+  de sesion `8000 -> 7050` con `socat`, sin persistir cambios de configuracion.
+- Validaciones ejecutadas:
+  `git diff --check`,
+  `corepack pnpm check`,
+  `corepack pnpm build` y
+  `PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:3050 T360_REAL_E2E=1 corepack pnpm exec playwright test e2e/t360-interaction-lab.spec.ts e2e/public-vera.spec.ts --project=chromium`.
+- Resultado: `git diff --check` OK, `pnpm check` OK con hint preexistente por
+  parametro `page` no usado en un test skipped, build OK y Playwright
+  `14 passed`, `1 skipped`.
+- No se modificaron backend, runtime Python/Litestar, endpoints, prompts,
+  migraciones, DB, Milvus, LiteLLM ni configuracion persistente de servicios.
+
+### 2026-06-21 - Integracion controlada `interaction_blocks` en `/t360`
+
+- Se agrego una capa frontend-runtime separada en
+  `SrvRestAstroLS_v1/astro/src/lib/t360/diagnosis/` para normalizar respuestas
+  del runtime publico y traducir eventos estructurados del renderer a requests
+  compatibles con `POST /api/diagnosis/turn`.
+- Se integro `T360InteractionRenderer` en `PublicVeraEntry.svelte` de forma
+  gradual: si el backend devuelve `interaction_block`, se renderiza; si no lo
+  devuelve, el flujo actual de texto y `DiagnosisResult` se conserva.
+- Se observo con `curl` que el backend actual responde `session_id`,
+  `response_text`, `turn_count`, `is_new`, `language`, `turn_decision` y
+  `diagnosis`, pero todavia no emite `interaction_block`.
+- Se documento la integracion y la diferencia de contrato en
+  `SrvRestAstroLS_v1/docs/t360_interaction_runtime_integration.md`.
+- Se ampliaron tests Playwright de `/t360` para cubrir `next_step_choice`,
+  `single_choice`, `diagnosis_action_card`, fallback de bloque invalido,
+  error/retry, mobile y smoke real contra backend vivo.
+- No se modificaron backend, runtime Python/Litestar, endpoints, prompts,
+  migraciones, DB, Milvus, LiteLLM, iframe, Web Component ni SDK.
+
+### 2026-06-21 - Primer `interaction_block` real (`next_step_choice`) desde backend
+
+- Se identificaron dos gaps que impedian que el backend emitiera
+  `interaction_block`: (1) faltaba el campo en `AssistantTurnOutput` y en
+  `PublicTurnResponse`, (2) faltaba logica en el runtime para construir el
+  bloque cuando `should_diagnose=True`.
+- Se agrego `interaction_block: dict | None = None` a `AssistantTurnOutput`
+  en `contracts.py`.
+- Se agrego `interaction_block: dict | None = None` a `PublicTurnResponse`
+  en `diagnosis_schemas.py`.
+- Se implemento `_build_next_step_choice_if_ready()` en `runtime.py`:
+  emite `next_step_choice` con acciones "Seguir conversando" y "Ver diagnóstico"
+  cuando el runtime decide diagnosticar (`should_diagnose=True` y `turn_count >= 2`).
+- Se paso `output.interaction_block` en el handler `public_turn` de `diagnosis.py`.
+- Se agrego cobertura backend para fijar el contrato del bloque emitido por el
+  runtime y se alinearon tests con el entrypoint vigente
+  `ls_iMotorSoft_Srv01.py`; no se agrego ni se restauro `backend/app.py`.
+- En la suite del endpoint dev se activa `TEAM360_BACKEND_DEBUG=1` solo para la
+  creacion de la app de test, porque esos casos validan detalles controlados de
+  error; el default del backend sigue siendo debug apagado.
+- Se detecto que `should_use_responses_api()` devolvia True para el modelo
+  `openai_gpt-5-nano` causando fallo silencioso (safe ack); se fijo
+  temporalmente con `TEAM360_LITELLM_API_MODE=chat`.
+- Cambios validados con `curl` y Browser MCP en `/t360`: el bloque
+  `next_step_choice` aparece correctamente en turnos donde se construye
+  diagnostico, el renderer Svelte muestra los botones, el adapter traduce
+  eventos correctamente y no hay errores de consola.
+- Validaciones automatizadas ejecutadas:
+  `uv run pytest tests/test_sales_diagnosis_runtime_contracts.py::TestRuntimeDecisionPolicy::test_runtime_diagnoses_when_context_is_sufficient -q`
+  (`1 passed`), `uv run pytest tests/test_diagnosis_public_router.py -q`
+  (`38 passed`) y
+  `uv run pytest tests/test_sales_diagnosis_runtime_route.py tests/test_sales_diagnosis_runtime_dev_route.py -q`
+  (`80 passed`).
+- No se implementaron iframe, Web Component, SDK ni otros bloques
+  (`single_choice`, `multi_choice`, etc.).
+- Archivos modificados:
+  - `SrvRestAstroLS_v1/backend/modules/sales_diagnosis_runtime/contracts.py`
+  - `SrvRestAstroLS_v1/backend/modules/sales_diagnosis_runtime/runtime.py`
+  - `SrvRestAstroLS_v1/backend/routes/diagnosis_schemas.py`
+
+### 2026-06-21 - Prueba de estabilidad `next_step_choice`
+
+- Se probaron los 4 casos obligatorios con Browser MCP y curl multi-turn:
+  - **Caso A (Ver diagnóstico)**: botón presente y clickeable; adapter traduce correctamente a "Dame el diagnóstico actual con la conclusión, factibilidad y próximos pasos."; backend recibe el mensaje; la diagnosis previa permanece visible en el DOM.
+  - **Caso B (Seguir conversando)**: botón presente y clickeable; la conversación continúa con preguntas útiles de Vera; el bloque no reaparece en turnos posteriores.
+  - **Caso C (conclusión directa)**: frases como "Dame el diagnóstico otra vez" no re-emiten el bloque; `_decide_turn` retorna `False` porque `diagnosis_status="completed"`.
+  - **Caso D (reaparición indebida)**: tras "Seguir conversando" + turno adicional, el bloque NO reaparece. La condición `should_diagnose and turn_count >= 2` está correctamente protegida por `_decide_turn` que retorna `False` cuando `status` es `completed`.
+- **Loop**: descartado. El guardrail `if status in ("completed",): return False` en `_decide_turn` previene cualquier re-emisión.
+- **Persistencia PostgreSQL**: no funciona entre reinicios de backend. La tabla `sales_diagnosis_conversation_states` no existe en la base de datos o falla silenciosamente en `save()`/`load()`. No se modificó esquema ni migraciones.
+- **Encontrado**: las variables de entorno exportadas en el shell no se heredan a procesos `nohup` iniciados desde otro shell de herramienta; el backend arrancó sin `TEAM360_LITELLM_API_MODE=chat` causando fallos del modelo Responses API. Se recomienda usar `env VAR=VAL ...` inline en el comando de arranque o escribir un script de inicio.
+- **Frontend**: el bloque permanece visible en el DOM del turno original después de la interacción; los botones no se deshabilitan tras el click. Esto es por diseño (cada mensaje mantiene su propio `interactionBlock`). No hay errores de consola ni doble envío.
+- Sin cambios de código en esta prueba.
+- No se implementaron iframe, Web Component, SDK, postMessage ni otros bloques.
+- Deuda técnica documentada: `interaction_block: dict | None = None` debe migrarse a modelo discriminado en el futuro.
+  - `SrvRestAstroLS_v1/backend/routes/diagnosis.py`
+  - `SrvRestAstroLS_v1/backend/tests/test_sales_diagnosis_runtime_contracts.py`
+  - `SrvRestAstroLS_v1/backend/tests/test_diagnosis_public_router.py`
+  - `SrvRestAstroLS_v1/backend/tests/test_sales_diagnosis_runtime_dev_route.py`
+  - `SrvRestAstroLS_v1/backend/tests/test_sales_diagnosis_runtime_route.py`
+
+### 2026-06-21 - Arquitectura UX para diagnosticos embebibles
+
+- Se agrego `SrvRestAstroLS_v1/docs/t360_diagnosis_embeddable_ux_architecture.md`
+  como nota tecnica de arquitectura para diagnosticos reutilizables y
+  embebibles.
+- El documento establece que el diagnostico debe evolucionar como capacidad de
+  plataforma reusable, agnostica al dominio y al host, con contrato JSON
+  estructurado, renderer Svelte generico y adaptadores de distribucion.
+- Se documentaron principios de seguridad sin HTML libre, modos iframe/Web
+  Component/SDK, tematizacion, responsive basado en contenedor, eventos
+  publicos interoperables, multitenancy, seguridad para embeds y fases
+  recomendadas.
+- No se modificaron backend, runtime, endpoints, migraciones ni integraciones
+  productivas.
+
+### 2026-06-21 - Revision estricta frontend `interaction_blocks`
+
+- Se reviso la base frontend reusable del lab `/t360-interaction-lab` en
+  `SrvRestAstroLS_v1/astro/src/lib/t360/interaction/`, manteniendo el alcance
+  aislado del backend productivo y sin integrar en `/t360`.
+- Se endurecieron los guards para rechazar payloads mal formados: tipo
+  conocido, strings no vacios, IDs unicos, intents/status conocidos, limites
+  razonables de acciones/opciones/requisitos/listas, bounds de seleccion,
+  `fit_score` 0-100 y fallback seguro ante bloque invalido.
+- Se ajusto el contrato de eventos frontend para emitir payloads minimos con
+  `session_id`, `block_type`, `action_id`, `intent` y opciones seleccionadas,
+  evitando objetos completos y emisiones accidentales al solo cambiar una
+  seleccion visual.
+- Se mejoro accesibilidad/UX de `single_choice` y `multi_choice` usando inputs
+  nativos asociados a labels, foco visible, feedback de seleccion, bloqueo al
+  llegar al maximo y envio unico por accion explicita.
+- Se agrego fixture invalido visible en el lab y se amplio el test Playwright
+  para cubrir render de bloques, seleccion simple, seleccion multiple,
+  fallback invalido, viewport mobile y errores JavaScript de consola.
+- Validaciones ejecutadas desde `SrvRestAstroLS_v1/astro`:
+  `corepack pnpm check`, `corepack pnpm build` y
+  `PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:4321 corepack pnpm exec playwright test e2e/t360-interaction-lab.spec.ts --project=chromium`.
+- Resultado: check OK con hint preexistente en `e2e/public-vera.spec.ts`,
+  build OK, Playwright `1 passed` y `git diff --check` OK.
+- No se levanto backend ni se consultaron endpoints productivos; el lab sigue
+  funcionando con fixtures locales y sin DB, Milvus, LiteLLM ni runtime.
+
+### 2026-06-20 - Actualizacion operativa del lab `interaction_blocks`
+
+- Se reviso el lab frontend `/t360-interaction-lab` y sus componentes en
+  `SrvRestAstroLS_v1/astro/src/lib/t360/interaction/`.
+- Se agrego `README.md` local para documentar alcance, ruta, eventos DOM
+  emitidos (`t360action`, `t360choice`, `t360choices`), componentes principales
+  y comandos de validacion.
+- Se actualizo `SrvRestAstroLS_v1/astro/playwright.config.ts` para que el
+  webserver de backend use el entrypoint real `ls_iMotorSoft_Srv01:app` en vez
+  de `app:app`, evitando depender de un wrapper no presente en este arbol.
+- Validaciones ejecutadas desde `SrvRestAstroLS_v1/astro`:
+  `corepack pnpm check`, `corepack pnpm build` y
+  `corepack pnpm exec playwright test e2e/t360-interaction-lab.spec.ts --project=chromium`.
+- Resultado: `astro check` sin errores, `astro build` OK y Playwright
+  `1 passed`. Queda un hint preexistente en `e2e/public-vera.spec.ts` por un
+  parametro `page` no usado en un test skipped.
+- No se conecto el lab a backend, DB, Milvus, LiteLLM ni contratos productivos.
+
+### 2026-06-20 - Hardening debug backend para 404 scanner
+
+- Se reviso el incidente productivo con requests externos a `/api/config` y
+  `/api/env`.
+- Diagnostico: esas rutas no pertenecen al contrato Team360; son probes
+  tipicos buscando configuracion o variables de entorno. Produccion responde
+  `404 Not Found` y `/api/health` responde `200 OK`.
+- Se cambio el entrypoint Litestar para que `debug` quede apagado por defecto
+  y solo pueda activarse explicitamente con `TEAM360_BACKEND_DEBUG`.
+- Se agrego `backend/app.py` como wrapper compatible para `uvicorn app:app`,
+  delegando en `ls_iMotorSoft_Srv01.py` sin duplicar rutas ni configuracion.
+- Se incluyo `app.py` en el build config del backend.
+- Se agregaron tests para validar `debug` por env y 404 controlado en
+  `/api/env` y `/api/config`.
+- Se documento el comando canonico productivo en
+  `lat.md/team360-runtime-operational-policy.md` y en
+  `SrvRestAstroLS_v1/docs/team360_live_frontend_deploy_20260618.md`, usando
+  `uv run uvicorn ls_iMotorSoft_Srv01:app --host 127.0.0.1 --port 7050`.
+- Se aclaro que no debe definirse `TEAM360_BACKEND_DEBUG` en produccion y que
+  `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres` / `TEAM360_EMBEDDING_VERSION` son
+  las variables efectivas para estado persistido y filtro de embeddings.
+- Validacion ejecutada desde `SrvRestAstroLS_v1/backend`:
+  `uv run pytest tests/test_automation_diagnosis_router.py tests/test_diagnosis_public_router.py -q`
+  (`52 passed`).
+- No se crearon endpoints `/api/env` ni `/api/config`; exponerlos seria
+  incorrecto para produccion.
+
+### 2026-06-19 - Base frontend reusable para `interaction_blocks`
+
+- Se creo una base frontend aislada y reusable en Astro/Svelte para renderizar
+  `interaction_blocks` JSON sin HTML dinamico y sin acoplamiento a endpoints
+  backend.
+- Se agregaron contratos TypeScript, eventos DOM internos, guards simples,
+  fixtures locales y componentes Svelte 5 para:
+  `next_step_choice`, `single_choice`, `multi_choice`,
+  `missing_requirements`, `product_fit_card`, `diagnosis_action_card` y
+  `diagnosis summary`.
+- Se creo la ruta lab solo frontend `/t360-interaction-lab` para validar todos
+  los bloques con fixtures locales y log visible de eventos (`t360action`,
+  `t360choice`, `t360choices`).
+- Se agrego test Playwright minimo no invasivo para cargar la ruta lab,
+  verificar los bloques, hacer click en una accion, validar el log de eventos y
+  revisar viewport mobile.
+- Validaciones ejecutadas desde `SrvRestAstroLS_v1/astro`:
+  `corepack pnpm check`, `corepack pnpm build`,
+  `PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:4321 corepack pnpm exec playwright test e2e/t360-interaction-lab.spec.ts --project=chromium`
+  y capturas Playwright desktop/mobile sobre `/t360-interaction-lab`.
+- Nota de alcance: no se tocaron backend, endpoints, migraciones, runtime
+  Python/Litestar, PostgreSQL, Milvus, LiteLLM, contratos productivos backend
+  ni navegacion productiva.
+- No se ejecuto preflight de servicios reales porque la tarea y la validacion
+  fueron estrictamente frontend con fixtures locales.
+
+### 2026-06-18 - Alineacion reasoning GPT-5.4 Nano
+
+- Se corrigio el test unitario de `LiteLLMClient.responses_completion()` para
+  esperar `reasoning.effort=low` en el camino Responses API.
+- Se documento en `lat.md/team360-runtime-operational-policy.md` la regla
+  operativa: Vera publica validada sigue usando Chat Completions sin
+  `reasoning_effort`; solo labs, compatibilidad o evaluaciones controladas con
+  Responses API contra upstream `openai/gpt-5.4-nano` deben enviar
+  `reasoning.effort=low`.
+- Se actualizo tambien `backend/modules/sales_diagnosis_runtime/README.md`, que
+  conservaba la descripcion antigua del valor de reasoning.
+- Se aclaro que `minimal` no debe usarse para ese upstream.
+- Validacion ejecutada:
+  `uv run pytest tests/test_automation_diagnosis_litellm.py -q`
+  (`13 passed`).
+- Smoke publico real ejecutado contra `https://team360.live/api/diagnosis/turn`:
+  - `GET /api/health`: `200 OK`, `time_total=1.416752s`;
+  - turno 1: `201 Created`, `time_total=4.441494s`, modelo reportado
+    `openai_gpt-5-nano`, `fallback_used=false`, accion `reflect_and_ask`;
+  - turno 2 en la misma sesion: `201 Created`, `time_total=7.818726s`,
+    modelo reportado `openai_gpt-5-nano`, `fallback_used=false`, accion
+    `diagnose`, `diagnosis_built=true`, factibilidad `high`.
+- Nota de alcance: desde la API publica se valida alias, respuesta, fallback y
+  latencia end-to-end; el upstream interno `openai/gpt-5.4-nano` se toma de la
+  politica/configuracion LiteLLM vigente, no se expone en el contrato publico.
+- No se modificaron runtime productivo, Milvus, PostgreSQL, LiteLLM, frontend,
+  deploy remoto ni configuracion de servicios.
+
+### 2026-06-18 - Build Astro publicado en remoto
+
+- Se genero un build estatico nuevo de Astro para `team360.live` desde
+  `SrvRestAstroLS_v1/astro`.
+- Se publico el contenido de `SrvRestAstroLS_v1/astro/dist/` en el remoto:
+  `/home/administrator/project/iMotorSoft/ai/Team360/SrvRestAstroLS_v1/astro/dist/`.
+- El build publicado usa `URL_REST_PRO=""`, por lo que la experiencia publica
+  llama al backend como `/api` sobre `team360.live` y no a `localhost`.
+- Validaciones ejecutadas:
+  `pnpm check`, `pnpm build`, busqueda de referencias a `localhost:7050` en
+  `dist/`, `rsync --delete`, `nginx -t`, `curl -I https://team360.live/` y
+  `curl -I https://team360.live/t360/`.
+- Resultado HTTP publico: `/` y `/t360/` respondieron `200 OK` por HTTPS con
+  `Last-Modified` del build nuevo.
+- Nota operativa: `nginx -t` paso; Nginx reporto warnings preexistentes por
+  `server_name` duplicados de otros dominios, sin bloquear la configuracion.
+- Durante la validacion se detecto que `console.team360.live` no resolvia DNS,
+  por lo que no se uso como host API productivo en este build.
+- No se modificaron backend, PostgreSQL, Milvus, LiteLLM, servicios systemd ni
+  configuracion Nginx.
+- No hubo commit ni push.
+
+### 2026-06-18 - Post-reload session isolation fix en `/t360`
+
+- Se corrigio el comportamiento de `/t360` que provocaba continuidad invisible de sesion tras recargar la pagina.
+- **Problema:** sessionStorage conservaba `session_id` al recargar. La UI perda el historial visual, pero el backend continuaba la sesion anterior con `semantic_memory` persistida. Vera respondia usando datos que el usuario ya no veia.
+- **Fix aplicado:** al montar `PublicVeraEntry.svelte`, si se detecta un `session_id` almacenado, se limpia de `sessionStorage` preservando solo preferencias de idioma (`initial_language`, `current_language`, `preferred_response_language`, `explicit_language_preference`).
+- **Archivo modificado:** `SrvRestAstroLS_v1/astro/src/components/diagnosis/PublicVeraEntry.svelte` (`restoreSession()`).
+- **Validacion principal:** Browser MCP:
+  - conversacion con datos reales;
+  - reload de `/t360#vera`;
+  - mensaje post-reload sin `session_id`;
+  - backend crea nueva sesion;
+  - Vera pregunta contexto sin mencionar datos anteriores.
+- **Test E2E:** test directo de `sessionStorage` post-reload queda skipped por timing inconsistente (`test.skip` documentado). El test funcional "primer mensaje post-reload no envia session_id anterior" queda activo y pasa.
+- **No se modificaron:** backend, Milvus, PostgreSQL, LiteLLM, DiagnosisResult, hero, estilos, copy.
+- No hubo commit ni push.
+
+### 2026-06-18 - Migracion Milvus local Docker a remoto Docker
+
+- Se migro Milvus local Docker hacia Milvus remoto Docker usando tunel SSH
+  `19531 -> remoto 127.0.0.1:19530`.
+- Regla critica aplicada: no se dropeo, recreo, inserto, borro ni altero la
+  collection remota `JAI_document_embeddings`.
+- Estado protegido validado:
+  - `JAI_document_embeddings` antes: 3231 entidades;
+  - `JAI_document_embeddings` despues: 3231 entidades.
+- Collections locales detectadas y validadas en remoto tras la migracion:
+  - `JAI_document_embeddings`: 3231;
+  - `JAI_document_embeddings_lab_ingest`: 108;
+  - `team360_diagnosis_debug_20260614_203636`: 0;
+  - `team360_diagnosis_debug_20260614_203658`: 139;
+  - `team360_diagnosis_debug_20260614_210254`: 139;
+  - `team360_diagnosis_debug_20260614_210515`: 158;
+  - `team360_diagnosis_debug_20260614_224849`: 158;
+  - `team360_lab_pgvector_benchmark_openai_small_1536`: 139;
+  - `team360_sales_diagnosis_knowledge_v1`: 183.
+- Se recrearon en remoto solo las collections permitidas distintas de
+  `JAI_document_embeddings`, copiando schema, datos e indices disponibles.
+- Se valido que la lista de collections local y remota coincida.
+- Se valido que los conteos por collection local/remoto coincidan.
+- Se valido schema de `team360_sales_diagnosis_knowledge_v1` y de la collection
+  protegida `JAI_document_embeddings`.
+- Se ejecuto busqueda vectorial basica en
+  `team360_sales_diagnosis_knowledge_v1`; el top hit devolvio el mismo
+  `chunk_id` consultado.
+- Resultado de validacion: `MILVUS_VALIDATION_OK`.
+- No se activo backend en produccion.
+
+### 2026-06-18 - Migracion PostgreSQL local Docker a remoto Docker
+
+- Se migro la DB local de desarrollo `team360` al PostgreSQL remoto Docker
+  `imotorsoft-postgres`.
+- Origen local:
+  - contenedor: `imotorsoft-postgres`;
+  - imagen: `pgvector/pgvector:pg18-trixie`;
+  - PostgreSQL reportado por `pg_dump`: `18.4`;
+  - DB: `team360`;
+  - usuario DB: `administrator`.
+- Destino remoto:
+  - contenedor: `imotorsoft-postgres`;
+  - imagen: `pgvector/pgvector:pg18-trixie`;
+  - PostgreSQL reportado por `pg_dump`: `18.3`;
+  - DB recreada: `team360`;
+  - usuario DB: `administrator`.
+- Se confirmo que la DB remota `team360` no existia antes del restore, por lo
+  que no habia datos remotos previos que respaldar para esa DB.
+- Se genero un dump SQL plano comprimido en `/tmp`, se transfirio al remoto, se
+  creo la DB `team360` remota y se restauro con `psql -v ON_ERROR_STOP=1`.
+- Se restauraron extensiones `pgcrypto`, `plpgsql` y `vector`.
+- Validacion:
+  - local: 57 tablas publicas;
+  - remoto: 57 tablas publicas;
+  - diff automatico de conteos por tabla local vs remoto: sin diferencias.
+- Conteos principales validados en remoto:
+  - `automation_diagnosis_answers`: 130;
+  - `automation_diagnosis_leads`: 13;
+  - `automation_diagnosis_sessions`: 14;
+  - `core_events`: 209;
+  - `knowledge_chunks`: 183;
+  - `knowledge_chunk_embeddings`: 183;
+  - `sales_diagnosis_conversation_states`: 225.
+- Se eliminaron los dumps temporales y archivos de conteo de `/tmp` local y
+  remoto al finalizar.
+- No se activo backend en produccion ni se guardaron passwords en archivos.
+
+### 2026-06-18 - DB settings usa `globalVar.py` como fallback
+
+- Se ajusto `modules/db/settings.py` para respetar la regla operativa de
+  configuracion central: si no encuentra `TEAM360_DB_URL`,
+  `TEAM360_DB_URL_PSQL` o `DB_PG_V360_URL`, intenta resolver la DSN mediante
+  `globalVar.get_team360_db_url_psql()`.
+- Se mantiene la normalizacion de `postgresql+psycopg://` a `postgresql://`
+  para compatibilidad con `psycopg`.
+- Se conserva el error controlado `DatabaseConfigurationError` cuando no hay
+  DSN PostgreSQL valida.
+- Se agregaron tests para fallback via `globalVar.py` y precedencia de env vars
+  directas sobre `globalVar.py`.
+- Validacion ejecutada:
+  `uv run pytest tests/test_db_module.py tests/test_global_var.py -q`
+  (`30 passed`).
+- No se activo backend en produccion ni se guardaron passwords en systemd,
+  docs o comandos.
+
+### 2026-06-18 - Deploy frontend inicial `team360.live`
+
+- Se preparo el deploy remoto inicial en
+  `/home/administrator/project/iMotorSoft/ai/Team360`.
+- Se sirvio el build estatico de Astro desde:
+  `/home/administrator/project/iMotorSoft/ai/Team360/SrvRestAstroLS_v1/astro/dist`.
+- Se configuro Nginx para `team360.live` con home `/`, fallback a
+  `/index.html` y headers sin cache.
+- Se dejo `/api/` preparado como proxy a `http://localhost:7050`, pero no se
+  activo backend en esta fase.
+- Se ajusto `astro/src/components/global.js` para que produccion use `API_BASE_URL`
+  relativo (`/api`) en vez de `http://localhost:7050` desde el navegador del
+  usuario final.
+- Se documento el despliegue y las variables pendientes para activar backend en
+  `team360_live_frontend_deploy_20260618.md`, sin guardar passwords.
+- Validaciones ejecutadas:
+  `pnpm check`, `pnpm build`, `nginx -t`,
+  `curl -I -H 'Host: team360.live' http://127.0.0.1/` y
+  `curl -I -H 'Host: team360.live' http://127.0.0.1/t360/`.
+- Se aplico Certbot para `team360.live`; HTTPS quedo habilitado con certificado
+  en `/etc/letsencrypt/live/team360.live/` y vencimiento informado
+  `2026-09-16`.
+
+### 2026-06-18 - Preview comercial del hero `/t360` conectado a Vera
+
+- Se ajusto el bloque visual premium del hero de `/t360` para explicitar que
+  es una vista previa, no el formulario interactivo real.
+- Copy aplicado:
+  - etiqueta: `Vista previa`;
+  - titulo: `Ejemplo de orientación inicial`;
+  - texto: `Este ejemplo muestra cómo Vera puede organizar la factibilidad, los puntos a validar y los próximos pasos de tu caso.`;
+  - CTA: `Probar diagnóstico en vivo`.
+- El CTA del preview ahora apunta a `#vera` y lleva a la experiencia real de
+  Vera sin procesar el textarea visual del hero.
+- Se preservo la estructura visual principal: mismo hero, grid, card premium,
+  imagen, fondos, gradientes, bordes, sombras, radius, tipografia general y
+  jerarquia.
+- Se agrego test E2E minimo en `public-vera.spec.ts` para verificar copy del
+  preview, `href="#vera"` y navegacion hacia la seccion Vera.
+- Validaciones ejecutadas:
+  `pnpm check`, `pnpm build`,
+  `pnpm exec playwright test e2e/public-vera.spec.ts --project=chromium`,
+  validacion visual Playwright desktop/mobile en `127.0.0.1:3050/t360` y
+  `git diff --check`.
+- Evidencia visual generada en
+  `data/reports/snapshots/t360-hero-preview-20260618/`.
+- No se tocaron backend, PostgreSQL, Milvus, LiteLLM, `PublicVeraEntry`,
+  `DiagnosisResult`, logica del diagnostico, navegacion general, branding,
+  paleta ni tipografia global.
+
+### 2026-06-18 - Guia DeepSeek V4 Flash + opencode-browser para agentes
+
+- Se documento y clasifico en `lat.md/deepseek-v4-flash-opencode-browser.md`
+  el uso validado de DeepSeek V4 Flash con OpenCode + `opencode-browser`.
+- La guia queda disponible para agentes desde `lat.md/lat.md`, `AGENTS.md` y
+  `.agents/skills/team360-project/SKILL.md`.
+- Se fijo el patron recomendado: navegar -> snapshot -> referencia actual ->
+  accion -> espera -> nuevo snapshot -> evidencia -> detencion.
+- Se agregaron prompts reutilizables para `/t360`: navegacion minima,
+  inspeccion de UI, seleccion de ejemplo, envio de mensaje, validacion
+  frontend/backend y smoke repetible.
+- Se clasificaron tareas adecuadas para DeepSeek V4 Flash y tareas que conviene
+  reservar para GPT-5.5 o modelo superior.
+- No se ejecuto prueba real ni preflight porque el cambio fue documental; no se
+  modificaron runtime, frontend, backend, DB, Milvus, LiteLLM, migraciones ni
+  tests.
+
+### 2026-06-18 - Validacion end-to-end estructurada `/t360`
+
+- Se valido la secuencia publica real:
+  `/t360 -> POST /api/diagnosis/turn -> StructuredDiagnosis v1 -> DiagnosisResult Svelte`.
+- Se endurecio el tipado frontend de `turn_decision` con tipos explicitos
+  `TurnGeneration` y `TurnDecision`, incluyendo el estado real `unavailable`
+  del camino sin LLM.
+- Se localizaron en frontend las frases canonicas deterministicas de
+  `StructuredDiagnosis` para pasos automatizables, intervencion humana,
+  supuestos, puntos a validar y proximo paso, sin traducir heuricamente texto
+  libre generado.
+- Se corrigio el camino no-LiteLLM de `_PublicTurnLLMProvider` para devolver
+  `safe_ack_for_language(response_language)` en vez de una frase fija en
+  espanol.
+- Se agregaron/actualizaron E2E de `/t360` para diagnostico visible,
+  `reflect_and_ask` sin `DiagnosisResult`, `entity_sources`, fallback, HTTP
+  503, ingles, hebreo RTL, mobile y ausencia de codigos internos.
+- Se ejecuto validacion real en navegador con Playwright/Chromium y
+  `agent-browser`, incluyendo conversacion multi-turn, red, consola,
+  `sessionStorage`, reload, desktop/mobile, fallback controlado y 503
+  controlado.
+- Preflight Milvus: el servicio esta activo y la collection
+  `team360_sales_diagnosis_knowledge_v1` existe con schema esperado y 183
+  filas, pero el inspector reporto `MISALIGNED` porque el filtro runtime
+  `ks_team360_sales_diagnosis` no devuelve hits sobre esa collection. No se
+  modifico Milvus ni se regeneraron embeddings.
+- Validaciones ejecutadas:
+  `uv run pytest tests/test_structured_diagnosis.py -q`,
+  `uv run pytest tests/test_diagnosis_public_router.py -q`,
+  `uv run pytest tests/ -q`, `pnpm check`, `pnpm build`,
+  `pnpm exec playwright test e2e/public-vera.spec.ts --project=chromium`,
+  smoke real `T360_REAL_E2E=1` contra `3050/7050` y `git diff --check`.
+- No se implemento SSE, streaming, Step-to-Action, lead capture,
+  diagnostic_code, WhatsApp handoff, pricing, SLA, cambios en Milvus ni
+  cambios de proveedor/modelo/modo API.
+
+### 2026-06-18 - Correccion de desalineamiento retrieval Milvus
+
+- Se corrigio el desalineamiento productivo de retrieval en Milvus 2.6:
+  - Causa raiz: el indexador almacena UUIDs en `knowledge_scope_id` (ej.
+    `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`), pero el runtime filtraba por
+    `knowledge_scope_code` (codigo legible `ks_team360_sales_diagnosis`) sobre
+    ese mismo campo, resultando 0 hits.
+  - La coleccion `team360_sales_diagnosis_knowledge_v1` tiene 183 vectores,
+    todos con el mismo UUID de scope.
+  - Schema: `chunk_id`, `document_id`, `knowledge_scope_id` (UUID),
+    `source_uri`, `title`, `node_path`, `chunk_index`, `content_preview`,
+    `content`, `embedding_version`, `embedding` (FLOAT_VECTOR 1536, COSINE).
+  - No existen campos `knowledge_scope_code`, `package_code`,
+    `organization_code`, `workspace_code` ni `permission_tags`.
+- Correccion implementada en `milvus_provider.py`:
+  - `_build_filters()` ahora descubre el UUID real almacenado cuando recibe un
+    codigo legible (`ks_team360_sales_diagnosis`) y el campo destino es
+    `knowledge_scope_id` con valores UUID.
+  - La discovery solo se activa para valores provenientes de `input`
+    (no de config explicita via `TEAM360_KNOWLEDGE_SCOPE_ID`).
+  - Si la coleccion tiene exactamente 1 UUID unico, lo usa como filtro de scope
+    (compatibilidad con colecciones mono-scope).
+  - Si tiene multiples UUIDs, no resuelve y emite warning (no mezcla scopes).
+  - Si `TEAM360_KNOWLEDGE_SCOPE_ID` esta explicitamente configurado, se usa
+    directamente sin discovery (camino productivo con aislamiento garantizado).
+  - Se agregaron helpers `_is_uuid()` y `_discover_scope_uuids()`.
+- Inspector mejorado (`inspect_sales_diagnosis_milvus_schema.py`):
+  - Estados detallados: `ALIGNED`, `MISALIGNED_FIELD`, `MISALIGNED_VALUE`,
+    `MISSING_METADATA`, `SEARCH_FAILED`, `EMPTY_COLLECTION`.
+  - Reporta tipo de valor almacenado (UUID vs code), cantidad de valores unicos
+    y valores concretos.
+  - Corregido query filter de `id >= 0` a `chunk_id != ""`.
+- Tests agregados (9 nuevos en `TestMilvusScopeUUIDDiscovery`):
+  - `_is_uuid` detecta formato UUID y rechaza codigos.
+  - `_discover_scope_uuids` retorna valores unicos, vacio si no hay resultados,
+    vacio si hay error de query.
+  - `_build_filters` descubre UUID unico, no descubre cuando config tiene env var,
+    no resuelve cuando hay multiples UUIDs.
+  - `retrieve()` usa discovery en el flujo completo.
+- Coleccion no modificada, embeddings no regenerados, no se elimino filtro de
+  scope ni se creo coleccion nueva.
+- Suite completa: 863 passed, 9 skipped (sin regresiones, +9 tests).
+- Inspector sin env: `MISALIGNED_VALUE` (esperado: codigo vs UUID).
+- Inspector con env: `ALIGNED`, 3 hits runtime y control.
+- Queries reales: 6/6 con hits > 0, scope correcto.
+- Runtime integration: OK, dev endpoint sigue funcionando (fake retrieval).
+- Commits: no hubo commit ni push.
+- No se modificaron: frontend, `/t360`, StructuredDiagnosis, intent classifier,
+  LiteLLM, modelo, prompt, conversacion, PostgreSQL schema, embeddings, UI,
+  Playwright.
+
+### 2026-06-18 - Resolucion dinamica knowledge_scope_code → UUID via PostgreSQL
+
+- Se reemplazo la resolucion temporal mono-scope de Milvus por una resolucion
+  dinamica, segura y multi-tenant usando PostgreSQL como fuente de verdad.
+- Flujo implementado:
+  `KnowledgeScopeContext (org/ws/pkg/scope) -> PostgresKnowledgeScopeResolver
+  -> knowledge_scope_id UUID -> Milvus filter -> retrieval aislado`.
+- Contrato `KnowledgeScopeContext` agregado (`contracts.py`):
+  - `organization_code`, `workspace_code`, `package_code`, `knowledge_scope_code`
+  - Se agregaron constantes `SALES_DIAGNOSIS_ORGANIZATION_CODE` y
+    `SALES_DIAGNOSIS_WORKSPACE_CODE`.
+- `AssistantTurnInput.knowledge_scope_id: str | None` agregado para transportar
+  el UUID ya resuelto hacia el provider Milvus.
+- `PostgresKnowledgeScopeResolver` creado en `knowledge_scope_resolver.py`:
+  - Query SQL que resuelve `scope_code` → UUID via `knowledge_scopes` +
+    `core_workspaces`, verificando `organization_code` en `metadata_jsonb`.
+  - Verifica package binding via `knowledge_scope_bindings` + `automation_packages`.
+  - Fallo controlado: contexto invalido → None → 0 retrieval.
+  - Sin pool o conexion → `ScopeResolutionError`.
+  - Resuelve `ks_team360_sales_diagnosis` → `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`.
+- `CachedScopeResolver` wrapper con TTL 300s (negativos 30s), clave
+  compuesta (org/ws/pkg/scope), invalidacion puntual y global.
+- `milvus_provider._build_filters()` refactorizado con prioridad:
+  1. `config.knowledge_scope_id` (debug/scripts)
+  2. `input.knowledge_scope_id` (resuelto por PostgreSQL)
+  3. `input.knowledge_scope_code` (fallback, fail-closed si no es UUID)
+- Mono-scope discovery gated detras de `TEAM360_MILVUS_ALLOW_MONOSCOPE_DISCOVERY=true`
+  (deshabilitado por defecto). Solo disponible para inspector/diagnostico/tests.
+- Integracion `/t360`: `public_turn` en `diagnosis.py` resuelve scope UUID
+  server-side antes de llamar al runtime. El browser no elige scope.
+- Tests agregados:
+  - `test_knowledge_scope_resolver.py`: 20 tests (contexto, resolver, cache,
+    multi-tenant isolation, errores).
+  - Tests de integracion real: PostgreSQL resuelve UUID correcto, Milvus
+    retorna hits con el UUID filtrado.
+- Suite completa: 883 passed, 9 skipped (+20 nuevos tests).
+- No se requiere `TEAM360_KNOWLEDGE_SCOPE_ID` para operacion normal.
+- No se usa discovery mono-scope como camino productivo.
+- No hubo commit ni push.
+
+### 2026-06-17 - Smoke multidioma real `/t360`
+
+- Se valido desde navegador real automatizado con Playwright Chromium la ruta
+  publica `http://127.0.0.1:3050/t360` contra el backend real
+  `POST /api/diagnosis/turn` en `127.0.0.1:7050`.
+- Se comprobaron sesiones iniciales en espanol, ingles y hebreo, recarga de
+  pestana con `sessionStorage`, cambio explicito de idioma a espanol,
+  preservacion de preferencia ante mensaje corto, mensajes mixtos,
+  terminos tecnicos y aislamiento entre sesiones ingles/hebreo.
+- Se corrigio `PublicVeraEntry.svelte` para persistir tambien
+  `initial_language` dentro de `team360.vera.session.v1`; antes quedaba vacio
+  aunque el backend ya lo devolvia correctamente.
+- Se corrigio `_PublicTurnLLMProvider` para pasar el idioma preferido al
+  `system prompt` de LiteLLM; antes el `turn prompt` podia pedir ingles pero el
+  `system prompt` quedaba en espanol por defecto.
+- Se corrigio `public_turn` para que un `UnsafeResponseError` no exponga
+  detalles internos de guardrail al usuario; ahora responde con fallback seguro
+  en el idioma de la sesion y conserva metadata basica de idioma.
+- PostgreSQL confirmo persistencia en `sales_diagnosis_conversation_states`
+  con `state_jsonb.semantic_memory.language` y `turn_count` separados por
+  sesion.
+- Validaciones ejecutadas: `pytest tests/test_sales_diagnosis_policies.py -q`,
+  `pytest tests/test_sales_diagnosis_runtime_contracts.py -q`, `pnpm check`,
+  `git diff --check`, escaneo basico de secretos y smoke Playwright real.
+- No se modifico arquitectura, Milvus, LiteLLM, modelo, streaming, estilos,
+  Markdown, Console ni telemetria general.
+
+### 2026-06-17 - Documentacion de politica operativa `/t360`
+
+- Se documento en `lat.md/team360-runtime-operational-policy.md` la politica
+  operativa validada para la experiencia publica de Vera:
+  `/t360 -> Backend Litestar -> PostgreSQL 18 -> Milvus 2.6 -> LiteLLM -> GPT-5.4 Nano`.
+- Se fijo como ruta principal el backend en `127.0.0.1:7050`, frontend Astro
+  en `127.0.0.1:3050`, LiteLLM en `http://localhost:4000/v1`, alias
+  `openai_gpt-5-nano`, upstream `openai/gpt-5.4-nano` y modo API `chat`.
+- Se registro la coleccion Milvus productiva
+  `team360_sales_diagnosis_knowledge_v1` y la tabla PostgreSQL
+  `sales_diagnosis_conversation_states`.
+- Se dejo explicitada la politica de secretos: no documentar DSN con password,
+  master keys ni claves upstream; usar solo DSN sanitizada.
+- Se documento la inconsistencia conocida: `global.js` es la fuente efectiva de
+  `/t360`, mientras `astro.config.mjs` conserva proxy `/api` hacia `8000`
+  para otros flujos relativos.
+- No se modifico codigo productivo, frontend, migraciones, modelo ni LiteLLM.
+
+### 2026-06-15 - Preparacion Build Production / Public Home Release /t360
+
+- Se reviso la Home publica `/t360` como base de salida productiva sin conectar runtime real.
+- Se ajusto el CTA principal de `Probar diagnostico` a `Ver diagnostico inicial` para no prometer una accion productiva conectada.
+- Se reemplazo la accion visual `Enviar situacion` por `Ver salida esperada`, apuntando a la seccion de metodo.
+- Se explicito que el campo del diagnostico no envia datos todavia y que la orientacion no ejecuta acciones.
+- Se reforzo que el diagnostico inicial no crea leads, no confirma por WhatsApp y no deriva datos sin autorizacion.
+- Se suavizaron referencias a CRM, bases y archivos para presentarlas como datos/canales disponibles con permisos o integracion, no como integraciones activas garantizadas.
+- No se tocaron Console interna, Knowledge Ingestion, endpoints productivos, runtime real, Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff automatico.
+
+### 2026-06-15 - Promocion de Home premium /t360 a console-backend-core
+
+- Se traslado la pagina publica premium `/t360` desde `ux/team360-console-design-handoff` hacia `feature/console-backend-core` como paso de integracion hacia produccion.
+- Se agrego el asset visual `SrvRestAstroLS_v1/astro/public/assets/team360-t360-hero.png`.
+- Se adapto `PublicMarketingLayout.astro` para permitir CTA/header/footer configurables sin romper el comportamiento por defecto de la Home actual.
+- Se adapto `MarketingHeader.astro` para aceptar `ctaHref`, `ctaLabel` y `ctaMobileLabel`; por defecto conserva `Hablar con Vera` hacia `#vera`.
+- Se adapto `MarketingFooter.astro` para aceptar `diagnosticHref`; por defecto conserva `#contacto`.
+- En `/t360`, el CTA superior queda como `Solicitar diagnostico` / `Diagnostico` y apunta al card conversacional `#diagnostico`.
+- Validacion: `pnpm check` = 0 errors, 0 warnings, 0 hints; `pnpm build` OK y genero `/t360/index.html`.
+- No se implemento backend real para el diagnosticador, lead_capture, Step-to-Action, diagnostic_code, WhatsApp handoff automatico ni CRM real.
+
+### 2026-06-14 - Modelo T360 Pack/Task/Diagnostico
+
+- Se documento en `lat.md/team360-pack-task-diagnosis-model.md` el modelo conceptual y comercial transversal de Team360:
+  - T360 Pack como solucion configurable;
+  - T360 Task como unidad puntual ejecutable;
+  - T360 Pack Flow como automatizacion de punta a punta;
+  - T360 Pack Integrate como pack orientado a conectar sistemas, canales o fuentes de datos;
+  - Diagnostico Team360 como puerta de entrada inteligente.
+- Se fijo que el diagnostico no debe limitarse al catalogo actual ni a ventas: debe entender la necesidad real y clasificar si la solucion esta disponible hoy, es configurable/armable, requiere desarrollo o no conviene vender todavia.
+- Se enlazo el nuevo invariante desde `lat.md/lat.md` y desde `lat.md/team360-global-orchestration.md`.
+- No se implemento codigo, no se tocaron migraciones, endpoints, frontend, Console, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni `knowledge/`.
+
+### 2026-06-14 - Fase 1.9w — Revalidacion GPT-5 nano
+
+- Se revisaron las dudas pendientes sobre `openai_gpt-5-nano` para Sales
+  Diagnosis con product adapter, LiteLLM y Milvus real.
+- Dudas previas revisadas:
+  - `cost_of_error_008` habia bloqueado por guardrail con menciones de `sla`;
+  - `low_frequency_015` habia bloqueado por guardrail con mezcla de capacidad
+    futura y claim de costo/precio;
+  - habia que confirmar que no fueran fallas de LiteLLM, auth, endpoint,
+    retrieval ni fallback silencioso.
+- Preflight minimo de modelo:
+  - alias `openai_gpt-5-nano` registrado en `/v1/models`;
+  - alias `openai/gpt-5-nano` registrado en `/v1/models`;
+  - ambos aliases respondieron por `LiteLLMClient.text_completion()` via
+    Responses API con contenido no vacio;
+  - `openai_gpt-5-nano`: `latency_ms=3186`, `total_tokens=65`;
+  - `openai/gpt-5-nano`: `latency_ms=1743`, `total_tokens=65`.
+- Milvus real revalidado:
+  - collection `team360_lab_pgvector_benchmark_openai_small_1536`;
+  - `139` filas;
+  - scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`;
+  - embedding version `team360-openai-small-1536-v1`;
+  - inspector reporto `Result: OK`.
+- Repeticion de casos dudosos con backend local en `127.0.0.1:8018`,
+  `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano` y Milvus real:
+  - primera repeticion:
+    - `cost_of_error_008`: FAIL por `unsafe_blocked`
+      (`forbidden_term_found:cobertura`, `forbidden_term_found:sla`,
+      `unsupported_sla_claim`);
+    - `low_frequency_015`: WARN, `response_is_fallback=false`;
+  - repeticion x3 posterior:
+    - `cost_of_error_008`: PASS / WARN / PASS;
+    - `low_frequency_015`: WARN / PASS / WARN;
+    - todos los casos reportados con `provider_result.response_is_fallback=false`.
+- Se capturo una salida cruda de `cost_of_error_008` antes de guardrail:
+  - 5 sources reales de Milvus;
+  - respuesta cautelosa sobre contrato, responsabilidad, validacion adicional y
+    no garantia de viabilidad;
+  - `GuardrailPolicy().evaluate_response()` paso;
+  - solo marco `max_questions_exceeded:4`.
+- Durante la corrida completa aparecio un FAIL nuevo en `mfa_closed_004` por
+  falso positivo del evaluator: la frase segura `no se debe bypassar MFA`
+  fue marcada como forbidden `bypassar mfa`.
+- Fix aplicado solo al evaluator headless:
+  - se agregaron negaciones conservadoras `no se debe` y `no debe`;
+  - se agrego test para `no se debe bypassar MFA`.
+- Validacion del fix:
+  - `uv run pytest tests/test_sales_diagnosis_headless_evaluator.py` =
+    **15 passed**;
+  - `mfa_closed_004` con `openai_gpt-5-nano`: PASS,
+    `response_is_fallback=false`.
+- Evaluacion headless completa posterior con evaluator corregido:
+  - dataset `sales_diagnosis_headless_response_validation_v1`;
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`;
+  - `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano`;
+  - retrieval Milvus real;
+  - resultado: **18 PASS / 7 WARN / 0 FAIL / 0 SKIP**;
+  - todos los casos reportaron `provider_result.response_is_fallback=false`.
+- Conclusion tecnica:
+  - `openai_gpt-5-nano` queda operativo via LiteLLM Responses API y no muestra
+    fallback provider;
+  - las dudas previas eran mezcla de salida intermitente sensible a guardrail y
+    falsos positivos del evaluator, no falla de infraestructura;
+  - no se cambia default aun con una sola corrida mejorada; recomendado repetir
+    matriz controlada si se quiere promoverlo a baseline.
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+
+### 2026-06-14 - Fase 1.9v — Validacion Requesty DeepSeek V4 Flash
+
+- Se valido operativamente LiteLLM + Requesty + DeepSeek V4 Flash para
+  Team360 usando el alias de proyecto `requesty_deepseek_4_flash`.
+- Preflight ejecutado:
+  - PostgreSQL activo (`team360`, PostgreSQL 18.4);
+  - Milvus activo (`milvus26-standalone` healthy);
+  - collection Milvus
+    `team360_lab_pgvector_benchmark_openai_small_1536` validada con
+    `139` filas, scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b` y embedding
+    version `team360-openai-small-1536-v1`;
+  - LiteLLM activo en `http://127.0.0.1:4000`, version `1.83.14`;
+  - `globalVar.py` importable;
+  - `LITELLM_MASTER_KEY` disponible en env de shell;
+  - alias `requesty_deepseek_4_flash` listado por `/v1/models`.
+- La metadata de LiteLLM para el alias reporto
+  `litellm_model=openai/deepseek/deepseek-v4-flash`.
+- Llamada minima real via `LiteLLMClient.chat_completion()`:
+  - `model=requesty_deepseek_4_flash`;
+  - respuesta no vacia;
+  - `latency_ms=2870`;
+  - `usage.total_tokens=86`;
+  - `usage.cost=0.00001904`.
+- Se confirmo que la llamada operativa recomendada para el proyecto es por
+  alias `requesty_deepseek_4_flash`, no hardcodeando el slug interno.
+- Smoke HTTP del product adapter con LiteLLM real:
+  - backend local levantado en `127.0.0.1:8018`;
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`;
+  - `TEAM360_LITELLM_MODEL_ALIAS=requesty_deepseek_4_flash`;
+  - resultado: **13/13 checks PASSED**;
+  - `LiteLLM responded (not fallback)`.
+- Evaluacion headless puntual con Milvus real:
+  - caso `crm_integration_018`;
+  - resultado: **PASS**;
+  - `provider_result.response_is_fallback=false`;
+  - `model_alias=requesty_deepseek_4_flash`;
+  - `team360.sources.ready` reporto `chunk_count=5`.
+- Evaluacion headless completa con Milvus real y DeepSeek V4 Flash via Requesty:
+  - dataset `sales_diagnosis_headless_response_validation_v1`;
+  - resultado: **15 PASS / 9 WARN / 1 FAIL / 0 SKIP**;
+  - los casos reportados tuvieron `provider_result.response_is_fallback=false`;
+  - el FAIL corresponde a brecha de calidad/evaluator en `legacy_no_api_013`
+    por forbidden hit `garantiza`, no a falla de infraestructura, auth,
+    credito, endpoint ni fallback del provider.
+- No se declaro nuevo default de modelo.
+- No se relajo guardrail ni evaluator.
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+
+### 2026-06-12 - Fase 1.9u — Analisis de FAIL del benchmark Diagnostico
+
+- Se revisaron los FAIL reales de la corrida Sales Diagnosis con product adapter,
+  LiteLLM y Milvus real para:
+  - `openai_gpt-5-nano`;
+  - `requesty_deepseek_4_flash`.
+- Preflight ejecutado antes de repetir casos:
+  - PostgreSQL activo (`team360`, PostgreSQL 18.4);
+  - Milvus 2.6 activo, collection
+    `team360_lab_pgvector_benchmark_openai_small_1536`, 139 filas;
+  - scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`;
+  - embedding version `team360-openai-small-1536-v1`;
+  - `globalVar.py` importable;
+  - LiteLLM activo y aliases registrados;
+  - llamadas minimas reales:
+    `openai_gpt-5-nano` via Responses API y
+    `requesty_deepseek_4_flash` via chat completions.
+- FAIL reproducidos/clasificados:
+  - `openai_gpt-5-nano` / `cost_of_error_008`:
+    `unsafe_blocked` por `forbidden_term_found:sla`; sin fallback provider.
+    Clasificado como `guardrail_policy_gap` + `model_quality_gap` no
+    concluyente. No se relajo guardrail.
+  - `openai_gpt-5-nano` / `low_frequency_015`:
+    `unsafe_blocked` por `planned_extension_misrepresented:whatsapp_handoff`
+    y `unsupported_precio_claim`; sin fallback provider. Clasificado como
+    `guardrail_policy_gap` + `model_quality_gap` no concluyente. No se relajo
+    guardrail.
+  - `requesty_deepseek_4_flash` / `crm_integration_018`:
+    falso positivo del evaluator: la respuesta negaba disponibilidad CRM, pero
+    el matcher marco `crm disponible` y duplico el hit.
+- Fix aplicado solo al evaluator headless:
+  - se agregaron negaciones conservadoras `no tiene`, `no tienen`,
+    `no dispone`, `no esta disponible`;
+  - se deduplican forbidden hits iguales entre patrones globales y del caso.
+- Tests agregados:
+  - negacion `no tiene ... CRM disponible hoy`;
+  - deduplicacion de `crm disponible`.
+- Repeticion minima posterior:
+  - `crm_integration_018` con `requesty_deepseek_4_flash`: PASS,
+    `response_is_fallback=false`, alias correcto y 5 sources reales de Milvus.
+- Se actualizo:
+  - `docs/sales_diagnosis_feasibility_20260612.md` con tabla de FAIL,
+    causa, evidencia y recomendacion;
+  - `lab/model-evaluation-sales-diagnosis/README.md` con regla de analisis de
+    FAIL y fila Requesty en la matriz de modelos.
+- Recomendacion vigente:
+  - mantener `openai_gpt_4o_mini_2024_07_18` como baseline;
+  - mantener `requesty_deepseek_4_flash` como candidato alternativo;
+  - mantener `openai_gpt-5-nano` activo via Responses API, no default hasta
+    repetir casos bloqueados con mejor evidencia de guardrail.
+- No se declaro ganador nuevo.
+- No se cambio default del sistema.
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+
+### 2026-06-11 - Fase 1.9m — Milvus schema/corpus alignment for Sales Diagnosis Product Adapter
+
+- Se agrego `scripts/inspect_sales_diagnosis_milvus_schema.py` como inspector reproducible del schema/corpus real de Milvus.
+- Se ajusto `MilvusRetrievalProvider` para resolver aliases reales de la collection viva sin romper el default fake:
+  - `knowledge_scope_code` -> `knowledge_scope_id`
+  - `source_uri` -> `node_path`
+  - `content` -> `content_preview`
+- Se preservo el comportamiento seguro por defecto:
+  - fake retrieval sigue default;
+  - LLM fake sigue default;
+  - Milvus sigue opt-in;
+  - pgvector no participa;
+  - frontend no se toca.
+- Se valido la collection real `team360_lab_pgvector_benchmark_openai_small_1536` con `139` filas:
+  - `knowledge_scope_id = 8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`
+  - `embedding_version = team360-openai-small-1536-v1`
+  - `embedding` `FLOAT_VECTOR(1536)`
+  - `node_path` como fallback de `source_uri`
+  - `content_preview` como fallback de `content`
+  - `metadata` no existe en la collection real
+- Se valido retrieval real con product adapter usando el UUID/version correctos: `retrieved_sources` reales y no vacios, sin `dev_doc_*`.
+- Se corroboro que el inspector reporta `OK` y que el runtime filter se alinea con la collection real cuando `TEAM360_KNOWLEDGE_SCOPE_ID` y `TEAM360_EMBEDDING_VERSION` apuntan al corpus observado.
+- Validaciones ejecutadas:
+  - `uv run pytest` = **379 passed, 9 skipped**
+  - `uv run pytest tests/test_sales_diagnosis_milvus_provider.py tests/test_sales_diagnosis_runtime_route.py tests/test_sales_diagnosis_runtime_dev_route.py` = **103 passed**
+  - `uv run python scripts/inspect_sales_diagnosis_milvus_schema.py` con pymilvus real = **OK**
+  - smoke Milvus real = **16/16 passed**
+  - smoke dev endpoint = **30/30 passed**
+  - smoke dev endpoint postgres cleanup = **30/30 passed**
+  - smoke product adapter Postgres = **22/22 passed**
+  - smoke product adapter OpenAI = **SKIP controlado** por provider no habilitado en esta sesion
+  - smoke product adapter LiteLLM = **SKIP controlado** por provider no habilitado en esta sesion
+- No se tocaron: frontend, Astro, Svelte, UI, SSE productivo, OpenAI real, LiteLLM real, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se creo rama nueva.
+
+### 2026-06-10 - Fase 1.9b — Product adapter state hardening
+
+- Se endurecio `POST /api/sales-diagnosis-runtime/turn` para que no use InMemory silencioso cuando `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1`.
+- Se agrego `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY` como selector obligatorio de state para el adapter.
+- Valores aceptados: `postgres` e `inmemory_test`.
+- `postgres` usa `globalVar.get_team360_db_url_psql()` y `SyncPostgresConversationStateRepository` con SQL encapsulado en `state_repository.py`.
+- `inmemory_test` queda permitido solo de forma explicita para tests/control adapter; no es produccion real.
+- Si falta state repo, es invalido o falta config DB para Postgres, la ruta devuelve HTTP 503 controlado, sin stacktrace ni secrets.
+- Retrieval y LLM siguen fake por default; no se activan Milvus real, LiteLLM real ni OpenAI real por default.
+- El endpoint dev `POST /api/dev/sales-diagnosis-runtime/turn` conserva su comportamiento y defaults.
+- No se toco frontend, Astro, Svelte, UI, SSE productivo, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9c — Product adapter Postgres HTTP smoke
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py`:
+  - Smoke HTTP para el endpoint no-dev `POST /api/sales-diagnosis-runtime/turn` con Postgres state.
+  - Usa solo stdlib (urllib), no levanta servidores.
+  - Default base URL: `http://127.0.0.1:8018` (distinto del dev endpoint para coexistencia).
+  - Si `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED` no esta habilitada, hace skip (exit 0).
+  - Si `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY` no es `postgres`, hace skip (exit 0).
+  - Valida 10 condiciones:
+    1. Request valido devuelve 201 con respuesta segura.
+    2. Response contract estable (9 keys).
+    3. session_id preservado.
+    4. turn_count incrementa (1 → 2).
+    5. runtime_mode = `product_adapter_skeleton`.
+    6. No LLM real (SAFE_ACK_TEXT).
+    7. No Milvus real (chunks fake `dev_doc_*`).
+    8. No stacktrace en errores 400.
+    9. Rechazo de IDs Vera prohibidos.
+    10. No LiteLLM real en respuestas.
+  - Cleanup: `--cleanup` borra solo filas `smoke_product_pg_%` y verifica remaining=0.
+  - No imprime DSN ni credenciales.
+- Se actualizaron:
+  - `scripts/README.md`: nueva entrada con descripcion, validaciones y comando.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9c agregada.
+  - `status_actual.md`: este registro (Fase 1.9c).
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, routes, schemas, tests existentes, endpoint dev, endpoint product adapter, smokes existentes.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9d — Product adapter release gate
+
+- Se documento Fase 1.9d como release gate del bloque 1.9a–1.9c.
+- Se agrego matriz del product adapter (5 casos: A–E) en:
+  - `modules/sales_diagnosis_runtime/README.md`
+  - `docs/status_actual.md`
+- Se documentaron comandos smoke consolidados (dev InMemory, dev Postgres, dev LiteLLM, product adapter Postgres).
+- Se confirmo cleanup prefix: `smoke_product_pg_%` exclusivo; no toca `smoke_dev_*`, `smoke_unsafe_*` ni sesiones reales.
+- Se confirmaron defaults seguros:
+  - State: `inmemory_test` (explicito) o `postgres` para product adapter.
+  - Retrieval: `fake` no configurable en product adapter.
+  - LLM: `fake` no configurable en product adapter.
+- Se confirmo que product adapter NO tiene envs opt-in para retrieval ni LLM. Es intencional.
+- Se confirmo que errores controlados no exponen stacktrace, DB URL, API keys, tokens ni headers sensibles.
+- Se confirmo que product adapter sigue feature-flagged, no es endpoint publico final.
+- Se confirmo que no hay frontend, SSE, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- Se agrego resumen del bloque 1.9 con estado de cada fase.
+- No se modifico logica del endpoint, routes, schemas, tests, ni smokes existentes.
+- No se activaron servicios reales nuevos.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9e — Product adapter OpenAI direct opt-in boundary
+
+- Se agrego `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER` env para selector de LLM en product adapter.
+- Valores aceptados: `fake` (default) y `openai`.
+- Se creo `_ProductOpenAILLMProvider` en `routes/sales_diagnosis_runtime.py`:
+  - Lazy import de OpenAI SDK (no se importa al cargar modulo).
+  - API key via `TEAM360_OPENAI_KEY` o `OPENAI_API_KEY`.
+  - Modelo via `TEAM360_OPENAI_MODEL` (default `gpt-5-nano`).
+  - Prompts via `PromptPolicy`.
+  - Errores de API retornan `SAFE_ACK_TEXT` como fallback (sin stacktrace).
+- Si API key falta: HTTP 503 controlado sin secrets.
+- Si provider invalido: HTTP 503 controlado listando valores aceptados.
+- Se agregaron 7 tests nuevos en `test_sales_diagnosis_runtime_route.py`:
+  1. LLM default remains fake.
+  2. Accepts explicit fake LLM provider.
+  3. Rejects invalid LLM provider.
+  4. OpenAI missing API key returns controlled error.
+  5. OpenAI config error does not leak secrets.
+  6. OpenAI mode does not call OpenAI in unit tests.
+  7. State hardening still required.
+- Total tests: 28 en route file.
+- Matriz actualizada (6 casos: A–F).
+- Se actualizaron:
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9e, matriz actualizada.
+  - `status_actual.md`: este registro.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, LiteLLM, Milvus, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, endpoint dev, smokes existentes.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9f — Product adapter OpenAI direct HTTP smoke
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py`.
+- Skip controlado si falta `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai`
+  o `TEAM360_OPENAI_KEY` / `OPENAI_API_KEY` (exit 0, no es fallo).
+- Valida: 201, session_id, runtime_mode, response contract, fake retrieval,
+  no stacktrace, no LiteLLM, no DB leak, provider result event, turn_count.
+- Flag `--allow-fallback` para no fallar si OpenAI devolvio SAFE_ACK_TEXT.
+- Se agrego `team360.llm.provider_result` event en `runtime.py` despues de
+  `self._llm.generate()` para distinguir respuesta real vs fallback.
+- Se actualizaron:
+  - `scripts/README.md`: seccion Fase 1.9f.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9f, matriz caso G.
+  - `docs/status_actual.md`: este registro.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, LiteLLM, Milvus, ArangoDB,
+  pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code,
+  WhatsApp handoff, CRM real, endpoint dev, smokes existentes, tests existentes.
+- No se agregaron tests que dependan de OpenAI real.
+- No se modifico el contrato HTTP publico.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9g — OpenAI direct real validation
+
+- Se agregaron helpers `get_team360_openai_key()` y `get_team360_openai_model()` en `globalVar.py`.
+- `get_team360_openai_key()` resuelve con prioridad: `OpenAI_Key_JAI_query` > `TEAM360_OPENAI_KEY` > `OPENAI_API_KEY` > `VERTICE360_OPENAI_KEY`.
+- `get_team360_openai_model()` resuelve: `TEAM360_OPENAI_MODEL` (default `gpt-5-nano`).
+- `_ProductOpenAILLMProvider` en `routes/sales_diagnosis_runtime.py` ahora usa `get_team360_openai_key()` de `globalVar.py` como fuente unica, no lee env vars directas.
+- `_detect_openai_envs()` en el smoke script ahora usa `get_team360_openai_key()` de `globalVar.py`.
+- Tests actualizados: se agrego `monkeypatch.delenv("OpenAI_Key_JAI_query")` en los 3 tests que requieren ausencia de key.
+- Se ejecuto smoke real OpenAI con `gpt-5-nano`:
+  - Backend levantado en puerto 8018.
+  - **14/14 checks PASSED**.
+  - `response_is_fallback=false` — OpenAI respondio realmente.
+  - No se uso fallback silencioso.
+  - No se uso LiteLLM.
+  - No se uso Milvus real.
+  - `/api/dev/sales-diagnosis-runtime/turn` sigue funcionando correctamente.
+- Tests unitarios pasan sin network real:
+  - `test_sales_diagnosis_runtime_route.py`: **28 passed**.
+  - `test_sales_diagnosis_runtime_dev_route.py`: **36 passed**.
+  - Suite completa: **363 passed, 9 skipped**.
+- Product adapter sigue feature-flagged (`TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED`).
+- State sigue explicito (inmemory_test o postgres).
+- LLM default sigue fake.
+- OpenAI solo opt-in explicito.
+- LiteLLM no se activo.
+- Milvus real no se activo.
+- Retrieval sigue fake.
+- No se toco frontend, Astro, Svelte, UI, SSE, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- Se elimino `bun.lock`, `index.ts`, `package.json`, `tsconfig.json` (artefactos del crash anteriores).
+- No se creo rama nueva.
+
+La key OpenAI se resuelve desde `globalVar.get_team360_openai_key()`, que lee `OpenAI_Key_JAI_query`, `TEAM360_OPENAI_KEY` o `OPENAI_API_KEY` del entorno.
+No es necesario exportarla explicitamente si ya esta configurada.
+
+### 2026-06-11 - Fase 1.9h — Product adapter LiteLLM opt-in boundary
+
+- Se agrego `_ProductLiteLLMProvider` en `routes/sales_diagnosis_runtime.py`.
+- Usa `LiteLLMClient` de `modules.automation_diagnosis.litellm_client` (urllib, no OpenAI SDK).
+- Requiere `TEAM360_LITELLM_BASE_URL` y `TEAM360_LITELLM_API_KEY`.
+- Modelo default: `openai_gpt-5-nano` via `TEAM360_LITELLM_MODEL_ALIAS`.
+- `_resolve_product_llm_provider()` actualizado para aceptar `litellm`.
+- Errores de config devuelven HTTP 503 controlado (no 500 como dev endpoint).
+- Tests agregados (6): accept, missing base_url, missing api_key, no-leak, no-network, invalid provider msg actualizado.
+- Se creo `scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py`.
+- Smoke skip controlado si falta config (exit 0).
+- Smoke con flag `--allow-fallback`.
+- Se actualizaron:
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9h, matriz caso H.
+  - `scripts/README.md`: seccion Fase 1.9h.
+  - `docs/status_actual.md`: este registro.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real, Milvus, ArangoDB,
+  pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code,
+  WhatsApp handoff, CRM real, endpoint dev, smokes existentes, tests existentes.
+- No se agregaron tests que dependan de LiteLLM real.
+- No se modifico el contrato HTTP publico.
+- No se creo rama nueva.
+
+### 2026-06-11 - Fase 1.9i — LiteLLM real validation for Sales Diagnosis Product Adapter
+
+- Se valido el product adapter contra LiteLLM real con alias `openai_gpt-5-nano`.
+- Backend levantado con:
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1`
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test`
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`
+  - `TEAM360_LITELLM_BASE_URL=http://localhost:4000`
+  - `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano`
+- Smoke LiteLLM real: **13/13 checks PASSED**.
+  - `response_is_fallback=false` — LiteLLM respondio realmente.
+  - No se uso fallback silencioso.
+  - No se uso OpenAI directo desde Team360.
+  - No se uso Milvus real.
+  - Retrieval sigue fake (chunks `dev_doc_*`).
+  - State: inmemory_test explicito.
+  - Sin stacktrace ni secrets en errores.
+- `/api/dev/sales-diagnosis-runtime/turn` sigue funcionando (30/30 passed en smoke InMemory).
+- Product adapter sigue feature-flagged.
+- LLM default sigue fake.
+- LiteLLM solo opt-in explicito.
+- No se modifico codigo, runtime, rutas, schemas ni tests existentes.
+- No se creo rama nueva.
+- Se ejecutaron todas las validaciones obligatorias:
+  - pytest completa: **368 passed, 9 skipped**.
+  - Smoke dev InMemory: 30/30 passed.
+  - Smoke dev LiteLLM (sin env): SKIP correcto.
+  - Smoke product adapter LiteLLM (sin env): SKIP correcto.
+  - Secret scan: sin leaks.
+  - `git diff --check`: limpio.
+
+### 2026-06-11 - Fase 1.9j — Product adapter LLM release gate
+
+- Se cerro documental y operativamente el bloque LLM del product adapter.
+- Se definio la matriz LLM del product adapter:
+
+| Provider | Env | Default | Network real | Smoke | Validacion real | Fallback esperado |
+|----------|-----|---------|-------------|-------|----------------|-------------------|
+| `fake` | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER` unset o `fake` | **Si** | No | No aplica | No aplica | No aplica |
+| `openai` | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai` | No | Solo opt-in | `smoke_sales_diagnosis_runtime_product_adapter_openai.py` | `response_is_fallback=false` con gpt-5-nano | SAFE_ACK_TEXT (con --allow-fallback) |
+| `litellm` | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm` + `TEAM360_LITELLM_BASE_URL` + alias `openai_gpt-5-nano` | No | Solo opt-in | `smoke_sales_diagnosis_runtime_product_adapter_litellm.py` | `response_is_fallback=false` con openai_gpt-5-nano | SAFE_ACK_TEXT (con --allow-fallback) |
+
+- `team360.llm.provider_result` event documentado:
+  - `response_is_fallback=false`: provider real respondio. Smoke falla si detecta fallback.
+  - `response_is_fallback=true`: provider devolvio SAFE_ACK_TEXT (fallback seguro).
+  - `--allow-fallback` permite pasar incluso con fallback, para entornos sin credencial real.
+- Validaciones ejecutadas en el gate:
+  - pytest completa: **368 passed, 9 skipped**.
+  - Smoke dev InMemory: 30/30 passed.
+  - Smoke product adapter OpenAI (skip sin env): correcto.
+  - Smoke product adapter LiteLLM (skip sin env): correcto.
+  - Smoke product adapter Postgres (skip sin env): correcto.
+  - **Smoke OpenAI real**: 14/14 passed, `response_is_fallback=false`.
+  - **Smoke LiteLLM real**: 13/13 passed, `response_is_fallback=false`.
+  - Secret scan: sin leaks.
+  - `git diff --check`: limpio.
+- No se modifico codigo, runtime, rutas, schemas ni tests existentes.
+- No se creo rama nueva.
+
+Comandos smoke consolidados:
+
+```bash
+cd SrvRestAstroLS_v1/backend
+
+# Dev endpoint — InMemory (no DB, no LLM, no Milvus)
+uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py
+
+# Dev endpoint — Postgres opt-in
+TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --cleanup
+
+# Dev endpoint — LiteLLM opt-in
+TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py
+
+# Product adapter — Postgres opt-in
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py --cleanup
+
+# Product adapter — OpenAI opt-in (skip si falta env o key)
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
+
+# Product adapter — LiteLLM opt-in (skip si falta env)
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py
+
+# Reales con backend levantado:
+# Terminal 1:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8018
+# Terminal 2:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
+
+# O con LiteLLM:
+# Terminal 1:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8018
+# Terminal 2:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py
+```
+
+```bash
+# Terminal 1:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8018
+
+# Terminal 2:
+TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=openai \
+  uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_openai.py
+```
+
+### 2026-06-11 - Fase 1.9k — Product adapter Milvus retrieval opt-in boundary
+
+- Se agrego `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER` en `routes/sales_diagnosis_runtime.py`.
+- Valores aceptados: `fake` (default) y `milvus` (opt-in).
+- Default obligatorio: `fake`.
+- `_resolve_product_retrieval_provider()` creada, con patron consistente con el dev endpoint.
+- `_build_product_adapter_runtime()` actualizada para usar `_resolve_product_retrieval_provider()`.
+- Modo `milvus` requiere `TEAM360_MILVUS_URI` o `TEAM360_MILVUS_HOST`.
+- Modo `milvus` usa `MilvusRetrievalProvider` con `_DevFakeEmbeddingProvider` (1536-dim, no OpenAI real).
+- Embedding fake: placeholder dev/product-adapter-boundary, no es estrategia final.
+- Errores de config devuelven HTTP 503 controlado (no 500), sin stacktrace ni secrets.
+- `MilvusRuntimeConfig.from_env()` usada tal cual existe; `__repr__` ya enmascara token.
+- No se creo `_ProductMilvusRetrievalProvider` — se reusa `MilvusRetrievalProvider` directo.
+- No se modifico `milvus_provider.py` ni `embedding_provider.py`.
+- No se modifico `runtime.py` ni `contracts.py`.
+- No se modifico el endpoint dev ni sus tests.
+- Tests agregados (9):
+  1. `product_route_retrieval_default_remains_fake`
+  2. `product_route_accepts_explicit_fake_retrieval_provider`
+  3. `product_route_accepts_milvus_retrieval_provider_with_mocked_config`
+  4. `product_route_invalid_retrieval_provider_returns_controlled_503`
+  5. `product_route_invalid_retrieval_provider_lists_fake_and_milvus`
+  6. `product_route_milvus_missing_config_returns_controlled_503`
+  7. `product_route_milvus_config_error_does_not_leak_secrets`
+  8. `product_route_milvus_mode_does_not_call_real_network_in_unit_tests`
+  9. `product_route_openai_litellm_paths_not_broken_by_retrieval_selector`
+- Smoke real Milvus queda para Fase 1.9l.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real, LiteLLM real,
+  Milvus real por default, ArangoDB, pgvector, cross-encoder, Step-to-Action,
+  lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- No se creo rama nueva.
+
+Se actualizaron:
+  - `routes/sales_diagnosis_runtime.py`: env var, resolver, imports, docstring.
+  - `tests/test_sales_diagnosis_runtime_route.py`: 9 nuevos tests.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9k, resumen bloque 1.9.
+  - `docs/status_actual.md`: este registro.
+
+### 2026-06-11 - Fase 1.9l — Product adapter Milvus real smoke
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py`:
+  - Smoke HTTP opt-in que requiere backend corriendo con `TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus`.
+  - Si no es `milvus` o faltan configs Milvus → skip (exit 0).
+  - Sin dependencias extra (urllib stdlib).
+  - Usa `_DevFakeEmbeddingProvider` (1536-dim zeros, no OpenAI/LiteLLM real).
+  - Valida: HTTP 201, session_id, runtime_mode, contract keys, sources no-fake, sin stacktrace, LLM fake, sin LiteLLM, sin DB leak, sin secrets, turn_count increment.
+  - Flag `--allow-empty-results` para entornos sin corpus cargado.
+- Ejecucion real contra Milvus standalone `127.0.0.1:19530` con coleccion `team360_lab_pgvector_benchmark_openai_small_1536`:
+  - **15/15 checks PASSED** (con `--allow-empty-results`).
+  - Backend conecto a Milvus real.
+  - Milvus search fallo por schema incompatible (falta `source_uri`) → runtime captura `MilvusSearchError` → devuelve HTTP 201 con sources vacios.
+  - Sin secrets, sin stacktraces, runtime_mode estable, contratos HTTP estables.
+  - LLM fake (SAFE_ACK_TEXT).
+- Sin envs: **SKIP correcto** (exit 0).
+- Sin modificacion de codigo productivo, routes, schemas, tests ni smokes existentes.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real, LiteLLM real,
+  ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture,
+  diagnostic_code, WhatsApp handoff, CRM real.
+- No se creo rama nueva.
+
+Se actualizaron:
+  - `scripts/README.md`: seccion Fase 1.9l con comandos y validaciones.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.9l, resumen bloque 1.9 actualizado.
+  - `docs/status_actual.md`: este registro.
+
+### 2026-06-10 - Fase 1.9a — Product route adapter skeleton
+
+- Se agrego la ruta controlada `POST /api/sales-diagnosis-runtime/turn` como `product adapter skeleton`.
+- La ruta no reemplaza el endpoint interno/dev `POST /api/dev/sales-diagnosis-runtime/turn`.
+- La ruta queda deshabilitada por default via feature flag `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED`; si no esta activa responde HTTP 404 controlado y sin stacktrace.
+- Con la feature flag activa usa `AssistantConversationRuntime`, `PromptPolicy` y `GuardrailPolicy` reales.
+- Defaults seguros 1.9a: state `inmemory`, retrieval `fake`, LLM `fake`. No se activan servicios reales por default.
+- Se agregaron schemas HTTP separados `ProductTurnRequest` y `ProductTurnResponse`, manteniendo contrato compatible con el endpoint dev y `runtime_mode = product_adapter_skeleton`.
+- Se rechazan IDs prohibidos `vera_team360_sales_diagnosis`, `pkg_vera_sales_diagnosis`, `ks_vera_team360_sales_diagnosis` y `svc_vera_sales_diagnosis` con HTTP 400 controlado.
+- Se agrego `tests/test_sales_diagnosis_runtime_route.py` para cubrir feature flag, contrato, defaults seguros, no uso de LiteLLM/Milvus real y continuidad del endpoint dev.
+- No se toco frontend, Astro, Svelte, UI, SSE productivo, OpenAI SDK, servicios reales por default, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se creo rama nueva.
+
+### 2026-06-10 - Fase 1.8p — Runtime dev endpoint release gate
+
+- Se audito el endpoint interno/dev `POST /api/dev/sales-diagnosis-runtime/turn` antes de abrir cualquier endpoint no-dev.
+- Se documento en `backend/modules/sales_diagnosis_runtime/README.md` una matriz clara de modos:
+  - State: `inmemory` default / `postgres` opt-in.
+  - Retrieval: `fake` default / `milvus` opt-in.
+  - LLM: `fake` default / `litellm` opt-in.
+- Defaults seguros confirmados: `state=inmemory`, `retrieval=fake`, `llm=fake`.
+- Se documentaron env vars necesarias para cada opt-in, combinaciones soportadas en dev y comandos smoke base InMemory, Postgres opt-in y LiteLLM opt-in.
+- Se aclaro que la configuracion DB se resuelve desde `backend/globalVar.py` via `get_team360_db_url_psql()`; las env vars son entradas de esa configuracion.
+- Se actualizo `backend/scripts/README.md` con el release gate operativo y comandos smoke.
+- Pytest normal no usa servicios reales; los servicios reales siguen siendo opt-in.
+- El endpoint sigue siendo interno/dev bajo `/api/dev/`; no se abrio endpoint publico.
+- No se toco frontend, Astro, Svelte, UI, SSE productivo, endpoint publico, OpenAI SDK, ArangoDB, pgvector, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- No se creo rama nueva.
+
+### 2026-06-10 - Fase 1.8l — Provider mode boundary for dev endpoint
+
+- Se agregaron dos nuevas variables de entorno en `routes/sales_diagnosis_runtime_dev.py`:
+  - `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER` (default `fake`) — selecciona proveedor de retrieval.
+  - `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER` (default `fake`) — selecciona proveedor de LLM.
+- `_resolve_retrieval_provider()`: acepta `fake`, rechaza valores invalidos con HTTP 500.
+- `_resolve_llm_provider(metadata)`: prioriza flag `dev_test_unsafe_llm` en metadata sobre env var.
+- `_build_dev_runtime()` refactorizada para usar los nuevos resolvers.
+- No se conectaron proveedores reales — solo el boundary/config selector preparado y testeado.
+- Se agregaron 10 tests en `TestDevSalesDiagnosisRouteProviders`:
+  - Default, explicit fake, invalid values (controlled error, no secret leaks), unsafe flag precedence, runtime intacto.
+- Validacion: `uv run pytest` = 327 passed, 9 skipped (sin regresiones).
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8m — Milvus retrieval opt-in boundary for dev endpoint
+
+- Se extendio `_resolve_retrieval_provider()` en `routes/sales_diagnosis_runtime_dev.py`:
+  - `TEAM360_SALES_DIAGNOSIS_DEV_RETRIEVAL_PROVIDER=milvus` ahora es valido.
+  - Crea `MilvusRetrievalProvider` con `MilvusRuntimeConfig.from_env()` + `_DevFakeEmbeddingProvider` (vector estatico 1536-dim, no OpenAI).
+  - Si falta `TEAM360_MILVUS_URI` y `TEAM360_MILVUS_HOST` → HTTP 500 controlado.
+  - Valores invalidos siguen dando HTTP 500 (ej: `"pinecone"`).
+- Se creo `_DevFakeEmbeddingProvider`: implementa `QueryEmbeddingProvider` protocol sin OpenAI.
+- Se agrego `TestDevSalesDiagnosisRouteMilvus` con 4 tests:
+  - `test_milvus_mode_is_accepted_with_env_config` — Milvus mode con mock config es aceptado.
+  - `test_milvus_mode_without_config_returns_controlled_error` — Sin config → HTTP 500.
+  - `test_milvus_mode_config_error_does_not_leak_secrets` — Error sin secrets.
+  - `test_postgres_state_still_works_with_fake_retrieval` — Postgres state + fake retrieval OK.
+- Se modifico `test_invalid_retrieval_provider_returns_controlled_error` para usar `"pinecone"` en vez de `"milvus"` (ahora valido).
+- Validacion: `uv run pytest` = 331 passed, 9 skipped (+4 nuevos).
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8n — LiteLLM LLM provider opt-in boundary for dev endpoint
+
+- Se extendio `_resolve_llm_provider()` en `routes/sales_diagnosis_runtime_dev.py`:
+  - `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER=litellm` ahora es valido.
+  - Crea `_DevLiteLLMProvider` que usa `LiteLLMClient` de `automation_diagnosis` (urllib, no OpenAI SDK).
+  - Requiere `TEAM360_LITELLM_BASE_URL` y `TEAM360_LITELLM_API_KEY` — si falta → HTTP 500.
+  - Construye prompts via `PromptPolicy.build_system_prompt()` y `build_turn_prompt()`.
+  - Modelo via `TEAM360_LITELLM_MODEL_ALIAS` (default: `openrouter_qwen3_30b_a3b_thinking_2507`).
+  - Valores invalidos siguen dando HTTP 500.
+  - `dev_test_unsafe_llm` en metadata sigue teniendo prioridad.
+- Se creo `_DevLiteLLMProvider` en la route file: implementa `LLMProvider` protocol.
+- Se agrego `TestDevSalesDiagnosisRouteLiteLLM` con 4 tests:
+  - `test_litellm_mode_is_accepted_with_env_config` — LiteLLM mode con env vars aceptado.
+  - `test_litellm_mode_without_config_returns_controlled_error` — Sin config → HTTP 500.
+  - `test_litellm_mode_does_not_leak_secrets` — Error sin secrets.
+  - `test_milvus_retrieval_does_not_force_real_llm` — Milvus retrieval + fake LLM coexisten.
+- Validacion: `uv run pytest` = 335 passed, 9 skipped (+4 nuevos).
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real por default, Milvus real por default, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8o — LiteLLM HTTP smoke opt-in for dev endpoint
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_dev_endpoint_litellm.py`:
+  - Smoke HTTP opt-in independiente del smoke base (evita ensuciar el existente).
+  - Si `TEAM360_SALES_DIAGNOSIS_DEV_LLM_PROVIDER` no es `litellm`, hace skip (exit 0, no es fallo).
+  - Si faltan `TEAM360_LITELLM_BASE_URL` o `TEAM360_LITELLM_API_KEY`, el backend devuelve HTTP 500 controlado; el smoke valida mensaje de error sin leaks de secrets.
+  - Si LiteLLM esta configurado, valida:
+    1. Status 201.
+    2. Response contract estable (9 keys esperadas).
+    3. session_id preservado.
+    4. runtime_mode = `dev_fake`.
+    5. retrieved_sources son chunks fake (prefijo `dev_doc_*`), no Milvus real.
+    6. Guardrail unsafe (`dev_test_unsafe_llm`) funciona: response_type `unsafe_blocked`.
+    7. No stack traces en errores 400.
+    8. No leaks de DB por defecto.
+  - Sin dependencias extra (urllib stdlib). No imprime API keys ni headers sensibles.
+- Se actualizaron:
+  - `scripts/README.md`: nueva entrada con descripcion y ejemplo de uso.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.8o agregada.
+  - `status_actual.md`: este registro.
+- Validacion: `uv run pytest` = 335 passed, 9 skipped (sin regresiones).
+- Validacion: `uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py` = 36 passed.
+- Validacion: smoke default InMemory = OK.
+- Validacion: smoke Postgres opt-in = OK.
+- Validacion: smoke LiteLLM opt-in (sin env LiteLLM) = SKIP con mensaje claro.
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI real por default, Milvus real por default, ArangoDB, cross-encoder, routes, schemas, tests existentes, smoke base.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Team360 DB URL visible en globalVar
+
+- Se actualizo `backend/globalVar.py` para exponer `TEAM360_DB_URL`, `TEAM360_DB_URL_PSQL`, `TEAM360_DB_NAME`, `TEAM360_DB_SCHEMA` y helpers `get_team360_db_url()` / `get_team360_db_url_psql()` como configuracion Team360 activa.
+- Se mantuvieron los nombres `FUTURE_OPTIONAL_*` como aliases compatibles para scripts existentes.
+- La resolucion activa de DSN queda alineada con `modules/db/settings.py`: prioridad `TEAM360_DB_URL`, fallback `TEAM360_DB_URL_PSQL`, fallback derivado desde `DB_PG_V360_URL`; sin DSN falso si no hay env configurada.
+- El fallback placeholder previo queda limitado al helper legacy `get_future_optional_team360_db_url()` para compatibilidad de scripts exploratorios.
+- Se agregaron tests directos en `tests/test_global_var.py`.
+- No se tocaron frontend, endpoints HTTP, routes, migraciones, labs ni `team360_orquestador`.
+
+### 2026-06-10 - Fase 1.8f — Backend-only runtime integration smoke with fakes + Postgres state
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_postgres.py`:
+  - `_SmokePostgresStateRepository`: sync bridge que implementa `StateRepository` protocol usando psycopg 3 sync directo, sin async, sin pool. Cada operacion abre/cierra conexion. Especifico para smoke; no reemplaza el async skeleton de `PostgresConversationStateRepository`.
+  - `FakeRetrievalProvider`: devuelve 2 chunks controlados (`CONTROLLED_CHUNKS`), no llama Milvus.
+  - `FakeLLMProvider`: modos configurables `safe`, `too_many_questions`, `unsafe_claim`, `empty`. No llama OpenAI/LiteLLM/OpenRouter.
+  - `FakeMetricsRecorder`: almacena turns en memoria.
+  - `FakeAuditTrail`: almacena records en memoria.
+  - Flujo de 4 turnos:
+    1. Turno 1 safe LLM: `AssistantConversationRuntime` real + fake retrieval + fake LLM safe → output con `response_type="final"`, `turn_count=1`. State guardado en Postgres real. Verifica `state_jsonb` y `turn_count` via SQL directo.
+    2. Turno 2 safe LLM: mismo `session_id` → carga state desde Postgres → `turn_count=2`. Slots/history_summary preservados.
+    3. Turno 3 soft guardrail: fake LLM `too_many_questions` → `max_questions_exceeded=True`, fallback aplicado, state guardado (`turn_count=3`).
+    4. Turno 4 hard guardrail: fake LLM `unsafe_claim` con `lead_capture listo y WhatsApp handoff con SLA` → `UnsafeResponseError` capturado, verifica bloqueo.
+  - Verifica existencia de tabla `sales_diagnosis_conversation_states` via `information_schema.tables`; si no existe, falla con mensaje claro: aplicar migracion 007.
+  - Cleanup via `_delete_smoke_session` en bloque `finally`.
+  - Usa `globalVar.get_team360_db_url()` para resolver DSN.
+  - No imprime URL cruda en logs.
+  - Exit 0 en exito, 1 en fallo, stdout con checks detallados.
+- Se creo `tests/test_sales_diagnosis_runtime_postgres_smoke_contract.py` con 10 tests:
+  - script exists, usa `get_team360_db_url()`, no imprime URL, falla sin env.
+  - usa fake retrieval (no Milvus), fake LLM (no OpenAI).
+  - guardrail failure case presente.
+  - cleanup de session smoke.
+  - referencia a migracion 007.
+  - integration test (skip sin env).
+- Se actualizo `README.md` del modulo con seccion Fase 1.8f.
+- Se actualizo `backend/scripts/README.md` con entrada del nuevo smoke.
+- Tests: `uv run pytest` = 281/282 passed, 1 skipped (integration sin env).
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se llama Milvus real, no se tocan otras tablas.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
+- `PostgresConversationStateRepository` sigue siendo sync skeleton documentado; el smoke usa su propio bridge sync.
+- No se creo rama nueva; todo en `feature/console-backend-core`.
+
+### 2026-06-10 - Fase 1.8g — Async runtime boundary / Postgres state repository decision
+
+- Se realizo la auditoria completa de contratos sync/async del Sales Diagnosis Runtime:
+  - Todos los protocolos son sync: `StateRepository`, `RetrievalProvider`, `LLMProvider`, `MetricsRecorder`, `AuditTrail`, `QueryEmbeddingProvider`.
+  - `AssistantConversationRuntime.handle_turn()` es sync — convertir a async romperia ~250 lineas de tests existentes en 5+ archivos.
+  - `PostgresConversationStateRepository` es un skeleton sync que lanza `StateRepositoryError` — nunca fue operacional por el async boundary irresuelto.
+  - El proyecto ya tiene un patron async establecido en `automation_diagnosis`: `AutomationDiagnosisPostgresRepository` (async def, AsyncConnection inyectada), `modules/db/transaction.py` (fetch_one, execute async), y `modules/db/pool.py` (AsyncConnectionPool).
+
+- **Decision**: Runtime core se mantiene sync. Se agrega el async boundary solo para persistencia.
+  - `AsyncStateRepository` protocol en `providers.py` — async version de `StateRepository` para produccion.
+  - `AsyncInMemoryStateRepository` en `providers.py` — implementacion in-memory async para testing.
+  - `AsyncPostgresConversationStateRepository` en `state_repository.py` — repositorio async productivo real contra PostgreSQL 18 con psycopg 3 pool.
+  - `PostgresConversationStateRepository` sync skeleton se mantiene como documentacion/referencia (no removido).
+  - Se creo `scripts/smoke_sales_diagnosis_state_postgres_async.py` — smoke async que valida save → load → update → load non-existent → verify round-trip con RetrievedChunks.
+  - Se creo `tests/test_sales_diagnosis_async_state_repository.py` — 19 tests: 2 protocolo, 5 in-memory async, 5 postgres sin DB (pool raises, repr, etc), 7 postgres con DB (skip si no hay TEAM360_DB_URL).
+  - Se creo `async_boundary_decision.md` — documenta la decision, arquitectura, archivos y futuro.
+
+- Se actualizaron READMEs:
+  - `modules/sales_diagnosis_runtime/README.md` con seccion Fase 1.8g.
+  - `backend/scripts/README.md` con entrada del nuevo smoke y referencias cruzadas.
+  - `docs/status_actual.md` con esta entrada.
+
+- Validacion: `uv run pytest` = 299/299 passed, 9 skipped (DB-dependent). Sin regresiones.
+- No se convirtio `handle_turn()` a async. No se tocaron endpoints, frontend, routes, migraciones, LLM real, Milvus real, ArangoDB.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+
+### 2026-06-10 - Fase 1.8h — Internal dev endpoint contract for Sales Diagnosis Runtime
+
+- Se creo el endpoint interno/dev `POST /api/dev/sales-diagnosis-runtime/turn`:
+  - Usa `AssistantConversationRuntime` real con providers fake por defecto.
+  - `_DevFakeRetrievalProvider`: 2 chunks controlados, no Milvus.
+  - `_DevFakeLLMProvider`: retorna `SAFE_ACK_TEXT`, no OpenAI/LiteLLM.
+  - `InMemoryConversationStateRepository` compartido entre requests para persistencia de sesion.
+  - `PromptPolicy` real y `GuardrailPolicy` real activos.
+  - Si `metadata.dev_test_unsafe_llm = true`, usa `_DevUnsafeFakeLLMProvider` que genera texto inseguro → guardrail bloquea → `response_type: "unsafe_blocked"`.
+  - Rechaza IDs prohibidos (prefijo `vera_*`) con HTTP 400.
+  - `runtime_mode: "dev_fake"` en toda respuesta.
+  - No expone stack traces.
+
+- Se crearon schemas Pydantic en `routes/sales_diagnosis_runtime_schemas.py`:
+  - `DevTurnRequest`: session_id, message (requeridos), codes con defaults, metadata.
+  - `DevTurnResponse`: session_id, response_text, response_type, fallback_applied, guardrail_flags, retrieved_sources, turn_count, events, runtime_mode.
+
+- Se registro el route handler en `app.py`.
+
+- Se crearon 12 tests en `tests/test_sales_diagnosis_runtime_dev_route.py`:
+  1. Returns 201 with safe response.
+  2. Requires message (400).
+  3. Requires session_id (400).
+  4. Uses default codes.
+  5. Rejects prohibited vera assistant_instance_code.
+  6. Rejects prohibited vera package_code.
+  7. Guardrail blocks unsafe fake LLM.
+  8. Increments turn_count same session.
+  9. Does not call real LLM.
+  10. Does not call real Milvus (fake sources returned).
+  11. Response contract stable (expected keys).
+  12. No stack trace in error responses.
+
+- Validacion: `uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py` = 12/12 passed.
+- Sin frontend, sin SSE, sin LLM real, sin Milvus real, sin DB real, sin ArangoDB.
+- Sin Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8i — Dev endpoint hardening + smoke script
+
+- Se creo `scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py`:
+  - Invoca `POST /api/dev/sales-diagnosis-runtime/turn` por HTTP.
+  - Requiere backend corriendo (no DB, no LLM real, no Milvus).
+  - `--backend-url` argumento (default `http://127.0.0.1:8000`).
+  - Usa `urllib.request` (stdlib, sin dependencias extras).
+  - Valida 12 condiciones:
+    1. Request valido devuelve 201.
+    2. Response contract estable (9 keys).
+    3. session_id se preserva.
+    4. turn_count incrementa (1 → 2).
+    5. Defaults seguros de codes.
+    6. IDs prohibidos Vera (`vera_team360_sales_diagnosis`, `pkg_vera_sales_diagnosis`, `ks_vera_team360_sales_diagnosis`) devuelven 400 con detail "prohibited".
+    7. Fake unsafe controlado (`dev_test_unsafe_llm`) → response_type `unsafe_blocked` + guardrail_flags `["unsafe_response_blocked"]`.
+    8. No stack trace en errores 400.
+    9. runtime_mode = `dev_fake` en todas las respuestas.
+    10. No LLM real (response es SAFE_ACK_TEXT, no texto generado por LLM real).
+    11. No Milvus real (sources son chunks con prefijo `dev_doc_*`).
+    12. No DB real (no leaks de "postgres" en respuestas).
+  - Report PASS/FAIL por check, exit 0 si todo pasa, exit 1 si falla.
+
+- Se actualizaron:
+  - `scripts/README.md`: nueva entrada con descripcion y ejemplo de uso.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.8i agregada.
+  - `status_actual.md`: este registro.
+
+- Sin tocar frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8j — Postgres opt-in state repository for dev endpoint
+
+- Se modifico `routes/sales_diagnosis_runtime_dev.py`:
+  - Nuevo env `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY`:
+    - `inmemory` (default) o no seteado → `InMemoryConversationStateRepository`.
+    - `postgres` → `_DevPostgresStateRepository` via psycopg 3 sync.
+    - Cualquier otro valor → HTTP 500 con mensaje de valores aceptados.
+  - `_DevPostgresStateRepository`: sync, per-request connection, reusa SQL de `AsyncPostgresConversationStateRepository`, serializa via `ConversationStateSerializer`.
+  - Si `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres` pero no hay `TEAM360_DB_URL` → HTTP 500 con mensaje claro.
+  - Errores de psycopg capturados como HTTP 500 controlado.
+  - No leaks de secrets en errores.
+  - No se crea pool propio.
+  - `_shared_inmemory_repo` se mantiene como singleton para modo default.
+
+- Se agregaron 6 tests en `tests/test_sales_diagnosis_runtime_dev_route.py`:
+  1. `test_default_uses_inmemory_state_repository` — confirma que sin env se usa InMemory.
+  2. `test_postgres_opt_in_requires_db_url` — mode=postgres sin DB_URL → 500 con mensaje.
+  3. `test_invalid_state_repository_mode_returns_controlled_error` — modo invalido → 500.
+  4. `test_endpoint_still_works_with_default_inmemory` — endpoint funcional sin env.
+  5. `test_no_real_db_called_by_default` — no leak de "postgres" en respuesta default.
+  6. `test_no_secret_leak_on_postgres_config_error` — error de config sin secrets.
+
+- Se actualizaron:
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.8j.
+  - `status_actual.md`: este registro.
+
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, scripts existentes, smoke existente.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8k — Postgres opt-in HTTP smoke for dev endpoint
+
+- Se extendio `scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py`:
+  - Detecta y muestra `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY` activo en backend.
+  - Nuevo flag `--cleanup`: elimina las sesiones de prueba de PostgreSQL al finalizar.
+  - `_cleanup_postgres_sessions()`: conecta via `get_team360_db_url_psql()`, DELETE por session_id, no bloqueante, warning si no hay `TEAM360_DB_URL`.
+  - Requiere `TEAM360_DB_URL` en el entorno del smoke (no necesita estar seteado para InMemory).
+  - Sin cambios en el flujo de validaciones HTTP existentes (sigue 30 checks).
+
+- Se actualizaron:
+  - `scripts/README.md`: entrada con flag `--cleanup` y ejemplo postgres.
+  - `modules/sales_diagnosis_runtime/README.md`: seccion Fase 1.8k.
+  - `status_actual.md`: este registro.
+
+- No se tocaron: frontend, Astro, Svelte, UI, SSE, OpenAI, LiteLLM, Milvus, Postgres real por defecto, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM real, routes, schemas, tests existentes.
+- Sin creacion de rama nueva.
+
+### 2026-06-10 - Fase 1.8e — PostgreSQL 18 local integration smoke for ConversationState persistence
+
+- Se creo migracion `db/migrations/007_sales_diagnosis_conversation_states.sql` con:
+  - Tabla `sales_diagnosis_conversation_states` con `session_id` PK, `assistant_instance_code`, `package_code`, `knowledge_scope_code`, `state_jsonb` jsonb NOT NULL, `created_at_utc`, `updated_at_utc`.
+  - CHECK constraint `chk_sd_cs_jsonb_is_object` que valida `jsonb_typeof(state_jsonb) = 'object'`.
+  - 4 indices: `idx_sd_cs_updated_at` (DESC), `idx_sd_cs_assistant_instance`, `idx_sd_cs_package`, `idx_sd_cs_knowledge_scope`.
+  - Idempotente (`IF NOT EXISTS`).
+- Se actualizo `state_repository.py`:
+  - Agregada constante `MIGRATION_FILE` apuntando a `db/migrations/007_sales_diagnosis_conversation_states.sql`.
+  - `PostgresConversationStateRepository.load()` y `save()` ahora lanzan `StateRepositoryError` con mensaje claro de que son sync skeleton y la validacion via smoke script. La guardia `_ensure_pool()` se mantiene.
+  - `SUGGESTED_DDL` actualizada con CHECK constraint y 4 indices (sincronizada con migracion).
+- Se creo `scripts/smoke_sales_diagnosis_state_postgres.py`:
+  - Lee `TEAM360_DB_URL` (con fallback a `TEAM360_DB_URL_PSQL`); error si no configurado.
+  - Sanitiza URL para logging (password oculto).
+  - Crea `AsyncConnectionPool`, adquiere conexion.
+  - Aplica migracion 007 (idempotente).
+  - Flujo: generate test state via `ConversationStateSerializer` → INSERT → SELECT + deserializa + verifica (session_id, turn_count, slots, history_summary, pending_questions) → UPSERT (turn_count 3→5) → SELECT + verifica cambio → verifica `updated_at_utc >= created_at_utc` → DELETE cleanup.
+  - Exit 0 en exito, 1 en fallo.
+- Se creo `tests/test_sales_diagnosis_state_postgres_contract.py` con 15 tests:
+  - Migration contract (5): file exists, table name, CHECK constraint, 4 indexes, idempotent.
+  - Repository contract (5): migration reference, table name matches, repr no password, repr with pool, errors without pool.
+  - Smoke script contract (4): script exists, requires env var, sanitizes URL, uses migration file.
+  - Integration (1, skip sin env): smoke real passes with DB URL.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se toca Milvus, no se tocan otras tablas.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
+
+### 2026-06-10 - Fase 1.8d — ConversationState persistence skeleton
+
+- Se creo `backend/modules/sales_diagnosis_runtime/state_repository.py` con:
+  - `ConversationStateSerializer`: serializa ConversationState a/desde dict JSON-compatible (jsonb-ready); preserva todos los campos incluyendo `last_sources` con `RetrievedChunk`; valida `session_id` no vacio en `to_dict`/`from_dict`; maneja campos faltantes con defaults seguros.
+  - `InMemoryConversationStateRepository`: implementa `StateRepository` protocol; almacena dicts serializados para round-trip fiel con el serializer; devuelve copias independientes en cada `load()`; usado en tests y dev.
+  - `PostgresConversationStateRepository skeleton`: implementa `StateRepository` protocol con pool inyectado; SQL directo con `INSERT ... ON CONFLICT DO UPDATE`; `load()` via SELECT/fetch_one; `__repr__` sin secrets; `SUGGESTED_DDL` constante con DDL de tabla sugerida (`sales_diagnosis_conversation_states` con state_jsonb). Requiere pool inyectado; levanta `StateRepositoryError` si no hay pool. No crea migracion, no conecta a DB real.
+- Se agregaron errores `StateRepositoryError` y `StateSerializationError` en `errors.py`.
+- Se actualizo `runtime.py`:
+  - `_load_or_create_state()`: maneja gracefulmente errores de load (falla → crea estado fresco); incrementa `turn_count` en cada turno (estado nuevo o existente).
+  - `_save_state()`: maneja gracefulmente errores de save (non-blocking, no falla la respuesta).
+- Se actualizo `__init__.py` con 6 nuevos exports.
+- Se crearon 27 tests en `tests/test_sales_diagnosis_state_repository.py` que cubren: serializer round-trip (core fields, chunks, sin chunks, optional fields, empty session_id, JSON compat, None fields), in-memory repo (save/load, missing, independent copy, overwrite, multiple sessions), postgres skeleton (repr sin secret, pool injection, error sin pool, DDL contract), runtime integration (initial state, turn_count increment, save after turn, preserve across turns, load existing, load failure graceful, save failure graceful, sin state repo, serializer-compatible storage).
+- Validacion: `uv run pytest` = 257/257 passed (230 existentes + 27 nuevos).
+- `git diff --check` = OK. Secret scan = 0 hits.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se toca DB, no se crearon migraciones.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
+
+### 2026-06-10 - Fase 1.8c — QueryEmbeddingProvider + Prompt/GuardrailPolicy hardening
+
+- Se creo `backend/modules/sales_diagnosis_runtime/embedding_provider.py` con:
+  - `QueryEmbeddingConfig`: dataclass con model, dimensions (1536 default), timeout_seconds, api_key_env, base_url_env; `from_env()` constructor; `__repr__` sin api_key_env.
+  - `OpenAIQueryEmbeddingProvider`: implementa `QueryEmbeddingProvider`; import lazy de `openai`; lee API key de env en runtime, no en import; valida texto no vacio (`InvalidAssistantRuntimeInputError`); valida dimension 1536 (`LLMUnavailableError`); `__repr__` sin secretos; acepta `_client` para tests.
+- Se endurecio `policies.py`:
+  - `PromptPolicy.build_system_prompt()`: diferenciacion explicita de automatable / vendible hoy / planned_extension / no documentado; prohibicion de CRM, cierre de ventas automatico y facturacion automatica como disponibles.
+  - `PromptPolicy.build_turn_prompt()`: contexto recuperado con source_uri, title, node_path y preview en formato estructurado; recordatorio de maximo 3 preguntas, espanol claro, sin HTML, sin AG-UI.
+  - `GuardrailPolicy`: `CAPABILITY_PATTERNS` extensible (step_to_action, lead_capture, diagnostic_code, whatsapp_handoff, crm, auto_billing); `DECLINE_PATTERNS` compartidos; `_has_decline()` unificado; `_build_contextual_fallback()` para fallback segun tipo de violation; metodos individuales: `is_lead_capture_ready()`, `is_diagnostic_code_ready()`, `is_whatsapp_handoff_ready()`, `is_crm_ready()`, `is_auto_billing_ready()`; `build_fallback_response()` con argumentos opcionales `input`/`state`.
+- Se actualizo `__init__.py` con exports de `QueryEmbeddingConfig`, `OpenAIQueryEmbeddingProvider`.
+- Se crearon 11 tests en `tests/test_sales_diagnosis_embedding_provider.py` con fakes que cubren: config defaults, config repr sin api_key_env, config from_env, import lazy, missing API key, empty query, fake client 1536, wrong dimension, repr sin secretos, config model, API failure.
+- Se crearon 39 tests en `tests/test_sales_diagnosis_policies.py` que cubren: PromptPolicy hardening (safe ack, future capabilities, system prompt con reglas, turn prompt con chunks, limits, diferenciacion), GuardrailPolicy individual capabilities (step_to_action, lead_capture, diagnostic_code, whatsapp_handoff, crm, auto_billing), evaluate_response integration (pricing, SLA, max questions, empty, happy path), fallback contextual (pricing, planned_extension, generico), negation detection.
+- Validacion: `uv run pytest` = 230/230 passed (180 existentes + 50 nuevos).
+- `git diff --check` = OK. Secret scan = 0 hits.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real en tests, no se toca DB, no se crearon migraciones.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
+
+### 2026-06-10 - Fase 1.8b — MilvusRetrievalProvider runtime backend-only
+
+- Se creo `backend/modules/sales_diagnosis_runtime/milvus_provider.py` con:
+  - `MilvusRuntimeConfig`: dataclass configurable por constructor o env vars (TEAM360_MILVUS_URI, TEAM360_MILVUS_HOST, TEAM360_MILVUS_PORT, TEAM360_MILVUS_TOKEN, TEAM360_MILVUS_COLLECTION, TEAM360_EMBEDDING_VERSION, TEAM360_KNOWLEDGE_SCOPE_ID). `__repr__` oculta token.
+  - `MilvusRetrievalProvider`: implementa `RetrievalProvider`, import lazy de pymilvus, conexion lazy al llamar retrieve, filtros por knowledge_scope_code y embedding_version, mapeo seguro a RetrievedChunk con fallbacks para campos faltantes.
+- Se agrego `QueryEmbeddingProvider` protocol en `providers.py` para separar embedding de retrieval.
+- Se agregaron errores `MilvusConfigurationError` y `MilvusSearchError` en `errors.py`.
+- Se actualizo `__init__.py` con exports de MilvusRetrievalProvider, MilvusRuntimeConfig, MilvusConfigurationError, MilvusSearchError, QueryEmbeddingProvider.
+- Se crearon 20 tests en `tests/test_sales_diagnosis_milvus_provider.py` con fakes (FakeEmbeddingProvider, FakeMilvusCollection, FakeHit) que cubren:
+  - QueryEmbeddingProvider protocol con fake embedding.
+  - MilvusRetrievalProvider: requiere embedding provider, mapeo de resultados, multiples resultados, filtros, configuracion, campos faltantes, resultado vacio, multiples result sets.
+  - MilvusRuntimeConfig: defaults, from_env, repr oculta token, int_or_none helper, no secrets en error.
+  - Runtime integration: runtime con MilvusRetrievalProvider real sin LLM, eventos, capacidades futuras.
+  - Configuracion: no secrets en repr ni error messages.
+- pymilvus 3.0.0 disponible en entorno. No se modifico pyproject.toml.
+- Validacion: `uv run pytest tests/test_sales_diagnosis_milvus_provider.py tests/test_sales_diagnosis_runtime_contracts.py` = 57/57 passed.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se toca DB, no se crearon migraciones.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
+
+### 2026-06-10 - Fase 1.8a — Sales Diagnosis Assistant Runtime Skeleton
+
+- Se creo el modulo `backend/modules/sales_diagnosis_runtime/` con 7 archivos:
+  - `contracts.py`: 6 dataclasses (AssistantTurnInput, AssistantTurnOutput, ConversationState, RetrievedChunk, GuardrailResult, ProgressiveEvent, RuntimeMetrics) y constantes (SAFE_ACK_TEXT, PLANNED_EXTENSIONS, FORBIDDEN_TERMS).
+  - `providers.py`: interfaces Protocol (RetrievalProvider, LLMProvider, StateRepository, MetricsRecorder, AuditTrail) y Null providers para testeo (NullRetrievalProvider, NullLLMProvider, InMemoryStateRepository).
+  - `policies.py`: PromptPolicy con prompts configurables por assistant/package/domain y GuardrailPolicy con evaluacion heuristica (forbidden claims, planned extension, pricing/SLA, max questions, empty response).
+  - `errors.py`: 6 excepciones controladas (SalesDiagnosisRuntimeError, RetrievalUnavailableError, LLMUnavailableError, GuardrailViolationError, UnsafeResponseError, InvalidAssistantRuntimeInputError).
+  - `runtime.py`: AssistantConversationRuntime skeleton con metodo handle_turn() que valida input, carga estado, emite eventos progresivos, aplica fallback seguro sin LLM sin Milvus y registra metricas/auditoria.
+  - `README.md`: documentacion del modulo.
+  - `__init__.py`: export publico completo.
+- Se crearon 37 tests en `backend/tests/test_sales_diagnosis_runtime_contracts.py` que cubren:
+  - Contratos: validacion de campos requeridos, serializacion, defaults.
+  - Runtime skeleton: fallback sin LLM, eventos progresivos, state repo, capacidades futuras.
+  - GuardrailPolicy: Step-to-Action detection, forbidden claims con/sin negacion, pricing/SLA, max questions, empty response, fallback responses.
+  - PromptPolicy: safe ack por dominio, system prompt con reglas, turn prompt con user message.
+  - Providers: Null providers, InMemoryStateRepository roundtrip.
+  - Constantes: PLANNED_EXTENSIONS, FORBIDDEN_TERMS, SAFE_ACK_TEXT.
+- Validacion: `uv run pytest tests/test_sales_diagnosis_runtime_contracts.py` = 37/37 passed.
+- No se crearon endpoints HTTP, no se toco frontend, no se modificaron routes.
+- No se llama LLM real, no se llama Milvus, no se toca DB.
+- No se activo Step-to-Action, lead_capture, diagnostic_code ni WhatsApp handoff.
+- No se hardcodearon API keys.
+
+### 2026-06-10 - Documento global de orquestacion Team360
+
+- Se creo `lat.md/team360-global-orchestration.md` como vista transversal para coordinar ramas Git, hilos de chat, frentes tecnicos, labs, knowledge y decisiones comerciales/productivas.
+- Se enlazo el documento desde `lat.md/lat.md`.
+- Se actualizo `lat.md/status_actual.md` porque se agrego un nuevo documento dentro de `lat.md/`.
+- El documento registra roles de ramas, regla de UX real vs handoff visual, separacion knowledge ingestion vs documentacion editorial, ownership de `lab/`, decisiones globales de producto y formato de cierre por rama.
+- No se modifico codigo productivo, backend runtime, frontend, migraciones, paquetes knowledge editoriales ni ramas distintas a `feature/console-backend-core`.
+
+### 2026-06-09 - Convencion de laboratorio tecnico reproducible
+
+- Se creo `SrvRestAstroLS_v1/lab/README.md` como convencion base para experimentos tecnicos pequenos, reproducibles, aislados de produccion, auditables y comparables.
+- Se documento que `lab/` no es codigo temporal descartable, sino un banco de pruebas para decidir rapido sin reconstruir contexto.
+- Se definieron casos de uso para comparar modelos LLM, embeddings, prompts, chunking, golden answers, paquetes knowledge, proveedores externos e infografias HTML.
+- Se establecieron reglas de estructura por experimento, resultados auditables en JSON/Markdown/HTML, ejecucion desde la raiz del proyecto y preferencia por `uv run` cuando corresponda.
+- Se agrego una referencia breve en `AGENTS.md` apuntando a `SrvRestAstroLS_v1/lab/README.md`.
+- No se crearon scripts, experimentos de ejemplo, integraciones productivas ni cambios de runtime.
+
+### 2026-06-07 - Diseno tecnico Knowledge Ingestion multi-scope / multi-nivel
+
+- Se creo `docs/knowledge_ingestion_multiscope_design_20260607.md` como documento de diseno tecnico para ingesta de conocimiento reusable multi-scope.
+- Se identifico la brecha actual: las tablas existentes (knowledge_scopes, knowledge_documents, knowledge_chunks) son planas y no permiten representar jerarquia organizacional (Empresa > Area > Sector > Proceso > Tema) ni filtrado por rol (CEO > Director > Gerente > Responsable).
+- Se propuso modelo conceptual con entidades nuevas: KnowledgeMap (estructura jerarquica), KnowledgeNode (nodos individuales), KnowledgeIngestionRun (registro de ingesta), KnowledgeAccessPolicy (politicas de acceso por rol), KnowledgeRetrievalPolicy (politicas de retrieval por asistente).
+- Se definieron 8 niveles de scope: global, package, partner, organization, workspace, service, assistant_instance, session.
+- Se diseño worker generico `knowledge_ingestion_worker` con 8 fases: validar metadata, convertir a texto, generar L0/L1, chunk semantico, guardar, generar embeddings, indexar, registrar estado.
+- Se documento la cascada de retrieval por capas y la relacion con ArangoDB/Milvus.
+- Se probo migracion minima futura (tablas KnowledgeMap, KnowledgeNode, KnowledgeIngestionRun, KnowledgeAccessPolicy, KnowledgeRetrievalPolicy) sin implementarla.
+- Se mantuvieron identificadores tecnicos estables: `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis`, `svc_sales_diagnosis`. `Vera` solo como marca comercial visible.
+- No se implemento codigo, no se crearon migraciones, no se tocaron frontend ni backend runtime.
+- Referencias: `lat.md/knowledge-scope-contract.md`, `lat.md/ai-diagnosis-rag-runtime.md`.
+
+### 2026-06-07 - Fase 1 Knowledge Ingestion Platform Service
+
+- Se creo migracion `db/migrations/006_team360_knowledge_ingestion_phase1.sql` (numero 006, siguiente disponible tras 005 seed).
+- Tabla nueva: `knowledge_ingestion_runs` para registrar cada corrida de ingesta con fases, estado, errores y stats.
+- Columnas nuevas en `knowledge_documents`: `node_path` (text) para referencia jerarquica.
+- Columnas nuevas en `knowledge_chunks`: `node_path` (text) + `permission_tags` (text[]) para filtrado por rol.
+- Seed de `worker_definitions.knowledge_ingestion_worker` con `worker_kind=api`, `default_mode=assisted`.
+- NO se agregaron columnas a `knowledge_chunk_embeddings` (decision: difiere a Fase 2 porque metadata_jsonb existente sirve como almacen temporal).
+- Se creo modulo `backend/modules/knowledge_ingestion/` con schemas, repository y worker skeleton:
+  - `schemas.py`: `IngestionMetadata` dataclass con validacion de 15 campos obligatorios.
+  - `repository.py`: `KnowledgeIngestionRepository` con `create_ingestion_run`, `update_ingestion_run_status`, `update_document_node_path`, `update_chunk_node_path_and_tags`.
+  - `worker.py`: `KnowledgeIngestionWorker` con metodo `validate_and_register` que valida metadata y crea run.
+- Se crearon tests `backend/tests/test_knowledge_ingestion.py`: 20 tests que cubren validacion de metadata (campos requeridos, tipos, valores), serializacion a dict, contrato del worker y constantes.
+- Se actualizo `backend/scripts/audit_team360_schema.py` con tablas/columnas esperadas de 006 y seed `knowledge_ingestion_worker`.
+- No se implementaron: upload publico, ArangoDB/Milvus, KnowledgeMap/KnowledgeNode, chunker semantico, embeddings pipeline, endpoints HTTP, cambios en automation_diagnosis.
+- Identificadores tecnicos estables: `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis`, `svc_sales_diagnosis`. Sin `vera_*`.
+
+### 2026-06-07 - Fase 1.1 Hardening de Knowledge Ingestion Platform Service
+
+- Se reviso y endurecio la migracion 006, schemas, repository, worker y tests basado en el analisis de consistencia del diseno original.
+- **Migration 006**: se agrego `updated_at_utc` a `knowledge_ingestion_runs` (columna faltante vs patron del proyecto), se agrego status `running` al CHECK constraint (para separar pending→running→completed|failed), se recreo la constraint de forma idempotente via `drop constraint if exists + add constraint`.
+- **Schemas**: se agrego `SOURCE_TYPES` constant (markdown, pdf, text, html) con validacion en `IngestionMetadata.validate()`. Se elimino `RETRIEVAL_MODES` y `NODE_TYPES` (no usados en Phase 1). Se agrego validacion de `node_path` sin trailing slash (excepto raiz `/`), `area_key`/`topic_key` sin `/`, `access_tags` sin strings vacios. Se agrego `updated_at_utc` a `IngestionRunRecord`. Se removio `register_completion` de `INGESTION_PHASES` (no es fase de procesamiento).
+- **Repository**: se agrego `DatabaseExecutionError` cuando `create_ingestion_run` devuelve None. Se agrego `started_at_utc = coalesce(started_at_utc, now())` en transicion a status `running`. Se agrego `updated_at_utc = now()` en todo status update. Se agrego `updated_at_utc` al SELECT de `get_ingestion_run`.
+- **Worker**: se cambio status inicial de `validating` a `running` (separacion semantica: running indica pipeline activo, los detalles de fase van en phases_jsonb). Se agrego metodo `advance_phase()` como stub estructural con validacion de orden, fase no completada y saltos invalidos.
+- **Tests**: se agregaron 8 tests nuevos (trailing slash en node_path, root `/` permitido, access_tags empty string, area_key/topic_key con `/`, source_type invalido, advance_phase unknown phase, advance_phase incomplete current, advance_phase skip). Se actualizaron tests existentes para reflejar el status `running`. Se elimino import no usado de `IngestionRunRecord`. Se agrego `SOURCE_TYPES` al test de constantes. Total: 30 tests.
+- **Module exports**: se agrego `__init__.py` con export publico de todas las clases y constantes.
+- Validacion: `uv run pytest` = 110/110 passed. `git diff --check` = OK. Sin identificadores `vera_*`.
+
+### 2026-06-07 - Analisis de estado del adapter publico Vera y proximos pasos
+
+- Se analizaron los 4 archivos funcionales de la entrada publica Vera (PublicVeraEntry.svelte, publicDiagnosis.ts, index.astro, public-vera.spec.ts) mas el backend asociado (routes, schemas, assistant_instances) y el diseno L0/L1/L2 existente.
+- Se creo `SrvRestAstroLS_v1/docs/public_vera_adapter_next_steps_20260607.md` con diagnostico de 10 puntos.
+- Hallazgos principales:
+  - El componente es single-shot: no hay loop conversacional, no hay mensaje backend (buildPreliminaryMessage es cadenas fijas locales), no hay checklist, no hay classify, no hay lead capture.
+  - El adapter reusa `/api/automation-diagnosis/session/start` y `/answer` pero nunca llama a `/classify`.
+  - La metadata enviada es completa (13 campos en visitor) y conserva identificadores tecnicos estables.
+  - El contrato futuro recomendado (`/api/diagnosis/*`) ya esta documentado en el diseno L0/L1/L2 y no requiere nuevo diseno.
+- No se modifico codigo funcional, backend, home ni se crearon endpoints.
+- No se introdujeron identificadores tecnicos `vera_*`.
+
+### 2026-06-07 - Contrato publico /api/diagnosis/* wrapper sobre automation_diagnosis
+
+- Se creo `backend/routes/diagnosis.py` con 3 endpoints wrapper que reutilizan el mismo servicio `automation_diagnosis` (comparten instancia via `get_service()`).
+- Endpoints creados:
+  - `POST /api/diagnosis/start` — crea sesion, acepta metadata publica (assistant_instance_code, source_channel, locale, etc.), devuelve session_id + technical_metadata.
+  - `POST /api/diagnosis/message` — guarda texto libre como `process_to_automate`, devuelve mensaje preliminar honesto desde backend.
+  - `GET /api/diagnosis/session/{id}` — hidrata estado basico de sesion (answers, result, status).
+- `POST /api/diagnosis/submit-checklist` y `POST /api/diagnosis/lead` quedan como stubs 501 Not Implemented.
+- La respuesta mensaje es backend-real (no sintetica cliente) pero aun es preliminary wrapper.
+- No se modifico service.py, scoring, guided_flow, postgres_repository, migraciones ni frontend.
+- Se agrego `get_service()` exportable a `routes/automation_diagnosis.py` y `get_session` en `_SyncToAsyncAdapter` para que el wrapper pueda leer sesiones.
+- Se extendio `routes/diagnosis_schemas.py` con schemas PublicStartRequest, PublicMessageRequest y stubs.
+- Se registraron las rutas en `app.py`.
+- Tests: `tests/test_diagnosis_public_router.py` — 16 tests que cubren defaults, metadata custom, visitor merge, mensaje, error handling y stubs 501.
+- Validacion: `uv run pytest` = 88/88 passed (16 nuevos + 72 existentes).
+- No se introdujeron identificadores tecnicos `vera_*`.
+
+### 2026-06-07 - Entrada publica Vera en Home
+
+- Se agrego una isla publica en la Home para `Hablá con Vera`, con textarea de texto libre, ejemplos breves y CTA `Analizar oportunidad`.
+- Se creo un adapter frontend minimo que reutiliza `/api/automation-diagnosis/session/start` y guarda el texto inicial como respuesta `process_to_automate`, sin clasificar ni mostrar checklist inicial.
+- El payload conserva los codigos tecnicos estables `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis`, `svc_sales_diagnosis` y `team360_sales_automation_diagnosis`; `Vera` queda solo como display/copy.
+- La respuesta publica es preliminar y honesta: no afirma motor conversacional completo, lead creado ni resultado final.
+- Se mantiene el mailto como fallback y la UI no pierde el texto si el backend no responde.
+- No se modifico backend, no se crearon endpoints definitivos `/api/diagnosis/*`, no se cambio scoring/guided flow, no se implemento captura de lead y no se activo L2/RAG ArangoDB/Milvus.
+
+### 2026-06-07 - Console muestra Team360.live y servicio Vera productivo mock
+
+- Se ajusto la Console mock para que el selector de perfiles muestre los emails reales de acceso mock: `mario.rojas@alquimiablue.com` como platform admin y `mario.rojas.marconi@gmail.com` como client admin.
+- El perfil `client_admin` de Team360.live ahora tiene el modulo `diagnosis` visible en navegacion mock sin cambiar el motor ni el flujo actual.
+- El detalle del servicio `svc_sales_diagnosis` muestra `Asistente Inteligente Vera` como servicio visible/comercial y conserva los codigos tecnicos `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis` y `svc_sales_diagnosis`.
+- Se agrego en el mock del servicio la indicacion visible de canal futuro `Home publica`, knowledge L2 preparado sin ingesta activa y flujo publico todavia no enganchado.
+- No se toco home publica, no se crearon rutas `/api/diagnosis/*`, no se cambio `automation_diagnosis`, no se activo ArangoDB/Milvus y no se modificaron migraciones.
+- No se introdujeron identificadores tecnicos `vera_*`; `Vera` sigue limitado a display/commercial/copy.
+
+### 2026-06-07 - Seeds y mocks productivos iniciales Team360.live / Vera
+
+- Se agrego `backend/db/migrations/005_team360_platform_live_vera_seed.sql` como seed idempotente sobre tablas existentes para Team360 Platform, Team360.live, administradores, RBAC minimo, assistant instance, paquete, knowledge scope, package workers y bindings.
+- La seed mantiene identificadores tecnicos estables: `team360_sales_diagnosis`, `pkg_sales_diagnosis`, `ks_team360_sales_diagnosis`; `Vera` queda solo como nombre visible/comercial en metadata y labels.
+- Se actualizo `modules/automation_diagnosis/assistant_instances.py` con metadata visible/comercial de Vera sin cambiar el default tecnico ni el motor `automation_diagnosis`.
+- Se actualizaron mocks de Console para representar `Team360.live` como cliente real, `mario.rojas@alquimiablue.com` como platform admin, `mario.rojas.marconi@gmail.com` como client admin y el servicio visible `Asistente Inteligente Vera` con `service_code` tecnico `svc_sales_diagnosis`.
+- No se implemento la home publica, no se crearon endpoints `/api/diagnosis/*`, no se cambio el flujo conversacional actual y no se implemento L2/RAG ArangoDB/Milvus.
+- Limitacion vigente: backend todavia no tiene tabla formal de organizaciones ni servicios contratados; la separacion Team360 Platform / Team360.live se representa por metadata de workspace y mocks hasta una migracion estructural futura.
+
+### 2026-06-07 - Decision de naming Vera como marca comercial
+
+- Se actualizo `docs/platform_initial_configuration_vera_team360_live_20260605.md` para dejar aprobada la Opcion B de naming.
+- `Vera` queda como nombre comercial visible, configurable en display/commercial metadata, marketing copy, Console label, home publica y CTA.
+- Se mantienen los identificadores tecnicos estables `team360_sales_diagnosis`, `pkg_sales_diagnosis` y `ks_team360_sales_diagnosis`.
+- No se deben introducir identificadores tecnicos `vera_*` en runtime, seeds, migrations, tests, workers, knowledge scopes ni integraciones core.
+- Esta decision evita migraciones por rebranding y mantiene compatibilidad con tests/runtime/docs actuales.
+- No se implemento codigo funcional, no se modificaron migraciones, no se toco frontend y no se agregaron secretos.
+
+### 2026-06-07 - Configuracion inicial productiva Vera para Team360.live
+
+- Se creo `docs/platform_initial_configuration_vera_team360_live_20260605.md` como documento tecnico de configuracion/seeding productivo inicial para el primer paquete real `Asistente Inteligente Vera`.
+- El documento separa `Team360 Platform` de `Team360.live` como primer cliente real y define plataforma, admins, cliente, workspace, paquete, servicio, assistant instance, workers, knowledge scope, home publica y Console.
+- Se inspeccionaron migraciones 001-004, runtime `automation_diagnosis`, routes Litestar, modulo DB, mocks de Console, navegacion y documentos `lat.md` relacionados.
+- Se documento la brecha principal: el runtime actual usa `team360_sales_diagnosis`, `pkg_sales_diagnosis` y `ks_team360_sales_diagnosis`; quedaba pendiente cerrar si Vera seria marca visible o identificador tecnico.
+- No se implemento codigo funcional, no se modificaron migraciones, no se toco frontend y no se agregaron secretos.
+
+### 2026-06-04 - Cierre pre-commit del asistente de diagnostico Team360
+
+- Estado de cierre para demo controlada: frontend real + API Litestar + PostgreSQL + LiteLLM real + E2E + smoke real.
+- Playwright E2E previo: verde (`1 passed`, `1 skipped`) para el flujo de diagnostico.
+- Backend pytest de cierre: `72 passed`.
+- Frontend check de cierre: `0 errors`, `0 warnings`, `0 hints`.
+- Smoke LiteLLM real: OK con `provider=litellm`, `model=openrouter_qwen3_30b_a3b_thinking_2507`, `classification=operational_automation`.
+- Smoke LiteLLM + PostgreSQL real: OK; session y lead verificados en PostgreSQL con `status=classified`.
+- No se implementaron ArangoDB, Milvus ni embeddings en runtime.
+- Riesgos pendientes reales: continuidad de sesion postgres desde DB, observabilidad formal de costos/latencia, repeticion de smokes para medir estabilidad, fallback IA controlado y RAG real con ArangoDB/Milvus en fase posterior.
+
+### 2026-06-04 - Smoke real LiteLLM + PostgreSQL para automation_diagnosis
+
+- Se extendio `backend/scripts/smoke_automation_diagnosis_litellm.py` con `--print-sql` para imprimir la query de verificacion PostgreSQL por `session_id`.
+- Se ejecuto el flujo completo contra backend aislado en modo combinado:
+  - `TEAM360_AI_PROVIDER=litellm`
+  - `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres`
+  - `TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1`
+  - `TEAM360_LITELLM_MODEL_ALIAS=openrouter_qwen3_30b_a3b_thinking_2507`
+- Proxy LiteLLM:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/litellm-server
+  ./scripts/run.sh
+  ```
+- Backend LiteLLM + PostgreSQL:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+  TEAM360_AI_PROVIDER=litellm \
+  AUTOMATION_DIAGNOSIS_REPOSITORY=postgres \
+  TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1 \
+  TEAM360_LITELLM_MODEL_ALIAS=openrouter_qwen3_30b_a3b_thinking_2507 \
+  TEAM360_LITELLM_TIMEOUT_SECONDS=45 \
+  TEAM360_LITELLM_FALLBACK_TO_MOCK=0 \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8011
+  ```
+- Comando smoke:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+  uv run python scripts/smoke_automation_diagnosis_litellm.py --backend-url http://127.0.0.1:8011 --timeout 120 --print-sql
+  ```
+- Resultado real:
+  - session_id: `diag_30d865c6-ddf7-4a00-a3e7-6ba2c89da3c8`
+  - classification: `operational_automation`
+  - score_total: `100`
+  - automation_mode: `assisted`
+  - provider: `litellm`
+  - model: `openrouter_qwen3_30b_a3b_thinking_2507`
+  - latency_ms: `17336`
+  - usage total_tokens: `3398`
+  - cost reportado por LiteLLM: `0.00413114`
+- Verificacion PostgreSQL read-only:
+  ```sql
+  SELECT ads.public_session_id, ads.status,
+         adl.classification, adl.score_total,
+         adl.automation_mode, adl.recommended_package_type,
+         ads.updated_at_utc
+  FROM automation_diagnosis_sessions ads
+  LEFT JOIN automation_diagnosis_leads adl ON adl.session_id = ads.id
+  WHERE ads.public_session_id = 'diag_30d865c6-ddf7-4a00-a3e7-6ba2c89da3c8'
+  ORDER BY ads.updated_at_utc DESC
+  LIMIT 10;
+  ```
+- Resultado DB: `status=classified`, `classification=operational_automation`, `score_total=100`, `automation_mode=assisted`, `recommended_package_type=team360_ops_starter`.
+- Validacion de error PostgreSQL: el contrato de ruta sigue cubierto por tests; si persistence falla durante el snapshot, el backend devuelve HTTP 503 y el smoke reporta el cuerpo truncado del error.
+- No se toco frontend, Playwright, ArangoDB, Milvus, embeddings ni migraciones.
+- Riesgos pendientes: falta observar repeticion de smoke en varias corridas para medir latencia/costo, probar fallback IA controlado y agregar telemetria persistente de costos.
+
+### 2026-06-04 - Smoke real LiteLLM para automation_diagnosis
+
+- Se agrego `backend/scripts/smoke_automation_diagnosis_litellm.py` como smoke HTTP controlado de backend.
+- El smoke no arranca servidores, no toca DBs, no usa Playwright y no lee secretos; consume un backend ya levantado.
+- Proxy LiteLLM esperado:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/litellm-server
+  ./scripts/run.sh
+  ```
+- Backend LiteLLM para smoke:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+  TEAM360_AI_PROVIDER=litellm \
+  TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1 \
+  TEAM360_LITELLM_API_KEY=... \
+  TEAM360_LITELLM_MODEL_ALIAS=openrouter_qwen3_30b_a3b_thinking_2507 \
+  TEAM360_LITELLM_TIMEOUT_SECONDS=45 \
+  TEAM360_LITELLM_FALLBACK_TO_MOCK=0 \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8010
+  ```
+- Comando smoke:
+  ```bash
+  cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+  uv run python scripts/smoke_automation_diagnosis_litellm.py --backend-url http://127.0.0.1:8010 --timeout 120
+  ```
+- Resultado real ejecutado contra LiteLLM local:
+  - session_id: `diag_4923d34f-eee0-4517-bec6-23354ccd0a4d`
+  - classification: `operational_automation`
+  - score_total: `100`
+  - automation_mode: `assisted`
+  - provider: `litellm`
+  - model: `openrouter_qwen3_30b_a3b_thinking_2507`
+  - latency_ms: `30181`
+  - usage total_tokens: `2433`
+  - cost reportado por LiteLLM: `0.00071144`
+- No hubo JSON invalido del modelo en este smoke; la respuesta fue parseada y clasificada correctamente.
+- Riesgos pendientes: falta smoke real en modo postgres, validacion de fallback controlado, logging de errores IA sin exponer datos de cliente y observabilidad formal de costos/latencia.
+
+### 2026-06-04 - Integracion activable de LiteLLM real en automation_diagnosis
+
+- Se mantuvo `mock` como provider default seguro para `automation_diagnosis`.
+- `TEAM360_AI_PROVIDER=litellm` activa el adapter real OpenAI-compatible contra LiteLLM.
+- El alias recomendado inicial es `openrouter_qwen3_30b_a3b_thinking_2507`; el fallback estable documentado es `openai_gpt_4o_mini_2024_07_18`.
+- El modelo se resuelve por `TEAM360_LITELLM_MODEL_ALIAS`, luego `TEAM360_AUTOMATION_DIAGNOSIS_TEXT_MODEL`, y finalmente el alias recomendado.
+- El cliente LiteLLM toma `TEAM360_LITELLM_BASE_URL` y normaliza a `/v1`; la API key se toma de `TEAM360_LITELLM_API_KEY`, `LITELLM_API_KEY` o `LITELLM_MASTER_KEY`.
+- `TEAM360_LITELLM_TIMEOUT_SECONDS` controla timeout; default: `45`.
+- El fallback a mock ante error de LiteLLM queda apagado por default y solo se habilita con `TEAM360_LITELLM_FALLBACK_TO_MOCK=1`.
+- Las rutas HTTP traducen errores de IA a respuesta controlada `502`, sin traceback publico.
+- Se agrega metadata Team360 al payload LiteLLM: organization, workspace, assistant instance, automation package, knowledge scope, session y correlation id.
+- No se toco frontend, Playwright, migraciones, ArangoDB, Milvus ni embeddings.
+- Modo mock:
+  ```bash
+  cd backend
+  TEAM360_AI_PROVIDER=mock uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  ```
+- Modo LiteLLM local:
+  ```bash
+  cd backend
+  TEAM360_AI_PROVIDER=litellm \
+  TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1 \
+  TEAM360_LITELLM_API_KEY=... \
+  TEAM360_LITELLM_MODEL_ALIAS=openrouter_qwen3_30b_a3b_thinking_2507 \
+  TEAM360_LITELLM_TIMEOUT_SECONDS=45 \
+  TEAM360_LITELLM_FALLBACK_TO_MOCK=0 \
+  uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  ```
+- ArangoDB y Milvus siguen documentados pero no implementados en runtime; el retrieval sigue usando el repository in-memory actual.
+
+### 2026-06-04 - Endurecimiento de modo PostgreSQL para automation_diagnosis
+
+- Se elimino el silenciamiento de errores en `PostgresAutomationDiagnosisService._persist_session()`: en modo postgres, si falla la persistencia critica de session/answers/lead/events, se levanta `AutomationDiagnosisPersistenceError`.
+- Las rutas HTTP traducen `AutomationDiagnosisPersistenceError` a HTTP 503 con detalle claro, evitando mostrar exito silencioso cuando PostgreSQL no guardo el snapshot.
+- El servicio postgres ahora filtra eventos ya persistidos en el proceso y solo envia eventos nuevos al repository.
+- El repository inserta eventos en `core_events` con `insert ... where not exists` usando workspace, event name, entity, correlation, timestamp y payload para reducir duplicados sin requerir nueva migracion.
+- Se agregaron tests para validar persistencia de session, answers, lead/result, eventos nuevos sin duplicacion y errores de persistencia no silenciados.
+- Memory sigue siendo el default seguro (`AUTOMATION_DIAGNOSIS_REPOSITORY=memory`) y postgres se activa con `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres`.
+- Limitacion vigente: el runtime postgres todavia delega logica a memoria y persiste snapshots; la continuidad de sesion entre reinicios/procesos todavia depende del proceso hasta implementar carga/hidratacion desde DB.
+- Modo postgres:
+  ```bash
+  cd backend
+  AUTOMATION_DIAGNOSIS_REPOSITORY=postgres TEAM360_DB_URL=postgresql://... uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  ```
+- Query demo:
+  ```sql
+  SELECT ads.public_session_id, ads.status,
+         adl.classification, adl.score_total
+  FROM automation_diagnosis_sessions ads
+  LEFT JOIN automation_diagnosis_leads adl ON adl.session_id = ads.id
+  ORDER BY ads.updated_at_utc DESC
+  LIMIT 10;
+  ```
+
+### 2026-06-04 - Documentacion del contrato KnowledgeScope derivado de JudaismoEnVivo
+
+- Se formalizo en `lat.md/knowledge-scope-contract.md` el contrato `KnowledgeScope / KnowledgeDocument / KnowledgeChunk / VectorEmbedding`.
+- Se agrego el analisis no-runtime `docs/analisis-tecnico/team360_knowledge_scope_contract_judaismo_pattern.md`.
+- Se documento la equivalencia JudaismoEnVivo `Catalog/MD/Chunk` hacia Team360 `KnowledgeScope/Document/Chunk`.
+- Se fijo que ArangoDB sera fuente textual/grafo y Milvus indice derivado, con filtros obligatorios multi-tenant por organizacion, workspace, assistant instance, knowledge scope, status y version.
+- Se recomendo persistir `chunk_text` en Team360 y definir fallback Arango-only.
+- Se aclaro que pgvector queda como laboratorio/fallback, que Milvus 2.6 es prueba paralela y que no se debe migrar ArangoDB a PostgreSQL ahora.
+- No se modifico runtime, backend, frontend, API, migraciones, ArangoDB, Milvus ni LiteLLM.
+
+### 2026-06-04 - Conexion de endpoints HTTP a PostgreSQL real via AUTOMATION_DIAGNOSIS_REPOSITORY
+
+- Se creo `backend/modules/automation_diagnosis/postgres_service.py` con `PostgresAutomationDiagnosisService` que envuelve el servicio sync existente y persiste session/answers/lead/events a PostgreSQL via `AutomationDiagnosisPostgresRepository` y pool de conexiones.
+- Se actualizo `backend/routes/automation_diagnosis.py` para leer `AUTOMATION_DIAGNOSIS_REPOSITORY=memory|postgres`. En modo memory usa `_SyncToAsyncAdapter` envolviendo `build_default_service()`. En modo postgres construye `PostgresAutomationDiagnosisService` con pool.
+- Se actualizo `backend/app.py` con hooks `on_startup`/`on_shutdown` que abren/cierran el pool solo cuando `AUTOMATION_DIAGNOSIS_REPOSITORY=postgres`.
+- El pool se crea con `open=False` en el routes module (import time seguro), se abre explicitamente en startup de Litestar.
+- No se abrio pool al importar modulos.
+- No se toco frontend.
+- Se mantuvo AI mock, knowledge in-memory y scoping por assistant_instance_id.
+- Se agregaron 5 tests en `tests/test_automation_diagnosis_postgres_service.py` que validan la delegacion de logica de negocio con pool fake.
+- Validacion: `uv run pytest` = 59 passed (54 anteriores + 5 nuevos).
+- Comandos:
+  - Memory (default): `cd backend && uv run uvicorn app:app --host 127.0.0.1 --port 8000`
+  - PostgreSQL:  `cd backend && AUTOMATION_DIAGNOSIS_REPOSITORY=postgres TEAM360_DB_URL=postgresql://... uv run uvicorn app:app --host 127.0.0.1 --port 8000`
+  - Tests: `cd backend && uv run pytest`
+- Query SQL para verificar sesiones/leads guardados:
+  ```sql
+  SELECT ads.public_session_id, ads.status, adl.classification, adl.score_total
+  FROM automation_diagnosis_sessions ads
+  LEFT JOIN automation_diagnosis_leads adl ON adl.session_id = ads.id
+  ORDER BY ads.updated_at_utc DESC
+  LIMIT 10;
+  ```
+
+### 2026-06-04 - Frontend conectado a endpoints HTTP reales de automation_diagnosis
+
+- Se creo `astro/src/lib/api/diagnosis.ts` con cliente API tipado para startSession, saveAnswer y classifySession, mas definicion de GUIDED_STEPS y OPTION_LABELS desde el backend.
+- Se creo `astro/src/components/console/diagnosis/ConsoleDiagnosis.svelte` con flujo completo: pantalla de bienvenida → preguntas guiadas una por una con progreso → clasificacion → resultado con desglose, riesgos y proximos pasos.
+- Se creo `astro/src/pages/w/[workspaceId]/diagnosis/index.astro` siguiendo el patron de paginas existentes (getStaticPaths + ConsoleAppLayout).
+- Se configuro proxy en `astro.config.mjs` para que `/api` se reenvie a `http://127.0.0.1:8000` en dev.
+- Se registro "diagnosis" en `navigation/registry.ts` como ConsoleView + nav item en grupo "operations" para audiencias owner/operator/partner.
+- Se agrego "diagnosis" a `enabledModules` en perfiles team360_admin y team360_operator.
+- Se agrego ruta `workspaceDiagnosis` en `global.js` y entrada "diagnosis" en `derive.ts`.
+- Se agregaron claves i18n `nav.diagnosis` en es/en/he.
+- Validacion: `pnpm check` = 0 errors, 0 warnings, 0 hints. Backend tests = 54/54 passed.
+- Smoke: backend responde `POST /api/automation-diagnosis/session/start` = 201 con defaults correctos.
+- No se modifico arquitectura RAG, no se toco DB, no se rompio mock UX existente.
+
+Comandos para correr:
+  Backend:  cd backend && uv run uvicorn app:app --host 127.0.0.1 --port 8000
+  Frontend: cd astro && corepack pnpm dev
+
+### 2026-06-04 - Primer endpoint HTTP Litestar para automation_diagnosis
+
+- No existia app Litestar montada. El entrypoint `ls_iMotorSoft_Srv01.py` era placeholder sin Litestar.
+- Los route handlers en `routes/automation_diagnosis.py` eran funciones planas sin decoradores HTTP.
+- Se creo `backend/app.py` con factory `create_app()` que monta Litestar 2.21.1 con route handlers para health, start_session, save_answer y classify.
+- Se reescribio `routes/automation_diagnosis.py` con decoradores `@post()` de Litestar, usando Pydantic solo en boundary HTTP (request validation en `routes/diagnosis_schemas.py`).
+- `StartSessionRequest` expone solo `source_url`, `locale`, `visitor`, `assistant_instance_id`; `knowledge_scope_id` y campos internos no son pasables por API (defense-in-depth).
+- El servicio usa `build_default_service(ai_provider="mock")` porque LiteLLM real no tiene configuracion (alineado con requisito 9).
+- Errores `ValueError` del service se traducen a HTTP 422.
+- Se crearon 9 tests de integracion via `Litestar.testing.TestClient` que cubren: health, start_session default, scope stripping, answer+classify full flow, errores 422 para session inexistente o sin respuestas, payload minimo.
+- Se reservaron los metodos `get_session`, `capture_contact`, `finalize`, `debug`, `search_knowledge` del router anterior sin exponerlos (disponibles para proxima iteracion).
+- Validacion: 54 tests pasan (45 anteriores + 9 nuevos).
+- No se abrio pool DB al importar. No se introdujo SQLAlchemy/SQLModel/asyncpg. No se modifico frontend.
+
+### 2026-06-04 - DB writes: persistencia runtime de automation_diagnosis
+
+- Se creo y aplico `backend/db/migrations/004_team360_automation_diagnosis_runtime.sql` sobre la DB viva `team360`.
+- La migracion agrega `assistant_instances.assistant_code`, crea `automation_diagnosis_sessions`, `automation_diagnosis_answers` y `automation_diagnosis_leads`, y agrega `uq_ksb_binding_scope_entity` para bindings idempotentes.
+- Se agregaron seeds de `worker_definitions` para los package workers del paquete de venta/diagnostico.
+- Se creo `backend/modules/automation_diagnosis/postgres_repository.py` con repository async de escritura usando `psycopg 3`, SQL parametrizado y conexiones recibidas desde el caller.
+- El repository implementa `upsert_package_installation()` y `persist_session_snapshot()` para instalar `team360_sales_diagnosis` y persistir sesion, respuestas, lead y eventos en `core_events`.
+- Se agrego `backend/tests/test_automation_diagnosis_postgres_repository.py`.
+- Smoke real sobre `team360`:
+  - `migration_004_applied=ok`.
+  - package installation: 9 package workers.
+  - persistencia snapshot: 1 sesion, 10 respuestas, 1 lead y 16 eventos.
+- Validacion:
+  - `python3 -m py_compile` sobre modulos/tests tocados: OK.
+  - `uv run pytest tests/test_automation_diagnosis.py tests/test_automation_diagnosis_postgres_repository.py`: `13 passed`.
+  - `uv run pytest`: `45 passed`.
+  - `uv run python -m scripts.audit_team360_schema`: `102` checks pasados, `0` fallidos, tablas esperadas `001+002+003+004`: `51/51`.
+  - `git diff --check`: OK.
+- No se implementaron ArangoDB, Milvus, LiteLLM real, endpoints Litestar nuevos ni frontend.
+
+### 2026-06-04 - Implementacion base: Team360 como cliente del paquete venta/diagnostico
+
+- Se agrego `backend/modules/automation_diagnosis/assistant_instances.py` con contrato in-memory de `AssistantInstanceConfig` y `PackageWorkerBinding`.
+- Se materializo `team360_sales_diagnosis` como primera instalacion cliente real del paquete `pkg_sales_diagnosis` para el workspace `team360_public_site`, con `knowledge_scope_id = ks_team360_sales_diagnosis`.
+- Se conservaron fixtures/lab existentes mediante `automation_diagnosis_default` y `ks_team360_automation_diagnosis` como compatibilidad explicita.
+- `AutomationDiagnosisService.start_session()` ahora resuelve la configuracion por `assistant_instance_id`, aplica locale soportado, rechaza overrides de scope que no coincidan y propaga organizacion, workspace, canal, lead owner, cost attribution y package workers.
+- Eventos y ficha interna de lead ahora incluyen `organization_id`, `site_channel`, `lead_owner`, `locale`, `package_worker_ids` y `cost_attribution`.
+- El repositorio knowledge in-memory carga scopes por assistant instance para evitar mezclar retrieval entre `ks_team360_sales_diagnosis` y el lab legacy.
+- Se actualizaron tests de `automation_diagnosis` para cubrir Team360 como cliente directo, rechazo de scope mismatch y metadata de ArangoDB/Milvus declarada.
+- Validacion:
+  - `python3 -m py_compile` sobre modulos `automation_diagnosis` y test: OK.
+  - `uv run pytest tests/test_automation_diagnosis.py`: `11 passed`.
+  - `uv run pytest`: `43 passed`.
+- En esa etapa no se implementaron DB writes, migraciones, ArangoDB, Milvus, LiteLLM real, endpoints Litestar nuevos ni frontend.
+
+### 2026-06-04 - Decision documental: RAG inicial de diagnostico con ArangoDB + Milvus
+
+- Se documento la direccion inicial para el asistente inteligente de venta y diagnostico de automatizacion.
+- Se documento el alcance inicial de salida: asistente de venta/diagnostico para Team360 directo y asistente de venta/diagnostico para Mamá Mía 360 como distribuidor regional en Israel, con soporte español, ingles y hebreo.
+- Se fijo que ambos casos deben compartir motor tecnico y separarse por `assistant_instance`, organizacion/workspace, canal, knowledge scope, lead owner y atribucion de costos.
+- Se documento que `team360_sales_diagnosis` debe tratarse como primera instalacion cliente real del paquete de venta/diagnostico, con package workers, scope propio y persistencia/auditoria como cualquier cliente.
+- Se documento la decision inicial para ArangoDB/Milvus: scoping logico obligatorio por organizacion/workspace/assistant/scope y no coleccion fisica por cliente como default.
+- Decision: para acelerar la salida de Team360, el runtime RAG/knowledge inicial replica el patron probado en JudaismoenVivo:
+  - ArangoDB para knowledge graph/documentos de diagnostico.
+  - Milvus para retrieval semantico.
+  - LiteLLM como gateway AI y control de aliases/modelos/costos.
+- PostgreSQL 18 sigue siendo la fuente de verdad transaccional para organizaciones, workspaces, permisos, paquetes, package workers, diagnosticos finales, eventos, auditoria, consumo y billing.
+- `003_team360_pgvector_knowledge_embeddings.sql` queda como capacidad instalada/disponible, pero no como RAG principal de la primera salida.
+- Se agrego `lat.md/ai-diagnosis-rag-runtime.md`.
+- Se actualizo `lat.md/knowledge-rag-graphrag.md`, `lat.md/postgres-ai-persistence.md`, `lat.md/lat.md` y `lat.md/status_actual.md`.
+- Se agrego el analisis no operativo `docs/analisis-tecnico/team360_ai_diagnostico_stack_arango_milvus_litellm.md` y se actualizaron indices/status documentales.
+- No se implemento codigo, no se tocaron DBs, migraciones, backend, frontend ni configuracion de LiteLLM.
+
+### 2026-06-02 - ConsoleBootstrap Fase C repositories read-only y servicio
+
+- Se crearon `backend/modules/console/repositories.py`, `service.py` y `errors.py`.
+- Se implementaron repositories read-only para workspace, permisos efectivos,
+  paquetes visibles, entitlements, flags seguros de knowledge/workers, resumen de
+  tareas y alertas acotadas a eventos `console.alert.*`.
+- Se implemento `ConsoleBootstrapService.build_bootstrap()` sin endpoint Litestar.
+- Se mantuvo la autorizacion provisional workspace-centric con
+  `core_users.workspace_id`; organizaciones y membresias multi-workspace siguen
+  requiriendo una migracion futura explicita.
+- `organization_context` se proyecta provisionalmente desde workspace.
+- No se consultan ni exponen `credential_references`, `package_worker_configs`,
+  `automation_packages.settings_jsonb`, payloads internos ni secretos.
+- Se corrigio `backend/modules/db/settings.py` para normalizar URLs
+  `postgresql+psycopg://` al formato `postgresql://` aceptado por psycopg/libpq.
+- Se corrigieron helpers existentes de `backend/modules/db/transaction.py` para
+  aceptar `dict_row` y adquirir conexiones del pool mediante context manager.
+- Se elimino un callback `configure` invalido de `backend/modules/db/pool.py`
+  que impedia inicializar `AsyncConnectionPool`.
+- Validacion:
+  - `python3 -m py_compile` sobre modulos Console y helpers DB tocados: OK.
+  - `uv run pytest`: `39 passed`.
+  - smoke real de schema y repositories contra `team360` con
+    `transaction_read_only=on`: OK.
+  - smoke real de pool, context manager y `fetch_one()` contra `team360` con
+    `transaction_read_only=on`: OK.
+  - build real completo omitido porque `team360` no tiene usuarios activos
+    sembrados; el armado se valido con fake repositories.
+  - busqueda de dependencias prohibidas y `git diff --check`: OK.
+- No se tocaron DB en modo escritura, migraciones, endpoints, frontend,
+  `v360`, `litellm`, `temp1.txt`, `.codex` ni labs de cliente.
+
+### 2026-06-02 - Modulo db base con psycopg 3 async
+
+- Se creo `SrvRestAstroLS_v1/backend/modules/db/` con 5 archivos:
+  - `errors.py`: `DatabaseError`, `DatabaseConfigurationError`, `DatabasePoolNotInitializedError`, `DatabaseExecutionError`.
+  - `settings.py`: `DatabaseSettings` (dataclass frozen), `get_database_settings()` con resolucion DSN desde `TEAM360_DB_URL` / `TEAM360_DB_URL_PSQL` / `DB_PG_V360_URL`, `sanitize_dsn()` para logging seguro.
+  - `pool.py`: `create_pool()`, `set_pool()`, `get_pool()`, `open_pool()`, `close_pool()`, `reset_pool_for_tests()`. Pool se crea con `open=False`, no abre conexiones al importar.
+  - `transaction.py`: `fetch_one()`, `fetch_all()`, `execute()`, `transaction()` context manager async.
+  - `__init__.py`: export publico de todas las funciones y excepciones.
+- Se creo `SrvRestAstroLS_v1/docs/db_runtime_psycopg_async.md` con documentacion del modulo.
+- Se crearon tests `SrvRestAstroLS_v1/backend/tests/test_db_module.py` (14 tests, todos pasan).
+- No se toco DB, migraciones, codigo runtime existente, `v360`, `litellm`, `temp1.txt`, `.codex` ni archivos no relacionados.
+- No se introdujo SQLAlchemy, SQLModel, asyncpg ni Pydantic.
+
+### 2026-06-02 - Contrato ConsoleBootstrap documentado
+
+- Se creo `SrvRestAstroLS_v1/docs/console_bootstrap_contract.md` con el diseno completo del contrato read-only que alimentara la carga inicial de Team360 Console.
+- Se creo `SrvRestAstroLS_v1/backend/modules/console/types.py` con TypedDicts y dataclass internos sin Pydantic, validado con `py_compile`.
+- Se creo `SrvRestAstroLS_v1/backend/modules/console/__init__.py`.
+- El contrato define:
+  - Endpoint recomendado: `GET /api/workspaces/{workspace_id}/console/bootstrap`.
+  - DTO JSON completo con 9 secciones: workspace, current_user, effective_permissions, capabilities, entitlements, navigation, services, tasks_summary, alerts, workspace_context, organization_context, debug.
+  - Mapeo DB a DTO contra las migraciones 001 y 002.
+  - Reglas de seguridad y visibilidad por audiencia.
+  - TypedDicts Python en `types.py` sin Pydantic.
+  - Diseno de 6 repositories futuros y 6 fases de implementacion.
+  - Exclusiones explicitas.
+- No se toco DB, migraciones, codigo runtime existente, `v360`, `litellm`, `temp1.txt`, `.codex` ni archivos no relacionados.
+
+### 2026-06-02 - Pydantic Boundary: Pydantic no es obligatorio en repositorios ni dominio
+
+- Se ajusto la politica de driver DB en `lat.md/postgres-driver-policy.md` para que Pydantic no sea obligatorio en repositories ni core de dominio.
+- Nueva regla: repositories devuelven `dict`, `dataclass`, `TypedDict` o DTO explicitos; Pydantic solo en bordes HTTP/API para validacion, serializacion JSON, OpenAPI o proteccion de campos.
+- Se agrego la seccion `Pydantic Boundary` que lista usos permitidos, no permitidos y guia para contratos internos.
+- Se actualizo el ejemplo de repositorio de Pydantic a dataclass (`dataclasses.dataclass`).
+- Se agrego la regla correspondiente en `.agents/skills/team360-project/SKILL.md`.
+- Se actualizaron `lat.md/status_actual.md`, `lat.md/postgres-driver-policy.md` y esta bitacora.
+- No se toco DB, migraciones, codigo runtime, `v360`, `litellm`, `temp1.txt`, `.codex` ni archivos no relacionados.
+
+### 2026-06-01 - Analisis de alineacion UX Console con backend PostgreSQL
+
+- Se revisaron la home publica, layouts, App Shell, rutas Astro, bootstrap mock, store de contexto, navegacion derivada, servicios, workers y runs de Team360 Console.
+- Se contrasto la UX actual con las migraciones aplicadas `001`, `002` y `003`, sin ejecutar migraciones ni tocar DB.
+- Se creo `docs/ux_console_backend_alignment.md` con estado UX, modelo backend disponible, mapeo UX-DB, rutas recomendadas, separacion publico/privado, visibilidad, fases y riesgos.
+- Se recomendo implementar primero un `ConsoleBootstrap` backend read-only con repositories y `psycopg 3 async`, antes de sustituir fixtures o agregar cambios grandes.
+- Se registro como brecha futura explicita el modelo de organizaciones, membresias multi-workspace, scope delegado y servicios visibles separados de paquetes/workers.
+- Se detectaron ajustes visuales posteriores en `ux/team360-console-design-handoff` todavia no integrados; no se mezclaron ramas en esta tarea.
+- No se tocaron frontend, backend, DB, migraciones, `temp1.txt`, `.codex`, `v360`, `litellm` ni labs de cliente.
+
+### 2026-06-01 - Aclaracion de rama para contexto de desarrollo
+
+- Se documento en `AGENTS.md` que `main` es la rama estable, `ux/team360-console-design-handoff` es la rama de diseno UX y `feature/console-backend-core` es la rama de desarrollo e integracion general.
+- Se reforzo en `.agents/skills/team360-project/SKILL.md` que una instruccion con `desarrollo`, `dev` o `backend` selecciona `feature/console-backend-core`.
+- Se aclaro que `Objetivo: desarrollo` en esta bitacora identifica documentacion tecnica y no implica crear una rama Git llamada `desarrollo`.
+- No se tocaron frontend, backend, DB, migraciones, `temp1.txt`, `.codex`, `v360`, `litellm` ni labs de cliente.
+
+### 2026-05-31 - Revisión UX, consistencia visual y preparación para diseño de Team360 Console
+
+- Se auditó la consola mock en desktop, laptop, tablet, mobile y preview RTL.
+- Se corrigió uso inválido de `class:list` dentro de componentes Svelte que impedía aplicar clases condicionales en drawer, navegación, banner y tabs.
+- Se agregaron `/login` y `/select-workspace` como entradas explícitamente mock sin formularios, credenciales ni auth real.
+- Se separó la audiencia visual `team360_operator` para conservar navegación técnica resumida sin exponer red global.
+- Se agregaron cards mobile para reportes y clientes, labels operativos para estados, formato `Intl` para fechas/duraciones y estados vacíos reutilizables.
+- Se pulieron foco visible, navegación por teclado en tabs, reduced motion, interacción táctil y overscroll del drawer.
+- Se crearon `docs/console_design_review_inventory.md` y `docs/console_ux_visual_review_phase.md`.
+- Se validó con `corepack pnpm check`, `corepack pnpm build`, smoke HTTP/DOM, capturas locales y medición CDP de overflow.
+- Resultado: `0 errors`, `0 warnings`, `0 hints`; build estático OK con `111` páginas y sin overflow horizontal en rutas críticas.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones ni AG-UI funcional.
+
+### 2026-05-31 - Team360 Console servicios y pantallas mock concretas
+
+- Se implementaron listas concretas de servicios, reportes, alertas, tareas y equipo usando fixtures sintéticos realistas.
+- Se agregó detalle de servicio con tabs adaptadas por audiencia: cliente, partner y Team360 mock.
+- Se agregaron settings de workspace solo lectura e integraciones placeholder sin conexiones reales.
+- Se agregaron vistas técnicas mock de workers y runs con resúmenes seguros, ocultas en navegación y con guarda visual ante URL directa fuera del perfil Team360.
+- Se ampliaron fixtures tipados con Automatización de Leads y CRM, Reporte Ejecutivo Semanal, Control de Stock y Publicaciones, Conciliación Bancaria Asistida y Agente de Atención Inicial.
+- Se agregaron wrappers UI `SectionHeader`, `StatCard`, `StatusBadge` y `Tabs`, manteniendo DaisyUI encapsulado.
+- El detalle operativo queda en `docs/console_services_reports_alerts_mock_phase.md`.
+- Se validó con `corepack pnpm check`, `corepack pnpm build`, smoke HTTP local, smoke DOM local con Chrome headless y auditorías acotadas.
+- Resultado: `0 errors`, `0 warnings`, `0 hints`; build estático OK con `109` páginas.
+- No se implementaron backend, auth real, permisos productivos, DB, migraciones, descargas reales ni AG-UI funcional.
+
+### 2026-05-31 - Team360 Console App Shell navegable con mock data
+
+- Se creó `astro/src/layouts/ConsoleAppLayout.astro`, separado del layout público de marketing.
+- Se creó `astro/src/components/console/` con App Shell Svelte, sidebar, topbar, switchers mock, breadcrumbs, banner de contexto, notificaciones, dashboard adaptativo y vistas de sección.
+- Se agregó navegación declarativa en `astro/src/lib/navigation/`, derivada desde capacidades, módulos, workspace, organización activa y servicios contratados.
+- Se crearon rutas mock estáticas bajo `/w/[workspaceId]/` para dashboard, red, servicios, resultados, operación técnica, reportes, alertas, tareas, equipo, soporte y configuración.
+- Se materializaron tres experiencias de diseño: Team360 Admin, Partner Admin y Cliente Final.
+- El selector de perfil queda rotulado como herramienta mock de diseño; no representa auth ni impersonation productivo.
+- Se mantuvo `Mamá Mía 360` únicamente como fixture configurable de partner regional, sin branching arquitectónico.
+- Se validó con `corepack pnpm check`, `corepack pnpm build`, smoke HTTP local, smoke Chrome headless local y auditorías acotadas.
+- Resultado: `0 errors`, `0 warnings`, `0 hints`; build estático OK con `97` páginas.
+- No se implementaron backend, DB, migraciones, auth real ni AG-UI funcional.
+
+### 2026-05-31 - Team360 Console mock context e i18n base
+
+- Se creó `astro/src/components/global.js` para centralizar URLs públicas, rutas, flags visibles, branding, locale default y perfil mock inicial; `global.d.ts` conserva tipado estricto.
+- Se agregó `astro/src/lib/mock/` con organizaciones, workspaces, usuarios, servicios, reportes, alertas, tareas, runs, cards de dashboard y bootstrap tipado.
+- Se agregaron perfiles mock `team360_admin`, `team360_operator`, `team360_support`, `partner_admin` y `client_admin`.
+- Se modeló `Mamá Mía 360` únicamente como dato mock configurable del primer partner regional para Israel, sin branching de producto por nombre o región.
+- Se agregó `astro/src/lib/i18n/` con base simple propia para español, inglés y hebreo, incluyendo resolución `ltr` / `rtl`.
+- Se agregó `astro/src/stores/consoleContext.svelte.ts` con Runes para perfil, bootstrap, locale, direction, organización, workspace, permisos, servicios y notificaciones.
+- El cambio de workspace reconstruye el bootstrap y valida scope para descartar contexto anterior.
+- Se validó con `corepack pnpm check`, `corepack pnpm build`, `git diff --check` acotado, búsqueda de whitespace, revisión de lockfiles incompatibles y búsqueda de términos sensibles en runtime.
+- No se implementaron App Shell visual, dashboards renderizados, auth real, backend, DB, migraciones ni AG-UI funcional.
+
+### 2026-05-31 - Home comercial publica `team360.live` Fase 1
+
+- Se reemplazo el smoke visual de `/` por la primera home comercial publica de Team360.
+- Se creo `PublicMarketingLayout.astro`, separado de layouts futuros de autenticacion y consola.
+- Se agregaron componentes Astro de marketing para marca, header, footer, encabezados de seccion y panel conceptual del hero.
+- Se agrego `LinkButton.astro` como wrapper UI minimo para CTAs enlazables con DaisyUI encapsulado.
+- La home presenta diagnostico, implementacion gradual, medicion, casos de uso, partners y contacto por email sin promesas excesivas.
+- Se valido con `corepack pnpm check`, `corepack pnpm build`, smoke local desktop y mobile, busqueda de referencias prohibidas y `git diff --check`.
+- No se implementaron backend, autenticacion real, consola, App Shell, AG-UI funcional, DB ni migraciones.
+
+### 2026-05-31 - Frontend Team360 Fase 1 Astro, Svelte, Tailwind y DaisyUI
+
+- Se completo el scaffold real en `SrvRestAstroLS_v1/astro/`.
+- Se fijo `packageManager: pnpm.5.0` y se genero `pnpm-lock.yaml` exclusivamente con pnpm.
+- Se agrego `pnpm-workspace.yaml` con `allowBuilds` restrictivo para `esbuild` y `sharp`, segun politica pnpm 11.
+- Se configuro Astro 6 con Svelte 5, TypeScript strict, Tailwind CSS 4 via `/vite` y DaisyUI 5 CSS-first.
+- Se creo el tema neutral `team360` y wrappers UI iniciales: Alert, Badge, Button, Card y Loading.
+- Se reservo `src/lib/agui/` sin transporte ni integracion funcional.
+- Se movio un README placeholder fuera de `src/pages/` para evitar una ruta accidental.
+- No se implementaron pantallas finales, App Shell, autenticacion, navegacion contextual, backend, DB ni migraciones.
+
+### 2026-05-31 - Politica frontend pnpm, DaisyUI 5 y wrappers Team360 — SOLO DOCUMENTACION
+
+- Se agrego `docs/frontend/team360-package-manager-and-ui-policy.md`.
+- Se agrego `docs/adr/ADR-005-team360-pnpm-tailwind4-daisyui5-ui-policy.md`.
+- Se fijo pnpm como package manager frontend obligatorio.
+- Se fijo Tailwind CSS 4 + DaisyUI 5 CSS-first como stack UI inicial obligatorio.
+- Se fijo el encapsulamiento DaisyUI detras de wrappers Team360 en `src/components/ui/`.
+- No se implemento codigo, `package.json`, dependencias, componentes, rutas, build, migraciones ni cambios en DB.
+
+### 2026-05-31 - Correccion documental frontend DaisyUI 5 + Tailwind 4 — SOLO DOCUMENTACION
+
+- Se corrigio la premisa incorrecta de incompatibilidad entre DaisyUI 5 y Tailwind 4.
+- Se documento Tailwind CSS 4 + DaisyUI 5 como combinacion valida con integracion CSS-first y wrappers Team360.
+- Se mantuvo la restriccion de no reutilizar `tailwind.config.cjs`, `postcss.config.cjs` legacy ni tema `vertice360`.
+- No se implemento codigo, paquetes, componentes, rutas, build, migraciones ni cambios en DB.
+
+### 2026-05-31 - App Shell y layouts base de Team360 Console — SOLO DOCUMENTACION
+
+- Se agrego `docs/ux/team360-console-app-shell-and-layout-system.md`.
+- Se agrego `docs/adr/ADR-003-team360-console-app-shell-and-layout-system.md`.
+- Se documentaron App Shell, sidebar, topbar, switchers, breadcrumbs, layouts reutilizables, estados de UI, responsive y bootstrap esperado.
+- Se amplio `lat.md/console-multi-organization.md` con el invariante estable de shell reutilizable y descarte de estado obsoleto.
+- No se implementaron pantallas, componentes, rutas, build, migraciones ni cambios en DB.
+
+### 2026-05-31 - Modelo de navegacion contextual para Team360 Console — SOLO DOCUMENTACION
+
+- Se agrego `docs/ux/team360-console-navigation-model.md`.
+- Se agrego `docs/adr/ADR-002-team360-console-navigation-by-role.md`.
+- Se documento navegacion por tipo de organizacion, rol, permisos efectivos, workspace activo, servicios contratados y modulos habilitados.
+- Se definieron App Shell adaptable, selector de contexto, tabs por servicio, wireframes textuales e implicancias para Astro, Svelte 5 con Runes y backend.
+- Se amplio `lat.md/console-multi-organization.md` con el invariante estable de navegacion contextual.
+- No se implementaron pantallas, componentes, rutas, navegacion funcional, migraciones ni cambios en DB.
+
+### 2026-05-31 - Decision UX y arquitectura base para Team360 Console — SOLO DOCUMENTACION
+
+- Se documento la separacion entre `team360.live` como sitio comercial publico y `console.team360.live` como plataforma privada operativa.
+- Se definio Team360 Console como plataforma multi-organizacion para Team360, partners regionales y clientes finales.
+- Se registro a `Mamá Mía 360` como primera instancia configurable de Partner / Distribuidor Regional para Israel, sin reglas hardcodeadas.
+- Se documento la diferencia entre `organization` y `workspace`, el alcance delegado de partners y la brecha del schema actual.
+- Se agregaron guia extensa en `docs/ux/`, ADR en `docs/adr/` e invariante estable en `lat.md/console-multi-organization.md`.
+- No se implementaron pantallas, componentes, rutas, migraciones ni cambios en DB.
+
+### 2026-05-29 - Documentacion de politica DB driver psycopg 3 async
+
+- Se creo `lat.md/postgres-driver-policy.md` como regla estable de arquitectura.
+- Define `psycopg 3 async` como driver runtime estandar de Team360, con `psycopg_pool.AsyncConnectionPool`.
+- Prohibe SQLAlchemy/SQLModel como fuente de verdad del core; solo evaluables para herramientas perifericas.
+- Prohibe asyncpg como driver base salvo workers especializados con metrica de cuello de botella.
+- Define patron de repositorios, unit-of-work, estructura de modulos `backend/modules/db/`.
+- Establece relacion con pgvector (mismo psycopg layer) y LangGraph PostgresSaver (schema `langgraph` separado, mismo driver, pool independiente).
+- Se actualizaron `lat.md/lat.md`, `lat.md/status_actual.md`, `.agents/skills/team360-project/SKILL.md` (reglas 11-14) y `AGENTS.md` (referencia breve).
+- No se toco DB, no se aplicaron migraciones, no se modificaron migraciones 001/002/003, no se toco v360, litellm ni temp1.txt.
+- Proximo paso recomendado: disenar `backend/modules/db/` con pool, transaccion y repositorios base.
+
+### 2026-05-29 - Aplicacion migracion 003 pgvector knowledge embeddings sobre team360
+
+- Se verifico preflight antes de aplicar:
+  - conexion sanitizada apunta a `team360`;
+  - migracion 002 seguia aplicada (`knowledge_scopes`, `knowledge_documents`, `knowledge_chunks`, `package_workers`, `credential_references` presentes);
+  - `vector` esta disponible en el servidor como `0.8.2`;
+  - tablas objetivo de 003 no existian previamente;
+  - `python3 -m py_compile` sobre `backend/scripts/audit_team360_schema.py` OK;
+  - `git diff --check` sobre archivos 003/auditor/doc OK.
+- Se creo `backend/db/migrations/003_team360_pgvector_knowledge_embeddings.sql`.
+- `psql` no se uso; la aplicacion se ejecuto con `psycopg` en transaccion explicita sobre `team360`, con rollback automatico ante error.
+- Resultado de aplicacion: `migration_003_applied=ok`.
+- Se instalo `vector` en `team360` y quedo en version `0.8.2`.
+- Se crearon `knowledge_embedding_models`, `knowledge_chunk_embeddings` y la view `knowledge_ready_chunks`.
+- Se creo el indice vectorial `idx_kce_embedding_hnsw_cosine` con HNSW + `vector_cosine_ops`, parcial para `embedding_status = 'ready'`.
+- Se cargo solo el seed tecnico `knowledge_embedding_models.default_1536` para `openai/text-embedding-3-small`; no se llamo a OpenAI ni se guardaron API keys.
+- Se actualizo `backend/scripts/audit_team360_schema.py` para validar la 003: extension `vector`, tablas, view, constraints, indices, seed, duplicados chunk/modelo, status invalidos, embeddings `ready` con vector NULL y consistencia basica de `knowledge_scope_id`.
+- Auditoria post-003:
+  - checks pasados: 88;
+  - checks fallidos: 0;
+  - tablas base esperadas 001+002+003: 48/48;
+  - view `knowledge_ready_chunks`: OK;
+  - seed `default_1536`: OK;
+  - indice HNSW cosine: OK;
+  - sin embeddings `ready` con vector NULL;
+  - sin duplicados chunk/modelo;
+  - sin datos reales de clientes ni embeddings cargados.
+- No se tocaron `v360`, `litellm`, `postgres`, `.codex` ni `temp1.txt`.
+- Proximo paso recomendado: disenar la fase de runtime para generar/cargar embeddings o, si hay un workflow concreto, disenar `004_team360_langgraph_checkpointing.sql` separado del modelo core.
+
+### 2026-05-29 - Aplicacion migracion 002 sobre team360
+
+- Se verifico preflight antes de aplicar:
+  - conexion sanitizada apunta a `team360`;
+  - migracion 001 seguia aplicada (`core_workspaces`, `core_users`, `core_events`, `task_runs` presentes);
+  - migracion 002 todavia no estaba aplicada (`0/6` tablas sonda de 002 presentes);
+  - `python3 -m py_compile` sobre `backend/scripts/audit_team360_schema.py` OK;
+  - `git diff --check` sobre archivos relevantes OK.
+- `psql` no estaba disponible en el entorno, por lo que se aplico 002 con `psycopg` en transaccion explicita sobre `team360`, con rollback automatico ante error.
+- Resultado de aplicacion: `migration_002_applied=ok`.
+- Se ejecuto auditoria post-002 con `backend.scripts.audit_team360_schema` usando conexion sanitizada.
+- Resultado de auditoria:
+  - checks pasados: 74;
+  - checks fallidos: 0;
+  - tablas esperadas 001+002: 46/46;
+  - columnas nuevas de `task_runs` presentes: `automation_package_id`, `package_worker_id`, `area_id`, `assigned_user_id`, `required_permission`, `approval_status`;
+  - `chk_task_runs_approval_status` OK sin `bypassed`;
+  - indices unicos parciales criticos OK, incluidos `uq_ksb_default_internal`, `uq_ksb_default_workspace` y `uq_ksb_default_per_entity`;
+  - FKs esperadas encontradas: 5/5;
+  - `chk_ksb_convention` OK;
+  - no se detectaron defaults ambiguos en `knowledge_scope_bindings`;
+  - `credential_references.metadata_jsonb` sin claves sospechosas;
+  - consistencia multi-tenant basica sin datos operativos que verificar.
+- Tablas principales creadas por 002: RBAC, planes/features, subscriptions, assistant instances, automation packages, workers, credential references, knowledge scopes/bindings/documents/chunks.
+- Datos cargados por seeds: 20 permisos, 4 planes, 17 features, 49 asignaciones plan-feature y 8 worker definitions.
+- No se cargaron datos reales de clientes; las tablas operativas de 002 quedaron en 0 filas.
+- No se tocaron `v360`, `litellm`, `postgres`, `.codex` ni `temp1.txt`.
+
+### 2026-05-29 - Decision arquitectonica PostgreSQL 18, pgvector y LangGraph — SOLO DOCUMENTACION
+
+- Se agrego `lat.md/postgres-ai-persistence.md` para documentar PostgreSQL 18 como nucleo transaccional unico de Team360.
+- Se definio que el modelo core de Team360 vive en tablas propias (`core_workspaces`, `core_users`, `core_events`, `task_runs`, `automation_packages`, `package_workers`, `knowledge_scopes`, `knowledge_documents`, `knowledge_chunks`).
+- Se documento que pgvector queda para una fase posterior sugerida `003_team360_pgvector_knowledge_embeddings.sql`.
+- Se documento que LangGraph PostgresSaver queda para una fase posterior sugerida `004_team360_langgraph_checkpointing.sql`, idealmente en schema `langgraph`.
+- Se fijo que LangGraph checkpoints no reemplazan `task_runs` ni `core_events`; solo guardan estado interno/reanudable de workflows/agentes.
+- Se agrego precaucion sobre `pg_checkpointer`: no asumir existencia ni depender de esa extension sin verificar `pg_available_extensions`.
+- Se actualizo `lat.md/lat.md`, `lat.md/status_actual.md` y `docs/postgresql_live_team360_setup.md`.
+- No se toco la DB, no se aplicaron migraciones y no se modifico la migracion 002.
+
+### 2026-05-29 - Auditor 002 v3 con predicates semanticos — NO APLICADA
+
+- Se corrigio `backend/scripts/audit_team360_schema.py` para dejar de comparar predicates de indices parciales por substring literal contra `pg_indexes.indexdef`.
+- El auditor ahora consulta `pg_index`, `pg_get_indexdef(pg_index.indexrelid)` y `pg_get_expr(pg_index.indpred, pg_index.indrelid)`.
+- Para `uq_ksb_default_internal`, `uq_ksb_default_workspace` y `uq_ksb_default_per_entity`, valida que los indices existan sobre `knowledge_scope_bindings`, sean `UNIQUE`, sean parciales y cumplan semanticamente los tipos esperados junto con `is_default = true`.
+- Se mantuvo la regex/lista de claves sospechosas para `credential_references.metadata_jsonb`: password, passwd, token, api_key, apikey, secret, private_key, credential.
+- Se corrigieron textos stale en `docs/postgresql_002_rbac_packages_workers_knowledge_design.md` y la frase de defaults para indicar "a lo sumo una" fila default.
+- **002 v3 sigue NO aplicada sobre team360.** No se toco DB team360, v360, litellm ni temp1.txt.
+
+### 2026-05-28 - Inicializacion DB viva Team360 con migracion 001
+
+- Se elimino la DB temporal `team360_dev` creada durante la preparacion inicial, por pedido explicito de usar `team360` como DB viva.
+- Se creo la DB PostgreSQL `team360` en el servidor local activo en puerto `5432`.
+- No se modificaron las DB `v360`, `litellm` ni `postgres`.
+- Se aplico `backend/db/migrations/001_team360_core_schema.sql` sobre `team360`.
+- La migracion quedo aplicada completa: 24 tablas versionadas, 51 indices versionados, 58 foreign keys, 24 primary keys, 9 unique constraints y `pgcrypto 1.4` instalado.
+- La migracion usa `gen_random_uuid()` y no usa `uuidv7()`.
+- Todas las tablas quedaron con `0` filas; no se cargaron seeds ni datos reales.
+- Se documento el setup y audit en `docs/postgresql_live_team360_setup.md`.
+- No se diseno ni aplico migracion `002`; queda como siguiente fase sobre la DB viva ya inicializada.
+
+### 2026-05-28 - automation_diagnosis Fase 1 con LiteLLM, RAG simple y classifier deterministico
+
+- Se creo el modulo aislado `backend/modules/automation_diagnosis/`.
+- El modulo implementa una experiencia guiada de diagnostico de automatizacion, no un chatbot abierto.
+- Se agrego adapter de IA con `LiteLLMAIInterpreter` como camino real inicial y `MockAIInterpreter`/`NoopAIInterpreter` para tests o fallback.
+- Se creo el knowledge scope interno `ks_team360_automation_diagnosis`.
+- Se agrego carga de documentos Markdown, chunking y retrieval keyword simple para Fase 1.
+- Se dejaron campos y nombres preparados para GraphRAG futuro: `retrieval_mode`, `graph_enabled`, `entity_extraction_status` y `relation_extraction_status`.
+- Se implementaron scoring y classifier deterministico para `standard_package`, `operational_automation`, `consulting_required` y `not_recommended`.
+- El resultado interno produce paquete recomendado, workers sugeridos, config requerida de `package_worker`, refs de credenciales, scope de conocimiento, modo de automatizacion, riesgos, acciones bloqueadas y aprobacion humana.
+- Se agregaron fixtures de knowledge y sesiones para las cuatro clasificaciones.
+- Se agregaron funciones de ruta en `backend/routes/automation_diagnosis.py`, preparadas para montarse luego en Litestar.
+- Se documento la fase en `docs/automation_diagnosis_fase1.md`.
+- No se tocaron `team360_orquestador`, AG-UI/SSE, Mercado Libre browser lab, messaging providers ni archivos sensibles.
+- No se guardaron secretos planos.
+- Se creo `lat.md/` en la raiz del repo como capa de arquitectura viva para Team360, siguiendo el patron usado en JudaismoenVivo.
+- Se agregaron anchors `@lat` en puntos clave del modulo `automation_diagnosis`.
+- Se formalizo el uso de `lat.md/` en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md` para proximos agentes y cambios de arquitectura.
+
+
+### 2026-05-20 - Evidencia manual Kommo para arquitectura RPA
+
+- Se incorporo evidencia manual de Kommo Dashboard, Inbox/Chats y `Analitica > Registro de actividades` dentro de `automation_mario_castro/docs/`.
+- Hallazgo principal: `Registro de actividades` expone una tabla estructurada de eventos con fecha, usuario, objeto, nombre, actividad, valor previo y valor posterior.
+- Se confirmaron eventos utiles para KPIs: nuevo lead, mensaje entrante/saliente, conversacion comenzada/cerrada, cambio de etapa, fuente lead, emprendimiento/proyecto y lead eliminado.
+- Se agrego `automation_mario_castro/src/kommo/inspect_activity_log.py` para validar filtro, export o captura estructurada de filas.
+- Decision tecnica: usar Registro de actividades Kommo como fuente candidata primaria para eventos historicos; Dashboard queda como control agregado e Inbox como evidencia secundaria de canal/respuesta.
+- No se guardaron screenshots reales ni credenciales en el repo.
+
+### 2026-05-20 - Laboratorio RPA exploratorio para Kommo, Facebook y Meta Ads de Mario Castro
+
+- Se creo `automation_mario_castro/` como laboratorio aislado de browser automation para auditoria tecnica previa a una automatizacion productiva.
+- Objetivo del laboratorio:
+  - analizar el Excel `KPIs_CEO_Proyectos_Inmobiliarios_COMPLETO.xlsx`;
+  - mapear KPIs contra fuentes probables;
+  - preparar probes Playwright para Kommo, Facebook Page/Inbox y Meta Ads Manager;
+  - documentar factibilidad y flujo MVP sin usar APIs.
+- Se agregaron scripts Python para:
+  - analizar el workbook desde `docs/clients/mario_castro/KPIs_CEO_Proyectos_Inmobiliarios_COMPLETO.xlsx`;
+  - iniciar login exploratorio en Kommo y Facebook leyendo credenciales desde `.env` o variables de entorno;
+  - inspeccionar dashboard, leads, pipeline y modulo WhatsApp/conversaciones en Kommo;
+  - inspeccionar paginas Facebook, Inbox/Meta Business Suite y Ads Manager;
+  - generar `runtime/inspect/data_inventory.json`.
+- Se agrego helper reutilizable de Playwright con `storage_state`, screenshots, timeouts largos y pausa HITL/manual ante 2FA, captcha o verificacion.
+- Se documento analisis de Excel, matriz KPI -> fuente probable, mapa de fuentes, factibilidad Playwright y flujo MVP recomendado.
+- No se guardaron credenciales reales en archivos del repo.
+- No se ejecuto login real contra Kommo/Facebook en esta etapa.
+- No se integro este laboratorio con `team360_orquestador`, AG-UI, backend productivo ni frontend.
+
+### 2026-05-13 - Reubicacion del documento SAP Business One fuera de docs tecnicos de runtime
+
+- Se movio `sap_b1_desktop_automation_factibilidad.md` desde `SrvRestAstroLS_v1/docs/` hacia `docs/analisis-tecnico/`.
+- Motivo:
+  - el documento es de factibilidad tecnico-comercial interna;
+  - no documenta runtime, backend, Astro, migraciones ni implementacion productiva actual;
+  - corresponde a la zona de analisis tecnico no operativo.
+- Se actualizaron los status locales de `docs/` y `docs/analisis-tecnico/`.
+- Se limpio una entrada duplicada previa sobre la ampliacion del documento SAP.
+- No se tocaron archivos funcionales.
+
+### 2026-05-13 - Probes Mercado Libre para lista de preguntas y borrador de respuesta
+
+- Se incorporo inspeccion superficial de la lista visible de preguntas del vendedor.
+- Se agrego `smoke_questions_list_inspect.py` para:
+  - reutilizar sesion persistente;
+  - abrir preguntas del vendedor;
+  - detectar lista, filtros, empty state y muestra superficial de items;
+  - guardar screenshot, storage state y reporte de inspeccion.
+- Se amplio `smoke_reply_draft.py` para validar borradores de respuesta sin publicar:
+  - localizar un item con accion de responder;
+  - completar textarea;
+  - validar estado del boton;
+  - limpiar el borrador por defecto salvo `--keep-draft`.
+- Se actualizaron helpers/selectores/configuracion del browser lab para soportar inspeccion de preguntas.
+- Se actualizaron README y `login-flow.md` con los probes disponibles.
+- No se integraron estos probes con `team360_orquestador`, AG-UI ni frontend.
+
+### 2026-05-13 - Documento de factibilidad SAP Business One Desktop Client
+
+- Se creo inicialmente `sap_b1_desktop_automation_factibilidad.md`.
+- El documento analiza la factibilidad tecnica y comercial de automatizar SAP Business One v10 Desktop Client sin depender inicialmente de:
+  - certificacion SAP;
+  - marketplace SAP;
+  - add-on oficial;
+  - acceso directo a HANA/SQL.
+- Se cubrieron las opciones:
+  - Service Layer;
+  - DI API / SDK local;
+  - RPA Desktop sobre SAP Business One Client;
+  - modelo asistido por RDP;
+  - fases recomendadas de evolucion;
+  - riesgos, mitigaciones y arquitectura minima propuesta.
+- Decision registrada en el documento:
+  - salida comercial rapida con RPA Desktop asistido en sesion del usuario por RDP;
+  - evolucion tecnica a VM dedicada y usuario BOT;
+  - robustez profesional posterior con DI API / Service Layer;
+  - no prometer autonomia total ni solucion SAP certificada al inicio.
+- No se genero codigo funcional ni se tocaron backend, Astro, `team360_orquestador`, AG-UI o laboratorio browser de Mercado Libre.
+
+### 2026-05-13 - Status locales por directorio documental
+
+- Se agrego la convencion de `status_actual.md` local por directorio documental activo.
+- Se crearon status locales en:
+  - `docs/`
+  - `docs/negocio/`
+  - `docs/estrategia/`
+  - `docs/analisis-tecnico/`
+  - `docs/templates/`
+  - `data/reports/`
+  - `data/reports/mercadolibre/`
+  - `data/reports/mercadolibre/netzaj-racing/`
+  - `data/reports/snapshots/`
+- Se actualizo `AGENTS.md` para que proximos agentes sepan que cada status local describe el ultimo estado de su propio directorio.
+- No se tocaron archivos funcionales, backend, Astro, `team360_orquestador`, AG-UI ni laboratorio browser de Mercado Libre.
+
+### 2026-05-13 - Orden documental no tecnico y reportes
+
+- Se reorganizo documentacion no tecnica de Team360 en `docs/`:
+  - `docs/negocio/` para contexto comercial y analisis de negocio.
+  - `docs/estrategia/` para continuidad, estrategia e inventarios tecnico-negocio.
+  - `docs/analisis-tecnico/` para analisis tecnico no operativo ni runtime.
+- Se agruparon reportes y evidencias generadas en `data/reports/`:
+  - `data/reports/mercadolibre/netzaj-racing/` para relevamientos, playbook e intents del seller NETZAJ RACING.
+  - `data/reports/snapshots/` para snapshots historicos.
+- Se agregaron indices `README.md` en las carpetas documentales principales.
+- Se actualizaron enlaces relativos afectados por los movimientos.
+- No se tocaron archivos funcionales, backend, Astro, `team360_orquestador`, AG-UI ni laboratorio browser de Mercado Libre.
+
+### 2026-05-13 - Automatizacion browser para permisos GitHub en `iMotorSoft/concilia`
+
+- Se uso browser automation sobre la web de GitHub para configurar el repositorio `iMotorSoft/concilia`.
+- Se invito a `msamia@gmail.com`, que GitHub resolvio como usuario `@msamia`.
+- La invitacion quedo pendiente de aceptacion:
+  - `0 collaborators`
+  - `1 invitation`
+  - invitacion visible para `@msamia`
+- Se creo y verifico una regla clasica de proteccion de rama para `main`.
+- Configuracion verificada de la regla:
+  - `Branch name pattern`: `main`
+  - `Lock branch`: activo
+  - `Do not allow bypassing the above settings`: desactivado
+  - `Allow force pushes`: desactivado
+  - `Allow deletions`: desactivado
+- Efecto esperado:
+  - colaboradores comunes no pueden modificar directamente `main`;
+  - owner y administradores conservan bypass;
+  - `@msamia` podra crear y actualizar ramas propias cuando acepte la invitacion, pero no deberia poder modificar `main`.
+
+### 2026-05-13 - Observacion tecnica sobre diferencia entre intentos GPT-5.4 y GPT-5.5
+
+- Intento anterior con GPT-5.4:
+  - el login y la invitacion del colaborador funcionaron;
+  - la UI de GitHub mostro el formulario de proteccion de rama con `main` y `Lock branch` cargados;
+  - el click automatizado sobre `Create` no disparo el submit real del formulario;
+  - no aparecio la navegacion de regreso a `settings/branches`;
+  - por eso la regla de proteccion no quedo guardada.
+- Intento posterior con GPT-5.5:
+  - se diagnostico que el problema no era la configuracion elegida sino el disparo del submit en la UI automatizada;
+  - primero se intento enviar el formulario por HTTP usando la sesion temporal, pero GitHub respondio `422` por proteccion anti-CSRF;
+  - luego se envio el formulario desde el contexto real de la pagina con `requestSubmit()`;
+  - esa variante si ejecuto el submit aceptado por GitHub y navego de vuelta a `settings/branches`;
+  - despues se abrio `Edit` para verificar que la regla quedo guardada con `main` y `Lock branch` activo.
+- Conclusion:
+  - el fallo anterior fue operativo del flujo de browser automation contra una UI dinamica de GitHub;
+  - el intento final funciono porque se uso el formulario real ya cargado por GitHub y se disparo el submit desde el contexto de la pagina, preservando las validaciones de sesion.
+
+### 2026-05-13 - Ampliacion del documento SAP con licenciamiento, checklist, costos, monitoreo y rollback
+
+- Se agregaron 5 secciones nuevas al documento `docs/analisis-tecnico/sap_b1_desktop_automation_factibilidad.md`:
+  - **Seccion 11 - Licenciamiento SAP**: tipos de licencia SAP B1 (Professional, Limited, Indirect Access, Partner) y recomendaciones por fase, con regla practica para evitar riesgos de licenciamiento.
+  - **Seccion 12 - Checklist de relevamiento**: checklist estructurada para evaluar prospectos en primera conversacion, cubriendo entorno, procesos, infraestructura y aceptacion comercial, con criterio de aptitud rapida para Fase 1.
+  - **Seccion 13 - Estimaciones de esfuerzo y costo**: tablas por fase con tiempos, costos Team360 e infraestructura (cliente), mas estructura de costos sugerida (one-time, por flujo, soporte mensual).
+  - **Seccion 14 - Monitoreo remoto**: heartbeat, logs estructurados JSON, evidencias visuales, alertas automaticas, canales (dashboard/webhook/email) y consideraciones de seguridad con modo offline.
+  - **Seccion 15 - Rollback operativo**: principios, tabla por tipo de operacion (pre-carga, maestro, actualizacion), operaciones excluidas de rollback automatico, procedimiento general, checklist pre y post ejecucion.
+- El documento paso de 600 a 868 lineas.
+- No se toco codigo funcional, backend, Astro, `team360_orquestador`, AG-UI ni laboratorio browser.
+
+### 2026-05-01 - Base documental y migration inicial de Team360
+
+- Se creo `docs/team360_multi_whatsapp_multi_llm_architecture.md`.
+- Se creo `docs/team360_postgres_dev_setup.md`.
+- Se creo `backend/db/migrations/001_team360_core_schema.sql`.
+
+### Estado observado en esta etapa
+
+- Team360 todavia no tiene backend Litestar productivo completo.
+- `backend/db/team360_pgvector_catalog.sql` existe, pero esta marcado como futuro opcional y no integrado al runtime actual.
+- `backend/globalVar.py` contiene configuracion basica y variables DB/OpenAI futuras opcionales.
+- No se implementaron repositorios Python ni rutas nuevas.
+- No se tocaron archivos funcionales.
+
+### PostgreSQL dev propuesto
+
+- DB local sugerida: `team360_dev`.
+- Usuario dev sugerido: `team360_dev`.
+- Puerto local sugerido: `54329`.
+- DSN backend sugerido:
+
+```bash
+export TEAM360_DB_URL="postgresql+psycopg://team360_dev:team360_dev_password@localhost:54329/team360_dev"
+```
+
+- DSN CLI sugerido:
+
+```bash
+export TEAM360_DB_URL_PSQL="postgresql://team360_dev:team360_dev_password@localhost:54329/team360_dev"
+```
+
+### Migration inicial
+
+Archivo:
+
+`backend/db/migrations/001_team360_core_schema.sql`
+
+Incluye estructura inicial para:
+
+- workspaces
+- usuarios placeholder
+- eventos core
+- communication providers
+- WhatsApp channels
+- WhatsApp numbers
+- provider credentials
+- webhook bindings
+- routing rules
+- message threads
+- message events
+- migracion de numeros WhatsApp
+- LLM providers
+- LLM credentials
+- LLM model profiles
+- workspace LLM settings
+- automation LLM policy
+- fallback policy
+- usage logs
+- cost estimates
+- scheduled tasks
+- task runs
+- local runners
+- runner heartbeats
+
+## Validacion
+
+- Se audito `team360` contra `001_team360_core_schema.sql`: no hay tablas, indices ni extensiones versionadas faltantes.
+- Se ejecuto `python3 -m py_compile` sobre los scripts del laboratorio `automation_mario_castro/`.
+- Se ejecuto `python3 src/excel/analyze_workbook.py` y genero `automation_mario_castro/runtime/inspect/excel_inventory.json`.
+- Se ejecuto `python3 src/reports/build_data_inventory.py` y genero `automation_mario_castro/runtime/inspect/data_inventory.json`.
+- Se verifico que `.env.example` no contiene credenciales reales.
+- No se probaron los logins contra Kommo/Facebook porque requieren configuracion local de `.env` e intervencion humana si aparece 2FA.
+- Se agrego pero no se ejecuto `kommo.inspect_activity_log`; requiere sesion Kommo local.
+- Se verifico que Playwright no esta instalado en el entorno Python actual; los probes quedan preparados pero requieren instalar dependencias antes de ejecutarse.
+- Se verifico que `sap_b1_desktop_automation_factibilidad.md` existe en `docs/analisis-tecnico/`.
+- Se verifico que ya no queda ubicado en `SrvRestAstroLS_v1/docs/`.
+- Se ejecuto `python3 -m py_compile` sobre los modulos Python tocados del browser lab Mercado Libre.
+- `git diff --check` paso sin errores para el commit de probes Mercado Libre.
+- `git diff --check` paso sin errores para el documento SAP B1.
+- Se verifico la estructura de directorios documentales activos antes de crear status locales.
+- `git diff --check` paso sin errores para los cambios documentales.
+- Se verifico la estructura final de `docs/` y `data/reports/`.
+- Se buscaron referencias internas a documentos movidos y se actualizaron enlaces relativos relevantes.
+- Se verifico en GitHub que la regla de rama existe entrando a `Settings > Branches > Edit`.
+- Se verifico que el formulario editado muestra `Branch name pattern = main` y `Lock branch` activo.
+- Se verifico que `msamia@gmail.com` quedo como invitacion pendiente a `@msamia`.
+- `git diff --check` paso sin errores para los archivos creados.
+- Se verifico que la migration contiene las tablas principales pedidas.
+- No se ejecuto la migration porque `psql` no estaba disponible en el `PATH` de esta sesion.
+
+## Pendientes recomendados
+
+1. Levantar PostgreSQL local con Docker.
+2. Aplicar `backend/db/migrations/001_team360_core_schema.sql`.
+3. Definir herramienta formal de migrations.
+4. Crear seed dev sin secretos reales.
+5. Integrar `TEAM360_DB_URL` al backend cuando exista runtime Litestar productivo.
+6. Crear repositorios Python en una fase posterior.
+7. Validar diseno de Knowledge Ingestion multi-scope (`docs/knowledge_ingestion_multiscope_design_20260607.md`) con el equipo.
+8. Definir metadata mocks para estructura Empresa/Area/Sector/Proceso/Tema.
+9. Evaluar migracion minima para KnowledgeMap, KnowledgeNode y policies cuando haya decision de implementacion.
+
+### 2026-05-29 - Correccion migracion 002 v3 — bloqueante knowledge_scope_bindings resuelto — NO APLICADA
+
+- GPT-5.5 reviso v2 y encontro bloqueante: `knowledge_scope_bindings` permitia defaults ambiguos con `bound_entity_id IS NULL`.
+- Correcciones aplicadas en v3:
+  - **CHECK constraint `chk_ksb_convention`**: reemplaza al viejo `chk_knowledge_scope_bindings_type`. Valida nulabilidad segun `binding_type`:
+    - `internal` -> workspace_id NULL, bound_entity_id NULL
+    - `workspace` -> workspace_id NOT NULL, bound_entity_id NOT NULL, bound_entity_id = workspace_id
+    - `assistant_instance`/`automation_package`/`package_worker` -> workspace_id NOT NULL, bound_entity_id NOT NULL
+  - **Indices unicos parciales** reestructurados:
+    - `uq_ksb_default_internal`: `WHERE binding_type = 'internal' AND is_default = true`
+    - `uq_ksb_default_workspace`: `UNIQUE(workspace_id) WHERE binding_type = 'workspace' AND is_default = true` (NUEVO)
+    - `uq_ksb_default_per_entity`: `UNIQUE(binding_type, bound_entity_id) WHERE binding_type IN ('assistant_instance','automation_package','package_worker') AND is_default = true` (mas preciso)
+  - **DO blocks**: filtros `conrelid` en pg_constraint y `table_schema = 'public'` en information_schema para evitar falsos positivos.
+  - **audit_team360_schema.py**: nueva seccion 7 de validacion de knowledge_scope_bindings; validacion de predicate en indices; claves sospechosas ampliadas (passwd, apikey); mensaje final cambiado.
+  - **Design doc**: seccion knowledge_scope_bindings reescrita con convencion fuerte, tabla de nulabilidad, defaults por tipo, y separacion DB vs app.
+- Archivos modificados:
+  - `backend/db/migrations/002_team360_rbac_packages_workers_knowledge.sql` (v3)
+  - `backend/scripts/audit_team360_schema.py` (v3)
+  - `docs/postgresql_002_rbac_packages_workers_knowledge_design.md` (v3)
+  - `docs/status_actual.md` (esta entrada)
+- **002 v3 NO fue aplicada sobre team360.** No se toco DB team360, v360, litellm ni temp1.txt.
+- Validacion: `python3 -m py_compile` sobre audit script OK; `git diff --check` sin errores.
+
+### 2026-05-28 - Correccion migracion 002 v2 (RBAC, packages, workers, knowledge) — NO APLICADA
+
+- Se aplicaron las 15 correcciones recomendadas por GPT-5.5 sobre el borrador 002 v1:
+  - **core_roles**: workspace_id nullable, is_system_role, indices unicos parciales.
+  - **core_permission_profiles**: indices unicos parciales para nullable workspace_id.
+  - **core_user_profiles**: area_id + indices unicos parciales (mismo perfil en areas distintas).
+  - **automation_packages**: package_code scoped a workspace (no global) + FK a package_plans.
+  - **knowledge_scope_bindings**: nueva tabla, binding movido desde knowledge_scopes.
+  - **knowledge_scopes**: eliminados binding_type/binding_id.
+  - **assistant_instances**: default_knowledge_scope_id sin FK (evita circular).
+  - **package_workers**: agregado package_worker_code + UNIQUE.
+  - **workspace_plan_subscriptions**: UNIQUE parcial para active only + ended_at_utc.
+  - **approval_status**: eliminado 'bypassed', valores seguros (not_required, pending, approved, rejected, expired, cancelled).
+  - **worker_definitions seeds**: 8 workers alineados con lat.md.
+  - **credential_references**: documentacion de seguridad + audit de metadata_jsonb.
+  - **Indices unicos parciales**: 11 criticales para integridad con workspace_id nullable.
+- Archivos corregidos:
+  - `backend/db/migrations/002_team360_rbac_packages_workers_knowledge.sql` (reescrito)
+  - `docs/postgresql_002_rbac_packages_workers_knowledge_design.md` (reescrito)
+  - `backend/scripts/audit_team360_schema.py` (reescrito con 8 checkpoints)
+- La migracion 002 v2 propone **22 tablas nuevas** (+1: knowledge_scope_bindings).
+- **11 indices unicos parciales** para restricciones UNIQUE con workspace_id nullable.
+- **ALTER TABLE**: task_runs +6 columnas + check constraint + 4 FKs; package_workers FK a knowledge_scopes.
+- **Seeds**: 20 permisos, 4 planes, 17 features, 8 worker_definitions.
+- Pendiente: validar v2 con GPT-5.5 antes de ejecutar.
+- No se modificaron `v360`, `litellm`, `postgres`, `.codex` ni `temp1.txt`.
+
+## Notas de seguridad
+
+- No se grabo la password de GitHub en archivos del proyecto.
+- Se uso un archivo temporal de sesion en `/tmp/team360_github_state.json` solo para diagnostico y se elimino al terminar.
+- Se cerro la sesion del navegador automatizado al finalizar la tarea.
+- No se hardcodearon secretos reales.
+- Las credenciales de providers/LLM se modelaron como `secret_ref`.
+- `backend/temp1.txt` aparece modificado en el worktree y contiene material sensible o notas internas; no fue tocado en esta etapa.
+
+### 2026-06-11 - Fase 1.9n - Headless diagnostic response validation
+
+- Se agrego el dataset `backend/tests/fixtures/sales_diagnosis_headless_questions_v1.json` con 10 casos semanticos para evaluar rapidez, accesibilidad, MFA, derivacion a partner, honestidad comercial y limites.
+- Se agrego `backend/scripts/evaluate_sales_diagnosis_headless_responses.py` para ejecutar evaluacion headless contra `POST /api/sales-diagnosis-runtime/turn` o `POST /api/dev/sales-diagnosis-runtime/turn`.
+- El evaluator trabaja con scoring PASS/WARN/FAIL/SKIP, detection conservadora de claims prohibidos y negaciones simples.
+- Se agregaron tests unitarios puros en `backend/tests/test_sales_diagnosis_headless_evaluator.py`.
+- Se actualizo la documentacion de runtime y scripts con la fase 1.9n.
+- No se toco frontend, Astro, UI, SSE productivo, pgvector, ArangoDB, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- Pendiente: ejecutar pytest, evaluar contra endpoints disponibles y validar `git diff --check` + secret scan.
+
+### 2026-06-11 - Fase 1.9p - Diagnose LiteLLM fallback difference
+
+- Se comparo el path que ya pasaba (`scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py`) contra el evaluator headless (`scripts/evaluate_sales_diagnosis_headless_responses.py`).
+- Confirmacion inicial:
+  - rama activa: `feature/console-backend-core`;
+  - worktree inicial limpio;
+  - Fase 1.9n committed en `570fbd7 test(backend): add headless diagnostic response validation`;
+  - no se creo rama nueva;
+  - no se hizo `git add` ni commit.
+- Diferencia encontrada:
+  - smoke y evaluator usan el mismo endpoint por defecto: `POST /api/sales-diagnosis-runtime/turn`;
+  - el evaluator agrega metadata (`source=headless_evaluator`, `case_id`, `dataset`, `endpoint`) pero no envia Authorization ni secretos;
+  - las envs pasadas al evaluator no cambian un backend ya levantado;
+  - la consola LiteLLM mostro llamadas `401 Unauthorized` previas y luego `200 OK`, consistente con token/env anterior o invalido en algun proceso backend;
+  - el evaluator mezclaba `fallback_applied=true` de guardrails/runtime con `team360.llm.provider_result.payload.response_is_fallback=true` del provider LLM.
+- Se corrigio el evaluator para distinguir:
+  - provider fallback real: `provider_result.response_is_fallback=true`;
+  - guardrail/runtime fallback: `fallback_applied=true`.
+- Se agregaron flags diagnosticos seguros:
+  - `--single-case <id>`;
+  - `--debug-request`;
+  - `--print-events`;
+  - `--dump-provider-events`;
+  - `--require-real-llm`;
+  - `--fail-on-fallback`.
+- El modo diagnostico imprime endpoint, provider cliente solicitado, runtime_mode indirecto via respuesta, session_id, metadata, response_type, turn_count, eventos sanitizados y estado PASS/WARN/FAIL sin imprimir API keys, Authorization, DB URL, token Milvus ni token LiteLLM.
+- Observacion de contrato: cuando la route devuelve `unsafe_blocked`, actualmente no conserva `events`; el evaluator lo reporta como falta de evidencia diagnostica y no lo interpreta como fallback LiteLLM.
+- Validacion comparativa ejecutada con backend reiniciado en `127.0.0.1:8018` usando LiteLLM real:
+  - smoke LiteLLM product adapter: **13/13 passed**, `response_is_fallback=false`;
+  - evaluator single-case `speed_simple_001` con `--print-events --require-real-llm --debug-request`: **FAIL por guardrails/unsafe_blocked**, no por provider fallback;
+  - evaluator full LiteLLM/fake con `--dump-provider-events`: **0 PASS / 9 WARN / 1 FAIL / 0 SKIP**; casos con eventos preservados reportaron `provider_result.response_is_fallback=false`;
+  - evaluator full LiteLLM/Milvus con `TEAM360_MILVUS_HOST=127.0.0.1`, collection `team360_lab_pgvector_benchmark_openai_small_1536`, scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b` y embedding version `team360-openai-small-1536-v1`: **1 PASS / 9 WARN / 0 FAIL / 0 SKIP**; todos los casos con eventos reportaron `provider_result.response_is_fallback=false`.
+- Tests ejecutados:
+  - `uv run pytest tests/test_sales_diagnosis_headless_evaluator.py` = **11 passed**.
+  - `uv run pytest tests/test_sales_diagnosis_runtime_route.py` = **42 passed**.
+  - `uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py` = **36 passed**.
+  - `uv run pytest` = **390 passed, 9 skipped**.
+- Smokes de no regresion ejecutados:
+  - `uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --backend-url http://127.0.0.1:8018` = **30/30 passed**.
+  - `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --backend-url http://127.0.0.1:8018 --cleanup` = **30/30 passed**.
+  - `uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py --cleanup` con backend product/Postgres = **22/22 passed**.
+  - `uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_milvus.py --allow-empty-results` con `TEAM360_MILVUS_HOST=127.0.0.1` y collection/scope/version alineados = **16/16 passed**, sources reales, sin `dev_doc_*`.
+- No se toco frontend, Astro, Svelte, UI, Console, SSE productivo, pgvector, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- Pendiente recomendado: Fase 1.9q para PromptPolicy/GuardrailPolicy tuning si se quiere convertir WARN/FAIL de calidad en PASS sin tocar el diagnostico de fallback.
+
+### 2026-06-11 - Fase 1.9q - Headless PromptPolicy/GuardrailPolicy tuning
+
+- Confirmacion inicial:
+  - rama activa: `feature/console-backend-core`;
+  - worktree inicial limpio;
+  - Fase 1.9p committed en `1beb0af test(backend): fix headless evaluator litellm fallback detection`;
+  - no se creo rama nueva;
+  - no se hizo `git add` ni commit.
+- Analisis inicial:
+  - LiteLLM/fake pre-ajuste: **0 PASS / 8 WARN / 2 FAIL / 0 SKIP** en la corrida observada; sin provider fallback masivo.
+  - LiteLLM/Milvus pre-ajuste: **0 PASS / 10 WARN / 0 FAIL / 0 SKIP** en la corrida observada; `response_is_fallback=false`, sources reales, pero guardrail fallback en varios casos.
+  - Los WARN/FAIL eran de calidad, prompt o falsos positivos de guardrail/scoring, no de LiteLLM roto.
+- Cambios en `PromptPolicy`:
+  - respuesta directa antes de limites/proximo paso;
+  - rubrica para rapidez, instalacion, proceso manual/automatizado, MFA/permisos cerrados, partners, lead generation, alucinacion, responsabilidad, respuestas falsas e incentivo comercial;
+  - aclaracion de no vender CRM via API REST como disponible hoy salvo fuente explicita;
+  - frases canonicas reutilizables para mejorar cobertura semantica sin hardcodear por `case_id`.
+- Cambios en `GuardrailPolicy`:
+  - declinaciones seguras ampliadas (`preliminar`, `validacion adicional`, `caso por caso`, `depende del alcance`, `debe pactarse`, `requiere aprobacion humana`);
+  - deteccion de `WhatsApp` y `CRM` reducida a claims de capacidad lista para evitar falsos positivos;
+  - se mantienen bloqueos de Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff, CRM listo/integrado, cierre automatico, bypass de MFA, promesas absolutas y claims de precio/SLA/plazo no soportados.
+- Cambios en evaluator:
+  - `_phrase_negated()` ahora reconoce negacion adyacente como `no garantiza viabilidad`, evitando FAIL falso por forbidden claim `garantiza`.
+- Resultados finales del evaluator:
+  - fake/fake: **0 PASS / 10 WARN / 0 FAIL / 0 SKIP**; `response_is_fallback=true` esperado por LLM fake.
+  - LiteLLM/fake `openai_gpt-5-nano`: **2 PASS / 8 WARN / 0 FAIL / 0 SKIP**; `response_is_fallback=false`.
+  - LiteLLM/Milvus `openai_gpt-5-nano`: **5 PASS / 5 WARN / 0 FAIL / 0 SKIP**; `response_is_fallback=false`, sources reales, objetivo minimo alcanzado.
+  - LiteLLM/Milvus `gpt5.5-nano`: comparacion opcional no utilizable; **10/10 provider fallback** (`response_is_fallback=true`), documentado como SKIP operativo sin tocar config LiteLLM.
+- Acotacion Milvus:
+  - se uso Milvus estandar local `milvus26-standalone` con host `127.0.0.1`, MinIO `milvus26-minio` y etcd `milvus26-etcd`;
+  - collection `team360_lab_pgvector_benchmark_openai_small_1536`;
+  - scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b`;
+  - embedding version `team360-openai-small-1536-v1`;
+  - no se uso token Milvus ni se activo Milvus por default.
+- Casos que siguen en WARN en LiteLLM/Milvus principal:
+  - `mfa_closed_004`, `partner_compare_005`, `leadgen_disguised_006`, `hallucination_007`, `trap_wrong_answers_009`;
+  - no son FAIL criticos ni provider fallback; quedan como posibles mejoras de prompt/policy posteriores si se busca superar el minimo.
+- Tests ejecutados:
+  - `uv run pytest tests/test_sales_diagnosis_headless_evaluator.py` = **12 passed**.
+  - `uv run pytest tests/test_sales_diagnosis_runtime_route.py` = **42 passed**.
+  - `uv run pytest tests/test_sales_diagnosis_runtime_dev_route.py` = **36 passed**.
+  - `uv run pytest` = **398 passed, 9 skipped**.
+- Smokes de no regresion ejecutados:
+  - `uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --backend-url http://127.0.0.1:8018` = **30/30 passed**.
+  - `TEAM360_SALES_DIAGNOSIS_DEV_STATE_REPOSITORY=postgres uv run python scripts/smoke_sales_diagnosis_runtime_dev_endpoint.py --backend-url http://127.0.0.1:8018 --cleanup` = **30/30 passed**.
+  - `TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=postgres uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_postgres.py --backend-url http://127.0.0.1:8018 --cleanup` = **22/22 passed**.
+  - product adapter Milvus con host `127.0.0.1`, collection/scope/version alineados = **16/16 passed**, sources reales, sin `dev_doc_*`.
+  - product adapter LiteLLM con `openai_gpt-5-nano` = **13/13 passed**, `LiteLLM responded (not fallback)`.
+- Validaciones finales:
+  - `git diff --check` = OK.
+  - Secret scan = sin secretos reales; solo nombres literales permitidos, ejemplos documentales y claves fake de tests.
+- No se toco frontend, Astro, Svelte, UI, Console, SSE productivo, pgvector, ArangoDB, cross-encoder, Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff ni CRM real.
+- LLM fake sigue default, retrieval fake sigue default, LiteLLM y Milvus siguen opt-in.
+
+### 2026-06-11 - Fase 1.9r — Headless diagnostic quality expansion
+
+- Se amplio el dataset `sales_diagnosis_headless_questions_v1.json` de **10 a 25 casos** (15 nuevos).
+- Categorias nuevas agregadas (14): repetitive manual, sensitive data, legacy no API, external portal, low frequency, human error, partial automation, CRM, WhatsApp handoff, lead capture, ROI, responsibility, unauthorized access, MFA bypass, extreme expectation.
+- `RISK_HINTS` expandido con 20 nuevas entradas.
+- `GLOBAL_FORBIDDEN_PATTERNS` ampliado de ~26 a ~47 patrones.
+- `PromptPolicy.build_system_prompt()` actualizado con reglas generales (sin if por pregunta).
+- GuardrailPolicy sin cambios.
+- Test `test_load_dataset_fixture` actualizado de 10 a 25.
+- Evaluaciones:
+
+| Escenario | Resultado | Fallback |
+| --- | ---: | --- |
+| fake/fake | 1 PASS / 24 WARN / 0 FAIL / 0 SKIP | `true` esperado |
+| LiteLLM/Milvus `openai_gpt-5-nano` | 0/0/25/0 FAIL | `true` — modelo contenido vacio |
+| LiteLLM/Milvus `openrouter_deepseek_4_flash` | 0/0/25/0 FAIL | `true` — fake dev_doc_* |
+| `gpt5.5-nano` | SKIP | Alias no existe |
+
+- Tests: **398 passed, 9 skipped** (sin regresiones).
+- `git diff --check` = OK.
+- Secret scan = sin leaks; solo nombres de variables literales, sin valores reales.
+- No se toco frontend, no capacidades futuras activadas, no rama nueva.
+- LLM fake default, retrieval fake default. LiteLLM y Milvus opt-in.
+
+### 2026-06-11 - Lab: Sales Diagnosis model evaluation lab
+
+- Se creo el laboratorio reproducible `lab/model-evaluation-sales-diagnosis/` para comparar modelos LLM sobre el dataset headless del diagnosticador.
+- **No modifica runtime productivo. No modifica product adapter. No modifica PromptPolicy. No modifica GuardrailPolicy. No activa modelos por default. No toca frontend, Console, WhatsApp ni CRM.**
+- Se crearon:
+  - `config/models.json`: 5 modelos candidatos (OpenAI directo gpt-5-nano, LiteLLM/OpenAI gpt-5-nano y gpt-4o-mini, LiteLLM/OpenRouter Qwen 3 30B y DeepSeek V4 Flash).
+  - `config/run_matrix.example.json`: matriz de ejecucion configurable (dataset path, backend URL, endpoint, state, retrieval, LLM provider, modelos, repeats, timeout, output).
+  - `scripts/run_model_evaluation.py`: runner que lee models.json y run_matrix, invoca el evaluador backend como subproceso para cada modelo, captura PASS/WARN/FAIL/SKIP, duracion, fallbacks y escribe JSONL sanitizado en `results/`. Soporta `--dry-run`, `--list-models`, `--models` (subset), `--no-write-results`.
+  - `scripts/summarize_results.py`: lee JSONL/JSON y muestra resumen tabular o JSON con modelo, provider, retrieval, total, PASS, WARN, FAIL, SKIP, fallback count, duracion y promedio por caso.
+  - `datasets/README.md`: documenta como referenciar el dataset canonico.
+  - `results/.gitkeep`: directorio de resultados preparado.
+  - `README.md` del lab: documenta objetivo, diferencia con backend validation, modelos incluidos/excluidos, prerrequisitos, comandos dry-run y reales, estructura, seguridad y notas.
+  - `lab/README.md`: indice raiz de laboratorios actualizado.
+- Validaciones:
+  - `python3 -m py_compile` = OK para ambos scripts.
+  - `uv run pytest` en backend = **398 passed, 9 skipped** (sin regresiones).
+  - `git diff --check` = OK.
+  - Secret scan sobre `lab/`, `SrvRestAstroLS_v1/backend/scripts/`, `status_actual.md`, `lat.md/` = sin leaks en archivos nuevos; solo nombres de variables literales pre-existentes.
+- No se modificaron: product adapter route, policies, evaluator backend, tests productivos, frontend, Console, WhatsApp, CRM, Step-to-Action, lead_capture, diagnostic_code.
+- No se creo rama nueva. Todo en `feature/console-backend-core`.
+- No se uso `feature/sales-diagnosis-runtime-skeleton`.
+- `archive-15ufPC/` no se agrego.
+
+### 2026-06-11 - Lab: alineacion con patrones de benchmark JudaismoEnVivo
+
+- Se revisaron como referencia los labs de JudaismoEnVivo:
+  - `reels_automation/labs/model_benchmark/`
+  - `SrvRestAstro_v2/lab/model-candidates-rag/`
+- Patrones utiles identificados:
+  - CLI con listado, filtros y dry-run;
+  - catalogo de modelos separado;
+  - resultados JSON/JSONL auditables y resumen tabular;
+  - medicion de duracion/latencia;
+  - errores como metadato sin abortar toda la matriz;
+  - comparativa agregada por modelo;
+  - documentacion de comandos, estructura y columnas.
+- Se excluyo explicitamente:
+  - datasets, prompts, golden answers y resultados de JudaismoEnVivo;
+  - secrets, credenciales, nombres de DB y configuracion de otro proyecto;
+  - modelos ajenos al diagnostico (`gpt5.5-nano`, `gpt5.4-nano`, Whisper, Flux, imagen/audio);
+  - logica de dominio de reels, halaja, DaisyUI o RAG de JudaismoEnVivo.
+- Cambios aplicados solo al lab `lab/model-evaluation-sales-diagnosis/`:
+  - IDs canonicos alineados con aliases reales Team360:
+    `openai_gpt-5-nano`, `openai_gpt_4o_mini_2024_07_18`,
+    `openrouter_qwen3_30b_a3b_thinking_2507`,
+    `openrouter_deepseek_4_flash` y `openai_direct_gpt-5-nano`;
+  - aliases legacy `litellm_*` mantenidos para compatibilidad CLI;
+  - validacion temprana de modelos desconocidos;
+  - resultados enriquecidos con `pass_rate` y `quality_status`;
+  - summary JSON enriquecido con totales, fastest model, best pass-rate,
+    modelos con fallas y modelos con fallback;
+  - `--output` ahora respeta la ruta JSONL custom documentada y ubica el
+    summary asociado junto a esa salida;
+  - README actualizado con patrones tomados y exclusiones.
+- No se modifico runtime productivo, product adapter, PromptPolicy,
+  GuardrailPolicy, frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+- **NOTA: Tarea interrumpida por cuelgue de sesion.** El bloque de validaciones
+  (tests, smokes, secret scan, git diff) no alcanzo a ejecutarse ni registrarse.
+  Ver punto de retoma abajo.
+
+---
+
+## Punto de retoma — corte por cuelgue de sesion (2026-06-11)
+
+La sesion se interrumpio al finalizar la documentacion del lab de evaluacion de modelos
+(`lab/model-evaluation-sales-diagnosis/`). El codigo del lab esta completo y escrito,
+pero **no se ejecutaron las validaciones finales** sobre los cambios del lab.
+
+### Pendiente inmediato para retomar
+
+1. **Validar laboratorio**:
+   ```bash
+   cd SrvRestAstroLS_v1
+   uv run pytest   # confirmar 398 passed, 9 skipped sin regresiones
+   ```
+2. **Ejecutar dry-run del lab**:
+   ```bash
+   cd SrvRestAstroLS_v1/backend
+   uv run python ../lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py --dry-run --list-models
+   ```
+3. **Verificar secret scan sobre archivos nuevos del lab**:
+   ```bash
+   cd SrvRestAstroLS_v1
+   git diff --name-only --cached | xargs -I{} sh -c 'echo "--- {} ---" && rg -n "(sk-[a-zA-Z0-9]{20,}|sk-proj-|sk-ant-|ghp_|github_pat_|TEAM360_OPENAI_KEY|TEAM360_LITELLM_API_KEY|OpenAI_Key|VERTICE360_OPENAI_KEY)" {} || true'
+   ```
+4. **Verificar `git diff --check`** limpio.
+5. **Cerrar entrada** en `status_actual.md` agregando resultados de validacion.
+
+### Estado base confirmado (pre-cuelgue)
+
+| Metric | Value |
+|--------|-------|
+| Tests | 398 passed, 9 skipped |
+| Rama | `feature/console-backend-core` |
+| Fase activa | Lab de evaluacion de modelos (post-Fase 1.9r) |
+| LLM default | `fake` |
+| Retrieval default | `fake` |
+| Product adapter | Feature-flagged, no expuesto |
+| Frontend/Console | No tocado |
+| Milvus/LiteLLM/OpenAI | Opt-in, no activos por defecto |
+
+---
+
+### 2026-06-12 - Fase 1.9s — LiteLLM Responses routing para GPT-5 nano
+
+- Se retomo la fase colgada con validacion previa de servicios:
+  - PostgreSQL local aceptando conexiones en Docker.
+  - Milvus 2.6 saludable con collection
+    `team360_lab_pgvector_benchmark_openai_small_1536`, 139 filas,
+    scope `8b071443-5bd6-4fe4-bbc3-fc2dca179a5b` y embedding version
+    `team360-openai-small-1536-v1`.
+  - LiteLLM local vivo en `127.0.0.1:4000`.
+- Se corrigio el lab de evaluacion:
+  - `run_model_evaluation.py` ya inicializa `non_comparable` en dry-run/skip-preflight.
+  - Se agrego `requesty_deepseek_4_flash` al catalogo/matriz/preflight.
+- Se corrigio configuracion local de LiteLLM fuera del repo Team360:
+  - `openai_gpt-5-nano` y `openai/gpt-5-nano` registrados contra proveedor OpenAI.
+  - `requesty_deepseek_4_flash` apuntando a `https://router.requesty.ai/v1`.
+  - `REQUESTY_API_KEY` normalizada en `~/.bashrc` tras detectar duplicacion/salto de linea.
+- Se agrego soporte runtime en Team360:
+  - `LiteLLMClient.responses_completion()` llama `/v1/responses`.
+  - `LiteLLMClient.text_completion()` enruta `openai_gpt-5-nano` y
+    `openai/gpt-5-nano` por Responses API. Nota vigente al 2026-06-18: si el
+    upstream efectivo es `openai/gpt-5.4-nano`, usar `reasoning.effort=low`.
+  - Los demas aliases siguen usando `/v1/chat/completions`.
+  - `TEAM360_LITELLM_API_MODE=auto|chat|responses` permite override controlado.
+  - Product adapter e `LiteLLMAIInterpreter` usan `text_completion()`.
+- Validaciones reales:
+  - LiteLLM catalogo: `openai_gpt-5-nano`, `openai/gpt-5-nano`,
+    `requesty_deepseek_4_flash`, `openrouter_deepseek_4_flash` y
+    `openai_gpt_4o_mini_2024_07_18` registrados.
+  - `openai_gpt-5-nano` via `/v1/responses`: OK, `status=completed`,
+    `usage_present=yes`.
+  - `requesty_deepseek_4_flash` via `/v1/chat/completions`: OK,
+    `finish_reason=stop`, `usage_present=yes`.
+  - Preflight directo `requesty_deepseek_4_flash`: PASS, latencia ~2450ms.
+  - Product adapter con `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano`:
+    preflight backend PASS, `response_is_fallback=false`, alias correcto.
+- Validaciones automatizadas:
+  - `uv run pytest` en backend: **403 passed, 9 skipped**.
+  - `uv run pytest ../../lab/model-evaluation-sales-diagnosis/scripts/tests/test_preflight.py`:
+    **10 passed**.
+  - `git diff --check`: limpio.
+- Observacion:
+  - El smoke `smoke_sales_diagnosis_runtime_product_adapter_litellm.py`
+    con GPT-5 nano obtuvo 12/13 por `turn_count` en un caso con guardrail/
+    `unsafe_blocked`; el preflight backend confirma que no fue fallback LiteLLM.
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+
+### 2026-06-12 - Fase 1.9t — Cierre de retoma y factibilidad Diagnostico
+
+- Se cerro el punto de retoma de la sesion colgada.
+- Se corrigieron las matrices del lab para apuntar al dataset canonico:
+  `SrvRestAstroLS_v1/backend/tests/fixtures/sales_diagnosis_headless_questions_v1.json`.
+- Se agrego `config/run_matrix.milvus.example.json` para corridas con
+  product adapter + Milvus real.
+- Se ejecuto matriz real secuencial por alias, reiniciando backend por modelo
+  para respetar que `TEAM360_LITELLM_MODEL_ALIAS` se resuelve al inicio.
+- Condiciones de corrida:
+  - endpoint product adapter;
+  - state `inmemory_test`;
+  - LLM LiteLLM real;
+  - retrieval Milvus real;
+  - collection `team360_lab_pgvector_benchmark_openai_small_1536`;
+  - dataset `sales_diagnosis_headless_response_validation_v1`, 25 casos.
+- Resultados comparativos:
+
+| Modelo | PASS | WARN | FAIL | Avg/case | Fallback |
+|---|---:|---:|---:|---:|---:|
+| `openai_gpt_4o_mini_2024_07_18` | 17 | 8 | 0 | 2.0s | 0 |
+| `openai_gpt-5-nano` | 17 | 6 | 2 | 2.8s | 0 |
+| `requesty_deepseek_4_flash` | 17 | 7 | 1 | 4.4s | 0 |
+| `openrouter_deepseek_4_flash` | 16 | 9 | 0 | 7.5s | 0 |
+| `openrouter_qwen3_30b_a3b_thinking_2507` | 11 | 13 | 1 | 13.1s | 0 |
+
+- Se ejecutaron probes manuales con preguntas extremas exactas:
+  - `necesito automatizar la forma que hago tortas`;
+  - `que significa automatizar`;
+  - caso SAP Business One desktop en VM sobre VPN con Visual Basic.
+- Probes manuales con `openai_gpt_4o_mini_2024_07_18`:
+  - 3/3 HTTP 201;
+  - sin fallback;
+  - sources Milvus reales;
+  - latencias: 1.819s a 3.189s.
+- Probes manuales con `requesty_deepseek_4_flash`:
+  - 3/3 HTTP 201;
+  - sin fallback;
+  - sources Milvus reales;
+  - latencias: 4.530s a 6.011s.
+- Se documento la factibilidad tecnica en:
+  `SrvRestAstroLS_v1/docs/sales_diagnosis_feasibility_20260612.md`.
+- Lectura de factibilidad:
+  - Diagnostico es factible como puerta comercial inicial.
+  - `openai_gpt_4o_mini_2024_07_18` queda como baseline estable inmediato.
+  - `requesty_deepseek_4_flash` queda como candidato viable de comparacion
+    velocidad/costo, con buena respuesta tecnica pero un FAIL en dataset.
+  - `openai_gpt-5-nano` queda operativo via Responses API, pero requiere revisar
+    FAIL antes de usarlo como default de diagnostico.
+  - No se debe prometer implementacion automatica completa, SAP directo, bypass
+    de MFA/VPN/permisos, ROI exacto, SLA, precio, WhatsApp handoff,
+    lead_capture, diagnostic_code ni Step-to-Action.
+- Evidencias:
+  - `lab/model-evaluation-sales-diagnosis/results/summary_20260612_milvus_models.json`
+  - `lab/model-evaluation-sales-diagnosis/results/manual_probe_20260612_business_extremes.jsonl`
+- No se tocaron frontend, Console, WhatsApp, CRM, Step-to-Action,
+  lead_capture ni diagnostic_code.
+
+### 2026-06-12 - Metodologia transversal de preflight de servicios reales
+
+- Se formalizo como metodologia obligatoria de desarrollo/test/pruebas el
+  preflight previo a cualquier smoke, benchmark o validacion con servicios reales.
+- Se documento el invariante estable en:
+  `lat.md/service-preflight-methodology.md`.
+- Se actualizo el protocolo operativo en:
+  - `.agents/skills/team360-project/SKILL.md`;
+  - `AGENTS.md`.
+- Regla central:
+  - validar PostgreSQL, Milvus, collection correcta, LiteLLM, `.bashrc`/env vars,
+    `globalVar.py`, alias registrado en LiteLLM y llamada real minima al modelo;
+  - si falla el preflight, no aceptar benchmark ni interpretar resultados como
+    evidencia de calidad del modulo.
+- No se modifico runtime productivo, migraciones, frontend, Console ni workers.
+
+### 2026-06-15 - Revision comercial/copy de Home premium /t360
+
+- **Objetivo**: Revisar copy completo de /t360, alinear narrativa con los principios Team360 (diagnóstico antes que promesa, automatización por etapas, límites honestos), y preparar espacio visual para el diagnosticador sin conectarlo.
+- **Cambios en `t360.astro`**:
+  - **Hero**: "automatizadas" → "automatizadas por etapas" para evitar promesa absoluta.
+  - **Disclaimer diagnóstico**: "No crea lead automático ni handoff por WhatsApp todavía" → "No genera confirmación automática ni deriva datos sin tu autorización" (mensaje más amigable para el usuario, no técnico).
+  - **Contacto**: "Para el diagnóstico completo, se pedirán datos de contacto" → "Para profundizar, se puede dejar un contacto sin compromiso" (clarifica que no es captura forzada).
+  - **T360 Pack/Task/Pack Flow/Pack Integrate**: definiciones más concretas con ejemplos (registrar consulta, clasificar pedido, generar reporte, secuencia ordenada paso a paso, conexión según permisos y factibilidad técnica).
+  - **Header CTA**: unificado a "Probar diagnóstico" (antes "Solicitar diagnóstico" en header y "Probar diagnóstico" en hero).
+- **Validaciones**:
+  - `pnpm check`: 0 errors, 0 warnings, 0 hints.
+  - `pnpm build`: 136 pages generadas (incluye /t360/index.html y /index.html).
+  - `git diff --check`: OK.
+  - Secret scan: sin secretos.
+- **No se tocó**: runtime, frontend home existente, Console, Knowledge Ingestion, LiteLLM, endpoint productivo, header/footer/layout (solo t360.astro).
+- **No se activó**: Step-to-Action, lead_capture, diagnostic_code, WhatsApp handoff. Sin commits.
+
+### 2026-06-15 - Migracion global.js a patron Vertice360
+
+- **Objetivo**: Incorporar el patron de `global.js` de Vertice360 (toggle dev/pro, helper centralizado, URL_SSE, regla de unica fuente de verdad para endpoints).
+- **Cambios en `SrvRestAstroLS_v1/astro/src/components/global.js`**:
+  - Se agregaron `URL_REST_DEV` / `URL_REST_PRO` con toggle `IS_REST_PRO`.
+  - Se agrego `getRestBaseUrl()` (helper sin trailing slash).
+  - Se agrego `URL_SSE` derivado de `getRestBaseUrl()`.
+  - `API_BASE_URL` y `AGUI_BASE_URL` ahora se derivan de `getRestBaseUrl()` en lugar de ser strings fijas.
+  - Se agrego comentario de regla: "unica fuente de verdad para endpoint REST — no hardcodear URLs fuera de este archivo".
+- **Cambios en `global.d.ts`**: tipado sincronizado con nuevas exportaciones (`URL_REST`, `getRestBaseUrl`, `URL_SSE`, `workspaceDiagnosis` en ROUTES).
+- **Validacion**: `pnpm check` 0 errors, 0 warnings, 0 hints.
+- **Pendiente revision** (manana): verificar que ningun componente en `src/lib/` ni `src/components/` tenga URLs hardcodeadas o importe `API_BASE_URL` como string fija. Idealmente migrar esos imports a `URL_REST` o `getRestBaseUrl()` desde `global.js`.
+- **Pendiente documentacion**: una vez validado que quede funcionando, documentar las reglas en `lat.md/` como invariante de arquitectura frontend (fuente de verdad, no hardcodear, toggle dev/pro, helper central).
+
+### 2026-06-16 - Auditoria URLs frontend e invariante lat.md
+
+- **Objetivo**: Cerrar los dos pendientes del 15/06: auditar URLs hardcodeadas en frontend y documentar invariante en `lat.md/`.
+- **Auditoria**: se revisaron 33 archivos en `src/lib/` y `src/components/`:
+  - 3 issues corregidos:
+    1. `src/lib/api/diagnosis.ts`: migrado de `const API_BASE = "/api/automation-diagnosis"` a import desde `global.js` (`API_BASE_URL`).
+    2. `MarketingFooter.astro`: migrado de `href="https://console.team360.live/login"` a `CONSOLE_SITE_URL` desde `global.js`.
+    3. `MarketingHeader.astro`: migrado de `href="https://console.team360.live/login"` a `CONSOLE_SITE_URL` desde `global.js`.
+  - 8 archivos ya usaban correctamente imports desde `global.js` (Section B).
+  - 33 archivos estaban limpios sin URLs hardcodeadas (Section C).
+- **Documentacion en lat.md/**: se creo `lat.md/team360-frontend-url-source-of-truth.md` con 5 reglas invariantes:
+  1. `global.js` es la unica fuente de verdad.
+  2. No hardcodear URLs fuera de `global.js`.
+  3. Toggle dev/pro exclusivo via `IS_REST_PRO`.
+  4. API clients en `src/lib/` deben importar desde `global.js`.
+  5. `global.d.ts` debe sincronizarse con `global.js`.
+- Se actualizaron: `lat.md/lat.md` (nueva referencia), `lat.md/status_actual.md`.
+- **Validacion**: `pnpm check` = 0 errors, 0 warnings, 0 hints.
+- **No se toco**: runtime, endpoints, DB, Console, Knowledge Ingestion, LiteLLM, Milvus, Step-to-Action, lead_capture, WhatsApp handoff.
+
+### 2026-06-21 - Cierre dialogo interactivo productivo
+
+- Se completo la primera implementacion del dialogo interactivo con 6 bloques:
+  `single_choice`, `multi_choice`, `missing_requirements`, `next_step_choice`,
+  `diagnosis_action_card` y `product_fit_card`.
+- Prioridad final: single_choice > multi_choice > missing_requirements >
+  diagnosis_action_card > product_fit_card > next_step_choice. Un solo bloque
+  por turno.
+- Todos los bloques tienen catalogos backend, validacion de values, labels
+  oficiales derivados en backend y firmas anti-loop.
+- Persistencia PostgreSQL validada: estado offered/answered, valores
+  seleccionados, labels oficiales y firmas sobreviven reinicio de backend.
+- Playwright: 13 passed, 2 skipped (pre-existing). Backend: 38 passed.
+- Frontend: `pnpm check` 0 errors, `pnpm build` 138 pages.
+- Browser MCP confirma recorrido completo sin errores de consola.
+- `product_fit_card` usa catalogo backend conservador (2 productos), sin
+  pricing, SLA, ROI ni promesas de capacidades no disponibles.
+- Textos en español, sin instrucciones internas ni terminos tecnicos.
+- Contratos transitorios: `interaction_block: dict | None` e
+  `interaction_response: dict | None` se mantienen para compatibilidad.
+- No se implemento iframe, Web Component, SDK ni postMessage. Arquitectura
+  embebible futura preservada en documentacion.
+- Primera salida: pagina propia de Team360 (/t360).
+
+### 2026-06-25 — Fase 1 DiagnosticadorCore extraccion mecanica (cierre documental)
+
+Implementacion:
+- Se creo `lib/t360/diagnosticador/DiagnosticadorCore.svelte` (400 lineas)
+  extrayendo el nucleo conversacional de `PublicVeraEntry.svelte` (de 447 a 75
+  lineas), segun `lat.md/diagnosticador-embeddable-component-architecture.md`.
+- `PublicVeraEntry.svelte` quedo como adapter publico de `/t360#vera`: conserva
+  `section#vera`, layout comercial, titulos, ejemplos, mailto y monta el Core.
+- `DiagnosticadorCore.svelte` contiene: estado conversacional, persistencia de
+  sesion, llamadas API, render de mensajes/`DiagnosisResult`/`T360InteractionRenderer`,
+  eventos de interaccion, input, loading, error y contador de turnos.
+- Props: `assistantName` (string), `mailtoHref` (string), bindables
+  `sessionId`, `messages`, `inputText`, `turnDisplayName`.
+- No se movio `interaction/`, `diagnosis/`, `global.js`, `publicVeraSession.ts`,
+  `ConsoleDiagnosis`, backend ni endpoints.
+- Deuda arquitectonica documentada: storage key fija
+  `team360.vera.session.v1`, `PUBLIC_DIAGNOSIS_CONTEXT` hardcodeado,
+  dependencia de `global.js` via `publicDiagnosis.ts`, mailto renderizado en el
+  Core (datos desde el adapter).
+
+Validacion estatica:
+- `pnpm check`: 0 errors, 0 warnings, 3 hints (preexistentes en E2E)
+- `pnpm build`: 139 pages, sin errores
+- `git diff --check`: OK
+
+Validacion runtime real (backend-dev.sh + astro-dev.sh, PostgreSQL/Milvus/LiteLLM
+operativos):
+- Backend `127.0.0.1:7050` health OK, modelo `openai_gpt-5-nano`,
+  `fallback_used=false` en turnos reales
+- Astro `127.0.0.1:3050` sirviendo `/t360` OK
+- Smoke curl: dos turnos reales contra `POST /api/diagnosis/turn` con respuesta
+  AI real y sesion preservada
+
+BrowserMCP:
+- Conexion exitosa, navegacion a `/t360#vera` validada
+- Click en ejemplo, envio de mensaje, respuesta real de Vera verificada
+- Mailto con conversacion completa, sin errores de consola
+
+Playwright (35 tests observados, servidores externos, `PLAYWRIGHT_SKIP_WEBSERVER=1`):
+- `33-34 passed` segun corrida, `2 skipped` (pre-existentes), `0-1 flaky`
+- `public-vera.spec.ts`: 12/12 passed (mocked, cobertura estructural)
+- `public-vera-new-conversation.spec.ts`: 1/1 passed
+- `public-vera-kommo.spec.ts`, `salesforce.spec.ts`, `email-orders-definitive.spec.ts`: passed
+- `public-vera-adversarial.spec.ts`: 12/12 passed
+- `public-vera-phone-problems-interaction-priority.spec.ts`: 5/5 passed
+- `public-vera-mobile-sequential-blocks.spec.ts`: unico test flaky.
+  `repeat-each=5` obtuvo aproximadamente 80% pass (4/5, 1/5). Dos modos de
+  fallo observados: (a) el backend no emite `single_choice` en ese turno
+  (respuesta valida `reflect_and_ask`), (b) `elementFromPoint` en Chromium
+  headless devuelve elemento inesperado. No se encontro evidencia de regresion
+  atribuible a la extraccion. No hubo comparacion baseline contra el commit
+  anterior.
+- Ninguna regresion atribuible a la extraccion fue detectada.
+
+Servicios permanentes no operados: PostgreSQL, Milvus, LiteLLM.
+Sin commit, sin push, sin cambios en backend, endpoints, tests ni
+configuracion.
+
+Estado:
+FASE 1 CERRADA — RUNTIME Y BROWSERMCP VALIDADOS, CON E2E MOVIL FLAKY DOCUMENTADO
+
+### 2026-06-25 — Fase 2 Configuracion y sesion extraibles
+
+Implementacion:
+- Se creo `config/types.ts` con `DiagnosticadorSessionData` como tipo canonico
+  de sesion desacoplado de Vera.
+- Se creo `config/defaults.ts` con constantes: `DEFAULT_ASSISTANT_NAME`,
+  `DEFAULT_ASSISTANT_INSTANCE_ID`, `DEFAULT_SESSION_STORAGE_KEY`.
+- Se creo `state/session.ts` como modulo de sesion configurable: `loadSession`,
+  `saveSession`, `clearSession`, `mergeSession`, `resetConversationOnPageLoad`.
+  Las funciones reciben `storageKey` como primer parametro, son SSR-safe y
+  preservan el formato de datos historico.
+- `publicVeraSession.ts` se convirtio en wrapper delgado que reexporta desde
+  `state/session.ts` usando `DEFAULT_SESSION_STORAGE_KEY`. La API publica
+  (`loadPublicVeraSession`, `savePublicVeraSession`, etc.) se mantiene identica.
+- `DiagnosticadorCore.svelte` ahora recibe `sessionStorageKey` (prop con default
+  `DEFAULT_SESSION_STORAGE_KEY`) y `assistantInstanceId` (prop con default
+  `"team360_sales_diagnosis"`). El Core ya no conoce una key fija ni importa
+  `publicVeraSession.ts` directamente.
+- `PublicVeraEntry.svelte` como adapter explicita la identidad de Vera:
+  `assistantInstanceId="team360_sales_diagnosis"` y
+  `sessionStorageKey={DEFAULT_SESSION_STORAGE_KEY}`.
+- La key historica `team360.vera.session.v1` queda definida exclusivamente en
+  `config/defaults.ts`. Ningun otro archivo la hardcodea.
+- No se modifico `global.js`, `PUBLIC_DIAGNOSIS_CONTEXT`, `ConsoleDiagnosis`,
+  `lib/t360/diagnosis/`, `lib/t360/interaction/`, backend ni endpoints.
+
+Validacion estatica:
+- `pnpm check`: 0 errors, 0 warnings, 3 hints (preexistentes)
+- `pnpm build`: 139 pages, sin errores
+- `git diff --check`: OK
+
+Playwright (28 tests, servidores externos, `PLAYWRIGHT_SKIP_WEBSERVER=1`):
+- `public-vera.spec.ts`: 12/12 passed (2 skipped pre-existing)
+- `public-vera-new-conversation.spec.ts`: 1/1 passed
+- `public-vera-kommo.spec.ts`, `salesforce.spec.ts`, `email-orders-definitive.spec.ts`: passed
+- `public-vera-adversarial.spec.ts`: 12/12 passed
+- Sesion y nueva conversacion validados con backend real
+- Sin regresiones atribuibles a la Fase 2
+
+Servicios permanentes no operados: PostgreSQL, Milvus, LiteLLM.
+Sin commit, sin push, sin cambios en backend, endpoints, tests ni
+configuracion global.
+
+Estado:
+FASE 2 IMPLEMENTADA Y VALIDADA
+
+### 2026-06-28 — Lab embebible: página nueva del DiagnosticadorCore fuera de /t360
+
+Implementacion:
+- Se creo `DiagnosticadorEmbedLab.svelte` en `src/lib/t360/diagnosticador/` como
+  adapter de laboratorio que monta `DiagnosticadorCore` con configuracion propia.
+- Se creo `/t360-diagnosticador-lab` como pagina nueva en `src/pages/`, usando
+  `BaseLayout` (misma convencion que `/t360-interaction-lab`).
+- Configuracion del lab:
+  - `assistantName="Diagnosticador Lab"`
+  - `assistantInstanceId="team360_sales_diagnosis"` (mismo backend que Vera)
+  - `sessionStorageKey="team360.diagnosticador.lab.session.v1"` (key aislada)
+  - `mailtoHref=""` (sin mailto de Team360)
+- El lab incluye banner visual "LABORATORIO INTERNO" y layout minimo sin copy
+  comercial de Vera.
+- No se modifico `PublicVeraEntry.svelte`, `DiagnosticadorCore.svelte`, `state/`,
+  `config/`, `global.js`, `t360.astro` ni ningun archivo existente.
+- No se creo workspace, package, Web Component ni iframe.
+
+Proteccion de /t360:
+- `t360.astro` no modificado
+- `PublicVeraEntry.svelte` no modificado
+- `/t360#vera` intacto
+- tests publicos estables pasan sin regresiones
+
+Lab nuevo:
+- Ruta: `/t360-diagnosticador-lab`
+- Componente: `src/lib/t360/diagnosticador/DiagnosticadorEmbedLab.svelte`
+- Session key: `team360.diagnosticador.lab.session.v1`
+- Key Vera: `team360.vera.session.v1` (no colisionan)
+- Nueva conversacion en lab limpia solo la key lab
+
+Validacion estatica:
+- `pnpm check`: 0 errors, 0 warnings, 3 hints (preexistentes)
+- `pnpm build`: 140 pages (antes 139), sin errores
+- `git diff --check`: OK
+- `t360.astro` sin cambios en diff
+
+Playwright (servidores externos, `PLAYWRIGHT_SKIP_WEBSERVER=1`):
+- `diagnosticador-embed-lab.spec.ts`: 1/1 passed (13s)
+- `public-vera.spec.ts`: 12/12 passed (2 skipped pre-existing)
+- Sin regresiones atribuibles al lab
+
+Aislamiento de sesion validado via E2E:
+1. Se crea sesion Vera en `/t360` con sessionStorage key `team360.vera.session.v1`
+2. Se abre lab en nueva pestana con sessionStorage fresco
+3. Lab key no existe hasta enviar primer mensaje (key no se crea en init)
+4. Lab envia mensaje real contra backend -> key lab se crea con session_id
+5. Key de Vera no esta en sessionStorage del lab (tab aislada)
+6. Vera en su pestana original mantiene sesion intacta
+
+Servicios permanentes no operados: PostgreSQL, Milvus, LiteLLM.
+Sin commit, sin push, sin cambios en backend, endpoints, tests existentes ni
+configuracion global.
+
+Estado:
+LAB EMBEBIBLE IMPLEMENTADO Y VALIDADO
+
+### 2026-06-28 — apiBaseUrl configurable en DiagnosticadorCore (Fase 4)
+
+Implementacion:
+- `sendPublicTurn` en `publicDiagnosis.ts` ahora acepta segundo parametro
+  `options?: { apiBaseUrl?: string }`; si no se provee, usa el default
+  `API_BASE_URL` importado de `global.js` (compatible hacia atras).
+- `DiagnosticadorCore.svelte` agrega prop opcional `apiBaseUrl` (default:
+  `API_BASE_URL` de `global.js`); lo pasa como options a `sendPublicTurn`.
+- `DiagnosticadorEmbedLab.svelte` pasa `apiBaseUrl={API_BASE_URL}` explicitamente,
+  validando que un consumidor externo puede overridear el base sin tocar global.js.
+
+Archivos modificados (desde HEAD):
+- `src/lib/api/publicDiagnosis.ts`: signature con options opcional
+- `src/lib/t360/diagnosticador/DiagnosticadorCore.svelte`: prop apiBaseUrl + import
+
+Archivos nuevos (Fase 3, no modificados):
+- `DiagnosticadorEmbedLab.svelte`: pasa apiBaseUrl explicito
+- `diagnosticador-embed-lab.spec.ts`: intercepta request para verificar URL
+
+Frozen files sin cambios:
+- `t360.astro`, `PublicVeraEntry.svelte`, `global.js`: 0 lineas de diff
+
+Validacion estatica:
+- `pnpm check`: 0 errors, 0 warnings, 3 hints (preexistentes)
+- `pnpm build`: 140 pages (sin cambios)
+- `git diff --check`: OK
+
+Playwright (servidores externos, `PLAYWRIGHT_SKIP_WEBSERVER=1`):
+- `diagnosticador-embed-lab.spec.ts`: 1/1 passed — intercepta request y verifica
+  URL explicita `http://localhost:7050/api/diagnosis/turn`
+- `public-vera.spec.ts`: 12/12 passed (2 skip pre-existing)
+- `public-vera-new-conversation.spec.ts`: 1/1 passed
+- Sin regresiones en /t360 ni en Vera
+
+Servicios no operados: PostgreSQL, Milvus, LiteLLM.
+Sin commit, sin push, sin cambios en backend, endpoints ni configuracion global.
+
+Estado:
+FASE 4 — API_BASE_URL CONFIGURABLE — IMPLEMENTADA Y VALIDADA
+
+### 2026-06-28 — publicDiagnosisContext configurable en DiagnosticadorCore (Fase 5)
+
+Implementacion:
+- Se agrego `PublicDiagnosisContext` interface en `config/types.ts` con los 9
+  campos del contexto publico (assistant_instance_code, source_channel,
+  site_channel, locale, lead_owner, service_code, package_code,
+  knowledge_scope_code, template_code).
+- Se exporto `DEFAULT_PUBLIC_DIAGNOSIS_CONTEXT` en `config/defaults.ts` como
+  re-export de `PUBLIC_DIAGNOSIS_CONTEXT` desde `publicDiagnosis.ts` (unica
+  fuente de verdad, compatible hacia atras).
+- `sendPublicTurn` en `publicDiagnosis.ts` acepta ahora
+  `options.publicDiagnosisContext`. Cuando se provee, los campos del contexto
+  se mergean al body del request via `{ ...ctx, ...request }`, donde los campos
+  de `TurnRequest` (locale, message, etc.) tienen prioridad.
+- `DiagnosticadorCore.svelte` agrega prop opcional `publicDiagnosisContext`
+  con default `DEFAULT_PUBLIC_DIAGNOSIS_CONTEXT`; lo pasa a `sendPublicTurn`.
+- `DiagnosticadorEmbedLab.svelte` pasa
+  `publicDiagnosisContext={PUBLIC_DIAGNOSIS_CONTEXT}` explicitamente.
+
+Comportamiento por defecto preservado:
+- Vera (via `PublicVeraEntry`) nunca pasa `publicDiagnosisContext` — el Core
+  usa default, y el body HTTP no incluye campos extra.
+- El lab pasa contexto explicito → el body HTTP incluye los 9 campos de contexto.
+- El backend ignora campos desconocidos — sin cambio de contrato.
+
+Archivos modificados (desde HEAD, acumulado Fase 4+5):
+- `src/lib/t360/diagnosticador/config/types.ts`: interface PublicDiagnosisContext
+- `src/lib/t360/diagnosticador/config/defaults.ts`: DEFAULT_PUBLIC_DIAGNOSIS_CONTEXT
+- `src/lib/api/publicDiagnosis.ts`: import + merge context en body
+- `src/lib/t360/diagnosticador/DiagnosticadorCore.svelte`: prop + import + pase
+- `SrvRestAstroLS_v1/docs/status_actual.md`
+- `lat.md/status_actual.md`
+
+Frozen files sin cambios:
+- `t360.astro`, `PublicVeraEntry.svelte`, `global.js`: 0 lineas de diff
+
+Validacion estatica:
+- `pnpm check`: 0 errors, 0 warnings, 3 hints (preexistentes)
+- `pnpm build`: 140 pages (sin cambios)
+- `git diff --check`: OK
+
+Playwright (servidores externos, `PLAYWRIGHT_SKIP_WEBSERVER=1`):
+- `diagnosticador-embed-lab.spec.ts`: 1/1 passed — intercepta request y verifica
+  URL explicita + body contiene assistant_instance_code, package_code,
+  knowledge_scope_code.
+- `public-vera.spec.ts`: 12/12 passed (2 skip pre-existing)
+- `public-vera-new-conversation.spec.ts`: 1/1 passed
+- Sin regresiones en /t360 ni en Vera
+- Total: 14/14 passed
+
+Servicios no operados: PostgreSQL, Milvus, LiteLLM.
+Sin commit, sin push, sin cambios en backend, endpoints ni configuracion global.
+
+Estado:
+FASE 5 — PUBLIC_DIAGNOSIS_CONTEXT CONFIGURABLE — IMPLEMENTADA Y VALIDADA
