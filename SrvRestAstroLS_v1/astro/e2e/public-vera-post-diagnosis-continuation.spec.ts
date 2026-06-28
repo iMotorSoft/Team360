@@ -83,6 +83,36 @@ test.describe("Vera post-diagnosis continuation", () => {
       expect(text.length).toBeGreaterThan(50);
       expect(text).not.toContain("Recibí la información");
       expect(text).not.toContain("Qué entendí");
+      // Response must reference SAP
+      expect(text.toLowerCase()).toContain("sap");
+
+      assertNoCriticalErrors(consoleErrors);
+    });
+
+    test("C: 'Tipo de diferencias' response contains specific discrepancy categories", async ({ page }) => {
+      const consoleErrors = setupConsoleTracking(page);
+      await page.goto(VERA_URL);
+      await expect(page.getByTestId("public-vera-entry")).toBeVisible();
+
+      await sendInitial(page, "Tengo SAP y extractos bancarios de 3 bancos");
+      await sendChat(page, "Quiero encontrar diferencias en forma automática");
+      await sendChat(page, "Alguien revisa a mano");
+      await sendChat(page, "Ver diagnóstico");
+      await sendChat(page, "Seguir conversando");
+      await sendChat(page, "Tipo de diferencias");
+
+      const text = await getEntryText(page);
+      expect(text).not.toContain("system");
+      expect(text).not.toContain("inquiry");
+      // Must reference bank/SAP concepts
+      expect(text.toLowerCase()).toContain("sap");
+      expect(text.toLowerCase()).toContain("banc");
+      // Must mention at least 3 discrepancy types
+      const concepts = ["faltante", "distinto", "fecha", "duplicado",
+        "comision", "cargo", "moneda", "cotización", "referencia",
+        "pendiente", "conciliación", "diferencia"];
+      const matched = concepts.filter(c => text.toLowerCase().includes(c));
+      expect(matched.length).toBeGreaterThanOrEqual(3);
 
       assertNoCriticalErrors(consoleErrors);
     });

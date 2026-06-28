@@ -11,6 +11,27 @@ from modules.sales_diagnosis_runtime.contracts import (
 
 
 # ---------------------------------------------------------------------------
+# Normalization for internal labels
+# ---------------------------------------------------------------------------
+
+SOURCES_LABEL_MAP: dict[str, str] = {
+    "system": "el sistema",
+    "inquiry": "la consulta",
+}
+
+def _normalize_source_label(source: str) -> str:
+    normalized = SOURCES_LABEL_MAP.get(source)
+    if normalized is not None:
+        return normalized
+    return source
+
+def _normalize_entity_sources_display(entity_sources: dict[str, str]) -> dict[str, str]:
+    return {e: _normalize_source_label(s) for e, s in entity_sources.items()}
+
+def _normalize_system_name(name: str) -> str:
+    return _normalize_source_label(name)
+
+# ---------------------------------------------------------------------------
 # Pattern detection helpers (deterministic, no LLM)
 # ---------------------------------------------------------------------------
 
@@ -263,10 +284,11 @@ def _build_automatable_steps(
 
     if channels:
         ch_str = " and ".join(channels)
-        steps.append(f"receive inquiries from {ch_str}")
+        steps.append(f"receive requests through {ch_str}")
 
     for entity, source in entity_sources.items():
-        steps.append(f"retrieve {entity} from {source}")
+        display_source = _normalize_source_label(source)
+        steps.append(f"retrieve {entity} from {display_source}")
 
     if channels:
         steps.append("generate standard replies")
@@ -472,7 +494,8 @@ def _build_next_step(
     )
 
     if systems:
-        system_names = and_join(systems, language)
+        normalized_systems = [_normalize_system_name(s) for s in systems]
+        system_names = and_join(normalized_systems, language)
         if channels:
             channel_names = and_join(channels, language)
             return t(
@@ -568,7 +591,8 @@ def format_structured_diagnosis_for_prompt(sd: dict[str, Any]) -> str:
     if sd.get("systems"):
         lines.append(f"Sistemas: {', '.join(sd['systems'])}")
     if sd.get("entity_sources"):
-        sources_str = ", ".join(f"{e} → {s}" for e, s in sd["entity_sources"].items())
+        normalized = _normalize_entity_sources_display(sd["entity_sources"])
+        sources_str = ", ".join(f"{e} → {s}" for e, s in normalized.items())
         lines.append(f"Fuentes de datos: {sources_str}")
     if sd.get("human_approval") and sd["human_approval"] != "unknown":
         lines.append(f"Aprobación humana: {sd['human_approval']}")

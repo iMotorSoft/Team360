@@ -275,14 +275,22 @@ class PromptPolicy:
             if continuation_active and status == "completed":
                 options = mem.get("_continuation_options", [])
                 opts_text = ""
-                for opt in options:
-                    opts_text += f"\n- {opt['label']}"
+                if options:
+                    opts_text = "\nOpciones disponibles:"
+                    for opt in options:
+                        opts_text += f"\n{opt['label']}"
+                    opts_text += "\n"
+                chosen_label = mem.get("_continuation_chosen_label", "")
+                chosen_text = ""
+                if chosen_label:
+                    chosen_text = f"\nEl usuario eligió: {chosen_label}. Respondé específicamente sobre ese tema.\n"
                 parts.append(
                     "\nInstrucciones para esta respuesta (ACCIÓN: POST-DIAGNÓSTICO - CONTINUACIÓN):\n"
                     "- El diagnóstico ya fue completado. El usuario quiere seguir explorando.\n"
                     "- Usá el diagnóstico estructurado como fuente de verdad.\n"
                     "- Hacé UNA pregunta concreta sobre el próximo paso que le interesa al usuario.\n"
-                    "- Ofrece opciones claras y numeradas para que el usuario pueda elegir.\n"
+                    f"{chosen_text}"
+                    f"{opts_text}"
                     "- No repetir el diagnóstico completo.\n"
                     "- No preguntes sobre hechos ya confirmados (SAP, bancos, revisión manual, etc.).\n"
                     "- Sé específico y conciso.\n"

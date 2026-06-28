@@ -49,7 +49,7 @@ from modules.sales_diagnosis_runtime.intent_classifier import (
     match_high_confidence,
 )
 from modules.sales_diagnosis_runtime.policies import GuardrailPolicy, PromptPolicy
-from modules.sales_diagnosis_runtime.structured_diagnosis import build_structured_diagnosis
+from modules.sales_diagnosis_runtime.structured_diagnosis import build_structured_diagnosis, _normalize_source_label
 from modules.sales_diagnosis_runtime.providers import (
     AuditTrail,
     LLMProvider,
@@ -776,8 +776,9 @@ class AssistantConversationRuntime:
             corrected = True
 
             # Also rebuild systems_and_data_sources from updated entity_sources
-            # to keep both in sync
-            rebuilt_systems = list(dict.fromkeys(existing_sources.values()))
+            # to keep both in sync, normalizing internal labels
+            rebuilt_raw = list(dict.fromkeys(existing_sources.values()))
+            rebuilt_systems = [_normalize_source_label(s) for s in rebuilt_raw]
             if rebuilt_systems:
                 mem["systems_and_data_sources"] = rebuilt_systems
 

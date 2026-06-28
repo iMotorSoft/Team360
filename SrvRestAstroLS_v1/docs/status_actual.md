@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-25 (Cierre documental Fase 1 DiagnosticadorCore)
+Ultima actualizacion: 2026-06-28 (Fix: post-diagnosis continuation context, internal label normalization)
 
 ## Directorio de trabajo
 
@@ -13,6 +13,51 @@ Ultima actualizacion: 2026-06-25 (Cierre documental Fase 1 DiagnosticadorCore)
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql`, `003_team360_pgvector_knowledge_embeddings.sql` y `004_team360_automation_diagnosis_runtime.sql`. Tambien existe una Fase 1 de `automation_diagnosis` operativa para demo controlada, con frontend real conectado a API Litestar, IA via LiteLLM por adapter, modo PostgreSQL activable, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures, tests y smokes reales. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar).
 
 ## Acciones realizadas
+
+### 2026-06-26 - Post-diagnosis continuation multilingue (ES/EN/HE)
+
+- Se implemento continuacion post-diagnostico en espanol, ingles y hebreo.
+- `runtime.py`: `_build_continuation_options(lang)` devuelve etiquetas localizadas
+  para "Tipos de diferencias"/"Types of discrepancies"/"סוגי פערים" y
+  "Flujo operativo"/"Operational workflow"/"תהליך תפעולי" segun el idioma de la
+  conversacion; `_resolve_post_diagnosis_continuation` resuelve "1"/"primera"/
+  "first"/"ראשונה" en los 3 idiomas; la activacion ocurre al completarse el
+  diagnostico (`diagnosis_status = "completed"`).
+- `structured_diagnosis.py`: `_build_next_step` acepta `language` param y genera
+  salida en ES/EN/HE con entidades reales, sin etiquetas internas, con " y " o
+  " ו " segun el idioma; se agregaron tests para next_step sin labels internos
+  en ES/EN/HE, con sistemas y sin sistemas.
+- `policies.py`: Prompt especifico para modo continuacion (`_continuation_active`)
+  vs modo diagnostico estandar; lee `_continuation_options` para instruir al LLM.
+- `last_structured_diagnosis` ya no se elimina tras el diagnostico, se preserva
+  para que los turnos post-diagnostico puedan usarlo como fuente de verdad.
+- Tests: 9 nuevos (5 en test_structured_diagnosis, 4 en test_sales_diagnosis_runtime_contracts).
+- E2E Playwright: 2 nuevos tests (ingles y hebreo), 5 total continuacion.
+- 1001 tests backend pass, 22 E2E pass (5 continuacion + 17 regresion).
+- Commit: `074dce0` en `feature/console-backend-core`.
+
+### 2026-06-28 - Fix: post-diagnosis continuation context y normalización de labels internos
+
+- **Causa raiz**: El prompt de continuacion (`policies.py`) calculaba `opts_text` con las opciones
+  disponibles pero nunca lo incluia en el prompt enviado al LLM; tampoco incluia el topic elegido
+  (`_continuation_chosen_label`) despues de que el usuario seleccionara una opcion.
+- **Causa raiz labels internos**: `entity_sources` almacena valores como `"system"` (canonical key
+  interna), que se usaban directamente en `_build_automatable_steps` y al reconstruir
+  `systems_and_data_sources` desde `entity_sources`, filtrando "system" e "inquiry" al texto publico.
+- **Fix `policies.py`**: `opts_text` ahora se incluye en las instrucciones del prompt de continuacion;
+  se agrego `_continuation_chosen_label` al prompt cuando el usuario ya eligio un topic.
+- **Fix `structured_diagnosis.py`**: Se agregaron `SOURCES_LABEL_MAP`, `_normalize_source_label()` y
+  `_normalize_entity_sources_display()` para mapear `"system"` a `"el sistema"` e `"inquiry"` a
+  `"la consulta"` en `_build_automatable_steps`; `_build_next_step` normaliza nombres de sistemas;
+  `format_structured_diagnosis_for_prompt` normaliza entity_sources display.
+- **Fix `runtime.py`**: Al reconstruir `systems_and_data_sources` desde entity_sources en
+  `_resolve_contradictions`, se normalizan valores internos via `_normalize_source_label`.
+- **E2E**: Se agrego Test C con validacion de conceptos de diferencias (faltantes, importes, fechas,
+  duplicados, comisiones, moneda) y ausencia de "system"/"inquiry"; Test B validacion de SAP.
+- **Backend**: 1001 tests pass, 0 regresiones.
+- **E2E**: 6/6 continuation tests pass real contra backend vivo; regresiones 9/10 pass (1 flaky
+  preexistente en mobile-sequential-blocks).
+- Commit: en `feature/console-backend-core` (este fix).
 
 ### 2026-06-25 - Contexto componentes Diagnosticador embeddable
 
