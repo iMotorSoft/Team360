@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-28 (Fases 3 a 5 y reorganizacion documental publicadas)
+Ultima actualizacion: 2026-06-28 (Fase 6 — contexto backend funcional)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -17,6 +17,7 @@ Este documento es un tablero del estado vigente. La bitacora detallada previa, i
 - Team360 mantiene frontend Astro 6 + Svelte 5 y backend Litestar.
 - PostgreSQL 18 es la verdad operacional del estado conversacional.
 - Milvus 2.6 es el indice vectorial derivado para retrieval.
+- El benchmark Milvus 2.6 vs. pgvector ya fue ejecutado y versionado en `804547d` (`feature/knowledge-ingestion-service`): ambos obtuvieron 44,0% de pass rate, mientras Milvus promedio 13,9 ms frente a 859,2 ms de pgvector (~61,8x; 98,4% menos latencia). No debe volver a figurar como pendiente salvo que cambien corpus, escala o condiciones de prueba.
 - LiteLLM es el gateway de modelos mediante aliases y adapters.
 - El runtime publico de Vera usa `/t360 -> Litestar -> PostgreSQL -> Milvus -> LiteLLM`.
 - Las migraciones `001` a `004` y la Fase 1 de `automation_diagnosis` fueron validadas anteriormente.
@@ -90,7 +91,7 @@ Limites de esta validacion:
 4. Reducir o retirar reglas duplicadas en `.agents/skills/team360-project/SKILL.md` y `.opencode-rules`.
 5. Crear comandos canonicos y CI para backend, frontend, LAT y E2E.
 6. Corregir evidencia hardcodeada, I/O sincronico dentro de handlers async y posibles fallbacks silenciosos del runtime.
-7. Evaluar Milvus frente a pgvector con metricas reales y hacer que LiteLLM registre tokens, coste, latencia y provider efectivo.
+7. Hacer que LiteLLM registre tokens, coste, latencia y provider efectivo.
 
 ## Notas de seguridad
 

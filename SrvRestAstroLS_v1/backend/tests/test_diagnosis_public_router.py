@@ -272,6 +272,83 @@ def test_public_message_persistence_error_returns_503(monkeypatch):
     assert response.status_code == 503
 
 
+# ── Context resolution ──────────────────────────────────────────────────────
+
+
+def test_public_turn_default_context_no_fields():
+    """Request without optional context fields uses hardcoded defaults."""
+    from routes.diagnosis import _resolve_public_turn_context
+    from routes.diagnosis_schemas import PublicTurnRequest
+
+    data = PublicTurnRequest(message="test")
+    ctx = _resolve_public_turn_context(data)
+    assert ctx["assistant_instance_code"] == "team360_sales_diagnosis"
+    assert ctx["organization_code"] == "team360_live"
+    assert ctx["workspace_code"] == "team360_public_site"
+    assert ctx["package_code"] == "pkg_sales_diagnosis"
+    assert ctx["knowledge_scope_code"] == "ks_team360_sales_diagnosis"
+
+
+def test_public_turn_explicit_context_overrides_defaults():
+    """Request with explicit context fields uses provided values."""
+    from routes.diagnosis import _resolve_public_turn_context
+    from routes.diagnosis_schemas import PublicTurnRequest
+
+    data = PublicTurnRequest(
+        message="test",
+        assistant_instance_code="test_instance",
+        organization_code="test_org",
+        workspace_code="test_ws",
+        package_code="test_pkg",
+        knowledge_scope_code="test_scope",
+    )
+    ctx = _resolve_public_turn_context(data)
+    assert ctx["assistant_instance_code"] == "test_instance"
+    assert ctx["organization_code"] == "test_org"
+    assert ctx["workspace_code"] == "test_ws"
+    assert ctx["package_code"] == "test_pkg"
+    assert ctx["knowledge_scope_code"] == "test_scope"
+
+
+def test_public_turn_partial_context_fills_defaults():
+    """Request with only some context fields fills missing ones from defaults."""
+    from routes.diagnosis import _resolve_public_turn_context
+    from routes.diagnosis_schemas import PublicTurnRequest
+
+    data = PublicTurnRequest(
+        message="test",
+        assistant_instance_code="custom_instance",
+        package_code="custom_pkg",
+    )
+    ctx = _resolve_public_turn_context(data)
+    assert ctx["assistant_instance_code"] == "custom_instance"
+    assert ctx["package_code"] == "custom_pkg"
+    assert ctx["organization_code"] == "team360_live"
+    assert ctx["workspace_code"] == "team360_public_site"
+    assert ctx["knowledge_scope_code"] == "ks_team360_sales_diagnosis"
+
+
+def test_public_turn_with_context_smoke():
+    """Integration smoke: request with context fields does not break."""
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={
+                "message": "Quiero automatizar ventas",
+                "assistant_instance_code": "team360_sales_diagnosis",
+                "organization_code": "team360_live",
+                "workspace_code": "team360_public_site",
+                "package_code": "pkg_sales_diagnosis",
+                "knowledge_scope_code": "ks_team360_sales_diagnosis",
+            },
+        )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["session_id"]
+    assert data["is_new"] is True
+    assert len(data["response_text"]) > 0
+
+
 # ── /api/diagnosis/turn ───────────────────────────────────────────────────
 
 

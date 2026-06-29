@@ -454,6 +454,24 @@ async def public_lead(data: PublicLeadRequest) -> dict:
     }
 
 
+def _resolve_public_turn_context(data: PublicTurnRequest) -> dict[str, str]:
+    """Resolve effective public diagnosis context from request or defaults.
+
+    When the request provides optional context fields (assistant_instance_code,
+    organization_code, workspace_code, package_code, knowledge_scope_code),
+    they take precedence. Missing fields fall back to the hardcoded defaults.
+    This guarantees backward compatibility: Vera never sends context fields
+    and always gets the current defaults.
+    """
+    return {
+        "assistant_instance_code": data.assistant_instance_code or SALES_DIAGNOSIS_INSTANCE_CODE,
+        "organization_code": data.organization_code or SALES_DIAGNOSIS_ORGANIZATION_CODE,
+        "workspace_code": data.workspace_code or SALES_DIAGNOSIS_WORKSPACE_CODE,
+        "package_code": data.package_code or SALES_DIAGNOSIS_PACKAGE_CODE,
+        "knowledge_scope_code": data.knowledge_scope_code or SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE,
+    }
+
+
 @post("/api/diagnosis/turn")
 async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
     text = data.message.strip()
@@ -464,7 +482,8 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
     session_id = data.session_id or f"conv_{uuid4().hex[:12]}"
 
     runtime = _build_public_turn_runtime()
-    display_name = _resolve_turn_display_name(SALES_DIAGNOSIS_INSTANCE_CODE)
+    ctx = _resolve_public_turn_context(data)
+    display_name = _resolve_turn_display_name(ctx["assistant_instance_code"])
 
     # Resolve knowledge scope code to UUID via PostgreSQL.
     # The resolver caches results in-memory for the process lifetime.
@@ -472,21 +491,21 @@ async def public_turn(data: PublicTurnRequest) -> PublicTurnResponse:
     resolver = _get_public_scope_resolver()
     if resolver is not None:
         try:
-            ctx = KnowledgeScopeContext(
-                organization_code=SALES_DIAGNOSIS_ORGANIZATION_CODE,
-                workspace_code=SALES_DIAGNOSIS_WORKSPACE_CODE,
-                package_code=SALES_DIAGNOSIS_PACKAGE_CODE,
-                knowledge_scope_code=SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE,
+            scope_ctx = KnowledgeScopeContext(
+                organization_code=ctx["organization_code"],
+                workspace_code=ctx["workspace_code"],
+                package_code=ctx["package_code"],
+                knowledge_scope_code=ctx["knowledge_scope_code"],
             )
-            resolved_scope_id = await resolver.resolve_scope_id(ctx)
+            resolved_scope_id = await resolver.resolve_scope_id(scope_ctx)
         except (ScopeResolutionError, Exception):
             resolved_scope_id = None
 
     input_ = AssistantTurnInput(
         session_id=session_id,
-        assistant_instance_code=SALES_DIAGNOSIS_INSTANCE_CODE,
-        package_code=SALES_DIAGNOSIS_PACKAGE_CODE,
-        knowledge_scope_code=SALES_DIAGNOSIS_KNOWLEDGE_SCOPE_CODE,
+        assistant_instance_code=ctx["assistant_instance_code"],
+        package_code=ctx["package_code"],
+        knowledge_scope_code=ctx["knowledge_scope_code"],
         knowledge_scope_id=resolved_scope_id,
         user_message=text,
         channel="web",

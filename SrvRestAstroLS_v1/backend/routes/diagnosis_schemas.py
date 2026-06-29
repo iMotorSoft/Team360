@@ -82,6 +82,11 @@ class PublicTurnRequest(BaseModel):
     message: str
     locale: str = "es"
     interaction_response: dict | None = None
+    assistant_instance_code: str | None = None
+    organization_code: str | None = None
+    workspace_code: str | None = None
+    package_code: str | None = None
+    knowledge_scope_code: str | None = None
 
 
 class PublicTurnResponse(BaseModel):
