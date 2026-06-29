@@ -1178,6 +1178,13 @@ class AssistantConversationRuntime:
         status = mem.get("diagnosis_status", "gathering")
         if status in ("completed",):
             return False
+
+        # Feasibility scope guard: if a previous turn already determined that
+        # enough data exists for a feasibility diagnosis, close the interview
+        # and deliver the diagnosis regardless of the current intent.
+        if status == "sufficient":
+            return True
+
         coverage = self._build_intent_state(state)
         has_critical = coverage.has_process and coverage.has_channels and coverage.has_systems
         is_strong = intent.confidence >= CLASSIFIER_CONFIDENCE_STRONG
@@ -1232,10 +1239,26 @@ class AssistantConversationRuntime:
         has_channel = bool(mem.get("channels"))
         has_system = bool(mem.get("systems_and_data_sources"))
 
+        # Primary path: strict process + channel + system
         if has_process and has_channel and has_system:
             mem["diagnosis_status"] = "sufficient"
             state.semantic_memory = mem
             return True
+
+        # Secondary path (feasibility scope):
+        # channel + system/management + objective = sufficient with ONE extra signal
+        has_management = bool(state.slots.get("management_system"))
+        has_volume = bool(mem.get("volume"))
+        has_approval = bool(mem.get("human_approval"))
+        has_entity = bool(mem.get("entities"))
+        has_goal = bool(state.slots.get("automation_goals"))
+
+        if has_channel and (has_system or has_management) and (has_process or has_goal):
+            extra_signals = sum(1 for s in [has_volume, has_approval, has_entity, has_process, has_goal])
+            if extra_signals >= 1:
+                mem["diagnosis_status"] = "sufficient"
+                state.semantic_memory = mem
+                return True
 
         return False
 
@@ -1367,10 +1390,18 @@ class AssistantConversationRuntime:
         min_turns = 2
         if state.turn_count < min_turns:
             return None
+        mem = state.semantic_memory or {}
+        status = mem.get("diagnosis_status", "gathering")
+        is_feasibility_sufficient = (status == "sufficient")
         return {
             "type": "next_step_choice",
-            "title": "¿Cómo querés seguir?",
-            "description": "Ya tengo suficiente información para darte una orientación inicial.",
+            "title": "Diagnóstico de factibilidad listo" if is_feasibility_sufficient else "¿Cómo querés seguir?",
+            "description": (
+                "Con lo que contaste ya alcanza para un diagnóstico. "
+                "Los detalles técnicos corresponden a la etapa de análisis de flujo."
+                if is_feasibility_sufficient else
+                "Ya tengo suficiente información para darte una orientación inicial."
+            ),
             "actions": [
                 {
                     "id": "continue",
@@ -1380,7 +1411,7 @@ class AssistantConversationRuntime:
                 },
                 {
                     "id": "show_diagnosis",
-                    "label": "Ver diagnóstico",
+                    "label": "Ver diagnóstico de factibilidad" if is_feasibility_sufficient else "Ver diagnóstico",
                     "intent": "show_current_diagnosis",
                     "style": "primary",
                 },
@@ -1397,10 +1428,18 @@ class AssistantConversationRuntime:
         if state.turn_count < 3:
             return None
         state.slots["pause_offered"] = True
+        mem = state.semantic_memory or {}
+        status = mem.get("diagnosis_status", "gathering")
+        is_feasibility_sufficient = (status == "sufficient")
         return {
             "type": "next_step_choice",
-            "title": "¿Cómo querés seguir?",
-            "description": "Ya tengo suficiente información para darte una orientación inicial.",
+            "title": "¿Cómo querés seguir?" if not is_feasibility_sufficient else "Diagnóstico de factibilidad listo",
+            "description": (
+                "Ya tengo suficiente información para darte una orientación inicial."
+                if not is_feasibility_sufficient else
+                "Con lo que contaste ya alcanza para un diagnóstico. "
+                "Los detalles técnicos corresponden a la etapa de análisis de flujo."
+            ),
             "actions": [
                 {
                     "id": "continue",
@@ -1410,7 +1449,7 @@ class AssistantConversationRuntime:
                 },
                 {
                     "id": "show_diagnosis",
-                    "label": "Ver diagnóstico",
+                    "label": "Ver diagnóstico" if not is_feasibility_sufficient else "Ver diagnóstico de factibilidad",
                     "intent": "show_current_diagnosis",
                     "style": "primary",
                 },
@@ -1530,6 +1569,8 @@ class AssistantConversationRuntime:
         if state.slots.get("management_system_choice_status") not in ("answered",):
             return None
 
+        is_feasibility_sufficient = (status == "sufficient")
+
         reqs: list[dict[str, str]] = []
 
         channels = mem.get("channels", [])
@@ -1611,6 +1652,26 @@ class AssistantConversationRuntime:
                 "required_for": "full_diagnosis",
             })
 
+        # Feasibility scope: when diagnosis is already sufficient, only show
+        # feasibility requirements (preliminary_diagnosis / full_diagnosis).
+        # Implementation items become "puntos a validar después" instead.
+        if is_feasibility_sufficient:
+            filtered = [r for r in reqs if r.get("required_for") in (
+                "preliminary_diagnosis", "full_diagnosis"
+            )]
+            # Add implementation items as a single note instead of separate items
+            impl_missing = [r for r in reqs if r.get("required_for") == "implementation" and r["status"] != "confirmed"]
+            impl_confirmed = [r for r in reqs if r.get("required_for") == "implementation" and r["status"] == "confirmed"]
+            if impl_missing or impl_confirmed:
+                filtered.append({
+                    "id": "implementation_details",
+                    "label": "Detalles de implementación",
+                    "status": "partial" if impl_missing or impl_confirmed else "missing",
+                    "required_for": "post_diagnosis",
+                    "note": "Corresponde a etapa posterior de análisis de flujo",
+                })
+            reqs = filtered
+
         has_any_confirmed = any(r["status"] == "confirmed" for r in reqs)
         has_any_missing = any(r["status"] != "confirmed" for r in reqs)
         if not has_any_confirmed or not has_any_missing:
@@ -1626,10 +1687,18 @@ class AssistantConversationRuntime:
                 return None
         state.slots["missing_requirements_last_signature"] = [[p[0], p[1]] for p in req_signature]
 
+        title = "Diagnóstico de factibilidad listo" if is_feasibility_sufficient else "Qué falta para afinar el diagnóstico"
+        description = (
+            "Ya hay datos suficientes para un diagnóstico. "
+            "Los detalles técnicos se validan en la etapa de análisis de flujo."
+            if is_feasibility_sufficient else
+            "Ya hay una orientación inicial. Estos datos ayudarían a hacerla más precisa."
+        )
+
         return {
             "type": "missing_requirements",
-            "title": "Qué falta para afinar el diagnóstico",
-            "description": "Ya hay una orientación inicial. Estos datos ayudarían a hacerla más precisa.",
+            "title": title,
+            "description": description,
             "requirements": reqs[:5],
             "actions": [
                 {
