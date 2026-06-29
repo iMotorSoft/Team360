@@ -126,6 +126,8 @@ class _DevFakeRetrievalProvider:
 class _DevFakeLLMProvider:
     """Fake LLM that returns safe ack text, no OpenAI/LiteLLM."""
 
+    is_test_fallback = True
+
     def generate(self, input: AssistantTurnInput, state: ConversationState, context: list[RetrievedChunk]) -> str:
         from modules.sales_diagnosis_runtime.contracts import SAFE_ACK_TEXT
         return SAFE_ACK_TEXT

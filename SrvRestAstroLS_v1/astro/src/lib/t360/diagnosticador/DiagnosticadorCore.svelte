@@ -159,12 +159,20 @@
     return text.slice(0, idx).trim();
   }
 
-  async function sendRuntimeMessage(text: string, displayText = text, clearComposer = true, interactionResponse?: Record<string, unknown>) {
+  async function sendRuntimeMessage(
+    text: string,
+    displayText = text,
+    clearComposer = true,
+    interactionResponse?: Record<string, unknown>,
+    appendUserMessage = true,
+  ) {
     const requestText = text.trim();
     const userText = displayText.trim();
     if (!requestText || isLoading) return;
 
-    messages = [...messages, { role: "user", text: userText || requestText }];
+    if (appendUserMessage) {
+      messages = [...messages, { role: "user", text: userText || requestText }];
+    }
     if (clearComposer) {
       inputText = "";
     }
@@ -240,7 +248,13 @@
       }
 
       const turn = t360InteractionEventToTurnRequest(event.detail as T360InteractionEventDetail);
-      void sendRuntimeMessage(turn.message, turn.display_text, false, turn.interaction_response as Record<string, unknown> | undefined);
+      void sendRuntimeMessage(
+        turn.message,
+        turn.display_text,
+        false,
+        turn.interaction_response as Record<string, unknown> | undefined,
+        false,
+      );
     };
     const target = interactionEventRoot;
     if (!target) return;

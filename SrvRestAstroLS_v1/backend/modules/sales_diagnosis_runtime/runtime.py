@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from typing import Any
 
 from modules.sales_diagnosis_runtime.contracts import (
@@ -116,6 +117,61 @@ MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP: dict[str, str] = {
     "none": "No hay un seguimiento definido",
 }
 
+MANAGEMENT_SYSTEM_ALIASES: dict[str, tuple[str, ...]] = {
+    "email_inbox": (
+        "Solo en la bandeja de email",
+        "En la bandeja de email",
+        "Bandeja de email",
+        "En el mail",
+        "Email",
+        "Gmail",
+        "En Gmail",
+        "Outlook",
+        "En Outlook",
+        "Solo por email",
+    ),
+    "custom_system": (
+        "Sistema propio",
+        "Sistema interno",
+        "CRM propio",
+        "Sistema de la empresa",
+        "Una app propia",
+        "Un sistema nuestro",
+    ),
+    "spreadsheet": (
+        "Planilla",
+        "Excel",
+        "Planilla / Excel",
+        "Google Sheets",
+        "Sheets",
+    ),
+    "none": (
+        "No usamos sistema",
+        "No tenemos sistema",
+        "Lo hacen a mano",
+        "Lo revisa alguien a mano",
+        "Alguien revisa a mano",
+        "Manual",
+    ),
+}
+
+
+def _normalize_management_text(value: str) -> str:
+    decomposed = unicodedata.normalize("NFKD", value.casefold())
+    without_accents = "".join(char for char in decomposed if not unicodedata.combining(char))
+    return re.sub(r"[^a-z0-9]+", " ", without_accents).strip()
+
+
+def _resolve_management_value(text: str, options: dict[str, str]) -> str | None:
+    normalized = _normalize_management_text(text)
+    if not normalized:
+        return None
+    for value, label in options.items():
+        candidates = (value, label, *MANAGEMENT_SYSTEM_ALIASES.get(value, ()))
+        if any(normalized == _normalize_management_text(candidate) for candidate in candidates):
+            return value
+    return None
+
 # Combined reverse map: canonical key -> display label (for dedup)
 _MANAGEMENT_KEY_TO_LABEL: dict[str, str] = {}
 for _d in [MANAGEMENT_SYSTEM_OPTIONS, MANAGEMENT_SYSTEM_OPTIONS_EMAIL, MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP]:
@@ -190,6 +246,18 @@ class AssistantConversationRuntime:
 
         # 1. Load or create conversation state
         state = self._load_or_create_state(input)
+        active_question = next(
+            (
+                question
+                for question in reversed(state.asked_questions or [])
+                if not question.get("answered")
+            ),
+            None,
+        )
+        active_question_waiting = active_question is not None
+        active_management_waiting = (
+            state.slots.get("management_system_choice_status") == "offered"
+        )
 
         events.append(ProgressiveEvent(
             event_type="team360.answer.quick_ack",
@@ -198,6 +266,11 @@ class AssistantConversationRuntime:
         ))
 
         has_real_llm = not isinstance(self._llm, NullLLMProvider)
+        provider_supports_context_recovery = not getattr(
+            self._llm,
+            "is_test_fallback",
+            False,
+        )
 
         # 2. Mark answered questions from user's current message
         self._mark_answered_questions(state, input)
@@ -212,7 +285,18 @@ class AssistantConversationRuntime:
         self._apply_interaction_response(state, input)
 
         # 3.6 Resolve active blocks from free-text user message
-        self._resolve_block_from_text(state, input)
+        resolved_text_block = self._resolve_block_from_text(state, input)
+
+        active_management_resolved = (
+            active_management_waiting
+            and state.slots.get("management_system_choice_status") == "answered"
+        )
+        management_text_resolved = resolved_text_block == "management_system"
+        deterministic_management_resolution = (
+            active_management_resolved or management_text_resolved
+        )
+        if deterministic_management_resolution:
+            self._mark_active_question_answered(state, input)
 
         # 4. Resolve contradictions
         self._resolve_contradictions(state, input)
@@ -282,26 +366,79 @@ class AssistantConversationRuntime:
             safe_to_show=True,
         ))
 
-        if not has_real_llm:
+        if not has_real_llm and not deterministic_management_resolution:
             return self._skeleton_response(input, state, events, metrics)
 
         # 8. Generate response
-        raw_response = self._llm.generate(input, state, chunks)
+        provider_called = False
+        provider_fallback_used = False
+        recovery_used = False
+        response_source = "llm"
+        if deterministic_management_resolution:
+            raw_response = self._build_active_management_response(state)
+            response_source = "deterministic_active_context"
+        elif not has_real_llm:
+            raw_response = self._build_active_management_clarification(state)
+            recovery_used = True
+            response_source = "deterministic_contextual_clarification"
+        else:
+            provider_called = True
+            raw_response = self._llm.generate(input, state, chunks)
+            provider_fallback_used = raw_response in set(SAFE_ACK_TEXTS.values())
+            if provider_fallback_used and provider_supports_context_recovery and (
+                active_management_waiting or active_question_waiting
+            ):
+                raw_response = (
+                    self._build_active_management_clarification(state)
+                    if active_management_waiting
+                    else self._build_active_question_recovery(input, state)
+                )
+                recovery_used = True
+                response_source = "deterministic_contextual_clarification"
 
         is_fallback = raw_response in set(SAFE_ACK_TEXTS.values())
-        events.append(ProgressiveEvent(
+        provider_result_event = ProgressiveEvent(
             event_type="team360.llm.provider_result",
-            payload={"response_is_fallback": is_fallback},
+            payload={
+                "provider_called": provider_called,
+                "response_is_fallback": provider_fallback_used,
+                "response_source": response_source,
+                "recovery_used": recovery_used,
+            },
             safe_to_show=True,
-        ))
+        )
+        events.append(provider_result_event)
 
         # 9. Guardrail evaluation
         guardrail_result = self._guardrail_policy.evaluate_response(raw_response, input, state)
 
         if not guardrail_result.passed:
             if guardrail_result.forbidden_claims or guardrail_result.planned_extension_misrepresented:
-                raise UnsafeResponseError(f"Response blocked by guardrails: {guardrail_result.notes}")
-            raw_response = self._guardrail_policy.build_fallback_response(reason="guardrail_violation")
+                if active_question_waiting or active_management_waiting:
+                    raw_response = (
+                        self._build_active_management_clarification(state)
+                        if active_management_waiting
+                        else self._build_active_question_recovery(input, state)
+                    )
+                    recovery_used = True
+                    response_source = "deterministic_guardrail_recovery"
+                    guardrail_result = self._guardrail_policy.evaluate_response(
+                        raw_response,
+                        input,
+                        state,
+                    )
+                else:
+                    raise UnsafeResponseError(f"Response blocked by guardrails: {guardrail_result.notes}")
+            else:
+                raw_response = self._guardrail_policy.build_fallback_response(
+                    reason="guardrail_violation",
+                    input=input,
+                    state=state,
+                )
+
+        is_fallback = raw_response in set(SAFE_ACK_TEXTS.values())
+        provider_result_event.payload["response_source"] = response_source
+        provider_result_event.payload["recovery_used"] = recovery_used
 
         events.append(ProgressiveEvent(
             event_type="team360.answer.final_ready", payload={"text": raw_response}, safe_to_show=True,
@@ -379,6 +516,10 @@ class AssistantConversationRuntime:
                     "model": model_name,
                     "fallback_used": is_fallback,
                     "fallback_reason": "transient_error" if is_fallback else None,
+                    "provider_called": provider_called,
+                    "provider_fallback_used": provider_fallback_used,
+                    "response_source": response_source,
+                    "recovery_used": recovery_used,
                 },
                 "diagnosis_built": diagnosis_built,
             },
@@ -517,74 +658,81 @@ class AssistantConversationRuntime:
         systems = mem.get("systems_and_data_sources", [])
         if not systems:
             return
-        SYSTEM_TO_MGMT_OPTION = {
+        system_to_management_option = {
             "crm": "crm",
             "kommo": "crm",
             "salesforce": "crm",
             "spreadsheet": "spreadsheet",
-            "custom_system": "custom_system",
+            "planilla excel": "spreadsheet",
+            "custom system": "custom_system",
+            "sistema propio": "custom_system",
             "erp": "crm",
             "database": "custom_system",
+            "base de datos": "custom_system",
         }
         for sys_name in systems:
-            option = SYSTEM_TO_MGMT_OPTION.get(sys_name)
+            option = system_to_management_option.get(_normalize_management_text(sys_name))
             if option:
-                state.slots["management_system"] = option
-                state.slots["management_system_choice_status"] = "answered"
+                AssistantConversationRuntime._apply_management_system_choice(
+                    state,
+                    option,
+                )
                 return
 
     @staticmethod
-    def _resolve_block_from_text(state: ConversationState, input: AssistantTurnInput) -> None:
-        msg = input.user_message.strip().lower()
+    def _apply_management_system_choice(
+        state: ConversationState,
+        option_value: str,
+    ) -> bool:
+        options = AssistantConversationRuntime._get_management_options(
+            (state.semantic_memory or {}).get("channels", [])
+        )
+        if option_value not in options:
+            return False
+        label = options[option_value]
+        state.slots["management_system"] = option_value
+        state.slots["management_system_label"] = label
+        state.slots["management_system_choice_status"] = "answered"
+        mem = state.semantic_memory or {}
+        systems = list(mem.get("systems_and_data_sources", []))
+        if label not in systems and option_value not in systems:
+            systems.append(label)
+        mem["systems_and_data_sources"] = AssistantConversationRuntime._normalize_systems(
+            systems
+        )
+        state.semantic_memory = mem
+        return True
+
+    @staticmethod
+    def _resolve_block_from_text(
+        state: ConversationState,
+        input: AssistantTurnInput,
+    ) -> str | None:
+        msg = input.user_message.strip()
         if not msg:
-            return
+            return None
 
         # Single choice resolution
         sc_status = state.slots.get("management_system_choice_status", "")
-        if sc_status not in ("answered",):
-            TEXT_TO_SINGLE_CHOICE = {
-                "en excel": "spreadsheet",
-                "planilla": "spreadsheet",
-                "excel": "spreadsheet",
-                "en una planilla": "spreadsheet",
-                "crm": "crm",
-                "en crm": "crm",
-                "en salesforce": "crm",
-                "salesforce": "crm",
-                "en kommo": "crm",
-                "kommo": "crm",
-                "sistema propio": "custom_system",
-                "propio": "custom_system",
-                "whatsapp business": "whatsapp_business",
-                "en whatsapp": "whatsapp_business",
-                "no gestionamos": "none",
-                "no hay seguimiento": "none",
-                "ninguno": "none",
-            }
-            for text_pattern, option_value in TEXT_TO_SINGLE_CHOICE.items():
-                if text_pattern in msg:
-                    all_options = {}
-                    for d in [MANAGEMENT_SYSTEM_OPTIONS, MANAGEMENT_SYSTEM_OPTIONS_EMAIL, MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP]:
-                        all_options.update(d)
-                    label = all_options.get(option_value, option_value)
-                    state.slots["management_system"] = option_value
-                    state.slots["management_system_label"] = label
-                    state.slots["management_system_choice_status"] = "answered"
-                    mem = state.semantic_memory or {}
-                    systems = mem.get("systems_and_data_sources", [])
-                    if label not in systems and option_value not in systems:
-                        systems.append(label)
-                        mem["systems_and_data_sources"] = systems
-                        state.semantic_memory = mem
-                    return
+        options = AssistantConversationRuntime._get_management_options(
+            (state.semantic_memory or {}).get("channels", [])
+        )
+        option_value = _resolve_management_value(msg, options)
+        if option_value:
+            if AssistantConversationRuntime._apply_management_system_choice(
+                state,
+                option_value,
+            ):
+                return "management_system"
 
-            # If text doesn't match and single_choice is active, don't guess
-            return
+        if sc_status not in ("answered",):
+            # If text doesn't match and single_choice is active, don't guess.
+            return None
 
         # Multi choice resolution
         mc_status = state.slots.get("automation_goals_choice_status", "")
         if mc_status not in ("answered",):
-            TEXT_TO_MULTI_CHOICE = {
+            text_to_multi_choice = {
                 "responder": "answer_faq",
                 "respuesta": "answer_faq",
                 "consultar stock": "answer_faq",
@@ -598,9 +746,10 @@ class AssistantConversationRuntime:
                 "humana": "escalate",
                 "todo": "*",
             }
+            msg_lower = msg.lower()
             matched_values = []
-            for text_pattern, opt_val in TEXT_TO_MULTI_CHOICE.items():
-                if text_pattern in msg:
+            for text_pattern, opt_val in text_to_multi_choice.items():
+                if text_pattern in msg_lower:
                     if opt_val == "*":
                         matched_values = list(AUTOMATION_GOALS.keys())
                         break
@@ -611,7 +760,74 @@ class AssistantConversationRuntime:
                 state.slots["automation_goals"] = matched_values
                 state.slots["automation_goals_labels"] = labels
                 state.slots["automation_goals_choice_status"] = "answered"
-                return
+                return "automation_goals"
+        return None
+
+    @staticmethod
+    def _mark_active_question_answered(
+        state: ConversationState,
+        input: AssistantTurnInput,
+    ) -> None:
+        for question in reversed(state.asked_questions or []):
+            if question.get("answered"):
+                continue
+            question["answered"] = True
+            question["answer_evidence"] = input.user_message[:200]
+            question["answered_turn"] = state.turn_count
+            return
+
+    @staticmethod
+    def _build_active_management_response(state: ConversationState) -> str:
+        label = state.slots.get("management_system_label") or state.slots.get(
+            "management_system",
+            "la modalidad indicada",
+        )
+        language = (
+            (state.semantic_memory or {})
+            .get("language", {})
+            .get("preferred_response_language", "es")
+        )
+        if language == "en":
+            return f"Got it. I recorded the current management method as: {label}. Let's continue with the next step."
+        if language == "he":
+            return f"הבנתי. רשמתי ששיטת הניהול הנוכחית היא: {label}. נמשיך לשלב הבא."
+        return f"Perfecto, registré que hoy lo gestionan así: {label}. Sigamos con el siguiente paso."
+
+    @staticmethod
+    def _build_active_management_clarification(state: ConversationState) -> str:
+        language = (
+            (state.semantic_memory or {})
+            .get("language", {})
+            .get("preferred_response_language", "es")
+        )
+        channels = (state.semantic_memory or {}).get("channels", [])
+        if language == "en":
+            return "I'm trying to identify where these messages are managed today. Is it only the email inbox, a spreadsheet, an internal system, or a CRM?"
+        if language == "he":
+            return "אני מנסה להבין היכן מנהלים כיום את הפניות. האם זה רק בתיבת האימייל, בגיליון, במערכת פנימית או ב-CRM?"
+        if "email" in channels:
+            return "Estoy tratando de ubicar dónde gestionan hoy los emails de postventa. ¿Es solo la bandeja de email, una planilla, un sistema propio o un CRM?"
+        return "Estoy tratando de ubicar dónde gestionan hoy las consultas. ¿Es de forma manual, en una planilla, en un sistema propio o en un CRM?"
+
+    @staticmethod
+    def _build_active_question_recovery(
+        input: AssistantTurnInput,
+        state: ConversationState,
+    ) -> str:
+        answer = input.user_message.strip().rstrip(".!?")
+        language = (
+            (state.semantic_memory or {})
+            .get("language", {})
+            .get("preferred_response_language", input.locale or "es")
+        )
+        channels = (state.semantic_memory or {}).get("channels", [])
+        if language == "en":
+            return f"Got it, I'll use “{answer}” as the answer in this context. Tell me where this process is managed today so we can continue."
+        if language == "he":
+            return f"הבנתי, אשתמש ב-„{answer}” כתשובה בהקשר הזה. כדי להמשיך, ספר לי היכן מנהלים כיום את התהליך."
+        if "email" in channels:
+            return f"Perfecto, tomo que estos emails corresponden a {answer}. Para seguir, indicame dónde se registran y gestionan hoy."
+        return f"Perfecto, tomo “{answer}” como respuesta en este contexto. Para seguir, contame dónde gestionan hoy ese proceso."
 
     @staticmethod
     def _build_continuation_options(lang: str) -> list[dict[str, str]]:
@@ -690,43 +906,40 @@ class AssistantConversationRuntime:
                 return
 
     @staticmethod
-    def _apply_interaction_response(state: ConversationState, input: AssistantTurnInput) -> None:
+    def _apply_interaction_response(
+        state: ConversationState,
+        input: AssistantTurnInput,
+    ) -> bool:
         resp = (input.metadata or {}).get("interaction_response")
         if not isinstance(resp, dict):
-            return
+            return False
         block_type = resp.get("block_type")
         if block_type == "single_choice":
             value = resp.get("value", "")
             valid_options = set(MANAGEMENT_SYSTEM_OPTIONS) | set(MANAGEMENT_SYSTEM_OPTIONS_EMAIL) | set(MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP)
             if value not in valid_options:
-                return
+                return False
             option_id = resp.get("option_id")
             if option_id is not None and option_id != value:
-                return
-            all_options = {**MANAGEMENT_SYSTEM_OPTIONS, **MANAGEMENT_SYSTEM_OPTIONS_EMAIL, **MANAGEMENT_SYSTEM_OPTIONS_WHATSAPP}
-            label = all_options.get(value, value)
-            state.slots["management_system"] = value
-            state.slots["management_system_label"] = label
-            state.slots["management_system_choice_status"] = "answered"
-            mem = state.semantic_memory or {}
-            systems = mem.get("systems_and_data_sources", [])
-            if label not in systems and value not in systems:
-                systems.append(label)
-                mem["systems_and_data_sources"] = systems
-                state.semantic_memory = mem
+                return False
+            return AssistantConversationRuntime._apply_management_system_choice(
+                state,
+                value,
+            )
         elif block_type == "multi_choice":
             values = resp.get("values", [])
             if not isinstance(values, list) or not values:
-                return
+                return False
             valid = {k for k in AUTOMATION_GOALS}
             filtered = [v for v in values if v in valid]
             if not filtered:
-                return
-            labels = resp.get("labels", [])
+                return False
             official_labels = [AUTOMATION_GOALS[v] for v in filtered]
             state.slots["automation_goals"] = filtered
             state.slots["automation_goals_labels"] = official_labels
             state.slots["automation_goals_choice_status"] = "answered"
+            return True
+        return False
 
     @staticmethod
     def _update_current_process(existing: str, msg: str) -> str:
@@ -1616,6 +1829,7 @@ class AssistantConversationRuntime:
     @staticmethod
     def _message_answers_intent(msg_lower: str, intent: str) -> bool:
         mapping = {
+            "identify_email_domain": ["postventa", "soporte", "reclamo", "pedido", "factura", "consulta", "venta"],
             "identify_channel": ["whatsapp", "email", "correo", "web", "sitio", "teléfono", "telefono", "chat", "presencial", "app", "gmail", "instagram", "facebook", "portal"],
             "identify_volume": ["diario", "diaria", "por día", "por dia", "mensual", "semanal", "consulta", "mensaje", "llamada", "50", "60", "80", "100", "120", "150", "200", "300", "500"],
             "clarify_current_process": ["manual", "excel", "planilla", "sistema", "responde", "copia", "escribe", "busca", "persona", "gestiona", "cruce", "cruza", "descarga", "arma", "armado", "reporte", "reportes", "paso", "proceso", "flujo"],
@@ -1731,6 +1945,7 @@ class AssistantConversationRuntime:
 
 
 QUESTION_INTENT_PATTERNS: list[tuple[str, list[str]]] = [
+    ("identify_email_domain", ["qué tipo de email", "que tipo de email", "emails son principalmente", "emails son", "correo corresponde"]),
     ("identify_channel", ["canal", "whatsapp", "email", "web", "por dónde", "por donde", "por qué medio"]),
     ("identify_volume", ["cuántos", "cuantas", "volumen", "diariamente", "por día", "por dia", "frecuencia", "cantidad", "cada cuánto"]),
     ("clarify_current_process", ["cómo gestiona", "como gestiona", "cómo maneja", "como maneja", "cómo hace", "como hace", "proceso actual", "hoy", "actualmente", "cómo lo hacen", "cómo es el proceso"]),
