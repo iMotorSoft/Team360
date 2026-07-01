@@ -1,6 +1,10 @@
 ---
 import PublicMarketingLayout from "../layouts/PublicMarketingLayout.astro";
 import PublicVeraEntry from "../components/diagnosis/PublicVeraEntry.svelte";
+import Badge from "../components/ui/Badge.svelte";
+import LinkButton from "../components/ui/LinkButton.astro";
+import OrientationExample from "../components/diagnosis/OrientationExample.astro";
+import HeroVisual from "../components/diagnosis/HeroVisual.astro";
 
 const solutions = [
   {
@@ -99,223 +103,115 @@ const objections = [
   headerCtaMobileLabel="Diagnóstico"
 >
   <main id="contenido" class="bg-[#f8faf7]">
-    <section
-      class="relative isolate min-h-[88svh] overflow-hidden bg-[#0f2632] text-white"
-    >
-      <img
-        src="/assets/team360-t360-hero.png"
-        alt=""
-        class="absolute inset-0 -z-20 h-full w-full object-cover object-[62%_center]"
-        loading="eager"
-      />
+    <section class="relative isolate overflow-hidden">
+      <div class="marketing-grid absolute inset-0 -z-20 opacity-55"></div>
       <div
-        class="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(8,21,28,0.94)_0%,rgba(8,21,28,0.78)_36%,rgba(8,21,28,0.34)_72%,rgba(8,21,28,0.18)_100%)]"
+        class="absolute -left-40 -top-36 -z-10 size-[24rem] md:size-[34rem] rounded-full bg-[#d7f3ee]/70 blur-3xl"
       >
       </div>
       <div
-        class="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-[#f8faf7] via-[#f8faf7]/35 to-transparent"
+        class="absolute -right-48 top-28 -z-10 size-[24rem] md:size-[32rem] rounded-full bg-[#E2D4ED]/75 blur-3xl"
       >
       </div>
 
       <div
-        class="mx-auto grid max-w-7xl gap-8 px-5 pb-8 pt-10 sm:px-8 sm:pt-14 lg:grid-cols-[0.88fr_1.12fr] lg:px-10 lg:pb-10 lg:pt-16"
+        class="mx-auto grid max-w-7xl gap-14 px-5 pb-24 pt-16 sm:px-8 sm:pb-28 sm:pt-20 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-16 lg:px-10 lg:pb-36 lg:pt-28"
       >
         <div class="flex min-h-[52svh] flex-col justify-center">
-          <p
-            class="max-w-max rounded-full border border-white/18 bg-white/10 px-3 py-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-[#a7f1df] backdrop-blur"
+          <Badge
+            variant="info"
+            class="h-auto rounded-full border border-[#b9dfe3] bg-[#effafa] px-3 py-2 text-xs
+            font-bold uppercase tracking-[0.15em] text-[#247c82]"
           >
             Diagnóstico Team360
-          </p>
+          </Badge>
           <h1
-            class="mt-6 max-w-2xl text-4xl font-poppins font-semibold leading-[1.1]
-            text-white max-[389px]:text-[2.4rem] sm:text-5xl lg:text-6xl"
+            class="mt-7 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.07em] text-[#102d4f] sm:text-6xl lg:text-[4.9rem]"
           >
             Automatizamos tareas y procesos que hoy tu equipo resuelve a mano.
           </h1>
-          <p class="mt-6 max-w-2xl text-xl leading-8 text-white/86 sm:text-2xl">
-            Consultas, seguimiento, reportes e integraciones organizados con
-            inteligencia artificial y control humano.
+          <p
+            class="mt-7 max-w-2xl text-xl font-poppins leading-8 text-slate-600 sm:text-2xl"
+          >
+            Analizamos cómo trabaja tu equipo y automatizamos lo que más tiempo
+            consume.
           </p>
           <p
-            class="mt-5 max-w-2xl text-base leading-7 text-white/68 sm:text-lg"
+            class="mt-7 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg"
           >
-            Team360 analiza cómo trabaja tu equipo, detecta qué partes conviene
-            automatizar y conecta canales, sistemas y datos en una operación más
-            clara.
-          </p>
-          <p class="mt-5 max-w-2xl text-sm leading-6 text-white/55">
-            Para equipos comerciales, administrativos y operativos. No necesitás
-            saber de automatización ni tener definido un proyecto técnico.
+            No necesitás conocimientos técnicos. Te ayudamos a identificar qué
+            procesos conviene automatizar.
           </p>
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              class="btn min-h-12 rounded-lg border-0 bg-[#44d6b2] px-6 text-sm font-bold text-[#092a2a] hover:bg-[#7ae8ce]"
-              href="#vera"
-            >
+            <LinkButton href="#vera" size="large" class="px-6">
               Empezar diagnóstico
-            </a>
-            <a
-              class="btn min-h-12 rounded-lg border border-white/24 bg-white/10 px-6 text-sm font-bold text-white hover:bg-white/18"
+            </LinkButton>
+            <LinkButton
               href="#solucion"
+              variant="ghost"
+              size="large"
+              class="px-6 border border-[#cfdbdf] bg-white/55 text-[#244966] hover:bg-white"
             >
               Ver soluciones
-            </a>
+            </LinkButton>
           </div>
         </div>
 
-        <div
-          id="diagnostico"
-          class="relative scroll-mt-24 self-end overflow-hidden rounded-2xl border border-white/16 bg-[#f7fbf8]/94 p-4 text-[#19364a] shadow-[0_24px_80px_-48px_rgba(0,0,0,0.75)] backdrop-blur sm:p-5 lg:mb-8"
-        >
-          <div
-            class="pointer-events-none absolute inset-x-5 top-0 h-px animate-pulse bg-gradient-to-r from-transparent via-[#44d6b2] to-transparent"
-          >
-          </div>
-          <div class="flex items-center justify-between gap-4">
-            <div>
-              <p
-                class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]"
-              >
-                Vista previa
-              </p>
-              <h2
-                class="mt-2 text-xl font-semibold leading-tight text-[#102d4f] sm:text-2xl"
-              >
-                Ejemplo de orientación inicial
-              </h2>
-            </div>
-            <span
-              class="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#e6f7f4] px-3 py-2 text-xs font-bold text-[#168b88]"
-            >
-              <span class="relative flex size-2">
-                <span
-                  class="absolute inline-flex h-full w-full rounded-full bg-[#21b99f] opacity-75 motion-safe:animate-ping"
-                ></span>
-                <span
-                  class="relative inline-flex size-2 rounded-full bg-[#21b99f]"
-                ></span>
-              </span>
-              Orientación
-            </span>
-          </div>
-          <div class="mt-5 rounded-xl border border-[#dcebea] bg-white/72 p-3">
-            <p
-              class="text-xs font-bold uppercase tracking-[0.14em] text-[#168b88]"
-            >
-              Vera organiza
-            </p>
-            <p class="mt-2 text-sm leading-6 text-[#425d6d]">
-              Este ejemplo muestra cómo Vera puede organizar la factibilidad,
-              los puntos a validar y los próximos pasos de tu caso.
-            </p>
-          </div>
-          <label
-            class="mt-5 block text-sm font-semibold text-[#324f64]"
-            for="diagnosis-problem"
-          >
-            Caso de ejemplo
-          </label>
-          <textarea
-            id="diagnosis-problem"
-            class="textarea mt-2 min-h-28 w-full resize-none rounded-xl border-[#cbdcdd] bg-white text-sm leading-6 text-[#1f3d52] cursor-default"
-            readonly
-            aria-readonly="true"
-            tabindex="-1"
-            >Ej: recibimos muchos WhatsApp, nadie sabe quién respondió y después
-            tengo que armar reportes manualmente.</textarea
-          >
-          <div
-            class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <a
-              href="#vera"
-              class="btn min-h-11 rounded-lg border-0 bg-[#102d4f] px-5 text-sm font-bold text-white hover:bg-[#1a4266]"
-            >
-              Probar diagnóstico en vivo
-            </a>
-            <p class="text-xs leading-5 text-[#667b86] sm:max-w-xs">
-              Usá la sección de Vera para escribir tu caso y recibir una
-              orientación conectada.
-            </p>
-          </div>
-          <p class="mt-5 text-sm font-semibold text-[#102d4f]">
-            El diagnóstico inicial debe devolver:
-          </p>
-          <div class="mt-3 grid gap-2 sm:grid-cols-3">
-            <div class="rounded-xl bg-[#edf8f5] p-3">
-              <p
-                class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#168b88]"
-              >
-                Tipo
-              </p>
-              <p class="mt-1 text-sm font-semibold text-[#173b52]">
-                Qué se puede automatizar
-              </p>
-            </div>
-            <div class="rounded-xl bg-[#f2f5fb] p-3">
-              <p
-                class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#506c9a]"
-              >
-                Necesita
-              </p>
-              <p class="mt-1 text-sm font-semibold text-[#173b52]">
-                Canales, datos o integración
-              </p>
-            </div>
-            <div class="rounded-xl bg-[#fff4de] p-3">
-              <p
-                class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#9a6a18]"
-              >
-                Síntesis
-              </p>
-              <p class="mt-1 text-sm font-semibold text-[#173b52]">
-                Qué conviene hacer ahora
-              </p>
-            </div>
-          </div>
-          <p class="mt-4 text-xs leading-5 text-[#667b86]">
-            Este es un ejemplo de orientación inicial. No ejecuta acciones, no
-            crea leads, no confirma por WhatsApp y no deriva datos sin
-            autorización.
-          </p>
-        </div>
+        <!-- <OrientationExample /> -->
+        <HeroVisual />
       </div>
     </section>
 
     <section class="border-y border-[#dde8e7] bg-white py-16 sm:py-20">
-      <div
-        class="mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:px-10"
-      >
-        <div>
-          <p
-            class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]"
-          >
-            Antes / Después
-          </p>
-          <h2
-            class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl"
-          >
-            Del desorden operativo a un plan que se puede ejecutar.
-          </h2>
-        </div>
-        <div class="grid gap-3 sm:grid-cols-2">
-          <div class="rounded-2xl border border-[#ead9d0] bg-[#fff8f3] p-5">
-            <p class="text-sm font-bold text-[#9a4f2a]">Antes</p>
-            <ul class="mt-4 space-y-3 text-sm leading-6 text-[#6b5a52]">
-              <li>Mensajes repartidos entre canales.</li>
-              <li>Reportes armados a mano y tarde.</li>
-              <li>Decisiones sin datos claros.</li>
-              <li>IA usada como herramienta suelta.</li>
-            </ul>
-          </div>
-          <div class="rounded-2xl border border-[#cfe5df] bg-[#f1fbf7] p-5">
-            <p class="text-sm font-bold text-[#168b88]">Después</p>
-            <ul class="mt-4 space-y-3 text-sm leading-6 text-[#355c58]">
-              <li>Canales ordenados por intención y prioridad.</li>
-              <li>Tasks medibles dentro de un flujo claro.</li>
-              <li>Integraciones pensadas según necesidad real.</li>
-              <li>Diagnóstico primero, automatización después.</li>
-            </ul>
+      <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+        <div
+          class="overflow-hidden rounded-[2rem] border border-[#dfe8ea]
+          bg-white shadow-[0_28px_80px_-58px_rgba(16,45,79,0.6)]"
+        >
+          <div class="grid lg:grid-cols-[0.74fr_1.26fr]">
+            <div class="bg-[#eaf7f5] p-7 sm:p-10 lg:p-12">
+              <p class="top-badge">Antes / Después</p>
+              <h2
+                class="mt-4 text-3xl font-semibold leading-tight tracking-[-0.05em] text-[#102d4f] sm:text-4xl"
+              >
+                Del desorden operativo a un plan que se puede ejecutar
+              </h2>
+            </div>
+            <div class="grid gap-px bg-[#e1e9eb] sm:grid-cols-2">
+              {
+                [
+                  {
+                    title: "Antes",
+                    text: [
+                      "Mensajes repartidos entre canales.",
+                      "Reportes armados a mano y tarde.",
+                      "Decisiones sin datos claros.",
+                      "IA usada como herramienta suelta.",
+                    ],
+                  },
+                  {
+                    title: "Después",
+                    text: [
+                      "Canales ordenados por intención y prioridad.",
+                      "Tasks medibles dentro de un flujo claro.",
+                      "Integraciones pensadas según necesidad real.",
+                      "Diagnóstico primero, automatización después.",
+                    ],
+                  },
+                ].map(({ title, text }) => (
+                  <article class="bg-white p-6 sm:p-7">
+                    <h3 class="text-base md:text-xl font-poppins font-semibold text-[#173b5b]">
+                      {title}
+                    </h3>
+                    <ul class="mt-3 space-y-2 text-base leading-6 text-[#667989] list-disc list-inside">
+                      {text.map((item) => (
+                        <li>{item}</li>
+                      ))}
+                    </ul>
+                  </article>
+                ))
+              }
+            </div>
           </div>
         </div>
       </div>
@@ -324,11 +220,7 @@ const objections = [
     <section id="solucion" class="scroll-mt-24 py-20 sm:py-28">
       <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
         <div class="max-w-3xl">
-          <p
-            class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]"
-          >
-            Soluciones principales
-          </p>
+          <p class="top-badge">Soluciones principales</p>
           <h2
             class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-5xl"
           >
@@ -341,31 +233,33 @@ const objections = [
           </p>
         </div>
 
-        <div class="mt-12 grid gap-4 lg:grid-cols-5">
+        <div class="mt-12 grid gap-4 lg:grid-cols-3">
           {
             solutions.map((solution, index) => (
               <article
                 class:list={[
-                  "rounded-2xl border p-5 shadow-[0_24px_60px_-54px_rgba(16,45,79,0.7)]",
+                  "rounded-2xl border p-5 shadow-[0_24px_60px_-54px_rgba(16,45,79,0.7)] transition duration-300 hover:-translate-y-1.5 hover:border-[#b9deda] hover:shadow-[0_22px_45px_-36px_rgba(16,45,79,0.55)]",
                   index === 0
-                    ? "border-[#95d9d0] bg-[#eaf8f4] lg:col-span-2"
+                    ? "border-[#95d9d0] bg-[#eaf8f4] lg:col-span-1"
                     : "border-[#dfe8e9] bg-white lg:col-span-1",
                 ]}
               >
-                <p class="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#168b88]">
-                  {solution.tag}
-                </p>
-                <h3 class="mt-3 text-xl font-semibold leading-tight text-[#102d4f]">
+                <p class="top-badge">{solution.tag}</p>
+                <h3 class="mt-3 text-xl font-poppins md:text-2xl font-semibold leading-tight text-[#102d4f]">
                   {solution.title}
                 </h3>
-                <p class="mt-3 text-sm leading-6 text-[#5f7481]">
+                <p class="mt-3 text-sm md:text-base leading-6 text-[#5f7481]">
                   {solution.text}
                 </p>
                 <div class="mt-5 flex flex-wrap gap-2">
                   {solution.items.map((item) => (
-                    <span class="rounded-full border border-[#d4e5e3] bg-white/80 px-3 py-1 text-[0.72rem] font-semibold text-[#456372]">
+                    <Badge
+                      variant="neutral"
+                      class="rounded-full border border-[#d4e5e3] bg-white/80 px-3 py-1 
+                    md:text-sm text-[0.72rem] font-semibold text-[#8be1d8]"
+                    >
                       {item}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </article>
@@ -384,24 +278,37 @@ const objections = [
       >
         <div>
           <p
-            class="text-xs font-bold uppercase tracking-[0.18em] text-[#8be1d8]"
+            class="text-xs md:text-sm font-bold uppercase tracking-[0.17em] text-[#8be1d8]"
           >
             Tasks simples
           </p>
-          <h2 class="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
+          <h2 class="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">
             Cada mejora empieza por una acción concreta.
           </h2>
-          <p class="mt-5 text-base leading-7 text-white/68">
+          <p class="mt-5 text-base md:text-lg leading-7 text-white/68">
             Una Task no es una promesa abstracta. Es una pieza puntual que puede
             entrar en un Pack o en un Flow.
           </p>
         </div>
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {
-            tasks.map(([title, text]) => (
-              <article class="rounded-2xl border border-white/12 bg-white/[0.065] p-5">
-                <h3 class="text-lg font-semibold text-white">{title}</h3>
-                <p class="mt-3 text-sm leading-6 text-white/62">{text}</p>
+            tasks.map(([title, text], index) => (
+              <article
+                class:list={[
+                  "rounded-2xl border p-5",
+                  index === 1
+                    ? "border-[#70d7cd]/50 bg-[#1b4d68]"
+                    : "border-white/12 bg-white/[0.055]",
+                ]}
+              >
+                <div class="">
+                  <h3 class="text-lg capitalize font-poppins font-semibold text-white">
+                    {title}
+                  </h3>
+                  <p class="mt-3 text-sm md:text-base leading-6 text-white/62">
+                    {text}
+                  </p>
+                </div>
               </article>
             ))
           }
@@ -413,18 +320,14 @@ const objections = [
       <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
         <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
-            <p
-              class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]"
-            >
-              Lógica Team360
-            </p>
+            <p class="top-badge">Lógica Team360</p>
             <h2
               class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl"
             >
               Diagnosticar primero. Configurar después. Automatizar con
               criterio.
             </h2>
-            <p class="mt-5 text-base leading-7 text-[#5e7382]">
+            <p class="mt-5 text-base md:text-lg leading-7 text-[#5e7382]">
               El diagnóstico no obliga al cliente a entrar en un catálogo
               cerrado. Primero entiende la operación; después traduce esa
               necesidad en Packs, Tasks, Flows e Integraciones posibles.
@@ -433,14 +336,20 @@ const objections = [
           <div class="grid gap-3 sm:grid-cols-2">
             {
               model.map(([title, text], index) => (
-                <article class="rounded-2xl border border-[#dfe8e9] bg-white p-5">
-                  <span class="grid size-9 place-items-center rounded-lg bg-[#e7f7f4] text-xs font-bold text-[#168b88]">
-                    {index + 1}
-                  </span>
-                  <h3 class="mt-4 text-lg font-semibold text-[#102d4f]">
+                <article
+                  class="relative overflow-hidden rounded-2xl border 
+                border-[#dfe8e9] bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-[#b9deda] hover:shadow-[0_22px_45px_-36px_rgba(16,45,79,0.55)]"
+                >
+                  <div class="absolute -top-6 -right-6 size-24 rounded-full border border-[#d9f2ef] bg-[#effaf8]" />
+                  <div class="text-sm md:text-lg font-bold text-[#28aa9e] tracking-[0.14em]">
+                    0{index + 1}
+                  </div>
+                  <h3 class="mt-4 text-lg md:text-xl font-poppins font-semibold text-[#102d4f]">
                     {title}
                   </h3>
-                  <p class="mt-3 text-sm leading-6 text-[#637784]">{text}</p>
+                  <p class="mt-3 text-sm md:text-base leading-6 text-[#637784]">
+                    {text}
+                  </p>
                 </article>
               ))
             }
@@ -455,55 +364,60 @@ const objections = [
     >
       <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
         <div class="grid gap-10 lg:grid-cols-[0.76fr_1.24fr]">
-          <div>
-            <p
-              class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]"
-            >
-              Prueba de método
-            </p>
+          <div class="flex flex-col justify-center">
+            <p class="top-badge">Prueba de método</p>
             <h2
-              class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl"
+              class="mt-3 text-3xl md:text-4xl font-semibold leading-tight text-[#102d4f]"
             >
               Cómo se ve un diagnóstico útil.
             </h2>
-            <p class="mt-5 text-base leading-7 text-[#5e7382]">
+            <p class="mt-5 text-base md:text-lg leading-7 text-[#5e7382]">
               En vez de decir "sí, se puede", Team360 separa factibilidad,
               prioridad, riesgo y próximo paso.
             </p>
-            <a
-              class="btn mt-7 min-h-12 rounded-lg border-0 bg-[#102d4f] px-6 text-sm font-bold text-white hover:bg-[#1a4266]"
-              href="#vera"
-            >
-              Ver diagnóstico inicial
-            </a>
+            <div class="w-fit">
+              <LinkButton
+                href="#vera"
+                variant="secondary"
+                class="mt-5"
+                size="large">Ver diagnóstico inicial</LinkButton
+              >
+            </div>
           </div>
-          <div class="grid gap-3">
+          <div class="grid gap-2">
             {
               [
                 [
-                  "1. Entender",
+                  "Entender",
                   "Qué canal entra, quién responde, qué datos faltan y cuánto volumen existe.",
                 ],
                 [
-                  "2. Clasificar",
+                  "Clasificar",
                   "Disponible hoy, configurable, requiere desarrollo o no conviene vender todavía.",
                 ],
                 [
-                  "3. Diseñar",
+                  "Diseñar",
                   "Qué Pack, Tasks, Flow o Integración forman una primera solución razonable.",
                 ],
                 [
-                  "4. Medir",
+                  "Medir",
                   "Qué resultado tiene que verse: menos demora, menos errores, más seguimiento o mejor reporte.",
                 ],
               ].map(([title, text]) => (
-                <article class="rounded-2xl border border-[#dfe8e9] bg-[#f8faf7] p-5 sm:flex sm:items-center sm:gap-5">
-                  <h3 class="min-w-32 text-lg font-semibold text-[#102d4f]">
-                    {title}
-                  </h3>
-                  <p class="mt-2 text-sm leading-6 text-[#637784] sm:mt-0">
-                    {text}
-                  </p>
+                <article
+                  class="group flex flex-col sm:flex-row overflow-hidden rounded-2xl border 
+                border-[#dfe8ea] bg-white transition-all duration-300 hover:border-[#b9deda] hover:shadow-[0_22px_45px_-36px_rgba(16,45,79,0.55)]"
+                >
+                  <div class="sm:w-[18%] bg-[#f8fbfb] justify-center p-6 sm:px-8 border-b sm:border-b-0 sm:border-r border-[#dfe8ea] flex items-center transition-colors group-hover:bg-[#f0faf9]">
+                    <h3 class="text-base md:text-lg font-poppins font-semibold text-[#102d4f]">
+                      {title}
+                    </h3>
+                  </div>
+                  <div class="sm:w-[82%] p-6 sm:px-8 flex items-center">
+                    <p class="text-sm md:text-base leading-relaxed text-[#637784]">
+                      {text}
+                    </p>
+                  </div>
                 </article>
               ))
             }
@@ -514,7 +428,7 @@ const objections = [
 
     <section class="py-8 text-center">
       <div class="mx-auto max-w-3xl px-5 sm:px-8 lg:px-10">
-        <p class="text-sm leading-7 text-[#5e7382]">
+        <p class="text-sm md:text-base leading-7 text-[#5e7382]">
           Vera es la asistente de diagnóstico de Team360. Te ayuda a identificar
           qué se puede automatizar y por dónde conviene empezar.
         </p>
@@ -523,19 +437,20 @@ const objections = [
 
     <PublicVeraEntry client:load />
 
-    <section id="partners" class="scroll-mt-24 bg-[#eff7f4] py-16 sm:py-20">
+    <section
+      id="partners"
+      class="scroll-mt-24 bg-[#102d4f] text-white py-16 sm:py-20"
+    >
       <div
         class="mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:px-10"
       >
         <div>
           <p
-            class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]"
+            class="text-xs md:text-sm font-bold uppercase tracking-[0.17em] text-[#8be1d8]"
           >
             Equipos y partners
           </p>
-          <h2
-            class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl"
-          >
+          <h2 class="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
             Una misma lógica para ventas, operación, administración y contenido.
           </h2>
         </div>
@@ -555,9 +470,13 @@ const objections = [
                 "Diagnosticar clientes y armar soluciones por alcance.",
               ],
             ].map(([title, text]) => (
-              <article class="rounded-2xl border border-[#d6e6e1] bg-white p-5">
-                <h3 class="text-lg font-semibold text-[#102d4f]">{title}</h3>
-                <p class="mt-3 text-sm leading-6 text-[#637784]">{text}</p>
+              <article class="rounded-2xl border border-[#70d7cd]/50 bg-[#1b4d68] p-5 shadow-[0_24px_60px_-54px_rgba(16,45,79,0.7)]">
+                <h3 class="text-lg md:text-xl font-poppins font-semibold">
+                  {title}
+                </h3>
+                <p class="mt-3 text-sm md:text-base leading-7 text-white/68">
+                  {text}
+                </p>
               </article>
             ))
           }
@@ -568,15 +487,11 @@ const objections = [
     <section id="faq" class="scroll-mt-24 py-20 sm:py-28">
       <div class="mx-auto max-w-5xl px-5 sm:px-8 lg:px-10">
         <div class="text-center">
-          <p
-            class="text-xs font-bold uppercase tracking-[0.18em] text-[#168b88]"
-          >
-            Preguntas frecuentes
-          </p>
+          <p class="top-badge">Preguntas frecuentes</p>
           <h2
             class="mt-3 text-3xl font-semibold leading-tight text-[#102d4f] sm:text-4xl"
           >
-            Objeciones normales antes de automatizar.
+            Dudas antes de automatizar.
           </h2>
         </div>
         <div
@@ -585,13 +500,19 @@ const objections = [
           {
             objections.map(([question, answer]) => (
               <details class="group p-5 open:bg-[#f6fbf8] sm:p-6">
-                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-base font-semibold text-[#102d4f]">
+                <summary
+                  class="flex cursor-pointer list-none items-center 
+                justify-between gap-4 text-left text-base md:text-xl font-poppins font-semibold text-[#102d4f]"
+                >
                   {question}
-                  <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-[#e8f6f3] text-[#168b88] transition group-open:rotate-45">
+                  <span
+                    class="grid size-8 text-xl md:text-2xl shrink-0 place-items-center rounded-lg 
+                  bg-[#e8f6f3] text-[#168b88] transition group-open:rotate-45"
+                  >
                     +
                   </span>
                 </summary>
-                <p class="mt-4 max-w-3xl text-sm leading-6 text-[#637784]">
+                <p class="mt-4 max-w-3xl text-sm md:text-lg leading-6 text-[#637784]">
                   {answer}
                 </p>
               </details>
@@ -601,51 +522,46 @@ const objections = [
       </div>
     </section>
 
-    <section
-      id="contacto"
-      class="scroll-mt-24 bg-[#f0f6f4] pb-24 pt-20 sm:pb-28"
-    >
+    <section id="contacto" class="scroll-mt-24 pb-24 sm:pb-32">
       <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
         <div
-          class="overflow-hidden rounded-2xl bg-[#102d4f] text-white shadow-[0_34px_90px_-60px_rgba(16,45,79,0.8)]"
+          class="relative overflow-hidden rounded-[2rem] bg-[#153b5b] px-7 py-10 text-white sm:px-10 sm:py-12 lg:px-14"
         >
-          <div class="grid gap-8 p-6 sm:p-9 lg:grid-cols-[1fr_0.72fr] lg:p-12">
-            <div>
-              <p
-                class="text-xs font-bold uppercase tracking-[0.18em] text-[#8be1d8]"
-              >
-                Siguiente paso
-              </p>
-              <h2
-                class="mt-3 max-w-3xl text-3xl font-semibold leading-tight sm:text-5xl"
-              >
-                Contanos qué operación querés ordenar y te devolvemos un primer
-                mapa de solución.
-              </h2>
-              <p class="mt-5 max-w-2xl text-base leading-7 text-white/68">
-                El diagnóstico puede orientar aunque todavía no exista el Pack o
-                la Task exacta. Si requiere integración o desarrollo, debe
-                decirlo sin ejecutarlo desde esta Home.
-              </p>
-            </div>
-            <div class="flex flex-col justify-end gap-3">
-              <a
-                class="btn min-h-12 rounded-lg border-0 bg-[#44d6b2] px-6 text-sm font-bold text-[#092a2a] hover:bg-[#7ae8ce]"
-                href="#vera"
-              >
-                Ver diagnóstico inicial
-              </a>
-              <a
-                class="btn min-h-12 rounded-lg border border-white/18 bg-white/[0.08] px-6 text-sm font-bold text-white hover:bg-white/[0.14]"
-                href="#vera"
-              >
-                Volver al diagnóstico inicial
-              </a>
-              <p class="text-xs leading-5 text-white/50">
-                La toma de datos se agrega solo con autorización explícita y
-                después de entregar una síntesis valiosa.
-              </p>
-            </div>
+          <div
+            class="absolute -right-24 -top-28 size-72 rounded-full border border-white/10 bg-[#2b9c99]/20"
+          >
+          </div>
+          <div class="relative max-w-3xl">
+            <p
+              class="text-sm md:text-base font-bold uppercase tracking-[0.18em] text-[#8be1d8]"
+            >
+              Siguiente paso
+            </p>
+            <h2
+              class="mt-4 max-w-3xl text-3xl font-semibold leading-tight sm:text-5xl"
+            >
+              Contanos qué operación querés ordenar y te devolvemos un primer
+              mapa de solución.
+            </h2>
+            <p class="mt-5 text-base md:text-lg leading-7 text-white/68">
+              El diagnóstico puede orientar aunque todavía no exista el Pack o
+              la Task exacta. Si requiere integración o desarrollo, debe decirlo
+              sin ejecutarlo desde esta Home.
+            </p>
+          </div>
+          <div class="flex flex-col justify-end gap-3">
+            <a
+              class="mt-7 inline-flex items-center gap-2 text-lg md:text-xl font-poppins font-semibold text-[#9ce7df] transition hover:text-white"
+              href="#vera"
+            >
+              Empezar diagnóstico inicial
+              <span aria-hidden="true">→</span>
+            </a>
+
+            <p class="text-xs md:text-sm leading-5 text-white/50">
+              La toma de datos se agrega solo con autorización explícita y
+              después de entregar una síntesis valiosa.
+            </p>
           </div>
         </div>
       </div>

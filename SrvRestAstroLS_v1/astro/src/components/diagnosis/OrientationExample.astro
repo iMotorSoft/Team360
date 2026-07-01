@@ -1,0 +1,110 @@
+<div
+    id="diagnostico"
+    class="relative scroll-mt-24 self-end overflow-hidden rounded-4xl border border-white/80 bg-white/82 p-4 text-[#19364a]
+          shadow-[0_24px_80px_-48px_rgba(0,0,0,0.75)] backdrop-blur sm:p-5 lg:mb-8"
+>
+    <div
+        class="pointer-events-none absolute inset-x-5 top-0 h-px animate-pulse bg-gradient-to-r from-transparent via-[#44d6b2] to-transparent"
+    >
+    </div>
+    <div class="flex items-center justify-between gap-4">
+        <div>
+            <p class="top-badge">Vista previa</p>
+            <h2
+                class="mt-2 text-xl font-semibold leading-tight text-[#102d4f] sm:text-2xl"
+            >
+                Ejemplo de orientación inicial
+            </h2>
+        </div>
+        <span
+            class="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#e6f7f4] px-3 py-2 text-xs font-bold text-[#168b88]"
+        >
+            <span class="relative flex size-2">
+                <span
+                    class="absolute inline-flex h-full w-full rounded-full bg-[#21b99f] opacity-75 motion-safe:animate-ping"
+                ></span>
+                <span
+                    class="relative inline-flex size-2 rounded-full bg-[#21b99f]"
+                ></span>
+            </span>
+            Orientación
+        </span>
+    </div>
+    <div class="mt-5 rounded-xl border border-[#dcebea] bg-white/72 p-3">
+        <p class="text-xs font-bold uppercase tracking-[0.14em] text-[#168b88]">
+            Vera organiza
+        </p>
+        <p class="mt-2 text-sm leading-6 text-[#425d6d]">
+            Este ejemplo muestra cómo Vera puede organizar la factibilidad, los
+            puntos a validar y los próximos pasos de tu caso.
+        </p>
+    </div>
+    <label
+        class="mt-5 block text-sm font-semibold text-[#324f64]"
+        for="diagnosis-problem"
+    >
+        Caso de ejemplo
+    </label>
+    <textarea
+        id="diagnosis-problem"
+        class="textarea mt-2 min-h-28 w-full resize-none rounded-xl border-[#cbdcdd] bg-white text-sm leading-6 text-[#1f3d52] cursor-default"
+        readonly
+        aria-readonly="true"
+        tabindex="-1"
+        >Ej: recibimos muchos WhatsApp, nadie sabe quién respondió y después
+        tengo que armar reportes manualmente.</textarea
+    >
+    <div
+        class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+    >
+        <a
+            href="#vera"
+            class="btn min-h-11 rounded-full border-0 bg-[#102d4f] px-5 text-sm font-bold text-white hover:bg-[#1a4266]"
+        >
+            Probar diagnóstico en vivo
+        </a>
+        <p class="text-xs leading-5 text-[#667b86] sm:max-w-xs">
+            Usá la sección de Vera para escribir tu caso y recibir una
+            orientación conectada.
+        </p>
+    </div>
+    <p class="mt-5 text-sm font-semibold text-[#102d4f]">
+        El diagnóstico inicial debe devolver:
+    </p>
+    <div class="mt-3 grid gap-2 sm:grid-cols-3">
+        <div class="rounded-xl bg-[#edf8f5] p-3">
+            <p
+                class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#168b88]"
+            >
+                Tipo
+            </p>
+            <p class="mt-1 text-sm font-semibold text-[#173b52]">
+                Qué se puede automatizar
+            </p>
+        </div>
+        <div class="rounded-xl bg-[#f2f5fb] p-3">
+            <p
+                class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#506c9a]"
+            >
+                Necesita
+            </p>
+            <p class="mt-1 text-sm font-semibold text-[#173b52]">
+                Canales, datos o integración
+            </p>
+        </div>
+        <div class="rounded-xl bg-[#fff4de] p-3">
+            <p
+                class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#9a6a18]"
+            >
+                Síntesis
+            </p>
+            <p class="mt-1 text-sm font-semibold text-[#173b52]">
+                Qué conviene hacer ahora
+            </p>
+        </div>
+    </div>
+    <p class="mt-4 text-xs leading-5 text-[#667b86]">
+        Este es un ejemplo de orientación inicial. No ejecuta acciones, no crea
+        leads, no confirma por WhatsApp y no deriva datos sin autorización.
+    </p>
+</div>

@@ -4,6 +4,7 @@ interface Props {
     inverted?: boolean;
     showIcon?: boolean;
     logoSrc?: string;
+    numberColor?: string;
     size?: "small" | "medium" | "large" | string;
 }
 
@@ -12,6 +13,7 @@ const {
     inverted = false,
     showIcon = true,
     logoSrc = "/src/assets/team360_logo_t.png",
+    numberColor = "text-[#168b88]",
     size = "medium",
 } = Astro.props;
 
@@ -48,7 +50,7 @@ const finalSizeClass = sizeClasses[size as keyof typeof sizeClasses] || size;
         ]}
     >
         <span class="text-2xl md:text-3xl font-poppins">Team</span><span
-            class="text-2xl md:text-3xl text-[#168b88] font-poppins">360</span
+            class={`text-2xl md:text-3xl ${numberColor} font-poppins`}>360</span
         >
         {
             !compact && (
