@@ -156,3 +156,11 @@ Cobertura:
 Fase chica siguiente: fixture cross-origin real controlado en puerto separado,
 con `allowed_origins` explicitamente preparados para validar CORS/origin sin
 mezclarlo con esta fase same-origin.
+
+## Relacion con 9D
+
+- 9D agrega un fixture cross-origin real en `3060/3061`;
+- el fixture same-origin de este documento se conserva como baseline sin tocar
+  DB;
+- la validacion cross-origin y el ajuste local de `allowed_origins` quedaron
+  documentados en `diagnosticador_cross_origin_fixture_v1.md`.

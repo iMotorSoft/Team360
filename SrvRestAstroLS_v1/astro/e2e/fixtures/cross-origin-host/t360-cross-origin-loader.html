@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team360 cross-origin loader fixture</title>
+    <meta
+      name="description"
+      content="Fixture cross-origin controlado para validar el loader público del Diagnosticador Team360."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(22, 139, 136, 0.12), transparent 26rem),
+          linear-gradient(180deg, #f7f5ef 0%, #f2ede2 100%);
+        color: #17324a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+      }
+
+      main {
+        max-width: 78rem;
+        margin: 0 auto;
+        padding: 2rem 1rem 3rem;
+      }
+
+      .fixture-shell {
+        display: grid;
+        gap: 1.25rem;
+      }
+
+      .fixture-panel,
+      .fixture-target-shell {
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        border-radius: 1.5rem;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      }
+
+      .fixture-panel {
+        padding: 1.5rem;
+      }
+
+      .fixture-kicker {
+        margin: 0 0 0.4rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #0f766e;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 3rem);
+        line-height: 1.05;
+        color: #102d4f;
+      }
+
+      .fixture-copy,
+      .fixture-panel li,
+      .fixture-panel p {
+        line-height: 1.6;
+        color: #526a7e;
+      }
+
+      .fixture-contract {
+        display: grid;
+        gap: 0.55rem;
+        margin-top: 1rem;
+      }
+
+      .fixture-contract p {
+        margin: 0;
+      }
+
+      code,
+      pre {
+        font-family: "IBM Plex Mono", "Fira Code", monospace;
+      }
+
+      .fixture-target-shell {
+        padding: 1.25rem;
+      }
+
+      .fixture-target {
+        min-height: 24rem;
+      }
+
+      .fixture-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 0.8rem 1.2rem;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .fixture-destroy {
+        background: #17324a;
+        color: #fff;
+      }
+
+      .fixture-remount {
+        background: #dff4f2;
+        color: #0f766e;
+      }
+
+      .fixture-error {
+        margin-top: 0.85rem;
+        color: #b91c1c;
+      }
+
+      .fixture-snippet {
+        overflow-x: auto;
+        border-radius: 1rem;
+        background: #11263f;
+        color: #e8f0f6;
+        padding: 1rem;
+      }
+
+      @media (min-width: 960px) {
+        .fixture-shell {
+          grid-template-columns: minmax(18rem, 26rem) minmax(0, 1fr);
+          align-items: start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main data-testid="cross-origin-loader-fixture">
+      <div class="fixture-shell">
+        <section class="fixture-panel">
+          <p class="fixture-kicker">Cross-Origin Loader Fixture</p>
+          <h1>Team360 cross-origin loader fixture</h1>
+          <p class="fixture-copy">
+            Host externo controlado en puerto separado que carga el loader remoto desde
+            <code>127.0.0.1:3050</code> y llama la API Team360 en <code>127.0.0.1:7050</code>.
+          </p>
+
+          <ul>
+            <li><strong>Host:</strong> <code data-testid="fixture-host-origin"></code></li>
+            <li><strong>Manifest:</strong> <code data-testid="fixture-manifest-url">http://127.0.0.1:3050/embed/team360-diagnosticador.manifest.json</code></li>
+            <li><strong>Loader:</strong> <code data-testid="fixture-loader-url">http://127.0.0.1:3050/embed/team360-diagnosticador-loader.js</code></li>
+            <li><strong>Asset:</strong> <code data-testid="fixture-asset-url">http://127.0.0.1:3050/embed/team360-diagnosticador.js</code></li>
+            <li><strong>Session key:</strong> <code>team360.embed.cross_origin.fixture.session.v1</code></li>
+          </ul>
+
+          <div class="fixture-contract" data-testid="fixture-contract">
+            <p><strong>Loader status:</strong> <span data-testid="fixture-status">pending</span></p>
+            <p><strong>Loader version:</strong> <span data-testid="fixture-loader-version">pending</span></p>
+            <p><strong>Global version:</strong> <span data-testid="fixture-global-version">pending</span></p>
+            <p><strong>Destroy support:</strong> <span data-testid="fixture-destroy-support">pending</span></p>
+            <p><strong>Last action:</strong> <span data-testid="fixture-last-action">pending</span></p>
+          </div>
+
+          <pre class="fixture-snippet"><code>&lt;script type="module" src="http://127.0.0.1:3050/embed/team360-diagnosticador-loader.js"&gt;&lt;/script&gt;
+&lt;script type="module"&gt;
+  await window.Team360DiagnosticadorLoader.load({
+    manifestUrl: "http://127.0.0.1:3050/embed/team360-diagnosticador.manifest.json"
+  });
+  const handle = window.Team360Diagnosticador.mount("#team360-diagnosticador-root", {
+    clientId: "local_embed_demo",
+    apiBaseUrl: "http://127.0.0.1:7050/api",
+    assistantName: "Vera",
+    sessionStorageKey: "team360.embed.cross_origin.fixture.session.v1"
+  });
+&lt;/script&gt;</code></pre>
+        </section>
+
+        <section class="fixture-target-shell" data-testid="fixture-target-shell">
+          <div
+            id="team360-diagnosticador-root"
+            class="fixture-target"
+            data-testid="fixture-target"
+          ></div>
+
+          <div class="fixture-controls">
+            <button
+              type="button"
+              class="fixture-destroy"
+              data-testid="fixture-destroy"
+            >
+              Destroy fixture
+            </button>
+            <button
+              type="button"
+              class="fixture-remount"
+              data-testid="fixture-remount"
+            >
+              Remount fixture
+            </button>
+          </div>
+
+          <p class="fixture-error" data-testid="fixture-error" hidden></p>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="http://127.0.0.1:3050/embed/team360-diagnosticador-loader.js"></script>
+    <script type="module">
+      const FIXTURE_CONFIG = Object.freeze({
+        clientId: "local_embed_demo",
+        apiBaseUrl: "http://127.0.0.1:7050/api",
+        assistantName: "Vera",
+        compact: false,
+        sessionStorageKey: "team360.embed.cross_origin.fixture.session.v1",
+      });
+
+      const FIXTURE_STATE = {
+        handle: null,
+        mountCount: 0,
+        lastError: "",
+      };
+
+      const statusNode = document.querySelector('[data-testid="fixture-status"]');
+      const loaderVersionNode = document.querySelector('[data-testid="fixture-loader-version"]');
+      const globalVersionNode = document.querySelector('[data-testid="fixture-global-version"]');
+      const destroySupportNode = document.querySelector('[data-testid="fixture-destroy-support"]');
+      const lastActionNode = document.querySelector('[data-testid="fixture-last-action"]');
+      const errorNode = document.querySelector('[data-testid="fixture-error"]');
+      const destroyButton = document.querySelector('[data-testid="fixture-destroy"]');
+      const remountButton = document.querySelector('[data-testid="fixture-remount"]');
+      const hostOriginNode = document.querySelector('[data-testid="fixture-host-origin"]');
+      const targetSelector = "#team360-diagnosticador-root";
+
+      function setText(node, value) {
+        if (node instanceof HTMLElement) {
+          node.textContent = value;
+        }
+      }
+
+      function setError(message) {
+        FIXTURE_STATE.lastError = message;
+        if (!(errorNode instanceof HTMLElement)) return;
+        if (!message) {
+          errorNode.hidden = true;
+          errorNode.textContent = "";
+          return;
+        }
+        errorNode.hidden = false;
+        errorNode.textContent = message;
+      }
+
+      function updateMountMetadata(action) {
+        FIXTURE_STATE.mountCount += 1;
+        setText(statusNode, "mounted");
+        setText(lastActionNode, action);
+        setText(
+          destroySupportNode,
+          typeof FIXTURE_STATE.handle?.destroy === "function" ? "function" : "missing",
+        );
+      }
+
+      async function mountFixture() {
+        setError("");
+        setText(statusNode, "loading");
+        setText(lastActionNode, "load");
+
+        await window.Team360DiagnosticadorLoader.load({
+          manifestUrl: "http://127.0.0.1:3050/embed/team360-diagnosticador.manifest.json",
+        });
+
+        if (!window.Team360Diagnosticador?.mount) {
+          throw new Error("Team360Diagnosticador browser asset did not expose mount().");
+        }
+
+        setText(loaderVersionNode, window.Team360DiagnosticadorLoader?.version ?? "unknown");
+        setText(globalVersionNode, window.Team360Diagnosticador.version ?? "unknown");
+        FIXTURE_STATE.handle = window.Team360Diagnosticador.mount(targetSelector, FIXTURE_CONFIG);
+        updateMountMetadata(FIXTURE_STATE.mountCount === 0 ? "initial-mount" : "remount");
+        return FIXTURE_STATE.handle;
+      }
+
+      function destroyFixture() {
+        if (!FIXTURE_STATE.handle || typeof FIXTURE_STATE.handle.destroy !== "function") {
+          setText(lastActionNode, "destroy-missing");
+          return false;
+        }
+
+        FIXTURE_STATE.handle.destroy();
+        FIXTURE_STATE.handle = null;
+        setText(statusNode, "destroyed");
+        setText(lastActionNode, "destroy");
+        return true;
+      }
+
+      destroyButton?.addEventListener("click", () => {
+        try {
+          destroyFixture();
+          setError("");
+        } catch (error) {
+          setError(error instanceof Error ? error.message : String(error));
+        }
+      });
+
+      remountButton?.addEventListener("click", async () => {
+        try {
+          destroyFixture();
+          await mountFixture();
+        } catch (error) {
+          setError(error instanceof Error ? error.message : String(error));
+        }
+      });
+
+      window.__team360CrossOriginFixture = {
+        mount: mountFixture,
+        destroy: destroyFixture,
+        getState: () => ({
+          mountCount: FIXTURE_STATE.mountCount,
+          lastError: FIXTURE_STATE.lastError,
+          hasHandle: Boolean(FIXTURE_STATE.handle),
+        }),
+      };
+
+      setText(hostOriginNode, window.location.origin);
+
+      try {
+        await mountFixture();
+      } catch (error) {
+        setText(statusNode, "error");
+        setText(lastActionNode, "mount-error");
+        setError(error instanceof Error ? error.message : String(error));
+      }
+    </script>
+  </body>
+</html>

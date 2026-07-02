@@ -88,6 +88,10 @@ def create_app() -> Litestar:
             allow_origins=[
                 "http://localhost:3050",
                 "http://127.0.0.1:3050",
+                "http://localhost:3060",
+                "http://127.0.0.1:3060",
+                "http://localhost:3061",
+                "http://127.0.0.1:3061",
             ],
             allow_methods=["*"],
             allow_headers=["*"],

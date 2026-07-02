@@ -173,6 +173,12 @@ Fixture 9C-ext:
 - no usa Astro ni Svelte para el host;
 - valida el consumo mas cercano a un tercero real same-origin sin bundler.
 
+Fixture 9D:
+
+- sirve el mismo flujo desde `http://127.0.0.1:3060`;
+- mantiene `loader + manifest + asset` en `3050`;
+- valida CORS del asset host y validacion exacta de `Origin` en `7050`.
+
 ## Configuracion permitida
 
 - `clientId`

@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-07-02 (Fase 9C-ext — browser loader fixture externo real)
+Ultima actualizacion: 2026-07-02 (Fase 9D-ext — cross-origin loader fixture controlado)
 
 ## Estado general
 
@@ -11,6 +11,27 @@ Ultima actualizacion: 2026-07-02 (Fase 9C-ext — browser loader fixture externo
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-07-02 — Fase 9D-ext — fixture cross-origin controlado
+
+Se agrego un host externo controlado en `3060/3061` para validar el loader
+publico del Diagnosticador con `Origin` real distinto de `3050`.
+
+- Fixture HTML nuevo:
+  `astro/e2e/fixtures/cross-origin-host/t360-cross-origin-loader.html`.
+- Nuevo E2E:
+  `e2e/diagnosticador-cross-origin-loader-fixture.spec.ts`.
+- Session key nueva:
+  `team360.embed.cross_origin.fixture.session.v1`.
+- `loader + manifest + asset` se mantienen en `3050`.
+- La API embed sigue en `7050`.
+- CORS backend local se amplio para `3060/3061` a fin de que el navegador pueda
+  recibir la respuesta.
+- `local_embed_demo.allowed_origins` se ajusto solo en la DB local para agregar
+  `http://127.0.0.1:3060`.
+- `3061` queda fuera de `allowed_origins` y se rechaza con `403`.
+- La capa fina de autorizacion sigue estando en PostgreSQL por `client_id`,
+  no en el host HTML.
 
 ### 2026-07-02 — Fase 9C-ext — validacion externa real del browser loader publico
 

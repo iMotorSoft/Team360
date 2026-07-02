@@ -37,6 +37,16 @@ Aplicacion local controlada validada el `2026-06-30`:
   - `http://localhost:3050`
 - secreto usado para smoke: no real, solo local
 
+Actualizacion controlada 9D (`2026-07-02`):
+
+- fixture cross-origin permitido local:
+  - `http://127.0.0.1:3060`
+- fixture cross-origin rechazado local:
+  - `http://127.0.0.1:3061`
+- el ajuste se hizo solo sobre `local_embed_demo.allowed_origins` en la DB
+  local de prueba;
+- `3061` se mantiene fuera de `allowed_origins` para validar rechazo `403`.
+
 Columnas operativas:
 
 - `client_id` — identificador publico del cliente embebible.

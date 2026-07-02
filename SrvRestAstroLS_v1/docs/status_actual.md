@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-07-02 (Fase 9C-ext — browser loader fixture externo real)
+Ultima actualizacion: 2026-07-02 (Fase 9D-ext — cross-origin loader fixture controlado)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -37,7 +37,58 @@ Estado: Fases 1 a 5 implementadas; confirmadas en `cdd1b1b`.
 ## Trabajo actual - Separacion factibilidad/implementacion
 
 Estado: Fase 7 a 9A implementadas y confirmadas en `15e3e98`. Fases 9B, 9C, 9D,
-9E y 9C-ext implementadas y validadas en este worktree.
+9E, 9C-ext y 9D-ext implementadas y validadas en este worktree.
+
+## Fase 9D-ext — fixture cross-origin controlado para validar Origin/CORS real
+
+Estado: IMPLEMENTADO Y VALIDADO. MCP limitado; gate efectivo con Playwright
+CLI sobre runtime fallback local.
+
+### Decision tecnica
+
+Se eligio host cross-origin controlado:
+
+- fixture HTML estatico fuera de `public/`, servido por test en `3060/3061`;
+- loader, manifest y asset remotos en `127.0.0.1:3050`;
+- API real en `127.0.0.1:7050`;
+- CORS backend local habilitado para `3050`, `3060` y `3061`;
+- `local_embed_demo.allowed_origins` actualizado solo en DB local para agregar
+  `http://127.0.0.1:3060`;
+- `3061` queda fuera de `allowed_origins` y se rechaza con `403`;
+- sin tocar `/t360`, `PublicVeraEntry.svelte` ni `global.js`.
+
+### Implementacion
+
+- nuevo fixture HTML:
+  `astro/e2e/fixtures/cross-origin-host/t360-cross-origin-loader.html`;
+- nueva session key aislada:
+  `team360.embed.cross_origin.fixture.session.v1`;
+- nuevo E2E:
+  `e2e/diagnosticador-cross-origin-loader-fixture.spec.ts`;
+- nueva documentacion:
+  `docs/diagnosticador_cross_origin_fixture_v1.md`.
+
+### Contrato validado
+
+- host permitido:
+  `http://127.0.0.1:3060/t360-cross-origin-loader.html`;
+- host rechazado:
+  `http://127.0.0.1:3061/t360-cross-origin-loader.html`;
+- `window.Team360DiagnosticadorLoader.load()`;
+- `window.Team360Diagnosticador.mount(...)`;
+- `destroy()` operativo;
+- `POST /api/diagnosis/embed/auth`;
+- `POST /api/diagnosis/turn` con `client_id`, `timestamp`,
+  `Origin` real y `X-T360-Signature`;
+- rechazo `403` para origin no permitido sin `turn` exitoso.
+
+### Seguridad
+
+- el fixture cross-origin no expone `hmac_secret`;
+- el fixture cross-origin no expone tenant/scope ni `allowed_origins`;
+- `3060` se habilita solo en la DB local del cliente de prueba;
+- `3061` queda fuera de `allowed_origins`;
+- la sesion del fixture no toca `team360.vera.session.v1`.
 
 ## Fase 9C-ext — validacion externa real del browser loader publico
 
