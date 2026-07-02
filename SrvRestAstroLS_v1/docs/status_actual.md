@@ -745,8 +745,7 @@ PostgreSQL persistente.
 
 - DB target verificada antes de aplicar: `postgresql://localhost:5432/team360`
   (usuario `administrator`, entorno local/controlado).
-- Backup logico minimo previo:
-  `backups/phase7c_pre_migration_20260630T122347Z.json`.
+- Backup logico minimo previo generado localmente, no versionado.
 - `public.embed_clients` no existia antes de la migracion; luego quedo creada y
   verificada.
 - Seed local insertado con UPSERT:

@@ -322,8 +322,7 @@ local/controlado, sin tocar `/t360` ni reiniciar servicios permanentes.
 
 - Migracion `008_create_embed_clients.sql` aplicada manualmente sobre DB local
   `team360` usando `psycopg`.
-- Backup logico minimo previo registrado en
-  `backups/phase7c_pre_migration_20260630T122347Z.json`.
+- Backup logico minimo previo generado localmente, no versionado.
 - Tabla `embed_clients` verificada post-migracion: columnas, indices y
   constraints compatibles con el contrato v1.
 - Seed local de prueba insertado con UPSERT:

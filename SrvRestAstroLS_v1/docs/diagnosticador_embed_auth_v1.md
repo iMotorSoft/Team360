@@ -30,7 +30,7 @@ Seed de ejemplo no automatico:
 Aplicacion local controlada validada el `2026-06-30`:
 
 - DB target: `team360` en `localhost:5432`
-- backup previo: `backups/phase7c_pre_migration_20260630T122347Z.json`
+- backup logico previo local no versionado
 - seed real de prueba insertado: `client_id=local_embed_demo`
 - origins locales permitidos:
   - `http://127.0.0.1:3050`
