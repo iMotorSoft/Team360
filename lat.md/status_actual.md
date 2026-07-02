@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-07-02 (Fase 9D-ext — cross-origin loader fixture controlado)
+Ultima actualizacion: 2026-07-02 (Fase 9F — integrity/checksum opcional para loader distribution)
 
 ## Estado general
 
@@ -11,6 +11,51 @@ Ultima actualizacion: 2026-07-02 (Fase 9D-ext — cross-origin loader fixture co
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-07-02 — Fase 9F — integrity/checksum opcional para loader distribution
+
+Se agrego metadata de integridad opcional al distribuble publico
+`manifest + loader + asset` sin cambiar la API browser del embed.
+
+- El manifest estable sigue en:
+  - `/embed/team360-diagnosticador.manifest.json`;
+  - `/embed/team360-diagnosticador-loader.js`;
+  - `/embed/team360-diagnosticador.js`.
+- La API publica no cambia:
+  - `window.Team360DiagnosticadorLoader.load()`;
+  - `window.Team360Diagnosticador.mount(...)`.
+- Se eligio Opcion C:
+  - `entrySha256` y `loaderSha256` en hex;
+  - `entryIntegrity` y `loaderIntegrity` en formato SRI `sha256-...`.
+- No se fuerza todavia enforcement runtime del asset dinamico cargado por el
+  loader.
+- `loader` se hashea desde `public/embed/`.
+- `entry` se hashea desde `dist/embed/` porque lo emite Vite en build.
+- Helper nuevo:
+  `astro/scripts/update-embed-integrity.mjs`.
+- El helper exige `build`, valida que `loader public == dist` y sincroniza:
+  - `public/embed/team360-diagnosticador.manifest.json`;
+  - `dist/embed/team360-diagnosticador.manifest.json`.
+- Spec endurecido:
+  `e2e/diagnosticador-loader-manifest.spec.ts`.
+- Documentacion nueva:
+  `docs/diagnosticador_loader_integrity_v1.md`.
+- Validacion:
+  - backend focal `83/83 PASS`;
+  - backend full `1089 PASS, 9 skipped`;
+  - `pnpm check` PASS;
+  - `pnpm build` PASS, `146 page(s)`;
+  - manifest checksum spec: `2 passed`;
+  - regresion loader/fixture/cross-origin/mount/external/embed:
+    `8 passed`;
+  - suite focalizada Vera/lab/embed/external/mount/loader/fixture/manifest:
+    `22 passed, 2 skipped`.
+- Manifest/loader/asset estables no contienen tenant/scope ni
+  `hmac_secret`.
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` se preservan sin cambios.
+- MCP `http://localhost:8931/mcp` siguio reachable por HTTP (`400 Bad Request`)
+  pero sin herramientas navegables expuestas; cierre efectivo con Playwright
+  CLI.
 
 ### 2026-07-02 — Fase 9D-ext — fixture cross-origin controlado
 

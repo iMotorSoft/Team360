@@ -10,6 +10,9 @@ Regla central:
 > El distribuble estable de esta fase es `manifest + loader + asset`, no un SDK
 > nuevo.
 
+Fase 9F agrega metadata de integridad opcional al manifest para verificar
+`loader + asset` sin cambiar la API publica del embed.
+
 ## URLs publicas estables
 
 ```text
@@ -59,7 +62,11 @@ Campos minimos actuales:
   "channel": "experimental",
   "asset": "/embed/team360-diagnosticador.js",
   "entry": "/embed/team360-diagnosticador.js",
+  "entrySha256": "<hex>",
+  "entryIntegrity": "sha256-<base64>",
   "loader": "/embed/team360-diagnosticador-loader.js",
+  "loaderSha256": "<hex>",
+  "loaderIntegrity": "sha256-<base64>",
   "format": "browser-global",
   "global": "Team360Diagnosticador"
 }
@@ -69,6 +76,10 @@ Notas:
 
 - `asset` se conserva por compatibilidad hacia atras.
 - `entry` explicita el contrato de distribucion nuevo.
+- `entrySha256` y `loaderSha256` permiten verificacion reproducible fuera del
+  runtime.
+- `entryIntegrity` y `loaderIntegrity` usan formato SRI compatible con
+  `integrity="sha256-..."`.
 - `version = 0.9.0-experimental` sigue siendo experimental y no implica SDK
   estable.
 
@@ -86,6 +97,8 @@ Semantica actual:
 
 ## Snippet externo copiable
 
+Opcion simple:
+
 ```html
 <div id="team360-diagnosticador"></div>
 <script type="module" src="/embed/team360-diagnosticador-loader.js"></script>
@@ -99,6 +112,40 @@ Semantica actual:
   });
 </script>
 ```
+
+Opcion con integrity para el loader:
+
+```html
+<div id="team360-diagnosticador"></div>
+<script
+  type="module"
+  src="https://team360.live/embed/team360-diagnosticador-loader.js"
+  integrity="sha256-..."
+  crossorigin="anonymous"
+></script>
+<script type="module">
+  await window.Team360DiagnosticadorLoader.load({
+    manifestUrl: "https://team360.live/embed/team360-diagnosticador.manifest.json"
+  });
+  window.Team360Diagnosticador.mount("#team360-diagnosticador", {
+    clientId: "local_embed_demo",
+    apiBaseUrl: "http://127.0.0.1:7050/api",
+    assistantName: "Vera",
+    sessionStorageKey: "team360.embed.client.session.v1"
+  });
+</script>
+```
+
+Notas del snippet:
+
+- el valor real de `integrity` debe salir de `loaderIntegrity` en el manifest;
+- para entorno local usar `http://127.0.0.1:3050`;
+- `clientId` es publico y no reemplaza la validacion server-side;
+- `hmac_secret` nunca se entrega al host;
+- tenant, scope y `allowed_origins` se administran server-side;
+- el loader no fuerza todavia verificacion runtime del `entryIntegrity`; esa
+  metadata queda disponible para verificacion offline o consumo directo del
+  asset estable.
 
 ## Compatibilidad
 
@@ -129,5 +176,23 @@ Gate efectivo:
 - sin Web Component final;
 - sin Shadow DOM;
 - sin eventos publicos estables;
-- sin integrity/checksum automatizado;
+- sin enforcement runtime automatico de SRI sobre el asset cargado por el
+  loader;
 - sin CSS encapsulado final.
+
+## Recalculo
+
+Helper interno:
+
+```bash
+cd SrvRestAstroLS_v1/astro
+corepack pnpm build
+node scripts/update-embed-integrity.mjs
+```
+
+El helper recalcula `SHA-256` para:
+
+- `public/embed/team360-diagnosticador-loader.js`;
+- `dist/embed/team360-diagnosticador.js`;
+
+y sincroniza el manifest de `public/embed` y `dist/embed`.

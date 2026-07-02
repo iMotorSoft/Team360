@@ -1,8 +1,17 @@
 import { expect, test } from "@playwright/test";
+import { createHash } from "node:crypto";
 
 const MANIFEST_URL = "/embed/team360-diagnosticador.manifest.json";
 const LOADER_URL = "/embed/team360-diagnosticador-loader.js";
 const ASSET_URL = "/embed/team360-diagnosticador.js";
+
+function toSha256(buffer: Buffer) {
+  const digest = createHash("sha256").update(buffer).digest();
+  return {
+    hex: digest.toString("hex"),
+    integrity: `sha256-${digest.toString("base64")}`,
+  };
+}
 
 test.describe("Diagnosticador Loader Manifest", () => {
   test("publica manifest + loader + asset con contrato minimo e idempotencia", async ({
@@ -14,12 +23,26 @@ test.describe("Diagnosticador Loader Manifest", () => {
 
     const manifestText = await manifestResponse.text();
     const manifest = JSON.parse(manifestText) as Record<string, unknown>;
+    const loaderResponse = await request.get(LOADER_URL);
+    const assetResponse = await request.get(ASSET_URL);
+
+    expect(loaderResponse.status()).toBe(200);
+    expect(assetResponse.status()).toBe(200);
+
+    const loaderBuffer = Buffer.from(await loaderResponse.body());
+    const assetBuffer = Buffer.from(await assetResponse.body());
+    const loaderDigest = toSha256(loaderBuffer);
+    const assetDigest = toSha256(assetBuffer);
 
     expect(manifest).toMatchObject({
       name: "team360-diagnosticador",
       version: "0.9.0-experimental",
       entry: ASSET_URL,
+      entrySha256: assetDigest.hex,
+      entryIntegrity: assetDigest.integrity,
       loader: LOADER_URL,
+      loaderSha256: loaderDigest.hex,
+      loaderIntegrity: loaderDigest.integrity,
       format: "browser-global",
       global: "Team360Diagnosticador",
     });
@@ -38,17 +61,21 @@ test.describe("Diagnosticador Loader Manifest", () => {
       expect(manifestText).not.toContain(forbiddenText);
     }
 
-    const loaderResponse = await request.get(LOADER_URL);
-    expect(loaderResponse.status()).toBe(200);
-    const loaderText = await loaderResponse.text();
+    const loaderText = loaderBuffer.toString("utf-8");
     expect(loaderText).toContain("Team360DiagnosticadorLoader");
     expect(loaderText).not.toContain("hmac_secret");
+    expect(loaderText).not.toContain("organization_code");
+    expect(loaderText).not.toContain("workspace_code");
+    expect(loaderText).not.toContain("package_code");
+    expect(loaderText).not.toContain("knowledge_scope_code");
 
-    const assetResponse = await request.get(ASSET_URL);
-    expect(assetResponse.status()).toBe(200);
-    const assetText = await assetResponse.text();
+    const assetText = assetBuffer.toString("utf-8");
     expect(assetText).toContain("Team360Diagnosticador");
     expect(assetText).not.toContain("hmac_secret");
+    expect(assetText).not.toContain("organization_code");
+    expect(assetText).not.toContain("workspace_code");
+    expect(assetText).not.toContain("package_code");
+    expect(assetText).not.toContain("knowledge_scope_code");
 
     await page.goto("/");
     await page.setContent(

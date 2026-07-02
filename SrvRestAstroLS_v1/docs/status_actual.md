@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-07-02 (Fase 9E — contrato publico de distribucion endurecido)
+Ultima actualizacion: 2026-07-02 (Fase 9F — integrity/checksum opcional para loader distribution)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -37,7 +37,118 @@ Estado: Fases 1 a 5 implementadas; confirmadas en `cdd1b1b`.
 ## Trabajo actual - Separacion factibilidad/implementacion
 
 Estado: Fase 7 a 9A implementadas y confirmadas en `15e3e98`. Fases 9B, 9C, 9D,
-9E, 9C-ext y 9D-ext implementadas y validadas en este worktree.
+9E, 9C-ext, 9D-ext y 9F implementadas y validadas en este worktree.
+
+## Fase 9F — integrity/checksum opcional para loader distribution
+
+Estado: IMPLEMENTADO Y VALIDADO. MCP limitado; gate efectivo con Playwright
+CLI sobre runtime fallback local.
+
+### Decision tecnica
+
+Se eligio Opcion C:
+
+- checksums `SHA-256` hex en manifest;
+- SRI `sha256-...` en manifest;
+- sin enforcement runtime del asset dinamico cargado por el loader;
+- helper deterministico para recalculo despues de `build`;
+- sin tocar `/t360`, `PublicVeraEntry.svelte` ni `global.js`.
+
+### Implementacion
+
+- manifest actualizado:
+  `astro/public/embed/team360-diagnosticador.manifest.json`;
+- helper nuevo:
+  `astro/scripts/update-embed-integrity.mjs`;
+- spec endurecido:
+  `e2e/diagnosticador-loader-manifest.spec.ts`;
+- documentacion nueva:
+  `docs/diagnosticador_loader_integrity_v1.md`;
+- documentacion actualizada:
+  - `docs/diagnosticador_loader_distribution_v1.md`;
+  - `docs/diagnosticador_loader_manifest_v1.md`.
+
+### Contrato de integridad
+
+Campos nuevos en el manifest:
+
+- `entrySha256`;
+- `entryIntegrity`;
+- `loaderSha256`;
+- `loaderIntegrity`.
+
+Fuente de verdad:
+
+- `loader`: `public/embed/team360-diagnosticador-loader.js`;
+- `entry`: `dist/embed/team360-diagnosticador.js`.
+
+### Snippet externo
+
+Se documentan dos caminos:
+
+- simple:
+  `<script type="module" src="https://team360.live/embed/team360-diagnosticador-loader.js"></script>`;
+- con integrity:
+  `<script type="module" src="https://team360.live/embed/team360-diagnosticador-loader.js" integrity="sha256-..." crossorigin="anonymous"></script>`.
+
+Notas:
+
+- `loaderIntegrity` sale del manifest;
+- `clientId` es publico;
+- `hmac_secret` nunca se entrega;
+- tenant/scope y `allowed_origins` quedan server-side.
+
+### Validacion 9F
+
+Preflight:
+
+- Git limpio al inicio: PASS.
+- DB real:
+  - `embed_clients`: presente;
+  - `local_embed_demo`: activo;
+  - `allowed_origins`: `127.0.0.1:3050`, `localhost:3050`, `127.0.0.1:3060`;
+  - secret presente (sin imprimirlo).
+- Runtime local:
+  - `backend-dev.sh`: PASS;
+  - fallback estatico local sobre `astro/dist` en `3050` con proxy `/api` a
+    `127.0.0.1:7050`: PASS.
+
+Backend:
+
+- `uv run pytest tests/test_diagnosis_public_router.py tests/test_embed_clients_contract.py`:
+  `83/83 PASS`.
+- `uv run pytest tests/ -x --ignore=tests/test_db_module.py`:
+  `1089 PASS, 9 skipped`.
+
+Frontend:
+
+- `pnpm check`: `0 errors`, `0 warnings`, `5 hints`.
+- `pnpm build`: `146 pages`.
+- helper:
+  `node scripts/update-embed-integrity.mjs`: PASS.
+
+Playwright CLI local (`PLAYWRIGHT_BASE_URL=http://127.0.0.1:3050`):
+
+- `e2e/diagnosticador-loader-manifest.spec.ts`:
+  `2 PASS`.
+- `loader-manifest + fixture + cross-origin + mount + external + embed`:
+  `8 PASS`.
+- suite focalizada con Vera/lab/embed/external/mount/loader/fixture/manifest:
+  `22 PASS, 2 skipped`.
+
+Seguridad:
+
+- manifest/loader/asset estables no contienen `hmac_secret`;
+- manifest/loader/asset estables no contienen tenant, scope ni
+  `allowed_origins`;
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` siguen sin cambios.
+
+MCP:
+
+- endpoint intentado: `http://localhost:8931/mcp`;
+- reachability HTTP: `400 Bad Request`;
+- sin herramientas MCP navegables expuestas en esta sesion;
+- cierre efectivo con Playwright CLI.
 
 ## Fase 9D-ext — fixture cross-origin controlado para validar Origin/CORS real
 

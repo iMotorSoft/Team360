@@ -76,7 +76,11 @@ Contenido actual:
   "channel": "experimental",
   "asset": "/embed/team360-diagnosticador.js",
   "entry": "/embed/team360-diagnosticador.js",
+  "entrySha256": "<hex>",
+  "entryIntegrity": "sha256-<base64>",
   "loader": "/embed/team360-diagnosticador-loader.js",
+  "loaderSha256": "<hex>",
+  "loaderIntegrity": "sha256-<base64>",
   "format": "browser-global",
   "global": "Team360Diagnosticador",
   "api": {
@@ -95,6 +99,9 @@ Notas:
 
 - `asset` se conserva por compatibilidad con los fixtures previos;
 - `entry` formaliza la ruta de distribucion publica estable;
+- `entrySha256` y `loaderSha256` publican checksum reproducible;
+- `entryIntegrity` y `loaderIntegrity` publican SRI listo para snippets
+  externos;
 - `format = browser-global` explicita que el host espera globals, no package ni
   import map.
 
@@ -179,6 +186,34 @@ Camino loader:
   });
 </script>
 ```
+
+Camino loader con integrity:
+
+```html
+<script
+  type="module"
+  src="https://team360.live/embed/team360-diagnosticador-loader.js"
+  integrity="sha256-..."
+  crossorigin="anonymous"
+></script>
+<script type="module">
+  await window.Team360DiagnosticadorLoader.load({
+    manifestUrl: "https://team360.live/embed/team360-diagnosticador.manifest.json"
+  });
+  window.Team360Diagnosticador.mount("#target", {
+    clientId: "local_embed_demo",
+    apiBaseUrl: "http://127.0.0.1:7050/api",
+    sessionStorageKey: "team360.embed.loader.demo.session.v1"
+  });
+</script>
+```
+
+Notas del consumo:
+
+- el valor real de `integrity` debe leerse desde `loaderIntegrity`;
+- `entryIntegrity` queda disponible para verificacion offline o para consumo
+  directo del asset estable;
+- el loader actual no aplica enforcement runtime del asset dinamico.
 
 Fixture 9C-ext:
 
@@ -267,6 +302,7 @@ Playwright CLI:
 Ver tambien:
 
 - `docs/diagnosticador_loader_distribution_v1.md`
+- `docs/diagnosticador_loader_integrity_v1.md`
 
 ## Limitaciones v1
 
@@ -278,7 +314,15 @@ Ver tambien:
 - el loader sigue dependiendo del asset estable `team360-diagnosticador.js`;
 - el asset estable sigue dependiendo de chunks compartidos `/_astro/*`.
 
+## Recalculo
+
+```bash
+cd SrvRestAstroLS_v1/astro
+corepack pnpm build
+node scripts/update-embed-integrity.mjs
+```
+
 ## Proxima fase sugerida
 
-Fase 9F: empaquetado externo controlado del loader/asset con metadata de
-compatibilidad y versionado mas consistente entre manifest, loader y global.
+Fase chica siguiente: consumo directo del asset estable con enforcement opt-in
+del `entryIntegrity`, sin romper el loader actual ni los fixtures existentes.
