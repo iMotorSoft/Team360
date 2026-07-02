@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-07-01 (Fase 9E — manifest/loader externo minimo)
+Ultima actualizacion: 2026-07-02 (Fase 9C-ext — browser loader fixture externo real)
 
 ## Estado general
 
@@ -11,6 +11,52 @@ Ultima actualizacion: 2026-07-01 (Fase 9E — manifest/loader externo minimo)
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-07-02 — Fase 9C-ext — validacion externa real del browser loader publico
+
+Se agrego un fixture HTML estatico controlado para validar el loader publico
+del Diagnosticador como lo consumiria un tercero real: `div` + `script` +
+config minima, sin Astro/Svelte en la pagina host.
+
+- Fixture externo same-origin:
+  `/embed-fixtures/t360-external-loader.html`.
+- Reusa las tres rutas publicas existentes:
+  - `/embed/team360-diagnosticador.manifest.json`;
+  - `/embed/team360-diagnosticador-loader.js`;
+  - `/embed/team360-diagnosticador.js`.
+- Session key nueva:
+  `team360.embed.loader.fixture.session.v1`.
+- Nuevo E2E:
+  `e2e/diagnosticador-browser-loader-fixture.spec.ts`.
+- Validacion del fixture:
+  - `window.Team360DiagnosticadorLoader.load()`;
+  - `window.Team360Diagnosticador.mount(...)`;
+  - `destroy()` operativo;
+  - `POST /api/diagnosis/embed/auth`;
+  - `POST /api/diagnosis/turn`;
+  - `client_id`, `timestamp` y `X-T360-Signature`;
+  - rechazo de config invalida sin requests extra;
+  - aislamiento contra `team360.vera.session.v1`,
+    `team360.embed.mount.demo.session.v1` y
+    `team360.embed.external.demo.session.v1`.
+- El fixture HTML y `dist/embed-fixtures/` no contienen tenant/scope ni
+  `hmac_secret`.
+- La busqueda amplia sobre `dist/` sigue mostrando strings tecnicos
+  preexistentes en bundles compartidos del proyecto, fuera del alcance de esta
+  fase.
+- Validacion:
+  - backend focal `83/83 PASS`;
+  - backend full `1089 PASS, 9 skipped`;
+  - `pnpm check` PASS;
+  - `pnpm build` PASS, `146 page(s)`;
+  - fixture spec aislado: `1 passed`;
+  - regresion corta fixture/loader/mount/external/embed:
+    `5 passed`;
+  - suite focalizada Vera/lab/embed/external/mount/loader/fixture:
+    `19 passed, 2 skipped`.
+- MCP `http://localhost:8931/mcp` siguio reachable por HTTP (`400 Bad Request`)
+  pero sin herramientas navegables expuestas; cierre efectivo con Playwright
+  CLI.
 
 ### 2026-07-01 — Fase 9E — manifest/loader externo minimo con versionado explicito
 

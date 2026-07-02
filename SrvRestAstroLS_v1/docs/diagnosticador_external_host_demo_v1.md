@@ -135,6 +135,16 @@ Cobertura del nuevo E2E:
 - las cuatro variantes (`external`, `mount`, `script`, `asset`) validan el
   mismo contrato embed auth -> turn.
 
+## Relacion con 9C-ext
+
+- 9C-ext agrega `/embed-fixtures/t360-external-loader.html`;
+- a diferencia de este host Astro, el fixture nuevo vive en `public/` como HTML
+  estatico puro;
+- consume `manifest + loader + asset` publicos y monta via
+  `window.Team360Diagnosticador.mount(...)`;
+- ambos validan el mismo contrato embed auth -> turn, pero el fixture 9C-ext
+  es la referencia mas cercana a un host tercero sin bundler.
+
 ## Actualizacion 9A-Fix
 
 - el bloqueo previo de 9A no era del adapter externo;

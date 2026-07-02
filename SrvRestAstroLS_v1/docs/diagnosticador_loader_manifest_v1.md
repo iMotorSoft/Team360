@@ -25,6 +25,12 @@ Ruta demo:
 /t360-loader-demo
 ```
 
+Fixture externo relacionado:
+
+```text
+/embed-fixtures/t360-external-loader.html
+```
+
 ## Versionado explicito
 
 Manifest:
@@ -161,6 +167,12 @@ Camino loader:
 </script>
 ```
 
+Fixture 9C-ext:
+
+- sirve ese mismo flujo desde HTML estatico en `public/embed-fixtures/`;
+- no usa Astro ni Svelte para el host;
+- valida el consumo mas cercano a un tercero real same-origin sin bundler.
+
 ## Configuracion permitida
 
 - `clientId`
@@ -228,8 +240,9 @@ Frontend:
 Playwright CLI:
 
 - `e2e/diagnosticador-loader-demo.spec.ts`
+- `e2e/diagnosticador-browser-loader-fixture.spec.ts`
 - regresion corta con asset/script/mount/external/embed
-- suite focalizada Vera/lab/embed/external/mount/script/asset/loader
+- suite focalizada Vera/lab/embed/external/mount/script/asset/loader/fixture
 
 ## Limitaciones v1
 

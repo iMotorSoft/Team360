@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-07-01 (Fase 9E — manifest/loader externo minimo)
+Ultima actualizacion: 2026-07-02 (Fase 9C-ext — browser loader fixture externo real)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -36,8 +36,115 @@ Estado: Fases 1 a 5 implementadas; confirmadas en `cdd1b1b`.
 
 ## Trabajo actual - Separacion factibilidad/implementacion
 
-Estado: Fase 7 a 9A implementadas y confirmadas en `15e3e98`. Fases 9B, 9C, 9D
-y 9E implementadas y validadas en este worktree.
+Estado: Fase 7 a 9A implementadas y confirmadas en `15e3e98`. Fases 9B, 9C, 9D,
+9E y 9C-ext implementadas y validadas en este worktree.
+
+## Fase 9C-ext — validacion externa real del browser loader publico
+
+Estado: IMPLEMENTADO Y VALIDADO. MCP limitado; gate efectivo con Playwright
+CLI sobre runtime fallback local.
+
+### Decision tecnica
+
+Se eligio Opcion A same-origin:
+
+- fixture HTML estatico en `astro/public/embed-fixtures/`;
+- mismo origin `127.0.0.1:3050` ya permitido por `embed_clients`;
+- sin tocar DB ni `allowed_origins`;
+- sin npm/package;
+- sin Web Component;
+- sin tocar `/t360`, `PublicVeraEntry.svelte` ni `global.js`.
+
+### Implementacion
+
+- nuevo fixture HTML:
+  `astro/public/embed-fixtures/t360-external-loader.html`;
+- nueva session key aislada:
+  `team360.embed.loader.fixture.session.v1`;
+- nuevo E2E:
+  `e2e/diagnosticador-browser-loader-fixture.spec.ts`;
+- nueva documentacion:
+  `docs/diagnosticador_browser_loader_fixture_v1.md`.
+
+### URLs locales validadas
+
+- fixture:
+  `/embed-fixtures/t360-external-loader.html`
+- manifest:
+  `/embed/team360-diagnosticador.manifest.json`
+- loader:
+  `/embed/team360-diagnosticador-loader.js`
+- asset:
+  `/embed/team360-diagnosticador.js`
+
+### Contrato validado
+
+- host HTML de tercero controlado con `div + script`;
+- `window.Team360DiagnosticadorLoader.load()`;
+- `window.Team360Diagnosticador.mount(...)`;
+- `destroy()` operativo;
+- `POST /api/diagnosis/embed/auth`;
+- `POST /api/diagnosis/turn` con `client_id`, `timestamp` y
+  `X-T360-Signature`;
+- rechazo de `mount()` sin `clientId` sin requests extra.
+
+### Seguridad
+
+- el fixture HTML no expone `hmac_secret`;
+- el fixture HTML no expone tenant/scope ni `allowed_origins`;
+- `public/embed-fixtures/` y `dist/embed-fixtures/` no contienen tenant/scope;
+- la busqueda amplia sobre `dist/` sigue mostrando strings tecnicos
+  preexistentes en bundles compartidos del proyecto, fuera del alcance de esta
+  fase;
+- el fixture no toca `team360.vera.session.v1`,
+  `team360.embed.mount.demo.session.v1` ni
+  `team360.embed.external.demo.session.v1`.
+
+### Validacion 9C-ext
+
+Preflight:
+
+- Git limpio al inicio: PASS.
+- DB real:
+  - `embed_clients`: presente;
+  - seed `local_embed_demo`: activo;
+  - `allowed_origins`: `127.0.0.1:3050` y `localhost:3050`;
+  - secret presente (sin imprimirlo).
+
+Backend:
+
+- `uv run pytest tests/test_diagnosis_public_router.py tests/test_embed_clients_contract.py`:
+  83/83 PASS.
+- `uv run pytest tests/ -x --ignore=tests/test_db_module.py`:
+  1089 PASS, 9 skipped.
+
+Frontend:
+
+- `pnpm check`: 0 errors, 0 warnings, 5 hints.
+- `pnpm build`: 146 pages.
+
+Playwright CLI local (`PLAYWRIGHT_BASE_URL=http://127.0.0.1:3050`):
+
+- `e2e/diagnosticador-browser-loader-fixture.spec.ts`:
+  1 PASS.
+- `fixture + loader + mount + external + embed`:
+  5 PASS.
+- suite focalizada con Vera/lab/embed/external/mount/loader/fixture:
+  19 PASS, 2 skipped.
+
+Runtime local:
+
+- `backend-dev.sh`: PASS.
+- fallback usado para Playwright CLI: backend real `7050` + servidor estatico
+  local sobre `astro/dist` con proxy `/api` a `127.0.0.1:7050`.
+- `curl -I /embed-fixtures/t360-external-loader.html`: 200 OK.
+
+MCP:
+
+- endpoint intentado: `http://localhost:8931/mcp`;
+- reachability HTTP: `400 Bad Request`;
+- sin herramientas MCP navegables expuestas en esta sesion;
+- cierre efectivo con Playwright CLI.
 
 ## Fase 9E — manifest/loader externo minimo con versionado explicito
 
