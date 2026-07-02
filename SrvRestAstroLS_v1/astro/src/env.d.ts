@@ -5,7 +5,11 @@ import type { Team360DiagnosticadorBrowserGlobal } from "./lib/t360/embed/browse
 
 type Team360DiagnosticadorLoaderGlobal = {
   version: string;
-  load: (options?: { assetUrl?: string; manifestUrl?: string }) => Promise<Team360DiagnosticadorBrowserGlobal>;
+  load: (options?: {
+    assetUrl?: string;
+    manifestUrl?: string;
+    verifyEntryIntegrity?: boolean;
+  }) => Promise<Team360DiagnosticadorBrowserGlobal>;
   defaults: {
     assetUrl: string;
     manifestUrl: string;

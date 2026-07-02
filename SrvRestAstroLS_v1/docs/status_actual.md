@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-07-02 (Fase 9F — integrity/checksum opcional para loader distribution)
+Ultima actualizacion: 2026-07-02 (Fase 9G — enforcement opt-in de entryIntegrity en el loader)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -38,6 +38,91 @@ Estado: Fases 1 a 5 implementadas; confirmadas en `cdd1b1b`.
 
 Estado: Fase 7 a 9A implementadas y confirmadas en `15e3e98`. Fases 9B, 9C, 9D,
 9E, 9C-ext, 9D-ext y 9F implementadas y validadas en este worktree.
+
+## Fase 9G — enforcement opt-in de entryIntegrity en el loader
+
+Estado: IMPLEMENTADO Y VALIDADO. MCP limitado; gate efectivo con Playwright
+CLI sobre runtime fallback local.
+
+### Decision tecnica
+
+- `window.Team360DiagnosticadorLoader.load()` sigue compatible;
+- `window.Team360Diagnosticador.mount(...)` no cambia;
+- se agrega `verifyEntryIntegrity: true` como modo opt-in explicito;
+- el loader conserva el camino default sin enforcement;
+- en modo opt-in el loader aplica `integrity` y `crossorigin="anonymous"` al
+  script dinamico del entry;
+- si falta `entryIntegrity`, rechaza antes de cargar;
+- si el browser bloquea el entry por mismatch, rechaza con error controlado;
+- si el global ya existe, resuelve idempotente y no revalida esa carga previa.
+
+### Implementacion
+
+- loader actualizado:
+  `astro/public/embed/team360-diagnosticador-loader.js`;
+- typing actualizado:
+  `astro/src/env.d.ts`;
+- spec endurecido:
+  `e2e/diagnosticador-loader-manifest.spec.ts`;
+- documentacion nueva:
+  `docs/diagnosticador_loader_integrity_enforcement_v1.md`;
+- documentacion actualizada:
+  - `docs/diagnosticador_loader_distribution_v1.md`;
+  - `docs/diagnosticador_loader_manifest_v1.md`;
+  - `docs/diagnosticador_loader_integrity_v1.md`.
+
+### Validacion 9G
+
+Preflight:
+
+- Git limpio al inicio: PASS.
+- DB real:
+  - `embed_clients`: presente;
+  - `local_embed_demo`: activo;
+  - `allowed_origins`: `127.0.0.1:3050`, `localhost:3050`, `127.0.0.1:3060`;
+  - secret presente (sin imprimirlo).
+- Runtime local:
+  - `backend-dev.sh`: PASS;
+  - fallback estatico local sobre `astro/dist` en `3050` con proxy `/api` a
+    `127.0.0.1:7050`: PASS;
+  - assets `loader`, `manifest` y `entry` servidos con CORS abierto para
+    validar el fixture cross-origin.
+
+Backend:
+
+- `uv run pytest tests/test_diagnosis_public_router.py tests/test_embed_clients_contract.py`:
+  `83/83 PASS`.
+- `uv run pytest tests/ -x --ignore=tests/test_db_module.py`:
+  `1089 PASS, 9 skipped`.
+
+Frontend:
+
+- `pnpm check`: `0 errors`, `0 warnings`, `5 hints`.
+- `pnpm build`: `146 pages`.
+- helper:
+  `node scripts/update-embed-integrity.mjs`: PASS.
+
+Playwright CLI local (`PLAYWRIGHT_BASE_URL=http://127.0.0.1:3050`):
+
+- `e2e/diagnosticador-loader-manifest.spec.ts`:
+  `6 PASS`.
+- `loader-manifest + fixture + cross-origin + mount + external + embed`:
+  `12 PASS`.
+- suite focalizada con Vera/lab/embed/external/mount/loader/fixture/manifest:
+  `26 PASS, 2 skipped`.
+
+Seguridad:
+
+- manifest/loader/asset estables no contienen `hmac_secret`;
+- manifest/loader/asset estables no contienen tenant, scope ni
+  `allowed_origins`;
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` siguen sin cambios.
+
+MCP:
+
+- endpoint intentado: `http://localhost:8931/mcp`;
+- si no expone herramientas navegables en la sesion, el gate real sigue siendo
+  Playwright CLI.
 
 ## Fase 9F — integrity/checksum opcional para loader distribution
 

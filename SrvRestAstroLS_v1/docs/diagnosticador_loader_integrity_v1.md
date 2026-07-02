@@ -7,9 +7,8 @@ Documentar la metadata de integridad opcional del distribuble publico
 
 Regla central:
 
-> La integridad de 9F agrega confianza de distribucion. No cambia
-> `window.Team360DiagnosticadorLoader.load()` ni
-> `window.Team360Diagnosticador.mount(...)`.
+> La integridad de 9F agrega metadata de distribucion.
+> 9G agrega enforcement runtime opt-in del entry sin romper `load()`.
 
 ## URLs publicas
 
@@ -109,14 +108,22 @@ Notas:
 
 ## Runtime
 
-En 9F no se fuerza enforcement runtime del `entryIntegrity`.
+Default compatible:
 
-Motivo:
+- `load()` sin opciones no exige `entryIntegrity`;
+- el host sigue pudiendo usar solo `loaderIntegrity` en el `<script>` externo.
 
-- el loader actual hace `import(assetUrl)`;
-- aplicar SRI al asset dinamico agregaria complejidad cross-origin y no es
-  necesario para esta fase;
-- el manifest ya publica metadata suficiente para verificacion reproducible.
+Opt-in 9G:
+
+- `load({ verifyEntryIntegrity: true })` exige `entryIntegrity`;
+- el loader aplica `integrity` al script dinamico del entry;
+- el loader aplica `crossorigin="anonymous"` cuando usa integrity;
+- si `entryIntegrity` falta, rechaza;
+- si el browser bloquea el entry por mismatch, rechaza con error controlado.
+
+Detalle operativo:
+
+- `diagnosticador_loader_integrity_enforcement_v1.md`.
 
 ## Validacion
 
@@ -134,11 +141,14 @@ Cobertura:
   `loaderIntegrity`;
 - coincidencia real de digest contra `loader` y `asset` servidos;
 - ausencia de `hmac_secret`, tenant, scope y `allowed_origins`;
-- `load()` sigue funcionando e idempotente.
+- `load()` default sigue funcionando e idempotente;
+- `verifyEntryIntegrity` correcto aplica `integrity` y `crossorigin`;
+- falta de `entryIntegrity` rechaza;
+- `entryIntegrity` invalido rechaza.
 
 ## Limitaciones
 
 - sin package/npm;
 - sin Web Component;
-- sin enforcement runtime del asset dinamico;
+- enforcement runtime del entry solo opt-in;
 - sin politica de rotacion de integrity por publicacion automatizada.

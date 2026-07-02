@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-07-02 (Fase 9F — integrity/checksum opcional para loader distribution)
+Ultima actualizacion: 2026-07-02 (Fase 9G — enforcement opt-in de entryIntegrity en el loader)
 
 ## Estado general
 
@@ -11,6 +11,55 @@ Ultima actualizacion: 2026-07-02 (Fase 9F — integrity/checksum opcional para l
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-07-02 — Fase 9G — enforcement opt-in de entryIntegrity en el loader
+
+Se agrego enforcement runtime opt-in de `entryIntegrity` al loader publico del
+Diagnosticador sin romper el camino compatible existente.
+
+- La API publica principal se preserva:
+  - `window.Team360DiagnosticadorLoader.load()`;
+  - `window.Team360Diagnosticador.mount(...)`.
+- Se agrega opt-in explicito:
+  - `load({ verifyEntryIntegrity: true })`.
+- El loader deja de depender de `import(assetUrl)` para este caso y crea un
+  `script type="module"` dinamico del entry cuando debe aplicar SRI.
+- En modo opt-in:
+  - lee `entryIntegrity` desde el manifest;
+  - aplica `integrity`;
+  - aplica `crossorigin="anonymous"`;
+  - rechaza si falta `entryIntegrity`;
+  - rechaza con error controlado si el browser bloquea el entry por mismatch.
+- En modo default:
+  - sigue cargando sin enforcement;
+  - sigue siendo idempotente;
+  - no rompe fixtures previos.
+- Si el global ya estaba cargado, el loader resuelve idempotente y no revalida
+  esa carga previa.
+- Typing actualizado:
+  `astro/src/env.d.ts`.
+- Spec endurecido:
+  `e2e/diagnosticador-loader-manifest.spec.ts`.
+- Documentacion nueva:
+  `docs/diagnosticador_loader_integrity_enforcement_v1.md`.
+- Documentacion actualizada:
+  - `docs/diagnosticador_loader_distribution_v1.md`;
+  - `docs/diagnosticador_loader_manifest_v1.md`;
+  - `docs/diagnosticador_loader_integrity_v1.md`.
+- Validacion:
+  - backend focal `83/83 PASS`;
+  - backend full `1089 PASS, 9 skipped`;
+  - `pnpm check` PASS;
+  - `pnpm build` PASS, `146 page(s)`;
+- helper integrity PASS;
+- manifest/enforcement spec: `6 passed`;
+- regresion loader/fixture/cross-origin/mount/external/embed:
+  `12 passed`;
+- suite focalizada Vera/lab/embed/external/mount/loader/fixture/manifest:
+  `26 passed, 2 skipped`.
+- Los assets publicos siguen sin exponer `hmac_secret`, tenant, scope ni
+  `allowed_origins`.
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` se preservan sin cambios.
 
 ### 2026-07-02 — Fase 9F — integrity/checksum opcional para loader distribution
 

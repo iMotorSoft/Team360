@@ -4,6 +4,7 @@
   const VERSION = "experimental-9e";
   const DEFAULT_ASSET_URL = "/embed/team360-diagnosticador.js";
   const DEFAULT_MANIFEST_URL = "/embed/team360-diagnosticador.manifest.json";
+  const ENTRY_SCRIPT_ATTRIBUTE = "data-team360-diagnosticador-entry";
 
   if (globalObject.Team360DiagnosticadorLoader) {
     return;
@@ -11,16 +12,32 @@
 
   let pendingLoad = null;
 
-  async function resolveAssetUrl(options) {
-    const assetUrl = typeof options?.assetUrl === "string" ? options.assetUrl.trim() : "";
-    if (assetUrl) {
-      return assetUrl;
-    }
+  function resolveUrl(url, baseUrl) {
+    return new URL(url, baseUrl).toString();
+  }
 
+  function resolveDocumentBaseUrl() {
+    return globalObject.document?.baseURI || globalObject.location?.href || "http://localhost/";
+  }
+
+  function resolveManifestUrl(options) {
     const manifestUrl =
       typeof options?.manifestUrl === "string" && options.manifestUrl.trim()
         ? options.manifestUrl.trim()
         : DEFAULT_MANIFEST_URL;
+    return resolveUrl(manifestUrl, resolveDocumentBaseUrl());
+  }
+
+  function resolveExplicitAssetUrl(options) {
+    const assetUrl = typeof options?.assetUrl === "string" ? options.assetUrl.trim() : "";
+    if (!assetUrl) {
+      return "";
+    }
+    return resolveUrl(assetUrl, resolveDocumentBaseUrl());
+  }
+
+  async function fetchManifest(options) {
+    const manifestUrl = resolveManifestUrl(options);
 
     const response = await fetch(manifestUrl, {
       headers: {
@@ -36,19 +53,113 @@
       );
     }
 
-    const manifest = await response.json();
-    const manifestAsset =
-      typeof manifest?.asset === "string" && manifest.asset.trim()
-        ? manifest.asset.trim()
-        : typeof manifest?.entry === "string" && manifest.entry.trim()
-          ? manifest.entry.trim()
+    return {
+      manifestUrl,
+      manifest: await response.json(),
+    };
+  }
+
+  async function resolveEntryConfig(options) {
+    const verifyEntryIntegrity = options?.verifyEntryIntegrity === true;
+    const explicitAssetUrl = resolveExplicitAssetUrl(options);
+
+    if (!explicitAssetUrl || verifyEntryIntegrity) {
+      const { manifestUrl, manifest } = await fetchManifest(options);
+      const manifestAsset =
+        typeof manifest?.asset === "string" && manifest.asset.trim()
+          ? manifest.asset.trim()
+          : typeof manifest?.entry === "string" && manifest.entry.trim()
+            ? manifest.entry.trim()
+            : "";
+      const resolvedManifestAssetUrl = manifestAsset
+        ? resolveUrl(manifestAsset, manifestUrl)
+        : "";
+      const entryIntegrity =
+        typeof manifest?.entryIntegrity === "string" && manifest.entryIntegrity.trim()
+          ? manifest.entryIntegrity.trim()
           : "";
 
-    if (!manifestAsset) {
-      throw new Error("Team360DiagnosticadorLoader: manifest asset is missing.");
+      if (!resolvedManifestAssetUrl) {
+        throw new Error("Team360DiagnosticadorLoader: manifest asset is missing.");
+      }
+
+      if (explicitAssetUrl && explicitAssetUrl !== resolvedManifestAssetUrl) {
+        throw new Error(
+          "Team360DiagnosticadorLoader: assetUrl must match manifest entry when verifyEntryIntegrity is enabled.",
+        );
+      }
+
+      if (verifyEntryIntegrity && !entryIntegrity) {
+        throw new Error(
+          "Team360DiagnosticadorLoader: entry integrity is required when verifyEntryIntegrity=true.",
+        );
+      }
+
+      return {
+        assetUrl: explicitAssetUrl || resolvedManifestAssetUrl,
+        entryIntegrity: verifyEntryIntegrity ? entryIntegrity : "",
+      };
     }
 
-    return manifestAsset;
+    return {
+      assetUrl: explicitAssetUrl,
+      entryIntegrity: "",
+    };
+  }
+
+  function removeDynamicEntryScripts() {
+    const scripts = globalObject.document?.querySelectorAll(`script[${ENTRY_SCRIPT_ATTRIBUTE}="true"]`);
+    if (!scripts?.length) {
+      return;
+    }
+    scripts.forEach((script) => script.remove());
+  }
+
+  function loadEntryScript(assetUrl, entryIntegrity) {
+    return new Promise((resolve, reject) => {
+      const documentRef = globalObject.document;
+      if (!documentRef?.createElement || !documentRef.head || !documentRef.body) {
+        reject(new Error("Team360DiagnosticadorLoader: document is not available."));
+        return;
+      }
+
+      removeDynamicEntryScripts();
+
+      const script = documentRef.createElement("script");
+      script.type = "module";
+      script.async = true;
+      script.src = assetUrl;
+      script.setAttribute(ENTRY_SCRIPT_ATTRIBUTE, "true");
+
+      if (entryIntegrity) {
+        script.integrity = entryIntegrity;
+        script.crossOrigin = "anonymous";
+      }
+
+      script.addEventListener(
+        "load",
+        () => {
+          resolve();
+        },
+        { once: true },
+      );
+      script.addEventListener(
+        "error",
+        () => {
+          script.remove();
+          reject(
+            new Error(
+              entryIntegrity
+                ? "Team360DiagnosticadorLoader: entry script failed to load or failed integrity verification."
+                : "Team360DiagnosticadorLoader: entry script failed to load.",
+            ),
+          );
+        },
+        { once: true },
+      );
+
+      (documentRef.head || documentRef.body).appendChild(script);
+    });
   }
 
   async function load(options) {
@@ -61,10 +172,12 @@
     }
 
     pendingLoad = (async () => {
-      const assetUrl = (await resolveAssetUrl(options)) || DEFAULT_ASSET_URL;
-      await import(assetUrl);
+      const { assetUrl, entryIntegrity } =
+        (await resolveEntryConfig(options)) || { assetUrl: DEFAULT_ASSET_URL, entryIntegrity: "" };
+      await loadEntryScript(assetUrl || DEFAULT_ASSET_URL, entryIntegrity);
 
       if (!globalObject.Team360Diagnosticador?.mount) {
+        removeDynamicEntryScripts();
         throw new Error("Team360DiagnosticadorLoader: asset loaded without mount API.");
       }
 

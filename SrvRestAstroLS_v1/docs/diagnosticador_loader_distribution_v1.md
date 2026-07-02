@@ -11,7 +11,10 @@ Regla central:
 > nuevo.
 
 Fase 9F agrega metadata de integridad opcional al manifest para verificar
-`loader + asset` sin cambiar la API publica del embed.
+`loader + asset`.
+
+Fase 9G agrega enforcement opt-in de `entryIntegrity` dentro del loader sin
+romper la API publica del embed.
 
 ## URLs publicas estables
 
@@ -90,10 +93,22 @@ Semantica actual:
 - resuelve `assetUrl` explicito si el host lo pasa;
 - si no, consulta el manifest estable;
 - acepta `manifest.asset` o `manifest.entry`;
+- acepta `verifyEntryIntegrity: true` como modo opt-in;
 - si `window.Team360Diagnosticador.mount` ya existe, no recarga;
 - devuelve `Promise`;
 - falla con error claro si el manifest responde no-`200`;
 - no hace mount automatico.
+
+Comportamiento opt-in:
+
+- `load()` sin opciones conserva el camino compatible actual;
+- `load({ verifyEntryIntegrity: true })` exige `entryIntegrity` en el manifest;
+- en modo opt-in el loader crea un `script type="module"` dinamico para el
+  entry;
+- aplica `integrity=manifest.entryIntegrity`;
+- aplica `crossorigin="anonymous"`;
+- si `entryIntegrity` falta, rechaza antes de cargar el entry;
+- si el browser bloquea el entry por SRI, rechaza con error controlado.
 
 ## Snippet externo copiable
 
@@ -143,9 +158,10 @@ Notas del snippet:
 - `clientId` es publico y no reemplaza la validacion server-side;
 - `hmac_secret` nunca se entrega al host;
 - tenant, scope y `allowed_origins` se administran server-side;
-- el loader no fuerza todavia verificacion runtime del `entryIntegrity`; esa
-  metadata queda disponible para verificacion offline o consumo directo del
-  asset estable.
+- el host puede activar enforcement runtime del entry con:
+  `load({ verifyEntryIntegrity: true })`;
+- el detalle operativo de ese modo queda en
+  `diagnosticador_loader_integrity_enforcement_v1.md`.
 
 ## Compatibilidad
 
@@ -176,8 +192,7 @@ Gate efectivo:
 - sin Web Component final;
 - sin Shadow DOM;
 - sin eventos publicos estables;
-- sin enforcement runtime automatico de SRI sobre el asset cargado por el
-  loader;
+- enforcement runtime del entry solo opt-in;
 - sin CSS encapsulado final.
 
 ## Recalculo

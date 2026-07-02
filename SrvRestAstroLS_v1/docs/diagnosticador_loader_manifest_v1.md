@@ -136,6 +136,7 @@ window.Team360DiagnosticadorLoader = {
   load: async (options?: {
     assetUrl?: string;
     manifestUrl?: string;
+    verifyEntryIntegrity?: boolean;
   }) => Promise<window.Team360Diagnosticador>,
   defaults: {
     assetUrl: "/embed/team360-diagnosticador.js",
@@ -150,7 +151,11 @@ Comportamiento:
   recargar nada;
 - si no existe, resuelve el asset desde `assetUrl` o desde el manifest;
 - acepta `manifest.asset` o `manifest.entry`;
-- carga el asset con `import(assetUrl)`;
+- en modo default carga el asset principal sin exigir integrity;
+- en modo opt-in crea un `script type="module"` dinamico para el entry;
+- si `verifyEntryIntegrity=true`, aplica `integrity` y `crossorigin="anonymous"`;
+- si `verifyEntryIntegrity=true` y falta `entryIntegrity`, rechaza;
+- si `verifyEntryIntegrity=true` y el browser bloquea el entry, rechaza;
 - no hace mount automatico;
 - no contiene `clientId`;
 - no contiene `apiBaseUrl`;
@@ -187,6 +192,28 @@ Camino loader:
 </script>
 ```
 
+Camino loader con enforcement opt-in del entry:
+
+```html
+<script
+  type="module"
+  src="https://team360.live/embed/team360-diagnosticador-loader.js"
+  integrity="sha256-..."
+  crossorigin="anonymous"
+></script>
+<script type="module">
+  await window.Team360DiagnosticadorLoader.load({
+    manifestUrl: "https://team360.live/embed/team360-diagnosticador.manifest.json",
+    verifyEntryIntegrity: true
+  });
+  window.Team360Diagnosticador.mount("#target", {
+    clientId: "local_embed_demo",
+    apiBaseUrl: "http://127.0.0.1:7050/api",
+    sessionStorageKey: "team360.embed.loader.demo.session.v1"
+  });
+</script>
+```
+
 Camino loader con integrity:
 
 ```html
@@ -211,9 +238,12 @@ Camino loader con integrity:
 Notas del consumo:
 
 - el valor real de `integrity` debe leerse desde `loaderIntegrity`;
-- `entryIntegrity` queda disponible para verificacion offline o para consumo
-  directo del asset estable;
-- el loader actual no aplica enforcement runtime del asset dinamico.
+- `entryIntegrity` queda disponible para verificacion offline y tambien para el
+  enforcement opt-in del entry;
+- `verifyEntryIntegrity` preserva el default compatible y solo protege cargas
+  nuevas del asset principal;
+- si el global ya estaba cargado antes de llamar `load({ verifyEntryIntegrity: true })`,
+  el loader resuelve de forma idempotente y no revalida esa carga previa.
 
 Fixture 9C-ext:
 
