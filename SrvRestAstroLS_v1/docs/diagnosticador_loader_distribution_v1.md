@@ -1,0 +1,133 @@
+# Diagnosticador embebible — loader distribution externo v1
+
+## Proposito
+
+Consolidar el contrato publico minimo del embed para hosts externos controlados
+sin crear todavia npm package, CDN final ni Web Component.
+
+Regla central:
+
+> El distribuble estable de esta fase es `manifest + loader + asset`, no un SDK
+> nuevo.
+
+## URLs publicas estables
+
+```text
+/embed/team360-diagnosticador.manifest.json
+/embed/team360-diagnosticador-loader.js
+/embed/team360-diagnosticador.js
+```
+
+## Contrato publico minimo
+
+API global:
+
+```text
+window.Team360DiagnosticadorLoader.load()
+window.Team360Diagnosticador.mount(container, config)
+```
+
+Config permitida:
+
+- `clientId`
+- `apiBaseUrl`
+- `assistantName`
+- `compact`
+- `initialMessage`
+- `sessionStorageKey`
+
+Config prohibida:
+
+- `hmac_secret`
+- `organization_code`
+- `workspace_code`
+- `assistant_instance_code`
+- `package_code`
+- `knowledge_scope_code`
+- `allowed_origins`
+- `service_code`
+- `template_code`
+
+## Manifest
+
+Campos minimos actuales:
+
+```json
+{
+  "name": "team360-diagnosticador",
+  "version": "0.9.0-experimental",
+  "channel": "experimental",
+  "asset": "/embed/team360-diagnosticador.js",
+  "entry": "/embed/team360-diagnosticador.js",
+  "loader": "/embed/team360-diagnosticador-loader.js",
+  "format": "browser-global",
+  "global": "Team360Diagnosticador"
+}
+```
+
+Notas:
+
+- `asset` se conserva por compatibilidad hacia atras.
+- `entry` explicita el contrato de distribucion nuevo.
+- `version = 0.9.0-experimental` sigue siendo experimental y no implica SDK
+  estable.
+
+## Loader
+
+Semantica actual:
+
+- resuelve `assetUrl` explicito si el host lo pasa;
+- si no, consulta el manifest estable;
+- acepta `manifest.asset` o `manifest.entry`;
+- si `window.Team360Diagnosticador.mount` ya existe, no recarga;
+- devuelve `Promise`;
+- falla con error claro si el manifest responde no-`200`;
+- no hace mount automatico.
+
+## Snippet externo copiable
+
+```html
+<div id="team360-diagnosticador"></div>
+<script type="module" src="/embed/team360-diagnosticador-loader.js"></script>
+<script type="module">
+  await window.Team360DiagnosticadorLoader.load();
+  window.Team360Diagnosticador.mount("#team360-diagnosticador", {
+    clientId: "local_embed_demo",
+    apiBaseUrl: "http://127.0.0.1:7050/api",
+    assistantName: "Vera",
+    sessionStorageKey: "team360.embed.client.session.v1"
+  });
+</script>
+```
+
+## Compatibilidad
+
+Se preserva compatibilidad con:
+
+- `/t360-loader-demo`
+- `/embed-fixtures/t360-external-loader.html`
+- `http://127.0.0.1:3060/t360-cross-origin-loader.html`
+- demos previas `asset`, `script`, `mount`, `external`, `embed`
+
+## Validacion
+
+Specs relevantes:
+
+- `e2e/diagnosticador-loader-manifest.spec.ts`
+- `e2e/diagnosticador-loader-demo.spec.ts`
+- `e2e/diagnosticador-browser-loader-fixture.spec.ts`
+- `e2e/diagnosticador-cross-origin-loader-fixture.spec.ts`
+
+Gate efectivo:
+
+- Playwright CLI con backend `7050`;
+- fallback estatico `astro/dist` en `3050` con proxy `/api`.
+
+## Limitaciones
+
+- sin npm package publicado;
+- sin Web Component final;
+- sin Shadow DOM;
+- sin eventos publicos estables;
+- sin integrity/checksum automatizado;
+- sin CSS encapsulado final.

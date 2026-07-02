@@ -37,11 +37,18 @@
     }
 
     const manifest = await response.json();
-    if (!manifest || typeof manifest.asset !== "string" || !manifest.asset.trim()) {
+    const manifestAsset =
+      typeof manifest?.asset === "string" && manifest.asset.trim()
+        ? manifest.asset.trim()
+        : typeof manifest?.entry === "string" && manifest.entry.trim()
+          ? manifest.entry.trim()
+          : "";
+
+    if (!manifestAsset) {
       throw new Error("Team360DiagnosticadorLoader: manifest asset is missing.");
     }
 
-    return manifest.asset.trim();
+    return manifestAsset;
   }
 
   async function load(options) {

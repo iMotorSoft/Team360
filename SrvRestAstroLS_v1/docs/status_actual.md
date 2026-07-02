@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-07-02 (Fase 9D-ext — cross-origin loader fixture controlado)
+Ultima actualizacion: 2026-07-02 (Fase 9E — contrato publico de distribucion endurecido)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -226,8 +226,12 @@ Se eligio Opcion A minima:
   `team360.embed.loader.demo.session.v1`;
 - nuevo E2E:
   `e2e/diagnosticador-loader-demo.spec.ts`;
+- nuevo E2E de contrato:
+  `e2e/diagnosticador-loader-manifest.spec.ts`;
 - nueva documentacion:
-  `docs/diagnosticador_loader_manifest_v1.md`.
+  `docs/diagnosticador_loader_manifest_v1.md`;
+- nueva documentacion de distribucion:
+  `docs/diagnosticador_loader_distribution_v1.md`.
 
 ### URLs publicas
 
@@ -249,6 +253,15 @@ Se eligio Opcion A minima:
 
 El versionado explicito nuevo vive en manifest y loader. El global del asset no
 se cambio porque 9E no introduce una segunda implementacion del embed.
+
+### Contrato publico endurecido
+
+- el manifest expone `asset` y `entry` hacia la misma ruta publica estable;
+- el manifest ahora explicita `format = browser-global`;
+- el loader acepta `manifest.asset` o `manifest.entry`;
+- `load()` sigue siendo idempotente: si el global ya existe, no recarga;
+- el host externo sigue usando solo `clientId`, `apiBaseUrl` y props visuales
+  seguras.
 
 ### Seguridad
 
@@ -278,10 +291,14 @@ Frontend:
 
 Playwright CLI local (`PLAYWRIGHT_BASE_URL=http://127.0.0.1:3050`):
 
+- `e2e/diagnosticador-loader-manifest.spec.ts`:
+  2 PASS.
 - `e2e/diagnosticador-loader-demo.spec.ts`:
   1 PASS.
-- `loader + asset + script + mount + external + embed`:
-  7 PASS.
+- `loader-manifest + loader + fixture + cross-origin + mount + external + embed`:
+  9 PASS.
+- suite focalizada con Vera/lab/embed/external/mount/loader/fixture/manifest:
+  24 PASS, 1 skipped.
 
 Runtime local:
 

@@ -79,7 +79,7 @@ config minima, sin Astro/Svelte en la pagina host.
   pero sin herramientas navegables expuestas; cierre efectivo con Playwright
   CLI.
 
-### 2026-07-01 — Fase 9E — manifest/loader externo minimo con versionado explicito
+### 2026-07-02 — Fase 9E — contrato publico de distribucion endurecido
 
 Se agrego un manifest publico minimo y un loader publico minimo para hosts
 controlados, sin npm/package, CDN real ni Web Component.
@@ -98,18 +98,28 @@ controlados, sin npm/package, CDN real ni Web Component.
   `team360.embed.loader.demo.session.v1`.
 - Nuevo E2E:
   `e2e/diagnosticador-loader-demo.spec.ts`.
+- Nuevo E2E de contrato:
+  `e2e/diagnosticador-loader-manifest.spec.ts`.
 - Versionado explicito nuevo:
   - manifest `0.9.0-experimental`;
   - loader `experimental-9e`;
   - global del asset conserva `experimental-9c`.
+- El manifest ahora publica tambien:
+  - `entry="/embed/team360-diagnosticador.js"`;
+  - `format="browser-global"`.
+- El loader acepta `manifest.asset` o `manifest.entry` y mantiene
+  idempotencia sin recargar si el global ya existe.
 - Validacion:
   - backend focal `83/83 PASS`;
   - backend full `1089 PASS, 9 skipped`;
   - `pnpm check` PASS;
   - `pnpm build` PASS, `146 page(s)`;
+  - `diagnosticador-loader-manifest.spec.ts`: `2 passed`;
   - `diagnosticador-loader-demo.spec.ts`: `1 passed`;
-  - regresion corta loader/asset/script/mount/external/embed:
-    `7 passed`.
+  - regresion corta loader/manifest/fixture/cross-origin/mount/external/embed:
+    `9 passed`;
+  - suite focalizada Vera/lab/embed/external/mount/loader/fixture/manifest:
+    `24 passed, 1 skipped`.
 - Manifest/loader/asset estables no contienen tenant/scope ni
   `hmac_secret`.
 - `/t360`, `PublicVeraEntry.svelte` y `global.js` no se tocaron.

@@ -137,3 +137,12 @@ Smokes complementarios:
 
 Fase chica siguiente: empaquetado externo controlado del embed con contrato
 minimo de distribucion, sin romper el loader/manifest ya validados.
+
+## Relacion con 9E
+
+- el fixture cross-origin sigue cargando las rutas estables:
+  - `/embed/team360-diagnosticador.manifest.json`;
+  - `/embed/team360-diagnosticador-loader.js`;
+  - `/embed/team360-diagnosticador.js`;
+- el contrato de distribucion y el spec dedicado del manifest quedaron
+  documentados en `diagnosticador_loader_distribution_v1.md`.

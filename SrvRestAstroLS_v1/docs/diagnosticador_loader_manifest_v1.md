@@ -75,16 +75,28 @@ Contenido actual:
   "version": "0.9.0-experimental",
   "channel": "experimental",
   "asset": "/embed/team360-diagnosticador.js",
+  "entry": "/embed/team360-diagnosticador.js",
   "loader": "/embed/team360-diagnosticador-loader.js",
+  "format": "browser-global",
   "global": "Team360Diagnosticador",
   "api": {
-    "mount": "window.Team360Diagnosticador.mount"
+    "mount": "window.Team360Diagnosticador.mount",
+    "auth": "POST /api/diagnosis/embed/auth",
+    "turn": "POST /api/diagnosis/turn"
   },
   "requires": {
-    "moduleScript": true
+    "moduleScript": true,
+    "api": "diagnosis-embed-auth-v1"
   }
 }
 ```
+
+Notas:
+
+- `asset` se conserva por compatibilidad con los fixtures previos;
+- `entry` formaliza la ruta de distribucion publica estable;
+- `format = browser-global` explicita que el host espera globals, no package ni
+  import map.
 
 No expone:
 
@@ -130,6 +142,7 @@ Comportamiento:
 - si `window.Team360Diagnosticador.mount` ya existe, `load()` resuelve sin
   recargar nada;
 - si no existe, resuelve el asset desde `assetUrl` o desde el manifest;
+- acepta `manifest.asset` o `manifest.entry`;
 - carga el asset con `import(assetUrl)`;
 - no hace mount automatico;
 - no contiene `clientId`;
@@ -245,10 +258,15 @@ Frontend:
 
 Playwright CLI:
 
+- `e2e/diagnosticador-loader-manifest.spec.ts`
 - `e2e/diagnosticador-loader-demo.spec.ts`
 - `e2e/diagnosticador-browser-loader-fixture.spec.ts`
 - regresion corta con asset/script/mount/external/embed
 - suite focalizada Vera/lab/embed/external/mount/script/asset/loader/fixture
+
+Ver tambien:
+
+- `docs/diagnosticador_loader_distribution_v1.md`
 
 ## Limitaciones v1
 

@@ -164,3 +164,10 @@ mezclarlo con esta fase same-origin.
   DB;
 - la validacion cross-origin y el ajuste local de `allowed_origins` quedaron
   documentados en `diagnosticador_cross_origin_fixture_v1.md`.
+
+## Relacion con 9E
+
+- el fixture sigue consumiendo el contrato publico estable
+  `manifest + loader + asset`;
+- el detalle del distribuble quedo consolidado en
+  `diagnosticador_loader_distribution_v1.md`.

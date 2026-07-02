@@ -3,12 +3,17 @@
   "version": "0.9.0-experimental",
   "channel": "experimental",
   "asset": "/embed/team360-diagnosticador.js",
+  "entry": "/embed/team360-diagnosticador.js",
   "loader": "/embed/team360-diagnosticador-loader.js",
+  "format": "browser-global",
   "global": "Team360Diagnosticador",
   "api": {
-    "mount": "window.Team360Diagnosticador.mount"
+    "mount": "window.Team360Diagnosticador.mount",
+    "auth": "POST /api/diagnosis/embed/auth",
+    "turn": "POST /api/diagnosis/turn"
   },
   "requires": {
-    "moduleScript": true
+    "moduleScript": true,
+    "api": "diagnosis-embed-auth-v1"
   }
 }
