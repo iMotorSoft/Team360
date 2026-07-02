@@ -1,0 +1,298 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const DEMO_API_BASE_URL = "http://127.0.0.1:7050/api";
+const DEMO_CLIENT_ID = "local_embed_demo";
+const ASSET_SESSION_STORAGE_KEY = "team360.embed.asset.demo.session.v1";
+const ASSET_SCRIPT_URL = "/embed/team360-diagnosticador.js";
+---
+
+<BaseLayout
+  title="Browser Asset Demo | Team360"
+  description="Host controlado para validar el asset JS browser real del Diagnosticador Team360"
+>
+  <main class="asset-demo" data-testid="asset-demo">
+    <section class="host-shell">
+      <header class="host-header" data-testid="asset-demo-header">
+        <p class="host-eyebrow">Browser Asset Demo</p>
+        <h1>Host controlado con asset JS real servido por Astro</h1>
+        <p class="host-copy">
+          Esta página carga un asset browser estable mediante
+          <code>{`<script type="module" src="${ASSET_SCRIPT_URL}">`}</code>
+          y luego monta el Diagnosticador desde <code>window.Team360Diagnosticador</code>.
+        </p>
+      </header>
+
+      <div class="host-grid">
+        <aside class="host-notes" data-testid="asset-demo-notes">
+          <h2>Contrato del asset</h2>
+          <ul>
+            <li><strong>URL estable:</strong> <code data-testid="asset-demo-script-url">{ASSET_SCRIPT_URL}</code></li>
+            <li><strong>Global expuesto:</strong> <code>window.Team360Diagnosticador</code></li>
+            <li><strong>Montaje:</strong> <code>mount(container, config)</code></li>
+            <li><strong>Session key:</strong> <code>{ASSET_SESSION_STORAGE_KEY}</code></li>
+          </ul>
+          <p>
+            El asset no contiene config de demo. Solo registra el global y delega en el
+            adapter existente. La firma server-side sigue pasando por
+            <code>/api/diagnosis/embed/auth</code> y <code>/api/diagnosis/turn</code>.
+          </p>
+
+          <div class="asset-contract" data-testid="asset-demo-contract">
+            <p><strong>Version:</strong> <span data-testid="asset-demo-version">pending</span></p>
+            <p><strong>Status:</strong> <span data-testid="asset-demo-status">pending</span></p>
+          </div>
+        </aside>
+
+        <section class="asset-slot" data-testid="asset-demo-slot">
+          <div
+            id="team360-asset-target"
+            class="asset-target"
+            data-testid="asset-demo-target"
+          ></div>
+
+          <p class="asset-error" data-testid="asset-demo-error" hidden></p>
+
+          <pre class="asset-snippet"><code>{`<div id="team360-asset-target"></div>
+<script type="module" src="${ASSET_SCRIPT_URL}"></script>
+<script type="module">
+  window.Team360Diagnosticador.mount('#team360-asset-target', {
+    clientId: '${DEMO_CLIENT_ID}',
+    apiBaseUrl: '${DEMO_API_BASE_URL}',
+    sessionStorageKey: '${ASSET_SESSION_STORAGE_KEY}'
+  });
+</script>`}</code></pre>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script
+    type="module"
+    src={ASSET_SCRIPT_URL}
+    is:inline
+    data-testid="asset-demo-script-tag"
+  ></script>
+
+  <script is:inline>
+    const assetScript = document.querySelector('[data-testid="asset-demo-script-tag"]');
+    const statusNode = document.querySelector('[data-testid="asset-demo-status"]');
+    const errorNode = document.querySelector('[data-testid="asset-demo-error"]');
+    const versionNode = document.querySelector('[data-testid="asset-demo-version"]');
+    const targetSelector = "#team360-asset-target";
+    const mountConfig = {
+      clientId: "local_embed_demo",
+      apiBaseUrl: "http://127.0.0.1:7050/api",
+      assistantName: "Diagnosticador Team360",
+      compact: false,
+      sessionStorageKey: "team360.embed.asset.demo.session.v1",
+    };
+
+    function setStatus(message) {
+      if (statusNode instanceof HTMLElement) {
+        statusNode.textContent = message;
+      }
+    }
+
+    function setError(message) {
+      if (!(errorNode instanceof HTMLElement)) {
+        return;
+      }
+
+      if (message) {
+        errorNode.hidden = false;
+        errorNode.textContent = message;
+        return;
+      }
+
+      errorNode.hidden = true;
+      errorNode.textContent = "";
+    }
+
+    function mountDiagnosticadorFromAsset() {
+      if (!window.Team360Diagnosticador) {
+        throw new Error("Team360Diagnosticador browser asset did not register the global API.");
+      }
+
+      if (versionNode instanceof HTMLElement) {
+        versionNode.textContent = window.Team360Diagnosticador.version ?? "unknown";
+      }
+
+      window.Team360Diagnosticador.mount(targetSelector, mountConfig);
+      setError("");
+      setStatus("mounted");
+    }
+
+    function handleMountError(error) {
+      setError(error instanceof Error ? error.message : "Falló el mount del asset browser.");
+      setStatus("mount-error");
+    }
+
+    if (window.Team360Diagnosticador) {
+      try {
+        mountDiagnosticadorFromAsset();
+      } catch (error) {
+        handleMountError(error);
+      }
+    } else if (assetScript instanceof HTMLScriptElement) {
+      assetScript.addEventListener(
+        "load",
+        () => {
+          try {
+            mountDiagnosticadorFromAsset();
+          } catch (error) {
+            handleMountError(error);
+          }
+        },
+        { once: true },
+      );
+      assetScript.addEventListener(
+        "error",
+        () => {
+          setError("No se pudo cargar el asset browser del Diagnosticador.");
+          setStatus("asset-load-error");
+        },
+        { once: true },
+      );
+    } else {
+      setError("No se encontró el script del asset browser.");
+      setStatus("asset-script-missing");
+    }
+  </script>
+</BaseLayout>
+
+<style>
+  .asset-demo {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top left, rgba(17, 94, 89, 0.16), transparent 28rem),
+      linear-gradient(180deg, #f6f8fb 0%, #edf4f7 100%);
+    padding: 2rem 1rem 3rem;
+  }
+
+  .host-shell {
+    margin: 0 auto;
+    max-width: 78rem;
+  }
+
+  .host-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .host-eyebrow {
+    margin-bottom: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #0f766e;
+  }
+
+  .host-header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.05;
+    color: #11263f;
+  }
+
+  .host-copy {
+    margin-top: 0.75rem;
+    max-width: 48rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4a627a;
+  }
+
+  .host-copy code {
+    font-size: 0.92em;
+  }
+
+  .host-grid {
+    display: grid;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .host-notes,
+  .asset-slot {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  }
+
+  .host-notes {
+    padding: 1.5rem;
+    color: #24364a;
+  }
+
+  .host-notes h2 {
+    margin: 0 0 0.85rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #102d4f;
+  }
+
+  .host-notes ul {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+    line-height: 1.55;
+  }
+
+  .host-notes p {
+    margin: 0 0 0.75rem;
+    font-size: 0.96rem;
+    line-height: 1.6;
+    color: #5a7086;
+  }
+
+  .host-notes code {
+    font-size: 0.9em;
+  }
+
+  .asset-contract p:last-child {
+    margin-bottom: 0;
+  }
+
+  .asset-slot {
+    padding: 1rem 0.75rem;
+  }
+
+  .asset-target:empty {
+    min-height: 28rem;
+  }
+
+  .asset-error {
+    margin: 1rem 0 0;
+    border-radius: 0.9rem;
+    background: #fff1f2;
+    padding: 0.9rem 1rem;
+    font-size: 0.92rem;
+    color: #be123c;
+  }
+
+  .asset-snippet {
+    overflow-x: auto;
+    margin: 1rem 0 0;
+    border-radius: 1rem;
+    background: #0f172a;
+    padding: 1rem;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #dbeafe;
+  }
+
+  .asset-snippet code {
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+  }
+
+  @media (min-width: 960px) {
+    .host-grid {
+      grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    }
+
+    .asset-slot {
+      padding: 1.25rem 0.75rem;
+    }
+  }
+</style>

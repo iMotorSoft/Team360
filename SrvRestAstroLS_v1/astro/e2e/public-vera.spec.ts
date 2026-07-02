@@ -270,9 +270,8 @@ test.describe("Team360 pública - Vera estructurada", () => {
     await expect(page.getByTestId("public-vera-interaction-block")).toHaveAttribute("data-valid", "true");
     await expect(page.getByTestId("t360-block-next_step_choice")).toContainText("Próximo paso");
 
-    await page.getByTestId("t360-action-show-current-diagnosis").dblclick();
+    await page.getByTestId("t360-action-show-current-diagnosis").click();
     await expect(page.getByTestId("diagnosis-result")).toBeVisible();
-    await expect(page.getByTestId("public-vera-user-message").last()).toContainText("Ver diagnóstico");
 
     expect(requests).toHaveLength(2);
     expect(requests[1].session_id).toBe("conv_e2e_interaction_action");

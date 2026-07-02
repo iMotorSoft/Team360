@@ -1,0 +1,332 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const DEMO_API_BASE_URL = "http://127.0.0.1:7050/api";
+const DEMO_CLIENT_ID = "local_embed_demo";
+const SCRIPT_SESSION_STORAGE_KEY = "team360.embed.script.demo.session.v1";
+---
+
+<BaseLayout
+  title="Browser Global Demo | Team360"
+  description="Host controlado para validar el script browser global experimental del Diagnosticador Team360"
+>
+  <main class="script-demo" data-testid="script-demo">
+    <section class="host-shell">
+      <header class="host-header" data-testid="script-demo-header">
+        <p class="host-eyebrow">Browser Global Demo</p>
+        <h1>Host controlado con `window.Team360Diagnosticador.mount()`</h1>
+        <p class="host-copy">
+          Esta página simula un host que registra un script global experimental y monta el
+          Diagnosticador desde un contenedor visible, sin exponer tenant, scope ni secretos.
+        </p>
+      </header>
+
+      <div class="host-grid">
+        <aside class="host-notes" data-testid="script-demo-notes">
+          <h2>Contrato global experimental</h2>
+          <ul>
+            <li><strong>window.Team360Diagnosticador.mount(container, config)</strong></li>
+            <li><strong>clientId</strong> y <strong>apiBaseUrl</strong> como contrato seguro mínimo.</li>
+            <li><strong>sessionStorageKey</strong> aislada para este host por script.</li>
+            <li><strong>destroy()</strong> disponible vía handle retornado por `mount()`.</li>
+          </ul>
+          <p>
+            El script global reusa el adapter interno de Fase 9B. La firma server-side sigue
+            pasando por <code>/api/diagnosis/embed/auth</code> y luego por
+            <code>/api/diagnosis/turn</code>.
+          </p>
+
+          <div class="script-contract" data-testid="script-demo-contract">
+            <p><strong>Version:</strong> <span data-testid="script-demo-version">pending</span></p>
+            <p>
+              <strong>Session key:</strong>
+              <code>{SCRIPT_SESSION_STORAGE_KEY}</code>
+            </p>
+          </div>
+        </aside>
+
+        <section class="script-slot" data-testid="script-demo-slot">
+          <div class="script-toolbar">
+            <button
+              type="button"
+              class="toolbar-button"
+              data-testid="script-demo-mount-button"
+            >
+              Mount
+            </button>
+            <button
+              type="button"
+              class="toolbar-button secondary"
+              data-testid="script-demo-destroy-button"
+            >
+              Destroy
+            </button>
+            <p class="script-status" data-testid="script-demo-status">pending</p>
+          </div>
+
+          <div
+            id="team360-script-target"
+            class="script-target"
+            data-testid="script-demo-target"
+          ></div>
+
+          <p class="script-error" data-testid="script-demo-error" hidden></p>
+
+          <pre class="script-snippet"><code>{`<script src="/experimental/team360-diagnosticador.js"></script>
+<script>
+  window.Team360Diagnosticador.mount('#team360-script-target', {
+    clientId: '${DEMO_CLIENT_ID}',
+    apiBaseUrl: '${DEMO_API_BASE_URL}',
+    sessionStorageKey: '${SCRIPT_SESSION_STORAGE_KEY}'
+  });
+</script>`}</code></pre>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    import { registerTeam360DiagnosticadorBrowserGlobal } from "../lib/t360/embed/browser-global";
+    import type { Team360DiagnosticadorMountHandle } from "../lib/t360/embed/browser-global";
+
+    const statusNode = document.querySelector('[data-testid="script-demo-status"]');
+    const errorNode = document.querySelector('[data-testid="script-demo-error"]');
+    const versionNode = document.querySelector('[data-testid="script-demo-version"]');
+    const mountButton = document.querySelector('[data-testid="script-demo-mount-button"]');
+    const destroyButton = document.querySelector('[data-testid="script-demo-destroy-button"]');
+    const targetSelector = "#team360-script-target";
+    const mountConfig = {
+      clientId: "local_embed_demo",
+      apiBaseUrl: "http://127.0.0.1:7050/api",
+      assistantName: "Diagnosticador Team360",
+      compact: false,
+      sessionStorageKey: "team360.embed.script.demo.session.v1",
+    };
+
+    let handle: Team360DiagnosticadorMountHandle | null = null;
+
+    function setStatus(message: string) {
+      if (statusNode instanceof HTMLElement) {
+        statusNode.textContent = message;
+      }
+    }
+
+    function setError(message: string) {
+      if (!(errorNode instanceof HTMLElement)) {
+        return;
+      }
+
+      if (message) {
+        errorNode.hidden = false;
+        errorNode.textContent = message;
+        return;
+      }
+
+      errorNode.hidden = true;
+      errorNode.textContent = "";
+    }
+
+    function mountDiagnosticador() {
+      const api = registerTeam360DiagnosticadorBrowserGlobal(window);
+
+      if (versionNode instanceof HTMLElement) {
+        versionNode.textContent = api.version;
+      }
+
+      handle?.destroy();
+      handle = api.mount(targetSelector, mountConfig);
+      setError("");
+      setStatus("mounted");
+    }
+
+    function destroyDiagnosticador() {
+      handle?.destroy();
+      handle = null;
+      setStatus("destroyed");
+    }
+
+    mountButton?.addEventListener("click", () => {
+      try {
+        mountDiagnosticador();
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "Falló el mount del script global.");
+        setStatus("mount-error");
+      }
+    });
+
+    destroyButton?.addEventListener("click", () => {
+      destroyDiagnosticador();
+      setError("");
+    });
+
+    try {
+      mountDiagnosticador();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Falló el mount del script global.");
+      setStatus("mount-error");
+    }
+  </script>
+</BaseLayout>
+
+<style>
+  .script-demo {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top left, rgba(14, 116, 144, 0.16), transparent 28rem),
+      linear-gradient(180deg, #f6f8fb 0%, #eef4f8 100%);
+    padding: 2rem 1rem 3rem;
+  }
+
+  .host-shell {
+    margin: 0 auto;
+    max-width: 78rem;
+  }
+
+  .host-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .host-eyebrow {
+    margin-bottom: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #0f766e;
+  }
+
+  .host-header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.05;
+    color: #11263f;
+  }
+
+  .host-copy {
+    margin-top: 0.75rem;
+    max-width: 46rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4a627a;
+  }
+
+  .host-grid {
+    display: grid;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .host-notes,
+  .script-slot {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  }
+
+  .host-notes {
+    padding: 1.5rem;
+    color: #24364a;
+  }
+
+  .host-notes h2 {
+    margin: 0 0 0.85rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #102d4f;
+  }
+
+  .host-notes ul {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+    line-height: 1.55;
+  }
+
+  .host-notes p {
+    margin: 0 0 0.75rem;
+    font-size: 0.96rem;
+    line-height: 1.6;
+    color: #5a7086;
+  }
+
+  .host-notes code {
+    font-size: 0.9em;
+  }
+
+  .script-contract p:last-child {
+    margin-bottom: 0;
+  }
+
+  .script-slot {
+    padding: 1rem 0.75rem;
+  }
+
+  .script-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.9rem;
+  }
+
+  .toolbar-button {
+    border: 0;
+    border-radius: 9999px;
+    background: #0f766e;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+  }
+
+  .toolbar-button.secondary {
+    background: #dbe4ec;
+    color: #1f3448;
+  }
+
+  .script-status {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f766e;
+  }
+
+  .script-target:empty {
+    min-height: 28rem;
+  }
+
+  .script-error {
+    margin: 1rem 0 0;
+    border-radius: 0.9rem;
+    background: #fff1f2;
+    padding: 0.9rem 1rem;
+    font-size: 0.92rem;
+    color: #be123c;
+  }
+
+  .script-snippet {
+    overflow-x: auto;
+    margin: 1rem 0 0;
+    border-radius: 1rem;
+    background: #0f172a;
+    padding: 1rem;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #dbeafe;
+  }
+
+  .script-snippet code {
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+  }
+
+  @media (min-width: 960px) {
+    .host-grid {
+      grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    }
+
+    .script-slot {
+      padding: 1.25rem 0.75rem;
+    }
+  }
+</style>

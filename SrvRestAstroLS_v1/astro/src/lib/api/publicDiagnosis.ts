@@ -45,6 +45,18 @@ export interface TurnRequest {
   interaction_response?: Record<string, unknown>;
 }
 
+export interface EmbedAuthRequest {
+  clientId: string;
+  sessionId: string;
+  message: string;
+}
+
+export interface PublicTurnEmbedAuth {
+  clientId: string;
+  timestamp: number;
+  signature: string;
+}
+
 export interface TurnLanguage {
   initial_language: string;
   current_language: string;
@@ -129,14 +141,58 @@ export type StructuredDiagnosis = {
 
 import type { PublicDiagnosisContext } from "../t360/diagnosticador/config/types";
 
-export async function sendPublicTurn(request: TurnRequest, options?: { apiBaseUrl?: string; publicDiagnosisContext?: PublicDiagnosisContext }): Promise<TurnResponse> {
+type SendPublicTurnOptions = {
+  apiBaseUrl?: string;
+  publicDiagnosisContext?: PublicDiagnosisContext;
+  embedAuth?: PublicTurnEmbedAuth;
+};
+
+export async function requestEmbedTurnAuth(
+  request: EmbedAuthRequest,
+  options?: { apiBaseUrl?: string },
+): Promise<PublicTurnEmbedAuth> {
+  const baseUrl = options?.apiBaseUrl ?? API_BASE_URL;
+  const res = await fetch(`${baseUrl}/diagnosis/embed/auth`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      client_id: request.clientId,
+      session_id: request.sessionId,
+      message: request.message,
+    }),
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "Error en la comunicación con el servidor");
+    throw new Error(detail);
+  }
+
+  const data = await res.json();
+  return {
+    clientId: data.client_id,
+    timestamp: data.timestamp,
+    signature: data.signature,
+  };
+}
+
+export async function sendPublicTurn(request: TurnRequest, options?: SendPublicTurnOptions): Promise<TurnResponse> {
   const baseUrl = options?.apiBaseUrl ?? API_BASE_URL;
   const ctx = options?.publicDiagnosisContext;
-  const body = ctx ? { ...ctx, ...request } : request;
+  const embedAuth = options?.embedAuth;
+  const body = embedAuth
+    ? {
+        ...request,
+        client_id: embedAuth.clientId,
+        timestamp: embedAuth.timestamp,
+      }
+    : (ctx ? { ...ctx, ...request } : request);
   const url = `${baseUrl}/diagnosis/turn`;
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(embedAuth ? { "X-T360-Signature": embedAuth.signature } : {}),
+    },
     body: JSON.stringify(body),
   });
   if (!res.ok) {

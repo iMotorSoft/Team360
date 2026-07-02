@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import EmbedDiagnosticadorWrapper from "../lib/t360/diagnosticador/EmbedDiagnosticadorWrapper.svelte";
+
+const DEMO_API_BASE_URL = "http://127.0.0.1:7050/api";
+const DEMO_CLIENT_ID = "local_embed_demo";
+---
+
+<BaseLayout
+  title="Diagnosticador Embed Demo | Team360"
+  description="Demo interna del wrapper embebible con firma server-side"
+>
+  <EmbedDiagnosticadorWrapper
+    client:load
+    apiBaseUrl={DEMO_API_BASE_URL}
+    clientId={DEMO_CLIENT_ID}
+    assistantName="Diagnosticador Embed Demo"
+  />
+</BaseLayout>

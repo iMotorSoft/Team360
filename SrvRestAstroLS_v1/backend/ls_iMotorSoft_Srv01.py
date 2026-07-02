@@ -16,6 +16,7 @@ from modules.db.pool import close_pool, get_pool, open_pool
 
 from routes.automation_diagnosis import classify, save_answer, start_session
 from routes.diagnosis import (
+    public_embed_auth,
     public_get_session,
     public_lead,
     public_message,
@@ -76,6 +77,7 @@ def create_app() -> Litestar:
             public_get_session,
             public_submit_checklist,
             public_lead,
+            public_embed_auth,
             public_turn,
             sales_diagnosis_turn,
             dev_sales_diagnosis_turn,

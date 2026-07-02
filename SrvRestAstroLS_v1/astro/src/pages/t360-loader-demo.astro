@@ -1,0 +1,325 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const DEMO_API_BASE_URL = "http://127.0.0.1:7050/api";
+const DEMO_CLIENT_ID = "local_embed_demo";
+const LOADER_SESSION_STORAGE_KEY = "team360.embed.loader.demo.session.v1";
+const MANIFEST_URL = "/embed/team360-diagnosticador.manifest.json";
+const LOADER_URL = "/embed/team360-diagnosticador-loader.js";
+const ASSET_URL = "/embed/team360-diagnosticador.js";
+---
+
+<BaseLayout
+  title="Loader Demo | Team360"
+  description="Host controlado para validar manifest y loader externos minimos del Diagnosticador Team360"
+>
+  <main class="loader-demo" data-testid="loader-demo">
+    <section class="host-shell">
+      <header class="host-header" data-testid="loader-demo-header">
+        <p class="host-eyebrow">Loader Manifest Demo</p>
+        <h1>Host controlado con manifest y loader externos minimos</h1>
+        <p class="host-copy">
+          Esta página simula un host externo que primero carga un loader estable, luego resuelve el
+          manifest y finalmente monta el Diagnosticador desde
+          <code>window.Team360Diagnosticador.mount</code>.
+        </p>
+      </header>
+
+      <div class="host-grid">
+        <aside class="host-notes" data-testid="loader-demo-notes">
+          <h2>Contrato externo minimo</h2>
+          <ul>
+            <li><strong>Manifest:</strong> <code data-testid="loader-demo-manifest-url">{MANIFEST_URL}</code></li>
+            <li><strong>Loader:</strong> <code data-testid="loader-demo-loader-url">{LOADER_URL}</code></li>
+            <li><strong>Asset:</strong> <code data-testid="loader-demo-asset-url">{ASSET_URL}</code></li>
+            <li><strong>Session key:</strong> <code>{LOADER_SESSION_STORAGE_KEY}</code></li>
+          </ul>
+          <p>
+            El loader no hace mount automático. Solo carga el asset browser real y deja la llamada
+            explícita a <code>mount()</code> en manos del host.
+          </p>
+
+          <div class="loader-contract" data-testid="loader-demo-contract">
+            <p><strong>Manifest version:</strong> <span data-testid="loader-demo-manifest-version">pending</span></p>
+            <p><strong>Loader version:</strong> <span data-testid="loader-demo-loader-version">pending</span></p>
+            <p><strong>Asset global version:</strong> <span data-testid="loader-demo-asset-version">pending</span></p>
+            <p><strong>Pre-load global:</strong> <span data-testid="loader-demo-preload-global">pending</span></p>
+            <p><strong>Status:</strong> <span data-testid="loader-demo-status">pending</span></p>
+          </div>
+        </aside>
+
+        <section class="loader-slot" data-testid="loader-demo-slot">
+          <div
+            id="team360-loader-target"
+            class="loader-target"
+            data-testid="loader-demo-target"
+          ></div>
+
+          <p class="loader-error" data-testid="loader-demo-error" hidden></p>
+
+          <pre class="loader-snippet"><code>{`<script type="module" src="${LOADER_URL}"></script>
+<script type="module">
+  await window.Team360DiagnosticadorLoader.load();
+  window.Team360Diagnosticador.mount('#team360-loader-target', {
+    clientId: '${DEMO_CLIENT_ID}',
+    apiBaseUrl: '${DEMO_API_BASE_URL}',
+    sessionStorageKey: '${LOADER_SESSION_STORAGE_KEY}'
+  });
+</script>`}</code></pre>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script
+    type="module"
+    src={LOADER_URL}
+    is:inline
+    data-testid="loader-demo-loader-script"
+  ></script>
+
+  <script is:inline>
+    const loaderScript = document.querySelector('[data-testid="loader-demo-loader-script"]');
+    const statusNode = document.querySelector('[data-testid="loader-demo-status"]');
+    const errorNode = document.querySelector('[data-testid="loader-demo-error"]');
+    const manifestVersionNode = document.querySelector('[data-testid="loader-demo-manifest-version"]');
+    const loaderVersionNode = document.querySelector('[data-testid="loader-demo-loader-version"]');
+    const assetVersionNode = document.querySelector('[data-testid="loader-demo-asset-version"]');
+    const preloadGlobalNode = document.querySelector('[data-testid="loader-demo-preload-global"]');
+    const targetSelector = "#team360-loader-target";
+    const manifestUrl = "/embed/team360-diagnosticador.manifest.json";
+    const mountConfig = {
+      clientId: "local_embed_demo",
+      apiBaseUrl: "http://127.0.0.1:7050/api",
+      assistantName: "Diagnosticador Team360",
+      compact: false,
+      sessionStorageKey: "team360.embed.loader.demo.session.v1",
+    };
+
+    function setStatus(message) {
+      if (statusNode instanceof HTMLElement) {
+        statusNode.textContent = message;
+      }
+    }
+
+    function setError(message) {
+      if (!(errorNode instanceof HTMLElement)) {
+        return;
+      }
+
+      if (message) {
+        errorNode.hidden = false;
+        errorNode.textContent = message;
+        return;
+      }
+
+      errorNode.hidden = true;
+      errorNode.textContent = "";
+    }
+
+    async function mountDiagnosticadorFromLoader() {
+      if (!window.Team360DiagnosticadorLoader?.load) {
+        throw new Error("Team360DiagnosticadorLoader did not register the load API.");
+      }
+
+      if (loaderVersionNode instanceof HTMLElement) {
+        loaderVersionNode.textContent = window.Team360DiagnosticadorLoader.version ?? "unknown";
+      }
+
+      if (preloadGlobalNode instanceof HTMLElement) {
+        preloadGlobalNode.textContent = window.Team360Diagnosticador ? "present" : "absent";
+      }
+
+      const manifestResponse = await fetch(manifestUrl, {
+        headers: { Accept: "application/json" },
+      });
+      if (!manifestResponse.ok) {
+        throw new Error(`Manifest request failed with status ${manifestResponse.status}.`);
+      }
+
+      const manifest = await manifestResponse.json();
+      if (manifestVersionNode instanceof HTMLElement) {
+        manifestVersionNode.textContent =
+          typeof manifest.version === "string" ? manifest.version : "unknown";
+      }
+
+      await window.Team360DiagnosticadorLoader.load({
+        manifestUrl,
+      });
+
+      if (!window.Team360Diagnosticador?.mount) {
+        throw new Error("Team360Diagnosticador browser asset did not expose mount().");
+      }
+
+      if (assetVersionNode instanceof HTMLElement) {
+        assetVersionNode.textContent = window.Team360Diagnosticador.version ?? "unknown";
+      }
+
+      window.Team360Diagnosticador.mount(targetSelector, mountConfig);
+      setError("");
+      setStatus("mounted");
+    }
+
+    function handleMountError(error) {
+      setError(error instanceof Error ? error.message : "Falló el loader/manifest del Diagnosticador.");
+      setStatus("loader-error");
+    }
+
+    async function start() {
+      try {
+        await mountDiagnosticadorFromLoader();
+      } catch (error) {
+        handleMountError(error);
+      }
+    }
+
+    if (window.Team360DiagnosticadorLoader?.load) {
+      void start();
+    } else if (loaderScript instanceof HTMLScriptElement) {
+      loaderScript.addEventListener("load", () => {
+        void start();
+      }, { once: true });
+      loaderScript.addEventListener("error", () => {
+        setError("No se pudo cargar el loader browser del Diagnosticador.");
+        setStatus("loader-script-error");
+      }, { once: true });
+    } else {
+      setError("No se encontró el script del loader browser.");
+      setStatus("loader-script-missing");
+    }
+  </script>
+</BaseLayout>
+
+<style>
+  .loader-demo {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top left, rgba(180, 83, 9, 0.16), transparent 28rem),
+      linear-gradient(180deg, #f8f7f3 0%, #f3efe5 100%);
+    padding: 2rem 1rem 3rem;
+  }
+
+  .host-shell {
+    margin: 0 auto;
+    max-width: 78rem;
+  }
+
+  .host-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .host-eyebrow {
+    margin-bottom: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #b45309;
+  }
+
+  .host-header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.05;
+    color: #11263f;
+  }
+
+  .host-copy {
+    margin-top: 0.75rem;
+    max-width: 48rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4a627a;
+  }
+
+  .host-copy code {
+    font-size: 0.92em;
+  }
+
+  .host-grid {
+    display: grid;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .host-notes,
+  .loader-slot {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  }
+
+  .host-notes {
+    padding: 1.5rem;
+    color: #24364a;
+  }
+
+  .host-notes h2 {
+    margin: 0 0 0.85rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #102d4f;
+  }
+
+  .host-notes ul {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+    line-height: 1.55;
+  }
+
+  .host-notes p {
+    margin: 0 0 0.75rem;
+    font-size: 0.96rem;
+    line-height: 1.6;
+    color: #5a7086;
+  }
+
+  .host-notes code {
+    font-size: 0.9em;
+  }
+
+  .loader-contract p:last-child {
+    margin-bottom: 0;
+  }
+
+  .loader-slot {
+    padding: 1rem;
+  }
+
+  .loader-target {
+    min-height: 34rem;
+    border-radius: 1.25rem;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 252, 245, 0.94)),
+      linear-gradient(135deg, rgba(217, 119, 6, 0.08), rgba(245, 158, 11, 0));
+    padding: 0.5rem;
+  }
+
+  .loader-error {
+    margin: 0.85rem 0 0;
+    color: #b91c1c;
+    font-weight: 600;
+  }
+
+  .loader-snippet {
+    overflow-x: auto;
+    margin: 1rem 0 0;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  @media (min-width: 960px) {
+    .host-grid {
+      grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+    }
+
+    .loader-slot {
+      padding: 1.25rem;
+    }
+  }
+</style>

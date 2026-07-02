@@ -6,15 +6,21 @@ Does NOT test business logic (already covered in test_automation_diagnosis.py).
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+import anyio
 from litestar.testing import TestClient
 
 from ls_iMotorSoft_Srv01 import create_app
 from modules.automation_diagnosis.ai_interpreter import AIInterpretationError
 from modules.automation_diagnosis.postgres_service import AutomationDiagnosisPersistenceError
+from modules.embed_clients.hmac import build_canonical_string, sign
+from modules.embed_clients.models import EmbedClient
+from modules.embed_clients.rate_limit import InMemoryRateLimiter
 import routes.automation_diagnosis as auto_routes
 import routes.diagnosis as diagnosis_routes
+from routes.diagnosis_schemas import PublicTurnRequest
 
 if TYPE_CHECKING:
     from modules.sales_diagnosis_runtime import AssistantConversationRuntime
@@ -24,6 +30,92 @@ _PRELUDE = "Entendí que querés analizar este proceso:"
 
 def _client():
     return TestClient(create_app())
+
+
+def _build_embed_client(**overrides) -> EmbedClient:
+    payload = {
+        "client_id": "public_demo_client",
+        "hmac_secret": "test-embed-secret",
+        "assistant_instance_code": "team360_sales_diagnosis",
+        "organization_code": "team360_live",
+        "workspace_code": "team360_public_site",
+        "package_code": "pkg_sales_diagnosis",
+        "knowledge_scope_code": "ks_team360_sales_diagnosis",
+        "allowed_origins": ["https://embed.cliente.test"],
+        "is_active": True,
+    }
+    payload.update(overrides)
+    return EmbedClient(**payload)
+
+
+def _sign_public_turn(
+    secret: str,
+    *,
+    client_id: str,
+    timestamp: int,
+    session_id: str,
+    message: str,
+) -> str:
+    canonical = build_canonical_string(
+        client_id=client_id,
+        timestamp=timestamp,
+        session_id=session_id,
+        message=message.strip(),
+    )
+    return f"sha256={sign(canonical, secret)}"
+
+
+class _RecordingRuntime:
+    def __init__(self) -> None:
+        self.calls = 0
+        self.last_input = None
+
+    def handle_turn(self, input_):
+        from modules.sales_diagnosis_runtime.contracts import (
+            AssistantTurnOutput,
+            ConversationState,
+        )
+
+        self.calls += 1
+        self.last_input = input_
+        return AssistantTurnOutput(
+            response_text="respuesta controlada",
+            next_state=ConversationState(
+                session_id=input_.session_id,
+                assistant_instance_code=input_.assistant_instance_code,
+                package_code=input_.package_code,
+                knowledge_scope_code=input_.knowledge_scope_code,
+                turn_count=1,
+                semantic_memory={"diagnosis_status": "gathering"},
+            ),
+            language={"current_language": "es", "preferred_response_language": "es"},
+            turn_decision={"action": "reflect_and_ask"},
+        )
+
+
+@dataclass
+class _FakeClock:
+    current: float
+
+    def now(self) -> float:
+        return self.current
+
+    def advance(self, seconds: float) -> None:
+        self.current += seconds
+
+
+class _RecordingEmbedAuthAuditor:
+    def __init__(self) -> None:
+        self.events = []
+
+    def record(self, event) -> None:
+        self.events.append(event)
+
+
+class _RequestStub:
+    def __init__(self, headers: dict[str, str] | None = None, client_host: str = "127.0.0.1") -> None:
+        self.headers = headers or {}
+        self.scope = {"client": (client_host, 4321)}
 
 
 # ── /api/diagnosis/start ─────────────────────────────────────────────────
@@ -326,6 +418,1252 @@ def test_public_turn_partial_context_fills_defaults():
     assert ctx["organization_code"] == "team360_live"
     assert ctx["workspace_code"] == "team360_public_site"
     assert ctx["knowledge_scope_code"] == "ks_team360_sales_diagnosis"
+
+
+def test_public_turn_default_context_allowed():
+    """Request without context fields is allowed (resolves to default, passes allowlist)."""
+    from routes.diagnosis import _resolve_public_turn_context, _validate_public_turn_context_allowed
+    from routes.diagnosis_schemas import PublicTurnRequest
+
+    data = PublicTurnRequest(message="test")
+    ctx = _resolve_public_turn_context(data)
+    # Should not raise
+    _validate_public_turn_context_allowed(ctx)
+
+
+def test_public_turn_explicit_default_context_allowed():
+    """Request with explicit context equal to default passes allowlist."""
+    from routes.diagnosis import _resolve_public_turn_context, _validate_public_turn_context_allowed
+    from routes.diagnosis_schemas import PublicTurnRequest
+
+    data = PublicTurnRequest(
+        message="test",
+        assistant_instance_code="team360_sales_diagnosis",
+        organization_code="team360_live",
+        workspace_code="team360_public_site",
+        package_code="pkg_sales_diagnosis",
+        knowledge_scope_code="ks_team360_sales_diagnosis",
+    )
+    ctx = _resolve_public_turn_context(data)
+    # Should not raise
+    _validate_public_turn_context_allowed(ctx)
+
+
+def test_public_turn_partial_context_allowed_when_resolves_to_default():
+    """Request with partial context that resolves to default passes allowlist."""
+    from routes.diagnosis import _resolve_public_turn_context, _validate_public_turn_context_allowed
+    from routes.diagnosis_schemas import PublicTurnRequest
+
+    data = PublicTurnRequest(
+        message="test",
+        assistant_instance_code="team360_sales_diagnosis",
+        package_code="pkg_sales_diagnosis",
+    )
+    ctx = _resolve_public_turn_context(data)
+    # Should not raise (partial fields filled from defaults, full tuple matches allowlist)
+    _validate_public_turn_context_allowed(ctx)
+
+
+def test_public_turn_invalid_context_rejected():
+    """Request with invalid context (changed knowledge_scope_code) returns 403."""
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={
+                "message": "Quiero automatizar ventas",
+                "knowledge_scope_code": "ks_some_other_scope",
+            },
+        )
+    assert response.status_code == 403
+    data = response.json()
+    assert "not allowed" in data.get("detail", "").lower()
+
+
+def test_public_turn_invalid_context_error_does_not_leak_allowlist():
+    """403 error for invalid context must not leak allowlist values."""
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={
+                "message": "Quiero automatizar ventas",
+                "knowledge_scope_code": "ks_some_other_scope",
+            },
+        )
+    assert response.status_code == 403
+    body = str(response.json())
+    # Must not contain default values that would reveal the allowlist
+    for leak in ("team360_sales_diagnosis", "team360_live", "team360_public_site",
+                 "pkg_sales_diagnosis", "ks_team360_sales_diagnosis"):
+        assert leak not in body, f"Error response leaks allowlist value: {leak}"
+
+
+def test_public_turn_invalid_context_rejected_via_workspace():
+    """Request with invalid workspace_code also returns 403."""
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={
+                "message": "Quiero automatizar ventas",
+                "workspace_code": "some_other_workspace",
+            },
+        )
+    assert response.status_code == 403
+
+
+def test_public_turn_invalid_context_does_not_create_session():
+    """Invalid context must not create a session in state."""
+    session_id = "phase7a_invalid_should_not_exist"
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={
+                "session_id": session_id,
+                "message": "Quiero automatizar ventas",
+                "knowledge_scope_code": "ks_some_other_scope",
+            },
+        )
+    assert response.status_code == 403
+    # Verify session does NOT exist
+    with _client() as client:
+        get_resp = client.get(f"/api/diagnosis/session/{session_id}")
+    assert get_resp.status_code == 404
+
+
+def test_public_turn_without_client_id_keeps_default_flow(monkeypatch):
+    runtime = _RecordingRuntime()
+
+    monkeypatch.setattr(diagnosis_routes, "_build_public_turn_runtime", lambda: runtime)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_scope_resolver", lambda: None)
+
+    response = anyio.run(
+        diagnosis_routes.public_turn.fn,
+        PublicTurnRequest(session_id="legacy_vera_flow", message="Quiero automatizar ventas"),
+        None,
+    )
+
+    assert runtime.calls == 1
+    assert runtime.last_input.assistant_instance_code == "team360_sales_diagnosis"
+    assert runtime.last_input.package_code == "pkg_sales_diagnosis"
+    assert runtime.last_input.knowledge_scope_code == "ks_team360_sales_diagnosis"
+    assert response.session_id == "legacy_vera_flow"
+
+
+def test_embed_auth_valid_client_returns_signature(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    embed_client = _build_embed_client(client_id="auth_ok_client")
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_build_public_turn_runtime",
+        lambda: (_ for _ in ()).throw(AssertionError("runtime should not be called by auth endpoint")),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "embed_auth_ok",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data == {
+        "client_id": embed_client.client_id,
+        "timestamp": timestamp,
+        "signature": _sign_public_turn(
+            embed_client.hmac_secret,
+            client_id=embed_client.client_id,
+            timestamp=timestamp,
+            session_id="embed_auth_ok",
+            message="Quiero automatizar consultas por WhatsApp",
+        ),
+    }
+
+
+def test_embed_auth_signature_can_authorize_public_turn(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    session_id = "embed_auth_then_turn"
+    message = "Quiero automatizar consultas por WhatsApp"
+    embed_client = _build_embed_client(
+        client_id="auth_turn_client",
+        assistant_instance_code="db_assistant",
+        organization_code="db_org",
+        workspace_code="db_workspace",
+        package_code="db_package",
+        knowledge_scope_code="db_scope",
+    )
+    runtime = _RecordingRuntime()
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(diagnosis_routes, "_build_public_turn_runtime", lambda: runtime)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_scope_resolver", lambda: None)
+
+    with _client() as client:
+        auth_response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": session_id,
+                "message": message,
+            },
+        )
+
+        assert auth_response.status_code == 200
+        signed = auth_response.json()
+
+        turn_response = anyio.run(
+            diagnosis_routes.public_turn.fn,
+            PublicTurnRequest(
+                client_id=signed["client_id"],
+                timestamp=signed["timestamp"],
+                session_id=session_id,
+                message=message,
+                workspace_code="malicious_workspace",
+                knowledge_scope_code="malicious_scope",
+            ),
+            _RequestStub(
+                {
+                    "Origin": "https://embed.cliente.test",
+                    "X-T360-Signature": signed["signature"],
+                }
+            ),
+        )
+
+    assert runtime.calls == 1
+    assert runtime.last_input.assistant_instance_code == "db_assistant"
+    assert runtime.last_input.package_code == "db_package"
+    assert runtime.last_input.knowledge_scope_code == "db_scope"
+    assert turn_response.session_id == session_id
+
+
+def test_embed_auth_unknown_client_rejected(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository(),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": "unknown_client",
+                "session_id": "embed_auth_unknown",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Embed client request is not authorized."
+
+
+def test_embed_auth_inactive_client_rejected(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    embed_client = _build_embed_client(client_id="embed_auth_inactive", is_active=False)
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "embed_auth_inactive",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+
+
+def test_embed_auth_invalid_origin_rejected(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    embed_client = _build_embed_client(client_id="embed_auth_origin_denied")
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://evil.example"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "embed_auth_origin_denied",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+
+
+def test_embed_auth_response_does_not_leak_secret_or_context(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    embed_client = _build_embed_client(
+        client_id="embed_auth_no_leak",
+        hmac_secret="super-secret-value",
+        organization_code="secret_org",
+        workspace_code="secret_ws",
+        package_code="secret_pkg",
+        knowledge_scope_code="secret_scope",
+        allowed_origins=["https://embed.secret.test"],
+    )
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.secret.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "embed_auth_no_leak",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 200
+    body = str(response.json())
+    for leak in (
+        embed_client.hmac_secret,
+        embed_client.organization_code,
+        embed_client.workspace_code,
+        embed_client.package_code,
+        embed_client.knowledge_scope_code,
+        "https://embed.secret.test",
+    ):
+        assert leak not in body
+
+
+def test_embed_auth_does_not_create_session(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    session_id = "embed_auth_no_state"
+    embed_client = _build_embed_client(client_id="embed_auth_no_state")
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": session_id,
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 200
+    assert diagnosis_routes._public_turn_state.load(session_id) is None
+
+
+def test_embed_auth_rate_limit_allows_under_limit(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    clock = _FakeClock(1_710_000_000)
+    limiter = InMemoryRateLimiter(window_seconds=60, max_requests=2, time_source=clock.now)
+    auditor = _RecordingEmbedAuthAuditor()
+    embed_client = _build_embed_client(client_id="rate_limit_under_limit")
+
+    monkeypatch.setattr(embed_auth, "time", lambda: int(clock.now()))
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_rate_limiter", lambda: limiter)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_auditor", lambda: auditor)
+
+    with _client() as client:
+        first = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "rate_limit_under_limit_1",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+        second = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "rate_limit_under_limit_2",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert [event.event_type for event in auditor.events] == [
+        "embed_auth_allowed",
+        "embed_auth_allowed",
+    ]
+
+
+def test_embed_auth_rate_limit_rejects_over_limit(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    clock = _FakeClock(1_710_000_000)
+    limiter = InMemoryRateLimiter(window_seconds=60, max_requests=2, time_source=clock.now)
+    auditor = _RecordingEmbedAuthAuditor()
+    embed_client = _build_embed_client(client_id="rate_limit_over_limit")
+
+    monkeypatch.setattr(embed_auth, "time", lambda: int(clock.now()))
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_rate_limiter", lambda: limiter)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_auditor", lambda: auditor)
+
+    with _client() as client:
+        for idx in range(2):
+            response = client.post(
+                "/api/diagnosis/embed/auth",
+                headers={"Origin": "https://embed.cliente.test"},
+                json={
+                    "client_id": embed_client.client_id,
+                    "session_id": f"rate_limit_over_limit_{idx}",
+                    "message": "Quiero automatizar consultas por WhatsApp",
+                },
+            )
+            assert response.status_code == 200
+
+        limited = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "rate_limit_over_limit_3",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+
+    assert limited.status_code == 429
+    assert limited.json()["detail"] == "Too many embed authentication requests."
+    assert limited.headers["Retry-After"] == "60"
+    assert auditor.events[-1].event_type == "embed_auth_rate_limited"
+    assert auditor.events[-1].reason_code == "rate_limited"
+
+
+def test_embed_auth_rate_limit_is_scoped_by_client_and_origin(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    clock = _FakeClock(1_710_000_000)
+    limiter = InMemoryRateLimiter(window_seconds=60, max_requests=1, time_source=clock.now)
+    auditor = _RecordingEmbedAuthAuditor()
+    first_client = _build_embed_client(
+        client_id="rate_limit_scope_a",
+        allowed_origins=["https://embed.cliente.test"],
+    )
+    second_client = _build_embed_client(
+        client_id="rate_limit_scope_b",
+        allowed_origins=["https://alt-origin.test"],
+    )
+
+    monkeypatch.setattr(embed_auth, "time", lambda: int(clock.now()))
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository(
+            {
+                first_client.client_id: first_client,
+                second_client.client_id: second_client,
+            }
+        ),
+    )
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_rate_limiter", lambda: limiter)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_auditor", lambda: auditor)
+
+    with _client() as client:
+        first = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": first_client.client_id,
+                "session_id": "rate_limit_scope_a",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+        limited = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": first_client.client_id,
+                "session_id": "rate_limit_scope_a_retry",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+        isolated = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://alt-origin.test"},
+            json={
+                "client_id": second_client.client_id,
+                "session_id": "rate_limit_scope_b",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+
+    assert first.status_code == 200
+    assert limited.status_code == 429
+    assert isolated.status_code == 200
+
+
+def test_embed_auth_rate_limit_error_is_generic(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    limiter = InMemoryRateLimiter(window_seconds=60, max_requests=1, time_source=lambda: 1_710_000_000)
+    auditor = _RecordingEmbedAuthAuditor()
+    embed_client = _build_embed_client(
+        client_id="rate_limit_generic",
+        hmac_secret="super-secret-value",
+        organization_code="secret_org",
+        workspace_code="secret_ws",
+        package_code="secret_pkg",
+        knowledge_scope_code="secret_scope",
+        allowed_origins=["https://embed.secret.test"],
+    )
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_auth_rate_limiter",
+        lambda: limiter,
+    )
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_auditor", lambda: auditor)
+
+    with _client() as client:
+        first = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.secret.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "rate_limit_generic_1",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+        limited = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.secret.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "rate_limit_generic_2",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert first.status_code == 200
+    assert limited.status_code == 429
+    body = str(limited.json())
+    for leak in (
+        embed_client.client_id,
+        embed_client.hmac_secret,
+        embed_client.organization_code,
+        embed_client.workspace_code,
+        embed_client.package_code,
+        embed_client.knowledge_scope_code,
+        "https://embed.secret.test",
+    ):
+        assert leak not in body
+
+
+def test_embed_auth_rate_limited_does_not_create_session_or_signature(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    session_id = "rate_limit_no_state"
+    embed_client = _build_embed_client(client_id="rate_limit_no_state")
+    limiter = InMemoryRateLimiter(window_seconds=60, max_requests=1, time_source=lambda: 1_710_000_000)
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_auth_rate_limiter",
+        lambda: limiter,
+    )
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_auditor", lambda: _RecordingEmbedAuthAuditor())
+
+    with _client() as client:
+        ok = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "rate_limit_no_state_ok",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+        limited = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": session_id,
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert ok.status_code == 200
+    assert limited.status_code == 429
+    assert "signature" not in limited.json()
+    assert diagnosis_routes._public_turn_state.load(session_id) is None
+
+
+def test_embed_auth_unknown_client_audited_without_leak(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    auditor = _RecordingEmbedAuthAuditor()
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository(),
+    )
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_rate_limiter", lambda: InMemoryRateLimiter(window_seconds=60, max_requests=5, time_source=lambda: 1_710_000_000))
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_auditor", lambda: auditor)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test", "User-Agent": "agent/1.0"},
+            json={
+                "client_id": "unknown-secret-client",
+                "session_id": "embed_auth_unknown_audit",
+                "message": "Mensaje sensible que no debe loguearse",
+            },
+        )
+
+    assert response.status_code == 403
+    event = auditor.events[-1]
+    assert event.event_type == "embed_auth_rejected"
+    assert event.reason_code == "unknown_client"
+    event_dump = str(event.as_dict())
+    for leak in (
+        "unknown-secret-client",
+        "Mensaje sensible que no debe loguearse",
+        "https://embed.cliente.test",
+        "agent/1.0",
+    ):
+        assert leak not in event_dump
+
+
+def test_embed_auth_invalid_origin_audited_without_leak(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    auditor = _RecordingEmbedAuthAuditor()
+    embed_client = _build_embed_client(
+        client_id="invalid_origin_audit",
+        hmac_secret="invalid-origin-secret",
+        organization_code="secret_org",
+        workspace_code="secret_ws",
+        package_code="secret_pkg",
+        knowledge_scope_code="secret_scope",
+        allowed_origins=["https://embed.secret.test"],
+    )
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_rate_limiter", lambda: InMemoryRateLimiter(window_seconds=60, max_requests=5, time_source=lambda: 1_710_000_000))
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_auditor", lambda: auditor)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://evil.example"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "invalid_origin_audit_session",
+                "message": "Mensaje sensible que no debe loguearse",
+            },
+        )
+
+    assert response.status_code == 403
+    event = auditor.events[-1]
+    assert event.event_type == "embed_auth_rejected"
+    assert event.reason_code == "invalid_origin"
+    event_dump = str(event.as_dict())
+    for leak in (
+        embed_client.client_id,
+        embed_client.hmac_secret,
+        embed_client.organization_code,
+        embed_client.workspace_code,
+        embed_client.package_code,
+        embed_client.knowledge_scope_code,
+        "https://evil.example",
+        "Mensaje sensible que no debe loguearse",
+    ):
+        assert leak not in event_dump
+
+
+def test_embed_auth_allowed_event_is_safe(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    clock = _FakeClock(1_710_000_000)
+    auditor = _RecordingEmbedAuthAuditor()
+    embed_client = _build_embed_client(
+        client_id="allowed_event_safe",
+        hmac_secret="allowed-event-secret",
+        organization_code="secret_org",
+        workspace_code="secret_ws",
+        package_code="secret_pkg",
+        knowledge_scope_code="secret_scope",
+        allowed_origins=["https://embed.secret.test"],
+    )
+
+    monkeypatch.setattr(embed_auth, "time", lambda: int(clock.now()))
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_rate_limiter", lambda: InMemoryRateLimiter(window_seconds=60, max_requests=5, time_source=clock.now))
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_auditor", lambda: auditor)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.secret.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "allowed_event_safe_session",
+                "message": "Mensaje sensible que no debe loguearse",
+            },
+        )
+
+    assert response.status_code == 200
+    event = auditor.events[-1]
+    assert event.event_type == "embed_auth_allowed"
+    assert event.reason_code == "allowed"
+    event_dump = str(event.as_dict())
+    for leak in (
+        embed_client.client_id,
+        embed_client.hmac_secret,
+        embed_client.organization_code,
+        embed_client.workspace_code,
+        embed_client.package_code,
+        embed_client.knowledge_scope_code,
+        "https://embed.secret.test",
+        "Mensaje sensible que no debe loguearse",
+    ):
+        assert leak not in event_dump
+
+
+def test_embed_auth_rate_limit_window_reset_restores_flow(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    clock = _FakeClock(1_710_000_000)
+    limiter = InMemoryRateLimiter(window_seconds=60, max_requests=1, time_source=clock.now)
+    auditor = _RecordingEmbedAuthAuditor()
+    embed_client = _build_embed_client(client_id="rate_limit_window_reset")
+
+    monkeypatch.setattr(embed_auth, "time", lambda: int(clock.now()))
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_rate_limiter", lambda: limiter)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_auth_auditor", lambda: auditor)
+
+    with _client() as client:
+        first = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "rate_limit_window_reset_1",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+        limited = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "rate_limit_window_reset_2",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+        clock.advance(61)
+        recovered = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "rate_limit_window_reset_3",
+                "message": "Quiero automatizar consultas por WhatsApp",
+            },
+        )
+
+    assert first.status_code == 200
+    assert limited.status_code == 429
+    assert recovered.status_code == 200
+
+
+def test_public_turn_valid_client_id_resolves_context_from_db_and_ignores_body(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    session_id = "embed_session_valid"
+    message = "Quiero automatizar turnos por WhatsApp"
+    embed_client = _build_embed_client(
+        client_id="public_demo_client",
+        assistant_instance_code="db_assistant",
+        organization_code="db_org",
+        workspace_code="db_workspace",
+        package_code="db_package",
+        knowledge_scope_code="db_scope",
+    )
+    runtime = _RecordingRuntime()
+    repo = InMemoryEmbedClientRepository({embed_client.client_id: embed_client})
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_client_repository", lambda: repo)
+    monkeypatch.setattr(diagnosis_routes, "_build_public_turn_runtime", lambda: runtime)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_scope_resolver", lambda: None)
+
+    signature = _sign_public_turn(
+        embed_client.hmac_secret,
+        client_id=embed_client.client_id,
+        timestamp=timestamp,
+        session_id=session_id,
+        message=message,
+    )
+
+    response = anyio.run(
+        diagnosis_routes.public_turn.fn,
+        PublicTurnRequest(
+            client_id=embed_client.client_id,
+            timestamp=timestamp,
+            session_id=session_id,
+            message=message,
+            assistant_instance_code="malicious_assistant",
+            organization_code="malicious_org",
+            workspace_code="malicious_workspace",
+            package_code="malicious_package",
+            knowledge_scope_code="malicious_scope",
+        ),
+        _RequestStub(
+            {
+                "Origin": "https://embed.cliente.test",
+                "X-T360-Signature": signature,
+            }
+        ),
+    )
+
+    assert runtime.calls == 1
+    assert runtime.last_input.session_id == session_id
+    assert runtime.last_input.assistant_instance_code == "db_assistant"
+    assert runtime.last_input.package_code == "db_package"
+    assert runtime.last_input.knowledge_scope_code == "db_scope"
+    assert response.session_id == session_id
+
+
+def test_public_turn_unknown_client_id_rejected(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository(),
+    )
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_build_public_turn_runtime",
+        lambda: (_ for _ in ()).throw(AssertionError("runtime should not be called")),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={
+                "client_id": "unknown_client",
+                "timestamp": 1_710_000_000,
+                "session_id": "embed_unknown",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Embed client request is not authorized."
+
+
+def test_public_turn_inactive_client_rejected(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    embed_client = _build_embed_client(client_id="inactive_client", is_active=False)
+    repo = InMemoryEmbedClientRepository({embed_client.client_id: embed_client})
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_client_repository", lambda: repo)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            headers={
+                "Origin": "https://embed.cliente.test",
+                "X-T360-Signature": _sign_public_turn(
+                    embed_client.hmac_secret,
+                    client_id=embed_client.client_id,
+                    timestamp=timestamp,
+                    session_id="embed_inactive",
+                    message="Quiero automatizar ventas",
+                ),
+            },
+            json={
+                "client_id": embed_client.client_id,
+                "timestamp": timestamp,
+                "session_id": "embed_inactive",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Embed client request is not authorized."
+
+
+def test_public_turn_origin_not_allowed_rejected(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    embed_client = _build_embed_client(client_id="origin_denied")
+    repo = InMemoryEmbedClientRepository({embed_client.client_id: embed_client})
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_client_repository", lambda: repo)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            headers={
+                "Origin": "https://otro-host.test",
+                "X-T360-Signature": _sign_public_turn(
+                    embed_client.hmac_secret,
+                    client_id=embed_client.client_id,
+                    timestamp=timestamp,
+                    session_id="embed_origin_denied",
+                    message="Quiero automatizar ventas",
+                ),
+            },
+            json={
+                "client_id": embed_client.client_id,
+                "timestamp": timestamp,
+                "session_id": "embed_origin_denied",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+
+
+def test_public_turn_missing_signature_rejected(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    embed_client = _build_embed_client(client_id="missing_signature")
+    repo = InMemoryEmbedClientRepository({embed_client.client_id: embed_client})
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_client_repository", lambda: repo)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            headers={"Origin": "https://embed.cliente.test"},
+            json={
+                "client_id": embed_client.client_id,
+                "timestamp": timestamp,
+                "session_id": "embed_missing_signature",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+
+
+def test_public_turn_invalid_signature_rejected(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    embed_client = _build_embed_client(client_id="bad_signature")
+    repo = InMemoryEmbedClientRepository({embed_client.client_id: embed_client})
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_client_repository", lambda: repo)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            headers={
+                "Origin": "https://embed.cliente.test",
+                "X-T360-Signature": "sha256=deadbeef",
+            },
+            json={
+                "client_id": embed_client.client_id,
+                "timestamp": timestamp,
+                "session_id": "embed_bad_signature",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+
+
+def test_public_turn_signature_for_different_message_rejected(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    embed_client = _build_embed_client(client_id="different_message")
+    repo = InMemoryEmbedClientRepository({embed_client.client_id: embed_client})
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_client_repository", lambda: repo)
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_build_public_turn_runtime",
+        lambda: (_ for _ in ()).throw(AssertionError("runtime should not be called")),
+    )
+
+    signed_for_other_message = _sign_public_turn(
+        embed_client.hmac_secret,
+        client_id=embed_client.client_id,
+        timestamp=timestamp,
+        session_id="embed_different_message",
+        message="Mensaje firmado original",
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            headers={
+                "Origin": "https://embed.cliente.test",
+                "X-T360-Signature": signed_for_other_message,
+            },
+            json={
+                "client_id": embed_client.client_id,
+                "timestamp": timestamp,
+                "session_id": "embed_different_message",
+                "message": "Mensaje distinto que no fue firmado",
+            },
+        )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Embed client request is not authorized."
+
+
+def test_public_turn_expired_timestamp_rejected(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    now_value = 1_710_000_000
+    expired_timestamp = now_value - 301
+    embed_client = _build_embed_client(client_id="expired_timestamp")
+    repo = InMemoryEmbedClientRepository({embed_client.client_id: embed_client})
+
+    monkeypatch.setattr(embed_auth, "time", lambda: now_value)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_client_repository", lambda: repo)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            headers={
+                "Origin": "https://embed.cliente.test",
+                "X-T360-Signature": _sign_public_turn(
+                    embed_client.hmac_secret,
+                    client_id=embed_client.client_id,
+                    timestamp=expired_timestamp,
+                    session_id="embed_expired",
+                    message="Quiero automatizar ventas",
+                ),
+            },
+            json={
+                "client_id": embed_client.client_id,
+                "timestamp": expired_timestamp,
+                "session_id": "embed_expired",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+
+
+def test_public_turn_future_timestamp_rejected(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    now_value = 1_710_000_000
+    future_timestamp = now_value + 301
+    embed_client = _build_embed_client(client_id="future_timestamp")
+    repo = InMemoryEmbedClientRepository({embed_client.client_id: embed_client})
+
+    monkeypatch.setattr(embed_auth, "time", lambda: now_value)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_embed_client_repository", lambda: repo)
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            headers={
+                "Origin": "https://embed.cliente.test",
+                "X-T360-Signature": _sign_public_turn(
+                    embed_client.hmac_secret,
+                    client_id=embed_client.client_id,
+                    timestamp=future_timestamp,
+                    session_id="embed_future",
+                    message="Quiero automatizar ventas",
+                ),
+            },
+            json={
+                "client_id": embed_client.client_id,
+                "timestamp": future_timestamp,
+                "session_id": "embed_future",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+
+
+def test_public_turn_embed_errors_do_not_leak_context_or_secret(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    embed_client = _build_embed_client(
+        client_id="no_leak_client",
+        hmac_secret="super-secret-should-not-leak",
+        assistant_instance_code="db_assistant_secret",
+        organization_code="db_org_secret",
+        workspace_code="db_workspace_secret",
+        package_code="db_package_secret",
+        knowledge_scope_code="db_scope_secret",
+        allowed_origins=["https://embed.secret.test"],
+    )
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={
+                "client_id": embed_client.client_id,
+                "timestamp": 1_710_000_000,
+                "session_id": "embed_no_leak",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+    body = str(response.json())
+    for leak in (
+        embed_client.client_id,
+        embed_client.hmac_secret,
+        embed_client.assistant_instance_code,
+        embed_client.organization_code,
+        embed_client.workspace_code,
+        embed_client.package_code,
+        embed_client.knowledge_scope_code,
+        "https://embed.secret.test",
+    ):
+        assert leak not in body
+
+
+def test_public_turn_invalid_embed_auth_does_not_create_state(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    session_id = "embed_invalid_no_state"
+    embed_client = _build_embed_client(client_id="invalid_no_state")
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/turn",
+            json={
+                "client_id": embed_client.client_id,
+                "timestamp": 1_710_000_000,
+                "session_id": session_id,
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+    assert diagnosis_routes._public_turn_state.load(session_id) is None
 
 
 def test_public_turn_with_context_smoke():

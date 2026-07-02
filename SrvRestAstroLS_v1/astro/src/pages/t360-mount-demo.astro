@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import MountDiagnosticadorDemo from "../lib/t360/embed/MountDiagnosticadorDemo.svelte";
+
+const DEMO_API_BASE_URL = "http://127.0.0.1:7050/api";
+const DEMO_CLIENT_ID = "local_embed_demo";
+const MOUNT_SESSION_STORAGE_KEY = "team360.embed.mount.demo.session.v1";
+---
+
+<BaseLayout
+  title="Mount Adapter Demo | Team360"
+  description="Host controlado para validar el adapter interno mount() del Diagnosticador Team360"
+>
+  <MountDiagnosticadorDemo
+    client:load
+    apiBaseUrl={DEMO_API_BASE_URL}
+    clientId={DEMO_CLIENT_ID}
+    assistantName="Diagnosticador Team360"
+    sessionStorageKey={MOUNT_SESSION_STORAGE_KEY}
+  />
+</BaseLayout>

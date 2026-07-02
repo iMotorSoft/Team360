@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-06-28 (publicDiagnosisContext configurable en DiagnosticadorCore)
+Ultima actualizacion: 2026-07-01 (Fase 9E — manifest/loader externo minimo)
 
 ## Estado general
 
@@ -11,6 +11,369 @@ Ultima actualizacion: 2026-06-28 (publicDiagnosisContext configurable en Diagnos
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-07-01 — Fase 9E — manifest/loader externo minimo con versionado explicito
+
+Se agrego un manifest publico minimo y un loader publico minimo para hosts
+controlados, sin npm/package, CDN real ni Web Component.
+
+- Manifest estable:
+  `/embed/team360-diagnosticador.manifest.json`.
+- Loader estable:
+  `/embed/team360-diagnosticador-loader.js`.
+- Asset estable conservado:
+  `/embed/team360-diagnosticador.js`.
+- El loader reusa el asset estable con `import(assetUrl)` y no duplica
+  `mount.ts` ni `browser-global.ts`.
+- Nuevo host controlado:
+  `/t360-loader-demo`.
+- Session key nueva:
+  `team360.embed.loader.demo.session.v1`.
+- Nuevo E2E:
+  `e2e/diagnosticador-loader-demo.spec.ts`.
+- Versionado explicito nuevo:
+  - manifest `0.9.0-experimental`;
+  - loader `experimental-9e`;
+  - global del asset conserva `experimental-9c`.
+- Validacion:
+  - backend focal `83/83 PASS`;
+  - backend full `1089 PASS, 9 skipped`;
+  - `pnpm check` PASS;
+  - `pnpm build` PASS, `146 page(s)`;
+  - `diagnosticador-loader-demo.spec.ts`: `1 passed`;
+  - regresion corta loader/asset/script/mount/external/embed:
+    `7 passed`.
+- Manifest/loader/asset estables no contienen tenant/scope ni
+  `hmac_secret`.
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` no se tocaron.
+- MCP `http://localhost:8931/mcp` siguio reachable por HTTP (`400 Bad Request`)
+  pero sin herramientas navegables expuestas; cierre efectivo con Playwright
+  CLI sobre backend `7050` + fallback estatico `astro/dist` con proxy `/api`.
+
+### 2026-07-01 — Fase 9D — asset JS browser real servido por Astro
+
+Se agrego un asset browser estable servido por Astro para hosts controlados,
+sin package npm, CDN externo ni Web Component.
+
+- URL publica estable:
+  `/embed/team360-diagnosticador.js`.
+- La salida se emite desde el build Astro/Vite con un chunk fijo definido en
+  `astro.config.mjs`.
+- Reutiliza `browser-global.ts` como registro global y `mount.ts` como fuente
+  de verdad; no duplica validaciones ni logica conversacional.
+- Nuevo host controlado:
+  `/t360-asset-demo`.
+- Session key nueva:
+  `team360.embed.asset.demo.session.v1`.
+- Nuevo E2E:
+  `e2e/diagnosticador-asset-demo.spec.ts`.
+- Validacion:
+  - backend focal `83/83 PASS`;
+  - backend full `1089 PASS, 9 skipped`;
+  - `pnpm check` PASS;
+  - `pnpm build` PASS, `145 page(s)`;
+  - `diagnosticador-asset-demo.spec.ts`: `1 passed`;
+  - regresion corta asset/script/mount/external/embed:
+    `6 passed`;
+  - suite focalizada Vera/lab/embed/external/mount/script/asset:
+    `20 passed, 2 skipped`.
+- El asset estable `dist/embed/team360-diagnosticador.js` no contiene
+  tenant/scope; los chunks compartidos `/_astro/*` siguen arrastrando strings
+  tecnicos historicos de Vera, fuera del alcance de esta fase.
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` no se tocaron.
+- MCP `http://localhost:8931/mcp` siguio reachable por HTTP (`400 Bad Request`)
+  pero sin herramientas navegables expuestas; cierre efectivo con Playwright
+  CLI sobre backend `7050` + fallback estatico `astro/dist` con proxy `/api`.
+
+### 2026-07-01 — Fase 9C — script browser global controlado sobre mount
+
+Se agrego una capa browser global experimental que expone
+`window.Team360Diagnosticador.mount(...)` sobre el adapter de Fase 9B, sin
+crear package npm, asset externo final ni Web Component.
+
+- Nuevo registro global:
+  `astro/src/lib/t360/embed/browser-global.ts`.
+- Reusa `mountTeam360Diagnosticador()`; no duplica validaciones ni logica
+  conversacional.
+- Nueva ruta host controlada:
+  `/t360-script-demo`.
+- Session key nueva:
+  `team360.embed.script.demo.session.v1`.
+- El global actual expone:
+  - `mount`;
+  - `version="experimental-9c"`;
+  - handle con `destroy()`.
+- Si el script se carga dos veces, conserva el global existente y no lo
+  sobreescribe.
+- El contrato embed sigue pasando por `POST /api/diagnosis/embed/auth` y
+  `POST /api/diagnosis/turn` con `client_id`, `timestamp` y
+  `X-T360-Signature`.
+- Nuevo E2E:
+  `e2e/diagnosticador-script-demo.spec.ts`.
+- Validacion:
+  - backend focal `83/83 PASS`;
+  - backend full `1089 PASS, 9 skipped`;
+  - `pnpm check` PASS;
+  - `pnpm build` PASS, `144 page(s)`;
+  - `diagnosticador-script-demo.spec.ts`: `2 passed`;
+  - regresion corta script/mount/external/embed:
+    `5 passed`;
+  - suite focalizada Vera/lab/embed/external/mount/script:
+    `19 passed, 2 skipped`.
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` no se tocaron.
+- MCP `http://localhost:8931/mcp` siguio reachable por HTTP (`400 Bad Request`)
+  pero sin herramientas navegables expuestas; cierre efectivo con Playwright
+  CLI sobre backend `7050` + fallback estatico `astro/dist` con proxy `/api`.
+
+### 2026-07-01 — Fase 9B — `mount()` JavaScript experimental controlado
+
+Se agrego una capa de montaje TypeScript interna para hosts controlados, sin
+crear SDK publico, package npm ni Web Component.
+
+- Nuevo adapter:
+  `astro/src/lib/t360/embed/mount.ts`.
+- Usa `mount()` y `unmount()` de Svelte 5 local.
+- Reutiliza `EmbedDiagnosticadorWrapper.svelte`; no duplica logica
+  conversacional ni contrato backend.
+- Nuevo host controlado:
+  `/t360-mount-demo`.
+- Nueva session key aislada:
+  `team360.embed.mount.demo.session.v1`.
+- El adapter valida:
+  - selector/HTMLElement;
+  - `clientId`;
+  - `apiBaseUrl`;
+  - rechazo de claves prohibidas (`hmac_secret`, tenant/scope, etc.).
+- Se exporta `mountTeam360Diagnosticador()` y namespace interno
+  `Team360Diagnosticador.mount(...)`, sin `window`.
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` no se tocaron.
+- Validacion:
+  - backend focal `83/83 PASS`;
+  - backend full `1089 PASS, 9 skipped`;
+  - `pnpm check` PASS;
+  - `pnpm build` PASS, `143 page(s)`;
+  - `diagnosticador-mount-demo.spec.ts` PASS;
+  - regresion corta embed/external/mount `3 passed`;
+  - suite focalizada Vera/lab/embed/external/mount:
+    `17 passed, 2 skipped`.
+- Preflight DB real confirmado:
+  `embed_clients` presente, seed `local_embed_demo` activo, secret presente.
+- MCP `http://localhost:8931/mcp` respondio `400 Bad Request` por HTTP, pero
+  no expuso herramientas navegables en esta sesion; cierre efectivo con
+  Playwright CLI sobre backend `7050` + fallback estatico `astro/dist` con
+  proxy `/api`.
+
+### 2026-06-30 — Fase 9A-Fix — runtime/gate E2E del adapter externo
+
+Se cerro el bloqueo operativo de 9A sin tocar `/t360`, `PublicVeraEntry` ni
+`global.js`.
+
+- El fallo real estaba en `e2e/public-vera-new-conversation.spec.ts`, no en el
+  adapter externo.
+- El spec usaba waits fijos, dependia del backend real y no limpiaba
+  `team360.vera.session.v1`, por eso quedaba expuesto a timing de hidratacion y
+  loading state (`Analizando...`).
+- Se endurecio el spec con el mismo patron de los tests estables de Vera:
+  limpieza explicita de sesion, route mocking de `/api/diagnosis/turn` y
+  esperas sobre estado habilitado/visible.
+- `astro-dev.sh` sigue bloqueado por la guarda intencional contra
+  `IS_REST_PRO=true` en `global.js`; no se toco ese diff preexistente.
+- El gate real se valido con backend `7050` + fallback estatico sobre
+  `astro/dist` + proxy `/api`.
+- Resultado final:
+  - `diagnosticador-external-host-demo`: PASS;
+  - `diagnosticador-embed-demo`: PASS;
+  - `public-vera-new-conversation`: PASS en aislado;
+  - suite focalizada Vera/lab/embed/external: `16 passed, 2 skipped`.
+- MCP oficial `http://localhost:8931/mcp` siguio sin herramientas navegables
+  expuestas en esta sesion; cierre efectivo con Playwright CLI.
+
+### 2026-06-30 — Fase 9A — Adapter externo controlado del embed
+
+Se agrego una ruta host externa controlada para montar el Diagnosticador fuera
+de `/t360` sin crear SDK, package ni Web Component.
+
+- Nueva ruta Astro:
+  `/t360-external-host-demo`.
+- Reutiliza `EmbedDiagnosticadorWrapper.svelte`.
+- El wrapper ahora acepta `sessionStorageKey` opcional para aislar hosts
+  controlados.
+- Session key nueva:
+  `team360.embed.external.demo.session.v1`.
+- Nuevo E2E:
+  `e2e/diagnosticador-external-host-demo.spec.ts`.
+- `POST /api/diagnosis/embed/auth` y `POST /api/diagnosis/turn` se validaron
+  otra vez con `client_id`, `timestamp` y `X-T360-Signature`.
+- No se toco `/t360`, `PublicVeraEntry.svelte` ni `global.js`.
+- El host HTML nuevo no incrusta tenant/scope ni secretos.
+- El bundle compartido del Core mantiene strings tecnicos historicos de Vera,
+  fuera del alcance de esta fase.
+- MCP oficial `http://localhost:8931/mcp` siguio sin herramientas navegables
+  en esta sesion; cierre con Playwright CLI.
+
+### 2026-06-30 — Fase 8C — Endurecimiento operativo embed auth
+
+Se endurecio `POST /api/diagnosis/embed/auth` antes de ampliar el contrato
+publico del embed.
+
+- Se eligio interfaz minima + rate limiter in-memory por proceso.
+- Nueva clave de rate limit:
+  `client_id + origin + remote_ip`.
+- Defaults v1:
+  - `TEAM360_EMBED_AUTH_RATE_LIMIT_WINDOW_SECONDS=60`
+  - `TEAM360_EMBED_AUTH_RATE_LIMIT_MAX_REQUESTS=20`
+  - `TEAM360_EMBED_AUTH_RATE_LIMIT_MAX_KEYS=10000`
+- Exceso de limite:
+  - `429 Too Many Requests`
+  - detail generico `Too many embed authentication requests.`
+  - `Retry-After`
+  - sin firma y sin sesion.
+- Auditoria segura nueva por intento:
+  - `embed_auth_allowed`
+  - `embed_auth_rejected`
+  - `embed_auth_rate_limited`
+- Los eventos solo registran hashes de `client_id`, `origin`, `remote_ip`,
+  `user_agent`, mas `status_code`, `reason_code` y `request_id` cuando existe.
+- No se persisten ni loguean `hmac_secret`, mensaje completo, tenant, scope ni
+  `allowed_origins`.
+- Validacion backend:
+  - focalizada `83/83 PASS`;
+  - suite completa `1089 PASS, 9 skipped`.
+- MCP oficial `http://localhost:8931/mcp` no expuso herramientas navegables en
+  esta sesion; el launcher oficial de Astro siguio bloqueado por el diff
+  preexistente `IS_REST_PRO=true` en `global.js`, que no corresponde tocar en
+  esta fase.
+
+### 2026-06-30 — Fase 8B — Contrato publico controlado v1
+
+Se formalizo el contrato publico controlado del embed sobre la opcion B
+(firma delegada por turno), sin introducir JWT ni token store.
+
+- Se mantiene `POST /api/diagnosis/embed/auth` como endpoint publico
+  controlado v1.
+- El timestamp lo genera siempre backend y la firma sigue el canonical string
+  `client_id.timestamp.session_id.message`.
+- El backend mantiene `embed_clients` como fuente exclusiva del contexto
+  cuando existe `client_id`.
+- Nuevo test backend de seguridad: una firma emitida para un mensaje no
+  autoriza otro mensaje distinto.
+- Playwright demo ahora valida request y response de auth sin leak de tenant,
+  scope, secret ni `allowed_origins`.
+- El gate Vera/lab/embed se estabilizo sin tocar `/t360`:
+  - `diagnosticador-embed-demo`: PASS;
+  - `diagnosticador-embed-lab`: route mocking para aislar el diff preexistente
+    de `global.js` y validar transporte/session keys;
+  - `public-vera` y `public-vera-new-conversation`: PASS sobre el entorno local
+    correcto, con ajuste de expectativas frágiles.
+- MCP oficial `http://localhost:8931/mcp` siguio reachable por HTTP, pero el
+  cierre efectivo permanecio en Playwright CLI por falta de herramientas MCP
+  navegables expuestas en esta sesion.
+
+### 2026-06-30 — Fase 8A — Wrapper embed interno/demo seguro
+
+Se implemento el primer wrapper embebible interno/demo sobre el contrato
+`embed_clients`, sin exponer `hmac_secret` al navegador.
+
+- Nuevo endpoint backend `POST /api/diagnosis/embed/auth`:
+  valida `client_id`, `is_active`, `Origin`/`Referer`; genera `timestamp`
+  server-side y devuelve solo `client_id`, `timestamp`, `signature`.
+- `routes/diagnosis.py` reutiliza `PostgresEmbedClientRepository`,
+  validacion de origins y helpers HMAC ya existentes; el endpoint de firma no
+  crea sesion ni contacta LLM.
+- `publicDiagnosis.ts` ahora soporta `embedAuth`:
+  si existe, envia `client_id` y `timestamp` en body + `X-T360-Signature`
+  en headers, sin mezclar `publicDiagnosisContext`.
+- `DiagnosticadorCore.svelte` agrega `turnAuthProvider` opcional. Vera y el lab
+  viejo no lo usan; el wrapper demo si.
+- Nuevo wrapper `EmbedDiagnosticadorWrapper.svelte` y pagina
+  `/t360-embed-demo` con `client_id=local_embed_demo`, `apiBaseUrl`
+  explicito y key aislada `team360.embed.demo.session.v1`.
+- Props publicas v1 del wrapper:
+  `apiBaseUrl`, `clientId`, `assistantName`, `compact`, `initialMessage`.
+- Props prohibidas por contrato: `hmac_secret`, tenant/scopes,
+  `allowed_origins`, `service_code`, `template_code`.
+- Validacion backend:
+  - `73/73 PASS` en tests focalizados (`embed auth` + router publico);
+  - `1079 PASS, 9 skipped` en la suite backend completa.
+- Validacion frontend:
+  - `pnpm check` 0 errors, 0 warnings, 5 hints;
+  - `pnpm build` 141 pages;
+  - `git diff --check` PASS.
+- Smoke real backend:
+  - `POST /api/diagnosis/embed/auth` con `local_embed_demo`: `200 OK`;
+  - auth → turn real: `201 Created`;
+  - body malicioso ignorado y contexto persistido desde DB;
+  - unknown client / invalid origin: `403`.
+- Playwright:
+  - MCP endpoint `http://localhost:8931/mcp` respondio a nivel HTTP, pero no
+    hubo herramientas MCP navegables expuestas en esta sesion;
+  - Playwright CLI quedo como evidencia de cierre;
+  - `e2e/diagnosticador-embed-demo.spec.ts`: PASS real;
+  - `public-vera-new-conversation` y `diagnosticador-embed-lab` fallaron bajo
+    el server local proxyeado por supuestos de entorno (`URL exacta` y
+    reset UI), no por el wrapper nuevo.
+- No se tocaron `/t360`, `PublicVeraEntry.svelte`, `global.js`, `runtime.py`
+  ni `policies.py`.
+
+### 2026-06-30 — Fase 7C — Aplicacion controlada de DB real para embed_clients
+
+Se cerro la validacion extremo a extremo de `embed_clients` sobre PostgreSQL
+local/controlado, sin tocar `/t360` ni reiniciar servicios permanentes.
+
+- Migracion `008_create_embed_clients.sql` aplicada manualmente sobre DB local
+  `team360` usando `psycopg`.
+- Backup logico minimo previo registrado en
+  `backups/phase7c_pre_migration_20260630T122347Z.json`.
+- Tabla `embed_clients` verificada post-migracion: columnas, indices y
+  constraints compatibles con el contrato v1.
+- Seed local de prueba insertado con UPSERT:
+  `client_id=local_embed_demo`, origins `http://127.0.0.1:3050` y
+  `http://localhost:3050`, secret no real.
+- Backend real levantado solo con `backend-dev.sh`; `/health` OK.
+- Smokes reales contra `http://127.0.0.1:7050/api/diagnosis/turn`:
+  - sin `client_id`: 201;
+  - `client_id` valido + HMAC + origin: 201;
+  - body malicioso con contexto manipulado: 201 pero contexto efectivo
+    persistido desde DB;
+  - `client_id` desconocido: 403;
+  - firma invalida: 403;
+  - origin invalido: 403;
+  - timestamp vencido/futuro: 403.
+- Requests 403 no crearon estado conversacional en PostgreSQL.
+- Validacion post-migracion:
+  `uv run pytest tests/test_diagnosis_public_router.py tests/test_embed_clients_contract.py`
+  66/66 PASS;
+  `uv run pytest tests/ -x --ignore=tests/test_db_module.py`
+  1072 PASS, 9 skipped;
+  `pnpm check` 0 errors, 0 warnings, 5 hints;
+  `pnpm build` 140 pages;
+  `git diff --check` PASS.
+- Playwright/MCP no ejecutados en esta fase: Astro runtime local no estaba
+  disponible y `global.js` conserva un diff preexistente ajeno a Fase 7C que
+  no debe tocarse para forzar `astro-dev.sh`.
+
+### 2026-06-30 — Fase 7B — Produccion multi-cliente para embed
+
+Se preparo el contrato backend seguro para clientes embebibles multi-tenant sin
+romper Vera ni `/t360`.
+
+- Nueva migracion `008_create_embed_clients.sql`: tabla persistente para
+  `client_id`, `hmac_secret`, contexto fijo y `allowed_origins`.
+- Seed de ejemplo separado `008_create_embed_clients_seed_example.sql`; no se
+  aplica automaticamente y no contiene secretos reales.
+- Nuevo modulo `backend/modules/embed_clients/` con validacion HMAC-SHA256,
+  canonical string `client_id.timestamp.session_id.message`, origin exacto y
+  timestamp window configurable.
+- `routes/diagnosis.py` ahora resuelve requests con `client_id` solo desde
+  PostgreSQL y descarta cualquier contexto enviado por frontend.
+- Vera sin `client_id` mantiene defaults + allowlist minima de Fase 7A.
+- Secret storage v1: `hmac_secret` en plaintext en PostgreSQL, con deuda
+  explicitada de vault/cifrado/rotacion futura.
+- Documentacion canonica nueva:
+  `SrvRestAstroLS_v1/docs/diagnosticador_embed_auth_v1.md`.
+- Validacion focalizada: 66/66 PASS en tests backend de router + contrato;
+  `pnpm check` sin errores; `pnpm build` 140 pages; `git diff --check` PASS.
+- Migracion no aplicada sobre PostgreSQL real en esta fase.
 
 ### 2026-06-28 — publicDiagnosisContext configurable en DiagnosticadorCore (Fase 5)
 
@@ -31,6 +394,26 @@ El Core acepta un contexto publico configurable sin alterar el payload historico
 - Validacion: `pnpm check` 0 errors, `pnpm build` 140 pages, Playwright
   14/14 pass (lab + Vera + new-conversation). Sin regresiones.
 - Estado: FASE 5 — PUBLIC_DIAGNOSIS_CONTEXT CONFIGURABLE — IMPLEMENTADA Y VALIDADA.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
+
+### 2026-06-29 — Fase 7A — Allowlist minima backend para PublicDiagnosisContext
+
+El backend ahora rechaza contextos publicos arbitrarios validando contra una allowlist de
+tuplas completas de 5 campos (assistant_instance_code, organization_code, workspace_code,
+package_code, knowledge_scope_code).
+
+- `ALLOWED_PUBLIC_DIAGNOSIS_CONTEXTS` en `backend/routes/diagnosis.py`: frozenset con el
+  unico contexto permitido (default actual de Vera).
+- `_validate_public_turn_context_allowed()`: compara tupla completa de 5 campos; HTTP 403
+  si no coincide.
+- Validacion integrada en `public_turn()` inmediatamente despues de resoler contexto.
+- Request sin contexto → pasa allowlist (resuelve a default). Request parcial → idem.
+- Request invalido → 403 con mensaje generico, sin leak de allowlist.
+- 7 tests nuevos en `test_diagnosis_public_router.py` (49/49 PASS).
+- Frozen files intactos: `t360.astro`, `PublicVeraEntry.svelte`, `global.js`.
+- Validacion: backend 1055 PASS, `pnpm check` 0 errors, `pnpm build` 140 pages,
+  smoke sin contexto 201, smoke permitido 201, smoke invalido 403.
+- Estado: FASE 7A — ALLOWLIST MINIMA BACKEND — IMPLEMENTADA Y VALIDADA.
 - Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
 
 ### 2026-06-28 — apiBaseUrl configurable en DiagnosticadorCore (Fase 4)

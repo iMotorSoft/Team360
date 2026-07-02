@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { API_BASE_URL } from "../../../components/global.js";
-  import { PUBLIC_DIAGNOSIS_CONTEXT, sendPublicTurn } from "../../api/publicDiagnosis";
+  import { sendPublicTurn, type PublicTurnEmbedAuth } from "../../api/publicDiagnosis";
   import type { StructuredDiagnosis, TurnDecision, TurnLanguage } from "../../api/publicDiagnosis";
   import { loadSession, saveSession, clearSession } from "./state/session";
   import { DEFAULT_SESSION_STORAGE_KEY, DEFAULT_PUBLIC_DIAGNOSIS_CONTEXT } from "./config/defaults";
@@ -26,6 +26,11 @@
     turnDecision?: TurnDecision | null;
   }
 
+  type TurnAuthProvider = (input: {
+    sessionId: string;
+    message: string;
+  }) => Promise<PublicTurnEmbedAuth>;
+
   let {
     assistantName = "Diagnosticador",
     assistantInstanceId = "team360_sales_diagnosis",
@@ -33,6 +38,7 @@
     mailtoHref = "",
     apiBaseUrl = API_BASE_URL,
     publicDiagnosisContext = DEFAULT_PUBLIC_DIAGNOSIS_CONTEXT,
+    turnAuthProvider,
     sessionId = $bindable(null),
     messages = $bindable([]),
     inputText = $bindable(""),
@@ -44,6 +50,7 @@
     mailtoHref?: string;
     apiBaseUrl?: string;
     publicDiagnosisContext?: PublicDiagnosisContext;
+    turnAuthProvider?: TurnAuthProvider;
     sessionId?: string | null;
     messages?: ChatMessage[];
     inputText?: string;
@@ -51,7 +58,7 @@
   } = $props();
   let isLoading = $state(false);
   let chatError = $state("");
-  let currentLocale = $state<string>(PUBLIC_DIAGNOSIS_CONTEXT.locale);
+  let currentLocale = $state<string>(publicDiagnosisContext.locale);
   let interactionEventRoot = $state<HTMLElement | undefined>();
   let consumedByMsgIdx = $state<Record<number, boolean>>({});
 
@@ -159,6 +166,13 @@
     return text.slice(0, idx).trim();
   }
 
+  function buildClientSessionId(): string {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return `embed_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`;
+    }
+    return `embed_${Math.random().toString(36).slice(2, 18)}`;
+  }
+
   async function sendRuntimeMessage(
     text: string,
     displayText = text,
@@ -181,12 +195,19 @@
     scrollToBottom();
 
     try {
+      const effectiveSessionId = sessionId ?? (turnAuthProvider ? buildClientSessionId() : undefined);
+      const embedAuth = turnAuthProvider && effectiveSessionId
+        ? await turnAuthProvider({
+            sessionId: effectiveSessionId,
+            message: requestText,
+          })
+        : undefined;
       const result = normalizeT360DiagnosisTurn(await sendPublicTurn({
-        session_id: sessionId ?? undefined,
+        session_id: effectiveSessionId,
         message: requestText,
         locale: currentLocale,
         interaction_response: interactionResponse,
-      }, { apiBaseUrl, publicDiagnosisContext }));
+      }, { apiBaseUrl, publicDiagnosisContext, embedAuth }));
       sessionId = result.session_id;
       if (result.assistant_display_name) {
         turnDisplayName = result.assistant_display_name;
@@ -268,7 +289,7 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <p class="text-sm font-bold text-[#153854]">{assistantDisplayName}</p>
-        <p class="mt-1 text-xs font-semibold text-[#78909f]">{PUBLIC_DIAGNOSIS_CONTEXT.service_code}</p>
+        <p class="mt-1 text-xs font-semibold text-[#78909f]">{publicDiagnosisContext.service_code}</p>
       </div>
       <span class="inline-flex w-fit rounded-full bg-[#e8f7f5] px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[#168b88]">
         Conversación
@@ -311,7 +332,7 @@
       <div>
         <p class="text-sm font-bold text-[#153854]">{assistantDisplayName}</p>
         <p class="mt-1 text-xs font-semibold text-[#78909f]">
-          {PUBLIC_DIAGNOSIS_CONTEXT.service_code}
+          {publicDiagnosisContext.service_code}
           {#if sessionId}
             <span class="ml-1 text-[0.6rem] text-[#91a2ad]">· {sessionId.slice(0, 16)}…</span>
           {/if}

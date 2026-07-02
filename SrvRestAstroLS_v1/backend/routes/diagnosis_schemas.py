@@ -87,6 +87,20 @@ class PublicTurnRequest(BaseModel):
     workspace_code: str | None = None
     package_code: str | None = None
     knowledge_scope_code: str | None = None
+    client_id: str | None = None
+    timestamp: int | None = None
+
+
+class PublicEmbedAuthRequest(BaseModel):
+    client_id: str
+    session_id: str
+    message: str
+
+
+class PublicEmbedAuthResponse(BaseModel):
+    client_id: str
+    timestamp: int
+    signature: str
 
 
 class PublicTurnResponse(BaseModel):
