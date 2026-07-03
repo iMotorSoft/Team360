@@ -19,6 +19,9 @@ romper la API publica del embed.
 Fase 9H agrega un fixture externo recomendado con `loaderIntegrity` en el host
 y `verifyEntryIntegrity: true` para el entry.
 
+Fase 9I agrega sincronizacion automatizada del `loaderIntegrity` de referencia
+en el fixture externo literal y un test anti-drift contra el manifest.
+
 ## URLs publicas estables
 
 ```text
@@ -199,6 +202,15 @@ Gate efectivo:
 - Playwright CLI con backend `7050`;
 - fallback estatico `astro/dist` en `3050` con proxy `/api`.
 
+Sync de referencia:
+
+- fuente de verdad: `public/embed/team360-diagnosticador.manifest.json`;
+- helper de hashes: `scripts/update-embed-integrity.mjs`;
+- helper de snippets/fixtures:
+  `scripts/sync-embed-integrity-snippets.mjs`;
+- fixture literal sincronizado:
+  `e2e/fixtures/cross-origin-host/t360-cross-origin-integrity-loader.html`.
+
 ## Limitaciones
 
 - sin npm package publicado;
@@ -216,6 +228,7 @@ Helper interno:
 cd SrvRestAstroLS_v1/astro
 corepack pnpm build
 node scripts/update-embed-integrity.mjs
+node scripts/sync-embed-integrity-snippets.mjs
 ```
 
 El helper recalcula `SHA-256` para:

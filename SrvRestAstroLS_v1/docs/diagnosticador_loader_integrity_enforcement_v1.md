@@ -148,6 +148,14 @@ Gate E2E relacionado:
 - `e2e/diagnosticador-external-host-demo.spec.ts`
 - `e2e/diagnosticador-embed-demo.spec.ts`
 
+Sincronizacion del host recomendado:
+
+- `loaderIntegrity` del host sigue siendo responsabilidad del snippet;
+- el fixture literal 9H ahora se mantiene con
+  `astro/scripts/sync-embed-integrity-snippets.mjs`;
+- el spec `diagnosticador-cross-origin-integrity-loader-fixture.spec.ts`
+  falla si el fixture deriva del manifest y queda desalineado.
+
 ## MCP / CLI
 
 - MCP intentado en `http://localhost:8931/mcp`;

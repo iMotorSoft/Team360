@@ -55,6 +55,7 @@ Archivo:
 
 ```text
 astro/scripts/update-embed-integrity.mjs
+astro/scripts/sync-embed-integrity-snippets.mjs
 ```
 
 Uso:
@@ -63,6 +64,7 @@ Uso:
 cd SrvRestAstroLS_v1/astro
 corepack pnpm build
 node scripts/update-embed-integrity.mjs
+node scripts/sync-embed-integrity-snippets.mjs
 ```
 
 Comportamiento:
@@ -75,6 +77,15 @@ Comportamiento:
 - actualiza en formato deterministico:
   - `public/embed/team360-diagnosticador.manifest.json`;
   - `dist/embed/team360-diagnosticador.manifest.json`.
+
+Sync complementario de snippets/fixtures:
+
+- lee `manifest.loaderIntegrity` desde `public/embed/team360-diagnosticador.manifest.json`;
+- valida tambien que `entryIntegrity` exista antes de sincronizar;
+- actualiza el fixture literal:
+  `e2e/fixtures/cross-origin-host/t360-cross-origin-integrity-loader.html`;
+- falla si no encuentra los marcadores `team360-sync` esperados;
+- no toca `clientId`, tenant, scope, `allowed_origins` ni secretos.
 
 ## Consumo externo
 
@@ -142,6 +153,7 @@ Cobertura:
 - presencia de `entrySha256`, `entryIntegrity`, `loaderSha256`,
   `loaderIntegrity`;
 - coincidencia real de digest contra `loader` y `asset` servidos;
+- fixture 9H sincronizado contra `manifest.loaderIntegrity`;
 - ausencia de `hmac_secret`, tenant, scope y `allowed_origins`;
 - `load()` default sigue funcionando e idempotente;
 - `verifyEntryIntegrity` correcto aplica `integrity` y `crossorigin`;

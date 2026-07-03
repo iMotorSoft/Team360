@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-07-02 (Fase 9H — fixture externo E2E con loaderIntegrity + verifyEntryIntegrity)
+Ultima actualizacion: 2026-07-03 (Fase 9I — sync automatizado de loaderIntegrity en snippets/fixtures)
 
 ## Estado general
 
@@ -11,6 +11,43 @@ Ultima actualizacion: 2026-07-02 (Fase 9H — fixture externo E2E con loaderInte
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-07-03 — Fase 9I — sync automatizado de loaderIntegrity en snippets/fixtures
+
+Se automatizo la sincronizacion del `loaderIntegrity` recomendado para el
+fixture externo 9H, manteniendo el host literal y agregando un control
+anti-drift contra el manifest publico.
+
+- Se preserva la API publica:
+  - `window.Team360DiagnosticadorLoader.load()`;
+  - `window.Team360Diagnosticador.mount(...)`.
+- La fuente de verdad queda en:
+  `astro/public/embed/team360-diagnosticador.manifest.json`.
+- Se agrega helper nuevo:
+  `astro/scripts/sync-embed-integrity-snippets.mjs`.
+- El fixture literal sincronizado queda en:
+  `astro/e2e/fixtures/cross-origin-host/t360-cross-origin-integrity-loader.html`.
+- El fixture ya no depende del placeholder
+  `__TEAM360_LOADER_INTEGRITY__` inyectado por el spec.
+- El helper valida que existan `loaderIntegrity` y `entryIntegrity` en el
+  manifest antes de sincronizar.
+- El spec
+  `e2e/diagnosticador-cross-origin-integrity-loader-fixture.spec.ts`
+  agrega anti-drift y exige coincidencia exacta entre fixture y manifest.
+- Validacion:
+  - backend focal `83/83 PASS`;
+  - backend full `1089 PASS, 9 skipped`;
+  - `pnpm check` PASS;
+  - `pnpm build` PASS, `146 page(s)`;
+  - `update-embed-integrity` PASS;
+  - `sync-embed-integrity-snippets` PASS;
+  - spec endurecido: `4 passed`;
+  - regresion relacionada: `16 passed`;
+  - suite focalizada Vera/lab/embed/external/mount/loader/fixture/manifest:
+    `30 passed, 2 skipped`.
+- Los snippets/fixtures sincronizados siguen sin exponer `hmac_secret`,
+  tenant, scope ni `allowed_origins`.
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` siguen sin cambios.
 
 ### 2026-07-02 — Fase 9H — fixture externo E2E con loaderIntegrity + verifyEntryIntegrity
 

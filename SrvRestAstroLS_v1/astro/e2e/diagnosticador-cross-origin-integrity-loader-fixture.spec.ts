@@ -43,6 +43,14 @@ const GOOD_FIXTURE_PATH = "/t360-cross-origin-integrity-loader.html";
 const BAD_LOADER_FIXTURE_PATH = "/t360-cross-origin-integrity-loader-invalid.html";
 const BAD_LOADER_INTEGRITY = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
 const SPEC_DIRNAME = path.dirname(fileURLToPath(import.meta.url));
+const SNIPPET_SYNC_BLOCK = {
+  start: "<!-- team360-sync: loader-integrity-snippet:start -->",
+  end: "<!-- team360-sync: loader-integrity-snippet:end -->",
+};
+const RUNTIME_SYNC_BLOCK = {
+  start: "<!-- team360-sync: loader-integrity-runtime:start -->",
+  end: "<!-- team360-sync: loader-integrity-runtime:end -->",
+};
 
 function hasForbiddenText(text: string) {
   return [
@@ -56,6 +64,22 @@ function hasForbiddenText(text: string) {
     "service_code",
     "template_code",
   ].some((term) => text.includes(term));
+}
+
+function extractSyncBlock(source: string, block: { start: string; end: string }) {
+  const blockStart = source.indexOf(block.start);
+  const blockEnd = source.indexOf(block.end);
+  expect(blockStart).toBeGreaterThanOrEqual(0);
+  expect(blockEnd).toBeGreaterThan(blockStart);
+  return source.slice(blockStart + block.start.length, blockEnd);
+}
+
+function readIntegrityFromBlock(source: string, block: { start: string; end: string }) {
+  const content = extractSyncBlock(source, block);
+  expect(content).toContain('data-team360-integrity-source="manifest.loaderIntegrity"');
+  const match = content.match(/integrity="([^"]+)"/);
+  expect(match?.[1]).toBeTruthy();
+  return match![1];
 }
 
 async function readFixtureTemplate() {
@@ -74,13 +98,15 @@ async function readManifestFile() {
   return JSON.parse(await readFile(manifestPath, "utf-8")) as EmbedManifest;
 }
 
-function injectLoaderIntegrity(html: string, loaderIntegrity: string) {
-  return html.replaceAll("__TEAM360_LOADER_INTEGRITY__", loaderIntegrity);
-}
-
 async function startFixtureServer(port: number): Promise<ServerHandle> {
   const template = await readFixtureTemplate();
   const manifest = await readManifestFile();
+  const snippetIntegrity = readIntegrityFromBlock(template, SNIPPET_SYNC_BLOCK);
+  const runtimeIntegrity = readIntegrityFromBlock(template, RUNTIME_SYNC_BLOCK);
+
+  expect(template).not.toContain("__TEAM360_LOADER_INTEGRITY__");
+  expect(snippetIntegrity).toBe(manifest.loaderIntegrity);
+  expect(runtimeIntegrity).toBe(manifest.loaderIntegrity);
 
   const server = http.createServer((req, res) => {
     if (!req.url) {
@@ -98,12 +124,16 @@ async function startFixtureServer(port: number): Promise<ServerHandle> {
 
     const loaderIntegrity =
       pathname === BAD_LOADER_FIXTURE_PATH ? BAD_LOADER_INTEGRITY : manifest.loaderIntegrity;
+    const html =
+      pathname === BAD_LOADER_FIXTURE_PATH
+        ? template.replaceAll(manifest.loaderIntegrity, loaderIntegrity)
+        : template;
 
     res.writeHead(200, {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "no-store",
     });
-    res.end(injectLoaderIntegrity(template, loaderIntegrity));
+    res.end(html);
   });
 
   await new Promise<void>((resolve, reject) => {
@@ -138,6 +168,23 @@ test.describe("Diagnosticador Cross-Origin Integrity Loader Fixture", () => {
     if (server) {
       await server.close();
     }
+  });
+
+  test("mantiene el fixture 9H sincronizado con manifest.loaderIntegrity", async ({
+    request,
+  }) => {
+    const manifestResponse = await request.get("/embed/team360-diagnosticador.manifest.json");
+    expect(manifestResponse.status()).toBe(200);
+    const manifest = (await manifestResponse.json()) as EmbedManifest;
+    const fixtureHtml = await readFixtureTemplate();
+
+    expect(readIntegrityFromBlock(fixtureHtml, SNIPPET_SYNC_BLOCK)).toBe(
+      manifest.loaderIntegrity,
+    );
+    expect(readIntegrityFromBlock(fixtureHtml, RUNTIME_SYNC_BLOCK)).toBe(
+      manifest.loaderIntegrity,
+    );
+    expect(fixtureHtml).not.toContain("__TEAM360_LOADER_INTEGRITY__");
   });
 
   test("carga host externo con loaderIntegrity + verifyEntryIntegrity y conserva auth -> turn", async ({

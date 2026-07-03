@@ -48,6 +48,16 @@ Local de validacion:
 - el loader lee `entryIntegrity` internamente cuando
   `verifyEntryIntegrity=true`.
 
+## Sincronizacion de referencia
+
+- fuente de verdad: `/embed/team360-diagnosticador.manifest.json`;
+- helper local: `astro/scripts/sync-embed-integrity-snippets.mjs`;
+- fixture literal sincronizado:
+  `astro/e2e/fixtures/cross-origin-host/t360-cross-origin-integrity-loader.html`;
+- el fixture queda copiable y ejecutable con el `loaderIntegrity` vigente;
+- el documento mantiene `sha256-...` como placeholder de publicacion, no como
+  hash productivo congelado.
+
 ## Comportamiento esperado
 
 - el host externo protege el loader con `integrity` y
@@ -87,6 +97,7 @@ Local de validacion:
 ## Validacion
 
 - `e2e/diagnosticador-cross-origin-integrity-loader-fixture.spec.ts`:
+  - anti-drift entre fixture 9H y `manifest.loaderIntegrity`;
   - flujo exitoso completo `loaderIntegrity + verifyEntryIntegrity + mount + auth + turn`;
   - `loaderIntegrity` invalido bloquea antes de requests;
   - `entryIntegrity` invalido rechaza antes de mount.

@@ -141,16 +141,18 @@
             <p><strong>Loader version:</strong> <span data-testid="fixture-loader-version">pending</span></p>
             <p><strong>Global version:</strong> <span data-testid="fixture-global-version">pending</span></p>
             <p><strong>Verify entry integrity:</strong> <span data-testid="fixture-verify-entry-integrity">enabled</span></p>
-            <p><strong>Loader integrity:</strong> <span data-testid="fixture-loader-integrity">__TEAM360_LOADER_INTEGRITY__</span></p>
+            <p><strong>Loader integrity:</strong> <span data-testid="fixture-loader-integrity">pending</span></p>
             <p><strong>Last action:</strong> <span data-testid="fixture-last-action">pending</span></p>
           </div>
 
+          <!-- team360-sync: loader-integrity-snippet:start -->
           <pre class="fixture-snippet"><code>&lt;div id="team360-diagnosticador-root"&gt;&lt;/div&gt;
 
 &lt;script
   src="http://127.0.0.1:3050/embed/team360-diagnosticador-loader.js"
-  integrity="__TEAM360_LOADER_INTEGRITY__"
+  integrity="sha256-juK3K/dL/O842pfKw7uSiUen3eegHvP7iSzv8yV+Bkw="
   crossorigin="anonymous"
+  data-team360-integrity-source="manifest.loaderIntegrity"
 &gt;&lt;/script&gt;
 
 &lt;script&gt;
@@ -165,6 +167,7 @@
     });
   });
 &lt;/script&gt;</code></pre>
+          <!-- team360-sync: loader-integrity-snippet:end -->
         </section>
 
         <section class="fixture-target-shell" data-testid="fixture-target-shell">
@@ -179,11 +182,14 @@
       </div>
     </main>
 
+    <!-- team360-sync: loader-integrity-runtime:start -->
     <script
       src="http://127.0.0.1:3050/embed/team360-diagnosticador-loader.js"
-      integrity="__TEAM360_LOADER_INTEGRITY__"
+      integrity="sha256-juK3K/dL/O842pfKw7uSiUen3eegHvP7iSzv8yV+Bkw="
       crossorigin="anonymous"
+      data-team360-integrity-source="manifest.loaderIntegrity"
     ></script>
+    <!-- team360-sync: loader-integrity-runtime:end -->
     <script>
       const FIXTURE_CONFIG = Object.freeze({
         clientId: "local_embed_demo",
@@ -204,6 +210,7 @@
       const statusNode = document.querySelector('[data-testid="fixture-status"]');
       const loaderVersionNode = document.querySelector('[data-testid="fixture-loader-version"]');
       const globalVersionNode = document.querySelector('[data-testid="fixture-global-version"]');
+      const loaderIntegrityNode = document.querySelector('[data-testid="fixture-loader-integrity"]');
       const lastActionNode = document.querySelector('[data-testid="fixture-last-action"]');
       const errorNode = document.querySelector('[data-testid="fixture-error"]');
       const hostOriginNode = document.querySelector('[data-testid="fixture-host-origin"]');
@@ -242,6 +249,13 @@
       function updateVersions() {
         setText(loaderVersionNode, window.Team360DiagnosticadorLoader?.version ?? "missing");
         setText(globalVersionNode, window.Team360Diagnosticador?.version ?? "missing");
+        const loaderScript = document.querySelector(
+          'script[data-team360-integrity-source="manifest.loaderIntegrity"]',
+        );
+        setText(
+          loaderIntegrityNode,
+          loaderScript instanceof HTMLScriptElement ? loaderScript.integrity || "missing" : "missing",
+        );
       }
 
       async function mountFixture() {
