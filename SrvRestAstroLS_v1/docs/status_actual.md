@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-07-02 (Fase 9G — enforcement opt-in de entryIntegrity en el loader)
+Ultima actualizacion: 2026-07-02 (Fase 9H — fixture externo E2E con loaderIntegrity + verifyEntryIntegrity)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -38,6 +38,94 @@ Estado: Fases 1 a 5 implementadas; confirmadas en `cdd1b1b`.
 
 Estado: Fase 7 a 9A implementadas y confirmadas en `15e3e98`. Fases 9B, 9C, 9D,
 9E, 9C-ext, 9D-ext y 9F implementadas y validadas en este worktree.
+
+## Fase 9H — fixture externo E2E con loaderIntegrity + verifyEntryIntegrity
+
+Estado: IMPLEMENTADO Y VALIDADO. MCP limitado; gate efectivo con Playwright
+CLI sobre runtime fallback local.
+
+### Decision tecnica
+
+- se crea fixture nuevo dedicado, sin reemplazar el fixture cross-origin
+  default;
+- el host recomendado usa `loaderIntegrity` en el `<script>` remoto;
+- el host recomendado usa `crossorigin="anonymous"` en ese `<script>`;
+- el loader resuelve el manifest default relativo a su propio `src`, por lo que
+  el snippet externo puede omitir `manifestUrl`;
+- el host recomendado activa `load({ verifyEntryIntegrity: true })`;
+- el entry dinamico sigue usando `entryIntegrity` + `crossorigin="anonymous"`;
+- `loaderIntegrity` invalido bloquea antes de `auth/turn`;
+- `entryIntegrity` invalido rechaza antes de mount.
+
+### Implementacion
+
+- loader actualizado:
+  `astro/public/embed/team360-diagnosticador-loader.js`;
+- manifest actualizado:
+  `astro/public/embed/team360-diagnosticador.manifest.json`;
+- fixture nuevo:
+  `astro/e2e/fixtures/cross-origin-host/t360-cross-origin-integrity-loader.html`;
+- spec nuevo:
+  `e2e/diagnosticador-cross-origin-integrity-loader-fixture.spec.ts`;
+- documentacion nueva:
+  `docs/diagnosticador_external_integrity_snippet_v1.md`;
+- documentacion actualizada:
+  - `docs/diagnosticador_loader_distribution_v1.md`;
+  - `docs/diagnosticador_loader_manifest_v1.md`;
+  - `docs/diagnosticador_loader_integrity_v1.md`;
+  - `docs/diagnosticador_loader_integrity_enforcement_v1.md`.
+
+### Validacion 9H
+
+Preflight:
+
+- Git limpio al inicio: PASS.
+- DB real:
+  - `embed_clients`: presente;
+  - `local_embed_demo`: activo;
+  - `allowed_origins`: `127.0.0.1:3050`, `localhost:3050`, `127.0.0.1:3060`;
+  - secret presente (sin imprimirlo).
+- Runtime local:
+  - `backend-dev.sh`: PASS;
+  - fallback estatico local sobre `astro/dist` en `3050` con proxy `/api` a
+    `127.0.0.1:7050`: PASS;
+  - assets embed servidos con CORS abierto para SRI cross-origin.
+
+Backend:
+
+- `uv run pytest tests/test_diagnosis_public_router.py tests/test_embed_clients_contract.py`:
+  `83/83 PASS`.
+- `uv run pytest tests/ -x --ignore=tests/test_db_module.py`:
+  `1089 PASS, 9 skipped`.
+
+Frontend:
+
+- `pnpm check`: `0 errors`, `0 warnings`, `5 hints`.
+- `pnpm build`: `146 pages`.
+- helper:
+  `node scripts/update-embed-integrity.mjs`: PASS.
+
+Playwright CLI local (`PLAYWRIGHT_BASE_URL=http://127.0.0.1:3050`):
+
+- `e2e/diagnosticador-cross-origin-integrity-loader-fixture.spec.ts`:
+  `3 PASS`.
+- `loader-integrity fixture + manifest + cross-origin + browser + mount + external + embed`:
+  `15 PASS`.
+- suite focalizada con Vera/lab/embed/external/mount/loader/fixture/manifest:
+  `29 PASS, 2 skipped`.
+
+Seguridad:
+
+- fixture/snippet nuevos no contienen `hmac_secret`;
+- fixture/snippet nuevos no contienen tenant, scope ni `allowed_origins`;
+- `loaderIntegrity` invalido bloquea antes de `auth/turn`;
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` siguen fuera del diff.
+
+MCP:
+
+- endpoint intentado: `http://localhost:8931/mcp`;
+- si no expone herramientas navegables en la sesion, el gate real sigue siendo
+  Playwright CLI.
 
 ## Fase 9G — enforcement opt-in de entryIntegrity en el loader
 

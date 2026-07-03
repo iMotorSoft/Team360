@@ -5,6 +5,7 @@
   const DEFAULT_ASSET_URL = "/embed/team360-diagnosticador.js";
   const DEFAULT_MANIFEST_URL = "/embed/team360-diagnosticador.manifest.json";
   const ENTRY_SCRIPT_ATTRIBUTE = "data-team360-diagnosticador-entry";
+  const LOADER_FILE_NAME = "team360-diagnosticador-loader.js";
 
   if (globalObject.Team360DiagnosticadorLoader) {
     return;
@@ -20,12 +21,31 @@
     return globalObject.document?.baseURI || globalObject.location?.href || "http://localhost/";
   }
 
+  function resolveLoaderBaseUrl() {
+    const documentRef = globalObject.document;
+    const currentScriptSrc =
+      typeof documentRef?.currentScript?.src === "string" ? documentRef.currentScript.src.trim() : "";
+    if (currentScriptSrc) {
+      return currentScriptSrc;
+    }
+
+    const scripts = Array.from(documentRef?.querySelectorAll?.("script[src]") || []);
+    for (let index = scripts.length - 1; index >= 0; index -= 1) {
+      const scriptSrc = typeof scripts[index]?.src === "string" ? scripts[index].src.trim() : "";
+      if (scriptSrc && scriptSrc.includes(LOADER_FILE_NAME)) {
+        return scriptSrc;
+      }
+    }
+
+    return resolveDocumentBaseUrl();
+  }
+
   function resolveManifestUrl(options) {
     const manifestUrl =
       typeof options?.manifestUrl === "string" && options.manifestUrl.trim()
         ? options.manifestUrl.trim()
         : DEFAULT_MANIFEST_URL;
-    return resolveUrl(manifestUrl, resolveDocumentBaseUrl());
+    return resolveUrl(manifestUrl, resolveLoaderBaseUrl());
   }
 
   function resolveExplicitAssetUrl(options) {

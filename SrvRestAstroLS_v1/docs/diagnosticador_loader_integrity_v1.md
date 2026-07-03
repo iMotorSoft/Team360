@@ -82,7 +82,6 @@ Snippet simple:
 
 ```html
 <script
-  type="module"
   src="https://team360.live/embed/team360-diagnosticador-loader.js"
 ></script>
 ```
@@ -91,7 +90,6 @@ Snippet con integrity:
 
 ```html
 <script
-  type="module"
   src="https://team360.live/embed/team360-diagnosticador-loader.js"
   integrity="sha256-..."
   crossorigin="anonymous"
@@ -101,6 +99,10 @@ Snippet con integrity:
 Notas:
 
 - el valor real de `integrity` sale de `loaderIntegrity` en el manifest;
+- el host recomendado puede combinar `loaderIntegrity` en el `<script>` con
+  `load({ verifyEntryIntegrity: true })` para el entry;
+- el manifest default se resuelve desde el `src` real del loader cuando el
+  host no pasa `manifestUrl`;
 - para local usar `http://127.0.0.1:3050`;
 - `clientId` es publico;
 - `hmac_secret` nunca se entrega;
@@ -144,7 +146,9 @@ Cobertura:
 - `load()` default sigue funcionando e idempotente;
 - `verifyEntryIntegrity` correcto aplica `integrity` y `crossorigin`;
 - falta de `entryIntegrity` rechaza;
-- `entryIntegrity` invalido rechaza.
+- `entryIntegrity` invalido rechaza;
+- fixture externo con `loaderIntegrity + verifyEntryIntegrity` pasa E2E;
+- `loaderIntegrity` invalido bloquea antes de `auth/turn`.
 
 ## Limitaciones
 

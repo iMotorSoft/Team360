@@ -37,6 +37,10 @@ await window.Team360DiagnosticadorLoader.load({
 });
 ```
 
+Si el host externo carga el loader remoto desde otro origin, el manifest
+default se resuelve relativo al `src` del loader. `manifestUrl` queda como
+override opcional, no como requisito del snippet recomendado.
+
 ## Manifest usado
 
 Campos leidos por el loader cuando `verifyEntryIntegrity=true`:
@@ -137,6 +141,7 @@ Cobertura agregada:
 
 Gate E2E relacionado:
 
+- `e2e/diagnosticador-cross-origin-integrity-loader-fixture.spec.ts`
 - `e2e/diagnosticador-cross-origin-loader-fixture.spec.ts`
 - `e2e/diagnosticador-browser-loader-fixture.spec.ts`
 - `e2e/diagnosticador-mount-demo.spec.ts`
@@ -157,6 +162,8 @@ Gate E2E relacionado:
 - sin Web Component;
 - sin Shadow DOM;
 - sin enforcement del `loaderIntegrity` desde el mismo loader;
+- el enforcement de `loaderIntegrity` sigue siendo responsabilidad del host via
+  `<script integrity="...">`;
 - sin rotacion automatizada por publicacion;
 - sin CSS encapsulado final;
 - sin eventos publicos definitivos.

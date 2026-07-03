@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team360 cross-origin integrity loader fixture</title>
+    <meta
+      name="description"
+      content="Fixture cross-origin dedicado para validar loaderIntegrity + verifyEntryIntegrity en el Diagnosticador Team360."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top right, rgba(15, 118, 110, 0.12), transparent 28rem),
+          linear-gradient(180deg, #f8f4ec 0%, #f2ecdf 100%);
+        color: #17324a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+      }
+
+      main {
+        max-width: 82rem;
+        margin: 0 auto;
+        padding: 2rem 1rem 3rem;
+      }
+
+      .fixture-shell {
+        display: grid;
+        gap: 1.25rem;
+      }
+
+      .fixture-panel,
+      .fixture-target-shell {
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        border-radius: 1.5rem;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      }
+
+      .fixture-panel {
+        padding: 1.5rem;
+      }
+
+      .fixture-kicker {
+        margin: 0 0 0.4rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #0f766e;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 3rem);
+        line-height: 1.05;
+        color: #102d4f;
+      }
+
+      .fixture-copy,
+      .fixture-panel li,
+      .fixture-panel p {
+        line-height: 1.6;
+        color: #526a7e;
+      }
+
+      .fixture-contract {
+        display: grid;
+        gap: 0.55rem;
+        margin-top: 1rem;
+      }
+
+      .fixture-contract p {
+        margin: 0;
+      }
+
+      code,
+      pre {
+        font-family: "IBM Plex Mono", "Fira Code", monospace;
+      }
+
+      .fixture-target-shell {
+        padding: 1.25rem;
+      }
+
+      .fixture-target {
+        min-height: 24rem;
+      }
+
+      .fixture-error {
+        margin-top: 0.85rem;
+        color: #b91c1c;
+      }
+
+      .fixture-snippet {
+        overflow-x: auto;
+        border-radius: 1rem;
+        background: #11263f;
+        color: #e8f0f6;
+        padding: 1rem;
+      }
+
+      @media (min-width: 960px) {
+        .fixture-shell {
+          grid-template-columns: minmax(19rem, 28rem) minmax(0, 1fr);
+          align-items: start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main data-testid="cross-origin-integrity-loader-fixture">
+      <div class="fixture-shell">
+        <section class="fixture-panel">
+          <p class="fixture-kicker">Cross-Origin Integrity Fixture</p>
+          <h1>Team360 cross-origin integrity loader fixture</h1>
+          <p class="fixture-copy">
+            Host externo controlado que carga el loader remoto con SRI y delega la verificación del
+            asset principal al manifest usando <code>verifyEntryIntegrity: true</code>.
+          </p>
+
+          <ul>
+            <li><strong>Host:</strong> <code data-testid="fixture-host-origin"></code></li>
+            <li><strong>Loader:</strong> <code data-testid="fixture-loader-url">http://127.0.0.1:3050/embed/team360-diagnosticador-loader.js</code></li>
+            <li><strong>Manifest:</strong> <code data-testid="fixture-manifest-url">http://127.0.0.1:3050/embed/team360-diagnosticador.manifest.json</code></li>
+            <li><strong>Asset:</strong> <code data-testid="fixture-asset-url">http://127.0.0.1:3050/embed/team360-diagnosticador.js</code></li>
+            <li><strong>Session key:</strong> <code>team360.embed.cross_origin.integrity.fixture.session.v1</code></li>
+          </ul>
+
+          <div class="fixture-contract" data-testid="fixture-contract">
+            <p><strong>Loader status:</strong> <span data-testid="fixture-status">pending</span></p>
+            <p><strong>Loader version:</strong> <span data-testid="fixture-loader-version">pending</span></p>
+            <p><strong>Global version:</strong> <span data-testid="fixture-global-version">pending</span></p>
+            <p><strong>Verify entry integrity:</strong> <span data-testid="fixture-verify-entry-integrity">enabled</span></p>
+            <p><strong>Loader integrity:</strong> <span data-testid="fixture-loader-integrity">__TEAM360_LOADER_INTEGRITY__</span></p>
+            <p><strong>Last action:</strong> <span data-testid="fixture-last-action">pending</span></p>
+          </div>
+
+          <pre class="fixture-snippet"><code>&lt;div id="team360-diagnosticador-root"&gt;&lt;/div&gt;
+
+&lt;script
+  src="http://127.0.0.1:3050/embed/team360-diagnosticador-loader.js"
+  integrity="__TEAM360_LOADER_INTEGRITY__"
+  crossorigin="anonymous"
+&gt;&lt;/script&gt;
+
+&lt;script&gt;
+  window.Team360DiagnosticadorLoader.load({
+    verifyEntryIntegrity: true
+  }).then(() =&gt; {
+    window.Team360Diagnosticador.mount("#team360-diagnosticador-root", {
+      clientId: "local_embed_demo",
+      apiBaseUrl: "http://127.0.0.1:7050/api",
+      assistantName: "Vera",
+      sessionStorageKey: "team360.embed.cross_origin.integrity.fixture.session.v1"
+    });
+  });
+&lt;/script&gt;</code></pre>
+        </section>
+
+        <section class="fixture-target-shell" data-testid="fixture-target-shell">
+          <div
+            id="team360-diagnosticador-root"
+            class="fixture-target"
+            data-testid="fixture-target"
+          ></div>
+
+          <p class="fixture-error" data-testid="fixture-error" hidden></p>
+        </section>
+      </div>
+    </main>
+
+    <script
+      src="http://127.0.0.1:3050/embed/team360-diagnosticador-loader.js"
+      integrity="__TEAM360_LOADER_INTEGRITY__"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const FIXTURE_CONFIG = Object.freeze({
+        clientId: "local_embed_demo",
+        apiBaseUrl: "http://127.0.0.1:7050/api",
+        assistantName: "Vera",
+        compact: false,
+        sessionStorageKey: "team360.embed.cross_origin.integrity.fixture.session.v1",
+      });
+
+      const FIXTURE_STATE = {
+        status: "pending",
+        lastAction: "pending",
+        lastError: "",
+        mounted: false,
+        verifyEntryIntegrity: true,
+      };
+
+      const statusNode = document.querySelector('[data-testid="fixture-status"]');
+      const loaderVersionNode = document.querySelector('[data-testid="fixture-loader-version"]');
+      const globalVersionNode = document.querySelector('[data-testid="fixture-global-version"]');
+      const lastActionNode = document.querySelector('[data-testid="fixture-last-action"]');
+      const errorNode = document.querySelector('[data-testid="fixture-error"]');
+      const hostOriginNode = document.querySelector('[data-testid="fixture-host-origin"]');
+      const targetSelector = "#team360-diagnosticador-root";
+
+      function setText(node, value) {
+        if (node instanceof HTMLElement) {
+          node.textContent = value;
+        }
+      }
+
+      function setError(message) {
+        FIXTURE_STATE.lastError = message;
+        document.body.dataset.team360IntegrityError = message;
+        if (!(errorNode instanceof HTMLElement)) {
+          return;
+        }
+
+        if (!message) {
+          errorNode.hidden = true;
+          errorNode.textContent = "";
+          return;
+        }
+
+        errorNode.hidden = false;
+        errorNode.textContent = message;
+      }
+
+      function setStatus(status, action) {
+        FIXTURE_STATE.status = status;
+        FIXTURE_STATE.lastAction = action;
+        setText(statusNode, status);
+        setText(lastActionNode, action);
+      }
+
+      function updateVersions() {
+        setText(loaderVersionNode, window.Team360DiagnosticadorLoader?.version ?? "missing");
+        setText(globalVersionNode, window.Team360Diagnosticador?.version ?? "missing");
+      }
+
+      async function mountFixture() {
+        setError("");
+        updateVersions();
+
+        if (!window.Team360DiagnosticadorLoader?.load) {
+          setStatus("loader-missing", "loader-blocked");
+          throw new Error("Team360DiagnosticadorLoader: loader script is unavailable.");
+        }
+
+        setStatus("loading", "load");
+
+        await window.Team360DiagnosticadorLoader.load({
+          verifyEntryIntegrity: true,
+        });
+
+        if (!window.Team360Diagnosticador?.mount) {
+          setStatus("error", "mount-missing");
+          throw new Error("Team360Diagnosticador: mount() API is unavailable after loader load.");
+        }
+
+        updateVersions();
+        window.Team360Diagnosticador.mount(targetSelector, FIXTURE_CONFIG);
+        FIXTURE_STATE.mounted = true;
+        setStatus("mounted", "mount");
+      }
+
+      window.__team360CrossOriginIntegrityFixture = {
+        getState: () => ({
+          ...FIXTURE_STATE,
+          hasLoader: typeof window.Team360DiagnosticadorLoader?.load === "function",
+          hasGlobal: Boolean(window.Team360Diagnosticador?.mount),
+        }),
+      };
+
+      setText(hostOriginNode, window.location.origin);
+      document.body.dataset.team360IntegrityError = "";
+
+      mountFixture().catch((error) => {
+        FIXTURE_STATE.mounted = false;
+        setStatus(FIXTURE_STATE.status === "loader-missing" ? "loader-missing" : "error", "load-error");
+        setError(error instanceof Error ? error.message : String(error));
+        updateVersions();
+      });
+    </script>
+  </body>
+</html>

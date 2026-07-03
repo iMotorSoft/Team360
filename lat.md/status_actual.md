@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-07-02 (Fase 9G — enforcement opt-in de entryIntegrity en el loader)
+Ultima actualizacion: 2026-07-02 (Fase 9H — fixture externo E2E con loaderIntegrity + verifyEntryIntegrity)
 
 ## Estado general
 
@@ -11,6 +11,44 @@ Ultima actualizacion: 2026-07-02 (Fase 9G — enforcement opt-in de entryIntegri
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-07-02 — Fase 9H — fixture externo E2E con loaderIntegrity + verifyEntryIntegrity
+
+Se agrego un fixture externo recomendado para validar en un host cross-origin
+controlado el camino completo `loaderIntegrity + verifyEntryIntegrity + mount +
+auth + turn`.
+
+- Se preserva la API publica:
+  - `window.Team360DiagnosticadorLoader.load()`;
+  - `window.Team360Diagnosticador.mount(...)`.
+- Se agrega fixture HTML nuevo:
+  `astro/e2e/fixtures/cross-origin-host/t360-cross-origin-integrity-loader.html`.
+- Se agrega E2E nuevo:
+  `e2e/diagnosticador-cross-origin-integrity-loader-fixture.spec.ts`.
+- Se agrega documentacion nueva:
+  `docs/diagnosticador_external_integrity_snippet_v1.md`.
+- El host recomendado usa:
+  - `<script src="...loader.js" integrity="..." crossorigin="anonymous">`;
+  - `load({ verifyEntryIntegrity: true })`.
+- El loader ahora resuelve el manifest default relativo a su propio `src`, lo
+  que evita exigir `manifestUrl` en el snippet externo recomendado.
+- El caso negativo de `loaderIntegrity` invalido bloquea antes de
+  `/api/diagnosis/embed/auth` y `/api/diagnosis/turn`.
+- El caso negativo de `entryIntegrity` invalido rechaza el loader antes del
+  mount.
+- Validacion:
+  - backend focal `83/83 PASS`;
+  - backend full `1089 PASS, 9 skipped`;
+  - `pnpm check` PASS;
+  - `pnpm build` PASS, `146 page(s)`;
+  - helper integrity PASS;
+  - spec nuevo: `3 passed`;
+  - regresion relacionada: `15 passed`;
+  - suite focalizada Vera/lab/embed/external/mount/loader/fixture/manifest:
+    `29 passed, 2 skipped`.
+- Los assets publicos y el fixture nuevo siguen sin exponer `hmac_secret`,
+  tenant, scope ni `allowed_origins`.
+- `/t360`, `PublicVeraEntry.svelte` y `global.js` siguen sin cambios.
 
 ### 2026-07-02 — Fase 9G — enforcement opt-in de entryIntegrity en el loader
 

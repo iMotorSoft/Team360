@@ -149,6 +149,8 @@ Comportamiento:
 
 - si `window.Team360Diagnosticador.mount` ya existe, `load()` resuelve sin
   recargar nada;
+- si el host no pasa `manifestUrl`, el loader resuelve el manifest relativo a
+  su propio `src` antes que a la pagina host;
 - si no existe, resuelve el asset desde `assetUrl` o desde el manifest;
 - acepta `manifest.asset` o `manifest.entry`;
 - en modo default carga el asset principal sin exigir integrity;
@@ -196,20 +198,19 @@ Camino loader con enforcement opt-in del entry:
 
 ```html
 <script
-  type="module"
   src="https://team360.live/embed/team360-diagnosticador-loader.js"
   integrity="sha256-..."
   crossorigin="anonymous"
 ></script>
-<script type="module">
-  await window.Team360DiagnosticadorLoader.load({
-    manifestUrl: "https://team360.live/embed/team360-diagnosticador.manifest.json",
+<script>
+  window.Team360DiagnosticadorLoader.load({
     verifyEntryIntegrity: true
-  });
-  window.Team360Diagnosticador.mount("#target", {
-    clientId: "local_embed_demo",
-    apiBaseUrl: "http://127.0.0.1:7050/api",
-    sessionStorageKey: "team360.embed.loader.demo.session.v1"
+  }).then(() => {
+    window.Team360Diagnosticador.mount("#target", {
+      clientId: "CLIENT_ID_PUBLICO",
+      apiBaseUrl: "https://team360.live/api",
+      sessionStorageKey: "team360.embed.loader.demo.session.v1"
+    });
   });
 </script>
 ```
@@ -218,12 +219,11 @@ Camino loader con integrity:
 
 ```html
 <script
-  type="module"
   src="https://team360.live/embed/team360-diagnosticador-loader.js"
   integrity="sha256-..."
   crossorigin="anonymous"
 ></script>
-<script type="module">
+<script>
   await window.Team360DiagnosticadorLoader.load({
     manifestUrl: "https://team360.live/embed/team360-diagnosticador.manifest.json"
   });
@@ -240,6 +240,8 @@ Notas del consumo:
 - el valor real de `integrity` debe leerse desde `loaderIntegrity`;
 - `entryIntegrity` queda disponible para verificacion offline y tambien para el
   enforcement opt-in del entry;
+- el manifest default se resuelve relativo al loader remoto, por lo que el
+  host externo puede omitir `manifestUrl` en el camino recomendado;
 - `verifyEntryIntegrity` preserva el default compatible y solo protege cargas
   nuevas del asset principal;
 - si el global ya estaba cargado antes de llamar `load({ verifyEntryIntegrity: true })`,
@@ -256,6 +258,13 @@ Fixture 9D:
 - sirve el mismo flujo desde `http://127.0.0.1:3060`;
 - mantiene `loader + manifest + asset` en `3050`;
 - valida CORS del asset host y validacion exacta de `Origin` en `7050`.
+
+Fixture 9H:
+
+- sirve un host externo recomendado con `loaderIntegrity` en el `<script>`
+  remoto;
+- activa `load({ verifyEntryIntegrity: true })` sin pasar `manifestUrl`;
+- valida SRI del loader en el host y enforcement del entry desde el manifest.
 
 ## Configuracion permitida
 

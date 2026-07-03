@@ -16,6 +16,9 @@ Fase 9F agrega metadata de integridad opcional al manifest para verificar
 Fase 9G agrega enforcement opt-in de `entryIntegrity` dentro del loader sin
 romper la API publica del embed.
 
+Fase 9H agrega un fixture externo recomendado con `loaderIntegrity` en el host
+y `verifyEntryIntegrity: true` para el entry.
+
 ## URLs publicas estables
 
 ```text
@@ -102,6 +105,8 @@ Semantica actual:
 Comportamiento opt-in:
 
 - `load()` sin opciones conserva el camino compatible actual;
+- el manifest default ahora se resuelve relativo al `src` real del loader,
+  tambien cuando el host vive en otro origin;
 - `load({ verifyEntryIntegrity: true })` exige `entryIntegrity` en el manifest;
 - en modo opt-in el loader crea un `script type="module"` dinamico para el
   entry;
@@ -133,20 +138,20 @@ Opcion con integrity para el loader:
 ```html
 <div id="team360-diagnosticador"></div>
 <script
-  type="module"
   src="https://team360.live/embed/team360-diagnosticador-loader.js"
   integrity="sha256-..."
   crossorigin="anonymous"
 ></script>
-<script type="module">
-  await window.Team360DiagnosticadorLoader.load({
-    manifestUrl: "https://team360.live/embed/team360-diagnosticador.manifest.json"
-  });
-  window.Team360Diagnosticador.mount("#team360-diagnosticador", {
-    clientId: "local_embed_demo",
-    apiBaseUrl: "http://127.0.0.1:7050/api",
-    assistantName: "Vera",
-    sessionStorageKey: "team360.embed.client.session.v1"
+<script>
+  window.Team360DiagnosticadorLoader.load({
+    verifyEntryIntegrity: true
+  }).then(() => {
+    window.Team360Diagnosticador.mount("#team360-diagnosticador", {
+      clientId: "CLIENT_ID_PUBLICO",
+      apiBaseUrl: "https://team360.live/api",
+      assistantName: "Vera",
+      sessionStorageKey: "team360.embed.client.session.v1"
+    });
   });
 </script>
 ```
@@ -154,6 +159,10 @@ Opcion con integrity para el loader:
 Notas del snippet:
 
 - el valor real de `integrity` debe salir de `loaderIntegrity` en el manifest;
+- el loader obtiene `entryIntegrity` desde el manifest y lo aplica al script
+  dinamico del entry cuando `verifyEntryIntegrity=true`;
+- el manifest default se deriva del `src` real del loader; `manifestUrl`
+  queda como override opcional si el host necesita otra ruta;
 - para entorno local usar `http://127.0.0.1:3050`;
 - `clientId` es publico y no reemplaza la validacion server-side;
 - `hmac_secret` nunca se entrega al host;
@@ -161,7 +170,9 @@ Notas del snippet:
 - el host puede activar enforcement runtime del entry con:
   `load({ verifyEntryIntegrity: true })`;
 - el detalle operativo de ese modo queda en
-  `diagnosticador_loader_integrity_enforcement_v1.md`.
+  `diagnosticador_loader_integrity_enforcement_v1.md`;
+- el snippet recomendado completo queda en
+  `diagnosticador_external_integrity_snippet_v1.md`.
 
 ## Compatibilidad
 
@@ -170,6 +181,7 @@ Se preserva compatibilidad con:
 - `/t360-loader-demo`
 - `/embed-fixtures/t360-external-loader.html`
 - `http://127.0.0.1:3060/t360-cross-origin-loader.html`
+- `http://127.0.0.1:3060/t360-cross-origin-integrity-loader.html`
 - demos previas `asset`, `script`, `mount`, `external`, `embed`
 
 ## Validacion
@@ -180,6 +192,7 @@ Specs relevantes:
 - `e2e/diagnosticador-loader-demo.spec.ts`
 - `e2e/diagnosticador-browser-loader-fixture.spec.ts`
 - `e2e/diagnosticador-cross-origin-loader-fixture.spec.ts`
+- `e2e/diagnosticador-cross-origin-integrity-loader-fixture.spec.ts`
 
 Gate efectivo:
 
