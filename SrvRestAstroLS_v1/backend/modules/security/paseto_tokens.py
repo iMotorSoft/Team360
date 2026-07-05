@@ -213,6 +213,11 @@ def _get_dev_key_pair() -> PasetoKeyPair:
     return _DEV_KEY_PAIR
 
 
+def get_dev_public_keys_by_id() -> dict[str, str]:
+    pair = _get_dev_key_pair()
+    return {pair.key_id: pair.public_pem}
+
+
 def issue_console_access_token(
     user_id: str,
     *,

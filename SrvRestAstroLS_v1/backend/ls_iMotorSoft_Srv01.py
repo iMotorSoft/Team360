@@ -16,6 +16,7 @@ from modules.db.pool import close_pool, get_pool, open_pool
 
 from routes.automation_diagnosis import classify, save_answer, start_session
 from routes.console_bootstrap import console_bootstrap
+from routes.console_me import console_me
 from routes.diagnosis import (
     public_embed_auth,
     public_get_session,
@@ -83,6 +84,7 @@ def create_app() -> Litestar:
             sales_diagnosis_turn,
             dev_sales_diagnosis_turn,
             console_bootstrap,
+            console_me,
         ],
         on_startup=[_open_db_pool],
         on_shutdown=[_close_db_pool],

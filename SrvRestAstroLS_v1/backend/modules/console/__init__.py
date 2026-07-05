@@ -1,3 +1,4 @@
+from modules.console.auth import ConsoleAuthError, ConsolePrincipal
 from modules.console.errors import (
     ConsoleBootstrapError,
     ConsolePermissionError,
@@ -14,8 +15,10 @@ from modules.console.service import ConsoleBootstrapService
 from modules.console.types import ConsoleBootstrap
 
 __all__ = [
+    "ConsoleAuthError",
     "ConsoleBootstrap",
     "ConsoleBootstrapService",
+    "ConsolePrincipal",
     "WorkspaceConsoleRepository",
     "PermissionConsoleRepository",
     "PackageConsoleRepository",

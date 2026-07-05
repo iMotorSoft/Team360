@@ -1321,6 +1321,22 @@ respuesta `POST /api/console/bootstrap`.
 - Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
 - Documento específico: `SrvRestAstroLS_v1/docs/paseto_console_bootstrap_access_token_v1.md`.
 
+### 2026-07-05 — P4B: Verificador PASETO para Console protegida
+
+Cierra el circuito P4A→P4B: token emitido por bootstrap se verifica en
+`GET /api/console/me`.
+
+- `modules/console/auth.py` — `extract_bearer_token()`, `verify_console_access_token()`,
+  `ConsolePrincipal`, `ConsoleAuthError`.
+- `routes/console_me.py` — `GET /api/console/me` protegido con `Authorization: Bearer`.
+- `modules/security/paseto_tokens.py` — `get_dev_public_keys_by_id()`.
+- Tests: auth 15/15 PASS, route 9/9 PASS, foundation 12/12, bootstrap 12/12.
+- Regresión: embed contract 6/6, diagnosis 77/77.
+- `git diff --check` PASS, secret search PASS, JWT search documentary only.
+- Sin cambios en `embed_clients/`, `diagnosis.py`, `global.js`, `/t360`, runtime.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
+- Documento específico: `SrvRestAstroLS_v1/docs/paseto_console_auth_verifier_v1.md`.
+
 ## Pendientes recomendados
 
 - Agregar nuevos documentos lat.md solo para conceptos estables de plataforma.

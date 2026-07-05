@@ -1810,6 +1810,101 @@ respuesta `POST /api/console/bootstrap`.
 - Producción env keys persistentes.
 - Fases P4B (revocation DB), P5 (frontend integration).
 
+## 2026-07-05 — P4B: Verificador PASETO para Console protegida
+
+Se implementó la Fase P4B del plan de migración HMAC→PASETO: verificador
+PASETO reutilizable para endpoints Console. Cierra el circuito P4A→P4B:
+`POST /api/console/bootstrap` emite token → `GET /api/console/me` lo verifica.
+
+### Módulos nuevos
+
+- **`modules/console/auth.py`** — auth de Console:
+  - `ConsolePrincipal` — dataclass frozen con `user_id`, `subject`, `claims`.
+  - `ConsoleAuthError` — excepción canónica para fallos.
+  - `extract_bearer_token(header)` — parsea `Authorization: Bearer <token>`.
+  - `verify_console_access_token(token, public_keys_by_id, issuer)` — verifica
+    PASETO v4.public con `typ=console_access`, `sub=user:<id>`, `user_id`.
+  - Errores específicos: header ausente, scheme no Bearer, token vacío,
+    typ/iss incorrecto, sub sin `user:`, `user_id` ausente, kid desconocido,
+    expirado, malformado.
+- **`modules/console/__init__.py`** — exporta `ConsoleAuthError`, `ConsolePrincipal`.
+- **`modules/security/paseto_tokens.py`** (ampliado):
+  - `get_dev_public_keys_by_id()` — helper público que expone la key pública
+    dev para el verificador (mismo singleton que usa `issue_console_access_token`).
+- **`routes/console_me.py`** — nuevo handler `GET /api/console/me`:
+  - Lee `Authorization` header via `request.headers`.
+  - Usa `extract_bearer_token()` + `verify_console_access_token()`.
+  - Resuelve public keys desde env vars (con fallback dev key).
+  - Devuelve `{user_id, subject, token_type}`.
+  - Errores: 401 con detail descriptivo.
+- **`ls_iMotorSoft_Srv01.py`** — import + registro de `console_me`.
+
+### Tests
+
+- **`tests/test_console_auth.py`** — 15 tests:
+  - `TestExtractBearerToken` (5): header ausente, vacío, Basic, Bearer vacío, token válido.
+  - `TestVerifyConsoleAccessToken` (9): token válido, `user_id` correcto,
+    typ incorrecto, issuer incorrecto, sub sin `user:`, `user_id` ausente,
+    kid desconocido, expirado, malformado.
+  - `TestEndToEndP4A` (1): token emitido por P4A se verifica con P4B.
+- **`tests/test_console_me_route.py`** — 9 tests via `TestClient`:
+  - Sin header → 401; Bearer vacío → 401; Basic → 401; token inválido → 401.
+  - Token válido → 200 con `user_id`, `subject`, `token_type`.
+  - Respuesta no contiene `access_token`, keys ni secrets.
+  - Token expirado → 401; typ incorrecto → 401.
+
+### Protocolo
+
+```
+GET /api/console/me
+Authorization: Bearer v4.public.<token>
+→ 200 { "user_id": "...", "subject": "user:...", "token_type": "paseto_v4_public" }
+→ 401 { "detail": "<reason>" }
+```
+
+### Decisión técnica
+
+- El verificador vive en `modules/console/auth.py` (Console Console-specific).
+- `verify_console_access_token` es wrapper sobre `verify_paseto_v4_public`
+  (foundation genérica). Agrega validación de `sub=user:` y `user_id`.
+- `extract_bearer_token` es independiente del tipo de token; podría reutilizarse.
+- Dev keys: `get_dev_public_keys_by_id()` expone el mismo singleton que usa
+  `issue_console_access_token()`, garantizando que tokens de bootstrap se
+  verifiquen en dev sin configurar env vars.
+- Producción: configurar `TEAM360_PASETO_PUBLIC_KEY_B64` + `TEAM360_PASETO_KEY_ID`.
+- Errores 401, no 403, porque el cliente no está autenticado (no autorizado
+  vs. no autenticado).
+
+### Validación
+
+| Validación | Resultado |
+| ---------- | --------- |
+| `git diff --check` | PASS |
+| `tests/test_paseto_tokens.py` | 12/12 PASS |
+| `tests/test_console_auth.py` | 15/15 PASS |
+| `tests/test_console_bootstrap_service.py` | 12/12 PASS |
+| `tests/test_console_me_route.py` | 9/9 PASS |
+| `tests/test_embed_clients_contract.py` | 6/6 PASS (sin regresión) |
+| `tests/test_diagnosis_public_router.py` | 77/77 PASS (sin regresión) |
+| Secret/no-leak search | PASS |
+| JWT search | PASS — solo referencias documentales |
+| Protección `embed_clients/` | Sin diff |
+| Protección `routes/diagnosis.py` | Sin diff |
+| Protección `/t360`, `PublicVeraEntry`, `global.js` | Sin diff |
+| Protección `astro/public/embed`, `cross-origin-host` | Sin diff |
+
+### Documentación
+
+- `docs/paseto_console_auth_verifier_v1.md` — documento específico P4B.
+
+### No implementado en esta fase
+
+- DB table para jti revocation.
+- Refresh token.
+- Scope/permisos en el endpoint.
+- Aplicación verificador a endpoints Console reales (pendiente).
+- Embed/HMAC dual-mode (Fase 2 del plan).
+
 ## Historial
 
 - historial tecnico completo hasta esta reorganizacion: `status_historico_hasta_2026-06-28.md`;
