@@ -1304,6 +1304,23 @@ reemplazando HMAC como contrato futuro.
   runtime, Milvus, LiteLLM ni PostgreSQL.
 - Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
 
+### 2026-07-05 — P4A: ConsoleBootstrap PASETO access_token experimental
+
+Se implementó la Fase P4A del plan de migración HMAC→PASETO: `ConsoleBootstrapService`
+emite un PASETO v4.public `access_token` firmado (Ed25519) como campo opcional de la
+respuesta `POST /api/console/bootstrap`.
+
+- Nuevo `routes/console_bootstrap.py` con handler `POST /api/console/bootstrap`.
+- `PasetoConsoleSettings` + `issue_console_access_token()` + `paseto_console_settings_from_env()`
+  en `modules/security/paseto_tokens.py`.
+- `ConsoleBootstrap` dataclass ampliado con `access_token`, `token_type`, `expires_in`.
+- `ConsoleBootstrapService.build_bootstrap()` acepta `paseto_settings` opcional.
+- Tests: 12/12 PASS (6 originales + 6 P4A).
+- Pasaron: embed contract (6/6), git diff --check, secret search.
+- Sin cambios en `embed_clients/`, `diagnosis.py`, `global.js`, `/t360`, runtime, Milvus, LiteLLM, PostgreSQL.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
+- Documento específico: `SrvRestAstroLS_v1/docs/paseto_console_bootstrap_access_token_v1.md`.
+
 ## Pendientes recomendados
 
 - Agregar nuevos documentos lat.md solo para conceptos estables de plataforma.

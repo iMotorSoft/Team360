@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import base64
 import json
+import os
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from time import time
 from typing import Any
 
@@ -12,6 +13,16 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 from pyseto import Key as PasetoKey
 from pyseto import decode as paseto_decode
 from pyseto import encode as paseto_encode
+
+
+@dataclass(frozen=True)
+class PasetoConsoleSettings:
+    enabled: bool = False
+    issuer: str = "team360"
+    key_id: str = "local-dev-key-1"
+    private_key_pem: str | None = None
+    public_key_pem: str | None = None
+    ttl_seconds: int = 900
 
 
 @dataclass(frozen=True)
@@ -152,3 +163,77 @@ def verify_paseto_v4_public(
 
 class PasetoVerificationError(Exception):
     pass
+
+
+def paseto_console_settings_from_env() -> PasetoConsoleSettings:
+    enabled = os.environ.get("TEAM360_PASETO_ENABLED", "").strip().lower() in {"1", "true", "yes"}
+    issuer = os.environ.get("TEAM360_PASETO_ISSUER", "team360")
+    key_id = os.environ.get("TEAM360_PASETO_KEY_ID", "local-dev-key-1")
+    ttl_raw = os.environ.get("TEAM360_CONSOLE_PASETO_TTL_SECONDS", "900")
+
+    try:
+        ttl = int(ttl_raw)
+    except (ValueError, TypeError):
+        ttl = 900
+
+    private_b64 = os.environ.get("TEAM360_PASETO_PRIVATE_KEY_B64", "")
+    public_b64 = os.environ.get("TEAM360_PASETO_PUBLIC_KEY_B64", "")
+
+    private_pem: str | None = None
+    public_pem: str | None = None
+
+    if private_b64:
+        try:
+            private_pem = base64.b64decode(private_b64).decode("utf-8")
+        except Exception:
+            private_pem = None
+    if public_b64:
+        try:
+            public_pem = base64.b64decode(public_b64).decode("utf-8")
+        except Exception:
+            public_pem = None
+
+    return PasetoConsoleSettings(
+        enabled=enabled,
+        issuer=issuer,
+        key_id=key_id,
+        private_key_pem=private_pem,
+        public_key_pem=public_pem,
+        ttl_seconds=ttl,
+    )
+
+
+_DEV_KEY_PAIR: PasetoKeyPair | None = None
+
+
+def _get_dev_key_pair() -> PasetoKeyPair:
+    global _DEV_KEY_PAIR
+    if _DEV_KEY_PAIR is None:
+        _DEV_KEY_PAIR = PasetoKeyPair.generate("local-dev-key-1")
+    return _DEV_KEY_PAIR
+
+
+def issue_console_access_token(
+    user_id: str,
+    *,
+    settings: PasetoConsoleSettings | None = None,
+) -> str | None:
+    cfg = settings or paseto_console_settings_from_env()
+    if not cfg.enabled:
+        return None
+
+    private_key_pem = cfg.private_key_pem
+    key_id = cfg.key_id
+    if not private_key_pem:
+        dev = _get_dev_key_pair()
+        private_key_pem = dev.private_pem
+        key_id = dev.key_id
+
+    return issue_paseto_v4_public(
+        {"sub": f"user:{user_id}", "user_id": user_id},
+        private_key_pem=private_key_pem,
+        key_id=key_id,
+        ttl_seconds=cfg.ttl_seconds,
+        issuer=cfg.issuer,
+        token_type="console_access",
+    )

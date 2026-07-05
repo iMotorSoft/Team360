@@ -20,6 +20,7 @@ from modules.console.types import (
     ServiceDTO,
     WorkspaceDTO,
 )
+from modules.security.paseto_tokens import PasetoConsoleSettings, issue_console_access_token
 
 _INTERNAL_FEATURES = {"workers.internal", "workers.external"}
 _VALID_USER_TYPES = {"internal", "partner", "client"}
@@ -46,6 +47,8 @@ class ConsoleBootstrapService:
         workspace_id: str,
         user_id: str,
         profile: str | None = None,
+        *,
+        paseto_settings: PasetoConsoleSettings | None = None,
     ) -> ConsoleBootstrap:
         # profile is reserved for a future authenticated HTTP boundary. It never
         # grants permissions or internal visibility by itself.
@@ -120,6 +123,20 @@ class ConsoleBootstrapService:
                 },
             }
 
+        access_token: str | None = None
+        token_type: str | None = None
+        expires_in: int | None = None
+
+        if paseto_settings is not None:
+            token_str = issue_console_access_token(
+                user_id,
+                settings=paseto_settings,
+            )
+            if token_str is not None:
+                access_token = token_str
+                token_type = "paseto_v4_public"
+                expires_in = paseto_settings.ttl_seconds
+
         return ConsoleBootstrap(
             workspace=workspace,
             current_user=current_user,
@@ -137,6 +154,9 @@ class ConsoleBootstrapService:
             },
             organization_context=self._provisional_organization_context(workspace),
             debug=debug,
+            access_token=access_token,
+            token_type=token_type,
+            expires_in=expires_in,
         )
 
     async def _service_dto(

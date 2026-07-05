@@ -5,6 +5,11 @@ import pytest
 from modules.console.errors import UserNotFoundError, WorkspaceNotFoundError
 from modules.console.repositories import PermissionConsoleRepository
 from modules.console.service import ConsoleBootstrapService
+from modules.security.paseto_tokens import (
+    PasetoConsoleSettings,
+    PasetoKeyPair,
+    verify_paseto_v4_public,
+)
 
 
 def _summary(**overrides):
@@ -115,8 +120,12 @@ def _service(user_type="client", permissions=None, features=None, workspace=True
     )
 
 
-def _build(service):
-    return asyncio.run(service.build_bootstrap(None, "workspace-1", "user-1"))
+def _build(service, paseto_settings=None):
+    return asyncio.run(
+        service.build_bootstrap(
+            None, "workspace-1", "user-1", paseto_settings=paseto_settings
+        )
+    )
 
 
 def test_build_bootstrap_maps_services_and_default_task_summary():
@@ -196,3 +205,91 @@ def test_missing_workspace_raises_domain_error():
 def test_missing_user_raises_domain_error():
     with pytest.raises(UserNotFoundError):
         _build(_service(user=False))
+
+
+# ---------------------------------------------------------------------------
+# P4A — PASETO access_token experimental
+# ---------------------------------------------------------------------------
+
+
+_DEV_KEY_PAIR = PasetoKeyPair.generate("test-key-p4a")
+
+
+def _paseto_settings(enabled: bool = True) -> PasetoConsoleSettings:
+    return PasetoConsoleSettings(
+        enabled=enabled,
+        issuer="team360",
+        key_id=_DEV_KEY_PAIR.key_id,
+        private_key_pem=_DEV_KEY_PAIR.private_pem,
+        public_key_pem=_DEV_KEY_PAIR.public_pem,
+        ttl_seconds=900,
+    )
+
+
+def test_bootstrap_still_returns_user_id_without_paseto():
+    bootstrap = _build(_service(permissions=["package.view"]))
+    assert bootstrap.current_user["user_id"] == "user-1"
+    assert bootstrap.access_token is None
+    assert bootstrap.token_type is None
+    assert bootstrap.expires_in is None
+
+
+def test_bootstrap_returns_access_token_when_paseto_enabled():
+    bootstrap = _build(
+        _service(
+            permissions=["package.view"],
+        ),
+        paseto_settings=_paseto_settings(enabled=True),
+    )
+    assert bootstrap.access_token is not None
+    assert isinstance(bootstrap.access_token, str)
+    assert bootstrap.access_token.startswith("v4.public.")
+    assert bootstrap.token_type == "paseto_v4_public"
+    assert bootstrap.expires_in == 900
+
+
+def test_access_token_verifies_with_public_key():
+    bootstrap = _build(
+        _service(permissions=["package.view"]),
+        paseto_settings=_paseto_settings(enabled=True),
+    )
+    assert bootstrap.access_token is not None
+
+    payload = verify_paseto_v4_public(
+        bootstrap.access_token,
+        public_keys_by_id={_DEV_KEY_PAIR.key_id: _DEV_KEY_PAIR.public_pem},
+        issuer="team360",
+        expected_type="console_access",
+    )
+    assert payload["sub"] == "user:user-1"
+    assert payload["user_id"] == "user-1"
+    assert payload["typ"] == "console_access"
+    assert payload["iss"] == "team360"
+    assert "iat" in payload
+    assert "exp" in payload
+    assert "jti" in payload
+    assert payload["_key_id"] == _DEV_KEY_PAIR.key_id
+
+
+def test_no_access_token_when_paseto_disabled():
+    bootstrap = _build(
+        _service(permissions=["package.view"]),
+        paseto_settings=_paseto_settings(enabled=False),
+    )
+    assert bootstrap.access_token is None
+    assert bootstrap.token_type is None
+    assert bootstrap.expires_in is None
+
+
+def test_bootstrap_user_id_preserved_with_paseto():
+    bootstrap = _build(
+        _service(
+            permissions=["package.view"],
+            user_type="internal",
+        ),
+        paseto_settings=_paseto_settings(enabled=True),
+    )
+    assert bootstrap.current_user["user_id"] == "user-1"
+    assert bootstrap.current_user["user_type"] == "internal"
+    assert bootstrap.debug is not None
+    assert bootstrap.access_token is not None

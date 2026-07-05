@@ -140,3 +140,6 @@ class ConsoleBootstrap:
     workspace_context: WorkspaceContextDTO
     organization_context: OrgContextDTO
     debug: DebugDTO | None = None
+    access_token: str | None = None
+    token_type: str | None = None
+    expires_in: int | None = None

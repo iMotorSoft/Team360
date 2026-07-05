@@ -15,6 +15,7 @@ from modules.db.errors import DatabasePoolNotInitializedError
 from modules.db.pool import close_pool, get_pool, open_pool
 
 from routes.automation_diagnosis import classify, save_answer, start_session
+from routes.console_bootstrap import console_bootstrap
 from routes.diagnosis import (
     public_embed_auth,
     public_get_session,
@@ -81,6 +82,7 @@ def create_app() -> Litestar:
             public_turn,
             sales_diagnosis_turn,
             dev_sales_diagnosis_turn,
+            console_bootstrap,
         ],
         on_startup=[_open_db_pool],
         on_shutdown=[_close_db_pool],

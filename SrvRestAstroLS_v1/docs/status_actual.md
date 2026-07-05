@@ -1738,6 +1738,78 @@ Estado: IMPLEMENTADO Y VALIDADO.
 | Protección `PublicVeraEntry.svelte` | Sin diff |
 | Protección `global.js` | Sin diff |
 
+## 2026-07-05 — P4A: ConsoleBootstrap PASETO access_token experimental
+
+Se implementó la Fase P4A del plan de migración HMAC→PASETO: `ConsoleBootstrapService`
+emite un PASETO v4.public `access_token` firmado (Ed25519) como campo opcional de la
+respuesta `POST /api/console/bootstrap`.
+
+### Nuevo módulo/archivos
+
+- **`routes/console_bootstrap.py`** — nuevo handler `POST /api/console/bootstrap`:
+  - Lee `workspace_id` + `user_id` del body JSON.
+  - Lee `PasetoConsoleSettings` desde env vars.
+  - Delega en `ConsoleBootstrapService.build_bootstrap()`.
+  - Serializa respuesta incluyendo `access_token`, `token_type`, `expires_in`.
+  - Manejo de errores: `HTTP_500` con detail del dominio.
+- **`modules/security/paseto_tokens.py`** (ampliado):
+  - `PasetoConsoleSettings` — dataclass frozen con `enabled`, `issuer`, `key_id`, `private_key_pem`, `public_key_pem`, `ttl_seconds`.
+  - `paseto_console_settings_from_env()` — factory desde `TEAM360_PASETO_*` env vars.
+  - `issue_console_access_token(user_id, settings)` — emite PASETO v4.public con claims `sub:user:<id>`, `user_id`, `typ=console_access`, `iat`, `exp`, `jti`.
+  - `_get_dev_key_pair()` — genera par Ed25519 dinámico si no hay env keys (solo dev).
+- **`modules/console/types.py`** (ampliado): `ConsoleBootstrap` con 3 campos opcionales:
+  `access_token: str | None`, `token_type: str | None`, `expires_in: int | None`.
+- **`modules/console/service.py`** (ampliado): `build_bootstrap()` acepta `paseto_settings: PasetoConsoleSettings | None`. Si `enabled=True`, llama `issue_console_access_token()` y lo agrega al resultado.
+- **`ls_iMotorSoft_Srv01.py`** (ampliado): import + registro de `console_bootstrap`.
+- **`tests/test_console_bootstrap_service.py`** (ampliado): 6 nuevos tests P4A.
+
+### Tests P4A (6 nuevos, sobre 6 originales = 12 total)
+
+| Test | Lo que valida |
+| ---- | ------------- |
+| `test_bootstrap_still_returns_user_id_without_paseto` | Sin settings → `access_token: None` |
+| `test_bootstrap_returns_access_token_when_paseto_enabled` | Token presente, formato `v4.public.` |
+| `test_access_token_verifies_with_public_key` | `verify_paseto_v4_public` pasa |
+| `test_no_access_token_when_paseto_disabled` | `enabled=False` → sin token |
+| `test_bootstrap_user_id_preserved_with_paseto` | `user_id` preservado con token + debug |
+
+### Decisión técnica
+
+- `PasetoConsoleSettings` se pasa como kwarg opcional — no es obligatorio, no rompe existing tests.
+- Dev keys: `PasetoKeyPair.generate()` dinámico, sin secretos en código.
+- TTL default 900s (15 min), configurable vía env.
+- `token_type` en respuesta: `"paseto_v4_public"` (no es un claim del PASETO, es metadato HTTP).
+- Claims del token: `sub=user:<id>`, `user_id`, `typ=console_access`, `iss=team360`, `iat`, `exp`, `jti`.
+- Footer: `{"kid":"local-dev-key-1"}`.
+
+### Validación
+
+| Validación | Resultado |
+| ---------- | --------- |
+| `git diff --check` | PASS |
+| `uv run pytest tests/test_paseto_tokens.py -v` | 12/12 PASS |
+| `uv run pytest tests/test_console_bootstrap_service.py -v` | 12/12 PASS (6 originales + 6 P4A) |
+| `uv run pytest tests/test_embed_clients_contract.py -v` | 6/6 PASS (sin regresión embed) |
+| `uv run pytest tests/test_diagnosis_public_router.py -v` | No corrido (sin cambios en `diagnosis.py`) |
+| Secret/no-leak search | PASS — sin secretos reales; dev keys dinámicas |
+| Protección `/t360` | Sin diff |
+| Protección `PublicVeraEntry.svelte` | Sin diff |
+| Protección `global.js` | Sin diff |
+| Protección `embed_clients/` | Sin diff |
+| Protección `routes/diagnosis.py` | Sin diff |
+
+### Documentación creada
+
+- `docs/paseto_console_bootstrap_access_token_v1.md` — documento específico P4A.
+
+### No implementado en esta fase
+
+- DB table para jti revocation.
+- Endpoint de validación/verificación de token.
+- Frontend mock consumer (no cambia `global.js` ni frontend).
+- Producción env keys persistentes.
+- Fases P4B (revocation DB), P5 (frontend integration).
+
 ## Historial
 
 - historial tecnico completo hasta esta reorganizacion: `status_historico_hasta_2026-06-28.md`;
