@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-07-03 (Fase 9I — sync automatizado de loaderIntegrity en snippets/fixtures)
+Ultima actualizacion: 2026-07-03 (Fase 10A — guia externa de instalacion + handoff interno para cliente tecnico)
 
 ## Estado general
 
@@ -11,6 +11,25 @@ Ultima actualizacion: 2026-07-03 (Fase 9I — sync automatizado de loaderIntegri
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-07-03 — Fase 10A — Guía externa de instalación + handoff interno para cliente técnico
+
+- Se creó guía externa de instalación:
+  `SrvRestAstroLS_v1/docs/diagnosticador_embed_installation_guide_v1.md`.
+- Se creó documento de handoff interno:
+  `SrvRestAstroLS_v1/docs/diagnosticador_embed_client_handoff_v1.md`.
+- La guía cubre HTML estático, PHP tradicional, WordPress bloque HTML,
+  shortcode/plugin mínimo conceptual.
+- Incluye snippet recomendado con integrity, snippet simple compatible,
+  parámetros permitidos/prohibidos, troubleshooting, checklists y flujo de alta.
+- El handoff documenta qué se entrega, qué no, flujo de alta y criterio de
+  "listo para cliente".
+- No se modificó `global.js`, `/t360`, `PublicVeraEntry.svelte`, backend ni
+  servicios.
+- `pnpm check` PASS, `pnpm build` PASS, `git diff --check` PASS.
+- Sin secretos ni códigos internos en documentación pública.
+- Validación: CLIENT INSTALLATION GUIDE IMPLEMENTADO Y VALIDADO.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
 
 ### 2026-07-03 — Fase 9I — sync automatizado de loaderIntegrity en snippets/fixtures
 
@@ -1263,6 +1282,26 @@ El laboratorio valida que el DiagnosticadorCore pueda montarse fuera de Vera con
 - Playwright: 28 tests, todos pasan. Sin regresiones.
 - Sin commit, sin cambios en backend, endpoints, tests ni config global.
 - Estado de cierre: FASE 2 IMPLEMENTADA Y VALIDADA.
+- Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
+
+### 2026-07-05 — Fase 11 — PASETO v4.public como estándar de tokens Team360
+
+Se adoptó PASETO v4.public como estándar Team360 para tokens firmados propios,
+reemplazando HMAC como contrato futuro.
+
+- ADR formal creado: `SrvRestAstroLS_v1/docs/adr_paseto_v4_public_standard_v1.md`.
+- Plan de migración HMAC → PASETO en 5 fases:
+  `SrvRestAstroLS_v1/docs/paseto_embed_auth_migration_plan_v1.md`.
+- Módulo `modules/security/paseto_tokens.py` con API pública:
+  `PasetoKeyPair.generate()`, `issue_paseto_v4_public()`,
+  `verify_paseto_v4_public()`, `PasetoVerificationError`.
+- 12 tests backend focalizados: 12/12 PASS.
+- Embed tests existentes: 6/6 PASS (sin regresión).
+- Dependencia `pyseto` 1.9.3 agregada.
+- Ed25519 como curva asimétrica; private key nunca llega al frontend.
+- HMAC embed permanece como compatibilidad transitoria.
+- No se tocaron `global.js`, `/t360`, `PublicVeraEntry.svelte`, embed existente,
+  runtime, Milvus, LiteLLM ni PostgreSQL.
 - Detalle completo en `SrvRestAstroLS_v1/docs/status_actual.md`.
 
 ## Pendientes recomendados

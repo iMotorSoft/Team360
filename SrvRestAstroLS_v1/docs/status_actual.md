@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-07-03 (Fase 9I — sync automatizado de loaderIntegrity en snippets/fixtures)
+Ultima actualizacion: 2026-07-03 (Fase 10A — guia externa de instalacion + handoff interno para cliente tecnico)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -38,6 +38,112 @@ Estado: Fases 1 a 5 implementadas; confirmadas en `cdd1b1b`.
 
 Estado: Fase 7 a 9A implementadas y confirmadas en `15e3e98`. Fases 9B, 9C, 9D,
 9E, 9C-ext, 9D-ext y 9F implementadas y validadas en este worktree.
+
+## Fase 10A — Guía externa de instalación + paquete mínimo para cliente técnico PHP/WordPress/HTML
+
+Estado: CLIENT INSTALLATION GUIDE IMPLEMENTADO Y VALIDADO.
+
+### Decisión técnica
+
+- Se crea documentación externa clara para clientes técnicos sin requerir
+  plug-and-play absoluto.
+- El formato de entrega es `div + script + clientId + origin autorizado`,
+  compatible con HTML estático, PHP, WordPress y builders.
+- No se crea package npm, Web Component ni plugin WordPress productivo en esta
+  fase.
+- El cliente técnico recibe solo `clientId` público, snippet recomendado y guía
+  de troubleshooting.
+- `hmac_secret`, tenant/scope, `allowed_origins` se administran server-side.
+- `global.js` no fue modificado.
+- `/t360` y `PublicVeraEntry.svelte` no fueron modificados.
+
+### Implementación
+
+Documentos creados:
+
+- `docs/diagnosticador_embed_installation_guide_v1.md` — guía externa completa
+  con snippets recomendado, simple, HTML, PHP, WordPress bloque HTML,
+  shortcode/plugin mínimo conceptual, parámetros permitidos/prohibidos,
+  troubleshooting, checklist cliente, checklist Team360.
+- `docs/diagnosticador_embed_client_handoff_v1.md` — handoff interno
+  comercial/técnico con flujo de alta, criterio de "listo para cliente" y
+  referencias.
+
+Documentos actualizados:
+
+- `docs/diagnosticador_external_integrity_snippet_v1.md` — referencia cruzada
+  a la guía de instalación.
+- `docs/status_actual.md` — esta sección.
+- `lat.md/status_actual.md` — sección equivalente.
+
+### Contenido de la guía de instalación
+
+- snippet recomendado con integrity;
+- snippet simple compatible;
+- HTML estático completo;
+- PHP tradicional;
+- WordPress bloque HTML;
+- shortcode/plugin mínimo conceptual;
+- tabla de parámetros permitidos;
+- lista de parámetros prohibidos;
+- flujo de alta de cliente;
+- troubleshooting;
+- checklist técnico del cliente;
+- checklist Team360.
+
+### Contenido del handoff interno
+
+- qué se entrega al cliente;
+- qué NO se entrega;
+- flujo de alta;
+- mensaje breve para técnico del cliente;
+- criterio de "listo para cliente".
+
+### Validación 10A
+
+| Validación | Resultado |
+| ---------- | --------- |
+| `git diff --check` | PASS |
+| `pnpm check` | PASS |
+| `pnpm build` | PASS |
+| Secret/no-leak search | PASS — sin secretos reales ni códigos internos en snippets |
+| Protección `/t360` | Sin diff |
+| Protección `PublicVeraEntry.svelte` | Sin diff |
+| Protección `global.js` | Sin diff |
+
+Servicios permanentes no reiniciados: PostgreSQL, Milvus, LiteLLM.
+
+### Seguridad
+
+- `clientId` tratado como público.
+- Sin `hmac_secret` real en documentación.
+- Sin `organization_code`, `workspace_code`, `package_code`,
+  `knowledge_scope_code`, `assistant_instance_code` en snippets públicos.
+- `allowed_origins` no expuesto como editable por cliente.
+- Parámetros prohibidos documentados explícitamente.
+
+### Compatibilidad
+
+- HTML estático.
+- PHP tradicional.
+- WordPress bloque HTML.
+- WordPress shortcode/plugin mínimo conceptual.
+- Gutenberg, Elementor, Divi, builders similares (con advertencia de
+  optimizadores).
+- Limitación conocida: plugins de seguridad/minificación/caché pueden alterar
+  scripts.
+
+### Deuda restante documentada
+
+- package npm.
+- Web Component nativo.
+- CSS encapsulado final.
+- Eventos públicos `t360:*` definitivos.
+- Plugin WordPress productivo completo.
+- Publicación en marketplace.
+- UI/admin para `embed_clients`.
+- E2E móvil flaky.
+- Deuda LAT preexistente.
 
 ## Fase 9I — sync automatizado de loaderIntegrity en snippets/fixtures
 
@@ -1566,6 +1672,71 @@ Frontend E2E (desde `astro/` con `PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_UR
 - No guardar secretos en el repositorio ni imprimirlos en comandos o documentacion.
 - Las credenciales expuestas previamente deben rotarse.
 - Evitar exportar todas las credenciales globalmente desde `~/.bashrc`; preferir carga acotada al proyecto o un gestor de secretos.
+
+## Fase 11 — PASETO v4.public como estándar de tokens Team360
+
+Estado: IMPLEMENTADO Y VALIDADO.
+
+### Decisión técnica
+
+- PASETO v4.public adoptado como estándar Team360 para tokens firmados propios.
+- JWT queda reservado solo para integración externa obligatoria.
+- HMAC embed actual queda como compatibilidad transitoria.
+- Ed25519 como curva asimétrica; private key nunca llega al frontend.
+- `pyseto 1.9.3` elegido como librería PASETO Python (compatible con v4.public).
+
+### Documentación creada
+
+- `docs/adr_paseto_v4_public_standard_v1.md` — ADR formal con decisión, motivos, política y riesgos.
+- `docs/paseto_embed_auth_migration_plan_v1.md` — Plan de migración en 5 fases (F0–F4), de fundación a deprecación HMAC.
+
+### Módulo backend
+
+- `backend/modules/security/__init__.py` — paquete nuevo.
+- `backend/modules/security/paseto_tokens.py` — API pública:
+  - `PasetoKeyPair.generate(key_id)` — genera par Ed25519 en PEM.
+  - `issue_paseto_v4_public(claims, *, private_key_pem, key_id, ttl_seconds, issuer, token_type)` — emite token `v4.public...`.
+  - `verify_paseto_v4_public(token, *, public_keys_by_id, issuer, expected_type)` — verifica y extrae payload, con validación de `typ`, `iss`, `exp`, `iat`, `jti` y leeway configurable.
+  - `PasetoVerificationError` — excepción canónica para fallos.
+
+### Tests
+
+- `tests/test_paseto_tokens.py` — 12 tests, todos PASS:
+  1. issue + verify valid token
+  2. expired token rejected
+  3. wrong issuer rejected
+  4. wrong typ rejected
+  5. unknown key_id rejected
+  6. malformed PASETO rejected
+  7. tampered payload/signature rejected
+  8. custom claims preserved
+  9. format is v4.public, not JWT
+  10. keys are Ed25519, not HMAC
+  11. kid in footer selects correct key across multiple keys
+  12. iat and jti auto-included
+
+### Dependencia
+
+- `pyseto` agregado vía `uv add pyseto`.
+
+### No implementado en esta fase
+
+- Fase 1 del plan migración (Console integration) — pendiente.
+- Fase 2 (Embed Dual Support) — pendiente.
+- Fases 3 y 4 (nuevo snippet, deprecación HMAC) — pendientes.
+- Sin cambios en `global.js`, `/t360`, `PublicVeraEntry.svelte`, embed existente, runtime, Milvus, LiteLLM ni PostgreSQL.
+
+### Validación
+
+| Validación | Resultado |
+| ---------- | --------- |
+| `git diff --check` | PASS |
+| `uv run pytest tests/test_paseto_tokens.py -v` | 12/12 PASS |
+| `uv run pytest tests/test_embed_clients_contract.py -v` | 6/6 PASS (no regresión) |
+| Secret/no-leak search | PASS — sin secretos reales; keys de test marcadas explícitamente como no-productivas |
+| Protección `/t360` | Sin diff |
+| Protección `PublicVeraEntry.svelte` | Sin diff |
+| Protección `global.js` | Sin diff |
 
 ## Historial
 
