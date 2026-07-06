@@ -2059,10 +2059,10 @@ def test_retry_after_timeout_preserves_session(monkeypatch):
 
 
 def test_public_turn_default_model_is_gpt5_nano(monkeypatch):
-    """Default model should be openai_gpt-5-nano."""
+    """Default model should be openai_gpt-5.4-nano."""
     from routes.diagnosis import _PublicTurnLLMProvider
     provider = _PublicTurnLLMProvider()
-    assert provider._model == "openai_gpt-5-nano"
+    assert provider._model == "openai_gpt-5.4-nano"
 
 
 def test_public_turn_model_from_env(monkeypatch):

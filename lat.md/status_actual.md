@@ -2,7 +2,7 @@
 
 Objetivo: `arquitectura-viva`
 
-Ultima actualizacion: 2026-07-03 (Fase 10A — guia externa de instalacion + handoff interno para cliente tecnico)
+Ultima actualizacion: 2026-07-06 (actualizacion del alias LiteLLM GPT-5.4 Nano)
 
 ## Estado general
 
@@ -11,6 +11,25 @@ Ultima actualizacion: 2026-07-03 (Fase 10A — guia externa de instalacion + han
 Esta capa sigue el patron usado en JudaismoenVivo: indice raiz `lat.md/lat.md`, documentos por concepto y referencias `[[...]]` que pueden anclarse desde codigo con comentarios `@lat`. Las reglas de uso quedaron declaradas en `AGENTS.md` y en `.agents/skills/team360-project/SKILL.md`.
 
 ## Acciones realizadas
+
+### 2026-07-06 — Alias LiteLLM GPT-5.4 Nano
+
+Esta actualización alinea el alias público de LiteLLM con el modelo upstream
+GPT-5.4 Nano sin alterar evidencia histórica.
+
+- El alias canónico del runtime cambia a `openai_gpt-5.4-nano`.
+- El upstream permanece en `openai/gpt-5.4-nano`.
+- Chat Completions queda seleccionado explícitamente con
+  `TEAM360_LITELLM_API_MODE=chat`.
+- Responses API requiere `TEAM360_LITELLM_API_MODE=responses` explícito y se
+  reserva para labs o validaciones controladas.
+- Se preservan sin reescritura los resultados y documentos históricos que
+  registran el alias anterior.
+- El smoke directo real respondió con contenido no vacío y sin fallback sobre
+  Chat Completions.
+- La validación productiva Vera pasó 10/10 escenarios con PostgreSQL, Milvus y
+  LiteLLM reales; el proceso backend heredó alias `openai_gpt-5.4-nano` y modo
+  `chat`.
 
 ### 2026-07-03 — Fase 10A — Guía externa de instalación + handoff interno para cliente técnico
 
@@ -946,7 +965,7 @@ El laboratorio valida que el DiagnosticadorCore pueda montarse fuera de Vera con
 - Se agrego `team360-runtime-operational-policy.md` como invariante estable para
   la experiencia publica `/t360` y el endpoint `POST /api/diagnosis/turn`.
 - Se documento el flujo validado: Astro/Svelte -> Litestar -> PostgreSQL 18 ->
-  Milvus 2.6 -> LiteLLM -> `openai_gpt-5-nano` -> `openai/gpt-5.4-nano`.
+  Milvus 2.6 -> LiteLLM -> `openai_gpt-5.4-nano` -> `openai/gpt-5.4-nano`.
 - Se fijaron puertos operativos, variables de entorno conceptuales, coleccion
   Milvus `team360_sales_diagnosis_knowledge_v1`, modo LiteLLM
   `chat`, endpoint base `http://localhost:4000/v1` y regla de no usar OpenAI

@@ -13,7 +13,6 @@ from typing import Any
 
 DEFAULT_LITELLM_BASE_URL = "http://localhost:4000/v1"
 DEFAULT_LITELLM_TIMEOUT_SECONDS = 45.0
-GPT5_NANO_RESPONSE_ALIASES = {"openai_gpt-5-nano", "openai/gpt-5-nano"}
 
 
 class LiteLLMClientError(RuntimeError):
@@ -244,7 +243,7 @@ def should_use_responses_api(model: str) -> bool:
         return False
     if explicit not in {"", "auto"}:
         raise LiteLLMClientError("TEAM360_LITELLM_API_MODE must be auto, chat or responses")
-    return model.strip() in GPT5_NANO_RESPONSE_ALIASES
+    return False
 
 
 def _messages_to_responses_instructions(messages: list[dict[str, str]]) -> str:

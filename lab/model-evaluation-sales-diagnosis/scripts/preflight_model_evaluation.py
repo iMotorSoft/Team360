@@ -415,7 +415,7 @@ def _resolve_aliases(models_arg: str | None) -> list[str]:
     if models_arg:
         return [m.strip() for m in models_arg.split(",")]
     return [
-        "openai_gpt-5-nano",
+        "openai_gpt-5.4-nano",
         "openai_gpt_4o_mini_2024_07_18",
         "openrouter_qwen3_30b_a3b_thinking_2507",
         "openrouter_deepseek_4_flash",

@@ -54,7 +54,7 @@ def test_redact_does_not_leak_litellm_key():
 
 def test_resolve_aliases_default():
     aliases = preflight._resolve_aliases(None)
-    assert "openai_gpt-5-nano" in aliases
+    assert "openai_gpt-5.4-nano" in aliases
     assert "openai_gpt_4o_mini_2024_07_18" in aliases
     assert "openrouter_qwen3_30b_a3b_thinking_2507" in aliases
     assert "openrouter_deepseek_4_flash" in aliases

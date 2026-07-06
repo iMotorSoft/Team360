@@ -32,19 +32,18 @@ lo invoca como subproceso para cada modelo y agrega metadatos de corrida.
 | ID | Provider | Modo | Modelo |
 |----|----------|------|--------|
 | `openai_direct_gpt-5-nano` | OpenAI directo | `openai` | `gpt-5-nano` |
-| `openai_gpt-5-nano` | LiteLLM → OpenAI | `litellm` | `openai_gpt-5-nano` |
+| `openai_gpt-5.4-nano` | LiteLLM → OpenAI | `litellm` | `openai_gpt-5.4-nano` |
 | `openai_gpt_4o_mini_2024_07_18` | LiteLLM → OpenAI | `litellm` | `openai_gpt_4o_mini_2024_07_18` |
 | `openrouter_qwen3_30b_a3b_thinking_2507` | LiteLLM → OpenRouter | `litellm` | `openrouter_qwen3_30b_a3b_thinking_2507` |
 | `openrouter_deepseek_4_flash` | LiteLLM → OpenRouter | `litellm` | `openrouter_deepseek_4_flash` |
 | `requesty_deepseek_4_flash` | LiteLLM → Requesty | `litellm` | `requesty_deepseek_4_flash` |
 
-Los IDs legacy `litellm_*` y `openai_direct_gpt_5_nano` se aceptan como
-aliases de CLI para no romper corridas existentes, pero los IDs canonicos son
-los de la tabla.
+Los IDs alternativos declarados en `config/models.json` se aceptan como aliases
+de CLI, pero los IDs canonicos son los de la tabla.
 
 ## Modelos excluidos
 
-- `gpt5.5-nano`, `gpt5.4-nano`, `openai_gpt-5.4-nano` — no existen en config.
+- `gpt5.5-nano`, `gpt5.4-nano` — no existen en config.
 - `whisper` — audio, no aplica.
 - `flux`/image models — no aplican.
 
@@ -103,7 +102,8 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
 TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano \
+TEAM360_LITELLM_API_MODE=chat \
   uv run litestar --app app:app run --host 127.0.0.1 --port 8018
 ```
 
@@ -136,7 +136,7 @@ Requiere backend levantado con `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=lit
 
 ```bash
 uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py \
-  --models openai_gpt-5-nano,openai_gpt_4o_mini_2024_07_18,openrouter_qwen3_30b_a3b_thinking_2507,openrouter_deepseek_4_flash \
+  --models openai_gpt-5.4-nano,openai_gpt_4o_mini_2024_07_18,openrouter_qwen3_30b_a3b_thinking_2507,openrouter_deepseek_4_flash \
   --no-write-results
 ```
 
@@ -152,7 +152,7 @@ uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.
 ```bash
 uv run python lab/model-evaluation-sales-diagnosis/scripts/run_model_evaluation.py \
   --config lab/model-evaluation-sales-diagnosis/config/run_matrix.example.json \
-  --models openai_gpt-5-nano \
+  --models openai_gpt-5.4-nano \
   --output lab/model-evaluation-sales-diagnosis/results/custom_run.jsonl
 ```
 

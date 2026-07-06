@@ -35,7 +35,7 @@ Main stack:
 - Conversational state: PostgreSQL 18.
 - Vector retrieval: Milvus 2.6.
 - LLM gateway: LiteLLM.
-- Team360 alias: `openai_gpt-5-nano`.
+- Team360 alias: `openai_gpt-5.4-nano`.
 - Real upstream: `openai/gpt-5.4-nano`.
 - Observed snapshot: `gpt-5.4-nano-2026-03-17`.
 - LiteLLM API mode: Chat Completions.
@@ -141,7 +141,7 @@ http://localhost:4000/v1
 Team360 alias:
 
 ```text
-openai_gpt-5-nano
+openai_gpt-5.4-nano
 ```
 
 The alias resolves internally to:
@@ -168,7 +168,7 @@ Backend configuration:
 ```bash
 TEAM360_AI_PROVIDER=litellm
 TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano
 TEAM360_LITELLM_API_MODE=chat
 ```
 
@@ -191,7 +191,7 @@ TEAM360_LITELLM_API_KEY="$LITELLM_MASTER_KEY"
 
 | Concept | Value |
 | --- | --- |
-| LiteLLM alias | `openai_gpt-5-nano` |
+| LiteLLM alias | `openai_gpt-5.4-nano` |
 | Upstream | `openai/gpt-5.4-nano` |
 | API | Chat Completions |
 | Temperature | `0.2` |
@@ -324,7 +324,7 @@ AUTOMATION_DIAGNOSIS_REPOSITORY=postgres \
 TEAM360_EMBEDDING_VERSION=team360-openai-small-1536-v1 \
 TEAM360_AI_PROVIDER=litellm \
 TEAM360_LITELLM_BASE_URL=http://127.0.0.1:4000 \
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano \
 TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER=milvus \
 TEAM360_MILVUS_HOST=127.0.0.1 \
 TEAM360_MILVUS_PORT=19530 \
@@ -363,7 +363,7 @@ Older conceptual commands may show:
 AUTOMATION_DIAGNOSIS_REPOSITORY=postgres \
 TEAM360_AI_PROVIDER=litellm \
 TEAM360_LITELLM_BASE_URL=http://localhost:4000/v1 \
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano \
 TEAM360_LITELLM_API_MODE=chat \
 TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER=milvus \
 TEAM360_MILVUS_HOST=127.0.0.1 \
@@ -713,7 +713,7 @@ Gateway:
 LiteLLM
 
 Alias:
-openai_gpt-5-nano
+openai_gpt-5.4-nano
 
 Upstream:
 openai/gpt-5.4-nano

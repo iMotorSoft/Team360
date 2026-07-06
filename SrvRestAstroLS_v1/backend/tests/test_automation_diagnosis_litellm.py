@@ -125,7 +125,7 @@ def test_litellm_client_handles_successful_responses_api_response(monkeypatch):
     body = json.dumps(
         {
             "id": "resp_test",
-            "model": "openai/gpt-5-nano",
+            "model": "openai/gpt-5.4-nano",
             "status": "completed",
             "output_text": "OK",
             "usage": {"total_tokens": 11},
@@ -143,7 +143,7 @@ def test_litellm_client_handles_successful_responses_api_response(monkeypatch):
 
     client = LiteLLMClient(base_url="http://localhost:4000", api_key="test", timeout_seconds=7)
     response = client.responses_completion(
-        "openai/gpt-5-nano",
+        "openai/gpt-5.4-nano",
         [
             {"role": "system", "content": "Sos breve."},
             {"role": "user", "content": "Responde OK."},
@@ -153,11 +153,11 @@ def test_litellm_client_handles_successful_responses_api_response(monkeypatch):
     )
 
     assert response.content == "OK"
-    assert response.model == "openai/gpt-5-nano"
+    assert response.model == "openai/gpt-5.4-nano"
     assert response.usage == {"total_tokens": 11}
     assert captured["url"] == "http://localhost:4000/v1/responses"
     assert captured["timeout"] == 7
-    assert captured["payload"]["model"] == "openai/gpt-5-nano"
+    assert captured["payload"]["model"] == "openai/gpt-5.4-nano"
     assert captured["payload"]["instructions"] == "Sos breve."
     assert captured["payload"]["input"] == "USER:\nResponde OK."
     assert captured["payload"]["reasoning"] == {"effort": "low"}
@@ -166,9 +166,14 @@ def test_litellm_client_handles_successful_responses_api_response(monkeypatch):
     assert captured["headers"]["X-team360-workspace-id"] == "ws_test"
 
 
-def test_litellm_client_text_completion_routes_gpt5_nano_to_responses(monkeypatch):
+def test_litellm_client_text_completion_routes_current_alias_to_chat_by_default(monkeypatch):
     captured = {}
-    body = json.dumps({"model": "openai/gpt-5-nano", "output_text": "OK"}).encode("utf-8")
+    body = json.dumps(
+        {
+            "model": "openai/gpt-5.4-nano",
+            "choices": [{"message": {"content": "OK"}}],
+        }
+    ).encode("utf-8")
 
     def fake_urlopen(request, timeout):
         captured["url"] = request.full_url
@@ -180,13 +185,13 @@ def test_litellm_client_text_completion_routes_gpt5_nano_to_responses(monkeypatc
 
     client = LiteLLMClient(base_url="http://localhost:4000", api_key="test")
     response = client.text_completion(
-        "openai_gpt-5-nano",
+        "openai_gpt-5.4-nano",
         [{"role": "user", "content": "Responde OK."}],
     )
 
     assert response.content == "OK"
-    assert captured["url"] == "http://localhost:4000/v1/responses"
-    assert captured["payload"]["model"] == "openai_gpt-5-nano"
+    assert captured["url"] == "http://localhost:4000/v1/chat/completions"
+    assert captured["payload"]["model"] == "openai_gpt-5.4-nano"
 
 
 def test_litellm_client_text_completion_keeps_non_gpt5_nano_on_chat(monkeypatch):
@@ -219,13 +224,14 @@ def test_litellm_client_text_completion_keeps_non_gpt5_nano_on_chat(monkeypatch)
 
 def test_litellm_api_mode_override(monkeypatch):
     monkeypatch.delenv("TEAM360_LITELLM_API_MODE", raising=False)
-    assert should_use_responses_api("openai_gpt-5-nano") is True
+    assert should_use_responses_api("openai_gpt-5.4-nano") is False
     assert should_use_responses_api("requesty_deepseek_4_flash") is False
 
     monkeypatch.setenv("TEAM360_LITELLM_API_MODE", "chat")
-    assert should_use_responses_api("openai_gpt-5-nano") is False
+    assert should_use_responses_api("openai_gpt-5.4-nano") is False
 
     monkeypatch.setenv("TEAM360_LITELLM_API_MODE", "responses")
+    assert should_use_responses_api("openai_gpt-5.4-nano") is True
     assert should_use_responses_api("requesty_deepseek_4_flash") is True
 
 

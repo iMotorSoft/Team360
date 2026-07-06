@@ -444,7 +444,7 @@ class ConversationValidator:
                 "backend": BASE_URL,
                 "scopes_resolved_dynamically": True,
                 "milvus_collection": "team360_sales_diagnosis_knowledge_v1",
-                "litellm_model": "openai_gpt-5-nano",
+                "litellm_model": "openai_gpt-5.4-nano",
                 "state_provider": "postgres",
                 "retrieval_provider": "milvus",
                 "llm_provider": "litellm",

@@ -18,7 +18,7 @@ Mide el overhead de latencia que agrega LiteLLM como gateway para gpt-5.4-nano.
 | Via | Endpoint | Modelo | Key |
 |---|---|---|---|
 | OpenAI directo | `https://api.openai.com/v1/chat/completions` | `gpt-5.4-nano` | `OpenAI_Key_JAI_query` |
-| LiteLLM proxy | `http://localhost:4000/v1/chat/completions` | `openai_gpt-5-nano` | `LITELLM_MASTER_KEY` |
+| LiteLLM proxy | `http://localhost:4000/v1/chat/completions` | `openai_gpt-5.4-nano` | `LITELLM_MASTER_KEY` |
 
 ## Ejecucion
 

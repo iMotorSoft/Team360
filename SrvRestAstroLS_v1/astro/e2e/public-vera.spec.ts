@@ -85,7 +85,7 @@ function response({
       diagnosis_status: withDiagnosis ? "completed" : "gathering",
       generation: {
         status: fallback ? "fallback" : "success",
-        model: "openai_gpt-5-nano",
+        model: "openai_gpt-5.4-nano",
         fallback_used: fallback,
         fallback_reason: fallback ? "transient_error" : null,
       },

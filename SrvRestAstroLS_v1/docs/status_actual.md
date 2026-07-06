@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-07-03 (Fase 10A — guia externa de instalacion + handoff interno para cliente tecnico)
+Ultima actualizacion: 2026-07-06 (actualizacion del alias LiteLLM GPT-5.4 Nano)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,27 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Actualizacion operativa 2026-07-06 — alias LiteLLM GPT-5.4 Nano
+
+- El alias operativo de Team360 cambia de `openai_gpt-5-nano` a
+  `openai_gpt-5.4-nano`.
+- El upstream continúa siendo `openai/gpt-5.4-nano`.
+- El runtime público usa Chat Completions de forma explícita mediante
+  `TEAM360_LITELLM_API_MODE=chat`.
+- Responses API queda limitada a labs o validaciones controladas mediante
+  `TEAM360_LITELLM_API_MODE=responses`.
+- Se actualizaron defaults backend, preflight de LiteLLM, scripts operativos,
+  tests, fixtures E2E, labs reutilizables y documentación canónica.
+- La evidencia histórica y los resultados fechados conservan el alias usado al
+  momento de cada ejecución.
+- Smoke directo real: PASS con contenido no vacío, `finish_reason=stop`, 38
+  tokens totales y 1149 ms de latencia; sin fallback en el cliente directo.
+- Validación productiva real de Vera: PostgreSQL + Milvus + LiteLLM, 10/10
+  escenarios PASS, 26 muestras, p50 3273 ms y p95 7313 ms.
+- El backend confirmó en runtime efectivo:
+  `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano` y
+  `TEAM360_LITELLM_API_MODE=chat`.
 
 ## Trabajo anterior - Diagnosticador embebible
 

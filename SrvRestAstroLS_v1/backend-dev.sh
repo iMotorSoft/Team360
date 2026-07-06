@@ -100,7 +100,8 @@ export TEAM360_EMBEDDING_VERSION="${TEAM360_EMBEDDING_VERSION:-team360-openai-sm
 
 export TEAM360_AI_PROVIDER="${TEAM360_AI_PROVIDER:-litellm}"
 export TEAM360_LITELLM_BASE_URL="${TEAM360_LITELLM_BASE_URL:-http://127.0.0.1:4000}"
-export TEAM360_LITELLM_MODEL_ALIAS="${TEAM360_LITELLM_MODEL_ALIAS:-openai_gpt-5-nano}"
+export TEAM360_LITELLM_MODEL_ALIAS="${TEAM360_LITELLM_MODEL_ALIAS:-openai_gpt-5.4-nano}"
+export TEAM360_LITELLM_API_MODE="${TEAM360_LITELLM_API_MODE:-chat}"
 
 export TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER="${TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER:-milvus}"
 export TEAM360_MILVUS_HOST="${TEAM360_MILVUS_HOST:-127.0.0.1}"
@@ -114,12 +115,10 @@ export TEAM360_PUBLIC_WORKSPACE_CODE="${TEAM360_PUBLIC_WORKSPACE_CODE:-team360_p
 export TEAM360_PUBLIC_PACKAGE_CODE="${TEAM360_PUBLIC_PACKAGE_CODE:-pkg_sales_diagnosis}"
 export TEAM360_PUBLIC_KNOWLEDGE_SCOPE_CODE="${TEAM360_PUBLIC_KNOWLEDGE_SCOPE_CODE:-ks_team360_sales_diagnosis}"
 
-# Intentionally not defined.
+# API routing policy.
 #
-# Production currently relies on automatic routing:
-# openai_gpt-5-nano -> /v1/responses
-#
-# Do not define TEAM360_LITELLM_API_MODE here unless production is changed too.
+# The public runtime uses Chat Completions explicitly. Responses API remains
+# available only for controlled labs through an explicit environment override.
 
 # ---- URL parsing -----------------------------------------------------------
 
@@ -213,10 +212,10 @@ _preflight_litellm_http() {
         _ok "LiteLLM HTTP preflight"
       fi
 
-      if grep -q '"openai_gpt-5-nano"' "$response_file"; then
-        _ok "LiteLLM model alias registered: openai_gpt-5-nano"
+      if grep -q '"openai_gpt-5.4-nano"' "$response_file"; then
+        _ok "LiteLLM model alias registered: openai_gpt-5.4-nano"
       else
-        _warn "LiteLLM responded successfully, but openai_gpt-5-nano was not found in /v1/models"
+        _warn "LiteLLM responded successfully, but openai_gpt-5.4-nano was not found in /v1/models"
       fi
       ;;
 
@@ -416,7 +415,7 @@ _log "Conversation state: ${TEAM360_DIAGNOSIS_STATE_PROVIDER}"
 _log "AI provider: ${TEAM360_AI_PROVIDER}"
 _log "LiteLLM: ${TEAM360_LITELLM_BASE_URL}"
 _log "Model alias: ${TEAM360_LITELLM_MODEL_ALIAS}"
-_log "API mode: auto / production default"
+_log "API mode: ${TEAM360_LITELLM_API_MODE}"
 _log "Retrieval: ${TEAM360_DIAGNOSIS_RETRIEVAL_PROVIDER}"
 _log "Milvus: ${TEAM360_MILVUS_HOST}:${TEAM360_MILVUS_PORT}"
 _log "Collection: ${TEAM360_MILVUS_COLLECTION}"
@@ -438,4 +437,3 @@ printf '\n'
 exec "$UVICORN" ls_iMotorSoft_Srv01:app \
   --host "$BACKEND_HOST" \
   --port "$BACKEND_PORT"
-

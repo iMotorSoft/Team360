@@ -482,7 +482,7 @@ class TestPromptPolicy:
                 return LiteLLMResponse(content="ok", model=model)
 
         monkeypatch.setenv("TEAM360_AI_PROVIDER", "litellm")
-        monkeypatch.setenv("TEAM360_LITELLM_MODEL_ALIAS", "openai_gpt-5-nano")
+        monkeypatch.setenv("TEAM360_LITELLM_MODEL_ALIAS", "openai_gpt-5.4-nano")
         monkeypatch.setattr(diagnosis_route, "LiteLLMClient", FakeLiteLLMClient)
 
         provider = diagnosis_route._PublicTurnLLMProvider()

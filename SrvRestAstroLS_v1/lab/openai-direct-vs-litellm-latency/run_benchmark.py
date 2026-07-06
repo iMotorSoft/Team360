@@ -45,7 +45,7 @@ DIRECT_CONFIG = {
 LITELLM_CONFIG = {
     "label": "LiteLLM proxy",
     "route": "litellm_proxy",
-    "model": "openai_gpt-5-nano",
+    "model": "openai_gpt-5.4-nano",
     "url": "http://localhost:4000/v1/chat/completions",
     "key_var": "LITELLM_MASTER_KEY",
 }
@@ -261,7 +261,7 @@ def main():
 
     print(f"Benchmark OpenAI directo vs LiteLLM - {timestamp}")
     print(f"Modelo upstream: gpt-5.4-nano")
-    print(f"Alias LiteLLM: openai_gpt-5-nano")
+    print(f"Alias LiteLLM: openai_gpt-5.4-nano")
     print(f"Direct: {DIRECT_CONFIG['url']}")
     print(f"LiteLLM: {LITELLM_CONFIG['url']}")
     print(f"Warm-up: {WARMUP_REPS}x por ruta")

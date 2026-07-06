@@ -1702,13 +1702,10 @@ No es endpoint final publico, no es MVP y no activa producto comercial.
   no OpenAI SDK).
 - Requiere `TEAM360_LITELLM_BASE_URL` (URL del proxy LiteLLM).
 - API key via `LiteLLMClient` constructor (`None` → `get_litellm_api_key()`).
-- Modelo via `TEAM360_LITELLM_MODEL_ALIAS` (default: `openai_gpt-5-nano`).
-- `LiteLLMClient.text_completion()` enruta automaticamente:
-  - `openai_gpt-5-nano` y `openai/gpt-5-nano` → `/v1/responses`
-    con `reasoning.effort=low` cuando el upstream efectivo es
-    `openai/gpt-5.4-nano`;
-  - el resto de aliases (`requesty_deepseek_4_flash`,
-    `openrouter_deepseek_4_flash`, etc.) → `/v1/chat/completions`.
+- Modelo via `TEAM360_LITELLM_MODEL_ALIAS` (default: `openai_gpt-5.4-nano`).
+- `LiteLLMClient.text_completion()` usa `/v1/chat/completions` por default.
+- `/v1/responses` requiere `TEAM360_LITELLM_API_MODE=responses` explicito para
+  labs o validaciones controladas.
 - Construye prompts via `PromptPolicy`.
 - Si falta config → HTTP 503 controlado sin secrets.
 - Si la llamada LiteLLM falla → retorna `SAFE_ACK_TEXT` como fallback.
@@ -1721,8 +1718,8 @@ No es endpoint final publico, no es MVP y no activa producto comercial.
 | `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm` | Si | — | Activa _ProductLiteLLMProvider |
 | `TEAM360_LITELLM_BASE_URL` | Si | — | URL del proxy LiteLLM |
 | `TEAM360_LITELLM_API_KEY` | Si | — | API key; no debe imprimirse |
-| `TEAM360_LITELLM_MODEL_ALIAS` | No | `openai_gpt-5-nano` | Alias de modelo en LiteLLM |
-| `TEAM360_LITELLM_API_MODE` | No | `auto` | `auto`, `chat` o `responses`; permite forzar endpoint LiteLLM si hace falta diagnostico |
+| `TEAM360_LITELLM_MODEL_ALIAS` | No | `openai_gpt-5.4-nano` | Alias de modelo en LiteLLM |
+| `TEAM360_LITELLM_API_MODE` | No | `auto` | `auto` y `chat` usan Chat Completions; `responses` habilita Responses API explicitamente |
 
 ### Matriz actualizada del product adapter
 
@@ -2203,7 +2200,8 @@ No se reescribio provider ni arquitectura. La comparacion mostro:
    - `TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test`
    - `TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm`
    - `TEAM360_LITELLM_BASE_URL=http://localhost:4000`
-   - `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano`
+   - `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano`
+   - `TEAM360_LITELLM_API_MODE=chat`
    - token LiteLLM valido en env del backend.
 4. La consola LiteLLM mostro llamadas `401 Unauthorized` previas y luego
    `200 OK`; eso apunta a token/env anterior o invalido en algun proceso, no a

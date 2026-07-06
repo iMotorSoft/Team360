@@ -281,7 +281,7 @@ class IntentClassifier(Protocol):
 
 
 class LiteLLMIntentClassifier:
-    def __init__(self, base_url: str | None = None, model: str = "openai_gpt-5-nano") -> None:
+    def __init__(self, base_url: str | None = None, model: str = "openai_gpt-5.4-nano") -> None:
         self._client = LiteLLMClient(base_url=base_url)
         self._model = model
 

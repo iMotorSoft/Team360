@@ -199,7 +199,7 @@ class _PublicTurnLLMProvider:
         self._base_url = os.environ.get("TEAM360_LITELLM_BASE_URL", "").strip() or None
         self._model = (
             os.environ.get("TEAM360_LITELLM_MODEL_ALIAS")
-            or "openai_gpt-5-nano"
+            or "openai_gpt-5.4-nano"
         )
         self.model_name = self._model
         self._prompt_policy = PromptPolicy()

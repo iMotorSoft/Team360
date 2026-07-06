@@ -20,7 +20,7 @@ LLM provider (env var):
   or OPENAI_API_KEY). Model via TEAM360_OPENAI_MODEL (default gpt-5-nano).
 - ``TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm``: uses
   _ProductLiteLLMProvider via LiteLLM proxy (requires TEAM360_LITELLM_BASE_URL
-  and TEAM360_LITELLM_API_KEY). Default model alias: openai_gpt-5-nano.
+  and TEAM360_LITELLM_API_KEY). Default model alias: openai_gpt-5.4-nano.
 - Invalid values: HTTP 503 controlled error
 
 Retrieval provider (env var):
@@ -264,7 +264,7 @@ class _ProductLiteLLMProvider:
     """LiteLLM provider for product adapter via LiteLLM proxy.
 
     Requires TEAM360_LITELLM_BASE_URL and TEAM360_LITELLM_API_KEY.
-    Default model alias: openai_gpt-5-nano.
+    Default model alias: openai_gpt-5.4-nano.
     Uses LiteLLMClient via urllib (no OpenAI SDK).
     """
 
@@ -309,7 +309,7 @@ class _ProductLiteLLMProvider:
         turn_prompt = self._prompt_policy.build_turn_prompt(input, state, context)
         model = (
             os.environ.get("TEAM360_LITELLM_MODEL_ALIAS")
-            or "openai_gpt-5-nano"
+            or "openai_gpt-5.4-nano"
         )
         messages = [
             {"role": "system", "content": system_prompt},

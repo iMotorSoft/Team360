@@ -733,7 +733,7 @@ def _print_provider_config(provider_config: dict[str, Any]) -> None:
             or os.environ.get("LITELLM_MASTER_KEY")
         )
         print(f"  TEAM360_LITELLM_BASE_URL configured: {bool(os.environ.get('TEAM360_LITELLM_BASE_URL'))}")
-        print(f"  TEAM360_LITELLM_MODEL_ALIAS: {model_alias or 'openai_gpt-5-nano (default)'}")
+        print(f"  TEAM360_LITELLM_MODEL_ALIAS: {model_alias or 'openai_gpt-5.4-nano (default)'}")
         print(f"  LiteLLM API key configured: {has_key}")
     if provider_config["llm_provider"] == "openai":
         print(f"  OpenAI API key configured: {_has_llm_config('openai')}")

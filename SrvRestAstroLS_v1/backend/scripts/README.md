@@ -299,7 +299,7 @@ Script:
     uv run python scripts/smoke_sales_diagnosis_runtime_product_adapter_litellm.py --allow-fallback
   ```
 
-  Modelo default: `openai_gpt-5-nano` via `TEAM360_LITELLM_MODEL_ALIAS`.
+  Modelo default: `openai_gpt-5.4-nano` via `TEAM360_LITELLM_MODEL_ALIAS`.
 
   LiteLLM es opt-in explicito. No usa OpenAI directo, no activa Milvus.
   Retrieval sigue fake, state debe ser explicito (inmemory_test o postgres).
@@ -422,7 +422,8 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
 TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano \
+TEAM360_LITELLM_API_MODE=chat \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=fake \
   uv run python scripts/evaluate_sales_diagnosis_headless_responses.py \
     --single-case speed_simple_001 \
@@ -479,7 +480,8 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
 TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano \
+TEAM360_LITELLM_API_MODE=chat \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=fake \
   uv run python scripts/evaluate_sales_diagnosis_headless_responses.py \
     --print-events \
@@ -490,7 +492,8 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
 TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano \
+TEAM360_LITELLM_API_MODE=chat \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
 TEAM360_MILVUS_HOST=127.0.0.1 \
 TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536 \
@@ -568,7 +571,8 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
 TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano \
+TEAM360_LITELLM_API_MODE=chat \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
 TEAM360_MILVUS_HOST=127.0.0.1 \
 TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536 \
@@ -583,7 +587,8 @@ TEAM360_SALES_DIAGNOSIS_PRODUCT_ROUTE_ENABLED=1 \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_STATE_REPOSITORY=inmemory_test \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_LLM_PROVIDER=litellm \
 TEAM360_LITELLM_BASE_URL=http://localhost:4000 \
-TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5-nano \
+TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano \
+TEAM360_LITELLM_API_MODE=chat \
 TEAM360_SALES_DIAGNOSIS_PRODUCT_RETRIEVAL_PROVIDER=milvus \
 TEAM360_MILVUS_HOST=127.0.0.1 \
 TEAM360_MILVUS_COLLECTION=team360_lab_pgvector_benchmark_openai_small_1536 \
@@ -630,7 +635,7 @@ retrieval dentro del endpoint productivo.
 
 - PostgreSQL 18 activo y migrado
 - Milvus 2.6 standalone con coleccion `team360_sales_diagnosis_knowledge_v1`
-- LiteLLM activo con modelo `openai_gpt-5-nano` y `openai_text_embedding_3_small`
+- LiteLLM activo con modelo `openai_gpt-5.4-nano` y `openai_text_embedding_3_small`
 - Backend Litestar activo en `127.0.0.1:7050`
 
 #### Salida

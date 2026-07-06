@@ -4,7 +4,7 @@
 Requiere:
   - PostgreSQL 18 en localhost:5432, db=team360, user=administrator
   - Milvus 2.6 en localhost:19530, coleccion team360_sales_diagnosis_knowledge_v1
-  - LiteLLM en http://localhost:4000, alias openai_gpt-5-nano
+  - LiteLLM en http://localhost:4000, alias openai_gpt-5.4-nano
   - OpenAI_Key_JAI_query y LITELLM_MASTER_KEY en entorno
 
 Uso:
@@ -250,7 +250,7 @@ def _init_runtime():
             self._client = LiteLLMClient(
                 base_url=os.environ.get("TEAM360_LITELLM_BASE_URL", "http://localhost:4000/v1")
             )
-            self._model = os.environ.get("TEAM360_LITELLM_MODEL_ALIAS", "openai_gpt-5-nano")
+            self._model = os.environ.get("TEAM360_LITELLM_MODEL_ALIAS", "openai_gpt-5.4-nano")
             self._prompt_policy = PromptPolicy()
 
         def generate(self, input_, state, context):
@@ -473,7 +473,7 @@ def analyze_results(results: list[dict]) -> dict:
     }
     report["config"] = {
         "llm_provider": "LiteLLM",
-        "model_alias": os.environ.get("TEAM360_LITELLM_MODEL_ALIAS", "openai_gpt-5-nano"),
+        "model_alias": os.environ.get("TEAM360_LITELLM_MODEL_ALIAS", "openai_gpt-5.4-nano"),
         "state_provider": "PostgreSQL 18",
         "retrieval_provider": "Null (no retrieval in this run)",
         "upstream_model": "openai/gpt-5.4-nano (via LiteLLM /health)",

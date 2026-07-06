@@ -35,7 +35,7 @@ function mockTurnResponse({
       diagnosis_status: "gathering",
       generation: {
         status: "success",
-        model: "openai_gpt-5-nano",
+        model: "openai_gpt-5.4-nano",
         fallback_used: false,
         fallback_reason: null,
       },
