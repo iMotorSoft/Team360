@@ -6,6 +6,8 @@ Security gates are business facts that must be modeled, surfaced and audited.
 
 ## MFA Modes
 
+Esta sección define los modos MFA y las restricciones de seguridad que cada uno impone.
+
 ```text
 HITL_CODE_INJECTION
 REMOTE_MIRRORING

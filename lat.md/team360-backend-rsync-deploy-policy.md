@@ -1,5 +1,7 @@
 # Politica de despliegue backend por rsync - Team360
 
+Esta sección resume el propósito y el alcance de «Politica de despliegue backend por rsync - Team360» dentro de Team360.
+
 ## Objetivo
 
 Definir el procedimiento unico para:
@@ -902,6 +904,8 @@ codigo correcto
 ```
 
 ## Referencias
+
+Esta sección reúne las referencias canónicas y fuentes relacionadas con la política.
 
 - [[team360-runtime-operational-policy]]
 - [[browser-mcp-validation-policy]]

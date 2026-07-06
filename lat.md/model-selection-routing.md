@@ -8,6 +8,8 @@ Extraer datos estructurados primero, analizar con modelos baratos despues. Visio
 
 ## Tier de modelos
 
+Esta sección define el modelo conceptual y las categorías utilizadas por las reglas posteriores.
+
 | Tier | Rol | Modelo OpenAI | Costo input | Costo output |
 |------|-----|---------------|-------------|--------------|
 | nano | clasificacion masiva, extraccion, scoring simple, resumen corto | `gpt-5-nano` | USD 0.05 / 1M tok | USD 0.40 / 1M tok |
@@ -31,13 +33,21 @@ DeepSeek V4 Flash no debe usarse como lector de capturas. Su rol es orquestador 
 
 ## Ruteo por tipo de automatizacion
 
+Esta sección define cómo seleccionar modelos y providers según el tipo de automatización.
+
 ### SAP Business One Desktop Client
+
+Esta sección resume el propósito y el alcance de «SAP Business One Desktop Client» dentro de Team360.
+
 1. Microsoft UI Automation (fuente primaria de estado)
 2. OCR local (Windows OCR, Tesseract, PaddleOCR, EasyOCR)
 3. Modelo visual economico (`gpt-5-nano` o `gemini-2.5-flash-lite`)
 4. Modelo visual superior o intervencion humana
 
 ### Browser automation (Meta, Mercado Libre, etc.)
+
+Esta sección resume el propósito y el alcance de «Browser automation (Meta, Mercado Libre, etc.)» dentro de Team360.
+
 1. Playwright extrae DOM, texto, tablas, metricas
 2. Modelo barato clasifica y analiza sobre datos estructurados
 3. Captura de pantalla solo como fallback o auditoria visual
@@ -49,6 +59,9 @@ restricciones explicitas y punto de detencion. Ver
 [[deepseek-v4-flash-opencode-browser]].
 
 ### Diagnosis assistant (Vera)
+
+Esta sección resume el propósito y el alcance de «Diagnosis assistant (Vera)» dentro de Team360.
+
 1. LiteLLM con alias `automation_diagnosis_text` para interpretacion
 2. `automation_diagnosis_classifier` para clasificacion barata
 3. `cheap_classifier` para extraccion y scoring simple
@@ -70,12 +83,16 @@ Esto permite cambiar de proveedor o modelo sin modificar codigo.
 
 ## Limites
 
+Esta sección delimita responsabilidades y comportamientos que quedan fuera del alcance permitido.
+
 - AI interpreta, Team360 decide (clasificacion final, scoring, acciones sensibles).
 - No prometer bypass de MFA, anti-bot, hardware keys, biometria ni firma fuerte.
 - Acciones sensibles (creacion documentos, pagos, publicacion, cambios de precio, movimientos stock) requieren aprobacion humana.
 - Modelos baratos requieren validacion: schema JSON estricto, confidence score y escalacion ante baja confianza.
 
 ## Referencias
+
+Esta sección reúne las referencias canónicas y fuentes relacionadas con la política.
 
 - [[ai-litellm]] — gateway y adapter
 - [[ai-diagnosis-rag-runtime]] — modelos por defecto para diagnosis

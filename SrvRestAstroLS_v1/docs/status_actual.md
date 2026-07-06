@@ -51,6 +51,18 @@ Referencias canonicas:
   `TEAM360_LITELLM_MODEL_ALIAS=openai_gpt-5.4-nano` y
   `TEAM360_LITELLM_API_MODE=chat`.
 
+## Normalización documental 2026-07-06 — compatibilidad con lat 0.11
+
+- `lat check` pasó de 130 errores a PASS completo.
+- Se restauraron los conceptos `team360-frontend-base` y
+  `team360-frontend-ui-policy` desde ADR-004/005 y sus documentos fuente.
+- `lat.md/status_actual.md` volvió a ser un tablero compacto; la evidencia
+  histórica permanece en este documento, el histórico congelado y Git.
+- Se agregaron resúmenes breves a 70 secciones existentes sin modificar sus
+  reglas, ejemplos ni contratos.
+- El índice LAT incluye ahora `status_actual` y no conserva links rotos.
+- `lat check code-refs`: PASS; todos los anchors `@lat` permanecen válidos.
+
 ## Trabajo anterior - Diagnosticador embebible
 
 Estado: Fases 1 a 5 implementadas; confirmadas en `cdd1b1b`.

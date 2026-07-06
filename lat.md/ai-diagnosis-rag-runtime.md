@@ -45,6 +45,8 @@ Team360 should not spend its first release cycle rebuilding this capability on p
 
 ## Persistence Boundaries
 
+Esta sección delimita qué sistema conserva la verdad operacional y cuáles mantienen índices derivados.
+
 ### PostgreSQL
 
 PostgreSQL 18 remains the source of truth for:

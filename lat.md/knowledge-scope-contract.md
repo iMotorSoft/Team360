@@ -45,6 +45,8 @@ ArangoDB and Milvus must never become the commercial source of truth for custome
 
 ## Entities
 
+Esta sección define las entidades canónicas y las fronteras de persistencia e indexación.
+
 ### KnowledgeScope
 
 `KnowledgeScope` is the queryable boundary for a corpus.

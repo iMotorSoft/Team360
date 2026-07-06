@@ -1,5 +1,7 @@
 # Service preflight methodology
 
+Esta sección resume el propósito y el alcance de «Service preflight methodology» dentro de Team360.
+
 ## Proposito
 
 Todo desarrollo, test, smoke, benchmark o prueba que dependa de servicios reales

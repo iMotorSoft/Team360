@@ -189,6 +189,8 @@ TEAM360_LITELLM_API_KEY="$LITELLM_MASTER_KEY"
 
 ## Model And Parameters
 
+Esta sección resume el propósito y el alcance de «Model And Parameters» dentro de Team360.
+
 | Concept | Value |
 | --- | --- |
 | LiteLLM alias | `openai_gpt-5.4-nano` |
@@ -414,6 +416,8 @@ persistent processes. A temporary shell may terminate Astro when closed.
 
 ## Relevant Endpoints
 
+Esta sección resume el propósito y el alcance de «Relevant Endpoints» dentro de Team360.
+
 | Route | Use |
 | --- | --- |
 | `POST /api/diagnosis/turn` | Public multi-turn conversation |
@@ -619,6 +623,8 @@ HTTP 200 is not enough. Real validation must happen from a browser and confirm:
 - No mixed sessions.
 
 ## Troubleshooting
+
+Esta sección reúne comprobaciones operativas para diagnosticar y resolver fallas frecuentes.
 
 ### LiteLLM returns 401
 

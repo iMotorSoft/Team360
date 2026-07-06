@@ -9,6 +9,8 @@ reemplace la experiencia real de usuario por terminal, codigo o HTML.
 
 ## Clasificacion
 
+Esta sección clasifica el alcance del flujo y las condiciones bajo las cuales puede utilizarse.
+
 | Eje | Clasificacion |
 |---|---|
 | Tipo de documento | Invariante operativo transversal para agentes |
@@ -23,6 +25,8 @@ reemplace la experiencia real de usuario por terminal, codigo o HTML.
 | Veredicto | Apto si el prompt fija herramientas, fases, snapshots, evidencia, restricciones y punto de detencion |
 
 ## Objetivo
+
+Esta sección define el objetivo, el alcance y los límites del documento.
 
 Usar DeepSeek V4 Flash como orquestador textual para navegar, inspeccionar e
 interactuar con aplicaciones web mediante `opencode-browser`, sin que el agente
@@ -112,6 +116,8 @@ herramienta obligatoria
 
 ## Reglas obligatorias
 
+Esta sección resume las reglas obligatorias que deben respetarse en este contexto.
+
 - Antes de iniciar Browser MCP sobre Team360, aplicar `[[browser-mcp-validation-policy]]`: Playwright + Chromium es el gate E2E oficial; Browser MCP / `opencode-browser` es evidencia exploratoria y de diagnostico visual; backend `127.0.0.1:7050` y Astro `127.0.0.1:3050` deben estar levantados cuando se prueba local; si Browser MCP falla, la prueba se detiene y se informa.
 - Para navegar e interactuar con paginas, usar herramientas `browsermcp_*` del plugin `opencode-browser`.
 - No usar `curl`, `wget`, Playwright desde terminal ni lectura directa del HTML como reemplazo del navegador.
@@ -186,6 +192,8 @@ Detente al terminar esta verificacion.
 
 ## Prompt minimo de navegacion
 
+Esta sección define el prompt operativo y las condiciones necesarias para usarlo de forma reproducible.
+
 ```text
 Usa exclusivamente las herramientas del plugin opencode-browser.
 
@@ -215,6 +223,8 @@ Finaliza despues de informar esos tres puntos.
 ```
 
 ## Prompt de inspeccion de interfaz
+
+Esta sección define el prompt operativo y las condiciones necesarias para usarlo de forma reproducible.
 
 ```text
 Entra en modo QA de navegador.
@@ -395,6 +405,8 @@ Reglas:
 
 ### Prompt integral recomendado
 
+Esta sección define el prompt operativo y las condiciones necesarias para usarlo de forma reproducible.
+
 ```text
 La integracion con opencode-browser quedo verificada.
 
@@ -539,6 +551,8 @@ Backend validado:
 
 ## Hallazgos
 
+Esta sección resume los hallazgos observados y su impacto sobre el flujo documentado.
+
 ### Browser como fase atomica
 
 No pedir en una sola instruccion:
@@ -643,6 +657,8 @@ Flujo recomendado:
 ```
 
 ## Plantilla de smoke repetible
+
+Esta sección define una prueba smoke repetible y la evidencia mínima necesaria para interpretarla.
 
 ```text
 Usa opencode-browser para ejecutar un smoke test repetible sobre:
@@ -759,6 +775,8 @@ El plugin `opencode-browser` funciona correctamente con DeepSeek V4 Flash. La
 confiabilidad depende principalmente de la disciplina del prompt.
 
 ## Referencias
+
+Esta sección reúne las referencias canónicas y fuentes relacionadas con la política.
 
 - [[model-selection-routing]]
 - [[browser-mcp-validation-policy]]

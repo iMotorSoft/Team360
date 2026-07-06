@@ -1,5 +1,7 @@
 # Politica de despliegue frontend Astro por rsync - Team360
 
+Esta sección resume el propósito y el alcance de «Politica de despliegue frontend Astro por rsync - Team360» dentro de Team360.
+
 ## Objetivo
 
 Definir el procedimiento unico para:
@@ -779,6 +781,8 @@ Finalmente demostrar que build esta sirviendo produccion.
 ```
 
 ## Referencias
+
+Esta sección reúne las referencias canónicas y fuentes relacionadas con la política.
 
 - [[browser-mcp-validation-policy]]
 - [[team360-frontend-url-source-of-truth]]

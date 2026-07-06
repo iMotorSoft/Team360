@@ -1,10 +1,14 @@
 # Team360 Frontend — URL Source of Truth
 
+Esta sección resume el propósito y el alcance de «Team360 Frontend — URL Source of Truth» dentro de Team360.
+
 ## Propósito
 
 Garantizar que todos los endpoints REST, URLs de site y conexiones SSE del frontend se resuelvan desde una única fuente de verdad, sin valores hardcodeados fuera de `global.js`.
 
 ## Reglas
+
+Esta sección resume las reglas obligatorias que deben respetarse en este contexto.
 
 ### 1. `global.js` es la única fuente de verdad
 
@@ -65,6 +69,8 @@ Todos los módulos en `src/lib/api/` deben importar `API_BASE_URL` o `URL_REST` 
 Cada vez que se agreguen, modifiquen o eliminen exports en `global.js`, el archivo `global.d.ts` debe actualizarse para reflejar los tipos correctos.
 
 ## Referencias
+
+Esta sección reúne las referencias canónicas y fuentes relacionadas con la política.
 
 - [[team360-frontend-base]] — Stack frontend Team360
 - [[team360-frontend-ui-policy]] — Política UI frontend

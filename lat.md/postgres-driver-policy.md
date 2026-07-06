@@ -6,6 +6,8 @@ This decision is stable across all core modules, repositories and runtime paths.
 
 ## Decision
 
+Esta sección establece la decisión técnica vigente y las restricciones derivadas de ella.
+
 ```
 Schema:    explicit SQL migrations (001/002/003)
 Runtime:   psycopg 3 async direct
@@ -116,6 +118,8 @@ Both use the same driver. No second driver is introduced.
 
 ## Recommended Module Structure
 
+Esta sección resume el propósito y el alcance de «Recommended Module Structure» dentro de Team360.
+
 ```
 backend/modules/db/
     __init__.py
@@ -133,6 +137,8 @@ backend/modules/knowledge/
 
 ## Repository Pattern Rules
 
+Esta sección resume las reglas obligatorias que deben respetarse en este contexto.
+
 1. Every repository is a class or set of functions that receive an `AsyncConnection` as first parameter.
 2. Repositories never manage connections or transactions — they receive them from the caller.
 3. Repositories return dicts, dataclasses, TypedDicts or explicit DTOs; never raw cursor rows. Pydantic is allowed only at HTTP/API borders for validation, serialization or OpenAPI contracts, not as domain truth or ORM surrogate.
@@ -141,6 +147,8 @@ backend/modules/knowledge/
 6. Parameterised queries use `$1`, `$2`, ... (PostgreSQL native positional) or `%(name)s` (psycopg named).
 
 ## Example: Pool
+
+Esta sección muestra una implementación de referencia coherente con la política definida.
 
 ```python
 from psycopg_pool import AsyncConnectionPool
@@ -166,6 +174,8 @@ async def get_connection():
 ```
 
 ## Example: Repository
+
+Esta sección muestra una implementación de referencia coherente con la política definida.
 
 ```python
 from dataclasses import dataclass
@@ -223,12 +233,16 @@ Pydantic is **not** the default data layer for Team360. Its use is restricted to
 
 ### Allowed use cases (HTTP/API borders only)
 
+Esta sección delimita los usos permitidos en los bordes HTTP y API del sistema.
+
 - JSON request/response validation in endpoint handlers.
 - OpenAPI / Schema generation for public or consumer-facing contracts.
 - Protection of sensitive fields (`SecretStr`, `Field(exclude=True)`).
 - Serialization contracts for external integrations (webhooks, API clients).
 
 ### Not allowed
+
+Esta sección delimita prácticas prohibidas porque rompen las fronteras arquitectónicas vigentes.
 
 - Using Pydantic models as domain entities or repository return types.
 - Duplicating SQL schema definitions as Pydantic models (anti-ORM pattern).
@@ -237,12 +251,16 @@ Pydantic is **not** the default data layer for Team360. Its use is restricted to
 
 ### Guidance for internal contracts
 
+Esta sección orienta la elección de contratos internos sin duplicar el dominio ni el esquema SQL.
+
 - Repositories: return `dict` (controlled keys), `dataclass`, `TypedDict` or explicit DTO.
 - Service / domain layer: use `dataclass` or `TypedDict` for internal data flow.
 - ConsoleBootstrap: document JSON shape / TypedDict first. Evaluate Pydantic only when a real endpoint with OpenAPI exists.
 - Cross-worker IPC: document message schema as TypedDict or Protocol; evaluate Pydantic only if strict validation is needed at the wire boundary.
 
 ### Why
+
+Esta sección explica la razón arquitectónica detrás de la frontera establecida.
 
 - Avoid model duplication (SQL migration ↔ Pydantic ↔ service layer).
 - Keep the domain layer free of serialization concerns.
@@ -251,6 +269,8 @@ Pydantic is **not** the default data layer for Team360. Its use is restricted to
 - If Pydantic is used at the border, the domain layer does not import it.
 
 ## What Is Discouraged
+
+Esta sección identifica prácticas desaconsejadas y las condiciones que exigirían justificarlas.
 
 - Writing raw SQL strings inside endpoint handlers or route functions.
 - Using `connection.execute()` with string interpolation or f-strings for parameter values.
@@ -261,11 +281,15 @@ Pydantic is **not** the default data layer for Team360. Its use is restricted to
 
 ## What Is Prohibited
 
+Esta sección delimita prácticas prohibidas porque rompen las fronteras arquitectónicas vigentes.
+
 - Storing database credentials, connection strings or secrets in source code.
 - Using ORM-managed migrations (Alembic, SQLAlchemy Migrate) as the primary migration tool. All schema changes must be explicit `.sql` files in `backend/db/migrations/`.
 - Bypassing the repository layer to write SQL directly in endpoints, except in well-justified, reviewed exceptions.
 
 ## Summary
+
+Esta sección sintetiza las decisiones y restricciones principales de la política.
 
 | Aspect | Decision |
 |--------|----------|

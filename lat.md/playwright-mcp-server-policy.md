@@ -1,5 +1,7 @@
 # Playwright MCP Server Policy
 
+Esta sección resume el propósito y el alcance de «Playwright MCP Server Policy» dentro de Team360.
+
 ## Proposito
 
 Playwright MCP Server es el servidor MCP que expone capacidades de navegador
@@ -21,6 +23,8 @@ inspeccionar una experiencia real de navegador, pero no reemplaza tests
 reproducibles ni asserts versionados.
 
 ## Diferencia entre Playwright MCP y Playwright CLI
+
+Esta sección distingue responsabilidades y límites entre herramientas que cumplen funciones relacionadas.
 
 Playwright MCP se usa para exploracion, diagnostico visual e interaccion humana
 asistida. Es apropiado cuando el agente necesita navegar una pagina, inspeccionar
@@ -145,6 +149,8 @@ expectativa funcional minima para navegar, inspeccionar, interactuar, capturar y
 cerrar recursos creados durante la prueba.
 
 ## Reglas de uso
+
+Esta sección resume las reglas obligatorias que deben respetarse en este contexto.
 
 - No usar Chrome MCP.
 - No usar Browser MCP para este flujo.

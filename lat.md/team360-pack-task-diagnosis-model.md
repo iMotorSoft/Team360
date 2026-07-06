@@ -1,5 +1,7 @@
 # Team360 — Modelo de Packs, Tasks y Diagnostico
 
+Esta sección resume el propósito y el alcance de «Team360 — Modelo de Packs, Tasks y Diagnostico» dentro de Team360.
+
 ## Proposito
 
 Definir el modelo funcional y comercial de Team360 para expresar soluciones configurables, tareas ejecutables, flujos de automatizacion, integraciones y diagnostico.

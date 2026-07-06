@@ -1,5 +1,7 @@
 # Team360 Root Cause Debugging Policy
 
+Esta sección resume el propósito y el alcance de «Team360 Root Cause Debugging Policy» dentro de Team360.
+
 ## Proposito
 
 Definir una politica unica para investigar bugs no triviales en Team360,
@@ -312,6 +314,8 @@ BLOCKED
 justificacion explicita, y validacion final.
 
 ## Regla final
+
+Esta sección sintetiza la regla operativa que debe cumplirse antes de cerrar una corrección.
 
 ```text
 Manual descubre.

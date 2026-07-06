@@ -6,6 +6,8 @@ Do not model only global workers. The operational center is `package_worker`: th
 
 ## Conceptual Model
 
+Esta sección resume el propósito y el alcance de «Conceptual Model» dentro de Team360.
+
 ```text
 workspace
   -> assistant_instance

@@ -1,5 +1,7 @@
 # Politica de validacion de navegador - Team360
 
+Esta sección establece el alcance, los gates y la evidencia requerida para la validación.
+
 ## Objetivo
 
 Definir una unica politica para pruebas de navegador en Team360,

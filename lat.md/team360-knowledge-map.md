@@ -1,5 +1,7 @@
 # Team360 Knowledge Map
 
+Esta sección resume el propósito y el alcance de «Team360 Knowledge Map» dentro de Team360.
+
 ## Proposito
 
 Definir un arbol de conocimiento navegable para `lat.md/` usando Mermaid como
@@ -21,6 +23,8 @@ El mapa debe mantenerse pequeno, legible y alineado con
 [[team360-mermaid-diagram-policy]].
 
 ## Mapa principal
+
+Esta sección resume el propósito y el alcance de «Mapa principal» dentro de Team360.
 
 ```mermaid
 mindmap
@@ -91,6 +95,8 @@ mindmap
 
 ## Referencias canonicas
 
+Esta sección reúne las referencias canónicas y fuentes relacionadas con la política.
+
 - Orquestacion global: [[team360-global-orchestration]]
 - Modelo de producto: [[team360-platform]],
   [[team360-pack-task-diagnosis-model]], [[automation-diagnosis]],
@@ -112,6 +118,8 @@ mindmap
 - Documentacion viva: [[team360-mermaid-diagram-policy]]
 
 ## Como mantenerlo
+
+Esta sección define cómo actualizar el documento sin introducir enlaces rotos ni duplicación.
 
 - Agregar solo conceptos estables que ya existan o que se documenten en
   `lat.md/`.

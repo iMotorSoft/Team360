@@ -1,5 +1,7 @@
 # Team360 Mermaid Diagram Policy
 
+Esta sección resume el propósito y el alcance de «Team360 Mermaid Diagram Policy» dentro de Team360.
+
 ## Proposito
 
 Definir el uso canonico de diagramas en Team360 sin incorporar dependencias,

@@ -1,5 +1,7 @@
 # Team360 — Orquestación global
 
+Esta sección resume el propósito y el alcance de «Team360 — Orquestación global» dentro de Team360.
+
 ## Propósito
 
 Mantener una visión unificada de Team360 entre ramas Git, hilos de chat, frentes técnicos, documentación knowledge, labs y decisiones comerciales/productivas.
@@ -11,6 +13,8 @@ Regla central:
 > Trabajar separado, decidir globalmente.
 
 ## Ramas activas
+
+Esta sección resume el propósito y el alcance de «Ramas activas» dentro de Team360.
 
 | Rama | Rol | Uso |
 |---|---|---|
@@ -132,6 +136,8 @@ Guía:
 - `ux/team360-console-design-handoff`: labs puramente visuales de handoff.
 
 ## Decisiones globales de producto
+
+Esta sección establece la decisión técnica vigente y las restricciones derivadas de ella.
 
 - `pkg_sales_diagnosis` es un knowledge package evolutivo.
 - Team360.live será el primer contexto de validación.

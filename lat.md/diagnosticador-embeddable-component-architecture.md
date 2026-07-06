@@ -1,6 +1,10 @@
 # Diagnosticador embeddable component architecture
 
+Esta sección resume el propósito y el alcance de «Diagnosticador embeddable component architecture» dentro de Team360.
+
 ## Proposito
+
+Esta sección define el objetivo, el alcance y los límites del documento.
 
 Este documento es la fuente canonica para el contexto de componentes Team360.
 Cuando el usuario escriba `contexto componentes`, el agente debe leer este
@@ -149,6 +153,8 @@ SrvRestAstroLS_v1/astro/src/
 ```
 
 ## Responsabilidades por capa
+
+Esta sección distribuye responsabilidades entre capas para evitar acoplamiento y autoridad duplicada.
 
 ### DiagnosticadorCore.svelte
 
@@ -397,6 +403,8 @@ El host no debe necesitar:
 
 ## Reglas para futuros componentes
 
+Esta sección resume las reglas obligatorias que deben respetarse en este contexto.
+
 ### Crear un producto nuevo
 
 Cuando cambian:
@@ -531,7 +539,11 @@ No documentar todavia como paquetes necesarios:
 
 ## Evolucion
 
+Esta sección describe una etapa de evolución y los límites que deben preservarse durante su implementación.
+
 ### Etapa 1 - Modularizacion interna
+
+Esta sección describe una etapa de evolución y los límites que deben preservarse durante su implementación.
 
 - Crear limites internos bajo `src/lib/t360/diagnosticador`.
 - No crear workspace.
@@ -558,6 +570,8 @@ Recien entonces:
 
 ### Etapa 3 - Paquete privado/versionado
 
+Esta sección describe una etapa de evolución y los límites que deben preservarse durante su implementación.
+
 - SemVer;
 - npm privado;
 - changelog;
@@ -576,7 +590,11 @@ Solo separar paquetes compartidos cuando un segundo producto lo justifique.
 
 ## Estrategia de pruebas
 
+Esta sección establece el alcance, los gates y la evidencia requerida para la validación.
+
 ### Core
+
+Esta sección resume el propósito y el alcance de «Core» dentro de Team360.
 
 - render;
 - estado;
@@ -591,6 +609,8 @@ Solo separar paquetes compartidos cuando un segundo producto lo justifique.
 
 ### CSS
 
+Esta sección resume el propósito y el alcance de «CSS» dentro de Team360.
+
 - host sin Tailwind;
 - host sin DaisyUI;
 - host con `.btn`, `.card`, `.badge` propias;
@@ -602,6 +622,8 @@ Solo separar paquetes compartidos cuando un segundo producto lo justifique.
 
 ### Integracion Astro
 
+Esta sección resume el propósito y el alcance de «Integracion Astro» dentro de Team360.
+
 - `/t360#vera` sigue funcionando;
 - Vera permanece;
 - no cambia layout;
@@ -609,6 +631,8 @@ Solo separar paquetes compartidos cuando un segundo producto lo justifique.
 - no cambia flujo.
 
 ### Backend real
+
+Esta sección resume el propósito y el alcance de «Backend real» dentro de Team360.
 
 - start session;
 - turn;

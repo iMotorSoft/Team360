@@ -33,3 +33,4 @@ It is managed as a `lat.md` documentation layer: source code can anchor to these
 - [[team360-mermaid-diagram-policy]] — Politica canonica para diagramas Team360: Mermaid como fuente versionable en Git, renders opcionales como derivados, sin instalacion global obligatoria ni adopcion del skill gstack `/diagram`.
 - [[team360-root-cause-debugging-policy]] — Politica canonica para bugs no triviales: no corregir sin causa raiz verificable, reproducir sintoma manual, formular hipotesis, probar evidencia, aplicar fix minimo y convertirlo en regresion Playwright/backend cuando corresponda.
 - [[team360-knowledge-map]] — Arbol de conocimiento Mermaid para navegar `lat.md/`: orquestacion, producto, runtime, knowledge, workers, DB, frontend, seguridad, validacion, deploy y documentacion viva.
+- [[status_actual]] — Tablero compacto del estado vigente de la arquitectura viva, validaciones recientes y deuda activa.
