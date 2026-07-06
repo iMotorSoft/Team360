@@ -6,6 +6,10 @@ Documentar el snippet externo recomendado para terceros que quieran proteger
 el loader con `loaderIntegrity` y el entry con
 `load({ verifyEntryIntegrity: true })`.
 
+> Para la guía completa de instalación (HTML, PHP, WordPress, shortcode,
+> troubleshooting, checklists), ver
+> `diagnosticador_embed_installation_guide_v1.md`.
+
 ## Snippet recomendado
 
 Produccion esperada:
