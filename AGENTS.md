@@ -87,6 +87,23 @@ No declarar PASS solo por HTTP 200, por Browser MCP o por una entrada previa del
 
 No duplicar contenido: enlazar a la fuente canonica.
 
+## Política LAT / Markdown
+
+La documentación del proyecto debe seguir la política permanente definida en `lat.md/lat-documentation-policy.md`.
+
+Antes de cerrar una tarea que crea o modifica documentación Markdown, ejecutar:
+
+```bash
+lat check md
+lat check index
+lat check sections
+lat check code-refs
+lat check
+git diff --check
+```
+
+Si cualquier gate falla, no declarar PASS.
+
 ## Cierre
 
 Reportar siempre:

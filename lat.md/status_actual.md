@@ -63,6 +63,14 @@ La arquitectura viva cumple las validaciones de enlaces, índice, resúmenes de 
 - Las secciones legacy recibieron resúmenes introductorios breves sin cambiar sus reglas.
 - `lat check` y `lat check code-refs` finalizan en PASS.
 
+### Política permanente de documentación LAT
+
+La política [[lat-documentation-policy]] centraliza las reglas documentales para reducir prompts futuros y prevenir regresiones de estructura.
+
+- Define reglas de encabezados, enlaces wiki, índice, status y no duplicación.
+- AGENTS y el skill Team360 enlazan la fuente canónica sin copiarla completa.
+- Los seis gates documentales son obligatorios antes de declarar PASS.
+
 ## Políticas canónicas activas
 
 Estas referencias definen las invariantes que deben consultarse antes de cambiar cada frente técnico.
@@ -78,6 +86,7 @@ Estas referencias definen las invariantes que deben consultarse antes de cambiar
 - Browser QA: [[browser-mcp-validation-policy]].
 - Playwright MCP: [[playwright-mcp-server-policy]].
 - Debugging por causa raíz: [[team360-root-cause-debugging-policy]].
+- Documentación LAT y Markdown: [[lat-documentation-policy]].
 - Deploy backend: [[team360-backend-rsync-deploy-policy]].
 - Deploy frontend: [[team360-frontend-rsync-deploy-policy]].
 

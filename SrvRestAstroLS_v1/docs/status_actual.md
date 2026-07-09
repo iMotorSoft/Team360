@@ -62,6 +62,8 @@ Referencias canonicas:
   reglas, ejemplos ni contratos.
 - El índice LAT incluye ahora `status_actual` y no conserva links rotos.
 - `lat check code-refs`: PASS; todos los anchors `@lat` permanecen válidos.
+- La política permanente queda en `lat.md/lat-documentation-policy.md`; AGENTS
+  y el skill Team360 la enlazan y recuerdan los gates sin duplicarla.
 
 ## Trabajo anterior - Diagnosticador embebible
 

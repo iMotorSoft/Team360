@@ -135,6 +135,23 @@ Reglas de uso:
 6. Al crear o modificar documentos de `lat.md/`, actualizar `lat.md/status_actual.md`.
 7. Mantener `SrvRestAstroLS_v1/docs/status_actual.md` como bitacora tecnica principal; `lat.md/` solo registra invariantes y conceptos estables.
 
+## Documentation gates
+
+Use `lat.md/lat-documentation-policy.md` as the source of truth for LAT and Markdown documentation rules.
+
+Run these gates before closing any task with documentation changes:
+
+```bash
+lat check md
+lat check index
+lat check sections
+lat check code-refs
+lat check
+git diff --check
+```
+
+A task with failing LAT gates must not be reported as PASS.
+
 ## Reglas de trabajo
 1. No inventar una estructura nueva fuera del patrón actual.
 2. No copiar módulos de Vertice360 fuera del alcance ya definido.
