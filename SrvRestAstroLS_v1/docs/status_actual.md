@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-06-04
+Ultima actualizacion: 2026-07-14
 
 ## Directorio de trabajo
 
@@ -13,6 +13,19 @@ Ultima actualizacion: 2026-06-04
 Se inicializo la DB viva `team360` en PostgreSQL local y se aplicaron correctamente las migraciones `001_team360_core_schema.sql`, `002_team360_rbac_packages_workers_knowledge.sql` y `003_team360_pgvector_knowledge_embeddings.sql`. Tambien existe una Fase 1 aislada para `automation_diagnosis`, con IA via LiteLLM por adapter, knowledge scope propio, retrieval simple sobre documentos Markdown, scoring/classifier deterministico, fixtures y tests. Se documento la politica de driver DB runtime (`psycopg 3 async` directo como estandar). El backend Litestar productivo sigue pendiente de integracion.
 
 ## Acciones realizadas
+
+### 2026-07-14 - Mejora del diseño mobile en la sección método de t360.astro
+
+- Se rediseñó el contenedor de los pasos del método ("Entender", "Evaluar", "Diseñar", "Mejorar") en `t360.astro` para mejorar la legibilidad y la estética en dispositivos móviles.
+- Se eliminaron el fondo diferenciado y los bordes horizontales internos en pantallas mobile para unificar el cuerpo de cada tarjeta.
+- Se alinearon a la izquierda el título y la descripción, y se agregó un indicador numérico flotante en formato badge (`01`, `02`, etc.) visible únicamente en dispositivos móviles.
+- Se preservó de manera idéntica la estructura de rejilla y el hover animado para la visualización en pantallas desktop.
+
+### 2026-07-08 - Tema oscuro para la sección de Vera
+
+- Se modificaron las clases de `PublicVeraEntry.svelte` para cambiar el fondo de la sección `#vera` de claro a oscuro (`bg-[#102d4f]`), a tono con la sección `#casos` de `t360.astro`.
+- Se adaptaron los colores de textos, botones de ejemplos, caja de chat, áreas de entrada, botones de acción y modal de confirmación a variables del tema oscuro con óptimo contraste.
+- Se actualizaron los estilos visuales en `DiagnosisResult.svelte` para integrarse armoniosamente dentro del contenedor de chat oscuro (badges de factibilidad, disponibilidad, canales, riesgos y validaciones con bordes semitransparentes y acentos cian `#8be1d8`).
 
 ### 2026-06-04 - Ajuste del ancho del sidebar en la consola mock
 
