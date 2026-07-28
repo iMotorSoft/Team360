@@ -71,3 +71,43 @@ def test_resolve_request_origin_falls_back_to_referer_origin():
         "https://cliente.com/landing/embed?campaign=test",
     )
     assert resolved == "https://cliente.com"
+
+
+def test_mamamia360_seed_exists():
+    path = (
+        _backend_root()
+        / "db"
+        / "migrations"
+        / "009_seed_mamamia360_embed_client.sql"
+    )
+    assert path.exists()
+    content = path.read_text(encoding="utf-8")
+    assert "mamamia360" in content
+    assert "mamamia360-embed-secret-change-in-production" in content
+    assert "https://mamamia360.com" in content
+
+
+def test_mamamia360_demo_and_docs_contain_client_id():
+    project_root = _backend_root().parent
+    for target_path in [
+        "astro/public/embed-demo/mamamia360.html",
+        "docs/mamamia360-embed-snippet.md",
+    ]:
+        path = project_root / target_path
+        assert path.exists(), f"Missing: {target_path}"
+        content = path.read_text(encoding="utf-8")
+        assert "mamamia360" in content, f"Missing clientId in {target_path}"
+        assert "hmac_secret" not in content, f"Leak in {target_path}"
+
+
+def test_mamamia360_public_snippets_no_secret_leak():
+    project_root = _backend_root().parent
+    for snippet_path in [
+        "astro/public/embed/vera-loader.js",
+        "astro/public/embed-demo/mamamia360.html",
+    ]:
+        path = project_root / snippet_path
+        assert path.exists(), f"Missing: {snippet_path}"
+        content = path.read_text(encoding="utf-8")
+        assert "hmac_secret" not in content, f"Leak in {snippet_path}"
+        assert "mamamia360-embed-secret" not in content, f"Leak in {snippet_path}"

@@ -1,5 +1,5 @@
 import { mount, unmount, type ComponentProps } from "svelte";
-import EmbedDiagnosticadorWrapper from "../diagnosticador/EmbedDiagnosticadorWrapper.svelte";
+import VeraEmbedWrapper from "../diagnosticador/VeraEmbedWrapper.svelte";
 
 export type Team360DiagnosticadorMountConfig = {
   clientId: string;
@@ -91,7 +91,7 @@ function assertForbiddenKeys(config: Record<string, unknown>): void {
 
 function buildWrapperProps(
   rawConfig: Team360DiagnosticadorMountConfig,
-): ComponentProps<typeof EmbedDiagnosticadorWrapper> {
+): ComponentProps<typeof VeraEmbedWrapper> {
   const config = rawConfig as Record<string, unknown>;
   assertForbiddenKeys(config);
 
@@ -111,7 +111,7 @@ export function mountTeam360Diagnosticador(
 ): Team360DiagnosticadorMountHandle {
   const target = resolveMountTarget(container);
   const props = buildWrapperProps(config);
-  const instance = mount(EmbedDiagnosticadorWrapper, {
+  const instance = mount(VeraEmbedWrapper, {
     target,
     props,
   });

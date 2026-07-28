@@ -25,7 +25,15 @@ function team360DiagnosticadorBrowserAsset() {
 export default defineConfig({
   site: "https://team360.live",
   integrations: [svelte()],
+  server: {
+    headers: {},
+  },
   vite: {
     plugins: [tailwindcss(), team360DiagnosticadorBrowserAsset()],
+    server: {
+      proxy: {
+        "/api": "http://127.0.0.1:7050",
+      },
+    },
   },
 });

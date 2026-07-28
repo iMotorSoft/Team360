@@ -1263,6 +1263,163 @@ def test_embed_auth_rate_limit_window_reset_restores_flow(monkeypatch):
     assert recovered.status_code == 200
 
 
+def test_mamamia360_embed_auth_allowed_origin_ok(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    embed_client = _build_embed_client(
+        client_id="mamamia360",
+        allowed_origins=["https://mamamia360.com"],
+    )
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_build_public_turn_runtime",
+        lambda: (_ for _ in ()).throw(AssertionError("runtime should not be called by auth endpoint")),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://mamamia360.com"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "mamamia_auth_ok",
+                "message": "Quiero automatizar facturacion",
+            },
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["client_id"] == "mamamia360"
+    assert isinstance(data["timestamp"], int)
+    assert str(data["signature"]).startswith("sha256=")
+
+
+def test_mamamia360_embed_auth_origin_denied_rejected(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    embed_client = _build_embed_client(
+        client_id="mamamia360",
+        allowed_origins=["https://mamamia360.com"],
+    )
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_build_public_turn_runtime",
+        lambda: (_ for _ in ()).throw(AssertionError("runtime should not be called by auth endpoint")),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://evil-site.com"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "mamamia_origin_denied",
+                "message": "Quiero automatizar facturacion",
+            },
+        )
+
+    assert response.status_code == 403
+    data = response.json()
+    assert "authorized" in str(data.get("detail", "")).lower() or "forbidden" in str(data.get("detail", "")).lower()
+
+
+def test_mamamia360_embed_auth_package_code_ignored(monkeypatch):
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    session_id = "mamamia_pkg_ignore"
+    message = "Quiero automatizar facturacion"
+    embed_client = _build_embed_client(
+        client_id="mamamia360",
+        package_code="pkg_sales_diagnosis",
+        knowledge_scope_code="ks_team360_sales_diagnosis",
+        allowed_origins=["https://mamamia360.com"],
+    )
+    runtime = _RecordingRuntime()
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(diagnosis_routes, "_build_public_turn_runtime", lambda: runtime)
+    monkeypatch.setattr(diagnosis_routes, "_get_public_scope_resolver", lambda: None)
+
+    signature = _sign_public_turn(
+        embed_client.hmac_secret,
+        client_id=embed_client.client_id,
+        timestamp=timestamp,
+        session_id=session_id,
+        message=message,
+    )
+
+    response = anyio.run(
+        diagnosis_routes.public_turn.fn,
+        PublicTurnRequest(
+            client_id=embed_client.client_id,
+            timestamp=timestamp,
+            session_id=session_id,
+            message=message,
+            package_code="malicious_package",
+            knowledge_scope_code="malicious_scope",
+        ),
+        _RequestStub(
+            {
+                "Origin": "https://mamamia360.com",
+                "X-T360-Signature": signature,
+            }
+        ),
+    )
+
+    assert runtime.calls == 1
+    assert runtime.last_input.package_code == "pkg_sales_diagnosis"
+    assert runtime.last_input.knowledge_scope_code == "ks_team360_sales_diagnosis"
+
+
+def test_mamamia360_unknown_client_rejected(monkeypatch):
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository(),
+    )
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_build_public_turn_runtime",
+        lambda: (_ for _ in ()).throw(AssertionError("runtime should not be called")),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            json={
+                "client_id": "mamamia360_unknown",
+                "session_id": "mamamia_unknown",
+                "message": "Quiero automatizar ventas",
+            },
+        )
+
+    assert response.status_code == 403
+
+
 def test_public_turn_valid_client_id_resolves_context_from_db_and_ignores_body(monkeypatch):
     import modules.embed_clients.auth as embed_auth
     from modules.embed_clients.repository import InMemoryEmbedClientRepository
