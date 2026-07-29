@@ -1303,6 +1303,47 @@ def test_mamamia360_embed_auth_allowed_origin_ok(monkeypatch):
     assert str(data["signature"]).startswith("sha256=")
 
 
+def test_mamamia360_embed_auth_www_origin_allowed(monkeypatch):
+    """www.mamamia360.com must be allowed as production origin."""
+    import modules.embed_clients.auth as embed_auth
+    from modules.embed_clients.repository import InMemoryEmbedClientRepository
+
+    timestamp = 1_710_000_000
+    embed_client = _build_embed_client(
+        client_id="mamamia360",
+        allowed_origins=["https://www.mamamia360.com", "https://mamamia360.com"],
+    )
+
+    monkeypatch.setattr(embed_auth, "time", lambda: timestamp)
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_get_public_embed_client_repository",
+        lambda: InMemoryEmbedClientRepository({embed_client.client_id: embed_client}),
+    )
+    monkeypatch.setattr(
+        diagnosis_routes,
+        "_build_public_turn_runtime",
+        lambda: (_ for _ in ()).throw(AssertionError("runtime should not be called by auth endpoint")),
+    )
+
+    with _client() as client:
+        response = client.post(
+            "/api/diagnosis/embed/auth",
+            headers={"Origin": "https://www.mamamia360.com"},
+            json={
+                "client_id": embed_client.client_id,
+                "session_id": "mamamia_www_auth_ok",
+                "message": "Quiero automatizar facturacion",
+            },
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["client_id"] == "mamamia360"
+    assert isinstance(data["timestamp"], int)
+    assert str(data["signature"]).startswith("sha256=")
+
+
 def test_mamamia360_embed_auth_origin_denied_rejected(monkeypatch):
     from modules.embed_clients.repository import InMemoryEmbedClientRepository
 

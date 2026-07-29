@@ -42,9 +42,10 @@ sin requerir implementación técnica del distribuidor.
 
 ```
 https://mamamia360.com
+https://www.mamamia360.com
 ```
 
-El backend solo acepta requests desde este dominio. Si el dominio cambia,
+El backend solo acepta requests desde estos dominios. Si el dominio cambia,
 solicitar actualización al equipo Team360.
 
 ## Qué NO debe modificar
