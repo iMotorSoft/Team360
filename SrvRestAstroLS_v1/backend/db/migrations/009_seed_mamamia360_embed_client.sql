@@ -25,7 +25,7 @@ insert into embed_clients (
     'team360_public_site',
     'pkg_sales_diagnosis',
     'ks_team360_sales_diagnosis',
-    '["http://127.0.0.1:3050", "http://localhost:3050", "https://mamamia360.com", "https://www.mamamia360.com"]'::jsonb,
+    '["http://127.0.0.1:3050", "http://localhost:3050", "https://mamamia360.com", "https://www.mamamia360.com", "https://team360.live"]'::jsonb,
     true,
     'Mamamia360 distribuidor piloto - Diagnosticador Vera embebible'
 ) on conflict (client_id) do nothing;
