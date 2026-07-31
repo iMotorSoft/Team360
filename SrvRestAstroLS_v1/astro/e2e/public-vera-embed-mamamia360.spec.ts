@@ -35,10 +35,16 @@ test.describe("Mamamia360 embed — Vera diagnosticador embebible", () => {
       "assistant_instance_code",
       "package_code",
       "knowledge_scope_code",
+      "Turno",
+      "sessionId",
     ];
     for (const term of forbidden) {
-      expect(pageText).not.toContain(term);
+      expect(pageText, `forbidden text "${term}" found in embed UI`).not.toContain(term);
     }
+
+    // Verify commercial-grade wrapper header and footer
+    await expect(page.locator(".vera-embed-badge")).toBeVisible();
+    await expect(page.locator(".vera-embed-footer")).toBeVisible();
 
     // Verify commercial-grade UI elements — button is present and visible
     // (disabled until text is entered is expected behavior)

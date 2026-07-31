@@ -424,18 +424,15 @@
       </button>
     </div>
 
+    {#if mailtoHref}
     <div class="mt-3 flex items-center justify-between">
-      {#if mailtoHref}
         <a
           class="text-xs font-medium text-[#78909f] underline transition hover:text-[#476275]"
           href={mailtoHref}
         >
           Solicitar revisión por correo
         </a>
-      {/if}
-      <p class="text-[0.6rem] text-[#91a2ad]">
-        Turno {messages.filter(m => m.role === 'user').length}
-      </p>
     </div>
+    {/if}
   {/if}
 </div>
