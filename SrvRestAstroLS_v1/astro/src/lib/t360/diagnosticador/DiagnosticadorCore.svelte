@@ -289,7 +289,7 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <p class="text-sm font-bold text-[#153854]">{assistantDisplayName}</p>
-        <p class="mt-1 text-xs font-semibold text-[#78909f]">{publicDiagnosisContext.service_code}</p>
+        <p class="mt-1 text-xs font-semibold text-[#78909f]">Diagnóstico abierto</p>
       </div>
       <span class="inline-flex w-fit rounded-full bg-[#e8f7f5] px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.12em] text-[#168b88]">
         Conversación
@@ -331,12 +331,7 @@
     <div class="flex items-center justify-between gap-2">
       <div>
         <p class="text-sm font-bold text-[#153854]">{assistantDisplayName}</p>
-        <p class="mt-1 text-xs font-semibold text-[#78909f]">
-          {publicDiagnosisContext.service_code}
-          {#if sessionId}
-            <span class="ml-1 text-[0.6rem] text-[#91a2ad]">· {sessionId.slice(0, 16)}…</span>
-          {/if}
-        </p>
+        <p class="mt-1 text-xs font-semibold text-[#78909f]">Diagnóstico abierto</p>
       </div>
       <button
         type="button"

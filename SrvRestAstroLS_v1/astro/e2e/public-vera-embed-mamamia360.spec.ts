@@ -28,6 +28,29 @@ test.describe("Mamamia360 embed — Vera diagnosticador embebible", () => {
     await expect(page.getByTestId("vera-embed-wrapper")).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId("diagnosticador-core")).toBeVisible({ timeout: 15000 });
 
+    // Anti-debug: no technical strings in the visible UI
+    const pageText = await page.locator("body").innerText();
+    const forbidden = [
+      "svc_sales_diagnosis",
+      "assistant_instance_code",
+      "package_code",
+      "knowledge_scope_code",
+    ];
+    for (const term of forbidden) {
+      expect(pageText).not.toContain(term);
+    }
+
+    // Verify commercial-grade UI elements — button is present and visible
+    // (disabled until text is entered is expected behavior)
+    await expect(page.getByTestId("public-vera-submit")).toBeVisible();
+    const textarea = page.getByTestId("public-vera-text");
+    await expect(textarea).toBeVisible();
+    // textarea should have non-zero dimensions (usable, not collapsed)
+    const textareaBox = await textarea.boundingBox();
+    expect(textareaBox).not.toBeNull();
+    expect(textareaBox!.width).toBeGreaterThan(100);
+    expect(textareaBox!.height).toBeGreaterThan(50);
+
     const criticalErrors = criticalConsoleErrors(consoleErrors);
     expect(criticalErrors).toEqual([]);
   });
