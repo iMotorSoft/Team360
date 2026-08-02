@@ -22,6 +22,14 @@ test.describe("Mamamia360 embed — Vera diagnosticador embebible", () => {
     });
     page.on("pageerror", (error) => consoleErrors.push(error.message));
 
+    // Track all requests to verify cross-origin asset resolution
+    const embeddedScripts: string[] = [];
+    page.on("request", (req) => {
+      if (req.url().includes("team360-diagnosticador") && req.resourceType() === "script") {
+        embeddedScripts.push(req.url());
+      }
+    });
+
     await page.goto("/embed-demo/mamamia360.html");
     await expect(page.getByTestId("mamamia360-embed-target")).toBeVisible();
 
@@ -59,6 +67,13 @@ test.describe("Mamamia360 embed — Vera diagnosticador embebible", () => {
 
     const criticalErrors = criticalConsoleErrors(consoleErrors);
     expect(criticalErrors).toEqual([]);
+
+    // Cross-origin safety: the loader must NOT request assets relative to
+    // the host domain. Every embedded script should be loaded from an
+    // absolute URL (not a root-relative path like "/embed/...").
+    const hostRelative = embeddedScripts.filter((url) => url.startsWith("/"));
+    expect(hostRelative, "no host-relative embedded script requests").toEqual([]);
+    expect(embeddedScripts.length, "at least one embedded script loaded").toBeGreaterThan(0);
   });
 
   test("conversation flow: feasibility diagnosis works", async ({ page }) => {

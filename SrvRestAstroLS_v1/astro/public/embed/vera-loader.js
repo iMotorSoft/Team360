@@ -7,37 +7,43 @@
   var SCRIPT_ATTR_INITIAL_MESSAGE = "data-initial-message";
   var API_BASE_PATH = "/api";
 
-  var LOADER_URL = "/embed/team360-diagnosticador-loader.js";
-  var MANIFEST_URL = "/embed/team360-diagnosticador.manifest.json";
-
   if (globalObject.__team360VeraLoader) {
     return;
   }
 
   var loaderScript = globalObject.document?.currentScript;
 
+  // -- Origin resolution ------------------------------------------------
+  // Assets and API MUST load from the loader's canonical origin
+  // (where vera-loader.js is published), NOT from the host domain.
+  // Cache/minification proxies (e.g. WP Rocket) rehost the script on
+  // the client domain — detect that and fall back.
+
+  function resolveOrigin() {
+    var scriptSrc = loaderScript?.src || "";
+    try {
+      var url = new URL(scriptSrc);
+      if (/\/(wp-content\/cache|cache\/min|min)\//.test(url.pathname)) {
+        return "https://team360.live";
+      }
+      return url.origin;
+    } catch (_) {}
+    return "https://team360.live";
+  }
+
+  var BASE_URL = resolveOrigin() + "/embed";
+  var LOADER_URL = BASE_URL + "/team360-diagnosticador-loader.js";
+  var MANIFEST_URL = BASE_URL + "/team360-diagnosticador.manifest.json";
+
+  // -- Utility ----------------------------------------------------------
+
   function getAttr(name) {
     if (!loaderScript) return null;
     return loaderScript.getAttribute(name) || null;
   }
 
-  function resolveDefaultBaseUrl() {
-    if (typeof globalObject.location?.origin === "string") {
-      return globalObject.location.origin;
-    }
-    return "http://localhost:3050";
-  }
-
   function resolveApiBaseUrl() {
-    var scriptSrc = loaderScript?.src || "";
-    var origin = globalObject.location?.origin || "http://localhost:3050";
-
-    try {
-      var url = new URL(scriptSrc);
-      origin = url.origin;
-    } catch (_) {}
-
-    return origin + API_BASE_PATH;
+    return resolveOrigin() + API_BASE_PATH;
   }
 
   function getTargetElement() {
