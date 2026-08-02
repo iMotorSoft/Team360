@@ -7,7 +7,7 @@
   let { onMenu = () => undefined }: { onMenu?: () => void } = $props();
 </script>
 
-<header class="sticky top-0 z-30 flex h-[4.75rem] items-center justify-between gap-4 border-b border-[#e1e9eb] bg-[#fbfcfa]/88 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
+<header class="sticky top-0 z-30 flex h-24 items-center justify-between gap-4 border-b border-[#e1e9eb] bg-[#fbfcfa]/88 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
   <div class="flex min-w-0 items-center gap-3">
     <button
       aria-label="Abrir navegación"
@@ -18,8 +18,8 @@
       <ConsoleIcon name="menu" />
     </button>
     <div class="min-w-0">
-      <p class="truncate text-xs font-bold uppercase tracking-[0.17em] text-[#168b88]">{consoleContext.bootstrap.uiHints.profileLabel}</p>
-      <p class="mt-1 truncate text-sm font-semibold text-[#284c67]">
+      <p class="top-badge">{consoleContext.bootstrap.uiHints.profileLabel}</p>
+      <p class="details-text mt-1 truncate font-semibold text-[#284c67]">
         {consoleContext.activeOrganization.name}
         <span class="mx-1.5 text-[#a5b3bb]">/</span>
         {consoleContext.activeWorkspace.name}
@@ -43,19 +43,19 @@
     </label>
     <button
       aria-label="Buscar"
-      class="hidden size-10 place-items-center rounded-xl border border-[#e0e8eb] bg-white text-[#526d81] transition hover:border-[#badbd9] hover:text-[#167f7c] sm:grid"
+      class="hidden size-11 cursor-pointer place-items-center rounded-full text-[#526d81] transition hover:bg-slate-100 sm:grid"
       type="button"
     >
-      <ConsoleIcon name="search" />
+      <ConsoleIcon class="size-7" name="search" />
     </button>
     <NotificationCenter />
     <div class="ms-1 hidden items-center gap-2 border-s border-[#e0e8eb] ps-3 sm:flex">
-      <span class="grid size-9 place-items-center rounded-xl bg-[#153b5b] text-xs font-bold text-white">
+      <span class="grid size-12 items-center rounded-full bg-base-content/80 text-center text-base font-bold tracking-[0.1em] text-white">
         {consoleContext.bootstrap.currentUser.avatarInitials}
       </span>
       <div class="hidden xl:block">
-        <p class="text-xs font-bold text-[#31536b]">{consoleContext.bootstrap.currentUser.name}</p>
-        <p class="mt-0.5 text-[0.68rem] text-[#8a9ba6]">{consoleContext.bootstrap.currentUser.role}</p>
+        <p class="text-base font-bold text-[#31536b]">{consoleContext.bootstrap.currentUser.name}</p>
+        <p class="mt-0.5 text-sm text-[#8a9ba6]">{consoleContext.bootstrap.currentUser.role}</p>
       </div>
     </div>
   </div>

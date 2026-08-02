@@ -13,20 +13,20 @@
 >
   <div>
     <div class="flex flex-wrap items-center gap-2">
-      <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#5c7788]">Contexto operativo</p>
+      <p class="top-badge-neutral">Contexto operativo</p>
       {#if consoleContext.bootstrap.uiHints.showDelegatedAccessNotice}
-        <Badge variant="warning" class="h-auto px-2 py-1 text-[0.62rem]">Acceso delegado</Badge>
+        <Badge variant="warning" class="h-auto px-2 py-1 text-sm">Acceso delegado</Badge>
       {:else}
-        <Badge variant="info" class="h-auto px-2 py-1 text-[0.62rem]">Contexto propio</Badge>
+        <Badge variant="info" class="h-auto px-2 py-1 text-sm">Contexto propio</Badge>
       {/if}
     </div>
-    <p class="mt-1.5 text-sm font-semibold text-[#254b66]">
+    <p class="mt-1.5 text-base font-semibold text-[#254b66]">
       {consoleContext.activeOrganization.name}
       <span class="mx-1.5 text-[#a1b0b8]">·</span>
       {consoleContext.activeWorkspace.name}
     </p>
   </div>
-  <p class="max-w-xl text-xs leading-5 text-[#718793]">
+  <p class="max-w-xl text-sm leading-5 text-[#718793]">
     {#if consoleContext.bootstrap.uiHints.showDelegatedAccessNotice}
       Estás consultando una organización autorizada desde {audience === "owner" || audience === "operator" ? "Team360" : "tu red partner"}.
     {:else}

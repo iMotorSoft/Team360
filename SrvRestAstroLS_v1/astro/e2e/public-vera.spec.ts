@@ -224,7 +224,7 @@ test.describe("Team360 pública - Vera estructurada", () => {
 
     await expect(page.getByText("Sí, Gmail puede evaluarse")).toBeVisible();
     await expect(page.getByTestId("diagnosis-result")).toHaveCount(0);
-    await expect(page.getByText("Turno 2")).toBeVisible();
+    await expect(page.getByText("Contame un poco más del proceso.")).toBeVisible();
   });
 
   test("renderiza interaction_block válido y traduce acción a request del runtime", async ({ page }) => {
