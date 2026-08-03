@@ -96,6 +96,13 @@ def create_app() -> Litestar:
                 "http://127.0.0.1:3060",
                 "http://localhost:3061",
                 "http://127.0.0.1:3061",
+                # Public embeddable widget: the diagnosticador is loaded from
+                # https://team360.live/embed/... and calls /api cross-origin
+                # from the client's site. Origin allowlist mirrors the
+                # embed_clients production seed (migration 010).
+                "https://team360.live",
+                "https://mamamia360.com",
+                "https://www.mamamia360.com",
             ],
             allow_methods=["*"],
             allow_headers=["*"],

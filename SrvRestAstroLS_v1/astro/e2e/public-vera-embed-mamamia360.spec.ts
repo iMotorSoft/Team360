@@ -30,6 +30,26 @@ test.describe("Mamamia360 embed — Vera diagnosticador embebible", () => {
       }
     });
 
+    // Track status and decoded size of the secondary loader and entry bundle
+    const embeddedResponses = new Map<
+      string,
+      { status: number | null; bodyBytes: number }
+    >();
+    page.on("response", async (res) => {
+      if (
+        res.url().includes("team360-diagnosticador-loader.js") ||
+        res.url().includes("team360-diagnosticador.js")
+      ) {
+        let bodyBytes = 0;
+        try {
+          bodyBytes = (await res.body()).length;
+        } catch {
+          bodyBytes = -1;
+        }
+        embeddedResponses.set(res.url(), { status: res.status(), bodyBytes });
+      }
+    });
+
     await page.goto("/embed-demo/mamamia360.html");
     await expect(page.getByTestId("mamamia360-embed-target")).toBeVisible();
 
@@ -67,6 +87,28 @@ test.describe("Mamamia360 embed — Vera diagnosticador embebible", () => {
 
     const criticalErrors = criticalConsoleErrors(consoleErrors);
     expect(criticalErrors).toEqual([]);
+    expect(consoleErrors.some((e) => e.includes("[VeraLoader] Failed to load"))).toBe(false);
+
+    // Secondary loader must load with a real body (guards against 0-byte
+    // responses like the one observed in production after the WP Rocket purge).
+    const loaderResponses = Array.from(embeddedResponses.entries()).filter(([url]) =>
+      url.includes("team360-diagnosticador-loader.js"),
+    );
+    expect(loaderResponses.length, "secondary loader response captured").toBeGreaterThan(0);
+    for (const [, info] of loaderResponses) {
+      expect(info.status, "secondary loader HTTP status").toBe(200);
+      expect(info.bodyBytes, "secondary loader body size").toBeGreaterThan(0);
+    }
+
+    // Entry bundle must appear in Network and load with a real body.
+    const entryResponses = Array.from(embeddedResponses.entries()).filter(([url]) =>
+      url.includes("team360-diagnosticador.js"),
+    );
+    expect(entryResponses.length, "entry bundle requested in Network").toBeGreaterThan(0);
+    for (const [, info] of entryResponses) {
+      expect(info.status, "entry bundle HTTP status").toBe(200);
+      expect(info.bodyBytes, "entry bundle body size").toBeGreaterThan(0);
+    }
 
     // Cross-origin safety: the loader must NOT request assets relative to
     // the host domain. Every embedded script should be loaded from an
@@ -74,6 +116,11 @@ test.describe("Mamamia360 embed — Vera diagnosticador embebible", () => {
     const hostRelative = embeddedScripts.filter((url) => url.startsWith("/"));
     expect(hostRelative, "no host-relative embedded script requests").toEqual([]);
     expect(embeddedScripts.length, "at least one embedded script loaded").toBeGreaterThan(0);
+    // No request must ever target the client site's own /embed/ directory.
+    const hostEmbedRequests = embeddedScripts.filter((url) =>
+      url.includes("mamamia360.com/embed/"),
+    );
+    expect(hostEmbedRequests, "no requests to mamamia360.com/embed/").toEqual([]);
   });
 
   test("conversation flow: feasibility diagnosis works", async ({ page }) => {

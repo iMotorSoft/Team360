@@ -79,6 +79,10 @@
       var script = globalObject.document.createElement("script");
       script.type = "module";
       script.async = true;
+      // Module scripts are always fetched in CORS mode. Explicitly request
+      // anonymous CORS so hosts like team360.live can serve ACAO:* and the
+      // loader bundle executes on the client's origin.
+      script.crossOrigin = "anonymous";
       script.src = LOADER_URL;
 
       script.addEventListener("load", function () {
