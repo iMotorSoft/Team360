@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-07-06 (actualizacion del alias LiteLLM GPT-5.4 Nano)
+Ultima actualizacion: 2026-08-04 (contrato CORS de embeds cross-origin)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -1942,6 +1942,8 @@ Authorization: Bearer v4.public.<token>
 
 ## Mamamia360 embed — producción aprobada
 
+La integración confirmó que HTTP `200` y MIME correcto no bastan para módulos cross-origin: el navegador debe aceptar el body por CORS y ejecutar toda la cadena hasta `mount()`.
+
 - Snippet público: `https://team360.live/embed/vera-loader.js?v=20260802-1`
 - Página cliente: `https://www.mamamia360.com/inteligencia-artificial/`
 - ClientId: `mamamia360`
@@ -1954,11 +1956,14 @@ Authorization: Bearer v4.public.<token>
   - CSS aislado del embed
   - CORS para module scripts estáticos (ACAO en nginx `/embed/` y `/_astro/`)
   - CORSConfig backend para API embed/auth y diagnosis/turn
+  - gate que trata `200 / 0 B` o `No data found` como posible bloqueo CORS, no como éxito de carga
 - Validación final (Playwright productivo):
   - widget montado en página real
   - `team360-diagnosticador-loader.js` 200
   - `team360-diagnosticador.js` 200
+  - bodies de loader, manifest y entry mayores que cero
   - chunks `_astro` cargando
+  - `window.Team360Diagnosticador.mount()` ejecutado
   - 0 requests a `www.mamamia360.com/embed/`
   - sin `[VeraLoader] Failed to load`
 - Snippet no cambió.

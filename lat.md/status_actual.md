@@ -4,7 +4,7 @@ Este tablero resume el estado vigente de la arquitectura viva de Team360 y enlaz
 
 Objetivo: `arquitectura-viva`
 
-Última actualización: 2026-07-06.
+Última actualización: 2026-08-04.
 
 ## Estado vigente
 
@@ -39,6 +39,8 @@ El runtime usa un alias alineado con GPT-5.4 Nano y selecciona el protocolo de f
 El componente externo dispone de loader versionado, verificación de integridad, autenticación por cliente y guías de instalación controladas.
 
 - El loader y el entry publican integrity desde un manifest canónico.
+- Los módulos cross-origin requieren CORS compatible en `/embed/` y en sus imports `/_astro/*`; HTTP `200` y MIME correcto no prueban ejecución.
+- Un `200 / 0 B` puede representar un body bloqueado por CORS, por lo que el gate exige observar la cadena hasta `mount()`.
 - Los fixtures E2E verifican loader, entry, cross-origin y montaje real.
 - El cliente recibe `clientId`, snippet y requisitos de origin; no recibe secretos ni códigos internos.
 - HTML, PHP y WordPress están documentados como superficies de integración.

@@ -230,12 +230,15 @@ sitio del cliente:
 
 ## Troubleshooting
 
+Esta tabla distingue fallos del host, autorización, caché y distribución cross-origin antes de pedir cambios al cliente.
+
 | Problema | Posible causa |
 | -------- | ------------- |
 | No aparece el componente | El div contenedor no existe o el script no se cargó |
 | Error de integrity | El valor de `integrity` en el `<script>` no coincide con el manifest actual |
 | Error 403 en embed/auth | El origin del sitio no está autorizado en `allowed_origins` |
-| Error CORS | El navegador bloquea requests a `team360.live` desde el origin del cliente |
+| Script module con `200 / 0 B` o `No data found` | El servidor respondió, pero el navegador pudo bloquear el body por CORS; revisar ACAO, Console y si se solicitó el bundle siguiente |
+| Error CORS | El navegador bloquea el loader, entry, chunks o API de `team360.live` desde el origin del cliente |
 | WordPress mueve/minifica scripts | Plugins de caché o minificación pueden alterar o diferir scripts |
 | CSP bloquea `team360.live` | La política Content-Security-Policy debe incluir `team360.live` |
 | Caché conserva loaderIntegrity viejo | Invalidar caché del navegador o CDN tras actualizar el manifest |
@@ -254,13 +257,19 @@ sitio del cliente:
 
 ## Checklist Team360
 
+Este checklist valida el contrato completo desde la distribución estática hasta el turno real, sin aprobar únicamente por HTTP `200`.
+
 - [ ] `clientId` creado.
 - [ ] `allowed_origins` configurados.
 - [ ] `hmac_secret` server-side.
 - [ ] Tenant/scope server-side.
 - [ ] Snippet entregado.
-- [ ] Manifest accesible.
-- [ ] Loader accesible.
+- [ ] Manifest accesible, con MIME correcto y body mayor que cero.
+- [ ] Loader y entry accesibles, con MIME correcto, body mayor que cero y CORS compatible.
+- [ ] El navegador solicita loader secundario, entry y chunks desde Team360.
+- [ ] No existen requests al `/embed/` del dominio cliente.
+- [ ] Console no muestra errores CORS, MIME, integrity ni `[VeraLoader] Failed to load`.
+- [ ] `window.Team360Diagnosticador.mount()` se ejecuta.
 - [ ] Prueba auth/turn OK.
 
 ## Recursos

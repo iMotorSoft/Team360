@@ -588,6 +588,32 @@ que lo justifiquen.
 Reutilizar estilos, interaction blocks, eventos, tipos, patterns y adapters.
 Solo separar paquetes compartidos cuando un segundo producto lo justifique.
 
+## Contrato de carga cross-origin
+
+Los módulos del embed deben superar la política CORS del navegador; una respuesta HTTP exitosa por sí sola no demuestra que el código haya quedado disponible ni que se haya ejecutado.
+
+Invariantes de distribución:
+
+- `vera-loader.js`, el loader secundario, el entry y sus imports `/_astro/*` deben servirse desde el origen canónico Team360;
+- los scripts `type="module"` cross-origin deben recibir `Access-Control-Allow-Origin` compatible con el host consumidor;
+- los scripts dinámicos deben usar `crossorigin="anonymous"` cuando corresponda, especialmente con SRI;
+- manifest, loader, entry y chunks deben conservar MIME correcto y cuerpo no vacío;
+- el CORS de assets estáticos y el CORS de la API son fronteras distintas y ambas deben validarse;
+- un recurso mostrado como `200 / 0 B` o `No data found` puede haber sido bloqueado por CORS aunque el servidor haya respondido `200`.
+
+El gate no termina en `curl`. Playwright debe demostrar la cadena completa:
+
+```text
+vera-loader.js
+-> team360-diagnosticador-loader.js
+-> team360-diagnosticador.manifest.json
+-> team360-diagnosticador.js
+-> imports /_astro/*
+-> window.Team360Diagnosticador.mount()
+```
+
+La validación debe comprobar status, bytes del body, origen final, errores de consola y ausencia de requests al `/embed/` del sitio cliente.
+
 ## Estrategia de pruebas
 
 Esta sección establece el alcance, los gates y la evidencia requerida para la validación.

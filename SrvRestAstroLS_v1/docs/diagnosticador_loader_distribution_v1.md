@@ -118,6 +118,25 @@ Comportamiento opt-in:
 - si `entryIntegrity` falta, rechaza antes de cargar el entry;
 - si el browser bloquea el entry por SRI, rechaza con error controlado.
 
+## CORS y ejecución cross-origin
+
+Este contrato operativo evita interpretar un `200` como éxito cuando el navegador bloquea un módulo antes de ejecutar la siguiente etapa.
+
+Los módulos JavaScript se solicitan en modo CORS. Por lo tanto, el servidor debe publicar headers CORS compatibles no solo para `/embed/`, sino también para cualquier chunk importado desde `/_astro/`.
+
+La validación mínima exige:
+
+- `Content-Type` JavaScript o JSON según el recurso;
+- body mayor que cero;
+- `Access-Control-Allow-Origin` compatible;
+- `crossorigin="anonymous"` en módulos dinámicos cuando corresponda;
+- hashes SRI alineados con el build si se activa integrity;
+- ejecución efectiva de `window.Team360Diagnosticador.mount()`.
+
+Un loader puede aparecer como `200`, `0 B` y `No data found for resource with given identifier` cuando DevTools recibió metadata HTTP pero el navegador bloqueó el body por CORS. En ese caso, el bundle siguiente no se solicita.
+
+El diagnóstico debe comparar toda la cadena en Network y Console. `curl` confirma servidor, bytes y headers; Playwright confirma que el navegador acepta, ejecuta y monta el bundle.
+
 ## Snippet externo copiable
 
 Opcion simple:
