@@ -1,6 +1,7 @@
 <script lang="ts">
   import { SUPPORTED_LOCALES } from "../../lib/i18n";
   import { consoleContext } from "../../stores/consoleContext.svelte";
+  import { Select } from "../ui";
   import ConsoleIcon from "./ConsoleIcon.svelte";
   import NotificationCenter from "./NotificationCenter.svelte";
 
@@ -30,16 +31,17 @@
   <div class="flex items-center gap-2 sm:gap-3">
     <label class="hidden sm:block">
       <span class="sr-only">Idioma de interfaz</span>
-      <select
+      <Select
         aria-label="Idioma de interfaz"
-        class="rounded-xl border border-[#e0e8eb] bg-white px-2.5 py-2 text-xs font-bold uppercase text-[#587184] transition focus-visible:border-[#71cfc6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]"
+        class="w-auto uppercase text-[#587184]"
+        controlSize="sm"
         onchange={(event) => consoleContext.setLocale((event.currentTarget as HTMLSelectElement).value)}
         value={consoleContext.locale}
       >
         {#each SUPPORTED_LOCALES as locale}
           <option value={locale}>{locale}</option>
         {/each}
-      </select>
+      </Select>
     </label>
     <button
       aria-label="Buscar"

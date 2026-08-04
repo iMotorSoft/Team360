@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BRAND } from "../global.js";
-  import { Badge } from "../ui";
+  import { Badge, DataTable } from "../ui";
   import { formatDate, formatDateTime } from "../../lib/formatters";
   import { getMockWorkspaceContext, organizations, reports, runs, services, tasks, users, workspaces } from "../../lib/mock";
   import { deriveConsoleAudience } from "../../lib/navigation/derive";
@@ -169,8 +169,7 @@
         </article>
       {/each}
     </div>
-    <div class="mt-7 hidden overflow-hidden rounded-3xl border border-[#e0e8ea] bg-white md:block">
-      <div class="overflow-x-auto">
+    <DataTable class="mt-7 hidden shadow-none md:block" label="Clientes visibles">
         <table class="w-full min-w-[42rem] text-start text-sm">
           <thead class="bg-[#f4f8f8] text-[0.65rem] uppercase tracking-[0.15em] text-[#78909f]">
             <tr><th class="px-5 py-3 text-start">Cliente</th><th class="px-5 py-3 text-start">Tipo</th><th class="px-5 py-3 text-start">Región</th><th class="px-5 py-3 text-start">Workspace</th><th class="px-5 py-3 text-start">Estado</th></tr>
@@ -187,8 +186,7 @@
             {/each}
           </tbody>
         </table>
-      </div>
-    </div>
+    </DataTable>
   {:else if view === "workspaces"}
     <div class="mt-7 grid gap-3 lg:grid-cols-2">
       {#each consoleContext.bootstrap.accessibleWorkspaces as workspace}

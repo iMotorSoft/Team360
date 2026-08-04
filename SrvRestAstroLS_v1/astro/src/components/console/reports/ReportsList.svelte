@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatusBadge } from "../../ui";
+  import { Button, DataTable, EmptyState, SectionHeader, StatusBadge } from "../../ui";
   import { formatDateTime } from "../../../lib/formatters";
   import { getAccessibleWorkspaceIds, getWorkspaceName, reports, services } from "../../../lib/mock";
   import { deriveConsoleAudience } from "../../../lib/navigation/derive";
@@ -53,14 +53,13 @@
             <div><dt class="text-[#91a2ad]">Período</dt><dd class="mt-1 font-semibold text-[#587184]">{report.period}</dd></div>
             <div><dt class="text-[#91a2ad]">Workspace</dt><dd class="mt-1 font-semibold text-[#587184]">{getWorkspaceName(report.workspaceId)}</dd></div>
           </dl>
-          <button class="mt-4 rounded-full border border-[#d5e4e4] px-3 py-1.5 text-xs font-bold text-[#78909f]" disabled type="button">
+          <Button class="mt-4" disabled size="sm" variant="secondary">
             {report.status === "ready" ? "Descarga no disponible en mock" : "Preparación en curso"}
-          </button>
+          </Button>
         </article>
       {/each}
     </div>
-    <div class="mt-7 hidden overflow-hidden rounded-3xl border border-[#e0e8ea] bg-white shadow-[0_24px_60px_-54px_rgba(16,45,79,0.7)] md:block">
-    <div class="overflow-x-auto">
+    <DataTable class="mt-7 hidden md:block" label="Reportes disponibles">
       <table class="w-full min-w-[58rem] text-start text-sm">
         <thead class="bg-[#f4f8f8] text-[0.65rem] uppercase tracking-[0.15em] text-[#78909f]">
           <tr>
@@ -84,16 +83,15 @@
               <td class="px-5 py-4 text-xs">{getWorkspaceName(report.workspaceId)}</td>
               <td class="px-5 py-4"><StatusBadge status={report.status} /></td>
               <td class="px-5 py-4">
-                <button class="rounded-full border border-[#d5e4e4] px-3 py-1.5 text-xs font-bold text-[#78909f]" disabled type="button">
+                <Button disabled size="sm" variant="secondary">
                   {report.status === "ready" ? "Descarga no disponible en mock" : "Preparación en curso"}
-                </button>
+                </Button>
               </td>
             </tr>
           {/each}
         </tbody>
       </table>
-    </div>
-  </div>
+    </DataTable>
   {:else}
     <EmptyState
       class="mt-7"

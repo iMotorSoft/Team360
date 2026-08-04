@@ -8,4 +8,4 @@ La home publica agrega `LinkButton.astro` como wrapper semantico para CTAs enlaz
 
 Las pantallas mock concretas de consola agregan `EmptyState`, `SectionHeader`, `StatCard`, `StatusBadge` y `Tabs`. Estos wrappers concentran jerarquia visual, estados, copy legible y tabs reutilizables sin convertir DaisyUI en contrato de dominio.
 
-Pendientes para fases siguientes: `Modal`, `Drawer`, `DataTable`, `FormField`, `TextInput`, `Select` y `Textarea`.
+La Etapa 3 agrega `DataTable`, `Select` nativo estilizado y `Textarea`, además de variantes seguras para cards, botones, badges y alertas. Se difieren `Modal`, `Drawer`, `FormField` y `TextInput` hasta que exista un consumidor real compatible.

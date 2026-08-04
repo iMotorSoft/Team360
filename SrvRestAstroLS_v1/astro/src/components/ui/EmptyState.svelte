@@ -8,6 +8,7 @@
     description,
     nextStep,
     variant = "empty",
+    compact = false,
     actions,
     class: className = "",
   }: {
@@ -15,6 +16,7 @@
     description: string;
     nextStep?: string;
     variant?: EmptyStateVariant;
+    compact?: boolean;
     actions?: Snippet;
     class?: string;
   } = $props();
@@ -26,9 +28,9 @@
   };
 </script>
 
-<section class={`rounded-2xl border border-dashed border-[#d7e3e5] bg-white/70 p-5 ${className}`}>
+<section class={`rounded-2xl border border-dashed border-[#d7e3e5] bg-white/70 ${compact ? "p-4" : "p-5"} ${className}`}>
   <p class="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-[#168b88]">{eyebrowByVariant[variant]}</p>
-  <h2 class="mt-2 text-sm font-bold text-[#31536b]">{title}</h2>
+  <h2 class="mt-2 text-sm font-bold text-console-subtitle">{title}</h2>
   <p class="mt-2 max-w-2xl text-xs leading-5 text-[#78909f]">{description}</p>
   {#if nextStep}
     <p class="mt-3 text-xs font-semibold leading-5 text-[#587184]">Próximo paso: {nextStep}</p>

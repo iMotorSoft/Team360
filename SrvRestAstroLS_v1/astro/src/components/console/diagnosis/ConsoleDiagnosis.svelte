@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Loading, Alert, Badge, Card } from "../../ui";
+  import { Loading, Alert, Badge, Button, Card, Textarea } from "../../ui";
   import {
     startSession,
     saveAnswer,
@@ -177,13 +177,14 @@
               <span>Recomendación de paquete y próximos pasos</span>
             </li>
           </ul>
-          <button
+          <Button
             onclick={handleStart}
             data-testid="btn-start-diagnosis"
-            class="mt-6 inline-flex items-center gap-2 rounded-full bg-[#168b88] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#126d6b]"
+            class="mt-6"
+            size="lg"
           >
             Comenzar diagnóstico
-          </button>
+          </Button>
         </div>
       </Card>
     </div>
@@ -192,17 +193,19 @@
     <Loading />
 
   {:else if state === "error"}
-    <div class="rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-6" data-testid="diagnosis-error">
-      <p class="text-sm font-bold text-[#991b1b]">Error</p>
-      <p class="mt-2 text-sm text-[#b91c1c]">{errorMessage}</p>
-      <button
+    <Alert class="p-6" data-testid="diagnosis-error" variant="danger">
+      <p class="text-sm font-bold">Error</p>
+      <p class="mt-2 text-sm">{errorMessage}</p>
+      <Button
         onclick={reset}
         data-testid="btn-retry"
-        class="mt-4 rounded-full bg-[#991b1b] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#7f1d1d]"
+        class="mt-4"
+        size="sm"
+        variant="danger"
       >
         Reintentar
-      </button>
-    </div>
+      </Button>
+    </Alert>
 
   {:else if state === "answering"}
     <div class="mb-6">
@@ -212,29 +215,31 @@
           style="width: {progress}%"
         ></div>
       </div>
-      <p class="mt-2 text-xs text-[#8396a2]">{currentStepIndex + 1} de {totalSteps}</p>
+      <p class="mt-2 text-end text-xs text-[#8396a2]" dir="ltr">{currentStepIndex + 1} de {totalSteps}</p>
     </div>
 
     <div data-testid="question-card" data-step-id={currentStep.id}>
       <Card class="p-6 sm:p-8">
-        <h2 class="text-xl font-bold tracking-[-0.03em] text-[#173b5b]">{currentStep.label}</h2>
-        <p class="mt-2 text-sm leading-6 text-[#567184]">{currentStep.description}</p>
+        <h2 class="text-xl font-bold tracking-[-0.03em] text-[#173b5b]" id="diagnosis-question-label">{currentStep.label}</h2>
+        <p class="mt-2 text-sm leading-6 text-[#567184]" id="diagnosis-question-description">{currentStep.description}</p>
 
         {#if isTextStep}
           <div class="mt-5">
-            <textarea
+            <Textarea
+              aria-describedby="diagnosis-question-description"
+              aria-labelledby="diagnosis-question-label"
               bind:value={textInput}
               data-testid="answer-textarea"
               rows="4"
-              class="w-full rounded-xl border border-[#d5e0e2] bg-white px-4 py-3 text-sm text-[#203c55] outline-none transition focus:border-[#168b88] focus:ring-2 focus:ring-[#168b88]/20"
               placeholder="Escriba su respuesta aquí..."
-            ></textarea>
+            />
           </div>
 
         {:else if currentStep.options}
           <div class="mt-5 grid gap-2 sm:grid-cols-2">
             {#each currentStep.options as option}
               <button
+                type="button"
                 onclick={() => toggleOption(option)}
                 data-testid="option-{option}"
                 class="rounded-xl border px-4 py-3 text-start text-sm leading-5 transition
@@ -249,24 +254,25 @@
         {/if}
 
         <div class="mt-6 flex items-center justify-between">
-          <button
+          <Button
             onclick={() => {
               if (isFirstStep) { reset(); } else { currentStepIndex--; textInput = ""; selectedOptions = []; }
             }}
             data-testid="btn-back"
-            class="rounded-full border border-[#d5e0e2] px-4 py-2 text-xs font-bold text-[#567184] transition hover:border-[#a0b8be]"
+            size="sm"
+            variant="secondary"
           >
             {isFirstStep ? "Cancelar" : "Anterior"}
-          </button>
+          </Button>
 
-          <button
+          <Button
             onclick={handleNext}
             disabled={!canProceed}
             data-testid="btn-next"
-            class="rounded-full bg-[#168b88] px-6 py-2 text-xs font-bold text-white transition hover:bg-[#126d6b] disabled:opacity-40"
+            size="sm"
           >
             {isLastStep ? "Clasificar" : "Siguiente"}
-          </button>
+          </Button>
         </div>
       </Card>
     </div>
@@ -393,13 +399,14 @@
           </Card>
         {/if}
 
-        <button
+        <Button
           onclick={reset}
           data-testid="btn-new-diagnosis"
-          class="w-full rounded-full bg-[#168b88] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#126d6b]"
+          class="w-full"
+          size="lg"
         >
           Nuevo diagnóstico
-        </button>
+        </Button>
       </aside>
     </div>
   {/if}

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { SectionHeader, StatusBadge } from "../../ui";
-  import { formatDateTime } from "../../../lib/formatters";
+  import { EmptyState, SectionHeader } from "../../ui";
   import { alerts, getAccessibleWorkspaceIds, getWorkspaceName, services, type AlertType } from "../../../lib/mock";
   import { deriveConsoleAudience } from "../../../lib/navigation/derive";
   import { consoleContext } from "../../../stores/consoleContext.svelte";
+  import AlertCard from "./AlertCard.svelte";
 
   const audience = $derived(deriveConsoleAudience(consoleContext.bootstrap));
   const visibleAlerts = $derived.by(() => {
@@ -37,24 +37,17 @@
         <p class="mt-1 text-xs leading-5 text-[#78909f]">{section.description}</p>
         <div class="mt-3 space-y-3">
           {#each visibleAlerts.filter(({ type }) => type === section.type) as alert}
-            <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
-              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <div class="flex flex-wrap gap-2">
-                    <StatusBadge status={alert.severity} />
-                    <StatusBadge status={alert.status} />
-                  </div>
-                  <h3 class="mt-3 text-sm font-bold text-[#31536b]">{alert.title}</h3>
-                  <p class="mt-2 text-xs leading-5 text-[#78909f]">{serviceName(alert.serviceId)} · {getWorkspaceName(alert.workspaceId)}</p>
-                </div>
-                <span class="text-xs text-[#91a2ad]">{formatDateTime(alert.createdAt, consoleContext.locale)}</span>
-              </div>
-              <p class="mt-4 rounded-xl bg-[#f8fbfa] px-3 py-2.5 text-xs font-semibold leading-5 text-[#668092]">
-                Acción sugerida: {alert.suggestedAction}
-              </p>
-            </article>
+            <AlertCard
+              {alert}
+              contextLabel={`${serviceName(alert.serviceId)} · ${getWorkspaceName(alert.workspaceId)}`}
+              showAction
+            />
           {:else}
-            <p class="rounded-2xl border border-dashed border-[#d7e3e5] bg-white/60 p-4 text-xs text-[#8396a2]">Sin alertas de este tipo en el alcance visible.</p>
+            <EmptyState
+              compact
+              title="Sin alertas de este tipo"
+              description="No hay situaciones registradas para esta categoría dentro del alcance visible."
+            />
           {/each}
         </div>
       </section>
