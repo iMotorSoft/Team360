@@ -1940,6 +1940,30 @@ Authorization: Bearer v4.public.<token>
 - Aplicación verificador a endpoints Console reales (pendiente).
 - Embed/HMAC dual-mode (Fase 2 del plan).
 
+## Mamamia360 embed — producción aprobada
+
+- Snippet público: `https://team360.live/embed/vera-loader.js?v=20260802-1`
+- Página cliente: `https://www.mamamia360.com/inteligencia-artificial/`
+- ClientId: `mamamia360`
+- Origins habilitados:
+  - `https://mamamia360.com`
+  - `https://www.mamamia360.com`
+  - `https://team360.live`
+- Fixes cerrados:
+  - loader assets resueltos desde dominio Team360
+  - CSS aislado del embed
+  - CORS para module scripts estáticos (ACAO en nginx `/embed/` y `/_astro/`)
+  - CORSConfig backend para API embed/auth y diagnosis/turn
+- Validación final (Playwright productivo):
+  - widget montado en página real
+  - `team360-diagnosticador-loader.js` 200
+  - `team360-diagnosticador.js` 200
+  - chunks `_astro` cargando
+  - 0 requests a `www.mamamia360.com/embed/`
+  - sin `[VeraLoader] Failed to load`
+- Snippet no cambió.
+- Pendiente cliente: corregir fuente `.ttf` servida por `http`/mixed content.
+
 ## Historial
 
 - historial tecnico completo hasta esta reorganizacion: `status_historico_hasta_2026-06-28.md`;
