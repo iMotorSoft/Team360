@@ -114,10 +114,18 @@ _free_astro_port
 
 # ---- Start Astro -----------------------------------------------------------
 
+_log "Preparing the local embed asset graph..."
+(
+  cd "$ASTRO_DIR"
+  npx astro build
+) || _die "local embed build failed"
+_ok "Local embed assets prepared in dist (production sources unchanged)."
+
 _log "Starting Astro at http://${ASTRO_HOST}:${ASTRO_PORT}"
 printf '\n'
 
 cd "$ASTRO_DIR"
 exec npx astro dev \
+  --config astro.config.dev.mjs \
   --host "$ASTRO_HOST" \
   --port "$ASTRO_PORT"

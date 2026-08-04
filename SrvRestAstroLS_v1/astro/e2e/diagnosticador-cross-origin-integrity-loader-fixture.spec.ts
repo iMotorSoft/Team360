@@ -298,7 +298,7 @@ test.describe("Diagnosticador Cross-Origin Integrity Loader Fixture", () => {
     expect(fixtureBefore).toBeNull();
     expect(veraBefore).toBeNull();
 
-    await expect(page.getByTestId("embed-demo-wrapper")).toBeVisible();
+    await expect(page.getByTestId("vera-embed-wrapper")).toBeVisible();
     await expect(page.getByTestId("diagnosticador-core")).toBeVisible();
 
     await page.getByTestId("public-vera-text").fill("Quiero automatizar consultas por WhatsApp");

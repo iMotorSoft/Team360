@@ -140,7 +140,7 @@ test.describe("Diagnosticador Loader Demo", () => {
     expect(embedBefore).toBeNull();
     expect(veraBefore).toBeNull();
 
-    await expect(page.getByTestId("embed-demo-wrapper")).toBeVisible();
+    await expect(page.getByTestId("vera-embed-wrapper")).toBeVisible();
     await expect(page.getByTestId("diagnosticador-core")).toBeVisible();
     await expect(page.getByTestId("public-vera-text")).toBeVisible();
 

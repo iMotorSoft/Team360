@@ -97,14 +97,14 @@ test.describe("Diagnosticador Script Demo", () => {
     expect(embedBefore).toBeNull();
     expect(veraBefore).toBeNull();
 
-    await expect(page.getByTestId("embed-demo-wrapper")).toBeVisible();
+    await expect(page.getByTestId("vera-embed-wrapper")).toBeVisible();
     await page.getByTestId("script-demo-destroy-button").click();
     await expect(page.getByTestId("script-demo-status")).toHaveText("destroyed");
-    await expect(page.getByTestId("embed-demo-wrapper")).toHaveCount(0);
+    await expect(page.getByTestId("vera-embed-wrapper")).toHaveCount(0);
 
     await page.getByTestId("script-demo-mount-button").click();
     await expect(page.getByTestId("script-demo-status")).toHaveText("mounted");
-    await expect(page.getByTestId("embed-demo-wrapper")).toBeVisible();
+    await expect(page.getByTestId("vera-embed-wrapper")).toBeVisible();
     await expect(page.getByTestId("diagnosticador-core")).toBeVisible();
     await expect(page.getByTestId("public-vera-text")).toBeVisible();
 
