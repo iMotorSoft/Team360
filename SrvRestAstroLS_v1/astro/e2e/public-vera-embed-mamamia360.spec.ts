@@ -275,12 +275,19 @@ test.describe("Mamamia360 embed — Vera diagnosticador embebible", () => {
 
       await input.fill(msg);
       await expect(submit).toBeEnabled();
+      const turnResponse = page.waitForResponse(
+        (response) =>
+          response.url().includes(DIAGNOSIS_ENDPOINT) &&
+          response.request().method() === "POST",
+        { timeout: 90_000 },
+      );
       await submit.click();
-      await expect(
-        isInitial
-          ? page.getByTestId("public-vera-chat-input")
-          : page.getByTestId("public-vera-chat-input"),
-      ).toBeEnabled({ timeout: 90_000 });
+      const response = await turnResponse;
+      expect(response.status(), "diagnosis turn HTTP status").toBeLessThan(500);
+      await expect(page.getByTestId("public-vera-chat-input")).toBeEnabled({ timeout: 90_000 });
+      await expect(page.getByTestId("public-vera-chat-submit")).toHaveText("Enviar", {
+        timeout: 90_000,
+      });
     }
 
     for (const text of responseTexts) {
