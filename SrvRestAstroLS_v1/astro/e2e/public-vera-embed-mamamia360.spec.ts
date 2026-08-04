@@ -316,6 +316,96 @@ test.describe("Mamamia360 embed — Vera diagnosticador embebible", () => {
     }
   });
 
+  test("single-choice options are visible, selectable, and advance the conversation", async ({ page }) => {
+    test.setTimeout(240_000);
+
+    const consoleErrors: string[] = [];
+    const failedRequests: string[] = [];
+    const hostEmbedRequests: string[] = [];
+
+    page.on("console", (message) => {
+      if (message.type() === "error") consoleErrors.push(message.text());
+    });
+    page.on("pageerror", (error) => consoleErrors.push(error.message));
+    page.on("request", (request) => {
+      if (request.url().includes("mamamia360.com/embed/")) {
+        hostEmbedRequests.push(request.url());
+      }
+    });
+    page.on("requestfailed", (request) => {
+      if (request.url().includes("team360.live")) {
+        failedRequests.push(`${request.method()} ${request.url()} ${request.failure()?.errorText ?? "unknown"}`);
+      }
+    });
+
+    await page.goto("/embed-demo/mamamia360.html");
+    await expect(page.getByTestId("vera-embed-wrapper")).toBeVisible({ timeout: 15_000 });
+
+    const sendTextTurn = async (message: string, initial = false) => {
+      const input = page.getByTestId(initial ? "public-vera-text" : "public-vera-chat-input");
+      const submit = page.getByTestId(initial ? "public-vera-submit" : "public-vera-chat-submit");
+      await input.fill(message);
+      await expect(submit).toBeEnabled();
+      const turnResponse = page.waitForResponse(
+        (response) => response.url().includes(DIAGNOSIS_ENDPOINT)
+          && response.request().method() === "POST",
+        { timeout: 90_000 },
+      );
+      await submit.click();
+      expect((await turnResponse).status()).toBeLessThan(500);
+      await expect(page.getByTestId("public-vera-chat-input")).toBeEnabled({ timeout: 90_000 });
+    };
+
+    await sendTextTurn("Vendo tortas", true);
+    await sendTextTurn("Por whatsapp");
+
+    const question = "¿Dónde se registran y siguen hoy las consultas?";
+    const block = page.getByTestId("t360-block-single_choice").filter({ hasText: question }).last();
+    await expect(block).toBeVisible({ timeout: 90_000 });
+
+    const option = block.getByText("Solo en WhatsApp Business", { exact: true });
+    const optionCard = option.locator("xpath=ancestor::label");
+    const continueButton = block.getByTestId("t360-single-submit");
+
+    await expect(optionCard).toBeVisible();
+    await expect(continueButton).toBeVisible();
+    await expect(continueButton).toBeDisabled();
+
+    const optionBox = await optionCard.boundingBox();
+    expect(optionBox).not.toBeNull();
+    expect(optionBox!.width).toBeGreaterThan(250);
+    expect(optionBox!.height).toBeGreaterThan(32);
+    expect(await optionCard.evaluate((element) => getComputedStyle(element).display)).not.toBe("inline");
+
+    await optionCard.click();
+    await expect(optionCard.locator("input")).toBeChecked();
+    await expect(continueButton).toBeEnabled();
+    await expect(optionCard).toHaveCSS("border-color", "rgb(22, 139, 136)");
+    await expect(optionCard).toHaveCSS("background-color", "rgb(230, 245, 243)");
+
+    const previousAssistantMessages = await page.getByTestId("public-vera-assistant-message").count();
+    const interactionResponse = page.waitForResponse(
+      (response) => response.url().includes(DIAGNOSIS_ENDPOINT)
+        && response.request().method() === "POST",
+      { timeout: 90_000 },
+    );
+    await continueButton.click();
+    expect((await interactionResponse).status()).toBeLessThan(500);
+    await expect(page.getByTestId("public-vera-assistant-message")).toHaveCount(
+      previousAssistantMessages + 1,
+      { timeout: 90_000 },
+    );
+    await expect(page.getByTestId("public-vera-error")).toHaveCount(0);
+
+    const visibleText = await page.locator("body").innerText();
+    for (const forbidden of ["Turno", "svc_sales_diagnosis", "sessionId"]) {
+      expect(visibleText).not.toContain(forbidden);
+    }
+    expect(hostEmbedRequests).toEqual([]);
+    expect(failedRequests).toEqual([]);
+    expect(criticalConsoleErrors(consoleErrors)).toEqual([]);
+  });
+
   test("embed auth does not leak sensitive data", async ({ page }) => {
     const capturedBodies: Record<string, unknown>[] = [];
 

@@ -94,6 +94,36 @@
 .t360-vera-embed .animate-pulse{display:inline-block;width:.5rem;height:.5rem;background:#168b88;border-radius:50%;margin-right:.5rem;animation:t360-pulse 1.4s infinite}\
 @keyframes t360-pulse{0%,100%{opacity:1}50%{opacity:.3}}\
 .t360-vera-embed [data-testid=public-vera-error]{background:#fff7f7!important;border:1px solid #f3c7c7!important;border-radius:1rem!important;padding:.75rem 1rem!important;margin-top:.75rem!important;font-size:.85rem!important;color:#8f3940!important;line-height:1.4!important}\
+.t360-vera-embed [data-testid=t360-interaction-block]{display:block!important;width:100%!important;margin-top:.75rem!important}\
+.t360-vera-embed [data-testid^=t360-block-]{display:block!important;width:100%!important;margin:.75rem 0 0!important;padding:0!important;border:1px solid #c9dcdd!important;border-radius:1rem!important;background:#fff!important;box-shadow:0 4px 16px rgba(16,45,79,.06)!important;overflow:hidden!important;color:#203c55!important}\
+.t360-vera-embed [data-testid^=t360-block-]>.card-body{display:flex!important;flex-direction:column!important;gap:.75rem!important;padding:1rem!important}\
+.t360-vera-embed [data-testid^=t360-block-] h2,.t360-vera-embed [data-testid^=t360-block-] h3{margin:0!important;color:#153854!important;font-family:inherit!important;line-height:1.45!important}\
+.t360-vera-embed [data-testid^=t360-block-] h2{font-size:1rem!important;font-weight:700!important}\
+.t360-vera-embed [data-testid^=t360-block-] h3{font-size:.88rem!important;font-weight:650!important}\
+.t360-vera-embed [data-testid^=t360-block-] p{margin:0!important;font-family:inherit!important}\
+.t360-vera-embed [data-testid^=t360-block-] .badge{display:inline-flex!important;align-items:center!important;width:max-content!important;max-width:100%!important;padding:.25rem .55rem!important;border:1px solid #c9dcdd!important;border-radius:9999px!important;background:#f7fbfa!important;color:#476275!important;font-size:.65rem!important;font-weight:700!important;line-height:1.2!important}\
+.t360-vera-embed [data-testid^=t360-block-] .badge-primary{border-color:#168b88!important;background:#e6f5f3!important;color:#126d6b!important}\
+.t360-vera-embed [data-testid^=t360-option-]{position:relative!important;display:block!important;width:100%!important;min-height:3rem!important;margin:0!important;padding:.85rem 1rem!important;border:1px solid #c9dcdd!important;border-radius:.9rem!important;background:#fff!important;color:#203c55!important;cursor:pointer!important;line-height:1.4!important;transition:border-color .15s,background-color .15s,box-shadow .15s!important}\
+.t360-vera-embed [data-testid^=t360-option-]+[data-testid^=t360-option-]{margin-top:.5rem!important}\
+.t360-vera-embed [data-testid^=t360-option-]:hover{border-color:#168b88!important;background:#f7fbfa!important}\
+.t360-vera-embed [data-testid^=t360-option-]:has(input:checked){border-color:#168b88!important;background:#e6f5f3!important;box-shadow:0 0 0 3px rgba(22,139,136,.14)!important}\
+.t360-vera-embed [data-testid^=t360-option-]:has(input:focus-visible){border-color:#168b88!important;box-shadow:0 0 0 3px rgba(22,139,136,.2)!important;outline:none!important}\
+.t360-vera-embed [data-testid^=t360-option-]:has(input:disabled){opacity:.55!important;cursor:not-allowed!important}\
+.t360-vera-embed [data-testid^=t360-option-]>input{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;border:0!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;overflow:hidden!important;white-space:nowrap!important}\
+.t360-vera-embed [data-testid^=t360-option-]>span{display:flex!important;align-items:flex-start!important;gap:.75rem!important;width:100%!important}\
+.t360-vera-embed [data-testid^=t360-option-]>span>span:first-child{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 1.25rem!important;width:1.25rem!important;height:1.25rem!important;margin-top:.08rem!important;border:1px solid #9fb9bc!important;background:#fff!important;color:#fff!important}\
+.t360-vera-embed [data-testid^=t360-option-]:has(input[type=radio])>span>span:first-child{border-radius:50%!important}\
+.t360-vera-embed [data-testid^=t360-option-]:has(input[type=checkbox])>span>span:first-child{border-radius:.3rem!important}\
+.t360-vera-embed [data-testid^=t360-option-]:has(input:checked)>span>span:first-child{border-color:#168b88!important;background:#168b88!important}\
+.t360-vera-embed [data-testid^=t360-option-]>span>span:last-child{display:block!important;min-width:0!important;flex:1!important}\
+.t360-vera-embed [data-testid^=t360-option-]>span>span:last-child>span:first-child{display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:space-between!important;gap:.4rem!important}\
+.t360-vera-embed [data-testid^=t360-option-] span{font-family:inherit!important}\
+.t360-vera-embed [data-testid=t360-single-submit],.t360-vera-embed [data-testid=t360-multi-submit],.t360-vera-embed [data-testid^=t360-action-]{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;min-height:2.5rem!important;padding:.55rem 1.15rem!important;border:1px solid #168b88!important;border-radius:9999px!important;background:#168b88!important;color:#fff!important;font-size:.82rem!important;font-weight:700!important;line-height:1.2!important;cursor:pointer!important}\
+.t360-vera-embed [data-testid=t360-single-submit],.t360-vera-embed [data-testid=t360-multi-submit]{width:100%!important}\
+.t360-vera-embed [data-testid^=t360-block-] button.btn-secondary,.t360-vera-embed [data-testid^=t360-block-] button.btn-outline,.t360-vera-embed [data-testid^=t360-block-] button.btn-ghost{border-color:#c9dcdd!important;background:#fff!important;color:#476275!important}\
+.t360-vera-embed [data-testid^=t360-block-] button:hover:not(:disabled){filter:brightness(.94)!important}\
+.t360-vera-embed [data-testid^=t360-block-] button:disabled{opacity:.45!important;cursor:not-allowed!important;filter:none!important}\
+.t360-vera-embed [data-testid=t360-block-missing_requirements] article,.t360-vera-embed [data-testid=t360-block-product_fit_card] .rounded-box,.t360-vera-embed [data-testid=t360-block-diagnosis_summary] .rounded-box{display:block!important;padding:.75rem!important;border:1px solid #dbe7e9!important;border-radius:.8rem!important;background:#fbfdfc!important}\
 .vera-embed-footer{text-align:center;margin-top:1.25rem;padding-top:.75rem;font-size:.62rem;color:#9bb2be;letter-spacing:.04em;border-top:1px solid #edf2f3}\
 .vera-embed-footer strong{color:#5b7283;font-weight:600}\
 @media(max-width:640px){.t360-vera-embed{padding:.5rem}.t360-vera-embed [data-testid=diagnosticador-core]{padding:1rem!important;border-radius:1rem}.t360-vera-embed [data-testid=public-vera-text]{min-height:6rem!important}}\
