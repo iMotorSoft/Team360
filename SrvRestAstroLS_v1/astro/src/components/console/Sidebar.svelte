@@ -41,7 +41,7 @@
     <a class="flex items-center gap-3" href="/" translate="no">
       <span
         class="h-14 w-14 shrink-0 bg-contain bg-center bg-no-repeat"
-        style={`background-image: url('${team360Logo}')`}
+        style={`background-image: url('${team360Logo.src}')`}
         aria-hidden="true"
       ></span>
       <span>

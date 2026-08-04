@@ -69,6 +69,45 @@ test.describe("Console shell E2E - shell funcional", () => {
     await expect(page).toHaveURL(/\/w\/ws-carmel-retail/);
   });
 
+  test("logo del sidebar carga correctamente sin errores", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", (msg) => { if (msg.type() === "error") errors.push(msg.text()); });
+    page.on("requestfailed", (req) => { if (req.url().includes("object%20Object")) errors.push(`Failed: ${req.url()}`); });
+
+    await openConsole(page, "/w/ws-team360-control/team");
+
+    const logo = page.locator("aside").getByRole("link", { name: /Team360/ }).locator("span[aria-hidden]").first();
+    await expect(logo).toBeVisible();
+
+    const bgImage = await logo.evaluate((el) => el.style.backgroundImage);
+    expect(bgImage).toContain("url(");
+    expect(bgImage).not.toContain("[object Object]");
+    expect(bgImage).not.toContain("undefined");
+    expect(bgImage).not.toContain("null");
+    expect(bgImage).toMatch(/\/_astro\/team360_logo/);
+
+    const urlMatch = bgImage.match(/url\(["']?([^"')]+)["']?\)/);
+    expect(urlMatch).toBeTruthy();
+    const imageUrl = urlMatch![1];
+
+    const response = await page.request.get(imageUrl);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toMatch(/^image\//);
+
+    const loaded = await page.evaluate((imgUrl) => {
+      const img = new Image();
+      return new Promise<{ w: number; h: number }>((res, rej) => {
+        img.onload = () => res({ w: img.naturalWidth, h: img.naturalHeight });
+        img.onerror = () => rej(new Error("Image load failed"));
+        img.src = imgUrl;
+      });
+    }, imageUrl);
+    expect(loaded.w).toBeGreaterThan(0);
+    expect(loaded.h).toBeGreaterThan(0);
+
+    expect(errors.filter((e) => !e.includes("favicon"))).toHaveLength(0);
+  });
+
   test("drawer mobile abre y cierra con overlay", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openConsole(page);
