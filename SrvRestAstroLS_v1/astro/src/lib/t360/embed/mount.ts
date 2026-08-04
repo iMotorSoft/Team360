@@ -1,5 +1,21 @@
-import { mount, unmount, type ComponentProps } from "svelte";
+import { mount, unmount, type Component } from "svelte";
 import VeraEmbedWrapper from "../diagnosticador/VeraEmbedWrapper.svelte";
+
+// Props accepted by VeraEmbedWrapper (mirrors its $props declaration).
+type VeraEmbedWrapperProps = {
+  clientId: string;
+  apiBaseUrl: string;
+  assistantName?: string;
+  compact?: boolean;
+  initialMessage?: string;
+  sessionStorageKey?: string;
+};
+
+// svelte2tsx + TypeScript 6 generate an unusable type for the .svelte module
+// (resolves to `Error`), so `ComponentProps<typeof VeraEmbedWrapper>` and the
+// plain `mount(VeraEmbedWrapper, ...)` call fail type-checking. Cast the
+// component to its real Svelte 5 `Component` shape — runtime is unchanged.
+const VeraEmbedWrapperComponent = VeraEmbedWrapper as unknown as Component<VeraEmbedWrapperProps>;
 
 export type Team360DiagnosticadorMountConfig = {
   clientId: string;
@@ -91,7 +107,7 @@ function assertForbiddenKeys(config: Record<string, unknown>): void {
 
 function buildWrapperProps(
   rawConfig: Team360DiagnosticadorMountConfig,
-): ComponentProps<typeof VeraEmbedWrapper> {
+): VeraEmbedWrapperProps {
   const config = rawConfig as Record<string, unknown>;
   assertForbiddenKeys(config);
 
@@ -111,7 +127,7 @@ export function mountTeam360Diagnosticador(
 ): Team360DiagnosticadorMountHandle {
   const target = resolveMountTarget(container);
   const props = buildWrapperProps(config);
-  const instance = mount(VeraEmbedWrapper, {
+  const instance = mount(VeraEmbedWrapperComponent, {
     target,
     props,
   });
