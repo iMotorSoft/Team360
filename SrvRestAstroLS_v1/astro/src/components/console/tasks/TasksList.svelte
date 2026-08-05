@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatusBadge } from "../../ui";
+  import { Card, EmptyState, SectionHeader, StatusBadge } from "../../ui";
   import { formatDate } from "../../../lib/formatters";
   import { getAccessibleWorkspaceIds, getWorkspaceName, services, tasks } from "../../../lib/mock";
   import { deriveConsoleAudience } from "../../../lib/navigation/derive";
@@ -27,7 +27,7 @@
 
   <div class="mt-7 space-y-3">
     {#each visibleTasks as task}
-      <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+      <Card variant="flat">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div class="flex flex-wrap gap-2">
@@ -35,14 +35,20 @@
               <StatusBadge status={task.status} />
             </div>
             <h2 class="mt-3 text-sm font-bold text-[#31536b]">{task.title}</h2>
-            <p class="mt-2 text-xs leading-5 text-[#78909f]">{serviceName(task.serviceId)} · {getWorkspaceName(task.workspaceId)}</p>
+            <p class="mt-2 text-sm leading-5 text-[#78909f]">{serviceName(task.serviceId)} · {getWorkspaceName(task.workspaceId)}</p>
           </div>
-          <dl class="grid shrink-0 grid-cols-2 gap-3 rounded-xl bg-[#f8fbfa] p-3 text-xs sm:min-w-[19rem]">
-            <div><dt class="text-[#91a2ad]">Responsable</dt><dd class="mt-1 font-bold text-[#587184]">{task.assigneeLabel}</dd></div>
-            <div><dt class="text-[#91a2ad]">Vencimiento</dt><dd class="mt-1 font-bold text-[#587184]">{formatDate(task.dueDate, consoleContext.locale)}</dd></div>
+          <dl class="flex shrink-0 flex-col divide-y divide-[#edf1f2] rounded-2xl border border-[#edf1f2] bg-[#fcfdfd] overflow-hidden sm:flex-row sm:divide-y-0 sm:divide-x lg:min-w-[20rem]">
+            <div class="flex-1 p-4">
+              <dt class="text-xs font-bold uppercase tracking-wider text-[#91a2ad]">Responsable</dt>
+              <dd class="mt-1 text-sm font-bold text-[#587184]">{task.assigneeLabel}</dd>
+            </div>
+            <div class="flex-1 p-4">
+              <dt class="text-xs font-bold uppercase tracking-wider text-[#91a2ad]">Vencimiento</dt>
+              <dd class="mt-1 text-sm font-bold text-[#587184]">{formatDate(task.dueDate, consoleContext.locale)}</dd>
+            </div>
           </dl>
         </div>
-      </article>
+      </Card>
     {/each}
     {#if visibleTasks.length === 0}
       <EmptyState
