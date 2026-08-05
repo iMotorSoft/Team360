@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, DataTable, EmptyState, SectionHeader, StatusBadge } from "../../ui";
+  import { Card, EmptyState, SectionHeader, StatusBadge } from "../../ui";
   import { formatDateTime } from "../../../lib/formatters";
   import { getAccessibleWorkspaceIds, getWorkspaceName, reports, services } from "../../../lib/mock";
   import { deriveConsoleAudience } from "../../../lib/navigation/derive";
@@ -40,58 +40,68 @@
   {#if visibleReports.length > 0}
     <div class="mt-7 grid gap-3 md:hidden">
       {#each visibleReports as report}
-        <article class="rounded-2xl border border-[#e0e8ea] bg-white p-4">
+        <Card variant="flat">
           <div class="flex items-start justify-between gap-3">
             <div>
               <h2 class="text-sm font-bold text-[#31536b]">{report.title}</h2>
-              <p class="mt-1 text-xs text-[#91a2ad]">{reportTypeLabel(report.type)} · {report.generatedAt ? formatDateTime(report.generatedAt, consoleContext.locale) : "Generación pendiente"}</p>
+              <p class="mt-1 text-sm text-[#91a2ad]">{reportTypeLabel(report.type)} · {report.generatedAt ? formatDateTime(report.generatedAt, consoleContext.locale) : "Generación pendiente"}</p>
             </div>
             <StatusBadge status={report.status} />
           </div>
-          <dl class="mt-4 space-y-2 border-t border-[#edf1f2] pt-3 text-xs">
+          <dl class="mt-4 space-y-2 border-t border-[#edf1f2] pt-3 text-sm">
             <div><dt class="text-[#91a2ad]">Servicio</dt><dd class="mt-1 font-semibold text-[#587184]">{serviceName(report.serviceId)}</dd></div>
             <div><dt class="text-[#91a2ad]">Período</dt><dd class="mt-1 font-semibold text-[#587184]">{report.period}</dd></div>
             <div><dt class="text-[#91a2ad]">Workspace</dt><dd class="mt-1 font-semibold text-[#587184]">{getWorkspaceName(report.workspaceId)}</dd></div>
           </dl>
-          <Button class="mt-4" disabled size="sm" variant="secondary">
+          <button
+            class="mt-4 rounded-full border border-[#d5e4e4] px-3 py-1.5 text-xs font-bold text-[#78909f]"
+            disabled
+            type="button"
+          >
             {report.status === "ready" ? "Descarga no disponible en mock" : "Preparación en curso"}
-          </Button>
-        </article>
+          </button>
+        </Card>
       {/each}
     </div>
-    <DataTable class="mt-7 hidden md:block" label="Reportes disponibles">
-      <table class="w-full min-w-[58rem] text-start text-sm">
-        <thead class="bg-[#f4f8f8] text-[0.65rem] uppercase tracking-[0.15em] text-[#78909f]">
-          <tr>
-            <th class="px-5 py-3 text-start">Reporte</th>
-            <th class="px-5 py-3 text-start">Servicio</th>
-            <th class="px-5 py-3 text-start">Período</th>
-            <th class="px-5 py-3 text-start">Workspace</th>
-            <th class="px-5 py-3 text-start">Estado</th>
-            <th class="px-5 py-3 text-start">Acción mock</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[#edf1f2]">
-          {#each visibleReports as report}
-            <tr class="text-[#567184]">
-              <td class="px-5 py-4">
-                <p class="font-bold text-[#31536b]">{report.title}</p>
-                <p class="mt-1 text-xs text-[#91a2ad]">{reportTypeLabel(report.type)} · {report.generatedAt ? formatDateTime(report.generatedAt, consoleContext.locale) : "Generación pendiente"}</p>
-              </td>
-              <td class="px-5 py-4 text-xs font-semibold">{serviceName(report.serviceId)}</td>
-              <td class="px-5 py-4 text-xs">{report.period}</td>
-              <td class="px-5 py-4 text-xs">{getWorkspaceName(report.workspaceId)}</td>
-              <td class="px-5 py-4"><StatusBadge status={report.status} /></td>
-              <td class="px-5 py-4">
-                <Button disabled size="sm" variant="secondary">
-                  {report.status === "ready" ? "Descarga no disponible en mock" : "Preparación en curso"}
-                </Button>
-              </td>
+    <Card tag="div" variant="large" class="mt-7 hidden overflow-hidden md:block p-0">
+      <div class="overflow-x-auto" role="region" aria-label="Reportes disponibles" tabindex="0">
+        <table class="w-full min-w-[58rem] text-start text-sm">
+          <thead class="bg-[#f4f8f8] text-xs font-bold uppercase tracking-[0.15em] text-[#78909f]">
+            <tr>
+              <th scope="col" class="px-5 py-3 text-start">Reporte</th>
+              <th scope="col" class="px-5 py-3 text-start">Servicio</th>
+              <th scope="col" class="px-5 py-3 text-start">Período</th>
+              <th scope="col" class="px-5 py-3 text-start">Workspace</th>
+              <th scope="col" class="px-5 py-3 text-start">Estado</th>
+              <th scope="col" class="px-5 py-3 text-start">Acción mock</th>
             </tr>
-          {/each}
-        </tbody>
-      </table>
-    </DataTable>
+          </thead>
+          <tbody class="divide-y divide-[#edf1f2]">
+            {#each visibleReports as report}
+              <tr class="text-[#567184]">
+                <td class="px-5 py-4">
+                  <p class="font-bold text-[#31536b]">{report.title}</p>
+                  <p class="mt-1 text-xs text-[#91a2ad]">{reportTypeLabel(report.type)} · {report.generatedAt ? formatDateTime(report.generatedAt, consoleContext.locale) : "Generación pendiente"}</p>
+                </td>
+                <td class="px-5 py-4 text-sm font-semibold">{serviceName(report.serviceId)}</td>
+                <td class="px-5 py-4 text-sm">{report.period}</td>
+                <td class="px-5 py-4 text-sm">{getWorkspaceName(report.workspaceId)}</td>
+                <td class="px-5 py-4"><StatusBadge status={report.status} /></td>
+                <td class="px-5 py-4">
+                  <button
+                    class="rounded-full border border-[#d5e4e4] px-3 py-1.5 text-xs font-bold text-[#78909f]"
+                    disabled
+                    type="button"
+                  >
+                    {report.status === "ready" ? "Descarga no disponible en mock" : "Preparación en curso"}
+                  </button>
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </Card>
   {:else}
     <EmptyState
       class="mt-7"

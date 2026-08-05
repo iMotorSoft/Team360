@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader } from "../../ui";
-  import { alerts, getAccessibleWorkspaceIds, getWorkspaceName, services, type AlertType } from "../../../lib/mock";
+  import { SectionHeader } from "../../ui";
+  import { alerts, getAccessibleWorkspaceIds, type AlertType } from "../../../lib/mock";
   import { deriveConsoleAudience } from "../../../lib/navigation/derive";
   import { consoleContext } from "../../../stores/consoleContext.svelte";
   import AlertCard from "./AlertCard.svelte";
@@ -17,10 +17,6 @@
     { type: "approval", title: "Aprobaciones pendientes", description: "Acciones que conservan revisión humana antes de continuar." },
     { type: "technical", title: "Alertas técnicas", description: "Configuraciones o estados operativos que requieren seguimiento." },
   ];
-
-  function serviceName(serviceId: string) {
-    return services.find(({ id }) => id === serviceId)?.name ?? "Servicio no disponible";
-  }
 </script>
 
 <section>
@@ -33,21 +29,22 @@
   <div class="mt-7 space-y-6">
     {#each sections as section}
       <section>
-        <h2 class="text-lg font-bold tracking-[-0.03em] text-[#173b5b]">{section.title}</h2>
-        <p class="mt-1 text-xs leading-5 text-[#78909f]">{section.description}</p>
-        <div class="mt-3 space-y-3">
+        <h2 class="text-xl font-bold tracking-[-0.03em] text-[#173b5b]">{section.title}</h2>
+        <p class="mt-1 text-sm leading-5 text-[#78909f]">{section.description}</p>
+        <div class="mt-4 space-y-3">
           {#each visibleAlerts.filter(({ type }) => type === section.type) as alert}
             <AlertCard
               {alert}
-              contextLabel={`${serviceName(alert.serviceId)} · ${getWorkspaceName(alert.workspaceId)}`}
+              cardVariant="flat"
+              showStatus
+              showService
+              showWorkspace
               showAction
             />
           {:else}
-            <EmptyState
-              compact
-              title="Sin alertas de este tipo"
-              description="No hay situaciones registradas para esta categoría dentro del alcance visible."
-            />
+            <p class="rounded-2xl border border-dashed border-[#d7e3e5] bg-white/60 p-4 text-sm text-[#8396a2]">
+              Sin alertas de este tipo en el alcance visible.
+            </p>
           {/each}
         </div>
       </section>
