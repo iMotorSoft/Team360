@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EmptyState, SectionHeader, StatusBadge } from "../../ui";
+  import { Card, EmptyState, SectionHeader, StatusBadge } from "../../ui";
   import { formatDateTime, formatDuration } from "../../../lib/formatters";
   import { getAccessibleWorkspaceIds, runs, services } from "../../../lib/mock";
   import { consoleContext } from "../../../stores/consoleContext.svelte";
@@ -25,7 +25,7 @@
   {#if consoleContext.bootstrap.uiHints.technicalDepth !== "business"}
     <div class="mt-7 space-y-3">
       {#each visibleRuns as run}
-        <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+        <Card variant="flat">
           <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <div class="flex flex-wrap gap-2">
@@ -33,16 +33,25 @@
                 <StatusBadge status={run.health} />
               </div>
               <h2 class="mt-3 text-sm font-bold text-[#31536b]">{run.workerName}</h2>
-              <p class="mt-1 text-xs text-[#8396a2]">{serviceName(run.serviceId)}</p>
-              <p class="mt-3 text-xs leading-5 text-[#668092]">{run.summary}</p>
+              <p class="mt-1 text-sm text-[#8396a2]">{serviceName(run.serviceId)}</p>
+              <p class="mt-3 text-sm leading-5 text-[#668092]">{run.summary}</p>
             </div>
-            <dl class="grid shrink-0 grid-cols-3 gap-3 rounded-xl bg-[#f8fbfa] p-3 text-xs xl:min-w-[23rem]">
-              <div><dt class="text-[#91a2ad]">Inicio</dt><dd class="mt-1 font-bold text-[#587184]">{formatDateTime(run.startedAt, consoleContext.locale)}</dd></div>
-              <div><dt class="text-[#91a2ad]">Duración</dt><dd class="mt-1 font-bold text-[#587184]">{formatDuration(run.durationSeconds, consoleContext.locale)}</dd></div>
-              <div><dt class="text-[#91a2ad]">Errores</dt><dd class="mt-1 font-bold text-[#587184]">{run.errorCount}</dd></div>
+            <dl class="flex shrink-0 flex-col divide-y divide-[#edf1f2] rounded-2xl border border-[#edf1f2] bg-[#fcfdfd] overflow-hidden sm:flex-row sm:divide-y-0 sm:divide-x xl:min-w-[28rem]">
+              <div class="flex-1 p-4">
+                <dt class="text-xs font-bold uppercase tracking-wider text-[#91a2ad]">Inicio</dt>
+                <dd class="mt-1 text-sm font-bold text-[#587184]">{formatDateTime(run.startedAt, consoleContext.locale)}</dd>
+              </div>
+              <div class="flex-1 p-4">
+                <dt class="text-xs font-bold uppercase tracking-wider text-[#91a2ad]">Duración</dt>
+                <dd class="mt-1 text-sm font-bold text-[#587184]">{formatDuration(run.durationSeconds, consoleContext.locale)}</dd>
+              </div>
+              <div class="flex-1 p-4">
+                <dt class="text-xs font-bold uppercase tracking-wider text-[#91a2ad]">Errores</dt>
+                <dd class="mt-1 text-sm font-bold text-[#587184]">{run.errorCount}</dd>
+              </div>
             </dl>
           </div>
-        </article>
+        </Card>
       {/each}
       {#if visibleRuns.length === 0}
         <EmptyState
