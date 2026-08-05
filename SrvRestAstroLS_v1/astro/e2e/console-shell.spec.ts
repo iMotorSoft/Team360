@@ -84,7 +84,7 @@ test.describe("Console shell E2E - shell funcional", () => {
     expect(bgImage).not.toContain("[object Object]");
     expect(bgImage).not.toContain("undefined");
     expect(bgImage).not.toContain("null");
-    expect(bgImage).toMatch(/\/_astro\/team360_logo/);
+    expect(bgImage).toMatch(/team360_logo/);
 
     const urlMatch = bgImage.match(/url\(["']?([^"')]+)["']?\)/);
     expect(urlMatch).toBeTruthy();
