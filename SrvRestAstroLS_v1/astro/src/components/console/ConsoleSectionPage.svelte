@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BRAND } from "../global.js";
-  import { Badge, DataTable } from "../ui";
+  import { Badge, Card, DataTable } from "../ui";
   import { formatDate, formatDateTime } from "../../lib/formatters";
   import { getMockWorkspaceContext, organizations, reports, runs, services, tasks, users, workspaces } from "../../lib/mock";
   import { deriveConsoleAudience } from "../../lib/navigation/derive";
@@ -155,38 +155,40 @@
   {:else if view === "clients"}
     <div class="mt-7 grid gap-3 md:hidden">
       {#each clients as client}
-        <article class="rounded-2xl border border-[#e0e8ea] bg-white p-4">
+        <Card variant="flat">
           <div class="flex items-start justify-between gap-3">
             <div>
               <h2 class="text-sm font-bold text-[#31536b]">{client.name}</h2>
-              <p class="mt-1 text-xs text-[#8396a2]">{client.region}</p>
+              <p class="mt-1 text-sm text-[#8396a2]">{client.region}</p>
             </div>
             <Badge variant={statusVariant(client.status)} class="h-auto px-2 py-1 text-[0.62rem]">{statusLabel(client.status)}</Badge>
           </div>
-          <p class="mt-4 border-t border-[#edf1f2] pt-3 text-xs text-[#78909f]">
+          <p class="mt-4 border-t border-[#edf1f2] pt-3 text-sm text-[#78909f]">
             Workspace: {workspaces.find(({ organizationId }) => organizationId === client.id)?.name ?? "Activación pendiente"}
           </p>
-        </article>
+        </Card>
       {/each}
     </div>
-    <DataTable class="mt-7 hidden shadow-none md:block" label="Clientes visibles">
+    <Card tag="div" variant="large" class="mt-7 hidden overflow-hidden md:block p-0">
+      <div class="overflow-x-auto">
         <table class="w-full min-w-[42rem] text-start text-sm">
-          <thead class="bg-[#f4f8f8] text-[0.65rem] uppercase tracking-[0.15em] text-[#78909f]">
+          <thead class="bg-[#f4f8f8] text-xs font-bold uppercase tracking-[0.15em] text-[#78909f]">
             <tr><th class="px-5 py-3 text-start">Cliente</th><th class="px-5 py-3 text-start">Tipo</th><th class="px-5 py-3 text-start">Región</th><th class="px-5 py-3 text-start">Workspace</th><th class="px-5 py-3 text-start">Estado</th></tr>
           </thead>
           <tbody class="divide-y divide-[#edf1f2]">
             {#each clients as client}
               <tr class="text-[#567184]">
                 <td class="px-5 py-4 font-bold text-[#31536b]">{client.name}</td>
-                <td class="px-5 py-4">{client.type}</td>
-                <td class="px-5 py-4">{client.region}</td>
-                <td class="px-5 py-4">{workspaces.find(({ organizationId }) => organizationId === client.id)?.name ?? "Pendiente"}</td>
+                <td class="px-5 py-4 text-sm">{client.type}</td>
+                <td class="px-5 py-4 text-sm">{client.region}</td>
+                <td class="px-5 py-4 text-sm">{workspaces.find(({ organizationId }) => organizationId === client.id)?.name ?? "Pendiente"}</td>
                 <td class="px-5 py-4"><Badge variant={statusVariant(client.status)} class="h-auto px-2 py-1 text-[0.62rem]">{statusLabel(client.status)}</Badge></td>
               </tr>
             {/each}
           </tbody>
         </table>
-    </DataTable>
+      </div>
+    </Card>
   {:else if view === "workspaces"}
     <div class="mt-7 grid gap-3 lg:grid-cols-2">
       {#each consoleContext.bootstrap.accessibleWorkspaces as workspace}
