@@ -113,43 +113,43 @@
   {#if view === "organizations"}
     <div class="mt-7 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
       {#each consoleContext.bootstrap.accessibleOrganizations as organization}
-        <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+        <Card variant="flat">
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="text-sm font-bold text-[#284c67]">{organization.name}</p>
-              <p class="mt-1 text-xs text-[#8396a2]">{organization.type}</p>
+              <p class="mt-1 text-sm text-[#8396a2]">{organization.type}</p>
             </div>
-            <Badge variant={statusVariant(organization.status)} class="h-auto px-2 py-1 text-[0.62rem]">{statusLabel(organization.status)}</Badge>
+            <Badge variant={statusVariant(organization.status)} class="h-auto px-2 py-1 text-xs">{statusLabel(organization.status)}</Badge>
           </div>
-          <div class="mt-5 flex items-center justify-between border-t border-[#edf1f2] pt-3 text-xs text-[#78909f]">
+          <div class="mt-5 flex items-center justify-between border-t border-[#edf1f2] pt-3 text-sm text-[#78909f]">
             <span>{organization.region}</span>
             <span>{workspaces.filter(({ organizationId }) => organizationId === organization.id).length} workspace(s)</span>
           </div>
-        </article>
+        </Card>
       {/each}
     </div>
   {:else if view === "partners"}
     <div class="mt-7 grid gap-4 lg:grid-cols-2">
       {#each partners as partner}
-        <article class="rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6">
+        <Card variant="large">
           <div class="flex items-center justify-between gap-3">
             <div>
               <p class="text-lg font-bold tracking-[-0.03em] text-[#173b5b]">{partner.name}</p>
-              <p class="mt-1 text-xs text-[#8396a2]">Partner regional · {partner.region}</p>
+              <p class="mt-1 text-sm text-[#8396a2]">Partner regional · {partner.region}</p>
             </div>
-            <Badge variant={statusVariant(partner.status)} class="h-auto px-2 py-1 text-[0.62rem]">{statusLabel(partner.status)}</Badge>
+            <Badge variant={statusVariant(partner.status)} class="h-auto px-2 py-1 text-xs">{statusLabel(partner.status)}</Badge>
           </div>
           <div class="mt-5 grid grid-cols-2 gap-3">
             <div class="rounded-2xl bg-[#f3f8f8] p-3">
               <p class="text-2xl font-bold tracking-[-0.05em] text-[#173b5b]">{organizations.filter(({ parentOrganizationId }) => parentOrganizationId === partner.id).length}</p>
-              <p class="mt-1 text-xs text-[#78909f]">Clientes asociados</p>
+              <p class="mt-1 text-sm text-[#78909f]">Clientes asociados</p>
             </div>
             <div class="rounded-2xl bg-[#f3f8f8] p-3">
               <p class="text-2xl font-bold tracking-[-0.05em] text-[#173b5b]">{workspaces.filter(({ organizationId }) => organizationId === partner.id).length}</p>
-              <p class="mt-1 text-xs text-[#78909f]">Workspaces propios</p>
+              <p class="mt-1 text-sm text-[#78909f]">Workspaces propios</p>
             </div>
           </div>
-        </article>
+        </Card>
       {/each}
     </div>
   {:else if view === "clients"}
@@ -192,16 +192,16 @@
   {:else if view === "workspaces"}
     <div class="mt-7 grid gap-3 lg:grid-cols-2">
       {#each consoleContext.bootstrap.accessibleWorkspaces as workspace}
-        <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+        <Card variant="flat">
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="text-sm font-bold text-[#284c67]">{workspace.name}</p>
-              <p class="mt-1 text-xs text-[#8396a2]">{organizationForWorkspace(workspace.id)?.name}</p>
+              <p class="mt-1 text-sm text-[#8396a2]">{organizationForWorkspace(workspace.id)?.name}</p>
             </div>
-            <Badge variant={statusVariant(workspace.status)} class="h-auto px-2 py-1 text-[0.62rem]">{statusLabel(workspace.status)}</Badge>
+            <Badge variant={statusVariant(workspace.status)} class="h-auto px-2 py-1 text-xs">{statusLabel(workspace.status)}</Badge>
           </div>
-          <p class="mt-4 text-xs text-[#78909f]">{workspace.type} · {workspace.locale.toUpperCase()} · {workspace.direction}</p>
-        </article>
+          <p class="mt-4 text-sm text-[#78909f]">{workspace.type} · {workspace.locale.toUpperCase()} · {workspace.direction}</p>
+        </Card>
       {/each}
     </div>
   {:else if view === "services" || view === "client-services"}
@@ -321,14 +321,14 @@
   {:else if view === "team"}
     <div class="mt-7 grid gap-3 lg:grid-cols-2">
       {#each visibleUsers as user}
-        <article class="flex items-center gap-4 rounded-2xl border border-[#e0e8ea] bg-white p-4">
+        <Card variant="flat" class="flex items-center gap-4 p-4">
           <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-[#153b5b] text-xs font-bold text-white">{user.avatarInitials}</span>
           <div class="min-w-0">
             <p class="truncate text-sm font-bold text-[#31536b]">{user.name}</p>
             <p class="mt-1 truncate text-xs text-[#8396a2]">{user.email}</p>
-            <p class="mt-1 text-[0.68rem] font-bold uppercase tracking-[0.1em] text-[#168b88]">{user.role}</p>
+            <p class="mt-1 text-xs font-bold uppercase tracking-[0.1em] text-[#168b88]">{user.role}</p>
           </div>
-        </article>
+        </Card>
       {/each}
     </div>
   {:else if view === "support"}
