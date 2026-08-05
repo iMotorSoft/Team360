@@ -333,27 +333,27 @@
     </div>
   {:else if view === "support"}
     <div class="mt-7 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-      <section class="rounded-3xl border border-[#e0e8ea] bg-white p-5 sm:p-6">
+      <Card tag="section" variant="large">
         <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#168b88]">Solicitudes recientes</p>
         <div class="mt-4 space-y-3">
           {#each context.tasks.slice(0, 4) as task}
-            <article class="rounded-xl border border-[#edf1f2] px-3 py-3">
-              <p class="text-xs font-bold text-[#36566f]">{task.title}</p>
-              <p class="mt-1 text-[0.68rem] text-[#8a9ba6]">Seguimiento contextual · {task.status}</p>
-            </article>
+            <Card variant="mini" class="px-3 py-3">
+              <p class="text-sm font-bold text-[#36566f]">{task.title}</p>
+              <p class="mt-1 text-xs text-[#8a9ba6]">Seguimiento contextual · {task.status}</p>
+            </Card>
           {:else}
-            <p class="rounded-xl bg-[#f4f8f8] p-4 text-xs text-[#718793]">No hay solicitudes abiertas.</p>
+            <p class="rounded-xl bg-[#f4f8f8] p-4 text-sm text-[#718793]">No hay solicitudes abiertas.</p>
           {/each}
         </div>
-      </section>
-      <section class="rounded-3xl bg-[#123653] p-5 text-white sm:p-6">
+      </Card>
+      <Card variant="dark">
         <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#86ddd5]">Escalamiento</p>
         <h2 class="mt-3 text-xl font-bold tracking-[-0.035em]">Soporte Team360</h2>
         <p class="mt-3 text-sm leading-6 text-white/70">Comparte el contexto activo, el servicio afectado y la evidencia necesaria para acelerar el seguimiento.</p>
-        <a class="mt-5 inline-flex rounded-full bg-[#72d9cf] px-4 py-2 text-xs font-bold text-[#123653] transition hover:bg-white" href={`mailto:${BRAND.supportEmail}`}>
+        <a class="mt-5 inline-flex rounded-full bg-[#72d9cf] px-4 py-2 text-sm font-bold text-[#123653] transition hover:bg-white" href={`mailto:${BRAND.supportEmail}`}>
           {BRAND.supportEmail}
         </a>
-      </section>
+      </Card>
     </div>
   {:else if view === "settings"}
     <div class="mt-7 grid gap-4 lg:grid-cols-2">
