@@ -234,12 +234,12 @@
     <div class="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {#each context.services as service}
         {#each service.metrics as metric}
-          <article class="rounded-2xl border border-[#e0e8ea] bg-white p-5">
+          <Card variant="flat">
             <p class="text-xs font-bold uppercase tracking-[0.14em] text-[#78909f]">{service.name}</p>
             <p class="mt-4 text-3xl font-bold tracking-[-0.06em] text-[#173b5b]">{metric.value}</p>
             <p class="mt-2 text-sm font-semibold text-[#587184]">{metric.label}</p>
             {#if metric.trend}<p class="mt-2 text-xs font-bold text-[#168b88]">{metric.trend}</p>{/if}
-          </article>
+          </Card>
         {/each}
       {/each}
     </div>
