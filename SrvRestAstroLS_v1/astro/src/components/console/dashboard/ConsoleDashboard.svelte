@@ -149,8 +149,8 @@
         {#if audience === "owner" || audience === "operator"}
           {#each visibleRuns.slice(0, 4) as run}
             <Card variant="mini" class="flex items-center justify-between gap-3 px-3 py-3">
-              <div>
-                <p class="text-sm font-bold text-[#36566f]">{run.workerName}</p>
+              <div class="min-w-0">
+                <p class="[overflow-wrap:anywhere] text-sm font-bold text-[#36566f]">{run.workerName}</p>
                 <p class="mt-1 text-xs text-[#8a9ba6]">{run.summary}</p>
               </div>
               <StatusBadge status={run.status} />
