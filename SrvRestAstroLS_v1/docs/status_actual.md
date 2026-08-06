@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-04 (contrato CORS de embeds cross-origin)
+Ultima actualizacion: 2026-08-06 (Stage 9: consolidacion UX + regresion protegida)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,90 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Stage 9 2026-08-06 — consolidacion UX, sincronizacion de estado y regresion protegida
+
+Estado: CONSOLIDADO. Documentacion canonica y documento consolidado UX creados;
+regresion Console ejecutada; pendiente `public-vera.spec.ts:230` verificado como
+resuelto; un bloqueo ambiental de Milvus documentado con evidencia.
+
+### Estado Git
+
+- rama: `feature/console-backend-core`;
+- HEAD inicial: `a89924a` (docs Stage 8);
+- HEAD final: `a89924a + 1 commit nuevo` (fix overflow dashboard);
+- worktree inicial: limpio; worktree final: limpio (todo commiteado);
+- push: no realizado.
+
+### Migracion UX Stages 1-8 (relevada y consolidada)
+
+- Stage 1 foundation visual: `5d8ca08` (tokens global.css) + `docs/ux/team360-console-design-handoff-stage-1-audit.md`;
+- Stage 2 shell funcional: `546e945` + `team360-console-design-handoff-stage-2-shell.md`;
+- Stage 3 componentes compartidos: `807a9a4` + `team360-console-design-handoff-stage-3-components.md`;
+- Gate 3B serving DEV del embed: `7527a24` + `docs/diagnosticador_embed_dev_serving_v1.md`;
+- Gate 3C logo del Sidebar: `b6f152c`; Gate 3D alineacion del test del logo: `3ae1258`;
+- Stage 4 Clients/Dashboard/Reportes/Alertas: `847f37f`, `e17b60b`, `f4f6669` + `team360-console-design-handoff-stage-4-screens.md`;
+- Stage 5 Operacion (services, tasks, runs, workers): `30119fa`, `40003e7`, `dcacbd8` + `team360-console-design-handoff-stage-5-operation.md`;
+- Stage 6 Organizacion (organizations, partners, workspaces, team): `a09aa4b`, `c20c2b7` + `team360-console-design-handoff-stage-6-organization.md`;
+- Stage 7 Settings y Support: `a511be9`, `80085fe` + `team360-console-design-handoff-stage-7-settings-support.md`;
+- Stage 8 Results y ServiceDetail: `8c9af41`, `67bdbac` + `team360-console-design-handoff-stage-8-results-service-detail.md`;
+- documento consolidado: `docs/ux/team360-console-ux-stages-1-8-consolidated.md`.
+
+Gate 3D: se determino por commits y documentacion que fue ejecutado y cerrado
+como el commit de alineacion del assertion del logo (`3ae1258`); no se invento
+estado adicional.
+
+### Funcionalidad preservada
+
+- rutas, tabs (ServiceDetail conserva 8 tabs), handlers y stores sin cambios;
+- Vera y `/t360` sin cambios; Diagnosticador, loader, manifest y entry sin cambios;
+- contratos publicos, CORS, allowed origins y DEV/PRO sin cambios;
+- cliente y produccion no tocados.
+
+### Regresion corregida en Stage 9
+
+- `ConsoleDashboard.svelte` (items de ejecuciones): overflow horizontal de 19 px
+  en 390 px por el token de worker name no fragmentable + bump tipografico
+  `text-xs -> text-sm` de Stages 4-8. Fix minimo: `min-w-0` + `overflow-wrap:anywhere`.
+  Commit separado `fix(ux)`.
+
+### Baseline de validacion (ejecutado en Stage 9)
+
+- Console E2E (runtime oficial 3050, backend-dev.sh 7050): shell 7/7, Stage 3 5/5,
+  Stage 5 4/4, Stage 6 5/5, Stage 7 3/3, Stage 8 3/3 = 27/27 PASS;
+- Vera `/t360` (mock de turn): `public-vera.spec.ts` 12/12 PASS + 2 skips preexistentes;
+- `public-vera.spec.ts:230` (interaction_block): PASS — pendiente historico resuelto,
+  comportamiento intencional: el interaction block representa la eleccion del usuario
+  y no duplica un bubble de usuario (`appendUserMessage=false`);
+- `t360-interaction-lab.spec.ts`: 1/1 PASS;
+- smoke visual Playwright 390/768/1280 sobre 16 rutas de consola: 48/48 PASS
+  (sin overflow, sin errores de consola, sin HTTP >= 400) tras el fix del dashboard;
+- `pnpm check`: 0 errors, 0 warnings, 6 hints preexistentes;
+- `pnpm build`: 146 pages; `git diff --check`: PASS;
+- LAT: `lat check md/index/sections/code-refs/check` = 0 errores.
+
+### Bloqueo ambiental documentado
+
+- El contenedor permanente `milvus26-standalone` salio con exit code 1 el
+  2026-08-06 ~13:26 por timeouts internos de etcd (lease expired).
+  PostgreSQL y LiteLLM permanecen operativos. No se reinicio Milvus (prohibido).
+- Consecuencia: `backend-dev.sh` no arranca (preflight Milvus) y las validaciones
+  que requieren backend real quedaron bloqueadas: smoke real `/t360`
+  (`T360_REAL_E2E=1`), contrato embed `auth -> turn` (7 tests E2E) y
+  `diagnosis.spec.ts` (1 test; 1 skip preexistente). Los tests que mockean el
+  turn pasan sin backend.
+- Se dejo registrado en este tablero; corresponde revisar cuando el servicio
+  Milvus vuelva a estar disponible.
+
+### Pendientes reales
+
+- push pendiente de la serie UX + este Stage 9;
+- PASETO fases 1-4 (Console integration, dual support, deprecacion HMAC);
+- deuda embed futura: package npm, Web Component, plugin WordPress, UI/admin
+  `embed_clients`, E2E movil flaky, migracion de tokens;
+- polish visual futuro: aumento tipografico integral, iconos SVG en stats panels,
+  `Card variant="dark"` donde no hay caso semantico, CustomSelect completo;
+- bloqueo ambiental Milvus (ver arriba).
 
 ## Actualizacion operativa 2026-07-06 — alias LiteLLM GPT-5.4 Nano
 
