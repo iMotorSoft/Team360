@@ -129,8 +129,9 @@ audiencia client), `configuration` (no-client), `technical` (owner/operator).
 | smoke visual 390/768/1280 × 16 rutas | 48 | PASS (tras fix overflow) |
 
 Los tests que requieren backend real (`diagnosis.spec.ts`, contrato embed
-`auth -> turn`, smoke real `/t360`) quedaron bloqueados en Stage 9 por la
-caída ambiental de Milvus; se detalla en `status_actual.md`.
+`auth -> turn`, smoke real `/t360`) quedaron temporalmente bloqueados durante
+la caída ambiental de Milvus; con el servicio restablecido se re-ejecutaron y
+pasan (68 PASS / 2 skips preexistentes en la regresión consolidada).
 
 ## 9. Superficies protegidas
 
@@ -157,8 +158,9 @@ caída ambiental de Milvus; se detalla en `status_actual.md`.
 - Regresión menor corregida en Stage 9: overflow horizontal de 19 px en
   dashboard 390 px (token de worker name + bump tipográfico). Fix `min-w-0` +
   `overflow-wrap:anywhere` con commit separado.
-- La caída ambiental de Milvus impide validar los contratos reales
-  `auth -> turn` y el smoke real `/t360` hasta que el servicio vuelva.
+- La caída ambiental de Milvus (2026-08-06 ~13:26, exit code 1 por timeouts
+  de etcd) bloqueó temporalmente los contratos reales `auth -> turn` y el smoke
+  real `/t360`; con el stack restablecido externamente se re-ejecutaron y pasan.
 - El test `public-vera-mobile-sequential-blocks.spec.ts` conserva un flaky
   móvil preexistente (1/2).
 

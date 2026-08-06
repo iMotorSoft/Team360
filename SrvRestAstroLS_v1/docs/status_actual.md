@@ -89,20 +89,26 @@ estado adicional.
   (sin overflow, sin errores de consola, sin HTTP >= 400) tras el fix del dashboard;
 - `pnpm check`: 0 errors, 0 warnings, 6 hints preexistentes;
 - `pnpm build`: 146 pages; `git diff --check`: PASS;
-- LAT: `lat check md/index/sections/code-refs/check` = 0 errores.
+- LAT: `lat check md/index/sections/code-refs/check` = 0 errores;
+- regresion consolidada final (Console + Vera + Embed, 21 spec files):
+  68 PASS / 2 skips preexistentes;
+- Vera family con LLM real: feasibility/adversarial/postsale 23/23,
+  email-orders/kommo/salesforce 3/3, phone-problems 5/5,
+  mobile-sequential 2/2, new-conversation 2/2;
+- smoke real `/t360` (`T360_REAL_E2E=1`): PASS con backend caliente
+  (6 turns reales, 23.5 s);
+- `diagnosis.spec.ts`: 1 PASS + 1 skip preexistente (caso backend apagado).
 
-### Bloqueo ambiental documentado
+### Bloqueo ambiental (resuelto durante Stage 9)
 
 - El contenedor permanente `milvus26-standalone` salio con exit code 1 el
   2026-08-06 ~13:26 por timeouts internos de etcd (lease expired).
-  PostgreSQL y LiteLLM permanecen operativos. No se reinicio Milvus (prohibido).
-- Consecuencia: `backend-dev.sh` no arranca (preflight Milvus) y las validaciones
-  que requieren backend real quedaron bloqueadas: smoke real `/t360`
-  (`T360_REAL_E2E=1`), contrato embed `auth -> turn` (7 tests E2E) y
-  `diagnosis.spec.ts` (1 test; 1 skip preexistente). Los tests que mockean el
-  turn pasan sin backend.
-- Se dejo registrado en este tablero; corresponde revisar cuando el servicio
-  Milvus vuelva a estar disponible.
+  PostgreSQL y LiteLLM permanecieron operativos. No se reinicio Milvus
+  (prohibido): el stack completo fue restablecido externamente ~13:55.
+- Mientras Milvus estuvo caido, `backend-dev.sh` no arrancaba (preflight) y
+  las validaciones con backend real quedaron temporalmente bloqueadas
+  (smoke real `/t360`, contrato embed `auth -> turn`, `diagnosis.spec.ts`).
+  Con Milvus disponible de nuevo se ejecutaron todas y pasan (ver baseline).
 
 ### Pendientes reales
 
@@ -112,7 +118,8 @@ estado adicional.
   `embed_clients`, E2E movil flaky, migracion de tokens;
 - polish visual futuro: aumento tipografico integral, iconos SVG en stats panels,
   `Card variant="dark"` donde no hay caso semantico, CustomSelect completo;
-- bloqueo ambiental Milvus (ver arriba).
+- bloqueo ambiental Milvus: resuelto (servicio restablecido externamente;
+  validaciones reales re-ejecutadas con PASS).
 
 ## Actualizacion operativa 2026-07-06 — alias LiteLLM GPT-5.4 Nano
 
