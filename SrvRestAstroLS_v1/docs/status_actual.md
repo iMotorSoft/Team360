@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-06 (gate proteccion home publica y Vera)
+Ultima actualizacion: 2026-08-06 (deploy productivo Console UX)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -164,6 +164,25 @@ Vera ni artefactos productivos.
 - `pnpm check`: 0 errors; `pnpm build`: 146 pages; `git diff --check`: PASS;
   LAT: 0 errores.
 
+## Deploy 2026-08-06 — Console UX en produccion
+
+Estado: `TEAM360_CONSOLE_UX_PRODUCTION_DEPLOY_PASS`. Publicacion del frontend
+estatico de `https://team360.live` con la migracion UX de Console (Stages 1-8 +
+gates de proteccion) mediante el procedimiento canonico de rsync.
+
+- HEAD desplegado: `0ac79fc` (23 commits locales sin push); push no realizado.
+- Backup remoto: `.../astro/backups/dist_before_ux_20260806_230348.tar.gz`.
+- Rsync real: exit 0; 111 paginas `w/` actualizadas, 2 assets hasheados
+  rotados (`AppShell.*.js`, `global.*.css`); sin rutas inesperadas.
+- Embed: loader, manifest, entry y `vera-loader.js` byte-identicos a
+  produccion (Caso A); SRI/CORS/allowed origins/URLs intactos.
+- Smoke productivo: home + `/#vera` 200 y metadata intacta; rutas Console 200;
+  `public-home-vera-protection` 7/7; Vera real `phone-problems` 5/5;
+  Mamamia360 embed 6/6; matriz responsive 390/768/1280 24/24; sin 5xx.
+- Notas de suites DEV vs PROD (no regresiones): `console-shell.spec.ts:29`
+  espera URL sin trailing slash; `stage3:34` clickea antes de la hidratacion.
+- Release documentada en `docs/releases/team360-console-ux-production-2026-08-06.md`.
+- PostgreSQL, Milvus y LiteLLM no fueron iniciados, detenidos ni reiniciados.
 ### Regresiones
 
 - Encontradas: ninguna en home/Vera/embed (las suites pasan sobre el runtime
