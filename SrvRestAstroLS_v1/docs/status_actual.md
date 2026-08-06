@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-06 (Stage 9: consolidacion UX + regresion protegida)
+Ultima actualizacion: 2026-08-06 (gate proteccion home publica y Vera)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -120,6 +120,57 @@ estado adicional.
   `Card variant="dark"` donde no hay caso semantico, CustomSelect completo;
 - bloqueo ambiental Milvus: resuelto (servicio restablecido externamente;
   validaciones reales re-ejecutadas con PASS).
+
+## Gate 2026-08-06 — proteccion de home publica y Vera
+
+Estado: PASS (`TEAM360_PUBLIC_HOME_VERA_PROTECTION_PASS`). Contrato protegido
+creado y enlazado; prueba E2E de proteccion consolidada; sin cambios en home,
+Vera ni artefactos productivos.
+
+### Contrato protegido
+
+- `SrvRestAstroLS_v1/docs/public_home_vera_protection_contract_v1.md` — reglas
+  de la home, Vera publica y embed productivo, y proteccion estructural para
+  Team360 Flow y futuros modulos.
+- Enlazado desde este tablero y desde la documentacion del embed.
+
+### Inventario relevado (sin cambios de codigo)
+
+- Home: `src/pages/index.astro` (idem `/t360`), layout
+  `src/layouts/PublicMarketingLayout.astro`, header/footer marketing,
+  seccion Vera en `src/components/diagnosis/PublicVeraEntry.svelte` con
+  `id="vera"` + `scroll-mt-24`.
+- Vera: `DiagnosticadorCore.svelte` + adapters publicos; sesion
+  `team360.vera.session.v1`; `appendUserMessage=false` en `t360action` es
+  intencional (el block representa la eleccion; no duplica bubble).
+- URLs: `src/components/global.js` sigue siendo fuente de verdad DEV/PRO.
+- Comparacion DEV vs PROD (GET seguros): `/` 200 HTML, loader/manifest/entry
+  200; manifest productivo identico al commiteado.
+
+### Validacion ejecutada
+
+- Nuevo E2E `e2e/public-home-vera-protection.spec.ts`: 7/7 PASS (home, `/#vera`,
+  hash tras reload, seccion bajo header, interaccion mock sin duplicacion,
+  nueva conversacion, mobile 390, HE/RTL, matriz 390/768/1280).
+- `public-home-social-meta.spec.ts`: 2/2 PASS.
+- `public-vera.spec.ts`: 15/15 PASS + 2 skips preexistentes; smoke real
+  (`T360_REAL_E2E=1`) PASS.
+- Familia Vera (feasibility/adversarial/postsale/email-orders/kommo/salesforce/
+  phone/mobile-sequential/new-conversation): 33/33 PASS.
+- Embed DEV + loader + manifest + SRI + cross-origin + mount/destroy/remount +
+  auth -> turn + Mamamia360: 28/28 PASS.
+- Matriz visual `/` y `/#vera` en 390/768/1280: sin overflow, sin errores de
+  consola, hash y reload correctos.
+- `pnpm check`: 0 errors; `pnpm build`: 146 pages; `git diff --check`: PASS;
+  LAT: 0 errores.
+
+### Regresiones
+
+- Encontradas: ninguna en home/Vera/embed (las suites pasan sobre el runtime
+  oficial con servicios reales disponibles).
+- Preexistentes: 2 skips de `public-vera.spec.ts` (reload-session y smoke real
+  por defecto).
+- No se realizaron cambios funcionales en este gate.
 
 ## Actualizacion operativa 2026-07-06 — alias LiteLLM GPT-5.4 Nano
 
