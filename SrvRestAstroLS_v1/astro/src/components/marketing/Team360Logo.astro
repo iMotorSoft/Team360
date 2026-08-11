@@ -1,0 +1,67 @@
+---
+import team360Logo from "../../assets/team360_logo_t.png";
+
+interface Props {
+  compact?: boolean;
+  inverted?: boolean;
+  showIcon?: boolean;
+  logoSrc?: string;
+  numberColor?: string;
+  size?: "small" | "medium" | "large" | string;
+}
+
+const {
+  compact = false,
+  inverted = false,
+  showIcon = true,
+  logoSrc = team360Logo.src,
+  numberColor = "text-[#168b88]",
+  size = "medium",
+} = Astro.props;
+
+const sizeClasses = {
+  small: "size-12",
+  medium: "size-18",
+  large: "size-20",
+};
+
+const finalSizeClass = sizeClasses[size as keyof typeof sizeClasses] || size;
+---
+
+<a
+  href="/"
+  class="inline-flex items-center gap-3"
+  aria-label="Team360, inicio"
+  data-team360-logo-variant="design-handoff"
+  translate="no"
+>
+  {showIcon && (
+    <span
+      aria-hidden="true"
+      class:list={[finalSizeClass, "bg-contain bg-center bg-no-repeat"]}
+      data-team360-logo-icon="t360"
+      style={`background-image: url('${logoSrc}');`}
+    />
+  )}
+  <span
+    class:list={[
+      "font-semibold tracking-[-0.04em]",
+      inverted ? "text-white/85" : "text-[#102d4f]",
+    ]}
+  >
+    <span class="font-poppins text-2xl md:text-3xl" data-team360-wordmark="team">Team</span><span
+      class={`font-poppins text-2xl md:text-3xl ${numberColor}`}
+      data-team360-wordmark="360">360</span
+    >
+    {!compact && (
+      <span
+        class:list={[
+          "ml-2 hidden text-sm font-medium tracking-[0.12em] sm:inline",
+          inverted ? "text-white/60" : "text-[#62758a]",
+        ]}
+      >
+        OPERACIONES INTELIGENTES
+      </span>
+    )}
+  </span>
+</a>

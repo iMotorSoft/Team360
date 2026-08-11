@@ -38,14 +38,26 @@
   }`}
 >
   <div class="flex h-24 items-center justify-between border-b border-[#e2eaec] px-5">
-    <a class="flex items-center gap-3" href="/" translate="no">
+    <a
+      aria-label="Team360 Console, inicio"
+      class="flex items-center gap-3"
+      data-team360-logo-variant="design-handoff"
+      href="/"
+      translate="no"
+    >
       <span
         class="h-14 w-14 shrink-0 bg-contain bg-center bg-no-repeat"
+        data-team360-logo-icon="t360"
         style={`background-image: url('${team360Logo.src}')`}
         aria-hidden="true"
       ></span>
       <span>
-        <span class="block text-2xl font-bold tracking-[-0.05em] text-[#233B56]">{APP_PUBLIC_NAME.split(" ")[0]}</span>
+        <span class="block font-semibold tracking-[-0.04em]">
+          <span class="font-poppins text-2xl text-[#102d4f]" data-team360-wordmark="team">Team</span><span
+            class="font-poppins text-2xl text-[#168b88]"
+            data-team360-wordmark="360">360</span
+          >
+        </span>
         <span class="block text-xs font-bold uppercase tracking-[0.2em] text-[#168b88]">{APP_PUBLIC_NAME.split(" ")[1]}</span>
       </span>
     </a>

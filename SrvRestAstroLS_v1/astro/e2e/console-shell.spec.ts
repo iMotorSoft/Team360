@@ -69,14 +69,19 @@ test.describe("Console shell E2E - shell funcional", () => {
     await expect(page).toHaveURL(/\/w\/ws-carmel-retail/);
   });
 
-  test("logo del sidebar carga correctamente sin errores", async ({ page }) => {
+  test("branding del sidebar usa el isotipo y wordmark aprobados", async ({ page }) => {
     const errors: string[] = [];
     page.on("console", (msg) => { if (msg.type() === "error") errors.push(msg.text()); });
     page.on("requestfailed", (req) => { if (req.url().includes("object%20Object")) errors.push(`Failed: ${req.url()}`); });
 
     await openConsole(page, "/w/ws-team360-control/team");
 
-    const logo = page.locator("aside").getByRole("link", { name: /Team360/ }).locator("span[aria-hidden]").first();
+    const brand = page.locator("aside").getByRole("link", { name: "Team360 Console, inicio" });
+    await expect(brand).toHaveAttribute("data-team360-logo-variant", "design-handoff");
+    await expect(brand.locator('[data-team360-wordmark="team"]')).toHaveCSS("color", "rgb(16, 45, 79)");
+    await expect(brand.locator('[data-team360-wordmark="360"]')).toHaveCSS("color", "rgb(22, 139, 136)");
+
+    const logo = brand.locator('[data-team360-logo-icon="t360"]');
     await expect(logo).toBeVisible();
 
     const bgImage = await logo.evaluate((el) => el.style.backgroundImage);
@@ -84,7 +89,7 @@ test.describe("Console shell E2E - shell funcional", () => {
     expect(bgImage).not.toContain("[object Object]");
     expect(bgImage).not.toContain("undefined");
     expect(bgImage).not.toContain("null");
-    expect(bgImage).toMatch(/team360_logo/);
+    expect(bgImage).toMatch(/team360_logo_t/);
 
     const urlMatch = bgImage.match(/url\(["']?([^"')]+)["']?\)/);
     expect(urlMatch).toBeTruthy();
@@ -108,6 +113,38 @@ test.describe("Console shell E2E - shell funcional", () => {
     expect(errors.filter((e) => !e.includes("favicon"))).toHaveLength(0);
   });
 
+  test("branding de acceso usa Team360Logo y excluye el isotipo alternativo", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") errors.push(message.text());
+    });
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("requestfailed", (request) => errors.push(`Failed: ${request.url()}`));
+
+    for (const route of ["/login", "/select-workspace"]) {
+      await page.goto(route);
+
+      const brand = page.locator("header").getByRole("link", { name: "Team360, inicio" });
+      await expect(brand).toHaveAttribute("data-team360-logo-variant", "design-handoff");
+      await expect(brand.locator('[data-team360-wordmark="team"]')).toHaveText("Team");
+      await expect(brand.locator('[data-team360-wordmark="team"]')).toHaveCSS("color", "rgb(16, 45, 79)");
+      await expect(brand.locator('[data-team360-wordmark="360"]')).toHaveText("360");
+      await expect(brand.locator('[data-team360-wordmark="360"]')).toHaveCSS("color", "rgb(22, 139, 136)");
+
+      const icon = brand.locator('[data-team360-logo-icon="t360"]');
+      const bgImage = await icon.evaluate((element) => element.style.backgroundImage);
+      expect(bgImage).toMatch(/team360_logo_t/);
+
+      const urlMatch = bgImage.match(/url\(["']?([^"')]+)["']?\)/);
+      expect(urlMatch).toBeTruthy();
+      const response = await page.request.get(urlMatch![1]);
+      expect(response.status()).toBe(200);
+      expect(response.headers()["content-type"]).toMatch(/^image\/png/);
+    }
+
+    expect(errors.filter((error) => !error.includes("favicon"))).toEqual([]);
+  });
+
   test("drawer mobile abre y cierra con overlay", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openConsole(page);
@@ -118,6 +155,9 @@ test.describe("Console shell E2E - shell funcional", () => {
     await page.getByRole("button", { name: "Abrir navegación" }).click();
     await expect(drawer).toHaveCSS("translate", "0px");
     await expect(page.getByRole("button", { name: "Cerrar navegación" })).toHaveCount(2);
+    const mobileBrand = drawer.getByRole("link", { name: "Team360 Console, inicio" });
+    await expect(mobileBrand).toHaveAttribute("data-team360-logo-variant", "design-handoff");
+    await expect(mobileBrand.locator('[data-team360-wordmark="360"]')).toHaveCSS("color", "rgb(22, 139, 136)");
 
     await drawer.getByRole("button", { name: "Cerrar navegación" }).click();
     await expect(drawer).toHaveCSS("translate", "-100%");

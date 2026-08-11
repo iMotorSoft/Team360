@@ -99,13 +99,21 @@ La consulta selectiva confirmó que la implementación funcional conserva la com
 | Shell | Sidebar fijo, topbar, breadcrumbs y content grid | Misma composición y responsive | A — coincidencia técnica |
 | Dashboard desktop | Métricas, servicios, prioridades, actividad y resultados | Misma jerarquía; datos y densidad actualizados | D — diferencia funcional preservada |
 | Dashboard mobile | Stacking de métricas y cards | Mismo orden semántico y stacking | A — coincidencia técnica |
-| Branding | Captura UX histórica con logo circular oscuro | Logo vigente verde y copy Console | E — sin captura final de Console |
+| Branding | `Team360Logo.astro` con isotipo T turquesa y wordmark Team/360 | El gate original solo comprobó carga del asset del Sidebar y no auditó `MockAccessLayout` | Diferencia confirmada y corregida en el gate específico de branding |
 | Métricas | Valores mock históricos 4/1/1/7 | Datos funcionales actuales 5/1/2/8 | D — diferencia funcional preservada |
 | Cliente | Netzaj Racing en handoff | Perfil cliente vigente Team360.live | D — diferencia funcional preservada |
 | Diagnosis | La rama UX elimina `ConsoleDiagnosis` | La rama funcional conserva Diagnosis y su ruta | D — `DIFFERENCE PRESERVED FOR FUNCTIONAL SAFETY` |
 | Cards | Variantes históricas blancas y dark | Pasteles semánticos y prioridades claras | E — requiere captura final de Console |
 
 Se revisaron selectivamente `AppShell.svelte`, `Sidebar.svelte`, `Topbar.svelte`, `ContextBanner.svelte` y `ConsoleDashboard.svelte`. No se copió `CustomSelect`, markup completo, stores, mocks ni navegación desde UX.
+
+### Corrección del gate de branding
+
+La revisión específica posterior determinó que el gate original no cubrió la identidad completa de marca de Console. Las capturas finales disponibles eran de Home/Vera, y la comparación técnica de Console se concentró en estructura y carga de assets.
+
+La prueba anterior aceptaba cualquier URL que contuviera `team360_logo`, tuviera HTTP 200 y dimensiones válidas. No distinguía `team360_logo_t.png`, colores del wordmark ni el `BrandMark` alternativo usado por `MockAccessLayout.astro` en login y select-workspace.
+
+La causa raíz fue una cobertura incompleta: se validó disponibilidad, no identidad. El gate de branding corrige esa omisión con un identificador estable de variante, el asset fuente exacto, colores diferenciados Team/360 y cobertura desktop, mobile y RTL.
 
 ## Comparación de las capturas protegidas
 
