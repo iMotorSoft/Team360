@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-12 (Flow escalamiento Alumbrado N1 a N2 V1)
+Ultima actualizacion: 2026-08-12 (Flow respuesta operacional Alumbrado N2 V1)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,44 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Gate 2026-08-12 — Flow respuesta operacional Alumbrado N2 V1
+
+Estado: PASS funcional real/controlado. Una respuesta humana al outbound N2 se
+normalizó en Messaging, correlacionó específicamente con el routing N2 por RFC,
+se interpretó con LiteLLM y cambió únicamente el work state N2 a IN_PROGRESS.
+
+### Generalización y seguridad multinivel
+
+- el servicio operacional trabaja por `routing_id`, conserva level/routing key
+  como contexto y consulta todos los routings ASSIGNED, no solo el actual;
+- prioridad: `In-Reply-To`, `References`, token `[R:<routing_key>]` más request
+  UUID y, únicamente para requests con un solo routing, UUID sin token;
+- request UUID sin headers/token queda ambiguo cuando conviven N1 y N2, por lo
+  que no se elige un nivel arbitrariamente;
+- work states, eventos y `first_response_at_utc` son independientes por routing;
+  el sender físico y Gmail `threadId` no participan en la identidad;
+- no fue necesaria una migración nueva: 013 + 015 ya soportan el modelo.
+
+### Evidencia real
+
+- request `28f8e055-ac93-4c02-9e16-9bc98871fd39`; N1
+  `3b1c6a1e-2c31-4d1c-add9-20e484413b57` permaneció ASSIGNED, SLA BREACHED,
+  sin primera respuesta ni eventos;
+- N2 `ff1ddbdb-8c85-46f8-ad55-1478bc511e92`, outbound Gmail
+  `19ff77a8a8717621`; reply real de técnico `19ff79e0029d48d1` y copia inbound
+  `19ff79e048d10cd3`;
+- correlación `in_reply_to_rfc`, acción `ACK_OR_PROGRESS`, N2
+  `ASSIGNED → IN_PROGRESS`, primera respuesta `2026-08-12T20:15:55Z`;
+- segundo polling: procesados 0, duplicados operacionales 1; un solo evento y
+  timestamp N2 sin cambios;
+- smoke LiteLLM real usó `openai_gpt-5.4-nano` y clasificó el texto controlado
+  como `ACK_OR_PROGRESS`.
+
+### Fuera de alcance confirmado
+
+Sin SLA/vencimiento N2, N3, escalamiento N2→N3, delegación, resolución,
+frontend, WhatsApp/Gupshup, Pub/Sub, scheduler ni worker permanente.
 
 ## Gate 2026-08-12 — Flow escalamiento Alumbrado N1 a N2 V1
 

@@ -65,6 +65,7 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
                         f"message_id={message.external_message_id} "
                         f"request_id={operational.request_id} "
                         f"routing_id={operational.routing_id} "
+                        f"level={operational.level} "
                         f"action={operational.action} status={operational.status} "
                         f"correlation={operational.correlation_method}"
                     )

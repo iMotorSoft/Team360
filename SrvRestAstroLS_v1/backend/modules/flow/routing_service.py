@@ -93,7 +93,7 @@ def build_routing_email(
     return RoutingEmail(
         destination=sector_level.destination,
         subject=(
-            f"[Team360 Flow] Nueva solicitud #{request.id} — "
+            f"[Team360 Flow][R:initial_n1] Nueva solicitud #{request.id} — "
             f"{sector.display_name}"
         ),
         body=body,

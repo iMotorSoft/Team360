@@ -99,7 +99,7 @@ class LiteLLMOperationalInterpreter:
                 max_tokens=300,
                 correlation_id=message.external_message_id,
                 metadata={
-                    "feature": "flow_n1_operational_reply",
+                    "feature": "flow_operational_reply",
                     "model_alias": self.model,
                 },
             )

@@ -255,7 +255,9 @@ def test_confirmed_request_routes_and_builds_useful_n1_email():
         "<gmail-out-1@gmail.example>"
     )
     assert call["to"] == "alumbrado.n1@alquimiablue.com"
-    assert call["subject"].startswith("[Team360 Flow] Nueva solicitud #")
+    assert call["subject"].startswith(
+        "[Team360 Flow][R:initial_n1] Nueva solicitud #"
+    )
     assert repo.request.id in call["subject"]
     assert repo.request.id in call["body"]
     assert repo.request.description in call["body"]

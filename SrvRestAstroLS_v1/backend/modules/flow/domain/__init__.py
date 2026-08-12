@@ -8,6 +8,7 @@ from .operations import (
     OperationalWorkState,
     request_id_from_subject,
     rfc_reference_ids,
+    routing_key_from_subject,
 )
 from .routing import (
     ConfirmedFlowRequest,
@@ -67,6 +68,7 @@ __all__ = [
     "resolve_sector_id",
     "request_id_from_subject",
     "rfc_reference_ids",
+    "routing_key_from_subject",
     "routing_rfc_message_id",
     "sla_due_at",
     "transition",

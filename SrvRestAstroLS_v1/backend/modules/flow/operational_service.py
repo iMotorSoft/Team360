@@ -1,4 +1,4 @@
-"""Correlate and process Level 1 operational replies before citizen intake."""
+"""Correlate and process routing-scoped operational replies before intake."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from .domain import (
     OperationalStatus,
     request_id_from_subject,
     rfc_reference_ids,
+    routing_key_from_subject,
 )
 from .operational_ai import OperationalInterpreterPort
 from .operational_repository import FlowOperationalPostgresRepository
@@ -29,6 +30,7 @@ class OperationalProcessResult:
     processed: bool
     request_id: str | None = None
     routing_id: str | None = None
+    level: int | None = None
     event_id: str | None = None
     action: OperationalAction | None = None
     status: OperationalStatus | None = None
@@ -69,6 +71,7 @@ class FlowOperationalReplyService:
                     processed=False,
                     request_id=context.request_id,
                     routing_id=context.routing_id,
+                    level=context.level,
                     event_id=event["event_id"] if event else None,
                     action=(
                         OperationalAction(event["interpretation_action"])
@@ -96,6 +99,7 @@ class FlowOperationalReplyService:
                 processed=True,
                 request_id=context.request_id,
                 routing_id=context.routing_id,
+                level=context.level,
                 event_id=event_id,
                 action=interpretation.action,
                 status=state.status,
@@ -128,7 +132,22 @@ class FlowOperationalReplyService:
 
         request_id = request_id_from_subject(message.subject)
         if request_id:
-            context = await self._repository.find_by_request_id(conn, request_id)
+            routing_key = routing_key_from_subject(message.subject)
+            if routing_key:
+                context = await self._repository.find_by_request_routing_key(
+                    conn,
+                    request_id=request_id,
+                    routing_key=routing_key,
+                )
+                if context is not None:
+                    return self._reply_correlation(
+                        context, message, "subject_routing_token"
+                    )
+                return None
+
+            context = await self._repository.find_unambiguous_by_request_id(
+                conn, request_id
+            )
             if context is not None:
                 return self._reply_correlation(
                     context, message, "subject_request_token"

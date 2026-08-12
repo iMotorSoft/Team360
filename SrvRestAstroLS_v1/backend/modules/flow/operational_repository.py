@@ -20,7 +20,8 @@ from .domain import (
 
 _CONTEXT_COLUMNS = """
     frr.id::text as routing_id, frr.request_id::text,
-    fr.conversation_id::text, frr.status as routing_status,
+    fr.conversation_id::text, frr.routing_key, frr.level,
+    frr.status as routing_status,
     frr.destination, frr.outbound_external_message_id,
     frr.outbound_rfc_message_id,
     frr.outbound_observed_rfc_message_id
@@ -70,7 +71,7 @@ class FlowOperationalPostgresRepository:
             )
         )
 
-    async def find_by_request_id(
+    async def find_unambiguous_by_request_id(
         self, conn: AsyncConnection, request_id: str
     ) -> OperationalRoutingContext | None:
         return _context(
@@ -82,10 +83,36 @@ class FlowOperationalPostgresRepository:
                 join flow_requests fr on fr.id = frr.request_id
                 where frr.request_id = %(request_id)s
                   and frr.status = 'ASSIGNED'
-                order by frr.level desc, frr.assigned_at_utc desc
-                limit 1
+                  and not exists (
+                      select 1 from flow_request_routings other
+                      where other.request_id = frr.request_id
+                        and other.status = 'ASSIGNED'
+                        and other.id <> frr.id
+                  )
                 """,
                 {"request_id": request_id},
+            )
+        )
+
+    async def find_by_request_routing_key(
+        self,
+        conn: AsyncConnection,
+        *,
+        request_id: str,
+        routing_key: str,
+    ) -> OperationalRoutingContext | None:
+        return _context(
+            await fetch_one(
+                conn,
+                f"""
+                select {_CONTEXT_COLUMNS}
+                from flow_request_routings frr
+                join flow_requests fr on fr.id = frr.request_id
+                where frr.request_id = %(request_id)s
+                  and frr.routing_key = %(routing_key)s
+                  and frr.status = 'ASSIGNED'
+                """,
+                {"request_id": request_id, "routing_key": routing_key},
             )
         )
 
@@ -254,7 +281,7 @@ class FlowOperationalPostgresRepository:
                    count(foe.id) as operational_events
             from flow_request_work_states fws
             left join flow_request_operational_events foe
-              on foe.request_id = fws.request_id
+              on foe.routing_id = fws.routing_id
             where fws.request_id = %(request_id)s
               and (%(routing_id)s::uuid is null
                    or fws.routing_id = %(routing_id)s::uuid)

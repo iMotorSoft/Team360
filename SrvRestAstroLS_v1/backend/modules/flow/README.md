@@ -45,19 +45,27 @@ destino `alumbrado.n1@alquimiablue.com`. La unicidad
 el servicio reconcilia Gmail Sent por `Message-ID` y por la referencia única del
 request; un fallo de reconciliación no habilita un segundo envío.
 
-## Respuesta operacional Nivel 1
+## Respuesta operacional por routing
 
 La migración `013_team360_flow_n1_operational_reply_v1.sql` agrega estado de
 trabajo y eventos auditables. `poll_once` intenta primero una correlación
 operacional determinística por `In-Reply-To`, `References` o UUID persistido en
 el subject. Solo los mensajes no correlacionados continúan al intake ciudadano;
-ni sender ni Gmail `threadId` deciden identidad técnica.
+ni sender ni Gmail `threadId` deciden identidad técnica. La correlación RFC
+consulta todos los routings, incluidos niveles históricos: una respuesta tardía
+N1 continúa perteneciendo a N1 aunque ya exista N2.
+
+Los nuevos emails incluyen un token estable `[R:<routing_key>]`. Si faltan
+headers RFC, Flow combina ese token con el UUID del request. Un subject que
+contiene solamente el request UUID se acepta únicamente cuando existe un solo
+routing `ASSIGNED`; con múltiples niveles queda deliberadamente sin correlación.
 
 El contenido correlacionado se interpreta mediante LiteLLM y el alias
 `openai_gpt-5.4-nano`. `ACK_OR_PROGRESS` cambia el estado operacional de
 `ASSIGNED` a `IN_PROGRESS`; `AMBIGUOUS`, `UNRELATED` y
 `UNSUPPORTED_OPERATIONAL_ACTION` se auditan sin transición. El timestamp
-`first_response_at_utc` usa `InboundMessage.received_at` y queda inmutable.
+`first_response_at_utc` usa `InboundMessage.received_at`, queda inmutable y se
+persiste independientemente para cada `routing_id`.
 
 ## SLA de primera respuesta N1
 

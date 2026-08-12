@@ -205,6 +205,7 @@ def test_breached_n1_sends_one_clear_n2_assignment_and_is_idempotent():
     call = sender.send_calls[0]
     assert call["to"] == "alumbrado.n2@alquimiablue.com"
     assert "[ESCALADO]" in call["subject"]
+    assert "[R:alumbrado_level_2]" in call["subject"]
     for expected in (
         escalations.candidate.request_id, "Nivel actual: 2", "Reparar poste apagado",
         "Olleros y Ciudad de la Paz", "SLA de primera respuesta de Nivel 1 vencido",

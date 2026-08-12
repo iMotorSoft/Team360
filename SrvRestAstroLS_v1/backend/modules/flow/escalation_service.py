@@ -63,7 +63,7 @@ def build_escalation_email(
     return RoutingEmail(
         destination=destination,
         subject=(
-            f"[Team360 Flow][ESCALADO][{candidate.request_id}] "
+            f"[Team360 Flow][ESCALADO][R:{routing_key}][{candidate.request_id}] "
             f"{candidate.sector_display_name} — Nivel {to_level}"
         ),
         body=body,

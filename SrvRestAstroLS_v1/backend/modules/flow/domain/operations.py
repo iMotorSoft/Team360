@@ -25,6 +25,8 @@ class OperationalRoutingContext:
     routing_id: str
     request_id: str
     conversation_id: str
+    routing_key: str
+    level: int
     routing_status: str
     destination: str
     outbound_external_message_id: str
@@ -61,10 +63,16 @@ _REQUEST_TOKEN = re.compile(
     r"\b([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\b",
     re.IGNORECASE,
 )
+_ROUTING_TOKEN = re.compile(r"\[R:([a-z][a-z0-9_]{0,63})\]", re.IGNORECASE)
 
 
 def request_id_from_subject(subject: str) -> str | None:
     match = _REQUEST_TOKEN.search(subject)
+    return match.group(1).lower() if match else None
+
+
+def routing_key_from_subject(subject: str) -> str | None:
+    match = _ROUTING_TOKEN.search(subject)
     return match.group(1).lower() if match else None
 
 

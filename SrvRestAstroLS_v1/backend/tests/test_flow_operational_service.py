@@ -18,6 +18,7 @@ from modules.messaging.domain import InboundMessage
 REQUEST_ID = "656977af-cc29-43d6-b78c-53464818f06a"
 OTHER_REQUEST_ID = "818126f6-84ad-4c40-bbef-480ccfc0387b"
 OBSERVED_RFC = "<gmail-real-id@mail.gmail.com>"
+N2_OBSERVED_RFC = "<gmail-level-two@mail.gmail.com>"
 
 
 class _AsyncContext:
@@ -41,16 +42,26 @@ class _Pool:
         return _AsyncContext(_Connection())
 
 
-def _context(request_id=REQUEST_ID):
+def _context(
+    request_id=REQUEST_ID,
+    *,
+    routing_id=None,
+    routing_key="initial_n1",
+    level=1,
+    destination=None,
+    observed_rfc=OBSERVED_RFC,
+):
     return OperationalRoutingContext(
-        routing_id=f"routing-{request_id[:8]}",
+        routing_id=routing_id or f"routing-{request_id[:8]}",
         request_id=request_id,
         conversation_id="conversation-1",
+        routing_key=routing_key,
+        level=level,
         routing_status="ASSIGNED",
-        destination="alumbrado.n1@alquimiablue.com",
+        destination=destination or f"alumbrado.n{level}@alquimiablue.com",
         outbound_external_message_id="gmail-out-1",
         outbound_rfc_message_id=f"<intended-{request_id}@alquimiablue.com>",
-        outbound_observed_rfc_message_id=OBSERVED_RFC,
+        outbound_observed_rfc_message_id=observed_rfc,
     )
 
 
@@ -79,25 +90,60 @@ def _message(
 
 
 class _Repository:
-    def __init__(self):
-        self.contexts = {REQUEST_ID: _context(), OTHER_REQUEST_ID: _context(OTHER_REQUEST_ID)}
+    def __init__(self, *, multilevel=False):
+        n1 = _context()
+        contexts = [n1, _context(OTHER_REQUEST_ID)]
+        if multilevel:
+            contexts.append(
+                _context(
+                    routing_id="routing-n2",
+                    routing_key="alumbrado_level_2",
+                    level=2,
+                    observed_rfc=N2_OBSERVED_RFC,
+                )
+            )
+        self.contexts = contexts
         self.messages = {}
         self.events = {}
-        self.state = OperationalWorkState(
-            REQUEST_ID,
-            _context().routing_id,
-            OperationalStatus.ASSIGNED,
-            None,
-            None,
-        )
+        self.states = {
+            context.routing_id: OperationalWorkState(
+                context.request_id,
+                context.routing_id,
+                OperationalStatus.ASSIGNED,
+                None,
+                None,
+            )
+            for context in contexts
+        }
+
+    @property
+    def state(self):
+        return self.states[_context().routing_id]
 
     async def find_by_rfc_reference(self, conn, references):
-        if OBSERVED_RFC in references:
-            return self.contexts[REQUEST_ID]
+        for context in self.contexts:
+            if context.outbound_observed_rfc_message_id in references:
+                return context
         return None
 
-    async def find_by_request_id(self, conn, request_id):
-        return self.contexts.get(request_id)
+    async def find_unambiguous_by_request_id(self, conn, request_id):
+        matches = [
+            context for context in self.contexts if context.request_id == request_id
+        ]
+        return matches[0] if len(matches) == 1 else None
+
+    async def find_by_request_routing_key(
+        self, conn, *, request_id, routing_key
+    ):
+        return next(
+            (
+                context
+                for context in self.contexts
+                if context.request_id == request_id
+                and context.routing_key == routing_key
+            ),
+            None,
+        )
 
     async def claim_message(self, conn, *, context, message):
         key = (message.provider, message.external_message_id)
@@ -107,7 +153,7 @@ class _Repository:
         return "source-1"
 
     async def ensure_work_state(self, conn, context):
-        return self.state
+        return self.states[context.routing_id]
 
     async def record_event(self, conn, **kwargs):
         message = kwargs["message"]
@@ -115,13 +161,14 @@ class _Repository:
         return f"event-{len(self.events)}"
 
     async def mark_in_progress(self, conn, *, context, message):
-        self.state = replace(
-            self.state,
+        state = self.states[context.routing_id]
+        self.states[context.routing_id] = replace(
+            state,
             status=OperationalStatus.IN_PROGRESS,
-            first_response_at=self.state.first_response_at or message.received_at,
-            first_responder=self.state.first_responder or message.sender,
+            first_response_at=state.first_response_at or message.received_at,
+            first_responder=state.first_responder or message.sender,
         )
-        return self.state
+        return self.states[context.routing_id]
 
     async def event_for_message(self, conn, provider, external_message_id):
         event = self.events.get(external_message_id)
@@ -217,6 +264,81 @@ def test_other_routing_token_does_not_contaminate_request():
     )
     assert result.request_id == OTHER_REQUEST_ID
     assert result.routing_id == _context(OTHER_REQUEST_ID).routing_id
+
+
+def test_multilevel_rfc_correlation_is_routing_specific_with_same_sender():
+    repo = _Repository(multilevel=True)
+    service = _service(repo, _Interpreter())
+    n2 = asyncio.run(
+        service.process_if_operational(
+            _message(message_id="n2-reply", in_reply_to=N2_OBSERVED_RFC)
+        )
+    )
+    assert n2.routing_id == "routing-n2"
+    assert n2.level == 2
+    assert repo.states["routing-n2"].status == OperationalStatus.IN_PROGRESS
+    assert repo.state.status == OperationalStatus.ASSIGNED
+
+    n1 = asyncio.run(
+        service.process_if_operational(
+            _message(message_id="late-n1-reply", in_reply_to=OBSERVED_RFC)
+        )
+    )
+    assert n1.routing_id == _context().routing_id
+    assert repo.state.status == OperationalStatus.IN_PROGRESS
+    assert repo.states["routing-n2"].status == OperationalStatus.IN_PROGRESS
+
+
+@pytest.mark.parametrize(
+    "action",
+    [
+        OperationalAction.AMBIGUOUS,
+        OperationalAction.UNRELATED,
+        OperationalAction.UNSUPPORTED_OPERATIONAL_ACTION,
+    ],
+)
+def test_n2_non_progress_actions_are_audited_without_transition(action):
+    repo = _Repository(multilevel=True)
+    result = asyncio.run(
+        _service(repo, _Interpreter(action)).process_if_operational(
+            _message(in_reply_to=N2_OBSERVED_RFC)
+        )
+    )
+    assert result.routing_id == "routing-n2"
+    assert result.action == action
+    assert repo.states["routing-n2"].status == OperationalStatus.ASSIGNED
+    assert repo.states["routing-n2"].first_response_at is None
+    assert repo.state.status == OperationalStatus.ASSIGNED
+
+
+def test_multilevel_references_correlates_n2():
+    result = asyncio.run(
+        _service(_Repository(multilevel=True), _Interpreter()).process_if_operational(
+            _message(references=f"<root@example.com> {N2_OBSERVED_RFC}")
+        )
+    )
+    assert result.routing_id == "routing-n2"
+    assert result.correlation_method == "references_rfc"
+
+
+def test_request_only_subject_is_ambiguous_but_routing_token_selects_n2():
+    repo = _Repository(multilevel=True)
+    service = _service(repo, _Interpreter())
+    ambiguous = asyncio.run(service.process_if_operational(_message()))
+    assert ambiguous.matched is False
+
+    routed = asyncio.run(
+        service.process_if_operational(
+            _message(
+                message_id="token-n2",
+                subject=(
+                    f"Re: [Team360 Flow][R:alumbrado_level_2] #{REQUEST_ID}"
+                ),
+            )
+        )
+    )
+    assert routed.routing_id == "routing-n2"
+    assert routed.correlation_method == "subject_routing_token"
 
 
 def test_assigned_ack_transitions_to_in_progress_using_received_timestamp():
