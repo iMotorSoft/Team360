@@ -14,6 +14,7 @@ from modules.messaging.domain import InboundMessage
 from .domain import (
     CorrelatedOperationalReply,
     OperationalAction,
+    OperationalRoutingContext,
     OperationalStatus,
     request_id_from_subject,
     rfc_reference_ids,
@@ -111,7 +112,9 @@ class FlowOperationalReplyService:
                 conn, rfc_reference_ids(in_reply_to, "")
             )
             if context is not None:
-                return CorrelatedOperationalReply(context, "in_reply_to_rfc")
+                return self._reply_correlation(
+                    context, message, "in_reply_to_rfc"
+                )
 
         references = str(message.metadata.get("references") or "").strip()
         if references:
@@ -119,11 +122,26 @@ class FlowOperationalReplyService:
                 conn, rfc_reference_ids("", references)
             )
             if context is not None:
-                return CorrelatedOperationalReply(context, "references_rfc")
+                return self._reply_correlation(
+                    context, message, "references_rfc"
+                )
 
         request_id = request_id_from_subject(message.subject)
         if request_id:
             context = await self._repository.find_by_request_id(conn, request_id)
             if context is not None:
-                return CorrelatedOperationalReply(context, "subject_request_token")
+                return self._reply_correlation(
+                    context, message, "subject_request_token"
+                )
         return None
+
+    @staticmethod
+    def _reply_correlation(
+        context: OperationalRoutingContext,
+        message: InboundMessage,
+        method: str,
+    ) -> CorrelatedOperationalReply | None:
+        recipients = {value.casefold() for value in message.recipients}
+        if context.destination.casefold() in recipients:
+            return None
+        return CorrelatedOperationalReply(context, method)

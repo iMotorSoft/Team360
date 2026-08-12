@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-12 (Flow routing email Alumbrado Nivel 1 V1)
+Ultima actualizacion: 2026-08-12 (Flow SLA primera respuesta Alumbrado N1 V1)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,47 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Gate 2026-08-12 — Flow SLA primera respuesta Alumbrado N1 V1
+
+Estado: PASS funcional real/controlado. Cada routing nuevo de Alumbrado N1
+captura un SLA de 30 segundos desde `assigned_at_utc`; el checker determinístico
+persiste cumplimiento o vencimiento sin IA, emails adicionales ni escalamiento.
+
+### Modelo e implementación
+
+- migración aditiva `014_team360_flow_n1_first_response_sla_v1.sql`: agrega
+  configuración positiva/null por `flow_sector_levels`, snapshots en
+  `flow_request_slas` y auditoría idempotente en `flow_request_sla_events`;
+- snapshot inmutable: duración, inicio y vencimiento pertenecen al routing
+  concreto y no cambian si después cambia el catálogo;
+- estados SLA separados de work status: `PENDING`, `MET`, `BREACHED`;
+- `first_response_at <= due_at` cumple, incluida igualdad exacta. Una respuesta
+  tardía conserva BREACHED aunque work status sea IN_PROGRESS;
+- `check_sla_once` es finito, usa clock inyectable en tests y no crea scheduler;
+- un breach provisional se reconcilia a MET solo cuando aparece evidencia
+  Gmail real recibida a tiempo. Los eventos `SLA_BREACHED` y `SLA_RECONCILED`
+  preservan la auditoría.
+
+### Evidencia real
+
+- MET: request `60aefb18-3f68-445f-8ba0-b7c0dc98e53f`, routing
+  `85a2e309-eb70-4b7a-91e2-971963d096a3`; inicio
+  `2026-08-12T18:44:32.499326Z`, due `18:45:02.499326Z`, respuesta Gmail
+  `18:44:37Z` (T+4.501 s), SLA MET y work status IN_PROGRESS;
+- BREACHED: request `28f8e055-ac93-4c02-9e16-9bc98871fd39`, routing
+  `3b1c6a1e-2c31-4d1c-add9-20e484413b57`; inicio
+  `18:45:15.158061Z`, due `18:45:45.158061Z`, sin primera respuesta, evaluado
+  `18:45:47.886743Z`, SLA BREACHED y work status ASSIGNED;
+- exactamente un email routing por caso; segunda evaluación `checked=0`, sin
+  eventos duplicados ni cambios en timestamps definitivos;
+- integración PostgreSQL validó constraint positivo, snapshot, cambio posterior
+  de catálogo, idempotencia, respuesta tardía y reconciliación.
+
+### Fuera de alcance confirmado
+
+Sin Nivel 2/3, escalamiento, email a supervisor, delegación, resolución,
+frontend, WhatsApp/Gupshup, Pub/Sub, worker permanente ni scheduler.
 
 ## Gate 2026-08-12 — Flow respuesta operacional Alumbrado N1 V1
 

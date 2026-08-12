@@ -179,6 +179,27 @@ def test_sender_alone_without_routing_evidence_is_not_technical_identity():
     assert interpreter.calls == 0
 
 
+def test_original_routing_delivery_is_not_misclassified_as_reply():
+    repo = _Repository()
+    interpreter = _Interpreter()
+    original = InboundMessage(
+        provider="gmail",
+        channel="email",
+        external_message_id="routing-copy",
+        external_thread_id="sender-thread",
+        sender="mesaentrada@alquimiablue.com",
+        recipients=("alumbrado.n1@alquimiablue.com",),
+        subject=f"[Team360 Flow] Nueva solicitud #{REQUEST_ID}",
+        text_body="Nueva solicitud confirmada.",
+        received_at=datetime(2026, 8, 12, 15, 0, tzinfo=timezone.utc),
+    )
+    result = asyncio.run(
+        _service(repo, interpreter).process_if_operational(original)
+    )
+    assert result.matched is False
+    assert interpreter.calls == 0
+
+
 def test_unknown_request_or_missing_routing_is_not_matched():
     message = _message(
         subject="Re: solicitud #aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"

@@ -59,7 +59,24 @@ El contenido correlacionado se interpreta mediante LiteLLM y el alias
 `UNSUPPORTED_OPERATIONAL_ACTION` se auditan sin transición. El timestamp
 `first_response_at_utc` usa `InboundMessage.received_at` y queda inmutable.
 
+## SLA de primera respuesta N1
+
+La migración `014_team360_flow_n1_first_response_sla_v1.sql` configura el SLA
+en segundos por nivel y crea un snapshot inmutable al asignar. Para Alumbrado
+N1 la duración inicial es 30 segundos. El snapshot usa `assigned_at_utc` como
+inicio y persiste `due_at_utc`; no vuelve a consultar el catálogo al evaluar.
+
+```bash
+uv run python -m modules.flow.check_sla_once
+```
+
+El checker finito clasifica `PENDING`, `MET` o `BREACHED` sin IA ni efectos
+externos. Una respuesta exactamente en `due_at_utc` cumple. Un breach
+provisional puede reconciliarse a MET si luego se procesa evidencia Gmail cuyo
+`received_at` real era anterior o igual al vencimiento; una respuesta realmente
+tardía conserva BREACHED aunque el trabajo pase a IN_PROGRESS.
+
 ## Límites V1
 
-No incluye SLA, vencimientos, Nivel 2/3, escalamiento, delegación, resolución,
+No incluye Nivel 2/3, escalamiento, envío a supervisor, delegación, resolución,
 frontend, WhatsApp, Pub/Sub ni daemon permanente.

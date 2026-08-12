@@ -89,7 +89,8 @@ class FlowRoutingPostgresRepository:
         row = await fetch_one(
             conn,
             """
-            select id::text, sector_id, level, channel, destination, active
+            select id::text, sector_id, level, channel, destination, active,
+                   first_response_sla_seconds
             from flow_sector_levels
             where sector_id = %(sector_id)s and level = %(level)s
             """,
@@ -301,6 +302,41 @@ class FlowRoutingPostgresRepository:
             on conflict (request_id) do nothing
             """,
             {"request_id": assignment.request_id, "routing_id": assignment.id},
+        )
+
+    async def ensure_first_response_sla(
+        self, conn: AsyncConnection, assignment: RoutingAssignment
+    ) -> None:
+        await execute(
+            conn,
+            """
+            with inserted as (
+                insert into flow_request_slas (
+                    routing_id, request_id, duration_seconds,
+                    started_at_utc, due_at_utc, evaluated_at_utc
+                )
+                select frr.id, frr.request_id, fsl.first_response_sla_seconds,
+                       frr.assigned_at_utc,
+                       frr.assigned_at_utc + make_interval(
+                           secs => fsl.first_response_sla_seconds
+                       ),
+                       frr.assigned_at_utc
+                from flow_request_routings frr
+                join flow_sector_levels fsl on fsl.id = frr.sector_level_id
+                where frr.id = %(routing_id)s
+                  and frr.status = 'ASSIGNED'
+                  and fsl.first_response_sla_seconds is not null
+                on conflict (routing_id) do nothing
+                returning id, started_at_utc
+            )
+            insert into flow_request_sla_events (
+                sla_id, event_type, occurred_at_utc, from_status, to_status
+            )
+            select id, 'SLA_STARTED', started_at_utc, null, 'PENDING'
+            from inserted
+            on conflict (sla_id, event_type) do nothing
+            """,
+            {"routing_id": assignment.id},
         )
 
     async def mark_failed(

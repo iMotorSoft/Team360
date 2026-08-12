@@ -255,6 +255,7 @@ class FlowRoutingService:
                         observed_rfc_message_id=observed,
                     )
                     await self._repository.ensure_work_state(conn, assigned)
+                    await self._repository.ensure_first_response_sla(conn, assigned)
                     return RoutingResult(
                         request.id,
                         assigned.status.value,
@@ -297,6 +298,7 @@ class FlowRoutingService:
                 observed_rfc_message_id=observed_rfc_message_id,
             )
             await self._repository.ensure_work_state(conn, assigned)
+            await self._repository.ensure_first_response_sla(conn, assigned)
             return RoutingResult(
                 request.id,
                 assigned.status.value,

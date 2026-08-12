@@ -59,6 +59,7 @@ class FlowSectorLevel:
     channel: str
     destination: str
     active: bool
+    first_response_sla_seconds: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -87,6 +88,8 @@ _CATEGORY_TO_SECTOR = {
     "poste_luz": "alumbrado",
     "poste_de_luz": "alumbrado",
     "reparacion_de_alumbrado_publico": "alumbrado",
+    "reparacion_de_alumbrado_publico_poste_de_luz": "alumbrado",
+    "alumbrado_publico_reparacion_de_luminaria": "alumbrado",
     "street_lighting": "alumbrado",
 }
 

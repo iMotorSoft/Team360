@@ -76,6 +76,7 @@ class _Repository:
         self.level = _level() if level is _DEFAULT else level
         self.assignment = None
         self.create_calls = 0
+        self.sla_calls = 0
 
     async def get_request(self, conn, request_id):
         return self.request
@@ -165,6 +166,9 @@ class _Repository:
     async def ensure_work_state(self, conn, assignment):
         return None
 
+    async def ensure_first_response_sla(self, conn, assignment):
+        self.sla_calls += 1
+
     async def mark_failed(
         self, conn, *, assignment_id, error_code, delivery_uncertain
     ):
@@ -222,6 +226,8 @@ def _service(repo, sender=None):
         "poste_luz",
         "street_lighting",
         "Reparación de alumbrado público",
+        "Reparación de alumbrado público / poste de luz",
+        "Alumbrado público - reparación de luminaria",
     ],
 )
 def test_sector_resolver_maps_known_categories(category):
@@ -271,6 +277,7 @@ def test_route_twice_creates_one_assignment_and_sends_once():
     assert second.idempotent is True
     assert second.status == "ASSIGNED"
     assert repo.create_calls == 1
+    assert repo.sla_calls == 1
     assert len(sender.send_calls) == 1
 
 
