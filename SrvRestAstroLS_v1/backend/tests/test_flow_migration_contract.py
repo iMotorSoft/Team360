@@ -21,4 +21,3 @@ def test_flow_migration_does_not_add_out_of_scope_operational_fields():
     sql = MIGRATION.read_text(encoding="utf-8").lower()
     for forbidden in ("sla_deadline", "assigned_sector", "escalation_level", "assignee_id"):
         assert forbidden not in sql
-

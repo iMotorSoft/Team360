@@ -58,4 +58,3 @@ class ReplyInterpretation:
             raise ValueError(f"Unsupported reply action: {self.action}")
         if self.action in {"correction", "reinterpret"} and not self.requests:
             raise ValueError(f"Reply action {self.action} requires the full revised request list.")
-
