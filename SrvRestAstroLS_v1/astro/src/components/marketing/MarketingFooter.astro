@@ -1,5 +1,5 @@
 ---
-import BrandMark from "./BrandMark.astro";
+import Team360Logo from "./Team360Logo.astro";
 import { CONSOLE_SITE_URL } from "../global.js";
 
 interface Props {
@@ -12,7 +12,7 @@ const { diagnosticHref = "#contacto" } = Astro.props;
 <footer class="bg-[#0d2947] text-white">
   <div class="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[1.5fr_1fr_1fr] lg:px-10">
     <div>
-      <BrandMark inverted />
+      <Team360Logo inverted showIcon={false} numberColor="text-[#8be1d8]" />
       <p class="mt-5 max-w-md text-sm leading-6 text-white/68">
         Automatización con IA aplicada a procesos reales de negocio, con implementación gradual,
         seguimiento y resultados medibles.

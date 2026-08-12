@@ -119,6 +119,37 @@ async function sendTurn(page: Page, text: string) {
 }
 
 test.describe("TEAM360_PUBLIC_HOME_VERA_PROTECTION — home pública", () => {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
+    test(`branding público ${viewport.width}px usa el logo aprobado`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      const errors = await collectConsoleErrors(page);
+
+      await page.goto(HOME_URL);
+
+      const brand = page.locator("header.sticky").getByRole("link", { name: "Team360, inicio" });
+      await expect(brand).toHaveAttribute("data-team360-logo-variant", "design-handoff");
+      await expect(brand.locator('[data-team360-wordmark="team"]')).toHaveCSS("color", "rgb(16, 45, 79)");
+      await expect(brand.locator('[data-team360-wordmark="360"]')).toHaveCSS("color", "rgb(22, 139, 136)");
+
+      const icon = brand.locator('[data-team360-logo-icon="t360"]');
+      await expect(icon).toBeVisible();
+      const backgroundImage = await icon.evaluate((element) => element.style.backgroundImage);
+      expect(backgroundImage).toMatch(/team360_logo_t/);
+      expect(backgroundImage).not.toContain("[object Object]");
+
+      const assetUrl = backgroundImage.match(/url\(["']?([^"')]+)["']?\)/)?.[1];
+      expect(assetUrl).toBeTruthy();
+      const response = await page.request.get(assetUrl!);
+      expect(response.status()).toBe(200);
+      expect(response.headers()["content-type"]).toMatch(/^image\/png/);
+
+      const footerBrand = page.locator("footer").getByRole("link", { name: "Team360, inicio" });
+      await expect(footerBrand).toHaveAttribute("data-team360-logo-variant", "design-handoff");
+      await expect(footerBrand.locator('[data-team360-logo-icon="t360"]')).toHaveCount(0);
+      expect(errors.filter((error) => !error.includes("favicon"))).toEqual([]);
+    });
+  }
+
   test("carga la home, navega a /#vera, conserva hash y sobrevive reload (desktop)", async ({ page }) => {
     const errors = await collectConsoleErrors(page);
 
