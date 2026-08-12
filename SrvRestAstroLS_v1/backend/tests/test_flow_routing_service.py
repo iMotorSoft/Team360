@@ -135,15 +135,35 @@ class _Repository:
         )
         return self.assignment
 
-    async def mark_assigned(self, conn, *, assignment_id, external_message_id):
+    async def mark_assigned(
+        self,
+        conn,
+        *,
+        assignment_id,
+        external_message_id,
+        observed_rfc_message_id=None,
+    ):
         self.assignment = replace(
             self.assignment,
             status=RoutingStatus.ASSIGNED,
             outbound_external_message_id=external_message_id,
+            outbound_observed_rfc_message_id=observed_rfc_message_id,
             delivery_uncertain=False,
             last_error_code=None,
         )
         return self.assignment
+
+    async def record_observed_rfc_message_id(
+        self, conn, *, assignment_id, observed_rfc_message_id
+    ):
+        self.assignment = replace(
+            self.assignment,
+            outbound_observed_rfc_message_id=observed_rfc_message_id,
+        )
+        return self.assignment
+
+    async def ensure_work_state(self, conn, assignment):
+        return None
 
     async def mark_failed(
         self, conn, *, assignment_id, error_code, delivery_uncertain
@@ -185,6 +205,9 @@ class _Sender:
             raise self.error
         return "gmail-out-1"
 
+    def get_message_rfc_id(self, message_id):
+        return f"<{message_id}@gmail.example>"
+
 
 def _service(repo, sender=None):
     return FlowRoutingService(pool=_Pool(), repository=repo, sender=sender)
@@ -222,6 +245,9 @@ def test_confirmed_request_routes_and_builds_useful_n1_email():
     assert result.sent is True
     assert result.assignment.sector_id == "alumbrado"
     assert result.assignment.level == 1
+    assert result.assignment.outbound_observed_rfc_message_id == (
+        "<gmail-out-1@gmail.example>"
+    )
     assert call["to"] == "alumbrado.n1@alquimiablue.com"
     assert call["subject"].startswith("[Team360 Flow] Nueva solicitud #")
     assert repo.request.id in call["subject"]

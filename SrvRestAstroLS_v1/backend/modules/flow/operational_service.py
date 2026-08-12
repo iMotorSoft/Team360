@@ -1,0 +1,129 @@
+"""Correlate and process Level 1 operational replies before citizen intake."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import datetime
+
+from psycopg import AsyncConnection
+from psycopg_pool import AsyncConnectionPool
+
+from modules.db.transaction import transaction
+from modules.messaging.domain import InboundMessage
+
+from .domain import (
+    CorrelatedOperationalReply,
+    OperationalAction,
+    OperationalStatus,
+    request_id_from_subject,
+    rfc_reference_ids,
+)
+from .operational_ai import OperationalInterpreterPort
+from .operational_repository import FlowOperationalPostgresRepository
+
+
+@dataclass(frozen=True, slots=True)
+class OperationalProcessResult:
+    matched: bool
+    processed: bool
+    request_id: str | None = None
+    routing_id: str | None = None
+    event_id: str | None = None
+    action: OperationalAction | None = None
+    status: OperationalStatus | None = None
+    first_response_at: datetime | None = None
+    correlation_method: str | None = None
+
+
+class FlowOperationalReplyService:
+    def __init__(
+        self,
+        *,
+        pool: AsyncConnectionPool,
+        repository: FlowOperationalPostgresRepository,
+        interpreter: OperationalInterpreterPort,
+    ) -> None:
+        self._pool = pool
+        self._repository = repository
+        self._interpreter = interpreter
+
+    async def process_if_operational(
+        self, message: InboundMessage
+    ) -> OperationalProcessResult:
+        async with transaction(self._pool) as conn:
+            correlation = await self._correlate(conn, message)
+            if correlation is None:
+                return OperationalProcessResult(False, False)
+
+            context = correlation.context
+            source_message_id = await self._repository.claim_message(
+                conn, context=context, message=message
+            )
+            if source_message_id is None:
+                event = await self._repository.event_for_message(
+                    conn, message.provider, message.external_message_id
+                )
+                return OperationalProcessResult(
+                    matched=True,
+                    processed=False,
+                    request_id=context.request_id,
+                    routing_id=context.routing_id,
+                    event_id=event["event_id"] if event else None,
+                    action=(
+                        OperationalAction(event["interpretation_action"])
+                        if event else None
+                    ),
+                    correlation_method=(event["correlation_method"] if event else None),
+                )
+
+            state = await self._repository.ensure_work_state(conn, context)
+            interpretation = self._interpreter.interpret(message)
+            event_id = await self._repository.record_event(
+                conn,
+                context=context,
+                source_message_id=source_message_id,
+                message=message,
+                correlation_method=correlation.method,
+                interpretation=interpretation,
+            )
+            if interpretation.action == OperationalAction.ACK_OR_PROGRESS:
+                state = await self._repository.mark_in_progress(
+                    conn, context=context, message=message
+                )
+            return OperationalProcessResult(
+                matched=True,
+                processed=True,
+                request_id=context.request_id,
+                routing_id=context.routing_id,
+                event_id=event_id,
+                action=interpretation.action,
+                status=state.status,
+                first_response_at=state.first_response_at,
+                correlation_method=correlation.method,
+            )
+
+    async def _correlate(
+        self, conn: AsyncConnection, message: InboundMessage
+    ) -> CorrelatedOperationalReply | None:
+        in_reply_to = str(message.metadata.get("in_reply_to") or "").strip()
+        if in_reply_to:
+            context = await self._repository.find_by_rfc_reference(
+                conn, rfc_reference_ids(in_reply_to, "")
+            )
+            if context is not None:
+                return CorrelatedOperationalReply(context, "in_reply_to_rfc")
+
+        references = str(message.metadata.get("references") or "").strip()
+        if references:
+            context = await self._repository.find_by_rfc_reference(
+                conn, rfc_reference_ids("", references)
+            )
+            if context is not None:
+                return CorrelatedOperationalReply(context, "references_rfc")
+
+        request_id = request_id_from_subject(message.subject)
+        if request_id:
+            context = await self._repository.find_by_request_id(conn, request_id)
+            if context is not None:
+                return CorrelatedOperationalReply(context, "subject_request_token")
+        return None

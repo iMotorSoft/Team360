@@ -11,6 +11,9 @@ from modules.db.settings import get_database_settings
 from modules.messaging.providers.gmail import GmailClient
 
 from .intake.ai import LiteLLMFlowIntakeInterpreter
+from .operational_ai import LiteLLMOperationalInterpreter
+from .operational_repository import FlowOperationalPostgresRepository
+from .operational_service import FlowOperationalReplyService
 from .repository import FlowPostgresRepository
 from .service import FlowIntakeService
 
@@ -35,6 +38,8 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
     duplicates = 0
     confirmations = 0
     confirmed_requests = 0
+    operational_replies = 0
+    operational_duplicates = 0
     try:
         service = FlowIntakeService(
             pool=pool,
@@ -42,9 +47,31 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
             interpreter=LiteLLMFlowIntakeInterpreter(),
             reply_sender=gmail,
         )
+        operational_service = FlowOperationalReplyService(
+            pool=pool,
+            repository=FlowOperationalPostgresRepository(),
+            interpreter=LiteLLMOperationalInterpreter(),
+        )
         message_ids = gmail.list_messages(max_results=limit, q=query)
         for message_id in reversed(message_ids):
             message = gmail.get_inbound_message(message_id)
+            operational = await operational_service.process_if_operational(message)
+            if operational.matched:
+                if operational.processed:
+                    processed += 1
+                    operational_replies += 1
+                    print(
+                        "flow operational reply processed "
+                        f"message_id={message.external_message_id} "
+                        f"request_id={operational.request_id} "
+                        f"routing_id={operational.routing_id} "
+                        f"action={operational.action} status={operational.status} "
+                        f"correlation={operational.correlation_method}"
+                    )
+                else:
+                    duplicates += 1
+                    operational_duplicates += 1
+                continue
             result = await service.process(message)
             if result.processed:
                 processed += 1
@@ -65,6 +92,8 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
             "duplicates": duplicates,
             "confirmations_sent": confirmations,
             "confirmed_requests": confirmed_requests,
+            "operational_replies": operational_replies,
+            "operational_duplicates": operational_duplicates,
         }
     finally:
         await close_pool(pool)

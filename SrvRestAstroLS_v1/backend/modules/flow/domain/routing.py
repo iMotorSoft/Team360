@@ -73,6 +73,7 @@ class RoutingAssignment:
     status: RoutingStatus
     outbound_rfc_message_id: str | None
     outbound_external_message_id: str | None
+    outbound_observed_rfc_message_id: str | None = None
     attempt_count: int = 0
     delivery_uncertain: bool = False
     last_error_code: str | None = None

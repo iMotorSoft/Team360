@@ -130,6 +130,13 @@ def test_get_inbound_message_requests_full_payload_without_modifying_labels():
     assert api.get_kwargs == {"userId": "me", "id": "gmail-message-1", "format": "full"}
 
 
+def test_get_message_rfc_id_uses_normalized_real_header():
+    api = _MessagesApi(_gmail_payload())
+    assert _client(api).get_message_rfc_id("gmail-message-1") == (
+        "<external-1@example.com>"
+    )
+
+
 def test_send_reply_preserves_gmail_thread_and_rfc_reply_headers():
     api = _MessagesApi()
     result = _client(api).send_reply(

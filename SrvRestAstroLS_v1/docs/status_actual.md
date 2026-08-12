@@ -30,6 +30,48 @@ Referencias canonicas:
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
 
+## Gate 2026-08-12 — Flow respuesta operacional Alumbrado N1 V1
+
+Estado: PASS funcional real/controlado. La respuesta humana del técnico al
+routing de Alumbrado N1 volvió a `mesaentrada@`, se normalizó, correlacionó por
+evidencia RFC persistida, interpretó mediante LiteLLM y produjo `IN_PROGRESS`
+con primer tiempo de respuesta inmutable.
+
+### Arquitectura e implementación
+
+- migración aditiva `013_team360_flow_n1_operational_reply_v1.sql`: RFC real
+  observado del outbound, `flow_request_work_states` y
+  `flow_request_operational_events`;
+- dispatcher dentro del único `poll_once`: correlación operacional primero e
+  intake ciudadano únicamente cuando no existe routing correlacionado;
+- correlación por `In-Reply-To`, `References`, RFC observado/intencionado y UUID
+  estable del request en subject; sender y Gmail `threadId` no deciden identidad;
+- interpretación validada por schema con LiteLLM alias
+  `openai_gpt-5.4-nano`: `ACK_OR_PROGRESS`, `AMBIGUOUS`, `UNRELATED` y
+  `UNSUPPORTED_OPERATIONAL_ACTION`;
+- routing `ASSIGNED` y estado operacional permanecen separados. Resolución o
+  cierre informados por el técnico se auditan pero no cierran el request.
+
+### Evidencia real
+
+- request `656977af-cc29-43d6-b78c-53464818f06a`, routing
+  `2b355d5a-813b-441f-baf2-238d1bc1d516`, outbound Gmail
+  `19ff654320c4964c`;
+- reply real desde `mario.rojas@alquimiablue.com`, inbound Gmail de
+  `mesaentrada@` `19ff6a9e337d5362`, correlación `in_reply_to_rfc`;
+- interpretación `ACK_OR_PROGRESS`, estado `ASSIGNED → IN_PROGRESS`,
+  `first_response_at_utc=2026-08-12T15:49:15Z`, igual al timestamp Gmail;
+- segundo polling: 0 procesados, 1 duplicado operacional, 1 evento total y
+  `first_response_at_utc` sin cambios;
+- preflight PostgreSQL 18.4, Milvus productivo, LiteLLM/modelo real y Gmail DWD
+  para mesa/técnico: PASS. Smoke real: dos avances `ACK_OR_PROGRESS`; “Ok.”
+  conservadoramente `AMBIGUOUS`.
+
+### Fuera de alcance confirmado
+
+Sin SLA, timeout, vencimiento, Nivel 2/3, escalamiento, delegación, resolución,
+frontend, WhatsApp/Gupshup, Pub/Sub, worker permanente ni orquestador general.
+
 ## Gate 2026-08-12 — Flow routing email Alumbrado Nivel 1 V1
 
 Estado: PASS funcional local/controlado. Una solicitud Flow `CONFIRMED` se

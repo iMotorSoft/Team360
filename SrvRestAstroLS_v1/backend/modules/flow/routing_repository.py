@@ -31,6 +31,7 @@ def _assignment(row: dict | None) -> RoutingAssignment | None:
         status=RoutingStatus(row["status"]),
         outbound_rfc_message_id=row["outbound_rfc_message_id"],
         outbound_external_message_id=row["outbound_external_message_id"],
+        outbound_observed_rfc_message_id=row["outbound_observed_rfc_message_id"],
         attempt_count=int(row["attempt_count"]),
         delivery_uncertain=bool(row["delivery_uncertain"]),
         last_error_code=row["last_error_code"],
@@ -41,7 +42,7 @@ _ASSIGNMENT_COLUMNS = """
     id::text, request_id::text, routing_key, sector_id, level, channel,
     destination, status, outbound_rfc_message_id,
     outbound_external_message_id, attempt_count, delivery_uncertain,
-    last_error_code
+    last_error_code, outbound_observed_rfc_message_id
 """
 
 
@@ -219,6 +220,7 @@ class FlowRoutingPostgresRepository:
         *,
         assignment_id: str,
         external_message_id: str,
+        observed_rfc_message_id: str | None = None,
     ) -> RoutingAssignment:
         row = await fetch_one(
             conn,
@@ -226,6 +228,10 @@ class FlowRoutingPostgresRepository:
             update flow_request_routings
             set status = 'ASSIGNED',
                 outbound_external_message_id = %(external_message_id)s,
+                outbound_observed_rfc_message_id = coalesce(
+                    %(observed_rfc_message_id)s,
+                    outbound_observed_rfc_message_id
+                ),
                 delivery_uncertain = false,
                 last_error_code = null,
                 last_error_detail = null,
@@ -237,12 +243,65 @@ class FlowRoutingPostgresRepository:
             {
                 "assignment_id": assignment_id,
                 "external_message_id": external_message_id,
+                "observed_rfc_message_id": observed_rfc_message_id,
             },
         )
         assignment = _assignment(row)
         if assignment is None:
             raise RuntimeError("Flow routing assigned update returned no row.")
         return assignment
+
+    async def record_observed_rfc_message_id(
+        self,
+        conn: AsyncConnection,
+        *,
+        assignment_id: str,
+        observed_rfc_message_id: str,
+    ) -> RoutingAssignment:
+        row = await fetch_one(
+            conn,
+            f"""
+            update flow_request_routings
+            set outbound_observed_rfc_message_id = %(observed_rfc_message_id)s,
+                updated_at_utc = now()
+            where id = %(assignment_id)s
+              and outbound_observed_rfc_message_id is null
+            returning {_ASSIGNMENT_COLUMNS}
+            """,
+            {
+                "assignment_id": assignment_id,
+                "observed_rfc_message_id": observed_rfc_message_id,
+            },
+        )
+        assignment = _assignment(row)
+        if assignment is not None:
+            return assignment
+        existing = await fetch_one(
+            conn,
+            f"""
+            select {_ASSIGNMENT_COLUMNS}
+            from flow_request_routings
+            where id = %(assignment_id)s
+            """,
+            {"assignment_id": assignment_id},
+        )
+        assignment = _assignment(existing)
+        if assignment is None:
+            raise RuntimeError("Flow routing observed RFC update returned no row.")
+        return assignment
+
+    async def ensure_work_state(
+        self, conn: AsyncConnection, assignment: RoutingAssignment
+    ) -> None:
+        await execute(
+            conn,
+            """
+            insert into flow_request_work_states (request_id, routing_id)
+            values (%(request_id)s, %(routing_id)s)
+            on conflict (request_id) do nothing
+            """,
+            {"request_id": assignment.request_id, "routing_id": assignment.id},
+        )
 
     async def mark_failed(
         self,
@@ -285,6 +344,7 @@ class FlowRoutingPostgresRepository:
                    frr.routing_key, frr.sector_id, frr.level, frr.channel,
                    frr.destination, frr.status,
                    frr.outbound_rfc_message_id,
+                   frr.outbound_observed_rfc_message_id,
                    frr.outbound_external_message_id, frr.attempt_count,
                    frr.delivery_uncertain, frr.last_error_code,
                    frr.routed_at_utc, frr.assigned_at_utc

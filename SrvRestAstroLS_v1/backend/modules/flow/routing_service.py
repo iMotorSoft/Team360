@@ -46,6 +46,8 @@ class RoutingMessageSenderPort(Protocol):
         self, reference: str, *, to: str | None = None
     ) -> str | None: ...
 
+    def get_message_rfc_id(self, message_id: str) -> str | None: ...
+
 
 @dataclass(frozen=True, slots=True)
 class RoutingEmail:
@@ -125,6 +127,22 @@ class FlowRoutingService:
 
             existing = await self._repository.get_assignment(conn, request_id)
             if existing is not None and existing.status == RoutingStatus.ASSIGNED:
+                if (
+                    confirm_send
+                    and self._sender is not None
+                    and existing.outbound_external_message_id
+                    and not existing.outbound_observed_rfc_message_id
+                ):
+                    observed = _safe_observed_rfc_message_id(
+                        self._sender, existing.outbound_external_message_id
+                    )
+                    if observed:
+                        existing = await self._repository.record_observed_rfc_message_id(
+                            conn,
+                            assignment_id=existing.id,
+                            observed_rfc_message_id=observed,
+                        )
+                await self._repository.ensure_work_state(conn, existing)
                 return RoutingResult(
                     request_id=request.id,
                     status=existing.status.value,
@@ -227,11 +245,16 @@ class FlowRoutingService:
                     )
                 )
                 if recovered_message_id:
+                    observed = _safe_observed_rfc_message_id(
+                        self._sender, recovered_message_id
+                    )
                     assigned = await self._repository.mark_assigned(
                         conn,
                         assignment_id=assignment.id,
                         external_message_id=recovered_message_id,
+                        observed_rfc_message_id=observed,
                     )
+                    await self._repository.ensure_work_state(conn, assigned)
                     return RoutingResult(
                         request.id,
                         assigned.status.value,
@@ -245,6 +268,9 @@ class FlowRoutingService:
                     subject=email.subject,
                     body=email.body,
                     rfc_message_id=email.rfc_message_id,
+                )
+                observed_rfc_message_id = _safe_observed_rfc_message_id(
+                    self._sender, external_message_id
                 )
             except Exception as exc:
                 failed = await self._repository.mark_failed(
@@ -268,7 +294,9 @@ class FlowRoutingService:
                 conn,
                 assignment_id=assignment.id,
                 external_message_id=external_message_id,
+                observed_rfc_message_id=observed_rfc_message_id,
             )
+            await self._repository.ensure_work_state(conn, assigned)
             return RoutingResult(
                 request.id,
                 assigned.status.value,
@@ -284,3 +312,12 @@ def _delivery_is_uncertain(exc: Exception) -> bool:
     return isinstance(exc, urllib.error.URLError) and isinstance(
         exc.reason, (TimeoutError, socket.timeout)
     )
+
+
+def _safe_observed_rfc_message_id(
+    sender: RoutingMessageSenderPort, external_message_id: str
+) -> str | None:
+    try:
+        return sender.get_message_rfc_id(external_message_id)
+    except Exception:
+        return None

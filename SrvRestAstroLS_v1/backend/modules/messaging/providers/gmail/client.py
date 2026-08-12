@@ -254,6 +254,12 @@ class GmailClient:
         )
         return message_ids[0] if message_ids else None
 
+    def get_message_rfc_id(self, message_id: str) -> str | None:
+        """Return the RFC Message-ID Gmail actually stored for a message."""
+        message = self.get_inbound_message(message_id)
+        value = str(message.metadata.get("rfc_message_id") or "").strip()
+        return value or None
+
     def send_reply(
         self,
         *,

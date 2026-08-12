@@ -1,4 +1,4 @@
-# Team360 Flow email intake y routing N1 V1
+# Team360 Flow email intake, routing y respuesta operacional N1 V1
 
 Este módulo contiene la lógica de negocio del intake por email. Recibe
 `InboundMessage` normalizados por Messaging, interpreta solicitudes mediante el
@@ -45,7 +45,21 @@ destino `alumbrado.n1@alquimiablue.com`. La unicidad
 el servicio reconcilia Gmail Sent por `Message-ID` y por la referencia única del
 request; un fallo de reconciliación no habilita un segundo envío.
 
+## Respuesta operacional Nivel 1
+
+La migración `013_team360_flow_n1_operational_reply_v1.sql` agrega estado de
+trabajo y eventos auditables. `poll_once` intenta primero una correlación
+operacional determinística por `In-Reply-To`, `References` o UUID persistido en
+el subject. Solo los mensajes no correlacionados continúan al intake ciudadano;
+ni sender ni Gmail `threadId` deciden identidad técnica.
+
+El contenido correlacionado se interpreta mediante LiteLLM y el alias
+`openai_gpt-5.4-nano`. `ACK_OR_PROGRESS` cambia el estado operacional de
+`ASSIGNED` a `IN_PROGRESS`; `AMBIGUOUS`, `UNRELATED` y
+`UNSUPPORTED_OPERATIONAL_ACTION` se auditan sin transición. El timestamp
+`first_response_at_utc` usa `InboundMessage.received_at` y queda inmutable.
+
 ## Límites V1
 
-No incluye SLA, Nivel 2/3, escalamiento, delegación, respuesta del técnico,
+No incluye SLA, vencimientos, Nivel 2/3, escalamiento, delegación, resolución,
 frontend, WhatsApp, Pub/Sub ni daemon permanente.

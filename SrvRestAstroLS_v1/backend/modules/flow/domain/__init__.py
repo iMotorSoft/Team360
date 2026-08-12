@@ -1,4 +1,14 @@
 from .models import CandidateRequest, InitialInterpretation, ReplyInterpretation
+from .operations import (
+    CorrelatedOperationalReply,
+    OperationalAction,
+    OperationalInterpretation,
+    OperationalRoutingContext,
+    OperationalStatus,
+    OperationalWorkState,
+    request_id_from_subject,
+    rfc_reference_ids,
+)
 from .routing import (
     ConfirmedFlowRequest,
     FlowRequestNotConfirmedError,
@@ -17,6 +27,7 @@ __all__ = [
     "CandidateRequest",
     "ConversationState",
     "ConfirmedFlowRequest",
+    "CorrelatedOperationalReply",
     "FlowRequestNotConfirmedError",
     "FlowRequestNotFoundError",
     "FlowRoutingError",
@@ -24,10 +35,17 @@ __all__ = [
     "FlowSectorLevel",
     "InitialInterpretation",
     "InvalidStateTransition",
+    "OperationalAction",
+    "OperationalInterpretation",
+    "OperationalRoutingContext",
+    "OperationalStatus",
+    "OperationalWorkState",
     "ReplyInterpretation",
     "RoutingAssignment",
     "RoutingStatus",
     "resolve_sector_id",
+    "request_id_from_subject",
+    "rfc_reference_ids",
     "routing_rfc_message_id",
     "transition",
 ]
