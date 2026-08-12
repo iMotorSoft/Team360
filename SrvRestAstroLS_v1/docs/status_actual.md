@@ -30,6 +30,58 @@ Referencias canonicas:
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
 
+## Gate 2026-08-12 — Flow email AI intake con confirmación humana V1
+
+Estado: PASS funcional local/controlado. Vertical real Gmail → Messaging → Flow
+→ LiteLLM/GPT-5.4 nano → confirmación Gmail → solicitudes `CONFIRMED`, sin
+routing ni capacidades del gate siguiente.
+
+### Arquitectura e implementación
+
+- Messaging incorpora `InboundMessage` inmutable y
+  `OutboundMessageReceipt`; Gmail normaliza headers/MIME `text/plain`, conserva
+  message/thread IDs y responde con `threadId`, `In-Reply-To` y `References`.
+- `modules/flow/` separa dominio, máquina de estados, intake IA, repository
+  PostgreSQL, servicio y `poll_once` finito.
+- La idempotencia usa `unique (provider, external_message_id)` y no depende de
+  `UNREAD`; el polling no modifica labels.
+- IA: adapter `LiteLLMClient` existente, alias efectivo
+  `openai_gpt-5.4-nano`, Chat Completions, JSON validado con schema Python y sin
+  fallback silencioso.
+- Persistencia: migración aditiva
+  `011_team360_flow_email_intake_v1.sql`, aplicada sobre la DB local/controlada;
+  5 tablas Flow para conversaciones, mensajes, interpretaciones, candidatos
+  revisionados y solicitudes confirmadas.
+
+### Evidencia real
+
+- preflight: PostgreSQL 18.4 PASS; Milvus y collection productiva PASS;
+  LiteLLM alias registrado + llamada real no vacía PASS; Gmail DWD lectura PASS.
+- smoke LiteLLM real: Caso A = 1 solicitud; Caso B = 2 solicitudes preservando
+  “misma cuadra”; confirmación y corrección clasificadas correctamente.
+- E2E A, thread de entrada `19ff62e3dba7f4e4`: 3 mensajes trazados,
+  2 interpretaciones, 1 candidato, estado `CONFIRMED`, 1 solicitud confirmada;
+  tercer `poll_once` procesó 0 mensajes nuevos.
+- E2E B, thread de entrada `19ff62ee85b334a6`: 3 mensajes trazados,
+  2 interpretaciones, 2 candidatos, estado `CONFIRMED`, 2 solicitudes
+  confirmadas independientes; tercer `poll_once` procesó 0 mensajes nuevos.
+
+### Tests y correcciones iterativas
+
+- tests Flow/Messaging focalizados: 23 PASS;
+- integración repository con PostgreSQL real y rollback: 1 PASS;
+- regresión backend completa: 1185 PASS, 10 skips, 1 warning preexistente;
+- bug E2E corregido: GPT-5.4 nano clasificó inicialmente “Sí, correcto.” como
+  ambiguo; causa raíz en prompt sin ejemplos de decisión, corregida y protegida
+  con smoke real;
+- bug de aislamiento de suite corregido: tests DB sin DSN dependían del momento
+  de import de `globalVar`; el fallback se aísla explícitamente en esos tests.
+
+### Fuera de alcance confirmado
+
+Sin routing, sectores, SLA, niveles, escalamiento, delegación, dashboard,
+frontend Flow, WhatsApp/Gupshup, MercadoLibre, Pub/Sub ni daemon permanente.
+
 ## Stage 9 2026-08-06 — consolidacion UX, sincronizacion de estado y regresion protegida
 
 Estado: CONSOLIDADO. Documentacion canonica y documento consolidado UX creados;

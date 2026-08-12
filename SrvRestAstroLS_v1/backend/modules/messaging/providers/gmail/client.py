@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import base64
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from email.message import EmailMessage
+from email.utils import getaddresses, parsedate_to_datetime
 from typing import Any
 
 from googleapiclient.discovery import Resource, build
 from googleapiclient.errors import HttpError
+
+from modules.messaging.domain import InboundMessage, OutboundMessageReceipt
 
 from .auth import create_delegated_credentials
 from .config import GmailConfigurationError, delegated_user
@@ -30,6 +34,80 @@ class GmailMessageMetadata:
     date: str
 
 
+def _decode_body(data: str) -> str:
+    if not data:
+        return ""
+    padding = "=" * (-len(data) % 4)
+    try:
+        return base64.urlsafe_b64decode(data + padding).decode("utf-8", errors="replace")
+    except (ValueError, TypeError):
+        return ""
+
+
+def _plain_text_body(payload: dict[str, Any]) -> str:
+    if payload.get("filename"):
+        return ""
+    if payload.get("mimeType") == "text/plain":
+        return _decode_body(str(payload.get("body", {}).get("data") or "")).strip()
+    parts = payload.get("parts") or []
+    plain_parts = [_plain_text_body(part) for part in parts if isinstance(part, dict)]
+    return "\n\n".join(part for part in plain_parts if part).strip()
+
+
+def _addresses(header_values: list[str]) -> tuple[str, ...]:
+    return tuple(address for _name, address in getaddresses(header_values) if address)
+
+
+def normalize_gmail_message(payload: dict[str, Any]) -> InboundMessage:
+    """Convert a Gmail ``format=full`` response without mutating it."""
+    gmail_payload = payload.get("payload") or {}
+    headers_list = gmail_payload.get("headers") or []
+    headers: dict[str, list[str]] = {}
+    for item in headers_list:
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get("name") or "").lower()
+        if name:
+            headers.setdefault(name, []).append(str(item.get("value") or ""))
+
+    sender_addresses = _addresses(headers.get("from", []))
+    recipient_values = headers.get("to", []) + headers.get("cc", [])
+    raw_date = next(iter(headers.get("date", [])), "")
+    try:
+        received_at = parsedate_to_datetime(raw_date) if raw_date else None
+    except (TypeError, ValueError, OverflowError):
+        received_at = None
+    if received_at is None:
+        internal_date = str(payload.get("internalDate") or "")
+        try:
+            received_at = datetime.fromtimestamp(int(internal_date) / 1000, tz=timezone.utc)
+        except (TypeError, ValueError, OverflowError):
+            received_at = datetime.now(timezone.utc)
+    elif received_at.tzinfo is None:
+        received_at = received_at.replace(tzinfo=timezone.utc)
+
+    external_message_id = str(payload.get("id") or "")
+    external_thread_id = str(payload.get("threadId") or "")
+    if not external_message_id or not external_thread_id:
+        raise GmailApiError("Gmail message response did not contain message/thread ids.")
+    return InboundMessage(
+        provider="gmail",
+        channel="email",
+        external_message_id=external_message_id,
+        external_thread_id=external_thread_id,
+        sender=next(iter(sender_addresses), next(iter(headers.get("from", [])), "")),
+        recipients=_addresses(recipient_values),
+        subject=next(iter(headers.get("subject", [])), ""),
+        text_body=_plain_text_body(gmail_payload),
+        received_at=received_at.astimezone(timezone.utc),
+        metadata={
+            "rfc_message_id": next(iter(headers.get("message-id", [])), ""),
+            "in_reply_to": next(iter(headers.get("in-reply-to", [])), ""),
+            "references": next(iter(headers.get("references", [])), ""),
+        },
+    )
+
+
 class GmailClient:
     """Small synchronous wrapper around the Gmail API methods under validation."""
 
@@ -39,6 +117,10 @@ class GmailClient:
         self._service: Resource = build(
             "gmail", "v1", credentials=credentials, cache_discovery=False
         )
+
+    @property
+    def sender_address(self) -> str:
+        return self.subject
 
     def list_messages(
         self,
@@ -91,6 +173,21 @@ class GmailClient:
             date=headers.get("date", ""),
         )
 
+    def get_inbound_message(self, message_id: str) -> InboundMessage:
+        """Fetch and normalize one full Gmail message without changing labels."""
+        if not message_id.strip():
+            raise GmailConfigurationError("Gmail message id cannot be empty.")
+        try:
+            response = (
+                self._service.users()
+                .messages()
+                .get(userId="me", id=message_id, format="full")
+                .execute()
+            )
+        except HttpError:
+            raise GmailApiError("Gmail API failed while reading a message.") from None
+        return normalize_gmail_message(response)
+
     def send_message(self, *, to: str, subject: str, body: str) -> str:
         """Send one plain-text message as the delegated user."""
         recipient = to.strip()
@@ -118,3 +215,54 @@ class GmailClient:
         if not message_id:
             raise GmailApiError("Gmail API send response did not contain a message id.")
         return message_id
+
+    def send_reply(
+        self,
+        *,
+        to: str,
+        subject: str,
+        body: str,
+        thread_id: str,
+        in_reply_to: str = "",
+        references: str = "",
+    ) -> OutboundMessageReceipt:
+        """Send a plain-text reply and preserve Gmail/RFC thread headers."""
+        recipient = to.strip()
+        gmail_thread_id = thread_id.strip()
+        if not recipient or not gmail_thread_id:
+            raise GmailConfigurationError("Reply recipient and thread id are required.")
+        message = EmailMessage()
+        message["From"] = self.subject
+        message["To"] = recipient
+        normalized_subject = subject.strip() or "Sin asunto"
+        message["Subject"] = (
+            normalized_subject
+            if normalized_subject.lower().startswith("re:")
+            else f"Re: {normalized_subject}"
+        )
+        if in_reply_to.strip():
+            message["In-Reply-To"] = in_reply_to.strip()
+        combined_references = " ".join(
+            value for value in (references.strip(), in_reply_to.strip()) if value
+        )
+        if combined_references:
+            message["References"] = combined_references
+        message.set_content(body)
+        raw = base64.urlsafe_b64encode(message.as_bytes()).decode("ascii")
+        try:
+            response = (
+                self._service.users()
+                .messages()
+                .send(userId="me", body={"raw": raw, "threadId": gmail_thread_id})
+                .execute()
+            )
+        except HttpError:
+            raise GmailApiError("Gmail API failed while sending a reply.") from None
+        message_id = str(response.get("id") or "")
+        response_thread_id = str(response.get("threadId") or gmail_thread_id)
+        if not message_id:
+            raise GmailApiError("Gmail API send response did not contain a message id.")
+        return OutboundMessageReceipt(
+            external_message_id=message_id,
+            external_thread_id=response_thread_id,
+        )
