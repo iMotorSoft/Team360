@@ -123,6 +123,7 @@ class TestGetDatabaseSettings:
         monkeypatch.delenv("TEAM360_DB_URL", raising=False)
         monkeypatch.delenv("TEAM360_DB_URL_PSQL", raising=False)
         monkeypatch.delenv("DB_PG_V360_URL", raising=False)
+        monkeypatch.setattr(db_settings, "_resolve_global_var_dsn", lambda: "")
         with pytest.raises(DatabaseConfigurationError):
             get_database_settings()
 
@@ -130,6 +131,7 @@ class TestGetDatabaseSettings:
         monkeypatch.setenv("TEAM360_DB_URL", "sqlite:///test.db")
         monkeypatch.delenv("TEAM360_DB_URL_PSQL", raising=False)
         monkeypatch.delenv("DB_PG_V360_URL", raising=False)
+        monkeypatch.setattr(db_settings, "_resolve_global_var_dsn", lambda: "")
         with pytest.raises(DatabaseConfigurationError):
             get_database_settings()
 
