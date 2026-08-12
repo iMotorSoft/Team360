@@ -105,9 +105,14 @@ def resolve_sector_id(tentative_category: str | None) -> str | None:
     return _CATEGORY_TO_SECTOR.get(normalize_routing_category(tentative_category))
 
 
-def routing_rfc_message_id(request_id: str) -> str:
+def routing_rfc_message_id(
+    request_id: str, routing_key: str = INITIAL_N1_ROUTING_KEY
+) -> str:
     """Stable reconciliation key across DB retries and Gmail timeouts."""
     safe_request_id = re.sub(r"[^a-zA-Z0-9-]", "", request_id)
     if not safe_request_id:
         raise ValueError("Flow request id cannot produce an RFC Message-ID.")
-    return f"<team360-flow-{INITIAL_N1_ROUTING_KEY}-{safe_request_id}@alquimiablue.com>"
+    safe_routing_key = re.sub(r"[^a-zA-Z0-9-]", "-", routing_key).strip("-")
+    if not safe_routing_key:
+        raise ValueError("Flow routing key cannot produce an RFC Message-ID.")
+    return f"<team360-flow-{safe_routing_key}-{safe_request_id}@alquimiablue.com>"

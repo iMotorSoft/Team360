@@ -1,4 +1,4 @@
-# Team360 Flow email intake, routing y respuesta operacional N1 V1
+# Team360 Flow email intake y operación multinivel V1
 
 Este módulo contiene la lógica de negocio del intake por email. Recibe
 `InboundMessage` normalizados por Messaging, interpreta solicitudes mediante el
@@ -76,7 +76,31 @@ provisional puede reconciliarse a MET si luego se procesa evidencia Gmail cuyo
 `received_at` real era anterior o igual al vencimiento; una respuesta realmente
 tardía conserva BREACHED aunque el trabajo pase a IN_PROGRESS.
 
+## Escalamiento controlado N1 a N2
+
+La migración `015_team360_flow_n1_to_n2_escalation_v1.sql` hace que el estado
+operacional pertenezca al routing concreto, agrega el catálogo Alumbrado N2 y
+audita la relación entre el SLA N1 vencido y el nuevo routing N2. N1 conserva
+su email, work state y SLA; N2 nace como otra asignación `ASSIGNED`, sin SLA
+configurado en este gate.
+
+```bash
+# inspección, sin escrituras ni email
+uv run python -m modules.flow.escalate_once
+
+# sincroniza replies, reconcilia SLA y recién después permite el envío
+uv run python -m modules.flow.escalate_once \
+  --account mesaentrada@alquimiablue.com \
+  --confirm-send
+```
+
+El comando es dry-run por defecto. Antes del envío real procesa evidencia
+operacional, ejecuta el checker SLA y vuelve a bloquear/releer el breach. Una
+respuesta recibida a tiempo impide el escalamiento aunque el SLA hubiese sido
+marcado provisionalmente como BREACHED. La unicidad por SLA disparador y por
+`request_id + routing_key` evita duplicar escalamiento, routing o email.
+
 ## Límites V1
 
-No incluye Nivel 2/3, escalamiento, envío a supervisor, delegación, resolución,
-frontend, WhatsApp, Pub/Sub ni daemon permanente.
+No incluye N3, SLA N2 evaluado, escalamiento N2→N3, respuesta funcional N2,
+delegación, resolución, frontend, WhatsApp, Pub/Sub, scheduler ni daemon.

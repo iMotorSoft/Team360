@@ -82,7 +82,8 @@ class FlowOperationalPostgresRepository:
                 join flow_requests fr on fr.id = frr.request_id
                 where frr.request_id = %(request_id)s
                   and frr.status = 'ASSIGNED'
-                  and frr.routing_key = 'initial_n1'
+                order by frr.level desc, frr.assigned_at_utc desc
+                limit 1
                 """,
                 {"request_id": request_id},
             )
@@ -132,8 +133,8 @@ class FlowOperationalPostgresRepository:
             """
             insert into flow_request_work_states (request_id, routing_id)
             values (%(request_id)s, %(routing_id)s)
-            on conflict (request_id) do update set
-                routing_id = flow_request_work_states.routing_id
+            on conflict (routing_id) do update set
+                request_id = flow_request_work_states.request_id
             returning request_id::text, routing_id::text, operational_status,
                       first_response_at_utc, first_responder
             """,
@@ -210,12 +211,12 @@ class FlowOperationalPostgresRepository:
                 ),
                 first_responder = coalesce(first_responder, %(responder)s),
                 updated_at_utc = now()
-            where request_id = %(request_id)s
+            where routing_id = %(routing_id)s
             returning request_id::text, routing_id::text, operational_status,
                       first_response_at_utc, first_responder
             """,
             {
-                "request_id": context.request_id,
+                "routing_id": context.routing_id,
                 "received_at": message.received_at,
                 "responder": message.sender,
             },
@@ -241,7 +242,9 @@ class FlowOperationalPostgresRepository:
             {"provider": provider, "external_message_id": external_message_id},
         )
 
-    async def evidence(self, conn: AsyncConnection, request_id: str) -> dict | None:
+    async def evidence(
+        self, conn: AsyncConnection, request_id: str, routing_id: str | None = None
+    ) -> dict | None:
         return await fetch_one(
             conn,
             """
@@ -253,8 +256,10 @@ class FlowOperationalPostgresRepository:
             left join flow_request_operational_events foe
               on foe.request_id = fws.request_id
             where fws.request_id = %(request_id)s
+              and (%(routing_id)s::uuid is null
+                   or fws.routing_id = %(routing_id)s::uuid)
             group by fws.request_id, fws.routing_id, fws.operational_status,
                      fws.first_response_at_utc, fws.first_responder
             """,
-            {"request_id": request_id},
+            {"request_id": request_id, "routing_id": routing_id},
         )

@@ -101,6 +101,13 @@ class FlowRoutingPostgresRepository:
     async def get_assignment(
         self, conn: AsyncConnection, request_id: str
     ) -> RoutingAssignment | None:
+        return await self.get_assignment_for_key(
+            conn, request_id=request_id, routing_key=INITIAL_N1_ROUTING_KEY
+        )
+
+    async def get_assignment_for_key(
+        self, conn: AsyncConnection, *, request_id: str, routing_key: str
+    ) -> RoutingAssignment | None:
         row = await fetch_one(
             conn,
             f"""
@@ -109,7 +116,7 @@ class FlowRoutingPostgresRepository:
             where request_id = %(request_id)s and routing_key = %(routing_key)s
             for update
             """,
-            {"request_id": request_id, "routing_key": INITIAL_N1_ROUTING_KEY},
+            {"request_id": request_id, "routing_key": routing_key},
         )
         return _assignment(row)
 
@@ -118,6 +125,25 @@ class FlowRoutingPostgresRepository:
         conn: AsyncConnection,
         *,
         request_id: str,
+        sector: FlowSector,
+        sector_level: FlowSectorLevel,
+        outbound_rfc_message_id: str,
+    ) -> RoutingAssignment:
+        return await self.create_pending_assignment_for_level(
+            conn,
+            request_id=request_id,
+            routing_key=INITIAL_N1_ROUTING_KEY,
+            sector=sector,
+            sector_level=sector_level,
+            outbound_rfc_message_id=outbound_rfc_message_id,
+        )
+
+    async def create_pending_assignment_for_level(
+        self,
+        conn: AsyncConnection,
+        *,
+        request_id: str,
+        routing_key: str,
         sector: FlowSector,
         sector_level: FlowSectorLevel,
         outbound_rfc_message_id: str,
@@ -138,7 +164,7 @@ class FlowRoutingPostgresRepository:
             """,
             {
                 "request_id": request_id,
-                "routing_key": INITIAL_N1_ROUTING_KEY,
+                "routing_key": routing_key,
                 "sector_id": sector.sector_id,
                 "sector_level_id": sector_level.id,
                 "level": sector_level.level,
@@ -150,7 +176,9 @@ class FlowRoutingPostgresRepository:
         created = _assignment(row)
         if created is not None:
             return created
-        existing = await self.get_assignment(conn, request_id)
+        existing = await self.get_assignment_for_key(
+            conn, request_id=request_id, routing_key=routing_key
+        )
         if existing is None:
             raise RuntimeError("Flow routing assignment conflict returned no row.")
         return existing
@@ -299,7 +327,7 @@ class FlowRoutingPostgresRepository:
             """
             insert into flow_request_work_states (request_id, routing_id)
             values (%(request_id)s, %(routing_id)s)
-            on conflict (request_id) do nothing
+            on conflict (routing_id) do nothing
             """,
             {"request_id": assignment.request_id, "routing_id": assignment.id},
         )
@@ -389,4 +417,25 @@ class FlowRoutingPostgresRepository:
               and frr.routing_key = %(routing_key)s
             """,
             {"request_id": request_id, "routing_key": INITIAL_N1_ROUTING_KEY},
+        )
+
+    async def routing_evidence_for_key(
+        self, conn: AsyncConnection, *, request_id: str, routing_key: str
+    ) -> dict | None:
+        return await fetch_one(
+            conn,
+            """
+            select frr.id::text as routing_id, frr.request_id::text,
+                   frr.routing_key, frr.sector_id, frr.level, frr.channel,
+                   frr.destination, frr.status,
+                   frr.outbound_rfc_message_id,
+                   frr.outbound_observed_rfc_message_id,
+                   frr.outbound_external_message_id, frr.attempt_count,
+                   frr.delivery_uncertain, frr.last_error_code,
+                   frr.routed_at_utc, frr.assigned_at_utc
+            from flow_request_routings frr
+            where frr.request_id = %(request_id)s
+              and frr.routing_key = %(routing_key)s
+            """,
+            {"request_id": request_id, "routing_key": routing_key},
         )

@@ -22,6 +22,12 @@ from .routing import (
     routing_rfc_message_id,
 )
 from .states import ConversationState, InvalidStateTransition, transition
+from .escalation import (
+    FIRST_RESPONSE_SLA_BREACHED,
+    EscalationCandidate,
+    EscalationStatus,
+    FlowEscalation,
+)
 from .sla import (
     FirstResponseSLA,
     FirstResponseSLAStatus,
@@ -40,6 +46,10 @@ __all__ = [
     "FlowRoutingError",
     "FlowSector",
     "FlowSectorLevel",
+    "FIRST_RESPONSE_SLA_BREACHED",
+    "EscalationCandidate",
+    "EscalationStatus",
+    "FlowEscalation",
     "FirstResponseSLA",
     "FirstResponseSLAStatus",
     "InitialInterpretation",

@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-12 (Flow SLA primera respuesta Alumbrado N1 V1)
+Ultima actualizacion: 2026-08-12 (Flow escalamiento Alumbrado N1 a N2 V1)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,45 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Gate 2026-08-12 — Flow escalamiento Alumbrado N1 a N2 V1
+
+Estado: PASS funcional real/controlado. Un breach final de primera respuesta
+N1 crea una etapa N2 independiente, entrega un único email real al destino
+lógico del catálogo y preserva íntegramente toda la evidencia N1.
+
+### Modelo e implementación
+
+- migración aditiva `015_team360_flow_n1_to_n2_escalation_v1.sql`: work state
+  por routing, seed Alumbrado N2 sin SLA y auditoría idempotente en
+  `flow_request_escalations`;
+- N1 y N2 conviven como routings distintos; la unicidad del trigger SLA y de
+  `request_id + routing_key` protege escalamiento y asignación;
+- `escalate_once` es dry-run por defecto. En modo real procesa primero replies
+  del inbox, reconcilia SLA y hace una última relectura bloqueada; evidencia
+  recibida a tiempo excluye el breach antes de cualquier envío;
+- el envío N2 reutiliza Messaging/Gmail y la reconciliación por RFC/reference.
+  Una entrega incierta no habilita un reenvío ciego;
+- el nivel actual se deriva del routing `ASSIGNED` de mayor nivel, sin puntero
+  duplicado ni sobrescritura histórica.
+
+### Evidencia real
+
+- request `28f8e055-ac93-4c02-9e16-9bc98871fd39`; routing N1
+  `3b1c6a1e-2c31-4d1c-add9-20e484413b57`, SLA
+  `a7be9c45-f9aa-45b0-a079-d2d4efab1b05` BREACHED, sin primera respuesta;
+- escalamiento `c1272620-6855-4622-9f40-07924465c5c0`, trigger
+  `FIRST_RESPONSE_SLA_BREACHED`, N1→N2, COMPLETED;
+- routing N2 `ff1ddbdb-8c85-46f8-ad55-1478bc511e92`, ASSIGNED a
+  `alumbrado.n2@alquimiablue.com`, Gmail sender id `19ff77a8a8717621`;
+- el buzón físico recibió un único mensaje con `To` lógico N2 y el mismo RFC
+  Message-ID observado. Segunda ejecución: eligible/created/sent = 0;
+- N1 continúa ASSIGNED con SLA BREACHED; N2 continúa ASSIGNED sin snapshot SLA.
+
+### Fuera de alcance confirmado
+
+Sin N3, SLA N2 evaluado, escalamiento N2→N3, delegación, resolución, frontend,
+WhatsApp/Gupshup, Pub/Sub, scheduler ni worker permanente.
 
 ## Gate 2026-08-12 — Flow SLA primera respuesta Alumbrado N1 V1
 
