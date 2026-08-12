@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-06 (deploy productivo Console UX)
+Ultima actualizacion: 2026-08-12 (Flow routing email Alumbrado Nivel 1 V1)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,43 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Gate 2026-08-12 — Flow routing email Alumbrado Nivel 1 V1
+
+Estado: PASS funcional local/controlado. Una solicitud Flow `CONFIRMED` se
+resuelve contra catálogo estable, se asigna a `alumbrado` Nivel 1 y se entrega
+por Messaging/Gmail a `alumbrado.n1@alquimiablue.com` sin duplicación.
+
+### Arquitectura e implementación
+
+- migración aditiva `012_team360_flow_routing_n1_v1.sql`: catálogos
+  `flow_sectors`, `flow_sector_levels` y evidencia idempotente en
+  `flow_request_routings`;
+- resolución determinística de categorías normalizadas; categorías desconocidas
+  o catálogo/nivel inactivo quedan `ROUTING_UNRESOLVED` y no envían email;
+- el estado principal `CONFIRMED` permanece estable y el routing usa su propia
+  máquina mínima (`ROUTING_PENDING`, `ASSIGNED`, `ROUTING_UNRESOLVED`,
+  `ROUTING_FAILED`);
+- `route_once` es dry-run por defecto y exige `--confirm-send` para Gmail real;
+- retries consultan Gmail Sent por `Message-ID` y referencia única de request.
+  Gmail reescribe el primero en envíos API, por lo que la referencia persistente
+  y visible en subject/body es la reconciliación efectiva.
+
+### Evidencia real
+
+- request `656977af-cc29-43d6-b78c-53464818f06a`, routing
+  `2b355d5a-813b-441f-baf2-238d1bc1d516`, sector `alumbrado`, Nivel 1;
+- Gmail emisor aceptó message id `19ff654320c4964c`; el buzón destino recibió un
+  único mensaje correlacionado por request id;
+- segunda ejecución: mismo routing/message id, `sent=False`,
+  `idempotent=True`; un único registro de routing y un único mensaje en Sent;
+- preflight: PostgreSQL 18.4, Milvus collection productiva, LiteLLM alias
+  `openai_gpt-5.4-nano` con llamada real no vacía y Gmail DWD lectura: PASS.
+
+### Fuera de alcance confirmado
+
+Sin SLA, timers, Nivel 2/3, escalamiento, delegación, respuesta del técnico,
+frontend, WhatsApp/Gupshup, Pub/Sub, worker permanente ni orquestador general.
 
 ## Gate 2026-08-12 — Flow email AI intake con confirmación humana V1
 

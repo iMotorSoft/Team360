@@ -7,6 +7,7 @@ from email import message_from_bytes
 import pytest
 
 from modules.messaging.providers.gmail import GmailClient, normalize_gmail_message
+from modules.messaging.providers.gmail.config import GmailConfigurationError
 
 
 def _encoded(value: str) -> str:
@@ -79,9 +80,11 @@ class _Executable:
 
 
 class _MessagesApi:
-    def __init__(self, full_payload=None):
+    def __init__(self, full_payload=None, list_response=None):
         self.full_payload = full_payload
+        self.list_response = list_response or {"messages": []}
         self.get_kwargs = None
+        self.list_kwargs = None
         self.send_kwargs = None
 
     def get(self, **kwargs):
@@ -91,6 +94,10 @@ class _MessagesApi:
     def send(self, **kwargs):
         self.send_kwargs = kwargs
         return _Executable({"id": "out-1", "threadId": "gmail-thread-1"})
+
+    def list(self, **kwargs):
+        self.list_kwargs = kwargs
+        return _Executable(self.list_response)
 
 
 class _UsersApi:
@@ -141,3 +148,58 @@ def test_send_reply_preserves_gmail_thread_and_rfc_reply_headers():
     assert email["Subject"] == "Re: Solicitud"
     assert email["In-Reply-To"] == "<external-1@example.com>"
     assert email["References"] == "<root@example.com> <external-1@example.com>"
+
+
+def test_send_message_preserves_explicit_rfc_message_id_for_safe_retry():
+    api = _MessagesApi()
+    message_id = _client(api).send_message(
+        to="alumbrado.n1@alquimiablue.com",
+        subject="Nueva solicitud",
+        body="Caso controlado",
+        rfc_message_id="<team360-flow-request-1@alquimiablue.com>",
+    )
+    decoded = base64.urlsafe_b64decode(api.send_kwargs["body"]["raw"])
+    email = message_from_bytes(decoded)
+    assert message_id == "out-1"
+    assert email["Message-ID"] == "<team360-flow-request-1@alquimiablue.com>"
+
+
+def test_find_sent_message_uses_exact_rfc_message_id_query():
+    api = _MessagesApi(list_response={"messages": [{"id": "out-1"}]})
+    found = _client(api).find_sent_message_by_rfc_message_id(
+        "<team360-flow-request-1@alquimiablue.com>"
+    )
+    assert found == "out-1"
+    assert api.list_kwargs == {
+        "userId": "me",
+        "maxResults": 2,
+        "q": "in:sent rfc822msgid:<team360-flow-request-1@alquimiablue.com>",
+    }
+
+
+def test_find_sent_message_by_reference_uses_quoted_sent_query():
+    api = _MessagesApi(list_response={"messages": [{"id": "out-1"}]})
+    found = _client(api).find_sent_message_by_reference(
+        "656977af-cc29-43d6-b78c-53464818f06a",
+        to="alumbrado.n1@alquimiablue.com",
+    )
+    assert found == "out-1"
+    assert api.list_kwargs == {
+        "userId": "me",
+        "maxResults": 2,
+        "q": (
+            "in:sent to:alumbrado.n1@alquimiablue.com "
+            '"656977af-cc29-43d6-b78c-53464818f06a"'
+        ),
+    }
+
+
+@pytest.mark.parametrize("value", ["bad-id", "<bad\nBcc:x@example.com>"])
+def test_send_message_rejects_invalid_rfc_message_id(value):
+    with pytest.raises(GmailConfigurationError, match="RFC Message-ID is invalid"):
+        _client(_MessagesApi()).send_message(
+            to="alumbrado.n1@alquimiablue.com",
+            subject="Nueva solicitud",
+            body="Caso controlado",
+            rfc_message_id=value,
+        )

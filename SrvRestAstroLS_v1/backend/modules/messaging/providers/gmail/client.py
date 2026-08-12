@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from email.message import EmailMessage
@@ -188,7 +189,14 @@ class GmailClient:
             raise GmailApiError("Gmail API failed while reading a message.") from None
         return normalize_gmail_message(response)
 
-    def send_message(self, *, to: str, subject: str, body: str) -> str:
+    def send_message(
+        self,
+        *,
+        to: str,
+        subject: str,
+        body: str,
+        rfc_message_id: str | None = None,
+    ) -> str:
         """Send one plain-text message as the delegated user."""
         recipient = to.strip()
         message_subject = subject.strip()
@@ -200,6 +208,8 @@ class GmailClient:
         message["From"] = self.subject
         message["To"] = recipient
         message["Subject"] = message_subject
+        if rfc_message_id is not None:
+            message["Message-ID"] = _validate_rfc_message_id(rfc_message_id)
         message.set_content(body)
         raw = base64.urlsafe_b64encode(message.as_bytes()).decode("ascii")
         try:
@@ -215,6 +225,34 @@ class GmailClient:
         if not message_id:
             raise GmailApiError("Gmail API send response did not contain a message id.")
         return message_id
+
+    def find_sent_message_by_rfc_message_id(
+        self, rfc_message_id: str
+    ) -> str | None:
+        """Find a previously accepted send for safe retry reconciliation."""
+        validated = _validate_rfc_message_id(rfc_message_id)
+        message_ids = self.list_messages(
+            max_results=2,
+            q=f"in:sent rfc822msgid:{validated}",
+        )
+        return message_ids[0] if message_ids else None
+
+    def find_sent_message_by_reference(
+        self, reference: str, *, to: str | None = None
+    ) -> str | None:
+        """Find an accepted send by a stable, searchable business reference."""
+        normalized = reference.strip()
+        if not re.fullmatch(r"[a-zA-Z0-9_-]{8,128}", normalized):
+            raise GmailConfigurationError("Message reference is invalid.")
+        recipient = (to or "").strip()
+        if recipient and not re.fullmatch(r"[^\s@]+@[^\s@]+", recipient):
+            raise GmailConfigurationError("Message recipient is invalid.")
+        recipient_query = f" to:{recipient}" if recipient else ""
+        message_ids = self.list_messages(
+            max_results=2,
+            q=f'in:sent{recipient_query} "{normalized}"',
+        )
+        return message_ids[0] if message_ids else None
 
     def send_reply(
         self,
@@ -266,3 +304,10 @@ class GmailClient:
             external_message_id=message_id,
             external_thread_id=response_thread_id,
         )
+
+
+def _validate_rfc_message_id(value: str) -> str:
+    normalized = value.strip()
+    if not re.fullmatch(r"<[^<>\s@]+@[^<>\s@]+>", normalized):
+        raise GmailConfigurationError("RFC Message-ID is invalid.")
+    return normalized
