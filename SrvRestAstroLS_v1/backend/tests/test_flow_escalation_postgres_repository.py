@@ -290,7 +290,7 @@ def test_real_postgres_multilevel_state_escalation_constraints_and_idempotency()
                 assert history == [
                     {"level": 1, "status": "ASSIGNED", "operational_status": "ASSIGNED", "sla_status": "BREACHED"},
                     {"level": 2, "status": "ASSIGNED", "operational_status": "ASSIGNED", "sla_status": "BREACHED"},
-                    {"level": 3, "status": "ASSIGNED", "operational_status": "ASSIGNED", "sla_status": None},
+                    {"level": 3, "status": "ASSIGNED", "operational_status": "ASSIGNED", "sla_status": "PENDING"},
                 ]
 
                 async with conn.cursor() as cur:
@@ -350,7 +350,7 @@ def test_real_postgres_multilevel_state_escalation_constraints_and_idempotency()
                 assert late_history == [
                     {"level": 1, "operational_status": "IN_PROGRESS", "sla_status": "BREACHED"},
                     {"level": 2, "operational_status": "ASSIGNED", "sla_status": "BREACHED"},
-                    {"level": 3, "operational_status": "ASSIGNED", "sla_status": None},
+                    {"level": 3, "operational_status": "ASSIGNED", "sla_status": "PENDING"},
                 ]
 
                 with pytest.raises(UniqueViolation):

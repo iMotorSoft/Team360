@@ -166,8 +166,8 @@ def test_late_breach_is_final_and_not_rechecked():
 
 
 class _MultilevelRepository:
-    def __init__(self, n1, n2):
-        self.slas = {n1.routing_id: n1, n2.routing_id: n2}
+    def __init__(self, *slas):
+        self.slas = {sla.routing_id: sla for sla in slas}
         self.events = []
 
     async def list_evaluable(self, conn):
@@ -202,7 +202,7 @@ class _MultilevelRepository:
         (None, DUE + timedelta(seconds=1), "BREACHED"),
     ],
 )
-def test_same_request_n1_and_n2_slas_are_evaluated_independently(
+def test_same_request_n1_n2_and_n3_slas_are_evaluated_independently(
     response, now, expected
 ):
     n1_breached_at = T0 + timedelta(seconds=31)
@@ -211,12 +211,17 @@ def test_same_request_n1_and_n2_slas_are_evaluated_independently(
         FirstResponseSLAStatus.BREACHED, None,
         breached_at=n1_breached_at, evaluated_at=n1_breached_at,
     )
-    n2_started = T0
     n2 = FirstResponseSLA(
-        "sla-n2", "routing-n2", "request-x", 30, n2_started, DUE,
+        "sla-n2", "routing-n2", "request-x", 30, T0, DUE,
+        FirstResponseSLAStatus.BREACHED, None,
+        breached_at=n1_breached_at, evaluated_at=n1_breached_at,
+    )
+    n3_started = T0
+    n3 = FirstResponseSLA(
+        "sla-n3", "routing-n3", "request-x", 30, n3_started, DUE,
         FirstResponseSLAStatus.PENDING, response,
     )
-    repo = _MultilevelRepository(n1, n2)
+    repo = _MultilevelRepository(n1, n2, n3)
     service = FlowFirstResponseSLAService(
         pool=_Pool(), repository=repo, clock=lambda: now
     )
@@ -225,10 +230,12 @@ def test_same_request_n1_and_n2_slas_are_evaluated_independently(
     second = asyncio.run(service.check_once())
 
     unchanged_n1 = repo.slas["routing-n1"]
-    evaluated_n2 = repo.slas["routing-n2"]
+    unchanged_n2 = repo.slas["routing-n2"]
+    evaluated_n3 = repo.slas["routing-n3"]
     assert unchanged_n1 == n1
+    assert unchanged_n2 == n2
     assert unchanged_n1.breached_at == n1_breached_at
-    assert evaluated_n2.status == FirstResponseSLAStatus(expected)
+    assert evaluated_n3.status == FirstResponseSLAStatus(expected)
     assert first.checked == 1
     assert second.checked == 0
-    assert repo.events == [("sla-n2", "routing-n2", expected)]
+    assert repo.events == [("sla-n3", "routing-n3", expected)]

@@ -81,6 +81,11 @@ La migración `016_team360_flow_n2_first_response_sla_v1.sql` habilita la misma
 política de 30 segundos para nuevos routings Alumbrado N2. No backfillea N2
 históricos: cada SLA conserva la política vigente cuando su routing pasó a
 `ASSIGNED`.
+La migración `018_team360_flow_n3_first_response_sla_v1.sql` configura también
+Alumbrado N3 en 30 segundos. El runtime no distingue niveles: cada routing nuevo
+consulta la política de su `sector_level_id`, crea como máximo un snapshot
+FIRST_RESPONSE y luego se evalúa por su propio `routing_id`. Los N3 creados
+cuando la política era nula permanecen sin SLA.
 
 ```bash
 uv run python -m modules.flow.check_sla_once
@@ -118,11 +123,13 @@ operacional, ejecuta el checker SLA y vuelve a bloquear/releer el breach. Una
 respuesta recibida a tiempo impide el escalamiento aunque el SLA hubiese sido
 marcado provisionalmente como BREACHED. La unicidad por SLA disparador y por
 `request_id + routing_key` evita duplicar escalamiento, routing o email.
-El destino, canal y política SLA salen del snapshot de catálogo del nivel
-resuelto; niveles inactivos se omiten. Así, un request puede conservar N1 y N2
-BREACHED mientras N3 queda ASSIGNED, con su work state propio y sin SLA.
+El destino, canal y política SLA salen del catálogo del nivel resuelto; niveles
+inactivos se omiten. Así, un request puede conservar N1 y N2 BREACHED mientras
+N3 queda ASSIGNED con su work state y snapshot SLA propios. Si N3 vence, la
+ausencia de un nivel activo posterior deja el breach persistido como fin normal
+de la cadena actual: el escalador no crea N4 ni envía otro email.
 
 ## Límites V1
 
-No incluye respuesta operacional ni SLA N3, N4, escalamiento N3→N4,
-delegación, resolución, frontend, WhatsApp, Pub/Sub, scheduler ni daemon.
+No incluye N4, escalamiento N3→N4, delegación, resolución, frontend, WhatsApp,
+Pub/Sub, scheduler ni daemon.

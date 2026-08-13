@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-13 (Flow respuesta operacional Alumbrado N3 V1)
+Ultima actualizacion: 2026-08-13 (Flow SLA primera respuesta Alumbrado N3 V1)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,61 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Gate 2026-08-13 — Flow SLA primera respuesta Alumbrado N3 V1
+
+Estado: PASS funcional real/controlado. La política de catálogo N3 en 30
+segundos activa el mismo motor FIRST_RESPONSE por routing y permite resultados
+MET o BREACHED sin lógica específica de nivel ni creación de N4.
+
+### Generalización y persistencia
+
+El runtime ya era completamente routing-scoped, por lo que el cambio funcional
+se limita a la migración de catálogo `018_team360_flow_n3_first_response_sla_v1.sql`.
+
+- cada routing ASSIGNED consulta su `sector_level_id` y congela duración,
+  `assigned_at_utc` y `due_at_utc` en un único snapshot;
+- checker, primera respuesta, reconciliación y eventos operan por `routing_id`;
+- N1, N2 y N3 pueden conservar tres FIRST_RESPONSE independientes para un mismo
+  request;
+- el N3 histórico `0fc2db47-064a-40ce-ad03-25e4d9877bdf`, creado con política
+  nula, continúa con cero SLA;
+- al no existir nivel activo posterior a N3, un breach final no es elegible para
+  escalamiento y no crea N4.
+
+### Evidencia real MET
+
+El caso `56076a27-4927-495c-b3f6-1a4fe309f31e` recorrió N1 y N2 BREACHED antes
+de asignar N3 `c7a7d73b-8c98-4458-9ab4-83f1189c114b`.
+
+- snapshot N3: 30 s desde `16:27:14.818611Z` hasta `16:27:44.818611Z`;
+- outbound Gmail `19ffbf30695fcd2b`, destino lógico
+  `alumbrado.n3@alquimiablue.com` y exactamente un mensaje N3;
+- reply sender-side `19ffbf3483969daa`, inbound `19ffbf34c9b08cf9`, recibido
+  `16:27:33Z` (T+18.181389 s);
+- correlación `in_reply_to_rfc`, interpretación `ACK_OR_PROGRESS`, work N3
+  IN_PROGRESS y SLA MET;
+- segundo poll y segundo checker no duplicaron eventos ni timestamps.
+
+### Evidencia real BREACHED y fin N3
+
+El caso `b0265a36-abca-4e2b-a0f3-1c9437446cb0` llegó con N1 y N2 BREACHED a N3
+`595953b3-2381-4c4c-866a-006d8951e0dd`.
+
+- snapshot N3: 30 s desde `16:32:20.076912Z` hasta `16:32:50.076912Z`;
+- outbound Gmail `19ffbf7acbba2926`, exactamente un mensaje al destino N3;
+- sin respuesta, work N3 ASSIGNED y SLA BREACHED evaluado
+  `16:33:14.124730Z`;
+- segunda evaluación `checked=0`; dry-run de escalamiento `eligible=0`;
+- catálogo N4, routing N4, escalamiento N3→N4 y email adicional: cero.
+
+### Fuera de alcance confirmado
+
+La validación focalizada Flow, incluidos los repositories PostgreSQL reales,
+cerró con 134 PASS. La suite backend completa cerró con 1296 PASS y 9 SKIP.
+
+Sin N4, escalamiento N3→N4, delegación, resolución, frontend, WhatsApp,
+Pub/Sub, scheduler ni worker permanente.
 
 ## Gate 2026-08-13 — Flow respuesta operacional Alumbrado N3 V1
 

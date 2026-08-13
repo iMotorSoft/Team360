@@ -353,11 +353,11 @@ def test_next_active_level_skips_inactive_catalog_entries():
     assert resolved.level == 4
 
 
-def test_breached_n2_routes_to_n3_with_dynamic_email_and_no_n3_sla():
+def test_breached_n2_routes_to_n3_and_invokes_generic_sla_ensure():
     candidate = _candidate(from_level=2)
     n3 = FlowSectorLevel(
         "level-n3", "alumbrado", 3, "email",
-        "alumbrado.n3@alquimiablue.com", True, None,
+        "alumbrado.n3@alquimiablue.com", True, 30,
     )
     escalations = _EscalationRepo(candidate=candidate)
     routings = _RoutingRepo(levels=(n3,))
@@ -374,6 +374,7 @@ def test_breached_n2_routes_to_n3_with_dynamic_email_and_no_n3_sla():
     assert routings.assignment.routing_key == "alumbrado_level_3"
     call = sender.send_calls[0]
     assert call["to"] == "alumbrado.n3@alquimiablue.com"
+    assert routings.sla_ensures == ["routing-n3"]
     assert "[R:alumbrado_level_3]" in call["subject"]
     for expected in (
         "Solicitud escalada a Nivel 3", "Nivel actual: 3",
