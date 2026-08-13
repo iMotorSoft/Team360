@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-12 (Flow respuesta operacional Alumbrado N2 V1)
+Ultima actualizacion: 2026-08-13 (Flow SLA primera respuesta Alumbrado N2 V1)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,65 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Gate 2026-08-13 — Flow SLA primera respuesta Alumbrado N2 V1
+
+Estado: PASS funcional real/controlado. N1 y N2 mantienen SLAs FIRST_RESPONSE
+independientes de 30 segundos para el mismo request, identificados por
+`routing_id`; N2 puede terminar MET o BREACHED sin modificar la evidencia N1.
+
+### Generalización y persistencia
+
+- migración mínima `016_team360_flow_n2_first_response_sla_v1.sql`: configura
+  Alumbrado Nivel 2 en 30 segundos sin backfill de routings históricos;
+- el motor SLA, el checker, la consulta de `first_response_at_utc`, los eventos
+  y la reconciliación ya eran genéricos por routing; no se creó motor N2;
+- el fix conecta las transiciones nuevas N2 `ASSIGNED` del servicio de
+  escalamiento con `ensure_first_response_sla`; los N2 ya asignados antes de la
+  política no reciben snapshots retrospectivos;
+- la elegibilidad de escalamiento conserva `frr.level = 1`: un SLA N2 BREACHED
+  queda persistido y no crea N3, otro N2 ni email adicional.
+
+### Evidencia real MET
+
+- request `7b8fd0cf-7645-448a-97b7-217aceacaf08`; N1
+  `6e987555-7fe5-4ff8-bb27-1ec58b487bb2`, SLA
+  `78d13cab-b09f-4fe3-84b3-d7aecdb4e164` BREACHED, sin respuesta;
+- N2 `39933b93-4898-47ac-b967-9d02770d2637`, outbound Gmail
+  `19ffb191996d6467`, snapshot 30 s desde `12:29:13.341101Z` hasta
+  `12:29:43.341101Z`;
+- reply Gmail real `19ffb192f84c9e00`, recibido `12:29:17Z` (T+3.658899 s),
+  work state IN_PROGRESS y SLA MET;
+- segunda evaluación `checked=0`; historial N2 exactamente `SLA_STARTED` y
+  `SLA_MET`; N1 siguió BREACHED con timestamps y conteos intactos.
+
+### Evidencia real BREACHED y protección N3
+
+- request `2ff06dc7-719f-45cf-a08a-177e4e9d77a8`; N1
+  `4a587e84-36c1-479c-8051-6ccac9fc2c89` BREACHED;
+- N2 `0f43ca1c-8a20-4f1e-a609-5d581f7e1213`, outbound Gmail
+  `19ffb1c185f3f38e`, snapshot 30 s desde `12:32:29.717636Z` hasta
+  `12:32:59.717636Z`;
+- sin respuesta; evaluado `12:33:01.611711Z`, work state ASSIGNED y SLA
+  BREACHED; segunda evaluación `checked=0`;
+- `escalate_once` dry-run: `eligible=0`, con 2 routings y 1 escalamiento total;
+  no N3, no escalamiento N2→N3 y no email adicional.
+
+### Validación
+
+- regresión focalizada Flow con PostgreSQL real: 113 PASS;
+- unitarios multinivel: N1 inmutable mientras N2 llega a MET/BREACHED;
+- configuración: 30 válido, NULL sin SLA, 0/negativo rechazados y snapshot 30
+  inmutable tras cambio 30→60;
+- PostgreSQL: dos FIRST_RESPONSE para un request en routings distintos,
+  creación idempotente, respuesta tardía, reconciliación y eventos por SLA;
+- preflight real: PostgreSQL 18.4, Milvus, LiteLLM
+  `openai_gpt-5.4-nano`, `globalVar` y Gmail DWD disponibles, sin reinicios.
+
+### Fuera de alcance confirmado
+
+Sin N3, escalamiento N2→N3, delegación, resolución, frontend, WhatsApp,
+Pub/Sub, scheduler ni worker permanente.
 
 ## Gate 2026-08-12 — Flow respuesta operacional Alumbrado N2 V1
 

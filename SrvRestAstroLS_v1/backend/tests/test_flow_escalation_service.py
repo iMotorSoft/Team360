@@ -116,6 +116,7 @@ class _RoutingRepo:
             if level_exists else None
         )
         self.assignment = None
+        self.sla_ensures = []
 
     async def get_sector(self, conn, sector_id):
         return self.sector
@@ -160,6 +161,9 @@ class _RoutingRepo:
 
     async def ensure_work_state(self, conn, assignment):
         return None
+
+    async def ensure_first_response_sla(self, conn, assignment):
+        self.sla_ensures.append(assignment.id)
 
 
 class _Sender:
@@ -214,6 +218,7 @@ def test_breached_n1_sends_one_clear_n2_assignment_and_is_idempotent():
         assert expected in call["body"]
     assert routings.assignment.level == 2
     assert routings.assignment.routing_key == "alumbrado_level_2"
+    assert routings.sla_ensures == ["routing-n2"]
 
 
 def test_dry_run_resolves_n2_without_creating_or_sending():
@@ -284,3 +289,20 @@ def test_reconciliation_finds_accepted_n2_without_resending():
     assert result.completed == 1
     assert result.outcomes[0].reconciled is True
     assert sender.send_calls == []
+    assert routings.sla_ensures == ["routing-n2"]
+
+
+def test_already_assigned_historical_n2_is_not_backfilled_with_sla():
+    escalations = _EscalationRepo()
+    routings = _RoutingRepo()
+    routings.assignment = RoutingAssignment(
+        "routing-n2", escalations.candidate.request_id, "alumbrado_level_2",
+        "alumbrado", 2, "email", "alumbrado.n2@alquimiablue.com",
+        RoutingStatus.ASSIGNED, "<n2@example.com>", "gmail-existing",
+    )
+    result = asyncio.run(
+        _service(escalations, routings, _Sender()).escalate_once(confirm_send=True)
+    )
+    assert result.completed == 1
+    assert result.outcomes[0].idempotent is True
+    assert routings.sla_ensures == []

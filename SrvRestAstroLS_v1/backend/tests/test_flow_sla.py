@@ -163,3 +163,72 @@ def test_late_breach_is_final_and_not_rechecked():
     assert result.checked == 0
     assert repo.sla.status == FirstResponseSLAStatus.BREACHED
     assert repo.sla.breached_at == DUE + timedelta(seconds=1)
+
+
+class _MultilevelRepository:
+    def __init__(self, n1, n2):
+        self.slas = {n1.routing_id: n1, n2.routing_id: n2}
+        self.events = []
+
+    async def list_evaluable(self, conn):
+        return tuple(
+            sla for sla in self.slas.values()
+            if sla.status == FirstResponseSLAStatus.PENDING
+        )
+
+    async def persist_evaluation(self, conn, *, sla, status, now, reconciled):
+        current = self.slas[sla.routing_id]
+        met_at = current.first_response_at if status == FirstResponseSLAStatus.MET else None
+        breached_at = current.breached_at
+        if status == FirstResponseSLAStatus.BREACHED:
+            breached_at = breached_at or now
+        updated = replace(
+            current,
+            status=status,
+            met_at=met_at,
+            breached_at=breached_at,
+            evaluated_at=now,
+        )
+        self.slas[sla.routing_id] = updated
+        if status != current.status:
+            self.events.append((sla.id, sla.routing_id, status.value))
+        return updated
+
+
+@pytest.mark.parametrize(
+    ("response", "now", "expected"),
+    [
+        (T0 + timedelta(seconds=10), T0 + timedelta(seconds=20), "MET"),
+        (None, DUE + timedelta(seconds=1), "BREACHED"),
+    ],
+)
+def test_same_request_n1_and_n2_slas_are_evaluated_independently(
+    response, now, expected
+):
+    n1_breached_at = T0 + timedelta(seconds=31)
+    n1 = FirstResponseSLA(
+        "sla-n1", "routing-n1", "request-x", 30, T0, DUE,
+        FirstResponseSLAStatus.BREACHED, None,
+        breached_at=n1_breached_at, evaluated_at=n1_breached_at,
+    )
+    n2_started = T0
+    n2 = FirstResponseSLA(
+        "sla-n2", "routing-n2", "request-x", 30, n2_started, DUE,
+        FirstResponseSLAStatus.PENDING, response,
+    )
+    repo = _MultilevelRepository(n1, n2)
+    service = FlowFirstResponseSLAService(
+        pool=_Pool(), repository=repo, clock=lambda: now
+    )
+
+    first = asyncio.run(service.check_once())
+    second = asyncio.run(service.check_once())
+
+    unchanged_n1 = repo.slas["routing-n1"]
+    evaluated_n2 = repo.slas["routing-n2"]
+    assert unchanged_n1 == n1
+    assert unchanged_n1.breached_at == n1_breached_at
+    assert evaluated_n2.status == FirstResponseSLAStatus(expected)
+    assert first.checked == 1
+    assert second.checked == 0
+    assert repo.events == [("sla-n2", "routing-n2", expected)]

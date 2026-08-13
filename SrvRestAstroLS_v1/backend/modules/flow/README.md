@@ -67,12 +67,16 @@ El contenido correlacionado se interpreta mediante LiteLLM y el alias
 `first_response_at_utc` usa `InboundMessage.received_at`, queda inmutable y se
 persiste independientemente para cada `routing_id`.
 
-## SLA de primera respuesta N1
+## SLA de primera respuesta por routing
 
 La migración `014_team360_flow_n1_first_response_sla_v1.sql` configura el SLA
 en segundos por nivel y crea un snapshot inmutable al asignar. Para Alumbrado
 N1 la duración inicial es 30 segundos. El snapshot usa `assigned_at_utc` como
 inicio y persiste `due_at_utc`; no vuelve a consultar el catálogo al evaluar.
+La migración `016_team360_flow_n2_first_response_sla_v1.sql` habilita la misma
+política de 30 segundos para nuevos routings Alumbrado N2. No backfillea N2
+históricos: cada SLA conserva la política vigente cuando su routing pasó a
+`ASSIGNED`.
 
 ```bash
 uv run python -m modules.flow.check_sla_once
@@ -89,8 +93,8 @@ tardía conserva BREACHED aunque el trabajo pase a IN_PROGRESS.
 La migración `015_team360_flow_n1_to_n2_escalation_v1.sql` hace que el estado
 operacional pertenezca al routing concreto, agrega el catálogo Alumbrado N2 y
 audita la relación entre el SLA N1 vencido y el nuevo routing N2. N1 conserva
-su email, work state y SLA; N2 nace como otra asignación `ASSIGNED`, sin SLA
-configurado en este gate.
+su email, work state y SLA; con la migración 016, un nuevo N2 `ASSIGNED` crea su
+propio snapshot FIRST_RESPONSE mediante el mismo método por `routing_id`.
 
 ```bash
 # inspección, sin escrituras ni email
@@ -110,5 +114,5 @@ marcado provisionalmente como BREACHED. La unicidad por SLA disparador y por
 
 ## Límites V1
 
-No incluye N3, SLA N2 evaluado, escalamiento N2→N3, respuesta funcional N2,
-delegación, resolución, frontend, WhatsApp, Pub/Sub, scheduler ni daemon.
+No incluye N3, escalamiento N2→N3, delegación, resolución, frontend, WhatsApp,
+Pub/Sub, scheduler ni daemon.

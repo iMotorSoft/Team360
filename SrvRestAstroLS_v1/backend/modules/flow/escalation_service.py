@@ -281,6 +281,7 @@ class FlowEscalationService:
                     observed_rfc_message_id=observed,
                 )
                 await self._routing_repository.ensure_work_state(conn, assigned)
+                await self._routing_repository.ensure_first_response_sla(conn, assigned)
                 completed = await self._repository.mark_completed(
                     conn, escalation_id=escalation.id, to_routing_id=assigned.id
                 )
@@ -350,6 +351,7 @@ class FlowEscalationService:
                 observed_rfc_message_id=observed,
             )
             await self._routing_repository.ensure_work_state(conn, assigned)
+            await self._routing_repository.ensure_first_response_sla(conn, assigned)
             completed = await self._repository.mark_completed(
                 conn, escalation_id=escalation.id, to_routing_id=assigned.id
             )

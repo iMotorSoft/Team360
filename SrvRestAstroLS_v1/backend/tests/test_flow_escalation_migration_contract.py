@@ -19,3 +19,10 @@ def test_escalation_migration_does_not_add_n3_or_scheduler():
     sql = MIGRATION.read_text(encoding="utf-8").lower()
     assert "alumbrado.n3" not in sql
     assert "create trigger" not in sql
+
+
+def test_escalation_repository_only_selects_level_one_breaches():
+    repository = (
+        Path(__file__).parents[1] / "modules/flow/escalation_repository.py"
+    ).read_text(encoding="utf-8").lower()
+    assert "and frr.level = 1" in repository

@@ -11,11 +11,12 @@ from psycopg.rows import dict_row
 from modules.db.settings import get_database_settings
 from modules.flow.escalation_repository import FlowEscalationPostgresRepository
 from modules.flow.operational_repository import FlowOperationalPostgresRepository
+from modules.flow.routing_repository import FlowRoutingPostgresRepository
 
 
 @pytest.mark.skipif(
     os.environ.get("TEAM360_FLOW_ESCALATION_POSTGRES_TEST") != "1",
-    reason="requires migrations 011-015 on Team360 PostgreSQL",
+    reason="requires migrations 011-016 on Team360 PostgreSQL",
 )
 def test_real_postgres_multilevel_state_escalation_constraints_and_idempotency():
     async def exercise():
@@ -157,6 +158,14 @@ def test_real_postgres_multilevel_state_escalation_constraints_and_idempotency()
                            values (%(request)s,%(routing)s)""",
                         {"request": request_id, "routing": n2},
                     )
+                routing_repo = FlowRoutingPostgresRepository()
+                n2_assignment = await routing_repo.get_assignment_for_key(
+                    conn,
+                    request_id=str(request_id),
+                    routing_key="alumbrado_level_2",
+                )
+                await routing_repo.ensure_first_response_sla(conn, n2_assignment)
+                await routing_repo.ensure_first_response_sla(conn, n2_assignment)
                 n2_context = await FlowOperationalPostgresRepository().find_by_rfc_reference(
                     conn, (f"<n2-{suffix}@example.com>",)
                 )
@@ -182,7 +191,7 @@ def test_real_postgres_multilevel_state_escalation_constraints_and_idempotency()
                     history = await cur.fetchall()
                 assert history == [
                     {"level": 1, "status": "ASSIGNED", "operational_status": "ASSIGNED", "sla_status": "BREACHED"},
-                    {"level": 2, "status": "ASSIGNED", "operational_status": "ASSIGNED", "sla_status": None},
+                    {"level": 2, "status": "ASSIGNED", "operational_status": "ASSIGNED", "sla_status": "PENDING"},
                 ]
 
                 # A late N1 response changes only N1 work state. N2 remains an
@@ -207,7 +216,7 @@ def test_real_postgres_multilevel_state_escalation_constraints_and_idempotency()
                     late_history = await cur.fetchall()
                 assert late_history == [
                     {"level": 1, "operational_status": "IN_PROGRESS", "sla_status": "BREACHED"},
-                    {"level": 2, "operational_status": "ASSIGNED", "sla_status": None},
+                    {"level": 2, "operational_status": "ASSIGNED", "sla_status": "PENDING"},
                 ]
 
                 with pytest.raises(UniqueViolation):
