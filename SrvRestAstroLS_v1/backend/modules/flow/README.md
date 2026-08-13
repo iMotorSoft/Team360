@@ -88,13 +88,16 @@ provisional puede reconciliarse a MET si luego se procesa evidencia Gmail cuyo
 `received_at` real era anterior o igual al vencimiento; una respuesta realmente
 tardía conserva BREACHED aunque el trabajo pase a IN_PROGRESS.
 
-## Escalamiento controlado N1 a N2
+## Escalamiento al siguiente nivel activo
 
 La migración `015_team360_flow_n1_to_n2_escalation_v1.sql` hace que el estado
 operacional pertenezca al routing concreto, agrega el catálogo Alumbrado N2 y
 audita la relación entre el SLA N1 vencido y el nuevo routing N2. N1 conserva
 su email, work state y SLA; con la migración 016, un nuevo N2 `ASSIGNED` crea su
 propio snapshot FIRST_RESPONSE mediante el mismo método por `routing_id`.
+La migración `017_team360_flow_n2_to_n3_escalation_v1.sql` agrega Alumbrado N3
+sin SLA y habilita el mismo servicio para resolver el menor nivel activo mayor
+al routing vencido. No existen rutas de código separadas N1→N2 o N2→N3.
 
 ```bash
 # inspección, sin escrituras ni email
@@ -111,8 +114,11 @@ operacional, ejecuta el checker SLA y vuelve a bloquear/releer el breach. Una
 respuesta recibida a tiempo impide el escalamiento aunque el SLA hubiese sido
 marcado provisionalmente como BREACHED. La unicidad por SLA disparador y por
 `request_id + routing_key` evita duplicar escalamiento, routing o email.
+El destino, canal y política SLA salen del snapshot de catálogo del nivel
+resuelto; niveles inactivos se omiten. Así, un request puede conservar N1 y N2
+BREACHED mientras N3 queda ASSIGNED, con su work state propio y sin SLA.
 
 ## Límites V1
 
-No incluye N3, escalamiento N2→N3, delegación, resolución, frontend, WhatsApp,
-Pub/Sub, scheduler ni daemon.
+No incluye respuesta operacional ni SLA N3, N4, escalamiento N3→N4,
+delegación, resolución, frontend, WhatsApp, Pub/Sub, scheduler ni daemon.

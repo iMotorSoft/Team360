@@ -1,4 +1,4 @@
-"""Finite, dry-run-by-default N1 to N2 escalation command."""
+"""Finite, dry-run-by-default next-level escalation command."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from .routing_repository import FlowRoutingPostgresRepository
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Escalate final Level 1 SLA breaches to Level 2. Dry-run by default."
+        description="Escalate final SLA breaches to the next active level. Dry-run by default."
     )
     parser.add_argument("--account", help="Delegated mesaentrada Gmail account.")
     parser.add_argument(
@@ -31,7 +31,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--confirm-send",
         action="store_true",
-        help="Synchronize replies, reconcile SLA and send real Level 2 email.",
+        help="Synchronize replies, reconcile SLA and send the next-level email.",
     )
     return parser
 
@@ -93,6 +93,7 @@ def main() -> int:
         print(
             "flow escalation "
             f"request_id={outcome.request_id} escalation_id={outcome.escalation_id} "
+            f"from_level={outcome.from_level} to_level={outcome.to_level} "
             f"routing_id={outcome.routing_id} status={outcome.status} "
             f"destination={outcome.destination} sent={outcome.sent} "
             f"reconciled={outcome.reconciled} idempotent={outcome.idempotent} "

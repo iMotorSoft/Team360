@@ -21,8 +21,10 @@ def test_escalation_migration_does_not_add_n3_or_scheduler():
     assert "create trigger" not in sql
 
 
-def test_escalation_repository_only_selects_level_one_breaches():
+def test_escalation_repository_selects_breaches_with_a_next_active_level():
     repository = (
         Path(__file__).parents[1] / "modules/flow/escalation_repository.py"
     ).read_text(encoding="utf-8").lower()
-    assert "and frr.level = 1" in repository
+    assert "and frr.level = 1" not in repository
+    assert "next_level.level > frr.level" in repository
+    assert "next_level.active = true" in repository

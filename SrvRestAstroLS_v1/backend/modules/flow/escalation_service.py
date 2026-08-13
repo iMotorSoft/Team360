@@ -1,4 +1,4 @@
-"""Escalate final Level 1 first-response breaches to the catalogued Level 2."""
+"""Escalate final first-response breaches to the next active catalog level."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from psycopg_pool import AsyncConnectionPool
 from modules.db.transaction import transaction
 
 from .domain import EscalationCandidate, EscalationStatus, RoutingStatus
-from .domain.routing import routing_rfc_message_id
+from .domain.routing import FlowSectorLevel, routing_rfc_message_id
 from .escalation_repository import FlowEscalationPostgresRepository
 from .routing_repository import FlowRoutingPostgresRepository
 from .routing_service import (
@@ -25,14 +25,14 @@ def escalation_routing_key(sector_id: str, level: int) -> str:
 
 
 def build_escalation_email(
-    candidate: EscalationCandidate, destination: str
+    candidate: EscalationCandidate, next_level: FlowSectorLevel
 ) -> RoutingEmail:
     first_response = (
         candidate.first_response_at.isoformat()
         if candidate.first_response_at is not None
         else "Sin respuesta"
     )
-    to_level = candidate.from_level + 1
+    to_level = next_level.level
     routing_key = escalation_routing_key(candidate.sector_id, to_level)
     body = "\n".join(
         [
@@ -61,7 +61,7 @@ def build_escalation_email(
         ]
     )
     return RoutingEmail(
-        destination=destination,
+        destination=next_level.destination,
         subject=(
             f"[Team360 Flow][ESCALADO][R:{routing_key}][{candidate.request_id}] "
             f"{candidate.sector_display_name} — Nivel {to_level}"
@@ -76,6 +76,8 @@ class EscalationOutcome:
     request_id: str
     trigger_sla_id: str
     status: str
+    from_level: int | None = None
+    to_level: int | None = None
     escalation_id: str | None = None
     routing_id: str | None = None
     destination: str | None = None
@@ -124,6 +126,8 @@ class FlowEscalationService:
                         candidate.request_id,
                         candidate.trigger_sla_id,
                         "DRY_RUN",
+                        from_level=candidate.from_level,
+                        to_level=level.level if level is not None else None,
                         destination=level.destination if level is not None else None,
                         reason_code=(
                             None if level is not None else "NEXT_LEVEL_UNAVAILABLE"
@@ -147,10 +151,9 @@ class FlowEscalationService:
 
     async def _get_active_next_level(self, candidate: EscalationCandidate):
         async with transaction(self._pool) as conn:
-            level = await self._routing_repository.get_sector_level(
-                conn, candidate.sector_id, candidate.from_level + 1
+            return await self._routing_repository.get_next_active_sector_level(
+                conn, candidate.sector_id, candidate.from_level
             )
-            return level if level is not None and level.active else None
 
     async def _escalate(self, trigger_sla_id: str) -> EscalationOutcome:
         async with transaction(self._pool) as conn:
@@ -164,6 +167,8 @@ class FlowEscalationService:
                     "",
                     trigger_sla_id,
                     existing.status.value if existing else "NOT_ELIGIBLE",
+                    from_level=existing.from_level if existing else None,
+                    to_level=existing.to_level if existing else None,
                     escalation_id=existing.id if existing else None,
                     routing_id=existing.to_routing_id if existing else None,
                     idempotent=existing is not None,
@@ -173,8 +178,8 @@ class FlowEscalationService:
             sector = await self._routing_repository.get_sector(
                 conn, candidate.sector_id
             )
-            next_level = await self._routing_repository.get_sector_level(
-                conn, candidate.sector_id, candidate.from_level + 1
+            next_level = await self._routing_repository.get_next_active_sector_level(
+                conn, candidate.sector_id, candidate.from_level
             )
             if (
                 sector is None
@@ -186,6 +191,7 @@ class FlowEscalationService:
                     candidate.request_id,
                     trigger_sla_id,
                     "NOT_ELIGIBLE",
+                    from_level=candidate.from_level,
                     reason_code="NEXT_LEVEL_UNAVAILABLE",
                 )
 
@@ -193,7 +199,7 @@ class FlowEscalationService:
                 conn, trigger_sla_id
             )
             escalation = existing_escalation or await self._repository.create_pending(
-                conn, candidate
+                conn, candidate, to_level=next_level.level
             )
             created = existing_escalation is None
             if escalation.status == EscalationStatus.COMPLETED:
@@ -201,6 +207,8 @@ class FlowEscalationService:
                     candidate.request_id,
                     trigger_sla_id,
                     "COMPLETED",
+                    from_level=candidate.from_level,
+                    to_level=next_level.level,
                     escalation_id=escalation.id,
                     routing_id=escalation.to_routing_id,
                     created=created,
@@ -209,7 +217,7 @@ class FlowEscalationService:
                 )
 
             routing_key = escalation_routing_key(candidate.sector_id, next_level.level)
-            email = build_escalation_email(candidate, next_level.destination)
+            email = build_escalation_email(candidate, next_level)
             assignment = await self._routing_repository.get_assignment_for_key(
                 conn, request_id=candidate.request_id, routing_key=routing_key
             )
@@ -233,6 +241,8 @@ class FlowEscalationService:
                     candidate.request_id,
                     trigger_sla_id,
                     "COMPLETED",
+                    from_level=candidate.from_level,
+                    to_level=next_level.level,
                     escalation_id=escalation.id,
                     routing_id=assignment.id,
                     destination=assignment.destination,
@@ -265,6 +275,8 @@ class FlowEscalationService:
                     candidate.request_id,
                     trigger_sla_id,
                     "FAILED",
+                    from_level=candidate.from_level,
+                    to_level=next_level.level,
                     escalation_id=escalation.id,
                     routing_id=failed.id,
                     destination=email.destination,
@@ -289,6 +301,8 @@ class FlowEscalationService:
                     candidate.request_id,
                     trigger_sla_id,
                     "COMPLETED",
+                    from_level=candidate.from_level,
+                    to_level=next_level.level,
                     escalation_id=completed.id,
                     routing_id=assigned.id,
                     destination=email.destination,
@@ -308,6 +322,8 @@ class FlowEscalationService:
                     candidate.request_id,
                     trigger_sla_id,
                     "FAILED",
+                    from_level=candidate.from_level,
+                    to_level=next_level.level,
                     escalation_id=escalation.id,
                     routing_id=assignment.id,
                     destination=email.destination,
@@ -337,6 +353,8 @@ class FlowEscalationService:
                     candidate.request_id,
                     trigger_sla_id,
                     "FAILED",
+                    from_level=candidate.from_level,
+                    to_level=next_level.level,
                     escalation_id=escalation.id,
                     routing_id=failed.id,
                     destination=email.destination,
@@ -359,6 +377,8 @@ class FlowEscalationService:
                 candidate.request_id,
                 trigger_sla_id,
                 "COMPLETED",
+                from_level=candidate.from_level,
+                to_level=next_level.level,
                 escalation_id=completed.id,
                 routing_id=assigned.id,
                 destination=email.destination,

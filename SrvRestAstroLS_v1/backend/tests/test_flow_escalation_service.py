@@ -33,7 +33,7 @@ class _Pool:
         return _AsyncContext()
 
 
-def _candidate(first_response_at=None, sla_status="BREACHED"):
+def _candidate(first_response_at=None, sla_status="BREACHED", from_level=1):
     return EscalationCandidate(
         request_id="11111111-1111-4111-8111-111111111111",
         description="Reparar poste apagado",
@@ -41,11 +41,11 @@ def _candidate(first_response_at=None, sla_status="BREACHED"):
         origin_channel="email",
         sector_id="alumbrado",
         sector_display_name="Alumbrado Público",
-        from_routing_id="routing-n1",
-        from_level=1,
-        from_destination="alumbrado.n1@alquimiablue.com",
+        from_routing_id=f"routing-n{from_level}",
+        from_level=from_level,
+        from_destination=f"alumbrado.n{from_level}@alquimiablue.com",
         from_assigned_at=T0,
-        trigger_sla_id="sla-n1",
+        trigger_sla_id=f"sla-n{from_level}",
         sla_due_at=T0 + timedelta(seconds=30),
         sla_status=sla_status,
         first_response_at=first_response_at,
@@ -79,12 +79,13 @@ class _EscalationRepo:
     async def get_by_trigger(self, conn, trigger_sla_id):
         return self.escalation
 
-    async def create_pending(self, conn, candidate):
+    async def create_pending(self, conn, candidate, *, to_level):
         if self.escalation is None:
             self.create_calls += 1
             self.escalation = FlowEscalation(
                 "escalation-1", candidate.request_id, candidate.sector_id,
-                candidate.from_routing_id, 1, candidate.trigger_sla_id, 2,
+                candidate.from_routing_id, candidate.from_level,
+                candidate.trigger_sla_id, to_level,
                 None, EscalationStatus.PENDING, T0,
             )
         return self.escalation
@@ -106,14 +107,17 @@ class _EscalationRepo:
 
 
 class _RoutingRepo:
-    def __init__(self, *, level_active=True, level_exists=True):
+    def __init__(self, *, levels=None):
         self.sector = FlowSector("alumbrado", "Alumbrado Público", True)
-        self.level = (
-            FlowSectorLevel(
-                "level-n2", "alumbrado", 2, "email",
-                "alumbrado.n2@alquimiablue.com", level_active, None,
+        self.levels = tuple(
+            levels
+            if levels is not None
+            else (
+                FlowSectorLevel(
+                    "level-n2", "alumbrado", 2, "email",
+                    "alumbrado.n2@alquimiablue.com", True, 30,
+                ),
             )
-            if level_exists else None
         )
         self.assignment = None
         self.sla_ensures = []
@@ -121,16 +125,25 @@ class _RoutingRepo:
     async def get_sector(self, conn, sector_id):
         return self.sector
 
-    async def get_sector_level(self, conn, sector_id, level):
-        return self.level
+    async def get_next_active_sector_level(self, conn, sector_id, current_level):
+        return next(
+            (
+                level for level in sorted(self.levels, key=lambda item: item.level)
+                if level.sector_id == sector_id
+                and level.level > current_level
+                and level.active
+            ),
+            None,
+        )
 
     async def get_assignment_for_key(self, conn, *, request_id, routing_key):
         return self.assignment
 
     async def create_pending_assignment_for_level(self, conn, **kwargs):
+        level = kwargs["sector_level"].level
         self.assignment = RoutingAssignment(
-            "routing-n2", kwargs["request_id"], kwargs["routing_key"],
-            kwargs["sector"].sector_id, kwargs["sector_level"].level,
+            f"routing-n{level}", kwargs["request_id"], kwargs["routing_key"],
+            kwargs["sector"].sector_id, level,
             kwargs["sector_level"].channel, kwargs["sector_level"].destination,
             RoutingStatus.ROUTING_PENDING, kwargs["outbound_rfc_message_id"], None,
         )
@@ -231,6 +244,8 @@ def test_dry_run_resolves_n2_without_creating_or_sending():
     assert result.eligible == 1
     assert result.created == result.sent == 0
     assert result.outcomes[0].status == "DRY_RUN"
+    assert result.outcomes[0].from_level == 1
+    assert result.outcomes[0].to_level == 2
     assert result.outcomes[0].destination == "alumbrado.n2@alquimiablue.com"
     assert escalations.escalation is None
     assert routings.assignment is None
@@ -251,7 +266,11 @@ def test_met_pending_or_timely_reconciliable_sla_never_sends():
 
 
 def test_missing_or_inactive_n2_is_typed_and_does_not_send():
-    for routing_repo in (_RoutingRepo(level_exists=False), _RoutingRepo(level_active=False)):
+    inactive = FlowSectorLevel(
+        "level-n2", "alumbrado", 2, "email",
+        "alumbrado.n2@alquimiablue.com", False, 30,
+    )
+    for routing_repo in (_RoutingRepo(levels=()), _RoutingRepo(levels=(inactive,))):
         sender = _Sender()
         result = asyncio.run(
             _service(_EscalationRepo(), routing_repo, sender).escalate_once(confirm_send=True)
@@ -262,7 +281,7 @@ def test_missing_or_inactive_n2_is_typed_and_does_not_send():
 
 def test_late_n1_response_is_reported_and_does_not_block_escalation():
     candidate = _candidate(first_response_at=T0 + timedelta(seconds=35))
-    email = build_escalation_email(candidate, "alumbrado.n2@alquimiablue.com")
+    email = build_escalation_email(candidate, _RoutingRepo().levels[0])
     assert candidate.first_response_at.isoformat() in email.body
     assert "Primera respuesta N1: Sin respuesta" not in email.body
 
@@ -306,3 +325,73 @@ def test_already_assigned_historical_n2_is_not_backfilled_with_sla():
     assert result.completed == 1
     assert result.outcomes[0].idempotent is True
     assert routings.sla_ensures == []
+
+
+def test_next_active_level_resolver_is_catalog_driven():
+    levels = (
+        FlowSectorLevel("n1", "alumbrado", 1, "email", "n1@example.com", True),
+        FlowSectorLevel("n2", "alumbrado", 2, "email", "n2@example.com", True),
+        FlowSectorLevel("n3", "alumbrado", 3, "email", "n3@example.com", True),
+    )
+    repo = _RoutingRepo(levels=levels)
+    service = _service(_EscalationRepo(), repo)
+    assert asyncio.run(service._get_active_next_level(_candidate(from_level=1))).level == 2
+    assert asyncio.run(service._get_active_next_level(_candidate(from_level=2))).level == 3
+    assert asyncio.run(service._get_active_next_level(_candidate(from_level=3))) is None
+
+
+def test_next_active_level_skips_inactive_catalog_entries():
+    levels = (
+        FlowSectorLevel("n3", "alumbrado", 3, "email", "n3@example.com", False),
+        FlowSectorLevel("n4", "alumbrado", 4, "email", "n4@example.com", True),
+    )
+    resolved = asyncio.run(
+        _service(_EscalationRepo(), _RoutingRepo(levels=levels))._get_active_next_level(
+            _candidate(from_level=2)
+        )
+    )
+    assert resolved.level == 4
+
+
+def test_breached_n2_routes_to_n3_with_dynamic_email_and_no_n3_sla():
+    candidate = _candidate(from_level=2)
+    n3 = FlowSectorLevel(
+        "level-n3", "alumbrado", 3, "email",
+        "alumbrado.n3@alquimiablue.com", True, None,
+    )
+    escalations = _EscalationRepo(candidate=candidate)
+    routings = _RoutingRepo(levels=(n3,))
+    sender = _Sender()
+
+    result = asyncio.run(
+        _service(escalations, routings, sender).escalate_once(confirm_send=True)
+    )
+
+    assert result.sent == result.completed == 1
+    assert result.outcomes[0].from_level == 2
+    assert result.outcomes[0].to_level == 3
+    assert routings.assignment.level == 3
+    assert routings.assignment.routing_key == "alumbrado_level_3"
+    call = sender.send_calls[0]
+    assert call["to"] == "alumbrado.n3@alquimiablue.com"
+    assert "[R:alumbrado_level_3]" in call["subject"]
+    for expected in (
+        "Solicitud escalada a Nivel 3", "Nivel actual: 3",
+        "SLA de primera respuesta de Nivel 2 vencido",
+        "Nivel anterior: Alumbrado Público N2", "Asignado N2:",
+        "Vencimiento N2:", "Primera respuesta N2: Sin respuesta",
+        "Resultado SLA N2: BREACHED",
+    ):
+        assert expected in call["body"]
+
+
+def test_late_n2_reply_remains_eligible_and_email_reports_timestamp():
+    late = T0 + timedelta(seconds=40)
+    candidate = _candidate(first_response_at=late, from_level=2)
+    n3 = FlowSectorLevel(
+        "level-n3", "alumbrado", 3, "email",
+        "alumbrado.n3@alquimiablue.com", True, None,
+    )
+    email = build_escalation_email(candidate, n3)
+    assert late.isoformat() in email.body
+    assert "Primera respuesta N2: Sin respuesta" not in email.body

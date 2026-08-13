@@ -98,6 +98,25 @@ class FlowRoutingPostgresRepository:
         )
         return FlowSectorLevel(**row) if row else None
 
+    async def get_next_active_sector_level(
+        self, conn: AsyncConnection, sector_id: str, current_level: int
+    ) -> FlowSectorLevel | None:
+        row = await fetch_one(
+            conn,
+            """
+            select id::text, sector_id, level, channel, destination, active,
+                   first_response_sla_seconds
+            from flow_sector_levels
+            where sector_id = %(sector_id)s
+              and level > %(current_level)s
+              and active = true
+            order by level
+            limit 1
+            """,
+            {"sector_id": sector_id, "current_level": current_level},
+        )
+        return FlowSectorLevel(**row) if row else None
+
     async def get_assignment(
         self, conn: AsyncConnection, request_id: str
     ) -> RoutingAssignment | None:

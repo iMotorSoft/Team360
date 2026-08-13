@@ -63,9 +63,15 @@ _CANDIDATE_QUERY = """
       and fs.status = 'BREACHED'
       and frr.status = 'ASSIGNED'
       and fr.status = 'CONFIRMED'
-      and frr.level = 1
       and (fws.first_response_at_utc is null
            or fws.first_response_at_utc > fs.due_at_utc)
+      and exists (
+          select 1
+          from flow_sector_levels next_level
+          where next_level.sector_id = frr.sector_id
+            and next_level.level > frr.level
+            and next_level.active = true
+      )
       and not exists (
           select 1 from flow_request_escalations fe
           where fe.trigger_sla_id = fs.id
@@ -115,7 +121,11 @@ class FlowEscalationPostgresRepository:
         )
 
     async def create_pending(
-        self, conn: AsyncConnection, candidate: EscalationCandidate
+        self,
+        conn: AsyncConnection,
+        candidate: EscalationCandidate,
+        *,
+        to_level: int,
     ) -> FlowEscalation:
         row = await fetch_one(
             conn,
@@ -138,7 +148,7 @@ class FlowEscalationPostgresRepository:
                 "from_level": candidate.from_level,
                 "trigger_type": FIRST_RESPONSE_SLA_BREACHED,
                 "trigger_sla_id": candidate.trigger_sla_id,
-                "to_level": candidate.from_level + 1,
+                "to_level": to_level,
             },
         )
         created = _escalation(row)
@@ -178,7 +188,7 @@ class FlowEscalationPostgresRepository:
             f"""
             update flow_request_escalations
             set status = 'FAILED', last_error_code = %(error_code)s,
-                last_error_detail = 'Level 2 delivery was not completed safely.',
+                last_error_detail = 'Next-level delivery was not completed safely.',
                 completed_at_utc = null, updated_at_utc = now()
             where id = %(id)s
             returning {_ESCALATION_COLUMNS}

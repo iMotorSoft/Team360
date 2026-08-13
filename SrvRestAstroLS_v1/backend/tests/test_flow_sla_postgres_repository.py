@@ -211,7 +211,7 @@ def test_real_postgres_sla_snapshot_constraints_reconciliation_and_idempotency()
                     candidate.trigger_sla_id
                     for candidate in await FlowEscalationPostgresRepository().list_eligible(conn)
                 }
-                assert n2_breached.id not in eligible_sla_ids
+                assert n2_breached.id in eligible_sla_ids
 
                 async with conn.cursor() as cur:
                     await cur.execute(
@@ -246,6 +246,11 @@ def test_real_postgres_sla_snapshot_constraints_reconciliation_and_idempotency()
                 assert final_n2["status"] == "MET"
                 assert final_n2["operational_status"] == "IN_PROGRESS"
                 assert final_n2["event_count"] == 3
+                eligible_after_reconciliation = {
+                    candidate.trigger_sla_id
+                    for candidate in await FlowEscalationPostgresRepository().list_eligible(conn)
+                }
+                assert n2_breached.id not in eligible_after_reconciliation
 
                 async with conn.cursor() as cur:
                     await cur.execute(

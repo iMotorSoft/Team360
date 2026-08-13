@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-13 (Flow SLA primera respuesta Alumbrado N2 V1)
+Ultima actualizacion: 2026-08-13 (Flow escalamiento Alumbrado N2 a N3 V1)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,61 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Gate 2026-08-13 — Flow escalamiento Alumbrado N2 a N3 V1
+
+Estado: PASS funcional real/controlado. Un SLA N2 BREACHED se reconcilió y
+escaló mediante el mismo mecanismo genérico al siguiente nivel activo, creando
+un routing N3 independiente y un único email real al destino lógico N3.
+
+### Generalización y persistencia
+
+La implementación elimina los supuestos N1 del selector, servicio, email y
+persistencia, manteniendo la identidad por routing y SLA disparador.
+
+- migración `017_team360_flow_n2_to_n3_escalation_v1.sql`: catálogo Alumbrado
+  N3 activo, email `alumbrado.n3@alquimiablue.com` y SLA nulo;
+- el resolver selecciona el menor `level` activo mayor al nivel del routing;
+- `UNIQUE(trigger_sla_id, trigger_type)` permite dos escalaciones del mismo
+  request y `UNIQUE(request_id, routing_key)` impide routings equivalentes;
+- la constraint acepta `to_level > from_level`, necesaria para omitir niveles
+  inactivos sin asumir adyacencia;
+- una relectura bloqueada posterior al polling y reconciliación descarta un
+  breach provisional antes de enviar.
+
+### Evidencia real N2→N3
+
+El caso reutilizado conservó íntegramente los dos niveles previos y produjo la
+tercera etapa sin crear SLA N3.
+
+- request `2ff06dc7-719f-45cf-a08a-177e4e9d77a8`; N1
+  `4a587e84-36c1-479c-8051-6ccac9fc2c89` y N2
+  `0f43ca1c-8a20-4f1e-a609-5d581f7e1213`, ambos SLA BREACHED;
+- dry-run: `eligible=1`, `from_level=2`, `to_level=3`, sin escrituras;
+- escalamiento `35f64455-5ff4-40f8-aa80-dcd324bf05aa`, trigger SLA N2
+  `dd05c1b8-d6ce-4bb3-bd4d-ea7e0c762015`, COMPLETED;
+- routing N3 `0fc2db47-064a-40ce-ad03-25e4d9877bdf`, key
+  `alumbrado_level_3`, work ASSIGNED y cero SLAs;
+- Gmail sender `19ffb389b6df6623`, receiver `19ffb38b58f8d609`, `To` lógico N3
+  y RFC observado coincidente; existe exactamente un mensaje N3 del request;
+- segunda ejecución real: `eligible=0`, `created=0`, `sent=0`.
+
+### Validación
+
+La cobertura incluye lógica determinística, repositorios y carrera real sobre
+PostgreSQL, además del cruce de evidencia con Gmail.
+
+- regresión N1→N2, N2→N3, MET/PENDING, reconciliación y respuesta tardía;
+- dos escalaciones y tres routings coexistentes para un request;
+- dos servicios concurrentes sobre el mismo SLA N2: un escalamiento, un
+  routing N3 y una única llamada lógica de envío;
+- incertidumbre Gmail reconciliada sin reenvío ciego;
+- migración 017 validada con apply, rollback y reapply sin reiniciar servicios.
+
+### Fuera de alcance confirmado
+
+Sin respuesta operacional ni SLA N3, N4, escalamiento N3→N4, delegación,
+resolución, frontend, WhatsApp, Pub/Sub, scheduler ni worker permanente.
 
 ## Gate 2026-08-13 — Flow SLA primera respuesta Alumbrado N2 V1
 
