@@ -10,7 +10,6 @@ La validación de red se limita al perfil `VPN-TELCHI` y al endpoint actual de S
 - Protocolo fuente: IPsec/IKEv1 con PSK y XAuth.
 - Usuario XAuth conocido: `insiding_vpn`.
 - HANA actual: `192.168.20.20:30015`.
-- `192.168.21.4` es una referencia histórica y no debe probarse.
 - No autenticar HANA ni ejecutar SQL durante este gate.
 
 ## Archivos operativos
@@ -168,15 +167,21 @@ sudo systemctl disable --now strongswan.service
 
 ### Conectar
 
-El conector traduce en memoria gateway, IKEv1, proposals, DH, ModeConfig y selectors del XML; no persiste credenciales.
+El conector traduce en memoria gateway, IKEv1, proposals, DH, ModeConfig y selectors del XML. El PSK se conserva solo en el storage privado externo y XAuth no se persiste.
 
 ```bash
 SrvRestAstroLS_v1/scripts/telchi/fortinet/connect-strongswan.sh
 ```
 
-El primer prompt solicita el PSK IKE original. El segundo solicita la contraseña VPN/XAuth. No usar la contraseña de backup ni credenciales HANA como PSK.
+En la primera ejecución, el conector solicita el PSK IKE original y crea `strongswan.env` fuera del repositorio con modo `600`. En cada conexión solicita la contraseña VPN/XAuth. No usar la contraseña de backup ni credenciales HANA como PSK.
 
-El flujo strongSwan sigue experimental y no tiene PASS end-to-end mientras no se disponga del PSK original.
+```text
+/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/access/fortinet/strongswan.env
+```
+
+El archivo contiene únicamente `TELCHI_VPN_PSK` y `TELCHI_VPN_USER`; nunca debe copiarse, imprimirse ni agregarse a Git. Las credenciales se cargan mediante archivos root-only efímeros bajo `/etc/swanctl` y se eliminan inmediatamente.
+
+El flujo strongSwan completó el gate de red el 2026-08-13: IKEv1, PSK, XAuth, ModeConfig, CHILD SA, XFRM, tabla 220 y TCP HANA quedaron en PASS.
 
 ### Consultar sesión y políticas
 
@@ -191,7 +196,7 @@ ip -4 route show table 220
 ip -4 route get 192.168.20.20
 ```
 
-No considerar la ruta válida si sigue saliendo por la interfaz o gateway de la red local sin una SA/política IPsec activa.
+strongSwan usa IPsec policy-based: la ruta puede conservar la interfaz física, pero debe usar la IP virtual de ModeConfig, la tabla 220 y una política XFRM que cubra HANA. No considerar válida una ruta física sin esas tres evidencias.
 
 ### Desconectar y bajar
 
@@ -272,11 +277,12 @@ cd /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360
 
 No enviar claves por chat, pegarlas en comandos, guardarlas en shell history ni incorporarlas a scripts o documentación.
 
-## Diagnóstico actual y próximo paso
+## Resultado actual y próximo paso
 
-El gate de red permanece bloqueado hasta resolver una de las dos condiciones externas.
+El camino strongSwan está validado para red/TCP; FortiClient permanece como alternativa no operativa por sus restricciones locales.
 
 - FortiClient: EMS debe permitir IPsec y debe revisarse la discrepancia IKEv1/IKEv2.
-- strongSwan: Telchi debe entregar el PSK IKE original de forma segura.
-- Después: confirmar SA/túnel, ruta a HANA y TCP `192.168.20.20:30015`.
-- Recién con TCP PASS comienza el gate separado de driver y autenticación SAP HANA.
+- strongSwan: conectado con IKEv1, PSK + XAuth, ModeConfig y CHILD SA.
+- XFRM y tabla 220 cubren el selector remoto; la IP virtual observada fue `10.250.250.20`.
+- TCP `192.168.20.20:30015`: PASS.
+- El próximo gate separado es driver y autenticación SAP HANA; este runbook no autoriza usar credenciales SAP ni ejecutar SQL.

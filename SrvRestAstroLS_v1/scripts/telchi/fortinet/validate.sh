@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Read-only Fortinet/Telchi connectivity diagnostics. Never prints VPN secrets.
+# Read-only strongSwan/Telchi diagnostics. Never prints VPN secrets or keys.
 set -uo pipefail
+set +x
 
 DEFAULT_TELCHI_ROOT="/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi"
 TELCHI_ROOT="${TELCHI_DATA_ROOT:-$DEFAULT_TELCHI_ROOT}"
@@ -10,142 +11,154 @@ SAP_HANA_PORT="30015"
 
 config_ok=0
 client_ok=0
-session_ok=0
-tunnel_ok=0
+service_ok=0
+loaded_ok=0
+ike_ok=0
+xauth_ok=0
+child_ok=0
+xfrm_state_ok=0
+xfrm_policy_ok=0
 routes_ok=0
-network_state="PENDING"
-hana_route_ok=0
 hana_tcp_ok=0
-profile_name=""
-config_networks_known=0
+network_state="PENDING"
 
 status() {
   printf '%-18s %s\n' "$1" "$2"
 }
 
-redact_forticlient_output() {
-  sed -E \
-    -e 's/((password|passwd|token|secret|psk|cookie|private[_ -]?key)[=: ]+)[^ ]+/\1[REDACTED]/Ig' \
-    -e 's/(--(password|passwd|token|otp|cookie)[= ]+)[^ ]+/\1[REDACTED]/Ig'
-}
-
-parse_output=""
-if [[ -f "$CONFIG_FILE" && ! -L "$CONFIG_FILE" ]]; then
-  if parse_output="$(python3 - "$CONFIG_FILE" <<'PY'
+if [[ -f "$CONFIG_FILE" && ! -L "$CONFIG_FILE" ]] && python3 - "$CONFIG_FILE" "$SAP_HANA_HOST" <<'PY' >/dev/null 2>&1
+import ipaddress
 import sys
 import xml.etree.ElementTree as ET
 
-path = sys.argv[1]
-try:
-    root = ET.parse(path).getroot()
-except (ET.ParseError, OSError):
+root = ET.parse(sys.argv[1]).getroot()
+connection = root.find("./vpn/ipsecvpn/connections/connection")
+if connection is None:
     raise SystemExit(2)
-if root.tag != "forticlient_configuration":
+value = lambda path: (connection.findtext(path) or "").strip()
+if value("name") != "VPN-TELCHI" or value("ike_settings/version") != "1":
     raise SystemExit(3)
-connections = root.findall("./vpn/ipsecvpn/connections/connection")
-if len(connections) != 1:
+if value("ike_settings/authentication_method").lower() != "preshared key":
     raise SystemExit(4)
-connection = connections[0]
-name = (connection.findtext("name") or "").strip()
-gateway = (connection.findtext("ike_settings/server") or "").strip()
-auth = (connection.findtext("ike_settings/authentication_method") or "").strip()
-psk = (connection.findtext("ike_settings/auth_data/preshared_key") or "").strip()
-username = (connection.findtext("ike_settings/xauth/username") or "").strip()
-if not name or not gateway or not auth or not psk or not username:
-    raise SystemExit(5)
-networks = []
-for network in connection.findall("ipsec_settings/remote_networks/network"):
-    address = (network.findtext("addr") or "").strip()
-    mask = (network.findtext("mask") or "").strip()
+target = ipaddress.ip_address(sys.argv[2])
+selectors = []
+for node in connection.findall("ipsec_settings/remote_networks/network"):
+    address = (node.findtext("addr") or "").strip()
+    mask = (node.findtext("mask") or "").strip()
     if address:
-        networks.append((address, mask))
-specific = [(a, m) for a, m in networks if a not in {"0.0.0.0", "::/0"}]
-# Only emit non-sensitive control metadata. Never emit gateway, username or PSK.
-print("PROFILE=" + name)
-print("SPECIFIC_NETWORKS=" + ("1" if specific else "0"))
+        try:
+            selectors.append(ipaddress.ip_network(f"{address}/{mask or '255.255.255.255'}", strict=False))
+        except ValueError:
+            continue
+if not any(target in selector for selector in selectors):
+    raise SystemExit(5)
 PY
-)"; then
-    profile_name="$(printf '%s\n' "$parse_output" | awk -F= '$1 == "PROFILE" {print substr($0, index($0, "=") + 1); exit}')"
-    config_networks_known="$(printf '%s\n' "$parse_output" | awk -F= '$1 == "SPECIFIC_NETWORKS" {print $2; exit}')"
-    config_ok=1
-    status "CONFIG" "PASS (FortiClient XML; profile $profile_name)"
-  else
-    status "CONFIG" "FAIL (CONFIG_INVALID)"
-  fi
+then
+  config_ok=1
+  status "CONFIG" "PASS (VPN-TELCHI; IKEv1; HANA selector covered)"
 else
-  status "CONFIG" "FAIL (missing or symlink rejected: $CONFIG_FILE)"
+  status "CONFIG" "FAIL"
 fi
 
-vpn_probe=""
-if command -v forticlient >/dev/null 2>&1; then
-  vpn_probe="$(forticlient vpn list 2>&1 || true)"
-  if printf '%s' "$vpn_probe" | grep -qi 'trial has expired'; then
-    status "VPN CLIENT" "FAIL (FortiClient installed but VPN trial/license unavailable)"
-  elif printf '%s' "$vpn_probe" | grep -Eqi 'unavailable|unable to|error:'; then
-    status "VPN CLIENT" "FAIL (FortiClient VPN CLI unavailable)"
-  else
-    client_ok=1
-    version_output="$(forticlient version 2>&1 || true)"
-    version="$(printf '%s\n' "$version_output" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)"
-    status "VPN CLIENT" "PASS (FortiClient${version:+ $version})"
-  fi
-elif command -v openfortivpn >/dev/null 2>&1; then
-  # The received file is IPsec/IKEv1, not an SSL-VPN openfortivpn profile.
-  status "VPN CLIENT" "FAIL (openfortivpn cannot consume the received IPsec profile)"
+if command -v swanctl >/dev/null 2>&1 && dpkg-query -W charon-systemd strongswan-swanctl libcharon-extra-plugins >/dev/null 2>&1; then
+  client_ok=1
+  version="$(dpkg-query -W -f='${Version}' strongswan-swanctl 2>/dev/null | cut -d- -f1)"
+  status "STRONGSWAN CLIENT" "PASS (${version:-installed})"
 else
-  status "VPN CLIENT" "FAIL (DEPENDENCY_MISSING)"
+  status "STRONGSWAN CLIENT" "FAIL (DEPENDENCY_MISSING)"
 fi
 
-vpn_status=""
-if (( client_ok )); then
-  vpn_status="$(forticlient vpn status 2>&1 || true)"
-  if printf '%s' "$vpn_status" | grep -Eqi 'connected|up'; then
-    if [[ -z "$profile_name" ]] || printf '%s' "$vpn_status" | grep -Fqi "$profile_name"; then
-      session_ok=1
-    fi
-  fi
-fi
-if (( session_ok )); then
-  status "VPN SESSION" "PASS"
+if systemctl is-active --quiet strongswan.service 2>/dev/null; then
+  service_ok=1
+  status "STRONGSWAN SERVICE" "PASS (active)"
 else
-  status "VPN SESSION" "FAIL (not connected or status unavailable)"
+  status "STRONGSWAN SERVICE" "FAIL (inactive)"
 fi
 
-# FortiClient IPsec commonly exposes ppp/forti interfaces; require both an
-# active session and a non-physical candidate to avoid treating Docker as VPN.
-tunnel_name=""
-while IFS= read -r candidate; do
-  [[ -n "$candidate" ]] || continue
-  tunnel_name="$candidate"
-  break
-done < <(ip -o link show 2>/dev/null | awk -F': ' '{print $2}' | cut -d@ -f1 | grep -E '^(ppp|tun|tap|forti|fct|ipsec|xfrm)' || true)
-if (( session_ok )) && [[ -n "$tunnel_name" ]]; then
-  tunnel_ok=1
-  status "TUNNEL" "PASS ($tunnel_name)"
-else
-  status "TUNNEL" "FAIL (no active Fortinet tunnel identified)"
+list_conns=""
+list_sas=""
+privileged=0
+if (( service_ok )) && [[ -r /dev/tty ]]; then
+  sudo -v </dev/tty >/dev/null 2>&1 || true
+fi
+if (( service_ok )) && sudo -n true >/dev/null 2>&1; then
+  privileged=1
+  list_conns="$(sudo -n swanctl --list-conns 2>/dev/null || true)"
+  list_sas="$(sudo -n swanctl --list-sas 2>/dev/null || true)"
 fi
 
-if (( tunnel_ok )) && ip -4 route show dev "$tunnel_name" 2>/dev/null | grep -q .; then
+if printf '%s\n' "$list_conns" | grep -Eq '^vpn-telchi:'; then
+  loaded_ok=1
+  status "CONFIG LOADED" "PASS"
+else
+  status "CONFIG LOADED" "FAIL"
+fi
+
+if printf '%s\n' "$list_sas" | grep -Eq '^vpn-telchi:.*ESTABLISHED'; then
+  ike_ok=1
+  status "IKE SA" "PASS"
+else
+  status "IKE SA" "FAIL"
+fi
+status "IKE VERSION" "IKEv1"
+
+if (( ike_ok )); then
+  status "PSK AUTH" "PASS"
+else
+  status "PSK AUTH" "FAIL"
+fi
+if (( ike_ok )) && printf '%s\n' "$list_conns" | grep -Eqi 'xauth'; then
+  xauth_ok=1
+  status "XAUTH" "PASS"
+else
+  status "XAUTH" "FAIL"
+fi
+
+if printf '%s\n' "$list_sas" | grep -Eq '^[[:space:]]+telchi:.*INSTALLED'; then
+  child_ok=1
+  status "CHILD SA" "PASS"
+else
+  status "CHILD SA" "FAIL"
+fi
+
+if (( privileged )) && sudo -n ip xfrm state 2>/dev/null | grep -q '^src '; then
+  xfrm_state_ok=1
+  status "XFRM STATE" "PASS"
+else
+  status "XFRM STATE" "FAIL"
+fi
+
+if (( privileged )) && sudo -n ip xfrm policy 2>/dev/null | python3 -c '
+import ipaddress, re, sys
+target = ipaddress.ip_address("192.168.20.20")
+text = sys.stdin.read()
+networks = []
+for value in re.findall(r"\bdst\s+([0-9.]+/[0-9]+)", text):
+    try:
+        networks.append(ipaddress.ip_network(value, strict=False))
+    except ValueError:
+        pass
+raise SystemExit(0 if any(target in network for network in networks) else 1)
+'; then
+  xfrm_policy_ok=1
+  status "XFRM POLICY" "PASS (covers $SAP_HANA_HOST)"
+else
+  status "XFRM POLICY" "FAIL"
+fi
+
+route_220="$(ip -4 route show table 220 2>&1 || true)"
+effective_route="$(ip -4 route get "$SAP_HANA_HOST" 2>&1 || true)"
+if (( xfrm_policy_ok )) && [[ -n "$route_220" ]] && printf '%s' "$route_220" | grep -Eq '\bsrc [0-9.]+' && ! printf '%s' "$effective_route" | grep -Eqi 'error|unreachable|prohibit|blackhole'; then
   routes_ok=1
-  route_count="$(ip -4 route show dev "$tunnel_name" 2>/dev/null | wc -l)"
-  status "ROUTES" "PASS ($route_count route(s) via tunnel)"
+  status "ROUTES" "PASS (table 220 + XFRM)"
+  status "SAP HANA ROUTE" "PASS (policy-based IPsec)"
 else
-  status "ROUTES" "FAIL (no routes via an identified tunnel)"
+  status "ROUTES" "FAIL"
+  status "SAP HANA ROUTE" "FAIL (NO_ROUTE_VIA_VPN)"
 fi
 
 status "SAP HANA TARGET" "$SAP_HANA_HOST:$SAP_HANA_PORT"
-
-hana_route="$(ip -4 route get "$SAP_HANA_HOST" 2>&1 || true)"
-hana_route_interface="$(printf '%s\n' "$hana_route" | awk '{for (i = 1; i <= NF; i++) if ($i == "dev") {print $(i + 1); exit}}')"
-if (( session_ok && tunnel_ok )) && [[ -n "$hana_route_interface" && "$hana_route_interface" == "$tunnel_name" ]] && ! printf '%s' "$hana_route" | grep -Eqi 'unreachable|prohibit|blackhole'; then
-  hana_route_ok=1
-  status "SAP HANA ROUTE" "PASS (interface $hana_route_interface)"
-else
-  status "SAP HANA ROUTE" "FAIL (NO_ROUTE via active VPN tunnel)"
-fi
-
-if (( hana_route_ok )); then
+if (( ike_ok && xauth_ok && child_ok && xfrm_state_ok && xfrm_policy_ok && routes_ok )); then
   tcp_output="$(timeout 6 nc -vz -w 5 "$SAP_HANA_HOST" "$SAP_HANA_PORT" 2>&1)"
   tcp_rc=$?
   if (( tcp_rc == 0 )); then
@@ -170,7 +183,7 @@ else
 fi
 status "TELCHI NETWORK" "$network_state"
 
-if (( config_ok && client_ok && session_ok && tunnel_ok && routes_ok && hana_route_ok && hana_tcp_ok )) && [[ "$network_state" == "PASS" ]]; then
+if (( config_ok && client_ok && service_ok && loaded_ok && ike_ok && xauth_ok && child_ok && xfrm_state_ok && xfrm_policy_ok && routes_ok && hana_tcp_ok )); then
   exit 0
 fi
 exit 2

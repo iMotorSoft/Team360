@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Headless IKEv1/XAuth-PSK connector for the received VPN-TELCHI profile.
-# Secrets are read without echo and streamed to charon; they are never saved.
+# The IKE PSK lives only in the external private env file. XAuth is ephemeral.
 set -uo pipefail
 set +x
 umask 077
@@ -8,17 +8,28 @@ umask 077
 DEFAULT_TELCHI_ROOT="/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi"
 TELCHI_ROOT="${TELCHI_DATA_ROOT:-$DEFAULT_TELCHI_ROOT}"
 CONFIG_FILE="$TELCHI_ROOT/access/fortinet/InsidingConfig.conf.txt"
+SECRETS_FILE="$TELCHI_ROOT/access/fortinet/strongswan.env"
 VPN_USERNAME="insiding_vpn"
 SAP_HANA_HOST="192.168.20.20"
 
 ike_psk=""
 xauth_password=""
 credentials_config=""
+runtime_connection=""
+runtime_credentials=""
 cleanup() {
   ike_psk=""
   xauth_password=""
   credentials_config=""
-  unset ike_psk xauth_password credentials_config
+  if [[ "$runtime_connection" == /etc/swanctl/team360-telchi-connection-*.conf ]]; then
+    sudo -n rm -f "$runtime_connection" 2>/dev/null || true
+  fi
+  if [[ "$runtime_credentials" == /etc/swanctl/team360-telchi-credentials-*.conf ]]; then
+    sudo -n rm -f "$runtime_credentials" 2>/dev/null || true
+  fi
+  runtime_connection=""
+  runtime_credentials=""
+  unset ike_psk xauth_password credentials_config runtime_connection runtime_credentials
 }
 trap cleanup EXIT HUP INT TERM
 
@@ -33,8 +44,8 @@ if [[ ! -f "$CONFIG_FILE" || -L "$CONFIG_FILE" ]]; then
   exit 3
 fi
 
-# Produce only non-secret strongSwan connection data. The FortiClient ENC PSK
-# is deliberately rejected because it is not the original IKE shared secret.
+# Produce only non-secret strongSwan connection data. The XML PSK is never
+# consumed: strongswan.env is the independent source for the original PSK.
 if ! connection_config="$(python3 - "$CONFIG_FILE" "$SAP_HANA_HOST" <<'PY'
 import ipaddress
 import sys
@@ -55,7 +66,7 @@ if value("ike_settings/version") != "1":
     raise SystemExit(4)
 if value("ike_settings/authentication_method").lower() != "preshared key":
     raise SystemExit(5)
-if not value("ike_settings/auth_data/preshared_key").lower().startswith("enc "):
+if not value("ike_settings/auth_data/preshared_key"):
     raise SystemExit(6)
 
 gateway = value("ike_settings/server")
@@ -129,10 +140,43 @@ PY
   exit 3
 fi
 
+if [[ -e "$SECRETS_FILE" && ( ! -f "$SECRETS_FILE" || -L "$SECRETS_FILE" ) ]]; then
+  printf '%s\n' 'SECRETS_INVALID: expected a regular non-symlink file.' >&2
+  exit 3
+fi
+if [[ ! -f "$SECRETS_FILE" ]]; then
+  printf '%s' 'Original IKE pre-shared key (not backup password): ' >/dev/tty
+  IFS= read -r -s ike_psk </dev/tty
+  printf '\n' >/dev/tty
+  if [[ -z "$ike_psk" ]]; then
+    printf '%s\n' 'PSK_INPUT_MISSING' >&2
+    exit 5
+  fi
+  escaped_psk="${ike_psk//\'/\'\\\'\'}"
+  printf "TELCHI_VPN_PSK='%s'\nTELCHI_VPN_USER='%s'\n" "$escaped_psk" "$VPN_USERNAME" >"$SECRETS_FILE"
+  chmod 600 "$SECRETS_FILE"
+  escaped_psk=""
+  unset escaped_psk
+fi
+if [[ "$(stat -c '%a' "$SECRETS_FILE")" != "600" ]]; then
+  printf '%s\n' 'SECRETS_INVALID: strongswan.env must have mode 600.' >&2
+  exit 3
+fi
+
+TELCHI_VPN_PSK=""
+TELCHI_VPN_USER=""
+# shellcheck disable=SC1090 -- fixed external operator-owned credentials file.
+source "$SECRETS_FILE"
+ike_psk="${TELCHI_VPN_PSK:-}"
+VPN_USERNAME="${TELCHI_VPN_USER:-}"
+TELCHI_VPN_PSK=""
+unset TELCHI_VPN_PSK TELCHI_VPN_USER
+if [[ -z "$ike_psk" || "$VPN_USERNAME" != "insiding_vpn" ]]; then
+  printf '%s\n' 'SECRETS_INVALID: required PSK/user values are missing or invalid.' >&2
+  exit 3
+fi
+
 sudo -v </dev/tty
-printf '%s' 'Original IKE pre-shared key (not backup password): ' >/dev/tty
-IFS= read -r -s ike_psk </dev/tty
-printf '\n' >/dev/tty
 printf '%s' 'VPN XAuth password: ' >/dev/tty
 IFS= read -r -s xauth_password </dev/tty
 printf '\n' >/dev/tty
@@ -156,13 +200,50 @@ credentials_config+=$'"\n    secret = '
 credentials_config+="$(swan_quote "$xauth_password")"
 credentials_config+=$'\n  }\n}\n'
 
-printf '%s' "$connection_config" | sudo -n swanctl --load-conns --file /dev/stdin
-printf '%s' "$credentials_config" | sudo -n swanctl --load-creds --file /dev/stdin --noprompt
-cleanup
+runtime_connection="/etc/swanctl/team360-telchi-connection-$$.conf"
+runtime_credentials="/etc/swanctl/team360-telchi-credentials-$$.conf"
+sudo -n install -m 600 /dev/null "$runtime_connection"
+sudo -n install -m 600 /dev/null "$runtime_credentials"
+sudo -n tee "$runtime_connection" >/dev/null <<<"$connection_config"
+sudo -n tee "$runtime_credentials" >/dev/null <<<"$credentials_config"
+if ! sudo -n swanctl --load-conns --file "$runtime_connection"; then
+  printf '%s\n' 'CONFIG_LOAD_FAILED'
+  exit 5
+fi
+if ! sudo -n swanctl --load-creds --file "$runtime_credentials" --noprompt; then
+  printf '%s\n' 'CREDENTIAL_LOAD_FAILED'
+  exit 5
+fi
+ike_psk=""
+xauth_password=""
+credentials_config=""
+sudo -n rm -f "$runtime_connection" "$runtime_credentials"
+runtime_connection=""
+runtime_credentials=""
 
-if sudo -n swanctl --initiate --child telchi --timeout 30; then
+init_output="$(sudo -n swanctl --initiate --child telchi --timeout 30 2>&1)"
+init_rc=$?
+printf '%s\n' "$init_output"
+if (( init_rc == 0 )); then
   printf '%s\n' 'STRONGSWAN_CONNECTED'
   exit 0
+fi
+if printf '%s' "$init_output" | grep -Eqi 'no proposal chosen|no acceptable proposal'; then
+  printf '%s\n' 'IKE_PROPOSAL_MISMATCH'
+elif printf '%s' "$init_output" | grep -Eqi 'no response from peer|giving up after .* retransmits'; then
+  printf '%s\n' 'NO_RESPONSE_FROM_GATEWAY'
+elif [[ "$(printf '%s' "$init_output" | grep -Ec 'CPRQ\(X_TYPE X_USER X_PWD\)' || true)" -ge 2 ]]; then
+  printf '%s\n' 'XAUTH_FAILED'
+elif printf '%s' "$init_output" | grep -Eqi 'AUTHENTICATION_FAILED|HASH.*invalid|no shared key found'; then
+  printf '%s\n' 'PSK_AUTH_FAILED'
+elif printf '%s' "$init_output" | grep -Eqi 'MODE_CONFIG|virtual IP.*failed'; then
+  printf '%s\n' 'MODECONFIG_FAILED'
+elif printf '%s' "$init_output" | grep -Eqi 'TS_UNACCEPTABLE|traffic selector.*unacceptable'; then
+  printf '%s\n' 'SELECTOR_MISMATCH'
+elif printf '%s' "$init_output" | grep -Eqi 'CHILD_SA.*not established|establishing CHILD_SA.*failed'; then
+  printf '%s\n' 'CHILD_SA_FAILED'
+else
+  printf '%s\n' 'IKE_NEGOTIATION_FAILED'
 fi
 printf '%s\n' 'STRONGSWAN_CONNECTION_FAILED'
 exit 5
