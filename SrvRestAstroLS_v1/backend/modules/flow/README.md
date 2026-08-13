@@ -66,6 +66,10 @@ El contenido correlacionado se interpreta mediante LiteLLM y el alias
 `UNSUPPORTED_OPERATIONAL_ACTION` se auditan sin transición. El timestamp
 `first_response_at_utc` usa `InboundMessage.received_at`, queda inmutable y se
 persiste independientemente para cada `routing_id`.
+El mismo mecanismo opera sobre N1, N2 y N3: el RFC observado o el token del
+routing seleccionan el nivel concreto aunque todos los aliases lleguen al mismo
+buzón físico. Un N3 sin política SLA puede registrar respuesta e IN_PROGRESS
+sin crear un snapshot SLA como efecto colateral.
 
 ## SLA de primera respuesta por routing
 

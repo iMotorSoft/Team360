@@ -18,7 +18,7 @@ from modules.messaging.domain import InboundMessage
 
 @pytest.mark.skipif(
     os.environ.get("TEAM360_FLOW_OPERATIONAL_POSTGRES_TEST") != "1",
-    reason="requires migrations 011-015 on Team360 PostgreSQL",
+    reason="requires migrations 011-017 on Team360 PostgreSQL",
 )
 def test_real_postgres_operational_repository_idempotency_and_first_response():
     async def exercise():
@@ -241,6 +241,114 @@ def test_real_postgres_operational_repository_idempotency_and_first_response():
                 assert n2_evidence["first_response_at_utc"] == n2_at
                 assert n1_evidence["operational_events"] == 1
                 assert n2_evidence["operational_events"] == 1
+
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        """
+                        select id from flow_sector_levels
+                        where sector_id='alumbrado' and level=3
+                        """
+                    )
+                    level_three_id = (await cur.fetchone())["id"]
+                    n3_observed_rfc = f"<n3-{suffix}@mail.gmail.com>"
+                    await cur.execute(
+                        """
+                        insert into flow_request_routings (
+                            request_id, routing_key, sector_id, sector_level_id,
+                            level, channel, destination, status,
+                            outbound_rfc_message_id,
+                            outbound_observed_rfc_message_id,
+                            outbound_external_message_id, assigned_at_utc
+                        ) values (%(request)s, 'alumbrado_level_3', 'alumbrado',
+                                  %(level_id)s, 3, 'email',
+                                  'alumbrado.n3@alquimiablue.com', 'ASSIGNED',
+                                  %(intended)s, %(observed)s, %(external)s, now())
+                        returning id
+                        """,
+                        {
+                            "request": request_id,
+                            "level_id": level_three_id,
+                            "intended": f"<intended-n3-{suffix}@example.com>",
+                            "observed": n3_observed_rfc,
+                            "external": f"gmail-out-n3-{suffix}",
+                        },
+                    )
+                    n3_routing_id = str((await cur.fetchone())["id"])
+
+                contexts = {
+                    level: await repo.find_by_rfc_reference(conn, (rfc,))
+                    for level, rfc in (
+                        (1, observed_rfc),
+                        (2, n2_observed_rfc),
+                        (3, n3_observed_rfc),
+                    )
+                }
+                assert {
+                    level: (context.routing_id, context.level)
+                    for level, context in contexts.items()
+                } == {
+                    1: (routing_id, 1),
+                    2: (n2_routing_id, 2),
+                    3: (n3_routing_id, 3),
+                }
+                assert (
+                    await repo.find_unambiguous_by_request_id(conn, request_id)
+                    is None
+                )
+                assert (
+                    await repo.find_by_request_routing_key(
+                        conn,
+                        request_id=request_id,
+                        routing_key="alumbrado_level_3",
+                    )
+                ).routing_id == n3_routing_id
+
+                n3_at = first_at + timedelta(minutes=10)
+                n3_reply = InboundMessage(
+                    "gmail", "email", f"reply-n3-{suffix}", "n3-thread",
+                    "tech@example.com", ("mesa@example.com",),
+                    f"Re: [R:alumbrado_level_3] {request_id}",
+                    "Recibido. Dirección está revisando el caso.", n3_at,
+                    {"in_reply_to": n3_observed_rfc},
+                )
+                n3_context = contexts[3]
+                n3_source_id = await repo.claim_message(
+                    conn, context=n3_context, message=n3_reply
+                )
+                assert n3_source_id is not None
+                assert await repo.claim_message(
+                    conn, context=n3_context, message=n3_reply
+                ) is None
+                await repo.ensure_work_state(conn, n3_context)
+                await repo.record_event(
+                    conn,
+                    context=n3_context,
+                    source_message_id=n3_source_id,
+                    message=n3_reply,
+                    correlation_method="in_reply_to_rfc",
+                    interpretation=interpretation,
+                )
+                n3_progressed = await repo.mark_in_progress(
+                    conn, context=n3_context, message=n3_reply
+                )
+                assert n3_progressed.first_response_at == n3_at
+
+                n1_after_n3 = await repo.evidence(conn, request_id, routing_id)
+                n2_after_n3 = await repo.evidence(conn, request_id, n2_routing_id)
+                n3_evidence = await repo.evidence(conn, request_id, n3_routing_id)
+                assert n1_after_n3 == n1_evidence
+                assert n2_after_n3 == n2_evidence
+                assert n3_evidence["operational_status"] == "IN_PROGRESS"
+                assert n3_evidence["first_response_at_utc"] == n3_at
+                assert n3_evidence["first_responder"] == "tech@example.com"
+                assert n3_evidence["operational_events"] == 1
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        """select count(*) as count
+                           from flow_request_slas where routing_id=%s""",
+                        (n3_routing_id,),
+                    )
+                    assert (await cur.fetchone())["count"] == 0
             finally:
                 await conn.rollback()
 

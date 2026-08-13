@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-13 (Flow escalamiento Alumbrado N2 a N3 V1)
+Ultima actualizacion: 2026-08-13 (Flow respuesta operacional Alumbrado N3 V1)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -29,6 +29,59 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+
+## Gate 2026-08-13 — Flow respuesta operacional Alumbrado N3 V1
+
+Estado: PASS funcional real/controlado. Una respuesta humana al outbound N3 se
+correlacionó por el RFC del routing, se interpretó con LiteLLM y cambió solo el
+work state N3 a IN_PROGRESS, sin crear SLA ni alterar N1/N2.
+
+### Generalización y persistencia
+
+El motor operacional ya era completamente routing-scoped, por lo que no fue
+necesario modificar runtime ni crear migración para Nivel 3.
+
+- RFC `In-Reply-To` y `References` consultan todos los routings ASSIGNED;
+- el fallback usa request UUID más `[R:<routing_key>]` para N1, N2 o N3;
+- request UUID sin routing token queda ambiguo cuando conviven varios niveles;
+- sender, mailbox físico y Gmail thread no determinan identidad operacional;
+- work state, primera respuesta y eventos pertenecen al `routing_id` concreto;
+- la unicidad `provider + inbound_external_message_id` conserva idempotencia.
+
+### Evidencia real N3
+
+El reply controlado se recibió y procesó una sola vez mediante el mismo
+`poll_once` usado por N1 y N2.
+
+- request `2ff06dc7-719f-45cf-a08a-177e4e9d77a8`; routing N3
+  `0fc2db47-064a-40ce-ad03-25e4d9877bdf`, key `alumbrado_level_3`;
+- outbound sender Gmail `19ffb389b6df6623`, RFC observado
+  `<CAOrU6M9bVnk8bM+AXMaRP+NcmM+AOeb+tpQ-vp3kjXdw5oHT-A@mail.gmail.com>`;
+- reply sender-side `19ffb4a3544c1410`, inbound `19ffb4a3ba3032ed`, recibido
+  `2026-08-13T13:22:52Z` con `In-Reply-To` N3;
+- correlación `in_reply_to_rfc`, interpretación `ACK_OR_PROGRESS` mediante
+  `openai_gpt-5.4-nano`, N3 `ASSIGNED → IN_PROGRESS`;
+- `first_response_at_utc=2026-08-13T13:22:52Z`, un evento operacional y cero
+  SLAs N3;
+- segundo polling: `processed=0`, `operational_duplicates=1`, sin cambios.
+
+### Validación e integridad
+
+La cobertura determinística y PostgreSQL demuestra la misma correlación por
+RFC y token para tres niveles, incluso con el mismo responder físico.
+
+- Flow focalizado con PostgreSQL real: 131 PASS;
+- backend completo: 1293 PASS, 9 SKIP;
+- N1/N2 permanecieron ASSIGNED, sin primera respuesta ni eventos nuevos, y sus
+  SLA siguieron BREACHED;
+- ambas escalaciones permanecieron COMPLETED, current level siguió 3 y no se
+  creó routing N4 ni email adicional;
+- smoke LiteLLM real clasificó el texto controlado como ACK_OR_PROGRESS.
+
+### Fuera de alcance confirmado
+
+Sin SLA N3, N4, escalamiento N3→N4, delegación, resolución, frontend,
+WhatsApp, Pub/Sub, scheduler ni worker permanente.
 
 ## Gate 2026-08-13 — Flow escalamiento Alumbrado N2 a N3 V1
 

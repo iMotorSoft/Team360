@@ -19,6 +19,7 @@ REQUEST_ID = "656977af-cc29-43d6-b78c-53464818f06a"
 OTHER_REQUEST_ID = "818126f6-84ad-4c40-bbef-480ccfc0387b"
 OBSERVED_RFC = "<gmail-real-id@mail.gmail.com>"
 N2_OBSERVED_RFC = "<gmail-level-two@mail.gmail.com>"
+N3_OBSERVED_RFC = "<gmail-level-three@mail.gmail.com>"
 
 
 class _AsyncContext:
@@ -94,12 +95,20 @@ class _Repository:
         n1 = _context()
         contexts = [n1, _context(OTHER_REQUEST_ID)]
         if multilevel:
-            contexts.append(
-                _context(
-                    routing_id="routing-n2",
-                    routing_key="alumbrado_level_2",
-                    level=2,
-                    observed_rfc=N2_OBSERVED_RFC,
+            contexts.extend(
+                (
+                    _context(
+                        routing_id="routing-n2",
+                        routing_key="alumbrado_level_2",
+                        level=2,
+                        observed_rfc=N2_OBSERVED_RFC,
+                    ),
+                    _context(
+                        routing_id="routing-n3",
+                        routing_key="alumbrado_level_3",
+                        level=3,
+                        observed_rfc=N3_OBSERVED_RFC,
+                    ),
                 )
             )
         self.contexts = contexts
@@ -287,6 +296,21 @@ def test_multilevel_rfc_correlation_is_routing_specific_with_same_sender():
     assert n1.routing_id == _context().routing_id
     assert repo.state.status == OperationalStatus.IN_PROGRESS
     assert repo.states["routing-n2"].status == OperationalStatus.IN_PROGRESS
+    assert repo.states["routing-n3"].status == OperationalStatus.ASSIGNED
+
+    n3 = asyncio.run(
+        service.process_if_operational(
+            _message(message_id="n3-reply", in_reply_to=N3_OBSERVED_RFC)
+        )
+    )
+    assert n3.routing_id == "routing-n3"
+    assert n3.level == 3
+    assert repo.states["routing-n3"].status == OperationalStatus.IN_PROGRESS
+    assert {event["context"].routing_id for event in repo.events.values()} == {
+        _context().routing_id,
+        "routing-n2",
+        "routing-n3",
+    }
 
 
 @pytest.mark.parametrize(
@@ -297,18 +321,19 @@ def test_multilevel_rfc_correlation_is_routing_specific_with_same_sender():
         OperationalAction.UNSUPPORTED_OPERATIONAL_ACTION,
     ],
 )
-def test_n2_non_progress_actions_are_audited_without_transition(action):
+def test_n3_non_progress_actions_are_audited_without_transition(action):
     repo = _Repository(multilevel=True)
     result = asyncio.run(
         _service(repo, _Interpreter(action)).process_if_operational(
-            _message(in_reply_to=N2_OBSERVED_RFC)
+            _message(in_reply_to=N3_OBSERVED_RFC)
         )
     )
-    assert result.routing_id == "routing-n2"
+    assert result.routing_id == "routing-n3"
     assert result.action == action
-    assert repo.states["routing-n2"].status == OperationalStatus.ASSIGNED
-    assert repo.states["routing-n2"].first_response_at is None
+    assert repo.states["routing-n3"].status == OperationalStatus.ASSIGNED
+    assert repo.states["routing-n3"].first_response_at is None
     assert repo.state.status == OperationalStatus.ASSIGNED
+    assert repo.states["routing-n2"].status == OperationalStatus.ASSIGNED
 
 
 def test_multilevel_references_correlates_n2():
@@ -321,7 +346,17 @@ def test_multilevel_references_correlates_n2():
     assert result.correlation_method == "references_rfc"
 
 
-def test_request_only_subject_is_ambiguous_but_routing_token_selects_n2():
+@pytest.mark.parametrize(
+    ("routing_key", "routing_id", "level"),
+    [
+        ("initial_n1", _context().routing_id, 1),
+        ("alumbrado_level_2", "routing-n2", 2),
+        ("alumbrado_level_3", "routing-n3", 3),
+    ],
+)
+def test_request_only_subject_is_ambiguous_but_routing_token_selects_level(
+    routing_key, routing_id, level
+):
     repo = _Repository(multilevel=True)
     service = _service(repo, _Interpreter())
     ambiguous = asyncio.run(service.process_if_operational(_message()))
@@ -330,15 +365,50 @@ def test_request_only_subject_is_ambiguous_but_routing_token_selects_n2():
     routed = asyncio.run(
         service.process_if_operational(
             _message(
-                message_id="token-n2",
+                message_id=f"token-n{level}",
                 subject=(
-                    f"Re: [Team360 Flow][R:alumbrado_level_2] #{REQUEST_ID}"
+                    f"Re: [Team360 Flow][R:{routing_key}] #{REQUEST_ID}"
                 ),
             )
         )
     )
-    assert routed.routing_id == "routing-n2"
+    assert routed.routing_id == routing_id
+    assert routed.level == level
     assert routed.correlation_method == "subject_routing_token"
+
+
+def test_n3_second_progress_keeps_original_first_response_and_two_events():
+    repo = _Repository(multilevel=True)
+    service = _service(repo, _Interpreter())
+    first = _message(message_id="n3-first", in_reply_to=N3_OBSERVED_RFC)
+    second = _message(
+        message_id="n3-second",
+        in_reply_to=N3_OBSERVED_RFC,
+        received_at=first.received_at + timedelta(hours=1),
+    )
+    asyncio.run(service.process_if_operational(first))
+    asyncio.run(service.process_if_operational(second))
+    state = repo.states["routing-n3"]
+    assert state.status == OperationalStatus.IN_PROGRESS
+    assert state.first_response_at == first.received_at
+    assert len(repo.events) == 2
+
+
+def test_n3_duplicate_has_one_event_and_preserves_other_levels():
+    repo = _Repository(multilevel=True)
+    interpreter = _Interpreter()
+    service = _service(repo, interpreter)
+    message = _message(message_id="n3-duplicate", in_reply_to=N3_OBSERVED_RFC)
+    first = asyncio.run(service.process_if_operational(message))
+    second = asyncio.run(service.process_if_operational(message))
+    assert first.processed is True
+    assert second.processed is False
+    assert second.routing_id == "routing-n3"
+    assert interpreter.calls == 1
+    assert len(repo.events) == 1
+    assert repo.states["routing-n3"].first_response_at == message.received_at
+    assert repo.state.status == OperationalStatus.ASSIGNED
+    assert repo.states["routing-n2"].status == OperationalStatus.ASSIGNED
 
 
 def test_assigned_ack_transitions_to_in_progress_using_received_timestamp():
