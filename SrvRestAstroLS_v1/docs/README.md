@@ -6,6 +6,7 @@ Documentacion transversal del proyecto Team360.
 
 - `automation_diagnosis_fase1.md`: modulo de diagnostico de automatizacion con LiteLLM, RAG simple, scoring deterministico y contratos preparados para multi-paquete / multi-worker.
 - `postgresql_live_team360_setup.md`: inicializacion de la DB viva `team360`, aplicacion de migraciones 001-004 y auditorias post-migracion.
+- `telchi_vpn_operations.md`: runbook headless de VPN Telchi con alternativas FortiClient y strongSwan, operación de servicios, seguridad y gate TCP de SAP HANA.
 - `postgresql_004_automation_diagnosis_runtime.md`: persistencia runtime del asistente de venta/diagnostico, sesiones, respuestas, leads, eventos y package installation `team360_sales_diagnosis`.
 - `frontend_phase1_astro_svelte_tailwind_daisyui.md`: scaffold tecnico inicial con pnpm, Astro, Svelte 5, Tailwind CSS 4, DaisyUI 5, wrappers UI y reserva AG-UI.
 - `frontend_home_team360_live_phase.md`: primera home comercial publica de `team360.live`, layout publico, copy, componentes marketing y validacion responsive.
