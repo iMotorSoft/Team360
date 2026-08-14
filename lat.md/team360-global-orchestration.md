@@ -12,6 +12,133 @@ Regla central:
 
 > Trabajar separado, decidir globalmente.
 
+Este documento es la fuente humana canonica de ownership modular, coordinacion entre agentes y limites por path. `AGENTS.md` resume la conducta obligatoria inmediata y enlaza esta politica.
+
+## Modelo de ownership modular
+
+El ownership se declara antes de comenzar y clasifica paths por su alcance real, no solo por el directorio donde viven. `PRODUCTION_PROTECTED` se aplica como una proteccion adicional sobre las otras categorias.
+
+### MODULE_LOCAL
+
+Un scope `MODULE_LOCAL` pertenece a un modulo existente y formalmente asignado. Su agente puede modificar implementacion, rutas, tests y documentacion propios sin pedir una ventana GLOBAL.
+
+- Los scopes de dos agentes escritores simultaneos deben ser explicitos y disjuntos.
+- No se reservan paths para modulos que todavia no existen.
+- Flow tiene como scope local `SrvRestAstroLS_v1/backend/modules/flow/**` y sus tests inequivocamente propios `SrvRestAstroLS_v1/backend/tests/test_flow_*.py`.
+- Match y Data Science no tienen todavia un scope declarado.
+- Knowledge conserva sus restricciones de rama actuales; su directorio no autoriza trabajo desde cualquier rama.
+
+### SHARED
+
+Un path `SHARED` tiene varios consumidores, pero no necesariamente controla toda la infraestructura. Su modificacion exige conocer el impacto y coordinar cuando pueda alterar contratos externos al modulo solicitante.
+
+Ejemplos actuales incluyen:
+
+- `SrvRestAstroLS_v1/backend/modules/messaging/**`;
+- providers y contratos comunes;
+- `SrvRestAstroLS_v1/astro/src/components/ui/**`;
+- formatters y utilidades consumidos por mas de un modulo.
+
+Antes de editar `SHARED`, el agente identifica consumidores, informa el cambio, obtiene asignacion o autorizacion y valida los consumidores afectados. `SHARED` nunca se asume `MODULE_LOCAL` por conveniencia.
+
+### GLOBAL
+
+Un path `GLOBAL` afecta bootstrap, configuracion, infraestructura, persistencia, dependencias, runtime o deploy de varios modulos. Un agente de modulo no puede modificarlo libremente.
+
+Ejemplos actuales, sin constituir aun un inventario machine-readable exhaustivo:
+
+- `SrvRestAstroLS_v1/backend/globalVar.py`;
+- `SrvRestAstroLS_v1/backend/ls_iMotorSoft_Srv01.py`;
+- `SrvRestAstroLS_v1/backend/modules/module_registry.py`;
+- `SrvRestAstroLS_v1/backend/modules/db/**` y `SrvRestAstroLS_v1/backend/db/migrations/**`;
+- configuracion, dependencias, lockfiles y scripts generales de backend;
+- `SrvRestAstroLS_v1/astro/src/components/global.js` y `global.d.ts`;
+- configuracion, dependencias, lockfiles y scripts generales de Astro;
+- autenticacion, runtime, infraestructura y deploy comunes.
+
+Si necesita cambiar `GLOBAL`, el agente se detiene antes de editar, informa path, motivo, impacto esperado y modulo solicitante, y pide una ventana GLOBAL exclusiva. Mientras espera puede continuar otra tarea `MODULE_LOCAL`.
+
+### PRODUCTION_PROTECTED
+
+`PRODUCTION_PROTECTED` es un overlay y no una categoria excluyente. Un mismo path puede ser `GLOBAL + PRODUCTION_PROTECTED` o `SHARED + PRODUCTION_PROTECTED`; siempre prevalece la restriccion mayor.
+
+Actualmente solo estan declarados `PRODUCTION_PROTECTED`:
+
+- Diagnosticador / Vera;
+- el componente/embed productivo.
+
+La Home y Console no adquieren automaticamente esta clasificacion por haber sido desplegadas o por tener tests de regresion. Los contratos vigentes de Vera/embed se detallan en `[[team360-runtime-operational-policy]]`, `[[diagnosticador-embeddable-component-architecture]]` y `SrvRestAstroLS_v1/docs/public_home_vera_protection_contract_v1.md`.
+
+Modificar una frontera protegida requiere detenerse, informar, obtener autorizacion explicita, ejecutar la regresion especifica y evitar cualquier ampliacion accidental de scope.
+
+## Concurrencia y locks
+
+Varios agentes pueden editar simultaneamente un mismo worktree solo cuando tienen scopes `MODULE_LOCAL` existentes, asignados y disjuntos. Esta coordinacion es manual hasta que exista una herramienta local.
+
+Cambios dentro del scope asignado a otro agente son `EXPECTED CONCURRENT CHANGES`. Deben preservarse: no se revierten, borran, formatean, modifican, adoptan como propios ni incluyen accidentalmente en Git.
+
+Un cambio fuera de los scopes concurrentes declarados que no pueda explicarse obliga a detenerse e informar.
+
+La edicion local concurrente no habilita operaciones globales concurrentes. Requieren una ventana exclusiva, sin otro agente escritor activo:
+
+- `git add`, commit, checkout, switch, merge, rebase, reset, stash y clean;
+- operaciones equivalentes sobre index, HEAD, working tree global o refs;
+- lockfiles, formatters globales y regeneraciones masivas;
+- scripts que alteren estado global;
+- regresiones completas cuando generen o modifiquen artefactos compartidos.
+
+## Ownership por paths y por ramas
+
+El ownership por paths y el ownership por ramas son controles independientes. Ser dueño de un scope `MODULE_LOCAL` no autoriza a trabajarlo desde cualquier rama.
+
+La tabla de ramas de este documento y `AGENTS.md` sigue vigente. En particular, Knowledge ingestion permanece asignado a `feature/knowledge-ingestion-service` y su contenido editorial a `docs/knowledge-documents-foundation`.
+
+Cualquier cambio de ese reparto requiere una decision transversal separada. Esta politica no habilita Knowledge desde `feature/console-backend-core` ni modifica su ownership actual.
+
+## Module registry
+
+`SrvRestAstroLS_v1/backend/modules/module_registry.py` es `GLOBAL`. El entrypoint `ls_iMotorSoft_Srv01.py` consume `get_module_route_handlers()` y conserva infraestructura, rutas y lifecycle existentes.
+
+La composicion vigente es:
+
+```text
+ls_iMotorSoft_Srv01.py
+-> get_module_route_handlers()
+-> module_registry.py
+-> ROUTE_HANDLERS de modulos registrados
+```
+
+Un modulo puede exponer desde su propio `routes.py`:
+
+```python
+ROUTE_HANDLERS = (
+    route_one,
+    route_two,
+)
+```
+
+El alta inicial del modulo requiere un cambio GLOBAL coordinado en `module_registry.py`. Despues, nuevas APIs se agregan a su `routes.py` `MODULE_LOCAL` sin modificar el entrypoint ni el registry por cada endpoint.
+
+El registry esta implementado y actualmente vacio. Flow todavia no fue integrado; su futura alta sera una ventana GLOBAL separada.
+
+## Salida de scope
+
+Un agente que descubre una necesidad fuera de su asignacion no expande su scope por inferencia. Debe clasificar el path y coordinar antes de editarlo.
+
+Procedimiento minimo:
+
+1. detener el cambio fuera de scope;
+2. informar path, categoria, motivo, impacto y modulo solicitante;
+3. solicitar asignacion `SHARED`, ventana `GLOBAL` o autorizacion `PRODUCTION_PROTECTED` segun corresponda;
+4. continuar, si existe, otra tarea `MODULE_LOCAL` mientras espera;
+5. cambiar el path solo dentro de la ventana autorizada y validar consumidores.
+
+## Representacion ejecutable futura
+
+Una etapa posterior puede incorporar `tools/team360_global_scope.json` como inventario ejecutable de globs para un coordinador Python. No reemplazara esta fuente humana ni explicara nuevamente la politica.
+
+El archivo futuro debera apuntar a `lat.md/team360-global-orchestration.md` mediante `policy_document` y representar como minimo `global`, `shared`, `module_local` y `production_protected`. Todavia no esta implementado.
+
 ## Ramas activas
 
 Esta sección resume el propósito y el alcance de «Ramas activas» dentro de Team360.
@@ -226,30 +353,3 @@ Antes de tomar decisiones amplias, revisar:
 - el hilo de orquestación global.
 
 Si un cambio técnico afecta producto, knowledge, UX real, documentación o ventas, mencionarlo explícitamente en el cierre.
-
-## Estado global actual
-
-Fecha: 2026-06-10
-
-Estado de ramas:
-
-- `main`: sincronizada con `origin/main`.
-- `feature/console-backend-core`: sincronizada con `origin/feature/console-backend-core`.
-- `feature/knowledge-ingestion-service`: sincronizada con `origin/feature/knowledge-ingestion-service`.
-- `docs/knowledge-documents-foundation`: sincronizada con `origin/docs/knowledge-documents-foundation`.
-- `ux/team360-console-design-handoff`: sincronizada con `origin/ux/team360-console-design-handoff`.
-
-Avances recientes:
-
-- `feature/console-backend-core` incorporó la convención de `lab/` como banco de pruebas técnico reproducible.
-- `feature/knowledge-ingestion-service` incorporó labs de embeddings, retrieval, package behavior y conversación como efecto de knowledge package.
-- El skill del proyecto documenta ownership de experimentos `lab/` por hipótesis validada y sistema bajo prueba.
-- Todas las ramas principales tienen upstream remoto y worktree limpio al último checkpoint.
-
-Próximos focos:
-
-- Consolidar experimento de embeddings.
-- Mantener `pkg_sales_diagnosis` como package evolutivo.
-- Usar Team360.live como primer contexto de validación.
-- Separar el hilo comercial de ventas/marketing/distribuidores.
-- Evitar que los resultados de labs crezcan sin pushes o revisiones intermedias.

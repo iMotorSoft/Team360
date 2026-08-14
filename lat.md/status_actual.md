@@ -4,7 +4,7 @@ Este tablero resume el estado vigente de la arquitectura viva de Team360 y enlaz
 
 Objetivo: `arquitectura-viva`
 
-Última actualización: 2026-08-04.
+Última actualización: 2026-08-14.
 
 ## Estado vigente
 
@@ -18,10 +18,22 @@ Team360 mantiene una arquitectura funcional separada por fronteras explícitas d
 - `/t360` resuelve URLs exclusivamente desde `SrvRestAstroLS_v1/astro/src/components/global.js`.
 - Playwright + Chromium es el gate E2E reproducible; Browser MCP es diagnóstico exploratorio.
 - El Diagnosticador embebible conserva el backend como autoridad de tenant, scope, origin y permisos.
+- La orquestación global define `MODULE_LOCAL`, `SHARED`, `GLOBAL` y el overlay `PRODUCTION_PROTECTED`, con edición local concurrente y ventanas exclusivas para Git y cambios transversales.
+- El module registry backend está implementado y vacío; Flow todavía no está integrado.
+- El coordinador Python y su inventario JSON continúan pendientes.
 
 ## Cambios recientes
 
 Esta sección conserva únicamente decisiones recientes que siguen afectando el estado vigente; la evidencia diaria vive fuera de LAT.
+
+### Ownership modular y concurrencia
+
+La política [[team360-global-orchestration]] es la fuente humana canónica para ownership por paths, coordinación entre agentes y alta inicial de módulos en el registry.
+
+- Varios agentes pueden editar scopes `MODULE_LOCAL` asignados y disjuntos.
+- `SHARED` requiere coordinación; `GLOBAL` y Git requieren ventana exclusiva.
+- Solo Diagnosticador/Vera y el embed productivo están hoy declarados `PRODUCTION_PROTECTED`.
+- Ownership por paths no reemplaza ownership por ramas; Knowledge conserva su política actual.
 
 ### Alias LiteLLM GPT-5.4 Nano
 

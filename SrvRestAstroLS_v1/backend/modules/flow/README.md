@@ -10,6 +10,19 @@ mediante un mapping determinístico y valida el sector/destino contra el catálo
 PostgreSQL. El estado de la solicitud no cambia: la asignación conserva su
 propio estado en `flow_request_routings`, lo que desacopla intake de routing.
 
+## Ownership
+
+La política canónica es [Team360 — Orquestación global](../../../../lat.md/team360-global-orchestration.md). Esta tabla declara el alcance de Flow sin redefinir las categorías globales.
+
+| Grupo | Alcance actual |
+| --- | --- |
+| `FLOW_LOCAL` | `SrvRestAstroLS_v1/backend/modules/flow/**` y tests `backend/tests/test_flow_*.py` inequívocamente propios |
+| `FLOW_SHARED_DEPENDENCIES` | Messaging, dominio normalizado, provider Gmail, contratos comunes y cliente LiteLLM reutilizado |
+| `FLOW_GLOBAL_DEPENDENCIES` | `module_registry.py`, `ls_iMotorSoft_Srv01.py`, `modules/db/**`, migraciones, `globalVar.py`, dependencias, lockfiles, runtime y deploy |
+| `FLOW_PRODUCTION_DEPENDENCIES` | Fronteras Diagnosis/embed consumidas por Flow, especialmente `modules/automation_diagnosis/litellm_client.py` mientras siga compartido con Vera |
+
+Las migraciones Flow continúan siendo `GLOBAL` por pertenecer al historial aplicado de PostgreSQL. Flow todavía no expone `routes.py` ni está registrado en el module registry; esa alta inicial requerirá una ventana GLOBAL separada.
+
 ## Ejecución manual
 
 Requiere la migración `011_team360_flow_email_intake_v1.sql`, PostgreSQL,

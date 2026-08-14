@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-13 (Flow SLA primera respuesta Alumbrado N3 V1)
+Ultima actualizacion: 2026-08-14 (politica de ownership modular y concurrencia)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -22,6 +22,9 @@ Este documento es un tablero del estado vigente. La bitacora detallada previa, i
 - El runtime publico de Vera usa `/t360 -> Litestar -> PostgreSQL -> Milvus -> LiteLLM`.
 - Las migraciones `001` a `004` y la Fase 1 de `automation_diagnosis` fueron validadas anteriormente.
 - La politica DB vigente exige `psycopg 3 async`, pools separados y SQL dentro de repositories.
+- El commit `e2e0a54` incorporó `backend/modules/module_registry.py`; el registry continúa vacío y `ls_iMotorSoft_Srv01.py` ya consume sus handlers.
+- La política modular vigente permite agentes concurrentes solo en scopes `MODULE_LOCAL` asignados y disjuntos, con coordinación `SHARED` y ventanas exclusivas para `GLOBAL`, Git y producción protegida.
+- Flow todavía no fue adaptado al registry. El inventario JSON y el coordinador Python de locks siguen pendientes.
 
 Referencias canonicas:
 
@@ -29,6 +32,7 @@ Referencias canonicas:
 - `lat.md/postgres-driver-policy.md`
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
+- `lat.md/team360-global-orchestration.md`
 
 ## Gate 2026-08-13 — Flow SLA primera respuesta Alumbrado N3 V1
 

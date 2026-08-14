@@ -9,9 +9,22 @@ Este archivo es la fuente operativa canonica para Codex, OpenCode, Crush y otros
 3. Leer `SrvRestAstroLS_v1/docs/status_actual.md` para conocer el estado vigente.
 4. Identificar el frente y consultar solo las referencias de la tabla siguiente.
 5. No cambiar de rama ni pisar cambios existentes. Si hay archivos modificados, preservar ownership y editar solo paths compatibles con la tarea.
-6. Un solo agente puede escribir sobre un worktree. Otros agentes deben trabajar en modo read-only o en otro worktree.
+6. Varios agentes pueden escribir en el mismo worktree solo sobre scopes `MODULE_LOCAL` explicitamente asignados y disjuntos.
 
-No hacer commit, push, merge, rebase, reset, clean, stash, checkout forzado ni borrar ramas salvo pedido explicito del usuario.
+No hacer commit, push, merge, rebase, reset, clean, stash, checkout forzado ni borrar ramas salvo pedido explicito del usuario y una ventana Git exclusiva.
+
+## Ownership y concurrencia
+
+La politica detallada y fuente humana canonica es `lat.md/team360-global-orchestration.md`; estas son las reglas operativas inmediatas.
+
+- `MODULE_LOCAL`: el agente puede editar solo el scope existente que le fue asignado, incluidos sus tests y documentacion propios.
+- `SHARED`: antes de editar, identificar consumidores, informar el impacto y obtener asignacion o autorizacion cuando pueda afectarlos.
+- `GLOBAL`: detenerse antes del cambio, informar path, motivo, impacto y modulo solicitante, y pedir una ventana GLOBAL exclusiva. Mientras espera, puede continuar otra tarea local.
+- `PRODUCTION_PROTECTED`: detenerse y obtener autorizacion explicita; exige regresion especifica y no permite ampliar el scope. Actualmente cubre solo Diagnosticador/Vera y el componente/embed productivo.
+- Los cambios dentro del scope asignado a otro agente son `EXPECTED CONCURRENT CHANGES`: preservarlos y no revertirlos, borrarlos, formatearlos, modificarlos ni incluirlos en Git.
+- Un cambio fuera de los scopes concurrentes declarados que no pueda explicarse obliga a detenerse e informar.
+- Edicion concurrente `MODULE_LOCAL` esta permitida; `git add`, commit, checkout/switch, merge, rebase, reset, stash, clean y operaciones equivalentes requieren exclusividad y ningun otro agente escritor activo.
+- Tambien requieren ventana exclusiva los formatters globales, lockfiles, regeneraciones masivas y scripts o regresiones que alteren artefactos compartidos.
 
 ## Ramas
 

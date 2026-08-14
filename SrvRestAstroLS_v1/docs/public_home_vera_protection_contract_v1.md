@@ -5,11 +5,18 @@ Cierre: 2026-08-06.
 Rama: `feature/console-backend-core` (HEAD `1b3d4f2` al inicio).
 Resultado: `TEAM360_PUBLIC_HOME_VERA_PROTECTION_PASS`.
 
-Este documento define el contrato mínimo protegido de la superficie pública
-productiva de Team360. Cualquier módulo futuro (Team360 Flow, Stage 10, nuevos
-embeds, etc.) debe respetar estas reglas sin excepción.
+Este documento define gates de regresión para la superficie pública de Team360.
+Cualquier módulo futuro (Team360 Flow, Stage 10, nuevos embeds, etc.) debe
+respetar estas reglas sin excepción.
 
-## 1. Superficie protegida
+En la política de ownership, `PRODUCTION_PROTECTED` se limita actualmente a
+Vera / Diagnosticador y al componente/embed productivo. La Home conserva este
+contrato y sus tests de regresión, pero no queda íntegramente clasificada como
+`PRODUCTION_PROTECTED`; tampoco Console adquiere esa clasificación por deploy.
+
+## 1. Superficie cubierta por regresión
+
+Los siguientes puntos públicos permanecen cubiertos por los gates existentes, independientemente de su categoría de ownership.
 
 - Home pública: `https://team360.live/`
 - Vera / Diagnosticador público: `https://team360.live/#vera`
