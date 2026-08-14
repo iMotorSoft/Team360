@@ -13,6 +13,7 @@ from litestar.config.cors import CORSConfig
 
 from modules.db.errors import DatabasePoolNotInitializedError
 from modules.db.pool import close_pool, get_pool, open_pool
+from modules.module_registry import get_module_route_handlers
 
 from routes.automation_diagnosis import classify, save_answer, start_session
 from routes.console_bootstrap import console_bootstrap
@@ -85,6 +86,7 @@ def create_app() -> Litestar:
             dev_sales_diagnosis_turn,
             console_bootstrap,
             console_me,
+            *get_module_route_handlers(),
         ],
         on_startup=[_open_db_pool],
         on_shutdown=[_close_db_pool],
