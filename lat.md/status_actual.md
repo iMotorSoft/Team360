@@ -19,7 +19,7 @@ Team360 mantiene una arquitectura funcional separada por fronteras explícitas d
 - Playwright + Chromium es el gate E2E reproducible; Browser MCP es diagnóstico exploratorio.
 - El Diagnosticador embebible conserva el backend como autoridad de tenant, scope, origin y permisos.
 - La orquestación global define `MODULE_LOCAL`, `SHARED`, `GLOBAL` y el overlay `PRODUCTION_PROTECTED`, con edición local concurrente y ventanas exclusivas para Git y cambios transversales.
-- El module registry backend está implementado y vacío; Flow todavía no está integrado.
+- El module registry backend está implementado y Flow está registrado una sola vez; su export `ROUTE_HANDLERS` permanece vacío mientras no existan APIs HTTP propias del módulo.
 - El coordinador Python y su inventario JSON continúan pendientes.
 
 ## Cambios recientes

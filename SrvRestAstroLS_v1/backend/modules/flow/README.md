@@ -21,7 +21,7 @@ La política canónica es [Team360 — Orquestación global](../../../../lat.md/
 | `FLOW_GLOBAL_DEPENDENCIES` | `module_registry.py`, `ls_iMotorSoft_Srv01.py`, `modules/db/**`, migraciones, `globalVar.py`, dependencias, lockfiles, runtime y deploy |
 | `FLOW_PRODUCTION_DEPENDENCIES` | Fronteras Diagnosis/embed consumidas por Flow, especialmente `modules/automation_diagnosis/litellm_client.py` mientras siga compartido con Vera |
 
-Las migraciones Flow continúan siendo `GLOBAL` por pertenecer al historial aplicado de PostgreSQL. Flow todavía no expone `routes.py` ni está registrado en el module registry; esa alta inicial requerirá una ventana GLOBAL separada.
+Las migraciones Flow continúan siendo `GLOBAL` por pertenecer al historial aplicado de PostgreSQL. Flow expone `ROUTE_HANDLERS` desde `routes.py` y está registrado una sola vez en el module registry. El tuple permanece vacío mientras Flow no tenga APIs HTTP; cada futura ruta se agrega localmente a `routes.py` sin volver a modificar el registry ni el entrypoint.
 
 ## Ejecución manual
 

@@ -119,7 +119,7 @@ ROUTE_HANDLERS = (
 
 El alta inicial del modulo requiere un cambio GLOBAL coordinado en `module_registry.py`. Despues, nuevas APIs se agregan a su `routes.py` `MODULE_LOCAL` sin modificar el entrypoint ni el registry por cada endpoint.
 
-El registry esta implementado y actualmente vacio. Flow todavia no fue integrado; su futura alta sera una ventana GLOBAL separada.
+El registry esta implementado y Flow esta registrado una sola vez. Su export `ROUTE_HANDLERS` permanece vacio mientras el modulo no exponga APIs HTTP; las futuras rutas de Flow se agregan dentro de su scope `MODULE_LOCAL` sin nuevas modificaciones del registry.
 
 ## Salida de scope
 

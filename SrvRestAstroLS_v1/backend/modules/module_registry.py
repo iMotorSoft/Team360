@@ -10,13 +10,16 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
+from modules.flow.routes import ROUTE_HANDLERS as FLOW_ROUTE_HANDLERS
+
 ModuleRouteHandlers = Sequence[Any]
 
 
-# Keep registration explicit and deterministic. Example for a future module:
-# from modules.flow.routes import ROUTE_HANDLERS as FLOW_ROUTE_HANDLERS
-# REGISTERED_MODULE_ROUTE_HANDLERS = (FLOW_ROUTE_HANDLERS,)
-REGISTERED_MODULE_ROUTE_HANDLERS: tuple[ModuleRouteHandlers, ...] = ()
+# Keep registration explicit and deterministic. Add each module once here;
+# handlers added later remain owned by that module's routes.py.
+REGISTERED_MODULE_ROUTE_HANDLERS: tuple[ModuleRouteHandlers, ...] = (
+    FLOW_ROUTE_HANDLERS,
+)
 
 
 def get_module_route_handlers() -> tuple[Any, ...]:
