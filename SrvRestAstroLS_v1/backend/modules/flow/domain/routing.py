@@ -93,6 +93,11 @@ _CATEGORY_TO_SECTOR = {
     "street_lighting": "alumbrado",
 }
 
+# Closed vocabulary offered to the intake interpreter. `tentative_category`
+# must be one of these canonical values or null; descriptive detail belongs in
+# `description` / `context_notes`, never in `tentative_category`.
+CANONICAL_CATEGORIES: tuple[str, ...] = ("alumbrado",)
+
 
 def normalize_routing_category(value: str | None) -> str:
     text = unicodedata.normalize("NFKD", value or "")
@@ -101,8 +106,24 @@ def normalize_routing_category(value: str | None) -> str:
 
 
 def resolve_sector_id(tentative_category: str | None) -> str | None:
-    """Map an exact normalized intake category to a stable sector id."""
-    return _CATEGORY_TO_SECTOR.get(normalize_routing_category(tentative_category))
+    """Map a normalized intake category to a stable sector id.
+
+    Exact normalized matches are resolved first. Compound labels that merely
+    LEAD with a known catalog label (e.g. "Alumbrado público - luminaria
+    apagada") are resolved to the leading label's sector. Labels whose leading
+    token is not part of the catalog (e.g. "robo de luminaria") stay
+    unresolved instead of being forced into a sector.
+    """
+    normalized = normalize_routing_category(tentative_category)
+    if not normalized:
+        return None
+    sector = _CATEGORY_TO_SECTOR.get(normalized)
+    if sector is not None:
+        return sector
+    for label in sorted(_CATEGORY_TO_SECTOR, key=len, reverse=True):
+        if normalized.startswith(label + "_"):
+            return _CATEGORY_TO_SECTOR[label]
+    return None
 
 
 def routing_rfc_message_id(

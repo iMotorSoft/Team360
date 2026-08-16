@@ -12,6 +12,7 @@ from modules.automation_diagnosis.litellm_client import LiteLLMClient
 from modules.messaging.domain import InboundMessage
 
 from ..domain.models import CandidateRequest, InitialInterpretation, ReplyInterpretation
+from ..domain.routing import CANONICAL_CATEGORIES
 
 
 DEFAULT_FLOW_MODEL = "openai_gpt-5.4-nano"
@@ -85,7 +86,14 @@ Cada solicitud usa exactamente:
 {"description": string, "tentative_category": string|null,
  "location_text": string|null, "missing_data": [string],
  "context_notes": string|null, "confidence": number|null}
-""".strip()
+
+tentative_category es vocabulario cerrado: debe ser exactamente uno de
+__CANONICAL_CATEGORIES__ o null. No escribas categorías
+compuestas ni descriptivas (por ejemplo "Alumbrado público - luminaria
+apagada"); usá la categoría canónica y poné el detalle en description o
+context_notes. Si la solicitud no corresponde a una categoría del catálogo,
+usá null.
+""".replace("__CANONICAL_CATEGORIES__", json.dumps(list(CANONICAL_CATEGORIES))).strip()
 
 
 def _extract_json(text: str) -> dict[str, Any]:
