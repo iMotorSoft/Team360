@@ -476,3 +476,20 @@ class FlowAuditRepository:
         if existing is None:
             raise RuntimeError("Flow audit record conflict returned no row.")
         return existing["id"]
+
+    async def get_record(
+        self, conn: AsyncConnection, request_id: str
+    ) -> dict[str, Any] | None:
+        return await fetch_one(
+            conn,
+            """
+            select id::text as audit_record_id, schema_version,
+                   generated_at_utc, resolved_at_utc, snapshot_sha256,
+                   snapshot_jsonb
+            from flow_case_audit_records
+            where request_id = %(request_id)s
+            order by generated_at_utc desc
+            limit 1
+            """,
+            {"request_id": request_id},
+        )

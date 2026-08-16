@@ -142,7 +142,41 @@ N3 queda ASSIGNED con su work state y snapshot SLA propios. Si N3 vence, la
 ausencia de un nivel activo posterior deja el breach persistido como fin normal
 de la cadena actual: el escalador no crea N4 ni envía otro email.
 
+## Consulta ejecutiva de casos (Director)
+
+Requiere la migración `019_team360_flow_supervisor_closure_audit_v1.sql` y el
+cierre con aprobación de supervisor. El servicio `executive_service.py` es de
+solo lectura: no muta el workflow, no crea mensajes, routings, eventos ni audit
+records.
+
+- `data_source = AUDIT_SNAPSHOT` para casos `RESOLVED` con registro en
+  `flow_case_audit_records` (representación inmutable del cierre);
+- `data_source = LIVE` para casos abiertos, construida desde las tablas
+  operacionales; no se fabrican audit records para casos abiertos;
+- contrato: request, routing_history, sla, escalations, operational_events,
+  resolution, closure_approval, result, metrics, timeline, audit y el hecho
+  operacional determinístico `status_fact` (closed/open/pending_approval);
+- trazabilidad: routing:<id>, sla:<id>, event:<id>, resolution:<id>,
+  approval:<id>, audit:<id>;
+- LLM: LiteLLM `openai_gpt-5.4-nano`, recibe únicamente los hechos
+  estructurados y reglas que prohíben inventar eventos/estados y contradicen
+  `status_fact`.
+
+CLI:
+
+```bash
+uv run python -m modules.flow.executive_query_once <request-id> \
+  --question "¿Qué pasó con el reclamo?"
+```
+
+Ruta HTTP autenticada con PASETO console:
+
+```text
+GET /api/team360-flow/executive/{request_id}?question=...
+```
+
 ## Límites V1
 
-No incluye N4, escalamiento N3→N4, delegación, resolución, frontend, WhatsApp,
-Pub/Sub, scheduler ni daemon.
+No incluye N4, escalamiento N3→N4, delegación, reopen, ciudadano aprobando
+cierre, frontend Directorio, dashboard, PDF, Excel, BI, WhatsApp, Pub/Sub,
+scheduler ni daemon.

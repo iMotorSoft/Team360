@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-16 (cierre de caso con aprobacion de supervisor y registro de auditoria)
+Ultima actualizacion: 2026-08-16 (consulta ejecutiva de casos Flow para Directorio)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -33,6 +33,57 @@ Referencias canonicas:
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
 - `lat.md/team360-global-orchestration.md`
+
+## Gate 2026-08-16 — Flow consulta ejecutiva / Directorio V1
+
+Estado: PASS funcional real/controlado. Una capa de consulta read-only sobre los
+hechos persistidos de Flow responde preguntas de Directorio sin alterar el
+workflow. `model_eval/**` no fue tocado.
+
+### Arquitectura
+
+- `executive_service.py` + `executive_query.py` (vista normalizada y métricas
+  derivadas) + `executive_ai.py` (LiteLLM `openai_gpt-5.4-nano`);
+- `data_source = AUDIT_SNAPSHOT` para `RESOLVED` con registro inmutable en
+  `flow_case_audit_records`; `data_source = LIVE` para casos abiertos (no se
+  fabrican audit records);
+- contrato: request, routing_history, sla, escalations, operational_events,
+  resolution, closure_approval, result, metrics, timeline, audit y el hecho
+  determinístico `status_fact` (closed/open/pending_approval) que el LLM no
+  puede contradecir;
+- trazabilidad: routing:<id>, sla:<id>, event:<id>, resolution:<id>,
+  approval:<id>, audit:<id>;
+- CLI `executive_query_once <request-id> [--question]` y ruta HTTP
+  `GET /api/team360-flow/executive/{request_id}` autenticada con PASETO console,
+  registrada vía `routes.py` (MODULE_LOCAL) sin tocar el registry ni el
+  entrypoint.
+
+### Evidencia real
+
+- caso `814f38ce` RESOLVED → `AUDIT_SNAPSHOT`, hash intacto, resumen trazable
+  que identifica quién autorizó el cierre;
+- caso `d16a0a08` RESOLUTION_PENDING_APPROVAL → `LIVE`,
+  `status_fact=pending_approval`; respuesta ejecutiva correcta: NO está cerrado;
+- caso `c92d739c` ACTIVE post-reject → `LIVE`, motivo de rechazo persistido y
+  explicado; cero audit records;
+- doble consulta: mismo hash y mismos conteos (audit=1, routing=1, evento=1);
+  cero mutaciones.
+
+### Validación
+
+- unitarios de vista, métricas, guardrails del prompt y contrato de ruta: PASS;
+- PostgreSQL real (LIVE → cierre real → AUDIT_SNAPSHOT + idempotencia): PASS;
+- backend completo: 1368 PASS, 19 SKIP;
+- LAT (md/index/sections/code-refs/general) y `git diff --check`: PASS;
+- `gitleaks`/`ruff` no instalados (documentado); secret scan manual sin
+  hallazgos.
+
+### Fuera de alcance confirmado
+
+Sin frontend Directorio, dashboard, PDF, Excel, BI, WhatsApp, N4, reopen,
+delegación, citizen approval ni worker/scheduler.
+
+
 
 ## Gate 2026-08-16 — Flow cierre con aprobación de supervisor y registro de auditoría V1
 
