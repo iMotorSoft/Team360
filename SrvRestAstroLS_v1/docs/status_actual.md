@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-14 (politica de ownership modular y concurrencia)
+Ultima actualizacion: 2026-08-16 (cierre de caso con aprobacion de supervisor y registro de auditoria)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -33,6 +33,58 @@ Referencias canonicas:
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
 - `lat.md/team360-global-orchestration.md`
+
+## Gate 2026-08-16 — Flow cierre con aprobación de supervisor y registro de auditoría V1
+
+Estado: PASS funcional real/controlado. El técnico propone resolución, el
+supervisor autoriza el cierre y Flow genera un registro de auditoría
+inmutable. El vecino y el técnico nunca cierran un caso.
+
+### Modelo de cierre
+
+- el intérprete operacional reconoce `RESOLUTION_PROPOSED` (lenguaje inequívoco
+  de reparación/cierre) sin cerrar el caso; lenguaje dudoso queda
+  `ACK_OR_PROGRESS`/`AMBIGUOUS`;
+- la propuesta (`flow_request_resolutions`) es idempotente por
+  `(source_provider, source_external_message_id)` y se asocia a un routing;
+- la autoridad de cierre (`flow_closure_approvals`) es configurable por sector
+  (`flow_sectors.closure_approval_level = 2` para alumbrado) y se resuelve al
+  destino `alumbrado.n2@alquimiablue.com`, nunca desde el current level;
+- `APPROVE` transiciona atómicamente approval + resolution + request RESOLVED y
+  genera `flow_case_audit_records` (snapshot JSONB + SHA-256 canónico);
+- `REJECT` persiste el motivo y devuelve el request a ACTIVE para nueva
+  propuesta; `RESOLVED` es terminal (trigger DB impide degradación);
+- el token de aprobación es determinístico (SHA-256 del source message) y
+  arranca con letra para que el correlador operacional no robe la decisión.
+
+### Evidencia real
+
+- caso `814f38ce-9509-4cd6-a355-fa176e63edb2`: técnico respondió en N1, Flow
+  interpretó `RESOLUTION_PROPOSED`, envió un único email de aprobación a
+  `alumbrado.n2@alquimiablue.com` con token, cadena N1 y resumen SLA; el
+  supervisor respondió `APROBAR` y el caso quedó RESOLVED con `authorized_by`
+  y audit record `a23aa1ec` (schema 1, SHA-256 verificado por re-cómputo);
+- caso `c92d739c-4e6e-4b84-a65d-99a6a90ef712`: supervisor respondió
+  `RECHAZAR: falta verificar...`, approval/resolution REJECTED, request ACTIVE
+  y cero audit records;
+- segundo `poll_once`: cero proposals/approvals/decisions/audit nuevos y
+  `resolved_at` intacto.
+
+### Validación
+
+- Flow focalizado con PostgreSQL real (propuestas, approve, reject, idempotencia
+  de decisión, rollback de transacción de cierre y terminalidad): PASS;
+- unitarios de clasificación, correlación, decisiones, hash y timeline: PASS;
+- backend completo: 1355 PASS, 18 SKIP;
+- migración 019 validada con apply, rollback y reapply sin reiniciar servicios;
+  trigger `trg_flow_request_resolution_guard` bloquea RESOLVED sin approval
+  APPROVED y la degradación de RESOLVED.
+
+### Fuera de alcance confirmado
+
+Sin reopen, ciudadano aprobando cierre, N4, delegación, frontend, dashboard,
+PDF, Excel, WhatsApp, scheduler, worker ni Pub/Sub. La ficha de auditoría es
+persistencia backend para consulta ejecutiva futura.
 
 ## Gate 2026-08-13 — Flow SLA primera respuesta Alumbrado N3 V1
 

@@ -42,11 +42,15 @@ decidas identidad ni routing. Respondé SOLO JSON válido con action y summary.
 Clasificá únicamente el texto nuevo del responder e ignorá el correo citado.
 
 ACK_OR_PROGRESS: recepción o trabajo iniciado/en curso, por ejemplo "Recibido,
-lo verificamos", "la cuadrilla ya va" o "tomado, revisamos hoy".
+lo verificamos", "la cuadrilla ya va", "estamos terminando", "ya casi está" o
+"creemos que está solucionado". Lenguaje no inequívoco de cierre es progreso.
 AMBIGUOUS: no permite afirmar recepción operativa o avance; "Ok" solo es ambiguo.
 UNRELATED: el contenido explícitamente no corresponde a la solicitud asignada.
-UNSUPPORTED_OPERATIONAL_ACTION: informa resolución/cierre/reparación terminada,
-porque este gate no puede cerrar solicitudes.
+RESOLUTION_PROPOSED: afirma de forma inequívoca que el trabajo fue resuelto,
+terminado o reparado, por ejemplo "la luminaria quedó reparada", "trabajo
+finalizado" o "problema solucionado". Nunca cierra el caso: solo propone.
+UNSUPPORTED_OPERATIONAL_ACTION: acción operativa no soportada distinta de
+resolución, por ejemplo delegación o reasignación.
 """.strip()
 
 

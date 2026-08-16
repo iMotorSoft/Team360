@@ -11,6 +11,7 @@ from psycopg_pool import AsyncConnectionPool
 from modules.db.transaction import transaction
 from modules.messaging.domain import InboundMessage
 
+from .closure_service import ClosureProposalResult, FlowClosureService
 from .domain import (
     CorrelatedOperationalReply,
     OperationalAction,
@@ -36,6 +37,7 @@ class OperationalProcessResult:
     status: OperationalStatus | None = None
     first_response_at: datetime | None = None
     correlation_method: str | None = None
+    proposal: ClosureProposalResult | None = None
 
 
 class FlowOperationalReplyService:
@@ -45,10 +47,12 @@ class FlowOperationalReplyService:
         pool: AsyncConnectionPool,
         repository: FlowOperationalPostgresRepository,
         interpreter: OperationalInterpreterPort,
+        closure: FlowClosureService | None = None,
     ) -> None:
         self._pool = pool
         self._repository = repository
         self._interpreter = interpreter
+        self._closure = closure
 
     async def process_if_operational(
         self, message: InboundMessage
@@ -59,6 +63,16 @@ class FlowOperationalReplyService:
                 return OperationalProcessResult(False, False)
 
             context = correlation.context
+            if context.request_status == "RESOLVED":
+                return OperationalProcessResult(
+                    matched=True,
+                    processed=False,
+                    request_id=context.request_id,
+                    routing_id=context.routing_id,
+                    level=context.level,
+                    correlation_method=correlation.method,
+                )
+
             source_message_id = await self._repository.claim_message(
                 conn, context=context, message=message
             )
@@ -90,10 +104,26 @@ class FlowOperationalReplyService:
                 correlation_method=correlation.method,
                 interpretation=interpretation,
             )
-            if interpretation.action == OperationalAction.ACK_OR_PROGRESS:
+            if interpretation.action in {
+                OperationalAction.ACK_OR_PROGRESS,
+                OperationalAction.RESOLUTION_PROPOSED,
+            }:
                 state = await self._repository.mark_in_progress(
                     conn, context=context, message=message
                 )
+
+            proposal = None
+            if (
+                interpretation.action == OperationalAction.RESOLUTION_PROPOSED
+                and self._closure is not None
+            ):
+                proposal = await self._closure.propose_resolution(
+                    conn,
+                    context=context,
+                    message=message,
+                    interpretation=interpretation,
+                )
+
             return OperationalProcessResult(
                 matched=True,
                 processed=True,
@@ -105,6 +135,7 @@ class FlowOperationalReplyService:
                 status=state.status,
                 first_response_at=state.first_response_at,
                 correlation_method=correlation.method,
+                proposal=proposal,
             )
 
     async def _correlate(

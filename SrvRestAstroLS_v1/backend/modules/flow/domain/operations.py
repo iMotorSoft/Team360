@@ -15,6 +15,7 @@ class OperationalStatus(StrEnum):
 
 class OperationalAction(StrEnum):
     ACK_OR_PROGRESS = "ACK_OR_PROGRESS"
+    RESOLUTION_PROPOSED = "RESOLUTION_PROPOSED"
     AMBIGUOUS = "AMBIGUOUS"
     UNRELATED = "UNRELATED"
     UNSUPPORTED_OPERATIONAL_ACTION = "UNSUPPORTED_OPERATIONAL_ACTION"
@@ -32,6 +33,7 @@ class OperationalRoutingContext:
     outbound_external_message_id: str
     outbound_rfc_message_id: str | None
     outbound_observed_rfc_message_id: str | None
+    request_status: str = "CONFIRMED"
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,6 +66,7 @@ _REQUEST_TOKEN = re.compile(
     re.IGNORECASE,
 )
 _ROUTING_TOKEN = re.compile(r"\[R:([a-z][a-z0-9_]{0,63})\]", re.IGNORECASE)
+_APPROVAL_TOKEN = re.compile(r"\[R:([0-9a-f]{8,64})\]", re.IGNORECASE)
 
 
 def request_id_from_subject(subject: str) -> str | None:
@@ -73,6 +76,11 @@ def request_id_from_subject(subject: str) -> str | None:
 
 def routing_key_from_subject(subject: str) -> str | None:
     match = _ROUTING_TOKEN.search(subject)
+    return match.group(1).lower() if match else None
+
+
+def approval_token_from_subject(subject: str) -> str | None:
+    match = _APPROVAL_TOKEN.search(subject)
     return match.group(1).lower() if match else None
 
 

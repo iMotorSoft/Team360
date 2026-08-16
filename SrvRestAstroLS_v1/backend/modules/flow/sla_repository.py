@@ -44,13 +44,17 @@ class FlowSLARepository:
             f"""
             select {_COLUMNS}
             from flow_request_slas fs
+            join flow_requests fr on fr.id = fs.request_id
             left join flow_request_work_states fws on fws.routing_id = fs.routing_id
-            where fs.status = 'PENDING'
-               or (
+            where fr.status in ('CONFIRMED', 'ACTIVE', 'RESOLUTION_PENDING_APPROVAL')
+              and (
+                   fs.status = 'PENDING'
+                or (
                     fs.status = 'BREACHED'
                     and fws.first_response_at_utc is not null
                     and fws.first_response_at_utc <= fs.due_at_utc
-               )
+                )
+              )
             order by fs.started_at_utc, fs.id
             for update of fs
             """,

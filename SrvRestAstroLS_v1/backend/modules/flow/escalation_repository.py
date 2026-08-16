@@ -62,7 +62,7 @@ _CANDIDATE_QUERY = """
     where fs.sla_type = 'FIRST_RESPONSE'
       and fs.status = 'BREACHED'
       and frr.status = 'ASSIGNED'
-      and fr.status = 'CONFIRMED'
+      and fr.status in ('CONFIRMED', 'ACTIVE')
       and (fws.first_response_at_utc is null
            or fws.first_response_at_utc > fs.due_at_utc)
       and exists (

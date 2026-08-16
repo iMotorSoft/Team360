@@ -10,6 +10,10 @@ from modules.db.pool import close_pool, create_pool, open_pool
 from modules.db.settings import get_database_settings
 from modules.messaging.providers.gmail import GmailClient
 
+from .approval_ai import LiteLLMApprovalInterpreter
+from .audit_repository import FlowAuditRepository
+from .closure_repository import FlowClosurePostgresRepository
+from .closure_service import FlowClosureService
 from .intake.ai import LiteLLMFlowIntakeInterpreter
 from .operational_ai import LiteLLMOperationalInterpreter
 from .operational_repository import FlowOperationalPostgresRepository
@@ -40,6 +44,12 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
     confirmed_requests = 0
     operational_replies = 0
     operational_duplicates = 0
+    proposals = 0
+    approvals_sent = 0
+    approval_replies = 0
+    approval_duplicates = 0
+    resolved = 0
+    rejected = 0
     try:
         service = FlowIntakeService(
             pool=pool,
@@ -47,10 +57,18 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
             interpreter=LiteLLMFlowIntakeInterpreter(),
             reply_sender=gmail,
         )
+        closure_service = FlowClosureService(
+            pool=pool,
+            repository=FlowClosurePostgresRepository(),
+            audit_repository=FlowAuditRepository(),
+            interpreter=LiteLLMApprovalInterpreter(),
+            sender=gmail,
+        )
         operational_service = FlowOperationalReplyService(
             pool=pool,
             repository=FlowOperationalPostgresRepository(),
             interpreter=LiteLLMOperationalInterpreter(),
+            closure=closure_service,
         )
         message_ids = gmail.list_messages(max_results=limit, q=query)
         for message_id in reversed(message_ids):
@@ -60,6 +78,9 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
                 if operational.processed:
                     processed += 1
                     operational_replies += 1
+                    if operational.proposal is not None:
+                        proposals += 1
+                        approvals_sent += int(operational.proposal.sent)
                     print(
                         "flow operational reply processed "
                         f"message_id={message.external_message_id} "
@@ -73,6 +94,34 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
                     duplicates += 1
                     operational_duplicates += 1
                 continue
+
+            approval = await closure_service.process_approval_reply(message)
+            if approval.matched:
+                if approval.processed:
+                    processed += 1
+                    approval_replies += 1
+                    resolved += int(
+                        approval.decision is not None
+                        and approval.decision.value == "APPROVE"
+                    )
+                    rejected += int(
+                        approval.decision is not None
+                        and approval.decision.value == "REJECT"
+                    )
+                    print(
+                        "flow approval reply processed "
+                        f"message_id={message.external_message_id} "
+                        f"request_id={approval.request_id} "
+                        f"approval_id={approval.approval_id} "
+                        f"decision={approval.decision} "
+                        f"authorized={approval.authorized} "
+                        f"correlation={approval.correlation_method}"
+                    )
+                else:
+                    duplicates += 1
+                    approval_duplicates += 1
+                continue
+
             result = await service.process(message)
             if result.processed:
                 processed += 1
@@ -95,6 +144,12 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
             "confirmed_requests": confirmed_requests,
             "operational_replies": operational_replies,
             "operational_duplicates": operational_duplicates,
+            "proposals": proposals,
+            "approvals_sent": approvals_sent,
+            "approval_replies": approval_replies,
+            "approval_duplicates": approval_duplicates,
+            "resolved": resolved,
+            "rejected": rejected,
         }
     finally:
         await close_pool(pool)

@@ -24,7 +24,8 @@ _CONTEXT_COLUMNS = """
     frr.status as routing_status,
     frr.destination, frr.outbound_external_message_id,
     frr.outbound_rfc_message_id,
-    frr.outbound_observed_rfc_message_id
+    frr.outbound_observed_rfc_message_id,
+    fr.status as request_status
 """
 
 
