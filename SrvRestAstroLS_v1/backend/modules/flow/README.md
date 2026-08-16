@@ -175,6 +175,23 @@ Ruta HTTP autenticada con PASETO console:
 GET /api/team360-flow/executive/{request_id}?question=...
 ```
 
+## Executive Query Authorization
+
+La ruta HTTP separa AUTHENTICATION de AUTHORIZATION:
+
+- autenticación: PASETO `console_access` demuestra identidad (401 si falta o es
+  inválido);
+- autorización: capability persistente `flow.executive.read`, resuelta por el
+  RBAC existente (`core_permissions` + `list_effective_permissions`) mediante
+  `executive_auth.py` (403 si el usuario autenticado no la tiene);
+- fail closed: sin capability explícita → DENY; el dominio `@alquimiablue.com`
+  no otorga acceso Directorio;
+- el 403 se emite antes de cualquier acceso a datos o al LLM, y también para
+  request_ids inexistentes (evita enumeración); el 404 solo llega a usuarios
+  autorizados;
+- el servicio interno (`executive_service.py`) y el CLI
+  `executive_query_once.py` siguen funcionando sin transporte HTTP.
+
 ## Límites V1
 
 No incluye N4, escalamiento N3→N4, delegación, reopen, ciudadano aprobando

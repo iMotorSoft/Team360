@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-16 (consulta ejecutiva de casos Flow para Directorio)
+Ultima actualizacion: 2026-08-16 (rol Directorio / autorizacion minima para consulta ejecutiva Flow)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -33,6 +33,49 @@ Referencias canonicas:
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
 - `lat.md/team360-global-orchestration.md`
+
+## Gate 2026-08-16 — Flow rol Directorio / autorización mínima V1
+
+Estado: PASS funcional real/controlado. La consulta ejecutiva HTTP queda
+protegida por la capability persistente `flow.executive.read` resuelta con el
+RBAC existente. `model_eval/**` no fue tocado.
+
+### Modelo de autorización
+
+- autenticación (PASETO console) ≠ autorización (capability persistente);
+- migración `020_team360_flow_director_authorization_v1.sql` (ventana GLOBAL
+  autorizada) siembra `flow.executive.read` en `core_permissions`; sin grants
+  de usuario en la migración (los grants son operacionales/fixtures);
+- `executive_auth.py` resuelve el workspace del usuario y consulta
+  `list_effective_permissions` (roles + permission profiles existentes);
+- fail closed: sin capability → DENY; el dominio no autoriza; el 403 ocurre
+  antes de datos/LLM y también para request_ids inexistentes (sin enumeración);
+- flujo: PASETO → capability → executive service; 401 / 403 / 200 / 404
+  diferenciados.
+
+### Evidencia
+
+- tests unitarios de ruta (TestClient + tokens reales del par de test): sin
+  token 401, token inválido 401, autenticado sin permiso 403 sin llamar al
+  LLM ni al servicio, autorizado 200, autorizado + request inexistente 404,
+  no autorizado + request inexistente 403, dos usuarios (A 200 / B 403),
+  intentos de escalada (`role=director`, `X-Is-Admin`, email por header)
+  ignorados;
+- PostgreSQL real: grant → `has_flow_executive_read` True y consulta
+  AUDIT_SNAPSHOT/LIVE reales; revoke → False (fail closed); read-only con hash
+  intacto;
+- backend completo: 1385 PASS, 20 SKIP;
+- LAT (md/index/sections/code-refs/general) y `git diff --check`: PASS;
+- `gitleaks`/`ruff` no instalados (documentado); secret scan manual sin
+  hallazgos.
+
+### Fuera de alcance confirmado
+
+Sin RBAC general, multi-tenant, roles por sector/municipio, gestión gráfica de
+permisos, frontend Directorio, dashboard, PDF, Excel, WhatsApp, N4, reopen,
+delegación ni citizen permissions.
+
+
 
 ## Gate 2026-08-16 — Flow consulta ejecutiva / Directorio V1
 
