@@ -1,0 +1,441 @@
+{
+  "benchmark": "team360-flow-model-eval",
+  "timestamp_utc": "2026-08-16T17:31:55+00:00",
+  "metadata": {
+    "git": {
+      "branch": "feature/console-backend-core",
+      "head": "f036cb7c14d987013c94563993ca113f7f3fe2af"
+    },
+    "dataset": {
+      "intake_cases": 20,
+      "operational_cases": 8,
+      "total_cases": 28,
+      "consistency_subset": 7,
+      "source": "synthetic"
+    },
+    "params": {
+      "contracts": {
+        "intake": {
+          "interpreter": "modules.flow.intake.ai.LiteLLMFlowIntakeInterpreter",
+          "temperature": 0.2,
+          "max_tokens": 1800,
+          "schema": "modules.flow.intake.ai._INITIAL_SCHEMA"
+        },
+        "operational": {
+          "interpreter": "modules.flow.operational_ai.LiteLLMOperationalInterpreter",
+          "temperature": 0.0,
+          "max_tokens": 300,
+          "schema": "modules.flow.operational_ai._SCHEMA"
+        }
+      },
+      "preflight": {
+        "openai_gpt-5.4-nano": {
+          "status": "PASS",
+          "latency_ms": 744,
+          "content_non_empty": true,
+          "provider_model": "openai_gpt-5.4-nano",
+          "detail": ""
+        },
+        "openai_gpt-5.6-luna-medium": {
+          "status": "PASS",
+          "latency_ms": 846,
+          "content_non_empty": true,
+          "provider_model": "openai_gpt-5.6-luna-medium",
+          "detail": ""
+        },
+        "deepseek_deepseek_4_flash": {
+          "status": "PASS",
+          "latency_ms": 1472,
+          "content_non_empty": true,
+          "provider_model": "deepseek_deepseek_4_flash",
+          "detail": ""
+        },
+        "deepseek_deepseek_4_pro": {
+          "status": "PASS",
+          "latency_ms": 1838,
+          "content_non_empty": true,
+          "provider_model": "deepseek_deepseek_4_pro",
+          "detail": ""
+        }
+      },
+      "consistency_repeats": 1
+    },
+    "models_selected": [
+      "openai_gpt-5.4-nano",
+      "openai_gpt-5.6-luna-medium",
+      "deepseek_deepseek_4_flash",
+      "deepseek_deepseek_4_pro"
+    ]
+  },
+  "models": {
+    "openai_gpt-5.4-nano": {
+      "alias": "openai_gpt-5.4-nano",
+      "cases_total": 28,
+      "completed": 28,
+      "failed": 0,
+      "errors": {},
+      "json_valid_rate": 1.0,
+      "score": 0.9363,
+      "score_completed": 0.9363,
+      "score_intake": 0.899,
+      "score_operational": 1.0,
+      "classification_accuracy": 0.9149,
+      "escalation": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "tn": 6,
+        "contract_failures": 0,
+        "error_rate": 0.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "missing_info": {
+        "coverage_rate": 0.9062,
+        "checks": 32
+      },
+      "hallucination": {
+        "violations": 2,
+        "checks": 15,
+        "violation_rate": 0.1333
+      },
+      "latency": {
+        "count": 28,
+        "p50": 1527,
+        "p95": 2080,
+        "average": 1400.1
+      },
+      "tokens": {
+        "prompt": 7056,
+        "completion": 3736,
+        "total": 10792,
+        "count": 28,
+        "present": true
+      },
+      "cost": "N/A",
+      "consistency_rate": 1.0
+    },
+    "openai_gpt-5.6-luna-medium": {
+      "alias": "openai_gpt-5.6-luna-medium",
+      "cases_total": 28,
+      "completed": 28,
+      "failed": 0,
+      "errors": {},
+      "json_valid_rate": 1.0,
+      "score": 0.9451,
+      "score_completed": 0.9451,
+      "score_intake": 0.9129,
+      "score_operational": 1.0,
+      "classification_accuracy": 0.8936,
+      "escalation": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "tn": 6,
+        "contract_failures": 0,
+        "error_rate": 0.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "missing_info": {
+        "coverage_rate": 0.9688,
+        "checks": 32
+      },
+      "hallucination": {
+        "violations": 1,
+        "checks": 15,
+        "violation_rate": 0.0667
+      },
+      "latency": {
+        "count": 28,
+        "p50": 1915,
+        "p95": 3081,
+        "average": 2000.6
+      },
+      "tokens": {
+        "prompt": 7056,
+        "completion": 3658,
+        "total": 10714,
+        "count": 28,
+        "present": true
+      },
+      "cost": "N/A",
+      "consistency_rate": 1.0
+    },
+    "deepseek_deepseek_4_flash": {
+      "alias": "deepseek_deepseek_4_flash",
+      "cases_total": 28,
+      "completed": 26,
+      "failed": 2,
+      "errors": {
+        "MODEL_OUTPUT_FAILURE": 2
+      },
+      "json_valid_rate": 0.9286,
+      "score": 0.8389,
+      "score_completed": 0.9164,
+      "score_intake": 0.8178,
+      "score_operational": 0.875,
+      "classification_accuracy": 0.9091,
+      "escalation": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "tn": 5,
+        "contract_failures": 1,
+        "error_rate": 0.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "missing_info": {
+        "coverage_rate": 0.9333,
+        "checks": 30
+      },
+      "hallucination": {
+        "violations": 2,
+        "checks": 15,
+        "violation_rate": 0.1333
+      },
+      "latency": {
+        "count": 26,
+        "p50": 4670,
+        "p95": 11563,
+        "average": 5303.8
+      },
+      "tokens": {
+        "prompt": 9252,
+        "completion": 12781,
+        "total": 22033,
+        "count": 26,
+        "present": true
+      },
+      "cost": "N/A",
+      "consistency_rate": 1.0
+    },
+    "deepseek_deepseek_4_pro": {
+      "alias": "deepseek_deepseek_4_pro",
+      "cases_total": 28,
+      "completed": 20,
+      "failed": 8,
+      "errors": {
+        "MODEL_OUTPUT_FAILURE": 8
+      },
+      "json_valid_rate": 0.7143,
+      "score": 0.7212,
+      "score_completed": 0.987,
+      "score_intake": 0.6312,
+      "score_operational": 0.875,
+      "classification_accuracy": 0.9688,
+      "escalation": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "tn": 5,
+        "contract_failures": 1,
+        "error_rate": 0.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "missing_info": {
+        "coverage_rate": 0.9524,
+        "checks": 21
+      },
+      "hallucination": {
+        "violations": 0,
+        "checks": 9,
+        "violation_rate": 0.0
+      },
+      "latency": {
+        "count": 20,
+        "p50": 17401,
+        "p95": 31507,
+        "average": 15269.7
+      },
+      "tokens": {
+        "prompt": 7380,
+        "completion": 16214,
+        "total": 23594,
+        "count": 20,
+        "present": true
+      },
+      "cost": "N/A",
+      "consistency_rate": 1.0
+    }
+  },
+  "nano_vs_luna": {
+    "computed": true,
+    "score_nano": 0.9363,
+    "score_luna": 0.9451,
+    "delta": 0.0088,
+    "magnitude": "marginal",
+    "quality": {
+      "nano": 0.9363,
+      "luna": 0.9451,
+      "delta": 0.0088
+    },
+    "json_valid": {
+      "nano": 1.0,
+      "luna": 1.0
+    },
+    "ambiguity_cases": {
+      "note": "detailed per-case scores in per_case.jsonl",
+      "nano_score": 0.9363,
+      "luna_score": 0.9451
+    },
+    "classification": {
+      "nano": 0.9149,
+      "luna": 0.8936
+    },
+    "escalation": {
+      "nano_error_rate": 0.0,
+      "luna_error_rate": 0.0
+    },
+    "missing_info": {
+      "nano": 0.9062,
+      "luna": 0.9688
+    },
+    "hallucination": {
+      "nano": 2,
+      "luna": 1
+    },
+    "consistency": {
+      "nano": 1.0,
+      "luna": 1.0
+    },
+    "latency": {
+      "nano_p50": 1527,
+      "luna_p50": 1915
+    },
+    "tokens": {
+      "nano_total": 10792,
+      "luna_total": 10714
+    },
+    "cost": "N/A"
+  },
+  "deepseek": {
+    "computed": true,
+    "flash": {
+      "score": 0.8389,
+      "score_intake": 0.8178,
+      "score_operational": 0.875,
+      "json_valid_rate": 0.9286,
+      "classification_accuracy": 0.9091
+    },
+    "pro": {
+      "score": 0.7212,
+      "score_intake": 0.6312,
+      "score_operational": 0.875,
+      "json_valid_rate": 0.7143,
+      "classification_accuracy": 0.9688
+    },
+    "flash_escalation_error_rate": 0.0,
+    "pro_escalation_error_rate": 0.0,
+    "flash_latency_p50": 4670,
+    "pro_latency_p50": 17401
+  },
+  "consistency": {
+    "enabled": true,
+    "repeats": 1,
+    "cases": [
+      "flow_eval_002",
+      "flow_eval_007",
+      "flow_eval_010",
+      "flow_eval_012",
+      "flow_eval_017",
+      "flow_eval_op_001",
+      "flow_eval_op_006"
+    ],
+    "models": {
+      "openai_gpt-5.4-nano": {
+        "rate": 1.0,
+        "consistent_cases": 7,
+        "total_cases": 7
+      },
+      "openai_gpt-5.6-luna-medium": {
+        "rate": 1.0,
+        "consistent_cases": 7,
+        "total_cases": 7
+      },
+      "deepseek_deepseek_4_flash": {
+        "rate": 1.0,
+        "consistent_cases": 7,
+        "total_cases": 7
+      },
+      "deepseek_deepseek_4_pro": {
+        "rate": 1.0,
+        "consistent_cases": 7,
+        "total_cases": 7
+      }
+    }
+  },
+  "failures": [
+    {
+      "case_id": "flow_eval_018",
+      "model_alias": "deepseek_deepseek_4_flash",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response did not contain JSON"
+    },
+    {
+      "case_id": "flow_eval_op_006",
+      "model_alias": "deepseek_deepseek_4_flash",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response did not contain JSON"
+    },
+    {
+      "case_id": "flow_eval_001",
+      "model_alias": "deepseek_deepseek_4_pro",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response did not contain JSON"
+    },
+    {
+      "case_id": "flow_eval_002",
+      "model_alias": "deepseek_deepseek_4_pro",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response did not contain JSON"
+    },
+    {
+      "case_id": "flow_eval_010",
+      "model_alias": "deepseek_deepseek_4_pro",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response did not contain JSON"
+    },
+    {
+      "case_id": "flow_eval_012",
+      "model_alias": "deepseek_deepseek_4_pro",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response contained invalid JSON"
+    },
+    {
+      "case_id": "flow_eval_013",
+      "model_alias": "deepseek_deepseek_4_pro",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response did not contain JSON"
+    },
+    {
+      "case_id": "flow_eval_014",
+      "model_alias": "deepseek_deepseek_4_pro",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response did not contain JSON"
+    },
+    {
+      "case_id": "flow_eval_016",
+      "model_alias": "deepseek_deepseek_4_pro",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response did not contain JSON"
+    },
+    {
+      "case_id": "flow_eval_op_004",
+      "model_alias": "deepseek_deepseek_4_pro",
+      "type": "MODEL_OUTPUT_FAILURE",
+      "description": "response did not contain JSON"
+    }
+  ],
+  "recommendation": {
+    "alias": "openai_gpt-5.4-nano",
+    "magnitude": "marginal",
+    "rationale": "Luna only recommended when score delta >= 0.05 (material) with escalation error rate not worse than Nano. Otherwise Nano stays as the productive baseline."
+  }
+}

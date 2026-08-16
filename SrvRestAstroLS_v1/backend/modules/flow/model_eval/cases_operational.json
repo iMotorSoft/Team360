@@ -1,0 +1,90 @@
+{
+  "contract": "operational",
+  "source": "synthetic",
+  "domain": "Flujo real de Team360 Flow: interpretacion de respuestas operativas correlacionadas (tecnicos) con el contrato REAL _SCHEMA de modules/flow/operational_ai.py (action: ACK_OR_PROGRESS, RESOLUTION_PROPOSED, AMBIGUOUS, UNRELATED, UNSUPPORTED_OPERATIONAL_ACTION).",
+  "notes": "En Flow el escalamiento por SLA es deterministico y no participa IA. La decision IA con criticidad de 'escalamiento' es RESOLUTION_PROPOSED: dispara el pedido de aprobacion al supervisor (ruta de cierre). FP = afirmar resolucion sin lenguaje inequivoco (dispara aprobacion indebida); FN = no detectar resolucion inequivoca (nunca propone cierre).",
+  "cases": [
+    {
+      "id": "flow_eval_op_001",
+      "category": "progreso_evidente_no_cierre",
+      "subject": "Re: [Team360 Flow][R:initial_n1] Nueva solicitud #00000000-0000-0000-0000-000000000001 — Alumbrado",
+      "message": "Recibido, la cuadrilla ya salió y está trabajando en el lugar. Calculo que para mañana queda listo.",
+      "weight": 1.5,
+      "consistency_subset": true,
+      "expected": {
+        "action": "ACK_OR_PROGRESS"
+      }
+    },
+    {
+      "id": "flow_eval_op_002",
+      "category": "resolucion_inequivoca",
+      "subject": "Re: [Team360 Flow][R:initial_n1] Nueva solicitud #00000000-0000-0000-0000-000000000002 — Alumbrado",
+      "message": "La luminaria quedó reparada y encendiendo correctamente. Damos el trabajo por terminado.",
+      "weight": 1.5,
+      "expected": {
+        "action": "RESOLUTION_PROPOSED"
+      }
+    },
+    {
+      "id": "flow_eval_op_003",
+      "category": "respuesta_ambigua",
+      "subject": "Re: [Team360 Flow][R:initial_n1] Nueva solicitud #00000000-0000-0000-0000-000000000003 — Alumbrado",
+      "message": "Ok.",
+      "weight": 1.5,
+      "expected": {
+        "action": "AMBIGUOUS"
+      }
+    },
+    {
+      "id": "flow_eval_op_004",
+      "category": "contenido_no_relacionado",
+      "subject": "Re: [Team360 Flow][R:initial_n1] Nueva solicitud #00000000-0000-0000-0000-000000000004 — Alumbrado",
+      "message": "Esto no es de mi zona, lo mandaron por error.",
+      "weight": 1.5,
+      "expected": {
+        "action": "UNRELATED"
+      }
+    },
+    {
+      "id": "flow_eval_op_005",
+      "category": "accion_no_soportada",
+      "subject": "Re: [Team360 Flow][R:initial_n1] Nueva solicitud #00000000-0000-0000-0000-000000000005 — Alumbrado",
+      "message": "No puedo hacerme cargo, lo derivo a otro sector.",
+      "weight": 1.5,
+      "expected": {
+        "action": "UNSUPPORTED_OPERATIONAL_ACTION"
+      }
+    },
+    {
+      "id": "flow_eval_op_006",
+      "category": "cierre_no_inequivoco",
+      "subject": "Re: [Team360 Flow][R:initial_n1] Nueva solicitud #00000000-0000-0000-0000-000000000006 — Alumbrado",
+      "message": "Creemos que ya está solucionado, pero queremos que lo verifiquen de noche.",
+      "weight": 1.5,
+      "consistency_subset": true,
+      "expected": {
+        "action": "ACK_OR_PROGRESS"
+      }
+    },
+    {
+      "id": "flow_eval_op_007",
+      "category": "resolucion_inequivoca_confirmada",
+      "subject": "Re: [Team360 Flow][R:initial_n1] Nueva solicitud #00000000-0000-0000-0000-000000000007 — Alumbrado",
+      "message": "Ya terminamos de cambiar la luminaria, el trabajo está finalizado y la vereda quedó limpia.",
+      "weight": 1.5,
+      "expected": {
+        "action": "RESOLUTION_PROPOSED"
+      }
+    },
+    {
+      "id": "flow_eval_op_008",
+      "category": "progreso_parcial",
+      "subject": "Re: [Team360 Flow][R:initial_n1] Nueva solicitud #00000000-0000-0000-0000-000000000008 — Alumbrado",
+      "message": "Vamos bien, mañana les confirmo.",
+      "weight": 1.5,
+      "expected": {
+        "action": "ACK_OR_PROGRESS"
+      }
+    }
+  ]
+}

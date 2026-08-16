@@ -1,0 +1,392 @@
+{
+  "contract": "intake",
+  "source": "synthetic",
+  "domain": "Flujo real de Team360 Flow: intake ciudadano por email sobre alumbrado publico (catalogo vigente alumbrado N1-N3). Casos inspirados en el E2E real documentado (solicitudes independientes 'misma cuadra', confirmacion humana, categorias no rutables).",
+  "notes": "Expectativas verificables sobre el contrato REAL _INITIAL_SCHEMA (description, tentative_category, location_text, missing_data, context_notes, confidence, clarification_question). No se inventan campos productivos: prioridad y escalamiento no existen en el contrato de intake (en Flow el escalamiento es deterministico por SLA); los casos 4/5 cubren extraccion correcta bajo contexto normal/urgente y los casos de escalamiento viven en cases_operational.json.",
+  "cases": [
+    {
+      "id": "flow_eval_001",
+      "category": "solicitud_clara",
+      "subject": "Luminaria apagada",
+      "message": "Buen día. En la calle Olleros al 2200 hay una luminaria apagada hace tres noches. Quisiera solicitar su reparación.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "clarification_required": false,
+        "requests": [
+          {
+            "description_contains": ["luminaria"],
+            "sector": "alumbrado",
+            "location_contains": ["olleros"],
+            "missing_data": [],
+            "missing_data_no_extra": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_002",
+      "category": "solicitud_ambigua",
+      "subject": "Consulta sobre el servicio",
+      "message": "Quería hacer una consulta por el servicio de la calle. ¿Me pueden ayudar? Es sobre un tema de luces.",
+      "weight": 1.0,
+      "consistency_subset": true,
+      "expected": {
+        "request_count": [0, 1],
+        "clarification_required": true,
+        "requests": [
+          {
+            "description_contains_any": ["luz", "luces", "luminaria"],
+            "sector": "any",
+            "location_text": "any",
+            "missing_data": ["ubicacion"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_003",
+      "category": "solicitud_incompleta",
+      "subject": "Arreglo de luz",
+      "message": "Necesito que arreglen la luz, gracias.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "requests": [
+          {
+            "description_contains": ["luz"],
+            "sector": "any",
+            "location_text": null,
+            "missing_data": ["ubicacion"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_004",
+      "category": "prioridad_normal",
+      "subject": "Luminaria que parpadea",
+      "message": "Hola, quiero reportar que una luminaria de la cuadra parpadea de noche. La dirección es Av. Maipú 850.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "clarification_required": false,
+        "requests": [
+          {
+            "description_contains": ["luminaria"],
+            "sector": "alumbrado",
+            "location_contains": ["maipu"],
+            "missing_data": [],
+            "missing_data_no_extra": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_005",
+      "category": "caso_urgente",
+      "subject": "URGENTE: poste caído",
+      "message": "URGENTE: un poste de luz se cayó sobre la vereda en Av. San Martín 3000 y quedaron cables sueltos. Por favor vengan ya, es peligroso.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "clarification_required": false,
+        "requests": [
+          {
+            "description_contains": ["poste"],
+            "sector": "alumbrado",
+            "location_contains": ["san martin"],
+            "missing_data": [],
+            "missing_data_no_extra": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_006",
+      "category": "derivacion_evidente",
+      "subject": "Luminaria rota",
+      "message": "La luminaria de la esquina de mi casa está rota hace una semana, no prende.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "requests": [
+          {
+            "description_contains": ["luminaria"],
+            "sector": "alumbrado",
+            "location_or_context_contains": ["esquina"],
+            "missing_data": ["ubicacion"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_007",
+      "category": "derivacion_menos_evidente",
+      "subject": "Luces de la calle",
+      "message": "Hay un problema con las luces de la calle, no sé bien qué es pero parpadean de noche. ¿Me pueden ayudar?",
+      "weight": 1.0,
+      "consistency_subset": true,
+      "expected": {
+        "request_count": 1,
+        "clarification_required": true,
+        "requests": [
+          {
+            "description_contains_any": ["luz", "luces", "luminaria"],
+            "sector": "any",
+            "location_text": null,
+            "missing_data": ["ubicacion"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_008",
+      "category": "texto_informal",
+      "subject": "luces x la calle!!",
+      "message": "xq no andan las luces de la calle 3?? dejo de alumbra anoche y nadie vino. avisen cuando lo arreglan",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "clarification_required": false,
+        "requests": [
+          {
+            "description_contains_any": ["luz", "luces", "luminaria"],
+            "sector": "alumbrado",
+            "location_contains": ["calle 3"],
+            "missing_data": [],
+            "missing_data_no_extra": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_009",
+      "category": "errores_ortograficos",
+      "subject": "lumunaria rota",
+      "message": "buenas, la lumunaria de la esqina de Juarbe y Espejo esta apagada desd hace varios dias. necesito que la travajen",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "requests": [
+          {
+            "sector": "alumbrado",
+            "location_contains": ["juarbe", "espejo"],
+            "missing_data": [],
+            "missing_data_no_extra": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_010",
+      "category": "mensaje_muy_corto",
+      "subject": "luz",
+      "message": "no anda la luz",
+      "weight": 1.0,
+      "consistency_subset": true,
+      "expected": {
+        "request_count": 1,
+        "requests": [
+          {
+            "description_contains": ["luz"],
+            "sector": "any",
+            "location_text": null,
+            "missing_data": ["ubicacion"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_011",
+      "category": "mensaje_largo",
+      "subject": "Reclamo por alumbrado en el barrio",
+      "message": "Estimados señores: Mi nombre es Marta González y les escribo porque desde hace más de dos semanas la cuadra de la calle Olavarría entre Donato Álvarez y Sanabria está muy oscura. Varias luminarias no encienden cuando cae el sol. Ya habíamos tenido un problema con un árbol el año pasado que se resolvió, pero esto es distinto. Les pido por favor que envíen una cuadrilla para revisar el alumbrado de esa cuadra. Quedo atenta. Saludos, Marta.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "clarification_required": false,
+        "requests": [
+          {
+            "description_contains": ["luminaria"],
+            "sector": "alumbrado",
+            "location_contains": ["olavarria"],
+            "missing_data": [],
+            "missing_data_no_extra": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_012",
+      "category": "datos_contradictorios",
+      "subject": "Luminaria apagada",
+      "message": "La luminaria de Lavalle 100 está apagada, aunque un vecino me dijo que la cambiaron ayer. No sé, capaz es la de Lavalle 1000, me confundo. Quisiera que la revisen.",
+      "weight": 1.25,
+      "consistency_subset": true,
+      "expected": {
+        "request_count": 1,
+        "requests": [
+          {
+            "description_contains": ["luminaria"],
+            "description_not_contains": ["fue reparada", "esta reparada", "ya la arreglaron"],
+            "sector": "alumbrado",
+            "location_contains": ["lavalle"],
+            "missing_data": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_013",
+      "category": "multiples_temas",
+      "subject": "Dos problemas en la misma cuadra",
+      "message": "En Av. de los Inmigrantes al 2400 hay una luminaria apagada y en la misma cuadra hay un árbol caído que obstruye la vereda.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 2,
+        "requests": [
+          {
+            "description_contains": ["luminaria"],
+            "sector": "alumbrado",
+            "location_contains": ["inmigrantes"],
+            "missing_data": []
+          },
+          {
+            "description_contains": ["arbol"],
+            "sector": null,
+            "location_or_context_contains": ["misma cuadra"],
+            "missing_data": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_014",
+      "category": "informacion_irrelevante",
+      "subject": "Queja y reclamo",
+      "message": "No sé si a alguien le importa pero ya estoy cansada. El vecino de al lado tiene la música alta, no duermo hace días, y encima la luminaria de la esquina de Boedo y Venezuela no enciende desde el lunes. Me parece una falta de respeto que no hagan nada por el barrio.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "requests": [
+          {
+            "description_contains": ["luminaria"],
+            "sector": "alumbrado",
+            "location_contains": ["boedo"],
+            "missing_data": [],
+            "missing_data_no_extra": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_015",
+      "category": "falta_responsable_claro",
+      "subject": "No sé a quién corresponde",
+      "message": "Hola, no sé a quién corresponde pero hay una luminaria rota en la calle Salta 400 y es peligroso para los chicos del colegio.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "clarification_required": false,
+        "requests": [
+          {
+            "description_contains": ["luminaria"],
+            "sector": "alumbrado",
+            "location_contains": ["salta"],
+            "missing_data": [],
+            "missing_data_no_extra": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_016",
+      "category": "caso_fuera_de_alcance",
+      "subject": "Denuncia",
+      "message": "Quiero denunciar que me robaron el celular anoche en la plaza. ¿Qué tengo que hacer?",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 0,
+        "clarification_required": true,
+        "requests": []
+      }
+    },
+    {
+      "id": "flow_eval_017",
+      "category": "pedir_informacion_adicional",
+      "subject": "Tema de la calle Rivadavia",
+      "message": "Escribo por un tema de la calle Rivadavia 700.",
+      "weight": 1.0,
+      "consistency_subset": true,
+      "expected": {
+        "request_count": [0, 1],
+        "clarification_required": true,
+        "requests": [
+          {
+            "location_contains": ["rivadavia"],
+            "missing_data": ["detalle"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_018",
+      "category": "evitar_inventar_informacion",
+      "subject": "Información sobre la cuadra",
+      "message": "La semana pasada un vecino me dijo que la luz de la cuadra anda mal, pero no vi nada raro. Quería avisar por las dudas.",
+      "weight": 1.25,
+      "expected": {
+        "request_count": 1,
+        "requests": [
+          {
+            "description_contains_any": ["luz", "luces", "iluminacion"],
+            "sector": "any",
+            "location_text": "any",
+            "missing_data": ["ubicacion"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_019",
+      "category": "derivacion_fuera_de_catalogo",
+      "subject": "Pozo en la calle",
+      "message": "Hay un pozo enorme en la calle Corrientes 1500, se rompió el pavimento y es peligroso para los autos.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "clarification_required": false,
+        "requests": [
+          {
+            "description_contains": ["pozo"],
+            "sector": null,
+            "location_contains": ["corrientes"],
+            "missing_data": [],
+            "missing_data_no_extra": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow_eval_020",
+      "category": "solicitud_formal",
+      "subject": "Solicitud formal de reparación de alumbrado",
+      "message": "Estimados: En virtud de lo expuesto, solicito se sirvan disponer la reparación del alumbrado público en el tramo de la calle Charcas entre Callao y Rodríguez Peña, ya que las luminarias no funcionan. Sin otro particular, saludo atte.",
+      "weight": 1.0,
+      "expected": {
+        "request_count": 1,
+        "clarification_required": false,
+        "requests": [
+          {
+            "description_contains": ["alumbrado"],
+            "sector": "alumbrado",
+            "location_contains": ["charcas"],
+            "missing_data": [],
+            "missing_data_no_extra": true
+          }
+        ]
+      }
+    }
+  ]
+}
