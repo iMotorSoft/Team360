@@ -17,6 +17,8 @@ from .domain import (
     OperationalAction,
     OperationalRoutingContext,
     OperationalStatus,
+    is_automated_message,
+    operational_sender_authorized,
     request_id_from_subject,
     rfc_reference_ids,
     routing_key_from_subject,
@@ -38,6 +40,8 @@ class OperationalProcessResult:
     first_response_at: datetime | None = None
     correlation_method: str | None = None
     proposal: ClosureProposalResult | None = None
+    ignored: str | None = None
+    authorized: bool = True
 
 
 class FlowOperationalReplyService:
@@ -67,6 +71,35 @@ class FlowOperationalReplyService:
                 return OperationalProcessResult(
                     matched=True,
                     processed=False,
+                    request_id=context.request_id,
+                    routing_id=context.routing_id,
+                    level=context.level,
+                    correlation_method=correlation.method,
+                )
+
+            # Deterministic rejection of RFC 3834 auto-replies and bounces:
+            # they never produce a first response, work transition or SLA MET
+            # even when they correlate to a routing thread.
+            if is_automated_message(message):
+                return OperationalProcessResult(
+                    matched=True,
+                    processed=False,
+                    ignored="AUTOMATED_MESSAGE",
+                    request_id=context.request_id,
+                    routing_id=context.routing_id,
+                    level=context.level,
+                    correlation_method=correlation.method,
+                )
+
+            # Correlation is not authorization: a message that correlates to a
+            # routing thread still requires an internal-domain responder.
+            if not operational_sender_authorized(
+                message.sender, context.destination
+            ):
+                return OperationalProcessResult(
+                    matched=True,
+                    processed=False,
+                    authorized=False,
                     request_id=context.request_id,
                     routing_id=context.routing_id,
                     level=context.level,

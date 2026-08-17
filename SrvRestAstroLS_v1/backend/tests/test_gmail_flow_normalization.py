@@ -63,6 +63,47 @@ def test_missing_subject_is_normalized_to_empty_string():
     assert normalize_gmail_message(_gmail_payload(subject=None)).subject == ""
 
 
+def test_automated_message_headers_are_exposed_in_metadata():
+    headers = [
+        {"name": "From", "value": "Tecnico <tech@alquimiablue.com>"},
+        {"name": "To", "value": "Mesa <mesa@example.com>"},
+        {"name": "Date", "value": "Tue, 12 Aug 2026 10:30:00 -0300"},
+        {"name": "Message-ID", "value": "<auto-1@example.com>"},
+        {"name": "In-Reply-To", "value": "<routing-1@example.com>"},
+        {"name": "Auto-Submitted", "value": "auto-replied"},
+        {"name": "Precedence", "value": "auto_reply"},
+        {"name": "X-Autoreply", "value": "yes"},
+        {"name": "X-Failed-Recipients", "value": "unknown@example.com"},
+    ]
+    payload = _gmail_payload(subject="Re: caso")
+    payload["payload"]["headers"] = headers
+    payload["payload"]["mimeType"] = "multipart/report"
+
+    message = normalize_gmail_message(payload)
+
+    assert message.metadata["auto_submitted"] == "auto-replied"
+    assert message.metadata["precedence"] == "auto_reply"
+    assert message.metadata["x_autoreply"] == "yes"
+    assert message.metadata["x_failed_recipients"] == "unknown@example.com"
+    assert message.metadata["content_type"] == "multipart/report"
+    assert message.metadata["in_reply_to"] == "<routing-1@example.com>"
+
+    from modules.flow.domain import is_automated_message
+
+    assert is_automated_message(message) is True
+
+
+def test_plain_reply_has_no_automated_markers():
+    message = normalize_gmail_message(_gmail_payload(subject="Re: caso"))
+    assert message.metadata["auto_submitted"] == ""
+    assert message.metadata["precedence"] == ""
+    assert message.metadata["content_type"] == "multipart/alternative"
+
+    from modules.flow.domain import is_automated_message
+
+    assert is_automated_message(message) is False
+
+
 def test_normalized_message_is_immutable():
     message = normalize_gmail_message(_gmail_payload())
     with pytest.raises(FrozenInstanceError):

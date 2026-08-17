@@ -7,6 +7,8 @@ from .operations import (
     OperationalStatus,
     OperationalWorkState,
     approval_token_from_subject,
+    is_automated_message,
+    operational_sender_authorized,
     request_id_from_subject,
     rfc_reference_ids,
     routing_key_from_subject,

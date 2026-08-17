@@ -105,6 +105,18 @@ def normalize_gmail_message(payload: dict[str, Any]) -> InboundMessage:
             "rfc_message_id": next(iter(headers.get("message-id", [])), ""),
             "in_reply_to": next(iter(headers.get("in-reply-to", [])), ""),
             "references": next(iter(headers.get("references", [])), ""),
+            # Deterministic automated-message markers (RFC 3834 auto-replies and
+            # bounce reports). These are additive; existing consumers ignore
+            # unknown metadata keys and Flow uses them to reject non-human
+            # replies without delegating to an LLM.
+            "auto_submitted": next(iter(headers.get("auto-submitted", [])), ""),
+            "precedence": next(iter(headers.get("precedence", [])), ""),
+            "x_autoreply": next(iter(headers.get("x-autoreply", [])), ""),
+            "x_autorespond": next(iter(headers.get("x-autorespond", [])), ""),
+            "x_failed_recipients": next(
+                iter(headers.get("x-failed-recipients", [])), ""
+            ),
+            "content_type": str(gmail_payload.get("mimeType") or ""),
         },
     )
 

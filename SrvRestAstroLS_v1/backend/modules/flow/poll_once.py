@@ -14,6 +14,7 @@ from .approval_ai import LiteLLMApprovalInterpreter
 from .audit_repository import FlowAuditRepository
 from .closure_repository import FlowClosurePostgresRepository
 from .closure_service import FlowClosureService
+from .domain import is_automated_message
 from .intake.ai import LiteLLMFlowIntakeInterpreter
 from .operational_ai import LiteLLMOperationalInterpreter
 from .operational_repository import FlowOperationalPostgresRepository
@@ -44,6 +45,9 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
     confirmed_requests = 0
     operational_replies = 0
     operational_duplicates = 0
+    operational_ignored = 0
+    operational_unauthorized = 0
+    automated = 0
     proposals = 0
     approvals_sent = 0
     approval_replies = 0
@@ -73,8 +77,21 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
         message_ids = gmail.list_messages(max_results=limit, q=query)
         for message_id in reversed(message_ids):
             message = gmail.get_inbound_message(message_id)
+            # Deterministic first gate: RFC 3834 auto-replies and bounces are
+            # never citizen intake, operational replies or approval decisions.
+            if is_automated_message(message):
+                automated += 1
+                print(
+                    "flow automated message ignored "
+                    f"message_id={message.external_message_id} "
+                    f"sender={message.sender}"
+                )
+                continue
             operational = await operational_service.process_if_operational(message)
             if operational.matched:
+                if operational.ignored:
+                    operational_ignored += 1
+                    continue
                 if operational.processed:
                     processed += 1
                     operational_replies += 1
@@ -92,7 +109,10 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
                     )
                 else:
                     duplicates += 1
-                    operational_duplicates += 1
+                    if operational.authorized:
+                        operational_duplicates += 1
+                    else:
+                        operational_unauthorized += 1
                 continue
 
             approval = await closure_service.process_approval_reply(message)
@@ -144,6 +164,9 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
             "confirmed_requests": confirmed_requests,
             "operational_replies": operational_replies,
             "operational_duplicates": operational_duplicates,
+            "operational_ignored": operational_ignored,
+            "operational_unauthorized": operational_unauthorized,
+            "automated": automated,
             "proposals": proposals,
             "approvals_sent": approvals_sent,
             "approval_replies": approval_replies,

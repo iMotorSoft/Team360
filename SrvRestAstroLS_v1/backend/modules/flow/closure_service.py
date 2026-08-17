@@ -25,6 +25,7 @@ from .domain import (
     approval_sender_authorized,
     approval_token_for,
     approval_token_from_subject,
+    is_automated_message,
     rfc_reference_ids,
 )
 from .routing_service import RoutingMessageSenderPort, _safe_observed_rfc_message_id
@@ -287,6 +288,17 @@ class FlowClosureService:
             if correlated is None:
                 return ApprovalProcessResult(matched=False)
             approval = correlated.approval
+            # RFC 3834 auto-replies / bounces never decide a closure even if
+            # they correlate to the approval thread.
+            if is_automated_message(message):
+                return ApprovalProcessResult(
+                    matched=True,
+                    processed=False,
+                    approval_id=approval.id,
+                    request_id=approval.request_id,
+                    correlation_method=correlated.method,
+                    reason="AUTOMATED_MESSAGE",
+                )
             request_ctx = await self._repository.get_request_context(
                 conn, approval.request_id
             )
