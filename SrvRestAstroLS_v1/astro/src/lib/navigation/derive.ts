@@ -35,6 +35,8 @@ const routeSuffixByView: Record<ConsoleView, string> = {
   support: "/support",
   settings: "/settings",
   diagnosis: "/diagnosis",
+  flow: "/flow",
+  "flow-config": "/flow/configuracion",
 };
 
 export function deriveConsoleAudience(bootstrap: ConsoleBootstrap): ConsoleAudience {

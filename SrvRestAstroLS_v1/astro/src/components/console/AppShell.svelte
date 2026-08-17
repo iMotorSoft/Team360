@@ -22,6 +22,8 @@
   import WorkersList from "./workers/WorkersList.svelte";
   import ConsoleDashboard from "./dashboard/ConsoleDashboard.svelte";
   import ConsoleDiagnosis from "./diagnosis/ConsoleDiagnosis.svelte";
+  import FlowConfiguracion from "./flow/FlowConfiguracion.svelte";
+  import FlowDirectorio from "./flow/FlowDirectorio.svelte";
 
   let {
     view,
@@ -102,6 +104,10 @@
             <RunsList />
           {:else if view === "diagnosis"}
             <ConsoleDiagnosis />
+          {:else if view === "flow"}
+            <FlowDirectorio />
+          {:else if view === "flow-config"}
+            <FlowConfiguracion />
           {:else}
             <ConsoleSectionPage {view} />
           {/if}

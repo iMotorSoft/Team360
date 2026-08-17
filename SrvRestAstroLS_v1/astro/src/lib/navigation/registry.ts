@@ -1,7 +1,7 @@
 import type { OrganizationType } from "../mock";
 
 export type ConsoleAudience = "owner" | "operator" | "partner" | "client";
-export type ConsoleNavigationGroup = "overview" | "network" | "operations" | "results" | "administration";
+export type ConsoleNavigationGroup = "overview" | "network" | "operations" | "results" | "administration" | "flow";
 export type ConsoleView =
   | "home"
   | "organizations"
@@ -19,7 +19,9 @@ export type ConsoleView =
   | "team"
   | "support"
   | "settings"
-  | "diagnosis";
+  | "diagnosis"
+  | "flow"
+  | "flow-config";
 
 export interface NavigationRegistryItem {
   id: string;
@@ -41,6 +43,7 @@ export const navigationGroupLabelKeys: Record<ConsoleNavigationGroup, string> = 
   operations: "nav.group.operations",
   results: "nav.group.results",
   administration: "nav.group.administration",
+  flow: "nav.group.flow",
 };
 
 export const navigationRegistry: NavigationRegistryItem[] = [
@@ -227,6 +230,28 @@ export const navigationRegistry: NavigationRegistryItem[] = [
     group: "operations",
     module: "diagnosis",
     audiences: ["owner", "operator", "partner", "client"],
+    requiresWorkspace: true,
+  },
+  {
+    id: "flow",
+    view: "flow",
+    labelKey: "nav.flowDirector",
+    icon: "flow",
+    group: "flow",
+    module: "flow",
+    audiences: ["owner", "operator"],
+    requiredPermissionsAny: ["flow.executive.read"],
+    requiresWorkspace: true,
+  },
+  {
+    id: "flow-config",
+    view: "flow-config",
+    labelKey: "nav.flowConfig",
+    icon: "settings",
+    group: "flow",
+    module: "flow",
+    audiences: ["owner"],
+    requiredPermissionsAny: ["flow.executive.read"],
     requiresWorkspace: true,
   },
 ];

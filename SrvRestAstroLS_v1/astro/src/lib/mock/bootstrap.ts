@@ -126,6 +126,7 @@ const profileDefinitions: Record<MockProfileId, MockProfileDefinition> = {
       "users.manage",
       "billing.read",
       "audit.read",
+      "flow.executive.read",
     ],
     enabledModules: [
       "home",
@@ -149,6 +150,7 @@ const profileDefinitions: Record<MockProfileId, MockProfileDefinition> = {
       "audit",
       "settings",
       "diagnosis",
+      "flow",
     ],
     technicalDepth: "full",
   },

@@ -30,4 +30,7 @@ export const messagesEn = {
   "common.retry": "Retry",
   "common.support": "Contact support",
   "nav.diagnosis": "Diagnosis",
+  "nav.flowDirector": "Directorio",
+  "nav.flowConfig": "Configuration",
+  "nav.group.flow": "Flow",
 } as const;

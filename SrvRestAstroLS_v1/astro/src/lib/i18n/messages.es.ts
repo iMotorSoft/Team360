@@ -34,4 +34,7 @@ export const messagesEs = {
   "status.attention": "Requiere atención",
   "status.pending": "Pendiente",
   "nav.diagnosis": "Diagnóstico",
+  "nav.flowDirector": "Directorio",
+  "nav.flowConfig": "Configuración",
+  "nav.group.flow": "Flow",
 } as const;
