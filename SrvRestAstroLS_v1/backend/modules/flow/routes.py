@@ -27,6 +27,7 @@ from litestar.status_codes import (
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
+    HTTP_409_CONFLICT,
     HTTP_422_UNPROCESSABLE_ENTITY,
 )
 
@@ -63,7 +64,10 @@ from .executive_list_service import (
     FlowExecutiveListService,
     FlowExecutiveListValidationError,
 )
-from .executive_service import FlowExecutiveAuditService
+from .executive_service import (
+    FlowAuditIntegrityError,
+    FlowExecutiveAuditService,
+)
 
 _FLOW_CAPABILITIES = {
     FLOW_EXECUTIVE_READ,
@@ -188,6 +192,10 @@ async def executive_audit_query(
         return await service.query_case(request_id, question=question)
     except FlowRequestNotFoundError as exc:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(exc))
+    except FlowAuditIntegrityError as exc:
+        raise HTTPException(
+            status_code=HTTP_409_CONFLICT, detail=str(exc)
+        )
 
 
 @get("/api/team360-flow/executive")

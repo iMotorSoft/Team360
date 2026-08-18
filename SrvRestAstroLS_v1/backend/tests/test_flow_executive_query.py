@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime, timezone
 
+from modules.flow.audit_repository import canonical_json, sha256_of_snapshot
 from modules.flow.domain import FlowRequestNotFoundError
 from modules.flow.executive_ai import _SYSTEM_PROMPT
 from modules.flow.executive_query import (
@@ -11,7 +12,10 @@ from modules.flow.executive_query import (
     executive_closure_fact,
     executive_context,
 )
-from modules.flow.executive_service import FlowExecutiveAuditService
+from modules.flow.executive_service import (
+    FlowAuditIntegrityError,
+    FlowExecutiveAuditService,
+)
 
 
 class _AsyncContext:
@@ -163,13 +167,16 @@ def _service(repo, audit, interpreter=None):
 
 
 def _audit_record(status="RESOLVED"):
+    snapshot = _snapshot(
+        result={"request_status": status, "resolved_at": "2026-08-16T10:08:00+00:00"}
+    )
     return {
         "audit_record_id": "audit-1",
         "schema_version": 1,
         "generated_at_utc": datetime(2026, 8, 16, 10, 9, tzinfo=timezone.utc),
         "resolved_at_utc": datetime(2026, 8, 16, 10, 8, tzinfo=timezone.utc),
-        "snapshot_sha256": "a" * 64,
-        "snapshot_jsonb": _snapshot(result={"request_status": status, "resolved_at": "2026-08-16T10:08:00+00:00"}),
+        "snapshot_sha256": sha256_of_snapshot(snapshot),
+        "snapshot_jsonb": snapshot,
     }
 
 
@@ -188,7 +195,7 @@ def test_resolved_case_prefers_audit_snapshot():
     assert view["data_source"] == AUDIT_SNAPSHOT
     assert view["status_fact"] == "closed"
     assert view["audit"]["audit_record_id"] == "audit-1"
-    assert view["audit"]["snapshot_sha256"] == "a" * 64
+    assert view["audit"]["snapshot_sha256"] == sha256_of_snapshot(_snapshot())
     assert view["resolution"]["resolution_status"] == "APPROVED"
     assert view["closure_approval"]["decision"] == "APPROVED"
     assert "current_age_seconds" not in view["metrics"]
@@ -282,3 +289,103 @@ def test_closure_answer_derived_from_facts_not_llm():
     )
     assert pending["status_fact"] == "pending_approval"
     assert pending["status_fact"] != "closed"
+
+
+def test_audit_canonical_hash_round_trip():
+    import json
+
+    snapshot = _snapshot()
+    first = sha256_of_snapshot(snapshot)
+    encoded = canonical_json(snapshot)
+    reparsed = json.loads(encoded)
+    assert sha256_of_snapshot(reparsed) == first
+
+
+def test_resolved_without_audit_raises_integrity():
+    import pytest
+
+    audit = _AuditRepo(record=None)
+    with pytest.raises(FlowAuditIntegrityError):
+        asyncio.run(
+            _service(_ClosureRepo("RESOLVED"), audit).query_case("r-1")
+        )
+    assert audit.built == 0
+
+
+def test_audit_hash_mismatch_raises_integrity():
+    import pytest
+
+    record = _audit_record()
+    record["snapshot_sha256"] = "f" * 64
+    with pytest.raises(FlowAuditIntegrityError):
+        asyncio.run(
+            _service(_ClosureRepo("RESOLVED"), _AuditRepo(record)).query_case("r-1")
+        )
+
+
+def test_unsupported_audit_schema_raises_integrity():
+    import pytest
+
+    record = _audit_record()
+    record["schema_version"] = 999
+    with pytest.raises(FlowAuditIntegrityError):
+        asyncio.run(
+            _service(_ClosureRepo("RESOLVED"), _AuditRepo(record)).query_case("r-1")
+        )
+
+
+def test_llm_failure_preserves_structured_facts():
+    class _FailingInterpreter:
+        def interpret(self, question, view):
+            raise RuntimeError("LLM down")
+
+    audit = _AuditRepo(record=_audit_record())
+    view = asyncio.run(
+        _service(_ClosureRepo("RESOLVED"), audit, _FailingInterpreter()).query_case(
+            "r-1", question="¿Qué pasó?"
+        )
+    )
+    assert view["data_source"] == AUDIT_SNAPSHOT
+    assert view["status_fact"] == "closed"
+    assert view["audit"]["snapshot_sha256"] == sha256_of_snapshot(_snapshot())
+
+
+def test_rejected_approval_is_not_closed():
+    snapshot = _snapshot(
+        result={"request_status": "ACTIVE", "resolved_at": None},
+        approval={
+            "approval_id": "appr-1",
+            "approver": "mario.rojas@alquimiablue.com",
+            "approver_level": 2,
+            "decision": "REJECTED",
+            "decision_at": "2026-08-16T10:08:00+00:00",
+            "decision_reason": "falta verificar",
+            "source_message_id": "gmail-dec-1",
+        },
+    )
+    view = build_executive_view(snapshot, data_source=LIVE, request_status="ACTIVE")
+    assert view["status_fact"] == "open"
+    assert view["status_fact"] != "closed"
+
+
+def test_build_timeline_emits_closure_events_for_approved_decision():
+    from modules.flow.audit_repository import build_timeline
+
+    approval = {
+        "approval_id": "appr-1",
+        "decision": "APPROVED",
+        "decision_at": "2026-08-16T10:08:00+00:00",
+    }
+    timeline = build_timeline(
+        received_at="2026-08-16T10:00:00+00:00",
+        confirmed_at="2026-08-16T10:01:00+00:00",
+        routings=[],
+        slas=[],
+        escalations=[],
+        resolution=None,
+        approval=approval,
+    )
+    events = [event["event_type"] for event in timeline]
+    assert "CLOSURE_APPROVED" in events
+    assert "REQUEST_RESOLVED" in events
+    assert timeline[-1]["event_type"] == "REQUEST_RESOLVED"

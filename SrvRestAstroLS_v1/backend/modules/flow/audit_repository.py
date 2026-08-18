@@ -140,10 +140,11 @@ def build_timeline(
                 reference_id=resolution.get("resolution_id"),
             )
         )
-    if approval is not None and approval.get("status") == "APPROVED":
+    if approval is not None and approval.get("decision") == "APPROVED":
         # Solo una aprobación APPROVED cierra el request: REJECTED vuelve a
         # ACTIVE y PENDING aún no decidió. Emitir CLOSURE_APPROVED o
-        # REQUEST_RESOLVED para otro estado falsearía el timeline.
+        # REQUEST_RESOLVED para otro estado falsearía el timeline. El snapshot
+        # del approval usa la clave ``decision`` (no ``status``).
         items.append(
             _event(
                 approval.get("decision_at"),

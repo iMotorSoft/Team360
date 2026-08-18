@@ -69,7 +69,7 @@ def test_build_timeline_is_chronological_and_complete():
     ]
     escalations = [{"escalation_id": "e1", "to_routing_id": "r2", "to_level": 2, "created_at": breached.isoformat()}]
     resolution = {"resolution_id": "res1", "proposed_at": proposed.isoformat(), "routing_id": "r3"}
-    approval = {"approval_id": "a1", "decision_at": decided.isoformat(), "status": "APPROVED"}
+    approval = {"approval_id": "a1", "decision_at": decided.isoformat(), "decision": "APPROVED"}
 
     timeline = build_timeline(
         received_at=received,
