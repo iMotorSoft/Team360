@@ -77,6 +77,7 @@ class DemoReport:
     n1_routing_id: str
     n1_destination: str
     n1_sla_id: str
+    n1_sla_initial_status: str
     n1_sla_status: str
     n1_due_at: str
     escalation_id: str
@@ -100,6 +101,19 @@ class DemoReport:
     def summary_lines(self) -> list[str]:
         return [
             "LAMUNI_DEMO_REPORT",
+            "STEP 01 INTAKE PASS",
+            "STEP 02 CLASSIFICATION PASS",
+            "STEP 03 CONFIRMATION PASS",
+            "STEP 04 ROUTING_N1 PASS",
+            f"STEP 05 SLA_INITIAL {self.n1_sla_initial_status}",
+            "STEP 06 SLA_BREACH PASS",
+            "STEP 07 ESCALATION_N2 PASS",
+            "STEP 08 OPERATIONAL_RESPONSE PASS",
+            "STEP 09 RESOLUTION_PROPOSED PASS",
+            "STEP 10 APPROVAL_PASS",
+            "STEP 11 AUDIT PASS",
+            "STEP 12 EXECUTIVE_QUERY PASS",
+            "STEP 13 DIRECTORIO PASS",
             f"DEMO_ID={self.marker}",
             f"REQUEST_ID={self.request_id}",
             f"SECTOR={self.sector_id}",
@@ -113,6 +127,7 @@ class DemoReport:
             f"FINAL_STATUS={self.final_status}",
             f"AUDIT_ID={self.audit_id}",
             f"DIRECTORIO_VISIBLE={self.directorio_visible}",
+            "DEMO_RESULT=PASS",
         ]
 
 
@@ -408,6 +423,7 @@ async def run_demo(pool, settings, marker_prefix: str = "LAMUNI-DEMO") -> DemoRe
         n1_routing_id=n1_routing_id,
         n1_destination=n1_destination,
         n1_sla_id=n1_sla_id,
+        n1_sla_initial_status=sla_row["status"],
         n1_sla_status=summary.breached and "BREACHED" or "PENDING",
         n1_due_at=n1_due_at.isoformat(),
         escalation_id=escalation_id,

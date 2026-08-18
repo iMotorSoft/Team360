@@ -24,6 +24,12 @@ Desde `SrvRestAstroLS_v1/backend`:
 uv run python -m modules.flow.demo.run
 ```
 
+Para una corrida identificable por un prefijo propio:
+
+```bash
+uv run python -m modules.flow.demo.run --prefix LAMUNI-DEMO-PRESENTACION
+```
+
 El comando es finito y termina con un reporte con los IDs del caso:
 
 ```text
@@ -37,7 +43,29 @@ APPROVAL=...
 FINAL_STATUS=RESOLVED
 AUDIT_ID=...
 DIRECTORIO_VISIBLE=True
+DEMO_RESULT=PASS
 ```
+
+El reporte también muestra pasos finitos:
+
+```text
+STEP 01 INTAKE PASS
+STEP 02 CLASSIFICATION PASS
+STEP 03 CONFIRMATION PASS
+STEP 04 ROUTING_N1 PASS
+STEP 05 SLA_INITIAL PENDING
+STEP 06 SLA_BREACH PASS
+STEP 07 ESCALATION_N2 PASS
+STEP 08 OPERATIONAL_RESPONSE PASS
+STEP 09 RESOLUTION_PROPOSED PASS
+STEP 10 APPROVAL_PASS
+STEP 11 AUDIT PASS
+STEP 12 EXECUTIVE_QUERY PASS
+STEP 13 DIRECTORIO PASS
+```
+
+Para la primera validación práctica se recomienda ejecutar el mismo comando
+tres veces. Cada ejecución crea un `request_id` y `audit_id` nuevos.
 
 Para inspeccionar un caso existente:
 
