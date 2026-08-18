@@ -127,6 +127,39 @@ export interface ExecutiveView {
   executive_summary?: string | null;
 }
 
+export interface ExecutiveCaseListItem {
+  request_id: string;
+  conversation_id?: string | null;
+  status: string;
+  data_source: DataSource;
+  status_fact: StatusFact;
+  request: ExecutiveRequest;
+  current_routing_id?: string | null;
+  current_level?: number | null;
+  current_destination?: string | null;
+  current_routing_status?: string | null;
+  current_work_status?: string | null;
+  sla_status?: string | null;
+  sla_due_at?: string | null;
+  has_breached_sla: boolean;
+  first_response_at?: string | null;
+  resolved_at?: string | null;
+  escalation_count: number;
+  updated_at?: string | null;
+}
+
+export interface ExecutiveCaseListPagination {
+  page: number;
+  page_size: number;
+  total: number;
+  has_next: boolean;
+}
+
+export interface ExecutiveCaseListSector {
+  sector_id: string;
+  display_name: string;
+}
+
 // --- Derivación de presentación (no es fuente de verdad, solo UI) -----------
 
 export function currentLevel(view: ExecutiveView): number {

@@ -4,7 +4,7 @@
 // demo) y respetan el contrato real `ExecutiveView` para que el cambio a una
 // API de listado sea directo. No son la fuente de verdad.
 
-import type { ExecutiveView } from "../t360/flow/types";
+import type { ExecutiveCaseListItem, ExecutiveView } from "../t360/flow/types";
 
 function iso(minutesAgo: number): string {
   return new Date(Date.now() - minutesAgo * 60_000).toISOString();
@@ -315,10 +315,14 @@ export interface FlowKpi {
   hint: string;
 }
 
-export function getFlowKpis(cases: ExecutiveView[]): FlowKpi[] {
+export function getFlowKpis(cases: Array<ExecutiveView | ExecutiveCaseListItem>): FlowKpi[] {
   const open = cases.filter((c) => c.status_fact === "open").length;
-  const breached = cases.filter((c) => c.sla.some((s) => s.status === "BREACHED")).length;
-  const escalated = cases.filter((c) => c.escalations.length > 0).length;
+  const breached = cases.filter((c) =>
+    "has_breached_sla" in c ? c.has_breached_sla : c.sla.some((s) => s.status === "BREACHED"),
+  ).length;
+  const escalated = cases.filter((c) =>
+    "escalation_count" in c ? c.escalation_count > 0 : c.escalations.length > 0,
+  ).length;
   const pendingApproval = cases.filter((c) => c.status_fact === "pending_approval").length;
   const resolved = cases.filter((c) => c.status_fact === "closed").length;
 

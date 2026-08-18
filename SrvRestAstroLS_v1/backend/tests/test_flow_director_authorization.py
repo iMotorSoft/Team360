@@ -39,6 +39,10 @@ def _route_path(request_id: str) -> str:
     return f"/api/team360-flow/executive/{request_id}"
 
 
+def _list_route_path() -> str:
+    return "/api/team360-flow/executive"
+
+
 class _AsyncContext:
     def __init__(self, value=None):
         self.value = value
@@ -93,6 +97,15 @@ class _Exec:
         return self.view
 
 
+class _ListExec:
+    def __init__(self):
+        self.calls = 0
+
+    async def list_cases(self, **kwargs):
+        self.calls += 1
+        return {"items": [], "sectors": [], "pagination": {"page": 1, "page_size": 20, "total": 0, "has_next": False}}
+
+
 def _auth_headers(user_id: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {_token(user_id)}"}
 
@@ -120,6 +133,56 @@ def test_invalid_token_returns_401(monkeypatch):
             headers={"Authorization": "Bearer not-a-paseto"},
         )
     assert response.status_code == 401
+
+
+def test_executive_list_no_token_returns_401(monkeypatch):
+    monkeypatch.setattr(
+        "modules.flow.routes._resolve_public_keys",
+        lambda settings: {_KEY_ID: _KEY_PAIR.public_pem},
+    )
+    _fake_pool(monkeypatch)
+    with _client() as client:
+        response = client.get(_list_route_path())
+    assert response.status_code == 401
+
+
+def test_executive_list_forbidden_before_query(monkeypatch):
+    list_fake = _ListExec()
+    monkeypatch.setattr(
+        "modules.flow.routes._resolve_public_keys",
+        lambda settings: {_KEY_ID: _KEY_PAIR.public_pem},
+    )
+    _fake_pool(monkeypatch)
+    monkeypatch.setattr(
+        "modules.flow.routes._authorization_service", lambda: _Authz(authorized=False)
+    )
+    monkeypatch.setattr("modules.flow.routes._executive_list_service", lambda pool: list_fake)
+    with _client() as client:
+        response = client.get(_list_route_path(), headers=_auth_headers("common-user"))
+    assert response.status_code == 403
+    assert list_fake.calls == 0
+
+
+def test_executive_list_authorized_returns_pagination_contract(monkeypatch):
+    list_fake = _ListExec()
+    monkeypatch.setattr(
+        "modules.flow.routes._resolve_public_keys",
+        lambda settings: {_KEY_ID: _KEY_PAIR.public_pem},
+    )
+    _fake_pool(monkeypatch)
+    monkeypatch.setattr(
+        "modules.flow.routes._authorization_service", lambda: _Authz(authorized=True)
+    )
+    monkeypatch.setattr("modules.flow.routes._executive_list_service", lambda pool: list_fake)
+    with _client() as client:
+        response = client.get(
+            _list_route_path(),
+            headers=_auth_headers("director-1"),
+            params={"page": "2", "page_size": "5", "status": "resolved"},
+        )
+    assert response.status_code == 200
+    assert response.json()["pagination"]["total"] == 0
+    assert list_fake.calls == 1
 
 
 def test_authenticated_without_permission_403_and_no_llm_or_data(monkeypatch):

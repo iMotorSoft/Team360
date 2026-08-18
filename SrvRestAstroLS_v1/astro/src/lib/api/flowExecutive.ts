@@ -1,9 +1,16 @@
-// Cliente read-only del endpoint ejecutivo real de Flow.
-// GET /api/team360-flow/executive/{request_id}
-// Consume el contrato real (build_executive_view). En modo mock sin token la
-// llamada falla de forma controlada y la UI cae a datos de demostración.
+// Cliente read-only de los endpoints ejecutivos reales de Flow.
+// GET /api/team360-flow/executive              -> resumen paginado
+// GET /api/team360-flow/executive/{request_id} -> detalle completo
 
-import type { ExecutiveView } from "../t360/flow/types";
+import type {
+  DataSource,
+  ExecutiveCaseListItem,
+  ExecutiveCaseListPagination,
+  ExecutiveCaseListSector,
+  ExecutiveRequest,
+  ExecutiveView,
+  StatusFact,
+} from "../t360/flow/types";
 
 // El Directorio consulta el backend por el MISMO origen: en producción
 // (URL_REST_PRO="") /api es same-origin, y en desarrollo el server de Astro
@@ -18,14 +25,20 @@ export type ExecutiveFetchError =
   | "not_found"
   | "unavailable";
 
+export type ExecutiveListFetchError = ExecutiveFetchError | "validation";
+
 export interface ExecutiveFetchResult {
   data: ExecutiveView | null;
   error: ExecutiveFetchError | null;
 }
 
-export interface ExecutiveBatchResult {
-  cases: ExecutiveView[];
-  failed: { requestId: string; error: ExecutiveFetchError }[];
+export interface ExecutiveCaseListResult {
+  data: {
+    items: ExecutiveCaseListItem[];
+    sectors: ExecutiveCaseListSector[];
+    pagination: ExecutiveCaseListPagination;
+  } | null;
+  error: ExecutiveListFetchError | null;
 }
 
 const DEFAULT_TIMEOUT_MS = 8000;
@@ -69,36 +82,99 @@ export async function fetchExecutiveCase(
   return fetchOne(requestId, options);
 }
 
-// Carga en paralelo con concurrencia limitada. Útil porque el backend expone
-// la vista ejecutiva por caso y aún no ofrece listado (gap documentado en
-// lib/t360/flow/caseRegistry.ts). Nunca duplica requests para un mismo id.
-export async function fetchExecutiveCases(
-  requestIds: readonly string[],
-  options: { token?: string; concurrency?: number; timeoutMs?: number } = {},
-): Promise<ExecutiveBatchResult> {
-  const uniqueIds = [...new Set(requestIds)];
-  const concurrency = Math.min(Math.max(options.concurrency ?? 6, 1), 12);
-  const results: ExecutiveView[] = [];
-  const failed: { requestId: string; error: ExecutiveFetchError }[] = [];
+export async function fetchExecutiveCaseList(
+  options: {
+    page?: number;
+    pageSize?: number;
+    status?: string;
+    sectorId?: string;
+    search?: string;
+    slaStatus?: string;
+    escalated?: boolean;
+    token?: string;
+    timeoutMs?: number;
+  } = {},
+): Promise<ExecutiveCaseListResult> {
+  const params = new URLSearchParams();
+  if (options.page !== undefined) params.set("page", String(options.page));
+  if (options.pageSize !== undefined) params.set("page_size", String(options.pageSize));
+  if (options.status) params.set("status", options.status);
+  if (options.sectorId) params.set("sector_id", options.sectorId);
+  if (options.search) params.set("search", options.search);
+  if (options.slaStatus) params.set("sla_status", options.slaStatus);
+  if (options.escalated !== undefined) params.set("escalated", String(options.escalated));
 
-  let cursor = 0;
-  async function worker() {
-    while (cursor < uniqueIds.length) {
-      const requestId = uniqueIds[cursor++];
-      const { data, error } = await fetchOne(requestId, {
-        token: options.token,
-        timeoutMs: options.timeoutMs,
-      });
-      if (data) {
-        results.push(data);
-      } else if (error) {
-        failed.push({ requestId, error });
-      }
-    }
+  const url = new URL(`${API_BASE}/executive`, window.location.origin);
+  url.search = params.toString();
+  const headers: Record<string, string> = {};
+  if (options.token) headers.Authorization = `Bearer ${options.token}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(url.toString(), { headers, signal: controller.signal });
+    if (res.status === 401) return { data: null, error: "unauthorized" };
+    if (res.status === 403) return { data: null, error: "forbidden" };
+    if (res.status === 422) return { data: null, error: "validation" };
+    if (!res.ok) return { data: null, error: "unavailable" };
+    const payload = (await res.json()) as {
+      items: Record<string, unknown>[];
+      sectors?: ExecutiveCaseListSector[];
+      pagination: ExecutiveCaseListPagination;
+    };
+    return {
+      data: {
+        items: payload.items.map(mapListItem),
+        sectors: payload.sectors ?? [],
+        pagination: payload.pagination,
+      },
+      error: null,
+    };
+  } catch {
+    return { data: null, error: "unavailable" };
+  } finally {
+    clearTimeout(timer);
   }
+}
 
-  await Promise.all(
-    Array.from({ length: Math.min(concurrency, uniqueIds.length || 1) }, () => worker()),
-  );
-  return { cases: results, failed };
+function mapListItem(item: Record<string, unknown>): ExecutiveCaseListItem {
+  const request: ExecutiveRequest = {
+    request_id: String(item.request_id ?? ""),
+    conversation_id: asString(item.conversation_id) ?? undefined,
+    sector_id: asString(item.sector_id),
+    sector_name: asString(item.sector_name),
+    category: asString(item.category),
+    description: asString(item.description),
+    location: asString(item.location),
+    received_at: asString(item.received_at),
+    confirmed_at: asString(item.confirmed_at),
+  };
+  return {
+    request_id: request.request_id,
+    conversation_id: request.conversation_id,
+    status: String(item.status ?? ""),
+    data_source: String(item.data_source ?? "LIVE") as DataSource,
+    status_fact: String(item.status_fact ?? "open") as StatusFact,
+    request,
+    current_routing_id: asString(item.current_routing_id),
+    current_level: asNumber(item.current_level),
+    current_destination: asString(item.current_destination),
+    current_routing_status: asString(item.current_routing_status),
+    current_work_status: asString(item.current_work_status),
+    sla_status: asString(item.sla_status),
+    sla_due_at: asString(item.sla_due_at),
+    has_breached_sla: Boolean(item.has_breached_sla),
+    first_response_at: asString(item.first_response_at),
+    resolved_at: asString(item.resolved_at),
+    escalation_count: Number(item.escalation_count ?? 0),
+    updated_at: asString(item.updated_at),
+  };
+}
+
+function asString(value: unknown): string | null {
+  return typeof value === "string" ? value : null;
+}
+
+function asNumber(value: unknown): number | null {
+  return typeof value === "number" ? value : null;
 }

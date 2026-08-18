@@ -180,7 +180,7 @@ test.describe("Flow Directorio — KPIs y lista", () => {
     await expect(page.locator("ul li button").first()).toContainText("#814f38ce");
 
     await search.fill("zzzz-inexistente");
-    await expect(page.getByText("No hay casos que coincidan")).toBeVisible();
+    await expect(page.getByText("No encontramos casos con estos filtros")).toBeVisible();
     expect(errors).toEqual([]);
   });
 });

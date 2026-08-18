@@ -59,6 +59,10 @@ from .configuration_service import (
 from .domain import FlowRequestNotFoundError
 from .executive_ai import LiteLLMExecutiveInterpreter
 from .executive_auth import FlowExecutiveAuthorizationService
+from .executive_list_service import (
+    FlowExecutiveListService,
+    FlowExecutiveListValidationError,
+)
 from .executive_service import FlowExecutiveAuditService
 
 _FLOW_CAPABILITIES = {
@@ -88,6 +92,10 @@ def _executive_service(
         audit_repository=FlowAuditRepository(),
         interpreter=LiteLLMExecutiveInterpreter() if question else None,
     )
+
+
+def _executive_list_service(pool: Any) -> FlowExecutiveListService:
+    return FlowExecutiveListService(pool=pool)
 
 
 def _configuration_authorization_service() -> FlowConfigurationAuthorizationService:
@@ -182,6 +190,36 @@ async def executive_audit_query(
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(exc))
 
 
+@get("/api/team360-flow/executive")
+async def executive_case_list(
+    page: int = 1,
+    page_size: int = 20,
+    status: str | None = None,
+    sector_id: str | None = None,
+    search: str | None = None,
+    sla_status: str | None = None,
+    escalated: bool | None = None,
+    request: Request | None = None,
+) -> dict[str, Any]:
+    """Read-only executive summaries for the Directorio list."""
+    await _require_flow_actor(request, capability=FLOW_EXECUTIVE_READ)
+    pool = get_pool()
+    try:
+        return await _executive_list_service(pool).list_cases(
+            page=page,
+            page_size=page_size,
+            status=status,
+            sector_id=sector_id,
+            search=search,
+            sla_status=sla_status,
+            escalated=escalated,
+        )
+    except FlowExecutiveListValidationError as exc:
+        raise HTTPException(
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        )
+
+
 @get("/api/team360-flow/configuration")
 async def flow_configuration_list(
     request: Request | None = None,
@@ -254,6 +292,7 @@ async def flow_configuration_update(
 
 ROUTE_HANDLERS: tuple[Any, ...] = (
     executive_audit_query,
+    executive_case_list,
     flow_configuration_list,
     flow_configuration_get,
     flow_configuration_update,

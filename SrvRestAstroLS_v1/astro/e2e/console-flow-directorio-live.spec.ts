@@ -68,7 +68,7 @@ test.describe("Flow Directorio LIVE — listado y KPIs", () => {
     expect(await kpiValue("Resueltos")).toBeGreaterThanOrEqual(1);
     expect(await kpiValue("Pendientes de aprobación")).toBe(1);
 
-    await expect(page.getByText(/Indicadores calculados sobre los \d+ casos disponibles/)).toBeVisible();
+    await expect(page.getByText(/Indicadores calculados sobre los \d+ casos de esta página/)).toBeVisible();
     expect(errors).toEqual([]);
   });
 
@@ -95,7 +95,34 @@ test.describe("Flow Directorio LIVE — listado y KPIs", () => {
     await expect(rows.first()).toContainText("#814f38ce");
 
     await search.fill("zzzz-inexistente");
-    await expect(page.getByText("No hay casos que coincidan")).toBeVisible();
+    await expect(page.getByText("No encontramos casos con estos filtros")).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+
+  test("paginación server-side y filtro de sector no descargan todo el detalle", async ({ page }) => {
+    const errors: string[] = [];
+    trackErrors(page, errors);
+    const listRequests: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/api/team360-flow/executive?")) listRequests.push(request.url());
+    });
+    await openFlow(page);
+
+    await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
+    await page.getByRole("button", { name: "Siguiente" }).click({ force: true });
+    await expect(page.getByText("Página 2", { exact: true })).toBeVisible();
+    await expect(page.locator("ul li button")).toHaveCount(4);
+    await page.getByRole("button", { name: "Anterior" }).click({ force: true });
+    await expect(page.getByText("Página 1", { exact: true })).toBeVisible();
+
+    const sector = page.getByRole("combobox", { name: "Sector" });
+    await expect(sector).toBeVisible();
+    await sector.selectOption("alumbrado");
+    await expect(page.locator("ul li button").first()).toBeVisible();
+    expect(listRequests.length).toBeGreaterThanOrEqual(4);
+    // page 1 se consulta nuevamente al volver desde page 2: duplicado
+    // explicable por navegación, no por un render/reactive loop.
+    expect(new Set(listRequests).size).toBeGreaterThanOrEqual(3);
     expect(errors).toEqual([]);
   });
 });
