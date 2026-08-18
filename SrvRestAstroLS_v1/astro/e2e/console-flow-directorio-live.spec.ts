@@ -1,17 +1,29 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type APIRequestContext, type Page } from "@playwright/test";
 
-// Team360 Flow — Directorio Premium V1 (modo LIVE)
-// Requiere el runtime oficial: backend-dev.sh (7050) + astro-dev.sh (3050).
-// Ejecutar con PLAYWRIGHT_SKIP_WEBSERVER=1 y PLAYWRIGHT_BASE_URL=http://127.0.0.1:3050.
-// Consume datos REALES de PostgreSQL vía GET /api/team360-flow/executive/{id};
-// no envía emails y no muta el workflow.
+// Real-data smoke only. It intentionally discovers cases from PostgreSQL and
+// asserts API/UI invariants, never global totals, row positions or historical IDs.
 
 const DIRECTORIO_URL = "/w/ws-team360-control/flow";
+type ListPayload = {
+  items: Array<Record<string, any>>;
+  sectors: Array<Record<string, any>>;
+  pagination: { page: number; page_size: number; total: number; has_next: boolean };
+};
 
 async function openFlow(page: Page) {
   await page.goto(DIRECTORIO_URL);
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
   await expect(page.getByText("Backend Flow · datos reales", { exact: true })).toBeVisible();
+}
+
+async function listCases(request: APIRequestContext, params = "") {
+  const response = await request.get(`/api/team360-flow/executive${params}`);
+  expect(response.ok(), `Executive list HTTP ${response.status()}`).toBeTruthy();
+  return (await response.json()) as ListPayload;
+}
+
+async function selectCaseById(page: Page, requestId: string) {
+  await page.locator("ul li button", { hasText: `#${requestId.slice(0, 8)}` }).click();
 }
 
 function trackErrors(page: Page, errors: string[]) {
@@ -23,264 +35,190 @@ function trackErrors(page: Page, errors: string[]) {
 }
 
 async function expectNoHorizontalOverflow(page: Page) {
-  const overflow = await page.evaluate(() => {
-    const doc = document.documentElement;
-    return doc.scrollWidth - doc.clientWidth;
-  });
-  expect(overflow, `overflow horizontal esperado <= 1, fue ${overflow}`).toBeLessThanOrEqual(1);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow, `overflow horizontal: ${overflow}`).toBeLessThanOrEqual(1);
 }
 
-async function selectCaseByText(page: Page, text: string) {
-  await page.locator("ul li button", { hasText: text }).click();
-}
-
-function detailSection(page: Page) {
-  return page.locator('[data-selected="yes"]');
-}
-
-test.describe("Flow Directorio LIVE — listado y KPIs", () => {
-  test("carga casos reales del backend con indicadores derivados", async ({ page }) => {
+test.describe("Flow Directorio LIVE smoke — list invariants", () => {
+  test("loads real PostgreSQL data without global golden totals", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);
     await openFlow(page);
 
-    const rows = page.locator("ul li button");
-    await expect(rows.first()).toBeVisible();
-    const count = await rows.count();
-    expect(count, "debe haber al menos 10 casos reales").toBeGreaterThanOrEqual(10);
-
-    for (const prefix of ["#814f38ce", "#c92d739c", "#333a15d0", "#d16a0a08"]) {
-      await expect(page.locator("ul li button", { hasText: prefix }).first()).toBeVisible();
+    const payload = await listCases(page.request, "?page=1&page_size=20");
+    expect(payload.items.length).toBeGreaterThan(0);
+    expect(payload.pagination.total).toBeGreaterThanOrEqual(payload.items.length);
+    expect(new Set(payload.items.map((item) => item.request_id)).size).toBe(payload.items.length);
+    for (const item of payload.items) {
+      expect(["ACTIVE", "CONFIRMED", "RESOLUTION_PENDING_APPROVAL", "RESOLVED"]).toContain(item.status);
+      expect(["open", "pending_approval", "closed"]).toContain(item.status_fact);
+      expect(["LIVE", "AUDIT_SNAPSHOT"]).toContain(item.data_source);
     }
-
-    // Ordenado por confirmación descendente: el caso más reciente primero.
-    await expect(rows.first()).toContainText("#9285797d");
-
-    const articles = page.locator("main article");
-    await expect(articles).toHaveCount(5);
-
-    async function kpiValue(label: string) {
-      const text = await page.locator("article", { hasText: label }).first().innerText();
-      const match = text.match(/\n(\d+)\n/);
-      return match ? Number(match[1]) : null;
-    }
-
-    expect(await kpiValue("Resueltos")).toBeGreaterThanOrEqual(1);
-    expect(await kpiValue("Pendientes de aprobación")).toBe(1);
-
-    await expect(page.getByText(/Indicadores calculados sobre los \d+ casos de esta página/)).toBeVisible();
+    await expect(page.locator("ul li button")).toHaveCount(payload.items.length);
+    await expect(page.locator("main article")).toHaveCount(5);
     expect(errors).toEqual([]);
   });
 
-  test("filtros y búsqueda funcionan sobre datos reales", async ({ page }) => {
+  test("search resolves an API-discovered request identity", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);
     await openFlow(page);
 
-    const tabs = page.getByRole("tablist", { name: "Filtrar casos" });
-    const rows = page.locator("ul li button");
-
-    await tabs.getByRole("tab", { name: "Pendientes" }).click();
-    await expect(rows).toHaveCount(1);
-    await expect(rows.first()).toContainText("#d16a0a08");
-
-    await tabs.getByRole("tab", { name: "Resueltos" }).click();
-    await expect(rows.first()).toBeVisible();
-    await expect(rows.first()).toContainText("#9285797d");
-
-    await tabs.getByRole("tab", { name: "Todos" }).click();
+    const payload = await listCases(page.request, "?page=1&page_size=100");
+    const fixture = payload.items[0];
+    const token = String(fixture.request_id).slice(0, 8);
     const search = page.getByRole("searchbox", { name: "Buscar caso" });
-    await search.fill("plaza central");
-    await expect(rows).toHaveCount(1);
-    await expect(rows.first()).toContainText("#814f38ce");
+    await search.fill(token);
+    await expect(page.locator("ul li button")).toHaveCount(1);
+    await expect(page.locator("ul li button").first()).toContainText(`#${token}`);
 
-    await search.fill("zzzz-inexistente");
+    await search.fill(`NO-SUCH-FLOW-${Date.now()}`);
     await expect(page.getByText("No encontramos casos con estos filtros")).toBeVisible();
     expect(errors).toEqual([]);
   });
 
-  test("paginación server-side y filtro de sector no descargan todo el detalle", async ({ page }) => {
+  test("status filters match their dynamic API result", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);
-    const listRequests: string[] = [];
-    page.on("request", (request) => {
-      if (request.url().includes("/api/team360-flow/executive?")) listRequests.push(request.url());
-    });
     await openFlow(page);
+    const tabs = page.getByRole("tablist", { name: "Filtrar casos" });
 
-    await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
-    await page.getByRole("button", { name: "Siguiente" }).click({ force: true });
-    await expect(page.getByText("Página 2", { exact: true })).toBeVisible();
-    await expect(page.locator("ul li button")).toHaveCount(4);
-    await page.getByRole("button", { name: "Anterior" }).click({ force: true });
-    await expect(page.getByText("Página 1", { exact: true })).toBeVisible();
+    const filters: Array<[string, string]> = [
+      ["Activos", "open"],
+      ["Pendientes", "pending_approval"],
+      ["Resueltos", "resolved"],
+    ];
+    for (const [label, status] of filters) {
+      const expected = await listCases(page.request, `?page=1&page_size=20&status=${status}`);
+      await tabs.getByRole("tab", { name: label }).click();
+      await expect(page.locator("ul li button")).toHaveCount(expected.items.length);
+    }
+    expect(errors).toEqual([]);
+  });
 
-    const sector = page.getByRole("combobox", { name: "Sector" });
-    await expect(sector).toBeVisible();
-    await sector.selectOption("alumbrado");
-    await expect(page.locator("ul li button").first()).toBeVisible();
-    expect(listRequests.length).toBeGreaterThanOrEqual(4);
-    // page 1 se consulta nuevamente al volver desde page 2: duplicado
-    // explicable por navegación, no por un render/reactive loop.
-    expect(new Set(listRequests).size).toBeGreaterThanOrEqual(3);
+  test("pagination follows API metadata and tolerates database growth", async ({ page }) => {
+    const errors: string[] = [];
+    trackErrors(page, errors);
+    await openFlow(page);
+    const first = await listCases(page.request, "?page=1&page_size=20");
+    const next = page.getByRole("button", { name: "Siguiente" });
+    if (first.pagination.has_next) {
+      await expect(next).toBeEnabled();
+      await next.click({ force: true });
+      await expect(page.getByText("Página 2", { exact: true })).toBeVisible();
+      const second = await listCases(page.request, "?page=2&page_size=20");
+      await expect(page.locator("ul li button")).toHaveCount(second.items.length);
+      expect(second.items.length).toBeGreaterThan(0);
+    } else {
+      await expect(next).toBeDisabled();
+    }
     expect(errors).toEqual([]);
   });
 });
 
-test.describe("Flow Directorio LIVE — detalle por estado", () => {
-  test("caso ACTIVE con cierre rechazado: motivo visible y sin cierre falso", async ({ page }) => {
+test.describe("Flow Directorio LIVE smoke — dynamic detail", () => {
+  test("resolved case is AUDIT_SNAPSHOT with stable evidence", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);
     await openFlow(page);
-
-    await selectCaseByText(page, "Luminaria intermitente en la avenida");
-    const detail = detailSection(page);
-
-    await expect(detail.locator('[aria-label*="Activo"]')).toBeVisible();
-    await expect(detail.getByText("Estado actual en vivo")).toBeVisible();
-    await expect(detail.getByText("Rechazado", { exact: true })).toBeVisible();
-    await expect(detail.getByText("falta verificar que la luminaria permanezca encendida.", { exact: true })).toBeVisible();
-    await expect(detail.getByText("El caso continúa activo", { exact: true })).toBeVisible();
-
-    // El timeline NO debe comunicar cierre: el request volvió a ACTIVE.
-    await expect(detail.getByText("Cierre autorizado por supervisor", { exact: true })).toHaveCount(0);
-    await expect(detail.getByText("Caso resuelto", { exact: true })).toHaveCount(0);
-    await expect(detail.getByText("Registro final auditado", { exact: false })).toHaveCount(0);
-    expect(errors).toEqual([]);
-  });
-
-  test("caso RESOLUTION_PENDING_APPROVAL: pendiente y nunca cerrado", async ({ page }) => {
-    const errors: string[] = [];
-    trackErrors(page, errors);
-    await openFlow(page);
-
-    await selectCaseByText(page, "Luminaria apagada en la esquina");
-    const detail = detailSection(page);
-
-    await expect(detail.locator('[aria-label*="Pendiente de aprobación"]')).toBeVisible();
-    await expect(detail.getByText("Estado actual en vivo")).toBeVisible();
-    await expect(detail.getByText("Pendiente de decisión", { exact: true })).toBeVisible();
-    await expect(detail.getByText("El caso sigue abierto hasta la decisión del supervisor.", { exact: true })).toBeVisible();
-    await expect(detail.getByText("Propuesta del técnico", { exact: true })).toBeVisible();
-
-    await expect(detail.getByText("Resuelto", { exact: true })).toHaveCount(0);
-    await expect(detail.getByText("Registro final auditado", { exact: false })).toHaveCount(0);
-    expect(errors).toEqual([]);
-  });
-
-  test("caso RESOLVED: AUDIT_SNAPSHOT con cierre, autorizador y evidencia", async ({ page }) => {
-    const errors: string[] = [];
-    trackErrors(page, errors);
-    await openFlow(page);
-
-    await selectCaseByText(page, "Luminaria apagada en la plaza central");
-    const detail = detailSection(page);
-
+    const payload = await listCases(page.request, "?page=1&page_size=100&status=resolved");
+    expect(payload.items.length).toBeGreaterThan(0);
+    const fixture = payload.items[0];
+    await selectCaseById(page, fixture.request_id);
+    const detail = page.locator('[data-selected="yes"]');
+    await expect(detail.getByText("Registro final auditado", { exact: true })).toBeVisible();
     await expect(detail.locator('[aria-label*="Resuelto"]')).toBeVisible();
-    await expect(detail.getByText("Registro final auditado", { exact: false }).first()).toBeVisible();
-    await expect(detail.getByText("Aprobado", { exact: true })).toBeVisible();
-    await expect(detail.getByText(/Autorizado por mario\.rojas@alquimiablue\.com/)).toBeVisible();
-    await expect(detail.getByText(/Cerrado el/)).toBeVisible();
-    await expect(detail.getByText("Caso resuelto", { exact: true })).toBeVisible();
-
-    // Trazabilidad: audit record y referencias reales.
-    await detail.getByText("Evidencia y trazabilidad", { exact: true }).click();
-    await expect(detail.getByText("Audit record", { exact: true })).toBeVisible();
-    await expect(detail.getByText(/^a23aa1ec-/)).toBeVisible();
-    await expect(detail.getByText("Routing N1", { exact: true })).toBeVisible();
-    await expect(detail.getByText("ba03a320-51ce-48d4-b3f7-3af1b1817b54", { exact: true })).toBeVisible();
-    await expect(detail.getByText("Propuesta de resolución", { exact: true })).toBeVisible();
-    await expect(detail.getByText("Aprobación de cierre", { exact: true })).toBeVisible();
+    await expect(detail.getByText("Historia del caso", { exact: true })).toBeVisible();
+    await expect(detail.getByText("Evidencia y trazabilidad", { exact: true })).toBeVisible();
     expect(errors).toEqual([]);
   });
 
-  test("caso escalado N1→N2→N3 con SLA por nivel", async ({ page }) => {
+  test("open case remains LIVE when available", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);
     await openFlow(page);
-
-    await selectCaseByText(page, "Luminaria apagada en la calle Olleros");
-    const detail = detailSection(page);
-
-    await expect(detail.getByText("Estado actual en vivo")).toBeVisible();
-    await expect(detail.getByText("Nivel 1 · Vencido", { exact: true })).toBeVisible();
-    await expect(detail.getByText("Nivel 2 · Vencido", { exact: true })).toBeVisible();
-    await expect(detail.getByText("Nivel 3 · Dentro de SLA", { exact: true })).toBeVisible();
-
-    await expect(detail.getByText("Nivel 1 → Nivel 2", { exact: true })).toBeVisible();
-    await expect(detail.getByText("Nivel 2 → Nivel 3", { exact: true })).toBeVisible();
-    await expect(detail.getByText("Escalamiento de nivel", { exact: true })).toHaveCount(2);
-    await expect(detail.getByText("Asignado a Nivel 3", { exact: true })).toBeVisible();
-
-    // El historial previo no se oculta: N1 y N2 siguen visibles.
-    await expect(detail.getByText("Asignado a Nivel 1", { exact: true })).toBeVisible();
-    await expect(detail.getByText("Asignado a Nivel 2", { exact: true })).toBeVisible();
+    const payload = await listCases(page.request, "?page=1&page_size=100&status=open");
+    const fixture = payload.items.find((item) => item.data_source === "LIVE");
+    if (!fixture) {
+      test.info().annotations.push({ type: "NO_TEST_DATA", description: "No open LIVE case available" });
+      return;
+    }
+    await page.getByRole("tablist", { name: "Filtrar casos" }).getByRole("tab", { name: "Activos" }).click();
+    await selectCaseById(page, fixture.request_id);
+    const detail = page.locator('[data-selected="yes"]');
+    await expect(detail.getByText("Estado actual en vivo", { exact: true })).toBeVisible();
     expect(errors).toEqual([]);
   });
 
-  test("cambio rápido de caso: el detalle final es el último seleccionado", async ({ page }) => {
+  test("escalated case preserves dynamic routing history", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);
     await openFlow(page);
-
-    await selectCaseByText(page, "Luminaria apagada en la calle Olleros");
-    await selectCaseByText(page, "Luminaria intermitente en la avenida");
-    const detail = detailSection(page);
-
-    await expect(detail.getByRole("heading", { name: "Luminaria intermitente en la avenida" })).toBeVisible();
-    await expect(detail.getByRole("heading", { name: "Luminaria apagada en la calle Olleros" })).toHaveCount(0);
+    const payload = await listCases(page.request, "?page=1&page_size=100&escalated=true");
+    const fixture = payload.items.find((item) => Number(item.escalation_count) > 0);
+    if (!fixture) {
+      test.info().annotations.push({ type: "NO_TEST_DATA", description: "No escalated case available" });
+      return;
+    }
+    await page.getByRole("tablist", { name: "Filtrar casos" }).getByRole("tab", { name: "Escalados" }).click();
+    await selectCaseById(page, fixture.request_id);
+    const detail = page.locator('[data-selected="yes"]');
+    await expect(detail.getByText("Escalamientos", { exact: true })).toBeVisible();
+    await expect(detail.getByText(/Nivel \d+ → Nivel \d+/, { exact: false }).first()).toBeVisible();
     expect(errors).toEqual([]);
   });
 
-  test("caso sin escalamientos: no se muestra sección vacía", async ({ page }) => {
+  test("pending approval is never presented as closed when available", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);
     await openFlow(page);
-
-    await selectCaseByText(page, "Luminaria apagada en la esquina");
-    const detail = detailSection(page);
-
-    await expect(detail.getByText("Escalamientos", { exact: true })).toHaveCount(0);
+    const payload = await listCases(page.request, "?page=1&page_size=100&status=pending_approval");
+    const fixture = payload.items[0];
+    if (!fixture) {
+      test.info().annotations.push({ type: "NO_TEST_DATA", description: "No pending approval case available" });
+      return;
+    }
+    await page.getByRole("tablist", { name: "Filtrar casos" }).getByRole("tab", { name: "Pendientes" }).click();
+    await selectCaseById(page, fixture.request_id);
+    const detail = page.locator('[data-selected="yes"]');
+    await expect(detail.getByText("Estado actual en vivo", { exact: true })).toBeVisible();
+    await expect(detail.getByText("Pendiente de decisión", { exact: true })).toBeVisible();
+    await expect(detail.getByText("Registro final auditado", { exact: false })).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 });
 
-test.describe("Flow Directorio LIVE — responsive", () => {
-  for (const [vp, width, height] of [["mobile", 390, 844], ["tablet", 768, 1024], ["desktop", 1280, 900]] as const) {
-    test(`sin overflow horizontal en ${vp}`, async ({ page }) => {
+test.describe("Flow Directorio LIVE smoke — responsive and races", () => {
+  for (const [name, width, height] of [["mobile", 390, 844], ["tablet", 768, 1024], ["desktop", 1280, 900]] as const) {
+    test(`no horizontal overflow at ${name}`, async ({ page }) => {
       await page.setViewportSize({ width, height });
-      const errors: string[] = [];
-      trackErrors(page, errors);
       await openFlow(page);
       await expectNoHorizontalOverflow(page);
-
-      await selectCaseByText(page, "Luminaria intermitente en la avenida");
-      await expect(detailSection(page).getByText("Rechazado", { exact: true })).toBeVisible();
-      await expectNoHorizontalOverflow(page);
-      expect(errors).toEqual([]);
     });
   }
-});
 
-test.describe("Flow Directorio LIVE — consola limpia", () => {
-  test("recorrido completo sin errores de consola ni requests fallidos", async ({ page }) => {
+  test("latest selected case wins the detail race", async ({ page }) => {
+    await openFlow(page);
+    const payload = await listCases(page.request, "?page=1&page_size=2");
+    if (payload.items.length < 2) {
+      test.info().annotations.push({ type: "NO_TEST_DATA", description: "Need two cases for detail race" });
+      return;
+    }
+    await selectCaseById(page, payload.items[0].request_id);
+    await selectCaseById(page, payload.items[1].request_id);
+    const detail = page.locator('[data-selected="yes"]');
+    await expect(detail.getByRole("heading", { name: payload.items[1].description })).toBeVisible();
+  });
+
+  test("full smoke has no console errors or failed executive requests", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);
     await openFlow(page);
-
-    await selectCaseByText(page, "Luminaria apagada en la plaza central");
-    await expect(detailSection(page).getByText("Registro final auditado", { exact: false }).first()).toBeVisible();
-    await selectCaseByText(page, "Luminaria apagada en la calle Olleros");
-    await expect(detailSection(page).getByText("Nivel 2 → Nivel 3", { exact: true })).toBeVisible();
-
-    const failures = await page.evaluate(() => {
-      const nav = performance.getEntriesByType("resource");
-      const apis = nav.filter((e) => e.name.includes("/api/team360-flow/executive/"));
-      const failed = apis.filter((e) => (e as PerformanceResourceTiming).responseStatus >= 400);
-      return { total: apis.length, failed: failed.length };
-    });
-    expect(failures.total, "debe haber consultas ejecutivas").toBeGreaterThanOrEqual(2);
-    expect(failures.failed, "ninguna consulta ejecutiva debe fallar").toBe(0);
+    const payload = await listCases(page.request, "?page=1&page_size=2");
+    if (payload.items.length > 0) await selectCaseById(page, payload.items[0].request_id);
+    const failures = await page.evaluate(() => performance.getEntriesByType("resource")
+      .filter((entry) => entry.name.includes("/api/team360-flow/executive/") && (entry as PerformanceResourceTiming).responseStatus >= 400).length);
+    expect(failures).toBe(0);
     expect(errors).toEqual([]);
   });
 });

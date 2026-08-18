@@ -162,8 +162,8 @@ def _message(
     )
 
 
-async def run_demo(pool, settings) -> DemoReport:
-    marker = f"LAMUNI-DEMO-{datetime.now(timezone.utc):%Y%m%d}-{uuid4().hex[:6]}"
+async def run_demo(pool, settings, marker_prefix: str = "LAMUNI-DEMO") -> DemoReport:
+    marker = f"{marker_prefix}-{datetime.now(timezone.utc):%Y%m%d}-{uuid4().hex[:6]}"
     thread = f"lamuni-demo-{uuid4().hex}"
     now = _now()
 
@@ -641,6 +641,11 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Delete only the LAMUNI demo cases created by this harness.",
     )
+    parser.add_argument(
+        "--prefix",
+        default="LAMUNI-DEMO",
+        help="Marker prefix for the new fixture identity.",
+    )
     return parser
 
 
@@ -663,7 +668,7 @@ def main() -> int:
                     + " ".join(f"{k}={v}" for k, v in status.items())
                 )
                 return 0
-            report = await run_demo(pool, settings)
+            report = await run_demo(pool, settings, marker_prefix=args.prefix)
             print("\n".join(report.summary_lines()))
             print(f"CONFIGURATION_SECTOR={report.configuration.get('sector_id')}")
             print(
