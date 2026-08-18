@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatDateTime } from "../../../lib/formatters";
+  import { flowDateTime } from "../../../lib/t360/flow/format";
   import type { SlaItem } from "../../../lib/t360/flow/types";
 
   let { sla }: { sla: SlaItem } = $props();
@@ -34,11 +34,11 @@
   </span>
   <span class="text-[0.62rem] leading-4 opacity-80">
     {#if sla.status === "MET"}
-      Respondido {formatDateTime(sla.first_response_at ?? null)}
+      Respondido {flowDateTime(sla.first_response_at ?? null)}
     {:else if sla.status === "BREACHED"}
-      Vencía {formatDateTime(sla.due_at ?? null)}
+      Vencía {flowDateTime(sla.due_at ?? null)}
     {:else}
-      Vence {formatDateTime(sla.due_at ?? null)}
+      Vence {flowDateTime(sla.due_at ?? null)}
     {/if}
   </span>
 </span>

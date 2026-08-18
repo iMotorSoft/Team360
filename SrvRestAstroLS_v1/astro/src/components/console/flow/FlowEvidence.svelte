@@ -25,6 +25,17 @@
         result.push({ label: `SLA N${sla.level}`, value: sla.sla_id });
       }
     }
+    for (const event of view.operational_events) {
+      if (event.event_id) {
+        result.push({ label: `Evento operacional N${event.level ?? ""}`.trim(), value: event.event_id });
+      }
+    }
+    if (view.resolution?.resolution_id) {
+      result.push({ label: "Propuesta de resolución", value: view.resolution.resolution_id });
+    }
+    if (view.closure_approval?.approval_id) {
+      result.push({ label: "Aprobación de cierre", value: view.closure_approval.approval_id });
+    }
     return result;
   });
 </script>

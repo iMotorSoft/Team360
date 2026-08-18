@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatDateTime, formatDuration } from "../../../lib/formatters";
+  import { flowDateTime } from "../../../lib/t360/flow/format";
   import { currentAssignee, currentLevel } from "../../../lib/t360/flow/types";
   import type { ExecutiveView } from "../../../lib/t360/flow/types";
   import type { ExecutiveFetchError } from "../../../lib/api/flowExecutive";
@@ -32,6 +32,8 @@
         return { title: "No se pudo cargar", detail: "El backend ejecutivo no está disponible en este momento." };
     }
   });
+
+  const levelText = $derived(view ? (currentLevel(view) > 0 ? `Nivel ${currentLevel(view)}` : "Sin nivel asignado") : "");
 </script>
 
 <div class="space-y-5">
@@ -73,7 +75,7 @@
           </div>
           <h2 class="mt-2 text-lg font-bold leading-6 tracking-[-0.02em] text-[#173b5b]">{view.request.description}</h2>
           <p class="mt-1 text-sm text-[#78909f]">
-            {view.request.sector_name ?? "Sector"} · {view.request.location ?? "Ubicación no informada"} · Nivel {currentLevel(view)}
+            {view.request.sector_name ?? "Sector"} · {view.request.location ?? "Ubicación no informada"} · {levelText}
           </p>
         </div>
         <div class="text-start sm:text-end">
@@ -127,7 +129,7 @@
               <div class="min-w-0">
                 <p class="text-sm font-semibold text-[#31536b]">Nivel {escalation.from_level} → Nivel {escalation.to_level}</p>
                 <p class="text-xs text-[#78909f]">
-                  {escalation.trigger === "FIRST_RESPONSE_SLA_BREACHED" ? "SLA de primera respuesta vencido" : escalation.trigger ?? "Escalamiento"} · {formatDateTime(escalation.created_at ?? null)}
+                  {escalation.trigger === "FIRST_RESPONSE_SLA_BREACHED" ? "SLA de primera respuesta vencido" : escalation.trigger ?? "Escalamiento"} · {flowDateTime(escalation.created_at ?? null)}
                 </p>
               </div>
               <span class="ms-auto text-xs font-bold text-[#30ae69]">{escalation.status === "COMPLETED" ? "Completado" : escalation.status}</span>
@@ -144,7 +146,7 @@
           <div class="mt-3">
             <p class="text-sm font-semibold text-[#31536b]">Propuesta del técnico</p>
             <p class="mt-1 text-sm leading-6 text-[#587184]">{view.resolution.resolution_text ?? "—"}</p>
-            <p class="mt-1 text-xs text-[#78909f]">{view.resolution.proposed_by} · {formatDateTime(view.resolution.proposed_at ?? null)}</p>
+            <p class="mt-1 text-xs text-[#78909f]">{view.resolution.proposed_by ?? "—"} · {flowDateTime(view.resolution.proposed_at ?? null)}</p>
           </div>
         {/if}
         {#if view.closure_approval}
@@ -152,12 +154,26 @@
             <p class="text-sm font-semibold text-[#31536b]">Decisión del supervisor</p>
             {#if view.closure_approval.decision === "APPROVED"}
               <p class="mt-1 text-sm font-bold text-[#17663d]">Aprobado</p>
-            {:else if view.closure_approval.decision === "REJECT"}
+              <p class="mt-1 text-xs text-[#587184]">
+                Autorizado por {view.closure_approval.approver ?? "—"}
+                {#if view.closure_approval.approver_level}{`(Nivel ${view.closure_approval.approver_level})`}{/if}
+                {#if view.result.resolved_at} · Cerrado el {flowDateTime(view.result.resolved_at)}{/if}
+              </p>
+            {:else if view.closure_approval.decision === "REJECTED"}
               <p class="mt-1 text-sm font-bold text-[#9b3328]">Rechazado</p>
+              <p class="mt-1 text-xs leading-5 text-[#587184]">{view.closure_approval.decision_reason ?? "Sin motivo registrado"}</p>
+              {#if view.status_fact === "open"}
+                <p class="mt-1.5 inline-flex items-center gap-1 rounded-full border border-[#f1dfa2] bg-[#fff7d9] px-2.5 py-1 text-[0.68rem] font-bold text-[#765d00]">
+                  El caso continúa activo
+                </p>
+              {/if}
             {:else}
               <p class="mt-1 text-sm font-bold text-[#765d00]">Pendiente de decisión</p>
+              {#if view.status_fact === "pending_approval"}
+                <p class="mt-1 text-xs leading-5 text-[#587184]">El caso sigue abierto hasta la decisión del supervisor.</p>
+              {/if}
             {/if}
-            {#if view.closure_approval.decision_reason}
+            {#if view.closure_approval.decision_reason && view.closure_approval.decision !== "REJECTED"}
               <p class="mt-1 text-xs leading-5 text-[#587184]">{view.closure_approval.decision_reason}</p>
             {/if}
           </div>
@@ -168,7 +184,11 @@
     <section class="rounded-2xl border border-card-border bg-card-bg p-5">
       <h3 class="text-xs font-bold uppercase tracking-[0.16em] text-[#78909f]">Historia del caso</h3>
       <div class="mt-4">
-        <FlowTimeline events={view.timeline} />
+        {#if view.timeline.length > 0}
+          <FlowTimeline events={view.timeline} />
+        {:else}
+          <p class="text-xs leading-5 text-[#78909f]">Sin eventos registrados para este caso.</p>
+        {/if}
       </div>
     </section>
 

@@ -214,7 +214,7 @@ export const FLOW_DEMO_CASES: ExecutiveView[] = [
     escalations: [],
     operational_events: [{ event_id: "ev-c92d", level: 1, interpretation: "ACK_OR_PROGRESS", received_at: iso(135), sender: "mario.rojas@alquimiablue.com" }],
     resolution: { resolution_id: "res-c92d", proposed_by: "mario.rojas@alquimiablue.com", proposed_at: iso(100), routing_id: "r-n1-c92d", resolution_text: "Reemplazo de luminarias en curso.", resolution_status: "REJECTED" },
-    closure_approval: { approval_id: "apr-c92d", approver: "alumbrado.n2@alquimiablue.com", approver_level: 2, decision: "REJECT", decision_at: iso(95), decision_reason: "Falta verificar el sector norte de la cuadra.", source_message_id: "gmail-reject-c92d" },
+    closure_approval: { approval_id: "apr-c92d", approver: "alumbrado.n2@alquimiablue.com", approver_level: 2, decision: "REJECTED", decision_at: iso(95), decision_reason: "Falta verificar el sector norte de la cuadra.", source_message_id: "gmail-reject-c92d" },
     result: { request_status: "ACTIVE", resolved_at: null },
     metrics: {
       routing_count: 1,

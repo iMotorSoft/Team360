@@ -69,7 +69,7 @@ def test_build_timeline_is_chronological_and_complete():
     ]
     escalations = [{"escalation_id": "e1", "to_routing_id": "r2", "to_level": 2, "created_at": breached.isoformat()}]
     resolution = {"resolution_id": "res1", "proposed_at": proposed.isoformat(), "routing_id": "r3"}
-    approval = {"approval_id": "a1", "decision_at": decided.isoformat()}
+    approval = {"approval_id": "a1", "decision_at": decided.isoformat(), "status": "APPROVED"}
 
     timeline = build_timeline(
         received_at=received,
@@ -96,3 +96,60 @@ def test_build_timeline_is_chronological_and_complete():
     stamps = [item["timestamp"] for item in timeline]
     assert stamps == sorted(stamps)
     assert timeline[-1]["event_type"] == "REQUEST_RESOLVED"
+
+
+def test_build_timeline_rejected_approval_has_no_closure_events():
+    """Un cierre REJECTED no genera CLOSURE_APPROVED ni REQUEST_RESOLVED."""
+    received = _dt("2026-08-13T00:00:00Z")
+    confirmed = _dt("2026-08-13T00:01:00Z")
+    proposed = _dt("2026-08-13T00:10:00Z")
+    decided = _dt("2026-08-13T00:12:00Z")
+
+    timeline = build_timeline(
+        received_at=received,
+        confirmed_at=confirmed,
+        routings=[],
+        slas=[],
+        escalations=[],
+        resolution={
+            "resolution_id": "res1",
+            "proposed_at": proposed.isoformat(),
+            "routing_id": "r3",
+        },
+        approval={
+            "approval_id": "a1",
+            "decision_at": decided.isoformat(),
+            "status": "REJECTED",
+        },
+    )
+
+    types = [item["event_type"] for item in timeline]
+    assert types == ["REQUEST_RECEIVED", "REQUEST_CONFIRMED", "RESOLUTION_PROPOSED"]
+    assert "CLOSURE_APPROVED" not in types
+    assert "REQUEST_RESOLVED" not in types
+
+
+def test_build_timeline_pending_approval_has_no_closure_events():
+    """Un cierre PENDING (sin decisión) no emite eventos de cierre."""
+    received = _dt("2026-08-13T00:00:00Z")
+    confirmed = _dt("2026-08-13T00:01:00Z")
+    proposed = _dt("2026-08-13T00:10:00Z")
+
+    timeline = build_timeline(
+        received_at=received,
+        confirmed_at=confirmed,
+        routings=[],
+        slas=[],
+        escalations=[],
+        resolution={
+            "resolution_id": "res1",
+            "proposed_at": proposed.isoformat(),
+            "routing_id": "r3",
+        },
+        approval={"approval_id": "a1", "decision_at": None, "status": "PENDING"},
+    )
+
+    types = [item["event_type"] for item in timeline]
+    assert types == ["REQUEST_RECEIVED", "REQUEST_CONFIRMED", "RESOLUTION_PROPOSED"]
+    assert "CLOSURE_APPROVED" not in types
+    assert "REQUEST_RESOLVED" not in types

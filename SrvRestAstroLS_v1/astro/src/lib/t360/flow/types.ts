@@ -5,6 +5,7 @@
 
 export type StatusFact = "open" | "closed" | "pending_approval";
 export type DataSource = "LIVE" | "AUDIT_SNAPSHOT";
+export type ClosureDecision = "PENDING" | "APPROVED" | "REJECTED";
 
 export interface ExecutiveRequest {
   request_id: string;
@@ -81,7 +82,7 @@ export interface ClosureApprovalItem {
   approval_id?: string;
   approver?: string | null;
   approver_level?: number | null;
-  decision?: string | null;
+  decision?: ClosureDecision | null;
   decision_at?: string | null;
   decision_reason?: string | null;
   source_message_id?: string | null;

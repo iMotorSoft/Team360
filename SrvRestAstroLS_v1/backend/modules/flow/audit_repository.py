@@ -140,7 +140,10 @@ def build_timeline(
                 reference_id=resolution.get("resolution_id"),
             )
         )
-    if approval is not None:
+    if approval is not None and approval.get("status") == "APPROVED":
+        # Solo una aprobación APPROVED cierra el request: REJECTED vuelve a
+        # ACTIVE y PENDING aún no decidió. Emitir CLOSURE_APPROVED o
+        # REQUEST_RESOLVED para otro estado falsearía el timeline.
         items.append(
             _event(
                 approval.get("decision_at"),
@@ -296,7 +299,14 @@ class FlowAuditRepository:
             )
 
         received_at = received["received_at"] if received else None
-        resolved_at = approval["decided_at_utc"] if approval else None
+        # Un request solo queda resuelto con una aprobación APPROVED; la fecha
+        # de decisión de un REJECTED (o de un PENDING sin decisión) no es un
+        # resolved_at.
+        resolved_at = (
+            approval["decided_at_utc"]
+            if approval and approval["status"] == "APPROVED"
+            else None
+        )
 
         routing_list = [
             {

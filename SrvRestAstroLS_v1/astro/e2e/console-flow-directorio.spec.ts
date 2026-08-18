@@ -5,6 +5,11 @@ import { test, expect, type Page } from "@playwright/test";
 // KPIs, lista, filtros, búsqueda, detalle por estado (LIVE escalado N1→N2→N3,
 // pending approval, rejected, AUDIT_SNAPSHOT resuelto), evidencia, timeline,
 // configuración futura, responsive y consola limpia.
+//
+// NOTA: el Directorio es live-first (consume el backend ejecutivo real por
+// caso). Esta suite prueba explícitamente el modo demostración con ?demo=1,
+// que es el fallback de diseño cuando el backend no está disponible. El flujo
+// contra el backend real está cubierto en console-flow-directorio-live.spec.ts.
 
 const DIRECTORIO_URL = "/w/ws-team360-control/flow";
 const CONFIG_URL = "/w/ws-team360-control/flow/configuracion";
@@ -14,7 +19,8 @@ const CONFIG_URL = "/w/ws-team360-control/flow/configuracion";
 const flowConfigLink = (page: Page) => page.locator('nav a[href*="/flow/configuracion"]');
 
 async function openFlow(page: Page, url = DIRECTORIO_URL) {
-  await page.goto(url);
+  const separator = url.includes("?") ? "&" : "?";
+  await page.goto(`${url}${separator}demo=1`);
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
 }
 
@@ -68,9 +74,9 @@ test.describe("Flow Directorio — navegación", () => {
     await expect(page).toHaveURL(/\/flow\/configuracion\/?$/);
 
     await expect(page.getByRole("heading", { name: "Sectores y niveles" })).toBeVisible();
-    await expect(page.getByText("Configuración preparada", { exact: true })).toBeVisible();
-    await expect(page.getByText("Modo demo · solo lectura", { exact: true })).toBeVisible();
-    await expect(page.getByText(/La persistencia real se habilitará cuando exista el backend mutativo/)).toBeVisible();
+    await expect(page.getByText("Configuración persistente", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(/se lee y guarda a través de PostgreSQL/)).toBeVisible();
+    await expect(page.getByText("alumbrado.n1@alquimiablue.com", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Alumbrado Público", { exact: true }).first()).toBeVisible();
 
     for (const email of ["alumbrado.n1@alquimiablue.com", "alumbrado.n2@alquimiablue.com", "alumbrado.n3@alquimiablue.com"]) {

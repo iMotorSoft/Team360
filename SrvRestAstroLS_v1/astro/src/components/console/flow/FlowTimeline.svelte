@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatDateTime } from "../../../lib/formatters";
+  import { flowDateTime } from "../../../lib/t360/flow/format";
   import type { TimelineEvent } from "../../../lib/t360/flow/types";
 
   let { events }: { events: TimelineEvent[] } = $props();
@@ -65,7 +65,7 @@
       <div class="min-w-0">
         <p class="text-sm font-semibold leading-5 text-[#31536b]">{step.label}</p>
         <p class="mt-0.5 text-xs text-[#78909f]">
-          {formatDateTime(event.timestamp ?? null)}
+          {flowDateTime(event.timestamp ?? null)}
           {#if event.level !== null && event.level !== undefined && ["ROUTING_ASSIGNED", "SLA_STARTED", "SLA_MET", "SLA_BREACHED", "ESCALATED"].includes(event.event_type)}
             · Nivel {event.level}
           {/if}

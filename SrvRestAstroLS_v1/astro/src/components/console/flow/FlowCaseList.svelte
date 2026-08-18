@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatDateTime } from "../../../lib/formatters";
+  import { flowDateTime } from "../../../lib/t360/flow/format";
   import { caseAttention, currentLevel, hasBreachedSla, hasPendingApproval, isResolved } from "../../../lib/t360/flow/types";
   import type { ExecutiveView } from "../../../lib/t360/flow/types";
   import FlowStatusBadge from "./FlowStatusBadge.svelte";
@@ -7,10 +7,12 @@
   let {
     cases,
     selectedId,
+    loading = false,
     onSelect = () => undefined,
   }: {
     cases: ExecutiveView[];
     selectedId: string | null;
+    loading?: boolean;
     onSelect?: (requestId: string) => void;
   } = $props();
 
@@ -67,6 +69,11 @@
   function shortId(requestId: string): string {
     return `#${requestId.slice(0, 8)}`;
   }
+
+  function levelLabel(item: ExecutiveView): string {
+    const level = currentLevel(item);
+    return level > 0 ? `Nivel ${level}` : "Sin nivel asignado";
+  }
 </script>
 
 <div class="space-y-4">
@@ -78,17 +85,19 @@
         type="search"
         placeholder="Buscar por descripción, sector o referencia…"
         bind:value={query}
-        class="w-full rounded-xl border border-card-border bg-white px-3 py-2.5 text-sm text-[#31536b] placeholder:text-[#91a2ad] focus:outline-2 focus:outline-offset-1 focus:outline-[#168b88]"
+        disabled={loading}
+        class="w-full rounded-xl border border-card-border bg-white px-3 py-2.5 text-sm text-[#31536b] placeholder:text-[#91a2ad] focus:outline-2 focus:outline-offset-1 focus:outline-[#168b88] disabled:opacity-60"
       />
     </div>
-    <div class="flex flex-wrap gap-1.5" role="tablist" aria-label="Filtrar casos">
+    <div class="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Filtrar casos">
       {#each filters as item (item.id)}
         <button
           type="button"
           role="tab"
           aria-selected={filter === item.id}
+          disabled={loading}
           onclick={() => (filter = item.id)}
-          class={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+          class={`rounded-full border px-3 py-1.5 text-xs font-bold transition disabled:opacity-60 ${
             filter === item.id
               ? "border-[#b7dfdc] bg-[#e4f5f3] text-[#126d6b]"
               : "border-card-border bg-white text-[#587184] hover:bg-base-200"
@@ -100,7 +109,17 @@
     </div>
   </div>
 
-  {#if filtered.length === 0}
+  {#if loading}
+    <div class="space-y-px overflow-hidden rounded-2xl border border-card-border bg-card-bg" aria-hidden="true">
+      {#each Array(5) as _, i (i)}
+        <div class="animate-pulse px-4 py-4">
+          <div class="h-3 w-40 rounded bg-base-200"></div>
+          <div class="mt-2 h-3 w-72 rounded bg-base-200"></div>
+          <div class="mt-2 h-2.5 w-56 rounded bg-base-200"></div>
+        </div>
+      {/each}
+    </div>
+  {:else if filtered.length === 0}
     <div class="rounded-2xl border border-dashed border-[#d7e3e5] bg-white/70 p-6 text-center">
       <p class="text-sm font-bold text-[#31536b]">No hay casos que coincidan</p>
       <p class="mt-1 text-xs text-[#78909f]">Ajustá la búsqueda o el filtro para ver otros casos.</p>
@@ -133,18 +152,22 @@
               </span>
               <span class="mt-1 block truncate text-sm font-semibold leading-5 text-[#31536b]">{item.request.description}</span>
               <span class="mt-0.5 block truncate text-xs text-[#78909f]">
-                Nivel {level} · {item.request.location ?? "Ubicación no informada"}
+                {levelLabel(item)} · {item.request.location ?? "Ubicación no informada"}
                 {#if item.escalations.length > 0} · Escalado{/if}
                 {#if hasBreachedSla(item)} · SLA vencido{/if}
               </span>
             </span>
             <span class="hidden shrink-0 text-end sm:block">
               <span class="block text-xs font-semibold text-[#587184]">{item.routing_history.at(-1)?.destination ?? "—"}</span>
-              <span class="mt-0.5 block text-[0.62rem] text-[#91a2ad]">{formatDateTime(item.timeline.at(-1)?.timestamp ?? null)}</span>
+              <span class="mt-0.5 block text-[0.62rem] text-[#91a2ad]">{flowDateTime(item.timeline.at(-1)?.timestamp ?? null)}</span>
             </span>
           </button>
         </li>
       {/each}
     </ul>
   {/if}
+
+  <p class="text-xs text-[#91a2ad]" aria-live="polite">
+    {filtered.length} de {cases.length} casos
+  </p>
 </div>
