@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import {
     cloneFlowConfiguration,
     configurationFingerprint,
@@ -7,6 +8,12 @@
     type FlowConfigurationSaveHandler,
     type FlowSectorConfiguration,
   } from "../../../lib/t360/flow/configuration";
+  import {
+    fetchFlowConfigurations,
+    mapFlowSectors,
+    updateFlowConfiguration,
+    type FlowConfigurationError,
+  } from "../../../lib/api/flowConfiguration";
   import FlowClosureSupervisorEditor from "./FlowClosureSupervisorEditor.svelte";
   import FlowLevelEditor from "./FlowLevelEditor.svelte";
   import FlowSectorSelector from "./FlowSectorSelector.svelte";
@@ -16,11 +23,15 @@
     persistenceEnabled = false,
     onSave = () => undefined,
     onCancel = () => undefined,
+    token = null,
+    apiEnabled = true,
   }: {
     configurations?: FlowSectorConfiguration[];
     persistenceEnabled?: boolean;
     onSave?: FlowConfigurationSaveHandler;
     onCancel?: () => void;
+    token?: string | null;
+    apiEnabled?: boolean;
   } = $props();
 
   let savedConfigurations = $state(cloneFlowConfiguration(configurations));
@@ -31,6 +42,13 @@
   let attemptedSave = $state(false);
   let saveState = $state<"idle" | "saving" | "saved" | "error" | "cancelled">("idle");
   let saveMessage = $state("");
+  let loading = $state(false);
+  let loadError = $state<FlowConfigurationError | null>(null);
+
+  // MVP: la ruta productiva usa la API real (default_admin) sin requerir token.
+  // `apiEnabled={false}` se usa en fixtures controlados.
+  const useRealApi = $derived(apiEnabled);
+  const canPersist = $derived(useRealApi || persistenceEnabled);
 
   const activeConfigurations = $derived(draftConfigurations ?? savedConfigurations);
   const selectedSector = $derived(activeConfigurations.find((sector) => sector.sectorId === selectedSectorId) ?? null);
@@ -62,6 +80,46 @@
   const visibleValidationErrorCount = $derived(
     Object.entries(validationErrors).filter(([key, value]) => value && (touched[key] || attemptedSave)).length,
   );
+
+  const loadErrorCopy = $derived.by(() => {
+    switch (loadError) {
+      case "unauthorized":
+        return { title: "Sesión requerida", detail: "Necesitás autenticarte para ver la configuración de Flow." };
+      case "forbidden":
+        return { title: "Sin permiso", detail: "Tu rol no tiene acceso de configuración de Flow (flow.configuration.read)." };
+      case "not_found":
+        return { title: "Configuración no encontrada", detail: "El sector solicitado no existe en el catálogo de Flow." };
+      case "validation":
+        return { title: "Datos inválidos", detail: "El backend rechazó la configuración enviada." };
+      default:
+        return { title: "No se pudo cargar", detail: "El servicio de configuración de Flow no está disponible en este momento." };
+    }
+  });
+
+  async function loadRealConfiguration() {
+    if (!useRealApi) return;
+    loading = true;
+    loadError = null;
+    const result = await fetchFlowConfigurations(token ?? undefined);
+    loading = false;
+    if (result.error) {
+      loadError = result.error;
+      return;
+    }
+    if (!result.data) {
+      loadError = "unavailable";
+      return;
+    }
+    const loaded = mapFlowSectors(result.data);
+    savedConfigurations = loaded;
+    selectedSectorId = loaded[0]?.sectorId ?? null;
+  }
+
+  onMount(() => {
+    if (useRealApi) {
+      void loadRealConfiguration();
+    }
+  });
 
   function beginEdit() {
     draftConfigurations = cloneFlowConfiguration(savedConfigurations);
@@ -103,7 +161,14 @@
     const next = cloneFlowConfiguration(draftConfigurations);
     const sector = next.find((item) => item.sectorId === selectedSectorId);
     const level = sector?.levels.find((item) => item.id === levelId);
-    if (level) level.destination = value;
+    if (level) {
+      level.destination = value;
+      // El supervisor de cierre es la autoridad del closure_approval_level;
+      // mantiene sincronizado el destination del nivel que lo autoriza.
+      if (sector && level.level === sector.closureApprovalLevel) {
+        sector.closureSupervisorDestination = value;
+      }
+    }
     draftConfigurations = next;
     saveState = "idle";
     saveMessage = "";
@@ -113,7 +178,30 @@
     if (!draftConfigurations || !selectedSectorId) return;
     const next = cloneFlowConfiguration(draftConfigurations);
     const sector = next.find((item) => item.sectorId === selectedSectorId);
-    if (sector) sector.closureSupervisorDestination = value;
+    if (sector) {
+      sector.closureSupervisorDestination = value;
+      const closureLevel = sector.levels.find((item) => item.level === sector.closureApprovalLevel);
+      if (closureLevel) closureLevel.destination = value;
+    }
+    draftConfigurations = next;
+    saveState = "idle";
+    saveMessage = "";
+  }
+
+  function updateClosureApprovalLevel(level: number) {
+    if (!draftConfigurations || !selectedSectorId) return;
+    const next = cloneFlowConfiguration(draftConfigurations);
+    const sector = next.find((item) => item.sectorId === selectedSectorId);
+    if (sector && sector.levels.some((item) => item.level === level)) {
+      sector.closureApprovalLevel = level;
+      // El supervisor es una proyección del nivel que aprueba: el destino
+      // mostrado sigue al nivel elegido (el email que se persiste es el del
+      // nivel; no hay una dirección de supervisor separada).
+      const closureLevel = sector.levels.find((item) => item.level === level);
+      if (closureLevel) {
+        sector.closureSupervisorDestination = closureLevel.destination;
+      }
+    }
     draftConfigurations = next;
     saveState = "idle";
     saveMessage = "";
@@ -126,9 +214,52 @@
   async function saveDraft() {
     attemptedSave = true;
     if (!draftConfigurations || hasValidationErrors || !isDirty) return;
-    if (!persistenceEnabled) {
+    if (!canPersist) {
       saveState = "error";
       saveMessage = "La persistencia todavía no está conectada. Tus cambios siguen siendo un borrador local de esta pantalla.";
+      return;
+    }
+
+    if (useRealApi) {
+      const sectorId = selectedSectorId;
+      if (!sectorId) return;
+      const sector = draftConfigurations.find((item) => item.sectorId === sectorId);
+      if (!sector) return;
+      saveState = "saving";
+      saveMessage = "Guardando cambios...";
+      const result = await updateFlowConfiguration(
+        sectorId,
+        {
+          levels: sector.levels.map((level) => ({ level: level.level, destination: level.destination })),
+          closure_approval_level: sector.closureApprovalLevel,
+        },
+        token ?? undefined,
+      );
+      if (result.error || !result.data) {
+        if (result.error === "unauthorized") {
+          saveState = "error";
+          saveMessage = "Tu sesión expiró. Volvé a iniciar sesión para guardar.";
+        } else if (result.error === "forbidden") {
+          saveState = "error";
+          saveMessage = "Tu rol no tiene permiso para modificar la configuración de Flow.";
+        } else if (result.error === "validation") {
+          saveState = "error";
+          saveMessage = "El backend rechazó los cambios. Revisá los destinatarios e intentá nuevamente.";
+        } else {
+          saveState = "error";
+          saveMessage = "No se pudieron guardar los cambios. Intentá nuevamente en unos instantes.";
+        }
+        return;
+      }
+      const canonical = mapFlowSectors({ sectors: [result.data] })[0];
+      savedConfigurations = savedConfigurations.map((item) =>
+        item.sectorId === canonical.sectorId ? canonical : item,
+      );
+      draftConfigurations = null;
+      touched = {};
+      attemptedSave = false;
+      saveState = "saved";
+      saveMessage = "Cambios guardados.";
       return;
     }
 
@@ -163,25 +294,74 @@
         <span class="rounded-full border border-[#f1dfa2] bg-[#fff7d9] px-3 py-1.5 text-xs font-bold text-[#765d00]">Cambios sin guardar</span>
       {:else if isEditing}
         <span class="rounded-full border border-[#dce6e8] bg-white px-3 py-1.5 text-xs font-bold text-[#587184]">Sin cambios</span>
+      {:else if useRealApi}
+        <span class="rounded-full border border-[#b9e7cc] bg-[#e8f8ef] px-3 py-1.5 text-xs font-bold text-[#17663d]">Configuración persistente</span>
       {:else}
         <span class="rounded-full border border-[#f1dfa2] bg-[#fff7d9] px-3 py-1.5 text-xs font-bold text-[#765d00]">Modo demo · solo lectura</span>
       {/if}
     </div>
   </header>
 
-  <div class="rounded-2xl border border-[#f1dfa2] bg-[#fff7d9] p-4" role="status">
-    <div class="flex items-start gap-3">
-      <span class="mt-0.5 text-base text-[#765d00]" aria-hidden="true">●</span>
-      <div>
-        <p class="text-xs font-bold uppercase tracking-[0.1em] text-[#765d00]">Configuración preparada</p>
-        <p class="mt-1 text-xs leading-5 text-[#765d00]">
-          Podés revisar y validar un borrador visual. La persistencia real se habilitará cuando exista el backend mutativo de Flow.
-        </p>
+  {#if useRealApi && loadError}
+    <div class="rounded-2xl border border-[#f1c7c2] bg-[#fdf0ee] p-4" role="alert">
+      <div class="flex items-start gap-3">
+        <span class="mt-0.5 text-base text-[#9b3328]" aria-hidden="true">●</span>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.1em] text-[#9b3328]">{loadErrorCopy.title}</p>
+          <p class="mt-1 text-xs leading-5 text-[#9b3328]">{loadErrorCopy.detail}</p>
+        </div>
       </div>
     </div>
-  </div>
+  {:else if useRealApi && !loading}
+    <div class="rounded-2xl border border-[#b9e7cc] bg-[#e8f8ef] p-4" role="status">
+      <div class="flex items-start gap-3">
+        <span class="mt-0.5 text-base text-[#17663d]" aria-hidden="true">✓</span>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.1em] text-[#17663d]">Configuración persistente</p>
+          <p class="mt-1 text-xs leading-5 text-[#17663d]">
+            La configuración se lee y guarda a través de PostgreSQL. Los cambios aplican a los próximos casos y autorizaciones de cierre.
+          </p>
+        </div>
+      </div>
+    </div>
+  {:else if !useRealApi}
+    <div class="rounded-2xl border border-[#f1dfa2] bg-[#fff7d9] p-4" role="status">
+      <div class="flex items-start gap-3">
+        <span class="mt-0.5 text-base text-[#765d00]" aria-hidden="true">●</span>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.1em] text-[#765d00]">Configuración preparada</p>
+          <p class="mt-1 text-xs leading-5 text-[#765d00]">
+            Podés revisar y validar un borrador visual. La persistencia real se habilitará cuando exista el backend mutativo de Flow.
+          </p>
+        </div>
+      </div>
+    </div>
+  {/if}
 
   <div class="grid min-w-0 gap-6 xl:grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)]">
+    {#if useRealApi && loadError}
+      <section class="rounded-2xl border border-dashed border-[#d7e3e5] bg-white/70 p-8 text-center xl:col-span-2" role="alert" data-flow-config-error>
+        <p class="text-sm font-bold text-[#31536b]">{loadErrorCopy.title}</p>
+        <p class="mt-2 text-xs leading-5 text-[#78909f]">{loadErrorCopy.detail}</p>
+        <p class="mt-4 text-xs text-[#91a2ad]">La configuración de Flow no está disponible en este momento. No se muestran datos de demostración.</p>
+      </section>
+    {:else if loading}
+      <aside class="animate-pulse rounded-2xl border border-card-border bg-card-bg p-4" aria-label="Cargando configuración">
+        <div class="h-3 w-24 rounded bg-base-200"></div>
+        <div class="mt-4 space-y-2">
+          <div class="h-14 rounded-xl bg-base-200"></div>
+          <div class="h-14 rounded-xl bg-base-200"></div>
+        </div>
+      </aside>
+      <section class="min-w-0 space-y-6 animate-pulse" aria-label="Cargando configuración">
+        <div class="h-36 rounded-2xl border border-card-border bg-card-bg p-5">
+          <div class="h-4 w-40 rounded bg-base-200"></div>
+          <div class="mt-3 h-6 w-56 rounded bg-base-200"></div>
+        </div>
+        <div class="h-24 rounded-2xl bg-base-200"></div>
+        <div class="h-32 rounded-2xl bg-base-200"></div>
+      </section>
+    {:else}
     <FlowSectorSelector sectors={activeConfigurations} selectedId={selectedSectorId} onSelect={requestSectorChange} />
 
     <section class="min-w-0 space-y-6" aria-label="Editor de configuración" data-flow-config-editor>
@@ -213,7 +393,7 @@
                 <button
                   type="button"
                   class="inline-flex min-h-11 items-center justify-center rounded-full border border-[#168b88] bg-[#168b88] px-5 py-2.5 text-sm font-bold text-white transition hover:border-[#126d6b] hover:bg-[#126d6b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] disabled:cursor-not-allowed disabled:opacity-50"
-                  disabled={!persistenceEnabled || !isDirty || hasValidationErrors || saveState === "saving"}
+                  disabled={!canPersist || !isDirty || hasValidationErrors || saveState === "saving"}
                   aria-describedby="flow-save-help"
                   onclick={saveDraft}
                 >
@@ -225,7 +405,7 @@
 
           {#if isEditing}
             <p id="flow-save-help" class="mt-4 text-xs leading-5 text-[#78909f]">
-              {#if persistenceEnabled}
+              {#if canPersist}
                 Validá todos los destinatarios antes de preparar el guardado.
               {:else}
                 Guardar cambios estará disponible cuando el backend mutativo de Flow esté conectado.
@@ -257,6 +437,7 @@
         <FlowLevelEditor
           levels={selectedSector.levels}
           editing={isEditing}
+          disabled={saveState === "saving"}
           errors={selectedValidationErrors.levels}
           touched={touched}
           onDestinationInput={updateLevelDestination}
@@ -266,11 +447,14 @@
         <FlowClosureSupervisorEditor
           approvalLevel={selectedSector.closureApprovalLevel}
           destination={selectedSector.closureSupervisorDestination}
+          levels={selectedSector.levels.map((level) => ({ level: level.level, label: level.label }))}
           editing={isEditing}
+          disabled={saveState === "saving"}
           error={selectedValidationErrors.closure}
           touched={Boolean(touched[`closure:${selectedSector.sectorId}`])}
           onDestinationInput={updateClosureDestination}
           onDestinationBlur={() => markTouched(`closure:${selectedSector.sectorId}`)}
+          onApprovalLevelChange={updateClosureApprovalLevel}
         />
       {:else}
         <section class="rounded-2xl border border-dashed border-[#d7e3e5] bg-white/70 p-8 text-center">
@@ -279,5 +463,6 @@
         </section>
       {/if}
     </section>
+    {/if}
   </div>
 </div>

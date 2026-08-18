@@ -2,12 +2,17 @@ import { expect, test, type Page } from "@playwright/test";
 
 const CONFIG_URL = "/w/ws-team360-control/flow/configuracion";
 const FIXTURE_URL = "/demo/flow/configuracion-fixtures";
+const REAL_LIST_URL = "**/api/team360-flow/configuration";
 
 async function openConfiguration(page: Page, url = CONFIG_URL) {
   await page.goto(url);
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible().catch(async () => {
     await expect(page.getByRole("heading", { name: /Sectores y niveles/ })).toBeVisible();
   });
+}
+
+async function waitForRealConfig(page: Page) {
+  await expect(page.getByText("Configuración persistente", { exact: true }).first()).toBeVisible();
 }
 
 function trackErrors(page: Page, errors: string[]) {
@@ -23,11 +28,88 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(overflow, `overflow horizontal: ${overflow}`).toBeLessThanOrEqual(1);
 }
 
+test.describe("Flow Configuración — MVP sin login (datos reales)", () => {
+  test("sin token carga la configuración real de PostgreSQL", async ({ page }) => {
+    const errors: string[] = [];
+    trackErrors(page, errors);
+    const apiResponses: number[] = [];
+    page.on("response", (response) => {
+      if (response.url().includes("/api/team360-flow/configuration")) apiResponses.push(response.status());
+    });
+
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+
+    await expect(page.getByRole("heading", { name: "Sectores y niveles" })).toBeVisible();
+    await expect(page.getByRole("listbox", { name: "Seleccionar sector" }).getByRole("option", { name: /Alumbrado Público/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Niveles de atención" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Supervisor de cierre" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Editar configuración" })).toBeVisible();
+
+    expect(apiResponses.length).toBeGreaterThan(0);
+    expect(apiResponses.every((status) => status === 200), `statuses: ${apiResponses}`).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  test("refresh directo conserva la configuración real sin login", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+    await page.reload();
+    await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+    await waitForRealConfig(page);
+    await expect(page.getByText("alumbrado.n1@alquimiablue.com", { exact: true }).first()).toBeVisible();
+  });
+
+  test("sin token: editar, guardar, recargar persiste y restaurar original", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+
+    // ORIGINAL desde la vista real.
+    const original = "alumbrado.n1@alquimiablue.com";
+    const temporary = "mvp.temporal.n1@alquimiablue.com";
+
+    // Editar -> cambiar N1 -> Guardar.
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    const first = page.locator('#flow-destination-alumbrado-level-1');
+    await expect(first).toHaveValue(original);
+    await first.fill(temporary);
+    await expect(page.getByText("Cambios sin guardar", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect(page.getByText("Cambios guardados.", { exact: true })).toBeVisible();
+
+    // Reload: el valor persistido permanece (no fake persistence).
+    await page.reload();
+    await waitForRealConfig(page);
+    await expect(page.getByText(temporary, { exact: true }).first()).toBeVisible();
+
+    // Restaurar ORIGINAL por la UI.
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    await page.locator('#flow-destination-alumbrado-level-1').fill(original);
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect(page.getByText("Cambios guardados.", { exact: true })).toBeVisible();
+    await page.reload();
+    await waitForRealConfig(page);
+    await expect(page.getByText(original, { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(temporary, { exact: true })).toHaveCount(0);
+  });
+
+  test("error del backend no reemplaza por datos demo", async ({ page }) => {
+    await page.route(REAL_LIST_URL, (route) =>
+      route.fulfill({ status: 500, contentType: "application/json", body: "{}" }),
+    );
+    await openConfiguration(page);
+    await expect(page.getByText("No se pudo cargar", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Configuración preparada", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("alumbrado.n1@alquimiablue.com", { exact: true })).toHaveCount(0);
+  });
+});
+
 test.describe("Flow Configuración — vista y navegación", () => {
   test("muestra sector, circuito operativo y supervisor separado", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);
     await openConfiguration(page);
+    await waitForRealConfig(page);
 
     await expect(page.getByRole("heading", { name: "Sectores y niveles" })).toBeVisible();
     await expect(page.getByRole("listbox", { name: "Seleccionar sector" }).getByRole("option", { name: /Alumbrado Público/ })).toBeVisible();
@@ -35,7 +117,7 @@ test.describe("Flow Configuración — vista y navegación", () => {
     await expect(page.getByRole("heading", { name: "Supervisor de cierre" })).toBeVisible();
     await expect(page.getByText("Autoriza la resolución final del caso.")).toBeVisible();
     await expect(page.getByText("no un nivel adicional de escalamiento.")).toBeVisible();
-    await expect(page.getByText("Modo demo · solo lectura")).toBeVisible();
+    await expect(page.getByText("Configuración persistente", { exact: true }).first()).toBeVisible();
     await expect(page.getByRole("button", { name: "Editar configuración" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Guardar cambios" })).toHaveCount(0);
     expect(errors).toEqual([]);
@@ -43,6 +125,7 @@ test.describe("Flow Configuración — vista y navegación", () => {
 
   test("preserva la navegación Flow y no agrega controles a otros módulos", async ({ page }) => {
     await openConfiguration(page);
+    await waitForRealConfig(page);
     const nav = page.getByRole("navigation", { name: "Navegación de consola" });
     await expect(nav.locator('a[href*="/flow/configuracion"]')).toBeVisible();
     await nav.getByRole("link", { name: "Directorio" }).click();
@@ -54,6 +137,7 @@ test.describe("Flow Configuración — vista y navegación", () => {
 test.describe("Flow Configuración — draft y validación", () => {
   test("Editar sin cambios mantiene Guardar deshabilitado", async ({ page }) => {
     await openConfiguration(page);
+    await waitForRealConfig(page);
     await page.getByRole("button", { name: "Editar configuración" }).click();
 
     await expect(page.getByText("Sin cambios", { exact: true })).toBeVisible();
@@ -64,6 +148,7 @@ test.describe("Flow Configuración — draft y validación", () => {
 
   test("cambio válido activa dirty y un email inválido queda asociado al campo", async ({ page }) => {
     await openConfiguration(page);
+    await waitForRealConfig(page);
     await page.getByRole("button", { name: "Editar configuración" }).click();
 
     const first = page.locator('#flow-destination-alumbrado-level-1');
@@ -83,6 +168,7 @@ test.describe("Flow Configuración — draft y validación", () => {
 
   test("vacío y formato sin dominio muestran mensajes de producto", async ({ page }) => {
     await openConfiguration(page);
+    await waitForRealConfig(page);
     await page.getByRole("button", { name: "Editar configuración" }).click();
     const first = page.locator('#flow-destination-alumbrado-level-1');
 
@@ -96,9 +182,11 @@ test.describe("Flow Configuración — draft y validación", () => {
 
   test("Cancelar descarta el draft y restaura la configuración guardada", async ({ page }) => {
     await openConfiguration(page);
-    const original = "alumbrado.n1@alquimiablue.com";
+    await waitForRealConfig(page);
     await page.getByRole("button", { name: "Editar configuración" }).click();
-    await page.locator('#flow-destination-alumbrado-level-1').fill("cambio.temporal@alquimiablue.com");
+    const first = page.locator('#flow-destination-alumbrado-level-1');
+    const original = await first.inputValue();
+    await first.fill("cambio.temporal@alquimiablue.com");
     await expect(page.getByText("Cambios sin guardar", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Cancelar" }).click();
 
@@ -111,6 +199,7 @@ test.describe("Flow Configuración — draft y validación", () => {
   test("focus visible y teclado llegan al campo y a las acciones", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openConfiguration(page);
+    await waitForRealConfig(page);
     await page.getByRole("button", { name: "Editar configuración" }).focus();
     await expect(page.getByRole("button", { name: "Editar configuración" })).toBeFocused();
     await page.keyboard.press("Enter");
@@ -122,7 +211,7 @@ test.describe("Flow Configuración — draft y validación", () => {
   });
 });
 
-test.describe("Flow Configuración — callbacks y niveles dinámicos", () => {
+test.describe("Flow Configuración — callbacks y niveles dinámicos (fixture)", () => {
   test("representa 1, 3 y 5 niveles sin selectores rígidos", async ({ page }) => {
     await page.goto(FIXTURE_URL);
     await expect(page.getByText("Prueba interna de validación UX")).toBeVisible();
@@ -185,6 +274,113 @@ test.describe("Flow Configuración — callbacks y niveles dinámicos", () => {
   });
 });
 
+test.describe("Flow Configuración — supervisor de cierre (nivel que aprueba)", () => {
+  test("cambiar el nivel de aprobación persiste y reaparece tras reload", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+
+    // Estado inicial real: N2 aprueba (vista de solo lectura).
+    await expect(page.getByText("Autoridad N2", { exact: true })).toBeVisible();
+
+    // Editar -> aprobar desde N3 -> el destino del supervisor sigue a N3.
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    await expect(page.getByRole("radio", { name: "Nivel 2 aprueba el cierre" })).toHaveAttribute("aria-checked", "true");
+    await page.getByRole("radio", { name: "Nivel 3 aprueba el cierre" }).click();
+    await expect(page.getByRole("radio", { name: "Nivel 3 aprueba el cierre" })).toHaveAttribute("aria-checked", "true");
+    await expect(page.getByRole("radio", { name: "Nivel 2 aprueba el cierre" })).toHaveAttribute("aria-checked", "false");
+    await expect(page.locator("#flow-closure-supervisor")).toHaveValue("alumbrado.n3@alquimiablue.com");
+    await expect(page.getByText("Cambios sin guardar", { exact: true })).toBeVisible();
+
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect(page.getByText("Cambios guardados.", { exact: true })).toBeVisible();
+
+    await page.reload();
+    await waitForRealConfig(page);
+    await expect(page.getByText("Autoridad N3", { exact: true })).toBeVisible();
+
+    // Restaurar el ORIGINAL (N2) por la UI.
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    await page.getByRole("radio", { name: "Nivel 2 aprueba el cierre" }).click();
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect(page.getByText("Cambios guardados.", { exact: true })).toBeVisible();
+    await page.reload();
+    await waitForRealConfig(page);
+    await expect(page.getByText("Autoridad N2", { exact: true })).toBeVisible();
+  });
+
+  test("cambiar el email de N2 actualiza el destino del supervisor", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    await page.locator("#flow-destination-alumbrado-level-2").fill("supervisor.temporal.n2@alquimiablue.com");
+    await expect(page.locator("#flow-closure-supervisor")).toHaveValue("supervisor.temporal.n2@alquimiablue.com");
+
+    await page.getByRole("button", { name: "Cancelar" }).click();
+    await expect(page.getByText("Los cambios se descartaron. La configuración guardada no fue modificada.")).toBeVisible();
+  });
+});
+
+test.describe("Flow Configuración — fallos de guardado (backend)", () => {
+  test("PATCH 403: no muestra Guardado, conserva el draft y permite reintentar", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    await page.locator("#flow-destination-alumbrado-level-1").fill("fallo403.n1@alquimiablue.com");
+
+    await page.route("**/api/team360-flow/configuration/alumbrado", (route) =>
+      route.request().method() === "PATCH"
+        ? route.fulfill({ status: 403, contentType: "application/json", body: JSON.stringify({ detail: "Forbidden" }) })
+        : route.continue(),
+    );
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+
+    await expect(page.getByText("Tu rol no tiene permiso para modificar la configuración de Flow.")).toBeVisible();
+    await expect(page.getByText("Cambios guardados.", { exact: true })).toHaveCount(0);
+    // El draft se conserva para reintento.
+    await expect(page.locator("#flow-destination-alumbrado-level-1")).toHaveValue("fallo403.n1@alquimiablue.com");
+    await expect(page.getByRole("button", { name: "Cancelar" })).toBeVisible();
+  });
+
+  test("PATCH 422: el backend rechaza y el draft queda intacto", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    await page.locator("#flow-destination-alumbrado-level-1").fill("fallo422.n1@alquimiablue.com");
+
+    await page.route("**/api/team360-flow/configuration/alumbrado", (route) =>
+      route.request().method() === "PATCH"
+        ? route.fulfill({ status: 422, contentType: "application/json", body: JSON.stringify({ detail: "destination no es un email válido" }) })
+        : route.continue(),
+    );
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+
+    await expect(page.getByText("El backend rechazó los cambios. Revisá los destinatarios e intentá nuevamente.")).toBeVisible();
+    await expect(page.locator("#flow-destination-alumbrado-level-1")).toHaveValue("fallo422.n1@alquimiablue.com");
+  });
+
+  test("PATCH 500: error de servicio sin estado Guardado y con reintento posible", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    await page.locator("#flow-destination-alumbrado-level-1").fill("fallo500.n1@alquimiablue.com");
+
+    await page.route("**/api/team360-flow/configuration/alumbrado", (route) =>
+      route.request().method() === "PATCH"
+        ? route.fulfill({ status: 500, contentType: "application/json", body: "{}" })
+        : route.continue(),
+    );
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+
+    await expect(page.getByText("No se pudieron guardar los cambios. Intentá nuevamente en unos instantes.")).toBeVisible();
+    await expect(page.getByText("Cambios guardados.", { exact: true })).toHaveCount(0);
+    await expect(page.locator("#flow-destination-alumbrado-level-1")).toHaveValue("fallo500.n1@alquimiablue.com");
+  });
+});
+
 test.describe("Flow Configuración — responsive y consola", () => {
   for (const [name, width, height] of [["390", 390, 844], ["768", 768, 1024], ["1024", 1024, 768], ["1280", 1280, 900]] as const) {
     test(`view y edit sin overflow en ${name}px`, async ({ page }) => {
@@ -192,6 +388,7 @@ test.describe("Flow Configuración — responsive y consola", () => {
       trackErrors(page, errors);
       await page.setViewportSize({ width, height });
       await openConfiguration(page);
+      await waitForRealConfig(page);
       await expectNoHorizontalOverflow(page);
       await page.getByRole("button", { name: "Editar configuración" }).click();
       await expect(page.locator('[data-flow-config-editor] input')).toHaveCount(4);
@@ -199,6 +396,7 @@ test.describe("Flow Configuración — responsive y consola", () => {
       await page.locator('#flow-destination-alumbrado-level-1').fill("direccion.muy.larga.para.validar.el.layout@alquimiablue.com");
       await page.locator('#flow-destination-alumbrado-level-1').blur();
       await expectNoHorizontalOverflow(page);
+      await page.getByRole("button", { name: "Cancelar" }).click();
       expect(errors).toEqual([]);
     });
   }

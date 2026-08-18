@@ -181,6 +181,7 @@ def test_real_route_director_e2e(monkeypatch):
 
     user_a, user_b, role_id = asyncio.run(setup())
     monkeypatch.setenv("AUTOMATION_DIAGNOSIS_REPOSITORY", "postgres")
+    monkeypatch.setenv("TEAM360_FLOW_ACCESS_MODE", "authenticated")
     monkeypatch.setattr(
         "modules.flow.routes._resolve_public_keys",
         lambda s: {_KEY_ID: _KEY_PAIR.public_pem},

@@ -13,6 +13,13 @@ _KEY_ID = "route-test-key"
 _KEY_PAIR = PasetoKeyPair.generate(_KEY_ID)
 
 
+@pytest.fixture(autouse=True)
+def _authenticated_flow_mode(monkeypatch):
+    # These tests verify the authenticated guard that default_admin mode will
+    # use again in the future. default_admin behavior is covered separately.
+    monkeypatch.setenv("TEAM360_FLOW_ACCESS_MODE", "authenticated")
+
+
 def _client():
     return TestClient(create_app())
 

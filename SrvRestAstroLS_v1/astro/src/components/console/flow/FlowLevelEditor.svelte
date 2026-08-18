@@ -4,6 +4,7 @@
   let {
     levels,
     editing = false,
+    disabled = false,
     errors = {},
     touched = {},
     onDestinationInput = () => undefined,
@@ -11,6 +12,7 @@
   }: {
     levels: FlowConfigurationLevel[];
     editing?: boolean;
+    disabled?: boolean;
     errors?: Record<string, string | null>;
     touched?: Record<string, boolean>;
     onDestinationInput?: (levelId: string, value: string) => void;
@@ -57,11 +59,12 @@
                     name={`destination-${level.id}`}
                     type="email"
                     value={level.destination}
+                    disabled={disabled}
                     aria-invalid={Boolean(error && touched[level.id])}
                     aria-describedby={error && touched[level.id] ? `flow-error-${level.id}` : undefined}
                     oninput={(event) => onDestinationInput(level.id, event.currentTarget.value)}
                     onblur={() => onDestinationBlur(level.id)}
-                    class="w-full min-w-0 rounded-xl border border-[#d5e0e2] bg-white px-3.5 py-3 text-sm text-[#31536b] outline-none transition placeholder:text-[#91a2ad] focus-visible:border-[#168b88] focus-visible:ring-2 focus-visible:ring-[#168b88]/20 aria-[invalid=true]:border-[#b54a3d] aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-[#b54a3d]/15"
+                    class="w-full min-w-0 rounded-xl border border-[#d5e0e2] bg-white px-3.5 py-3 text-sm text-[#31536b] outline-none transition placeholder:text-[#91a2ad] disabled:opacity-60 focus-visible:border-[#168b88] focus-visible:ring-2 focus-visible:ring-[#168b88]/20 aria-[invalid=true]:border-[#b54a3d] aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-[#b54a3d]/15"
                   />
                   {#if error && touched[level.id]}
                     <span id={`flow-error-${level.id}`} class="mt-1.5 block text-xs font-semibold text-[#9b3328]">{error}</span>

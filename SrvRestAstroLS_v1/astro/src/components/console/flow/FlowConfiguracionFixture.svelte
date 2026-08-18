@@ -76,6 +76,6 @@
       </div>
     </div>
 
-    <FlowConfiguracion configurations={configurations} persistenceEnabled={true} onSave={simulateSave} />
+    <FlowConfiguracion configurations={configurations} apiEnabled={false} persistenceEnabled={true} onSave={simulateSave} />
   </div>
 </div>
