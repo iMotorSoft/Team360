@@ -117,6 +117,10 @@ def test_lamuni_demo_full_scenario_end_to_end():
             assert report.directorio_status_fact == "closed"
             assert report.configuration.get("sector_id") == "alumbrado"
             assert report.configuration.get("closure_approval_level") == 2
+            assert report.citizen_received == 1
+            assert report.citizen_in_progress == 1
+            assert report.citizen_resolved == 1
+            assert report.citizen_internal_leak == "NONE"
         finally:
             await cleanup_demo_cases(pool)
             await close_pool(pool)

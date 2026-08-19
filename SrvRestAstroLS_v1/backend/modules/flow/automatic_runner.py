@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Callable
+from typing import Awaitable, Callable
 
 from psycopg_pool import AsyncConnectionPool
 
@@ -78,6 +78,7 @@ class FlowAutomaticRunner:
         routing_repository: FlowRoutingPostgresRepository,
         sender: RoutingMessageSenderPort | None,
         clock: Callable[[], datetime] | None = None,
+        citizen_notifier: Callable[[str], Awaitable[object]] | None = None,
     ) -> None:
         self._pool = pool
         self._sla_service = FlowFirstResponseSLAService(
@@ -89,12 +90,20 @@ class FlowAutomaticRunner:
             routing_repository=routing_repository,
             sender=sender,
         )
+        self._citizen_notifier = citizen_notifier
 
     async def run_once(self, *, confirm_send: bool = False) -> RunnerSummary:
         sla = await self._sla_service.check_once()
         escalation = await self._escalation_service.escalate_once(
             confirm_send=confirm_send
         )
+        if self._citizen_notifier is not None:
+            # Escalation is a real continuation of the treatment: the citizen
+            # receives a single generic IN_PROGRESS signal (idempotent at the
+            # notification service level), never the internal reason.
+            for outcome in escalation.outcomes:
+                if outcome.status == "COMPLETED" and outcome.request_id:
+                    await self._citizen_notifier(outcome.request_id)
         skipped = max(0, escalation.eligible - escalation.completed - escalation.failed)
         return RunnerSummary(
             scanned=sla.checked,

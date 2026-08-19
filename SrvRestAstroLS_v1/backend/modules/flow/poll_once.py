@@ -12,6 +12,10 @@ from modules.messaging.providers.gmail import GmailClient
 
 from .approval_ai import LiteLLMApprovalInterpreter
 from .audit_repository import FlowAuditRepository
+from .citizen_notifications import (
+    CitizenNotificationPostgresRepository,
+    FlowCitizenNotificationService,
+)
 from .closure_repository import FlowClosurePostgresRepository
 from .closure_service import FlowClosureService
 from .domain import is_automated_message
@@ -54,12 +58,22 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
     approval_duplicates = 0
     resolved = 0
     rejected = 0
+    citizen_received = 0
+    citizen_in_progress = 0
+    citizen_resolved = 0
+    citizen_skipped = 0
+    citizen_failed = 0
     try:
         service = FlowIntakeService(
             pool=pool,
             repository=FlowPostgresRepository(),
             interpreter=LiteLLMFlowIntakeInterpreter(),
             reply_sender=gmail,
+        )
+        citizen_service = FlowCitizenNotificationService(
+            pool=pool,
+            repository=CitizenNotificationPostgresRepository(),
+            sender=gmail,
         )
         closure_service = FlowClosureService(
             pool=pool,
@@ -98,6 +112,22 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
                     if operational.proposal is not None:
                         proposals += 1
                         approvals_sent += int(operational.proposal.sent)
+                    if operational.action in {
+                        "ACK_OR_PROGRESS",
+                        "RESOLUTION_PROPOSED",
+                    } and operational.request_id:
+                        citizen = await citizen_service.notify_in_progress(
+                            operational.request_id
+                        )
+                        if citizen.outcome in ("SENT", "SENT_RECONCILED"):
+                            citizen_in_progress += 1
+                        elif citizen.outcome in (
+                            "DELIVERY_FAILED",
+                            "DELIVERY_UNCERTAIN",
+                        ):
+                            citizen_failed += 1
+                        else:
+                            citizen_skipped += 1
                     print(
                         "flow operational reply processed "
                         f"message_id={message.external_message_id} "
@@ -128,6 +158,23 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
                         approval.decision is not None
                         and approval.decision.value == "REJECT"
                     )
+                    if (
+                        approval.decision is not None
+                        and approval.decision.value == "APPROVE"
+                        and approval.request_id
+                    ):
+                        citizen = await citizen_service.notify_resolved(
+                            approval.request_id
+                        )
+                        if citizen.outcome in ("SENT", "SENT_RECONCILED"):
+                            citizen_resolved += 1
+                        elif citizen.outcome in (
+                            "DELIVERY_FAILED",
+                            "DELIVERY_UNCERTAIN",
+                        ):
+                            citizen_failed += 1
+                        else:
+                            citizen_skipped += 1
                     print(
                         "flow approval reply processed "
                         f"message_id={message.external_message_id} "
@@ -147,6 +194,21 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
                 processed += 1
                 confirmations += int(result.outbound_message_id is not None)
                 confirmed_requests += result.confirmed_count
+                if result.confirmed_count and result.conversation_id:
+                    for citizen in (
+                        await citizen_service.notify_received_for_conversation(
+                            result.conversation_id
+                        )
+                    ):
+                        if citizen.outcome in ("SENT", "SENT_RECONCILED"):
+                            citizen_received += 1
+                        elif citizen.outcome in (
+                            "DELIVERY_FAILED",
+                            "DELIVERY_UNCERTAIN",
+                        ):
+                            citizen_failed += 1
+                        else:
+                            citizen_skipped += 1
                 print(
                     "flow message processed "
                     f"message_id={message.external_message_id} "
@@ -173,6 +235,11 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
             "approval_duplicates": approval_duplicates,
             "resolved": resolved,
             "rejected": rejected,
+            "citizen_received": citizen_received,
+            "citizen_in_progress": citizen_in_progress,
+            "citizen_resolved": citizen_resolved,
+            "citizen_skipped": citizen_skipped,
+            "citizen_failed": citizen_failed,
         }
     finally:
         await close_pool(pool)

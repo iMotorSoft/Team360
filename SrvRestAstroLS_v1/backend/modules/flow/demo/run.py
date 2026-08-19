@@ -39,6 +39,10 @@ from modules.messaging.domain import InboundMessage
 
 from ..audit_repository import FlowAuditRepository
 from ..automatic_runner import FlowAutomaticRunner
+from ..citizen_notifications import (
+    CitizenNotificationPostgresRepository,
+    FlowCitizenNotificationService,
+)
 from ..closure_repository import FlowClosurePostgresRepository
 from ..closure_service import FlowClosureService
 from ..configuration_service import FlowConfigurationService
@@ -97,6 +101,10 @@ class DemoReport:
     directorio_data_source: str
     directorio_status_fact: str
     configuration: dict = field(default_factory=dict)
+    citizen_received: int = 0
+    citizen_in_progress: int = 0
+    citizen_resolved: int = 0
+    citizen_internal_leak: str = "NONE"
 
     def summary_lines(self) -> list[str]:
         return [
@@ -114,6 +122,13 @@ class DemoReport:
             "STEP 11 AUDIT PASS",
             "STEP 12 EXECUTIVE_QUERY PASS",
             "STEP 13 DIRECTORIO PASS",
+            "STEP 14 CITIZEN_RECEIVED PASS" if self.citizen_received else "STEP 14 CITIZEN_RECEIVED FAIL",
+            "STEP 15 CITIZEN_IN_PROGRESS PASS" if self.citizen_in_progress else "STEP 15 CITIZEN_IN_PROGRESS FAIL",
+            "STEP 16 CITIZEN_RESOLVED PASS" if self.citizen_resolved else "STEP 16 CITIZEN_RESOLVED FAIL",
+            f"CITIZEN_RECEIVED={self.citizen_received}",
+            f"CITIZEN_IN_PROGRESS={self.citizen_in_progress}",
+            f"CITIZEN_RESOLVED={self.citizen_resolved}",
+            f"CITIZEN_INTERNAL_DATA_LEAK={self.citizen_internal_leak}",
             f"DEMO_ID={self.marker}",
             f"REQUEST_ID={self.request_id}",
             f"SECTOR={self.sector_id}",
@@ -199,6 +214,11 @@ async def run_demo(pool, settings, marker_prefix: str = "LAMUNI-DEMO") -> DemoRe
         interpreter=DemoApprovalInterpreter(),
         sender=routing_sender,
     )
+    citizen_service = FlowCitizenNotificationService(
+        pool=pool,
+        repository=CitizenNotificationPostgresRepository(),
+        sender=routing_sender,
+    )
     operational_service = FlowOperationalReplyService(
         pool=pool,
         repository=FlowOperationalPostgresRepository(),
@@ -250,6 +270,12 @@ async def run_demo(pool, settings, marker_prefix: str = "LAMUNI-DEMO") -> DemoRe
     request_id = request_row["request_id"]
     conversation_id = request_row["conversation_id"]
 
+    # 2b. RECEIVED citizen notification: only after the request was really
+    # created (CONFIRMED). The send is idempotent and never leaks internals.
+    received_result = await citizen_service.notify_received(request_id)
+    if received_result.outcome not in ("SENT", "SENT_RECONCILED"):
+        raise RuntimeError("DEMO_CITIZEN_RECEIVED_FAILURE")
+
     # 3. Routing N1 (real send through the deterministic routing sender).
     routing_service = FlowRoutingService(
         pool=pool,
@@ -289,6 +315,7 @@ async def run_demo(pool, settings, marker_prefix: str = "LAMUNI-DEMO") -> DemoRe
         routing_repository=FlowRoutingPostgresRepository(),
         sender=routing_sender,
         clock=lambda: future,
+        citizen_notifier=citizen_service.notify_in_progress,
     )
     summary = await runner.run_once(confirm_send=True)
     if summary.breached < 1 or summary.completed < 1:
@@ -382,6 +409,12 @@ async def run_demo(pool, settings, marker_prefix: str = "LAMUNI-DEMO") -> DemoRe
     if approval_result.decision != ApprovalDecision.APPROVE:
         raise RuntimeError("DEMO_APPROVAL_FAILURE")
 
+    # 6b. RESOLVED citizen notification: only after the closure was really
+    # APPROVED and the request reached RESOLVED (terminal).
+    resolved_result = await citizen_service.notify_resolved(request_id)
+    if resolved_result.outcome not in ("SENT", "SENT_RECONCILED"):
+        raise RuntimeError("DEMO_CITIZEN_RESOLVED_FAILURE")
+
     # 7. Audit + executive verification.
     executive = FlowExecutiveAuditService(
         pool=pool,
@@ -414,6 +447,36 @@ async def run_demo(pool, settings, marker_prefix: str = "LAMUNI-DEMO") -> DemoRe
         "alumbrado"
     )
 
+    citizen_traces = await citizen_service.trace(request_id)
+    citizen_received = sum(
+        1
+        for t in citizen_traces
+        if t["notification_type"] == "CITIZEN_RECEIVED" and t["status"] == "SENT"
+    )
+    citizen_in_progress = sum(
+        1
+        for t in citizen_traces
+        if t["notification_type"] == "CITIZEN_IN_PROGRESS"
+        and t["status"] == "SENT"
+    )
+    citizen_resolved = sum(
+        1
+        for t in citizen_traces
+        if t["notification_type"] == "CITIZEN_RESOLVED" and t["status"] == "SENT"
+    )
+    citizen_text = " ".join(f"{t['subject']} {t['body']}" for t in citizen_traces)
+    internal_markers = [
+        "BREACHED",
+        n1_destination,
+        n2_destination,
+        "supervisor",
+        "CIERRE",
+        approval_token,
+        audit_id or "",
+    ]
+    leaked = [marker for marker in internal_markers if marker and marker in citizen_text]
+    citizen_internal_leak = ",".join(leaked) if leaked else "NONE"
+
     report = DemoReport(
         marker=marker,
         request_id=request_id,
@@ -443,6 +506,10 @@ async def run_demo(pool, settings, marker_prefix: str = "LAMUNI-DEMO") -> DemoRe
         directorio_data_source=item["data_source"],
         directorio_status_fact=item["status_fact"],
         configuration=configuration or {},
+        citizen_received=citizen_received,
+        citizen_in_progress=citizen_in_progress,
+        citizen_resolved=citizen_resolved,
+        citizen_internal_leak=citizen_internal_leak,
     )
     return report
 
@@ -587,6 +654,16 @@ async def cleanup_demo_cases(pool) -> int:
                 await cur.execute(
                     """
                     delete from flow_request_routings
+                    where request_id in (
+                        select fr.id from flow_requests fr
+                        join flow_conversations fc on fc.id = fr.conversation_id
+                        where fc.external_thread_id like 'lamuni-demo-%'
+                    )
+                    """
+                )
+                await cur.execute(
+                    """
+                    delete from flow_citizen_notifications
                     where request_id in (
                         select fr.id from flow_requests fr
                         join flow_conversations fc on fc.id = fr.conversation_id

@@ -11,6 +11,10 @@ from modules.db.settings import get_database_settings
 from modules.messaging.providers.gmail import GmailClient
 
 from .automatic_runner import FlowAutomaticRunner
+from .citizen_notifications import (
+    CitizenNotificationPostgresRepository,
+    FlowCitizenNotificationService,
+)
 from .escalation_repository import FlowEscalationPostgresRepository
 from .poll_once import poll_once
 from .routing_repository import FlowRoutingPostgresRepository
@@ -54,12 +58,19 @@ async def run_automatic_once(
     pool = create_pool(get_database_settings(min_size=1, max_size=3))
     await open_pool(pool)
     try:
+        gmail = GmailClient(account) if confirm_send else None
+        citizen_service = FlowCitizenNotificationService(
+            pool=pool,
+            repository=CitizenNotificationPostgresRepository(),
+            sender=gmail,
+        )
         summary = await FlowAutomaticRunner(
             pool=pool,
             sla_repository=FlowSLARepository(),
             escalation_repository=FlowEscalationPostgresRepository(),
             routing_repository=FlowRoutingPostgresRepository(),
-            sender=GmailClient(account) if confirm_send else None,
+            sender=gmail,
+            citizen_notifier=citizen_service.notify_in_progress,
         ).run_once(confirm_send=confirm_send)
         result: dict[str, object] = summary.as_dict()
         result["inbox_processed"] = inbox_processed
