@@ -62,6 +62,13 @@ STEP 10 APPROVAL_PASS
 STEP 11 AUDIT PASS
 STEP 12 EXECUTIVE_QUERY PASS
 STEP 13 DIRECTORIO PASS
+STEP 14 CITIZEN_RECEIVED PASS
+STEP 15 CITIZEN_IN_PROGRESS PASS
+STEP 16 CITIZEN_RESOLVED PASS
+CITIZEN_RECEIVED=1
+CITIZEN_IN_PROGRESS=1
+CITIZEN_RESOLVED=1
+CITIZEN_INTERNAL_DATA_LEAK=NONE
 ```
 
 Para la primera validación práctica se recomienda ejecutar el mismo comando
@@ -117,15 +124,35 @@ uv run python -m modules.flow.demo.run --status <REQUEST_ID>
 entra un reclamo
 -> Flow lo clasifica (alumbrado)
 -> confirma con el vecino
+-> notifica al vecino: "Recibimos su solicitud"
 -> lo asigna a N1
 -> controla el SLA de primera respuesta
 -> escala automáticamente a N2 al vencer
+-> notifica al vecino: "Su solicitud continúa en gestión"
 -> registra la respuesta técnica del N2
 -> propone resolución
 -> el supervisor aprueba
 -> cierra con auditoría inmutable
+-> notifica al vecino: "Su solicitud fue atendida y quedó finalizada"
 -> la Dirección ve exactamente qué ocurrió
 ```
+
+### Comunicación con el vecino
+
+Durante el tratamiento de la solicitud, Flow mantiene informado al vecino sin
+exponer el funcionamiento interno de LaMuni.
+
+El vecino recibe comunicaciones simples en los momentos relevantes del caso:
+
+- **Recepción**: "Recibimos su solicitud N.º <referencia>."
+- **En tratamiento**: "Su solicitud continúa en gestión."
+- **Resolución**: "Su solicitud fue atendida y quedó finalizada."
+
+La información interna de gestión —responsables, niveles, escalaciones, tiempos
+de SLA, supervisión y auditoría— permanece reservada para LaMuni.
+
+Para el vecino, el circuito se mantiene simple: sabe que su solicitud fue
+recibida, que está siendo tratada y cuándo quedó definitivamente resuelta.
 
 ## 7. Configuración (para mostrar sin editar)
 

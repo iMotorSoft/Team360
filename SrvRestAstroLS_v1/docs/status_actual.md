@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-16 (rol Directorio / autorizacion minima para consulta ejecutiva Flow)
+Ultima actualizacion: 2026-08-19 (Flow comunicacion ciudadana MVP validada)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -74,6 +74,76 @@ RBAC existente. `model_eval/**` no fue tocado.
 Sin RBAC general, multi-tenant, roles por sector/municipio, gestión gráfica de
 permisos, frontend Directorio, dashboard, PDF, Excel, WhatsApp, N4, reopen,
 delegación ni citizen permissions.
+
+## Gate 2026-08-19 — Flow comunicación ciudadana mínima y segura V1
+
+Estado: PASS (`TEAM360_FLOW_CITIZEN_COMMUNICATION_V1_PASS`). Capa mínima de
+comunicación con el vecino durante el ciclo de vida del caso, sin exponer
+información operacional interna de LaMuni.
+
+### Alcance ciudadano validado
+
+El vecino recibe comunicaciones simples en los momentos relevantes del caso:
+
+- **Recepción**: "Recibimos su solicitud N.º <referencia>."
+- **En tratamiento**: "Su solicitud continúa en gestión."
+- **Resolución**: "Su solicitud fue atendida y quedó finalizada."
+
+La información interna de gestión —responsables, niveles, escalaciones, tiempos
+de SLA, supervisión y auditoría— permanece reservada para LaMuni.
+
+### Fuera de alcance del MVP actual
+
+- Solicitud automática de información adicional al vecino (INFO_REQUIRED).
+- Conversación ciudadana bidireccional avanzada.
+- Portal ciudadano.
+- WhatsApp outbound.
+- Consulta ciudadana de estado.
+- Carga de documentación por parte del vecino.
+- Chatbot ciudadano.
+
+En futuras etapas podrán incorporarse interacciones adicionales con el vecino.
+
+### Arquitectura
+
+- Migration 022: tabla `flow_citizen_notifications` con dedupe por
+  `(request_id, notification_type)`, trazabilidad de delivery, reconciliación
+  RFC y estados `PENDING`/`SENT`/`DELIVERY_UNCERTAIN`/`DELIVERY_FAILED`.
+- Domain: proyección pública `CitizenCaseProjection` construida por allowlist
+  (nunca por serialización con remoción de claves), templates determinísticos
+  en español, sanitización de texto público.
+- Service: entrega idempotente con dedupe key determinístico, clasificación de
+  fallo, retry mediante reconciliación RFC sin envíos duplicados.
+- Integración: `poll_once` dispara RECEIVED tras confirmación, IN_PROGRESS en
+  primera actuación operacional o escalamiento, RESOLVED solo después de
+  APPROVE + request RESOLVED.
+- `automatic_runner` dispara IN_PROGRESS en escalamiento completado.
+- Demo harness verifica pasos ciudadanos + ausencia de filtración interna.
+
+### Seguridad y aislamiento de roles
+
+- Ciudadano ≠ Operacional ≠ Aprobador.
+- Respuesta ciudadana con texto "APROBADO" no crea approval.
+- Respuesta ciudadana con texto "RESUELTO" no crea resolution.
+- Respuesta ciudadana con texto operacional no se interpreta como respuesta
+  técnica.
+- Thread ciudadano ≠ thread operacional ≠ thread de aprobación.
+
+### Evidencia
+
+- 57 tests ciudadanos (unit, contrato, PostgreSQL real, role isolation, reply
+  handling, migration contract, LaMuni E2E): PASS.
+- Backend regresión: 1574 PASS, 47 skipped, 0 failed.
+- Frontend `pnpm check`: 0 errors, 0 warnings.
+- Frontend `pnpm build`: Complete (161 pages).
+- LaMuni demo E2E: RECEIVED/IN_PROGRESS/RESOLVED validados, zero internal leak.
+
+### Fuera de alcance confirmado
+
+Sin WhatsApp, portal ciudadano, solicitud automática de información adicional,
+conversación bidireccional avanzada, SMS, push notifications, preference
+center, subscriptions, marketing email, i18n nuevo, LLM para texto público,
+model change, LiteLLM change.
 
 
 
@@ -2750,6 +2820,124 @@ La integración confirmó que HTTP `200` y MIME correcto no bastan para módulos
   - sin `[VeraLoader] Failed to load`
 - Snippet no cambió.
 - Pendiente cliente: corregir fuente `.ttf` servida por `http`/mixed content.
+
+## Telchi / DataScience — baseline SQL HANA2 pausada para continuidad
+
+Fecha de corte: `2026-08-17`.
+
+### Estado y alcance
+
+- Workspace operativo: `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi`.
+- Rama Team360: `feature/console-backend-core`.
+- HEAD observado: `d476cee562798c0017db6cd623ece87cde8306be`.
+- El worktree Team360 ya tenía cambios pendientes del gate Flow anterior; no se revirtieron ni se mezclaron con este trabajo.
+- Este frente permanece separado del producto: no crear todavía `backend/modules/telchi`.
+- Política: `LEGACY_READ_ONLY`; no modificar scripts legacy, SAP, Parquet ni notebooks.
+
+### Infraestructura confirmada
+
+- VPN strongSwan: `active` y debe permanecer levantada.
+- HANA `192.168.20.20:30015`: TCP `PASS`, autenticación `PASS`.
+- Schema: `TELCHI`.
+- Driver: `hdbcli 2.29.25`.
+- HANA: `2.00.056.00.1624618329`.
+
+### Baseline previa
+
+- Reporte: `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/validation/legacy_sync/sync_validation.yaml`.
+- Estado: `TEAM360_TELCHI_LEGACY_SYNC_BASELINE_PARTIAL`.
+- Harness read-only: `validation/legacy_sync/legacy_sync_baseline.py`.
+- Se validó HANA para Sales, Credit Notes, Inventory Movements, Products, Customers, Warehouses, Payments, Reconciliation y Sales Targets.
+- `SALES_TARGETS` permanece `BLOCKED_EXTERNAL_DATA` porque `@OBJ_VENTAS_L` está vacío.
+- Parquet fue leído únicamente con `pyarrow 25.0.1`; no se reescribió ningún archivo.
+- La comparación mensual detectó drift histórico contra HANA actual: sales `-90` filas, NC `-1`, movements `+4225` en Parquet, payments `-9` y reconciliation `-3715`. Esto no debe interpretarse automáticamente como bug de transformación.
+
+### Código HANA2 legacy identificado
+
+- `/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/SrvRest/srvSyncTelchiSB101.py`: Sales, Credit Notes, Movements, Products, Customers y Warehouses.
+- `/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/sapb1Tools01.py`: variantes Sales, Products, Customers, Warehouses, Payments, Reconciliation y maestros `OITB`, `OACT`, `OWHS`.
+- `/media/issajar/DEVELOP/Projects/telchi/tb1/i-MotorSoft/SrvRest/faTB1Srv02.py`: Sales Targets.
+- `srvSyncTelchi02.py` fue identificado como MSSQL (`mssql+pymssql`) y queda fuera de la baseline HANA2.
+
+### Próxima sesión
+
+1. Crear `telchi/sql/legacy_hana2/` por dominio.
+2. Extraer fielmente las SQL realmente usadas, sin optimizarlas ni corregirlas.
+3. Crear `validation/sql_baseline.yaml` y un harness read-only con safety gate contra operaciones de escritura.
+4. Ejecutar cada SQL con ventana bounded de un día, validar columnas, grano y PK, y registrar `PASS`, `CHANGE_REQUIRED`, `BLOCKED_EXTERNAL_DATA`, `DEPRECATED` o `UNKNOWN`.
+5. No crear todavía `sql/current/`, nuevos extractores, Parquet ni cambios de transformación pandas.
+
+### Cierre de esta sesión
+
+- No commit, push, deploy ni cambio de rama.
+- No se modificó el repositorio legacy.
+- No se modificó SAP.
+- No se escribieron Parquet.
+- La VPN quedó activa.
+
+## Gate 2026-08-19 — Flow comunicación ciudadana mínima y segura V1
+
+Estado: PASS funcional real/controlado
+(`TEAM360_FLOW_CITIZEN_COMMUNICATION_V1_PASS`). El vecino recibe únicamente
+comunicación pública de recepción, avance y cierre aprobado; la operación
+interna de LaMuni permanece reservada. `model_eval/**` no fue tocado.
+
+### Arquitectura
+
+- Proyección pública por allowlist (`CitizenCaseProjection`) construida solo
+  con `public_reference`, `public_status`, `subject`, `public_description`,
+  `public_location`; los templates ciudadanos consumen únicamente esa
+  proyección y son determinísticos (sin LLM).
+- Mapeo interno→público: `CONFIRMED→RECEIVED`, `ACTIVE→IN_PROGRESS`,
+  `RESOLUTION_PENDING_APPROVAL→IN_PROGRESS`, `RESOLVED→RESOLVED`. NUNCA se
+  exponen BREACHED, escalamiento, niveles, SLA, destinos internos, supervisor,
+  token de aprobación, audit ids, métricas ni notas.
+- `flow_citizen_notifications` (migración aditiva 022, clasificación GLOBAL
+  documentada): traza idempotente por `(request_id, notification_type)`, con
+  `channel='email'`, estado de entrega, `provider_message_id`, RFC estable y
+  reconciliación contra Gmail Sent antes de cualquier retry (sin envíos
+  duplicados). No es duplicación de `flow_messages` (no puede representar
+  type/status/dedupe de forma segura) y no contamina el audit snapshot ni el
+  timeline de Directorio.
+- Transporte reutiliza el puerto de mensajería existente (`RoutingMessageSenderPort`,
+  satisfecho por GmailClient y los fakes determinísticos). Sin código de
+  provider nuevo, sin acoplamiento a Gmail directo, sin WhatsApp.
+
+### Disparadores
+
+- RECEIVED: tras confirmación de intake persistida (request CONFIRMED).
+- IN_PROGRESS: primera actuación real elegible (respuesta operacional
+  ACK/RESOLUTION_PROPOSED o escalamiento COMPLETED); exactamente uno por caso
+  (dedupe), nunca después de RESOLVED.
+- RESOLVED: solo tras APPROVE → request RESOLVED (guard terminal); nunca con
+  resolución PROPOSED, aprobación PENDING/REJECTED ni caso abierto.
+- INFO_REQUIRED: NO IMPLEMENTADO — `INFO_REQUIRED_DOMAIN_TRIGGER_NOT_AVAILABLE`
+  (gap no bloqueante). La necesidad de información se resuelve en intake vía
+  `PENDING_CLARIFICATION`; no existe evento de follow-up post-confirmación.
+
+### Evidencia real
+
+- Demo LAMUNI E2E (PostgreSQL real, transporte determinístico):
+  `CITIZEN_RECEIVED=1`, `CITIZEN_IN_PROGRESS=1`, `CITIZEN_RESOLVED=1`,
+  `CITIZEN_INTERNAL_DATA_LEAK=NONE`; pasos 14-16 PASS; Directorio/Audit
+  intactos.
+- PostgreSQL real: traza persistida con dedupe, fallo de entrega sin afectar
+  el caso, retry reconciliado (un único envío eventual), guard de RESOLVED
+  solo tras cierre real aprobado, y separación `citizen_email != N1/N2`.
+- Suite backend completa: 1536 PASS / 47 SKIP; Flow gated (incl. PostgreSQL):
+  398 PASS. Frontend: `pnpm check` 0 errors/0 warnings, `pnpm build` 161
+  páginas. `git diff --check` PASS.
+
+### Fuera de alcance confirmado
+
+Sin portal ciudadano, WhatsApp, LLM en texto público, notificaciones INFO_REQUIRED
+outbound V1, respuesta ciudadana correlacionada al caso, thread ciudadano único,
+ni runner/scheduler.
+
+### Nota de concurrencia
+
+El cambio concurrente Telchi/DataScience en este archivo (2026-08-17) fue
+preservado intacto.
 
 ## Historial
 
