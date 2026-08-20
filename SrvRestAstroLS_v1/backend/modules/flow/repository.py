@@ -34,6 +34,71 @@ class StoredCandidate:
 class FlowPostgresRepository:
     """All Flow SQL lives here and receives a caller-owned connection."""
 
+    async def claim_whatsapp_inbound(
+        self, conn: AsyncConnection, message: InboundMessage
+    ) -> dict:
+        """Claim a WhatsApp inbound message with PostgreSQL idempotency.
+
+        Upserts the conversation by (provider, external_thread_id) and
+        inserts the message with ON CONFLICT DO NOTHING on
+        (provider, external_message_id). Returns a dict with is_new flag.
+        """
+        conversation = await fetch_one(
+            conn,
+            """
+            insert into flow_conversations (
+                provider, channel, external_thread_id, citizen_address, subject
+            ) values (
+                %(provider)s, %(channel)s, %(external_thread_id)s,
+                %(citizen_address)s, %(subject)s
+            )
+            on conflict (provider, external_thread_id) do update set
+                updated_at_utc = now()
+            returning id::text, state, candidate_revision
+            """,
+            {
+                "provider": message.provider,
+                "channel": message.channel,
+                "external_thread_id": message.external_thread_id,
+                "citizen_address": message.sender,
+                "subject": message.subject,
+            },
+        )
+        if conversation is None:
+            raise RuntimeError("WhatsApp claim conversation upsert returned no row.")
+        stored_message = await fetch_one(
+            conn,
+            """
+            insert into flow_messages (
+                conversation_id, provider, external_message_id, direction,
+                sender_address, recipients_jsonb, subject, text_body,
+                occurred_at_utc, metadata_jsonb, processed_at_utc
+            ) values (
+                %(conversation_id)s, %(provider)s, %(external_message_id)s, 'inbound',
+                %(sender_address)s, %(recipients_jsonb)s, %(subject)s, %(text_body)s,
+                %(occurred_at_utc)s, %(metadata_jsonb)s, now()
+            )
+            on conflict (provider, external_message_id) do nothing
+            returning id::text
+            """,
+            {
+                "conversation_id": conversation["id"],
+                "provider": message.provider,
+                "external_message_id": message.external_message_id,
+                "sender_address": message.sender,
+                "recipients_jsonb": Jsonb(list(message.recipients)),
+                "subject": message.subject,
+                "text_body": message.text_body,
+                "occurred_at_utc": message.received_at,
+                "metadata_jsonb": Jsonb(dict(message.metadata)),
+            },
+        )
+        return {
+            "is_new": stored_message is not None,
+            "conversation_id": conversation["id"],
+            "message_id": stored_message["id"] if stored_message else None,
+        }
+
     async def claim_inbound(
         self, conn: AsyncConnection, message: InboundMessage
     ) -> ClaimedInbound:

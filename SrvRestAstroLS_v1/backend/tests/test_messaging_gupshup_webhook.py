@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -16,10 +17,24 @@ _backend_root = str(Path(__file__).resolve().parent.parent)
 if _backend_root not in sys.path:
     sys.path.insert(0, _backend_root)
 
-# Ensure the app can be imported
 from ls_iMotorSoft_Srv01 import create_app  # noqa: E402
-
 from litestar.testing import TestClient  # noqa: E402
+from modules.messaging.whatsapp_claim import ClaimResult  # noqa: E402
+
+
+def _mock_claimer(is_new: bool = True) -> MagicMock:
+    """Create a mock WhatsAppMessageClaimer."""
+    claimer = MagicMock()
+    claimer.claim = AsyncMock(
+        return_value=ClaimResult(
+            is_new=is_new,
+            provider_message_id="msg-123",
+            sender="5491122334455",
+            conversation_id="conv-abc",
+            message_id="stored-msg-1",
+        )
+    )
+    return claimer
 
 
 @pytest.fixture()
@@ -33,11 +48,13 @@ WEBHOOK_PATH = "/webhooks/messaging/gupshup/whatsapp"
 
 
 # ---------------------------------------------------------------------------
-# Minimal inbound message
+# Minimal inbound message — new
 # ---------------------------------------------------------------------------
 
 
-def test_webhook_minimal_inbound(client) -> None:
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
+def test_webhook_minimal_inbound_new(mock_get_claimer, client) -> None:
+    mock_get_claimer.return_value = _mock_claimer(is_new=True)
     payload = {
         "payload": {
             "from": "5491122334455",
@@ -52,8 +69,34 @@ def test_webhook_minimal_inbound(client) -> None:
     data = response.json()
     assert data["ok"] is True
     assert data["event_type"] == "message"
-    assert data["message_id"] == "msg-123"
+    assert data["is_new"] is True
+    assert data["provider_message_id"] == "msg-123"
     assert data["sender"] == "5491122334455"
+
+
+# ---------------------------------------------------------------------------
+# Duplicate inbound message
+# ---------------------------------------------------------------------------
+
+
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
+def test_webhook_duplicate_inbound(mock_get_claimer, client) -> None:
+    mock_get_claimer.return_value = _mock_claimer(is_new=False)
+    payload = {
+        "payload": {
+            "from": "5491122334455",
+            "to": "14155551234",
+            "text": "hola",
+            "timestamp": "1700000000",
+            "id": "msg-123",
+        }
+    }
+    response = client.post(WEBHOOK_PATH, json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["ok"] is True
+    assert data["is_new"] is False
+    assert data["provider_message_id"] == "msg-123"
 
 
 # ---------------------------------------------------------------------------
@@ -61,7 +104,9 @@ def test_webhook_minimal_inbound(client) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_webhook_wrapper_message(client) -> None:
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
+def test_webhook_wrapper_message(mock_get_claimer, client) -> None:
+    mock_get_claimer.return_value = _mock_claimer(is_new=True)
     payload = {
         "app": "team360dev",
         "timestamp": 1770565000000,
@@ -80,8 +125,7 @@ def test_webhook_wrapper_message(client) -> None:
     data = response.json()
     assert data["ok"] is True
     assert data["event_type"] == "message"
-    assert data["message_id"] == "inbound-msg-001"
-    assert data["sender"] == "541130946950"
+    assert data["is_new"] is True
 
 
 # ---------------------------------------------------------------------------
@@ -89,7 +133,9 @@ def test_webhook_wrapper_message(client) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_webhook_event_wrapper_live(client) -> None:
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
+def test_webhook_event_wrapper_live(mock_get_claimer, client) -> None:
+    mock_get_claimer.return_value = _mock_claimer(is_new=True)
     payload = {
         "app": "team360dev",
         "timestamp": 1770565000000,
@@ -108,7 +154,7 @@ def test_webhook_event_wrapper_live(client) -> None:
     data = response.json()
     assert data["ok"] is True
     assert data["event_type"] == "message"
-    assert data["sender"] == "541130946950"
+    assert data["is_new"] is True
 
 
 # ---------------------------------------------------------------------------
@@ -160,8 +206,6 @@ def test_webhook_failed_status_event(client) -> None:
 
 
 def test_webhook_unknown_event(client) -> None:
-    # Payload with type field but no recognized structure is classified as
-    # a status event by the Gupshup mapper (expected V360-port behavior).
     payload = {"type": "unknown_event_type", "data": {}}
     response = client.post(WEBHOOK_PATH, json=payload)
     assert response.status_code == 200
@@ -195,7 +239,6 @@ def test_webhook_empty_body(client) -> None:
         content=b"",
         headers={"Content-Type": "application/json"},
     )
-    # Empty JSON parses as null in some frameworks; expect 200 or 400
     assert response.status_code in (200, 400)
 
 
@@ -224,19 +267,25 @@ def test_webhook_get_not_allowed(client) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Path is correct
+# DB error handling
 # ---------------------------------------------------------------------------
 
 
-def test_webhook_path_exists(client) -> None:
-    """Verify the webhook path is registered and reachable."""
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
+def test_webhook_db_error_returns_200(mock_get_claimer, client) -> None:
+    claimer = MagicMock()
+    claimer.claim = AsyncMock(side_effect=RuntimeError("DB connection lost"))
+    mock_get_claimer.return_value = claimer
     payload = {
         "payload": {
             "from": "5491122334455",
             "to": "14155551234",
-            "text": "ping",
-            "id": "ping-1",
+            "text": "test",
+            "id": "msg-dberr",
         }
     }
     response = client.post(WEBHOOK_PATH, json=payload)
     assert response.status_code == 200
+    data = response.json()
+    assert data["ok"] is True
+    assert "error" in data

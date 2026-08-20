@@ -1,7 +1,8 @@
 """Gupshup WhatsApp webhook handler for Team360.
 
 Receives Gupshup webhook payloads, validates structure, normalizes inbound
-messages to InboundMessage, and returns appropriate HTTP responses.
+messages to InboundMessage, claims idempotency via PostgreSQL, and returns
+appropriate HTTP responses.
 
 Security:
 - No signature verification in DEV (Gupshup DEV does not support it).
@@ -17,16 +18,32 @@ from typing import Any
 
 from litestar import Controller, Request, post
 from litestar.exceptions import HTTPException
-from litestar.response import Response
 
-from modules.messaging.domain.messages import InboundMessage
+from modules.db.pool import get_pool
+from modules.db.settings import get_database_settings
+from modules.flow.repository import FlowPostgresRepository
 from modules.messaging.providers.gupshup.whatsapp.mapper import (
     is_inbound_message,
     is_status_event,
-    normalize_inbound,
 )
+from modules.messaging.whatsapp_claim import WhatsAppMessageClaimer
 
 logger = logging.getLogger(__name__)
+
+# Lazy-initialized claimer (created on first request to avoid import-time DB access)
+_claimer: WhatsAppMessageClaimer | None = None
+
+
+def _get_claimer() -> WhatsAppMessageClaimer:
+    """Get or create the WhatsApp message claimer with a DB pool."""
+    global _claimer
+    if _claimer is None:
+        pool = get_pool()
+        _claimer = WhatsAppMessageClaimer(
+            pool=pool,
+            repository=FlowPostgresRepository(),
+        )
+    return _claimer
 
 
 class GupshupWhatsAppWebhookController(Controller):
@@ -43,7 +60,7 @@ class GupshupWhatsAppWebhookController(Controller):
         1. Parse JSON body
         2. Identify event type (message vs status)
         3. Filter irrelevant events
-        4. Normalize inbound messages via mapper
+        4. Claim inbound message for PostgreSQL idempotency
         5. Return HTTP 200 (always, to acknowledge receipt)
         """
         received_at_ms = _epoch_ms()
@@ -77,31 +94,41 @@ class GupshupWhatsAppWebhookController(Controller):
         # --- Inbound messages ---
         if is_inbound_message(payload):
             try:
-                inbound = normalize_inbound(payload)
+                claimer = _get_claimer()
+                result = await claimer.claim(payload)
+                if result is None:
+                    # Claimer returned None — payload was filtered
+                    return {"ok": True, "event_type": "message", "claimed": False}
+
                 logger.info(
-                    "GUPSHUP_INBOUND_NORMALIZED provider=%s channel=%s sender=%s "
-                    "message_id=%s text_len=%d",
-                    inbound.provider,
-                    inbound.channel,
-                    inbound.sender or "-",
-                    inbound.external_message_id or "-",
-                    len(inbound.text_body or ""),
+                    "GUPSHUP_INBOUND_CLAIMED provider=gupshup channel=whatsapp "
+                    "sender=%s message_id=%s is_new=%s conversation_id=%s",
+                    result.sender or "-",
+                    result.provider_message_id or "-",
+                    result.is_new,
+                    result.conversation_id or "-",
                 )
-                # TODO: CHECKPOINT 6 — delegate to Flow Intake
-                # flow_intake.process(inbound)
+
+                # TODO: CHECKPOINT 6 — if result.is_new, connect to Flow Intake
+                # if result.is_new:
+                #     await flow_intake.process(...)
+
                 return {
                     "ok": True,
                     "event_type": "message",
-                    "message_id": inbound.external_message_id,
-                    "sender": inbound.sender,
+                    "is_new": result.is_new,
+                    "provider_message_id": result.provider_message_id,
+                    "sender": result.sender,
+                    "conversation_id": result.conversation_id,
                 }
-            except ValueError as exc:
-                logger.warning(
-                    "GUPSHUP_WEBHOOK_NORMALIZE_FAILED event_type=%s error=%s",
+            except Exception as exc:
+                logger.exception(
+                    "GUPSHUP_WEBHOOK_CLAIM_FAILED event_type=%s error=%s",
                     event_type or "-",
                     exc,
                 )
-                return {"ok": True, "event_type": "message", "normalized": False}
+                # Still return 200 to avoid Gupshup retries on our internal errors
+                return {"ok": True, "event_type": "message", "error": str(exc)}
 
         # --- Unknown/ignored events ---
         logger.info(
