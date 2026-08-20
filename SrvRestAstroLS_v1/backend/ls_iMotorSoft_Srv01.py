@@ -30,6 +30,9 @@ from routes.diagnosis import (
 from routes.health import get_health
 from routes.sales_diagnosis_runtime import sales_diagnosis_turn
 from routes.sales_diagnosis_runtime_dev import dev_sales_diagnosis_turn
+from modules.messaging.webhooks.gupshup_whatsapp import (
+    GupshupWhatsAppWebhookController,
+)
 
 
 @get("/api/health")
@@ -86,6 +89,7 @@ def create_app() -> Litestar:
             dev_sales_diagnosis_turn,
             console_bootstrap,
             console_me,
+            GupshupWhatsAppWebhookController,
             *get_module_route_handlers(),
         ],
         on_startup=[_open_db_pool],
