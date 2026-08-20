@@ -100,7 +100,9 @@
       sla: slaErrors,
     };
   });
-  const hasValidationErrors = $derived(Object.values(validationErrors).some(Boolean));
+  const hasValidationErrors = $derived(
+    Object.values(validationErrors).some(Boolean) || Object.values(selectedValidationErrors.sla).some(Boolean),
+  );
   const visibleValidationErrorCount = $derived(
     Object.entries(validationErrors).filter(([key, value]) => value && (touched[key] || attemptedSave)).length,
   );
@@ -542,7 +544,7 @@
           onDestinationInput={updateLevelDestination}
           onDestinationBlur={markTouched}
           onSlaInput={updateLevelSla}
-          onSlaBlur={markTouched}
+          onSlaBlur={(levelId) => markTouched(`sla:${levelId}`)}
           slaErrors={selectedValidationErrors.sla ?? {}}
         />
 
