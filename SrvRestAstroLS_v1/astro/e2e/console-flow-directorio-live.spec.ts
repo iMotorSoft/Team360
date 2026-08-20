@@ -23,7 +23,15 @@ async function listCases(request: APIRequestContext, params = "") {
 }
 
 async function selectCaseById(page: Page, requestId: string) {
-  await page.locator("ul li button", { hasText: `#${requestId.slice(0, 8)}` }).click();
+  // The API probe may use page_size=100 while the rendered list intentionally
+  // stays paginated at 20. Search by the API-discovered identity before
+  // clicking so a valid case outside page one remains selectable.
+  const token = requestId.slice(0, 8);
+  const search = page.getByRole("searchbox", { name: "Buscar caso" });
+  await search.fill(token);
+  const item = page.locator("ul li button", { hasText: `#${token}` });
+  await expect(item).toHaveCount(1);
+  await item.click();
 }
 
 function trackErrors(page: Page, errors: string[]) {

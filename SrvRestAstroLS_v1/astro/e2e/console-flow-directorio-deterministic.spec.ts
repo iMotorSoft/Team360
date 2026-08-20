@@ -19,7 +19,12 @@ test("fresh PostgreSQL fixture is discoverable as AUDIT_SNAPSHOT", async ({ page
   expect(payload.items[0].request_id).toBe(requestId);
   expect(payload.items[0].data_source).toBe("AUDIT_SNAPSHOT");
 
-  await page.locator("ul li button", { hasText: `#${requestId.slice(0, 8)}` }).click();
+  const token = requestId.slice(0, 8);
+  const search = page.getByRole("searchbox", { name: "Buscar caso" });
+  await search.fill(token);
+  const item = page.locator("ul li button", { hasText: `#${token}` });
+  await expect(item).toHaveCount(1);
+  await item.click();
   const detail = page.locator('[data-selected="yes"]');
   await expect(detail.getByText("Registro final auditado", { exact: true })).toBeVisible();
   await expect(detail.getByText("Caso resuelto", { exact: true })).toBeVisible();
