@@ -30,6 +30,7 @@ from routes.diagnosis import (
 from routes.health import get_health
 from routes.sales_diagnosis_runtime import sales_diagnosis_turn
 from routes.sales_diagnosis_runtime_dev import dev_sales_diagnosis_turn
+from modules.flow.scheduler import start_scheduler, stop_scheduler
 from modules.messaging.webhooks.gupshup_whatsapp import (
     GupshupWhatsAppWebhookController,
 )
@@ -65,6 +66,23 @@ async def _close_db_pool() -> None:
         pass
 
 
+async def _start_flow_scheduler() -> None:
+    """Start the Flow module-local scheduler after DB pool is open."""
+    try:
+        await start_scheduler()
+    except Exception:
+        # Flow scheduler failure must not block the backend.
+        pass
+
+
+async def _stop_flow_scheduler() -> None:
+    """Stop the Flow scheduler before DB pool closes."""
+    try:
+        await stop_scheduler()
+    except Exception:
+        pass
+
+
 def _backend_debug_enabled() -> bool:
     value = os.environ.get("TEAM360_BACKEND_DEBUG", "").strip().lower()
     return value in {"1", "true", "yes", "on", "debug", "development"}
@@ -92,8 +110,8 @@ def create_app() -> Litestar:
             GupshupWhatsAppWebhookController,
             *get_module_route_handlers(),
         ],
-        on_startup=[_open_db_pool],
-        on_shutdown=[_close_db_pool],
+        on_startup=[_open_db_pool, _start_flow_scheduler],
+        on_shutdown=[_stop_flow_scheduler, _close_db_pool],
         cors_config=CORSConfig(
             allow_origins=[
                 "http://localhost:3050",
