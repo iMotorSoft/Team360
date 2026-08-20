@@ -1,8 +1,8 @@
 """Gupshup WhatsApp webhook handler for Team360.
 
 Receives Gupshup webhook payloads, validates structure, normalizes inbound
-messages to InboundMessage, claims idempotency via PostgreSQL, and returns
-appropriate HTTP responses.
+messages to InboundMessage, claims idempotency via PostgreSQL, and for new
+messages connects to the existing Flow intake pipeline.
 
 Security:
 - No signature verification in DEV (Gupshup DEV does not support it).
@@ -25,17 +25,18 @@ from modules.flow.repository import FlowPostgresRepository
 from modules.messaging.providers.gupshup.whatsapp.mapper import (
     is_inbound_message,
     is_status_event,
+    normalize_inbound,
 )
 from modules.messaging.whatsapp_claim import WhatsAppMessageClaimer
 
 logger = logging.getLogger(__name__)
 
-# Lazy-initialized claimer (created on first request to avoid import-time DB access)
+# Lazy-initialized singletons (created on first request)
 _claimer: WhatsAppMessageClaimer | None = None
+_bridge: Any = None  # WhatsAppFlowBridge, typed as Any to avoid import cycle
 
 
 def _get_claimer() -> WhatsAppMessageClaimer:
-    """Get or create the WhatsApp message claimer with a DB pool."""
     global _claimer
     if _claimer is None:
         pool = get_pool()
@@ -44,6 +45,37 @@ def _get_claimer() -> WhatsAppMessageClaimer:
             repository=FlowPostgresRepository(),
         )
     return _claimer
+
+
+def _get_bridge():
+    """Get or create the WhatsApp→Flow bridge with a real FlowIntakeService."""
+    global _bridge
+    if _bridge is None:
+        from modules.messaging.whatsapp_flow_bridge import WhatsAppFlowBridge
+        from modules.flow.service import FlowIntakeService
+        from modules.flow.intake.ai import LiteLLMFlowIntakeInterpreter
+
+        pool = get_pool()
+
+        class _NoOpReplySender:
+            """Reply sender that does nothing (WhatsApp replies deferred)."""
+            sender_address = "team360@whatsapp"
+
+            def send_reply(self, **kwargs):
+                from modules.messaging.domain.messages import OutboundMessageReceipt
+                return OutboundMessageReceipt(
+                    external_message_id="noop",
+                    external_thread_id="noop",
+                )
+
+        flow_service = FlowIntakeService(
+            pool=pool,
+            repository=FlowPostgresRepository(),
+            interpreter=LiteLLMFlowIntakeInterpreter(),
+            reply_sender=_NoOpReplySender(),
+        )
+        _bridge = WhatsAppFlowBridge(pool=pool, flow_service=flow_service)
+    return _bridge
 
 
 class GupshupWhatsAppWebhookController(Controller):
@@ -56,12 +88,13 @@ class GupshupWhatsAppWebhookController(Controller):
     async def receive_webhook(self, request: Request) -> dict[str, Any]:
         """Receive and process a Gupshup WhatsApp webhook event.
 
-        Responsibilities:
+        Flow:
         1. Parse JSON body
         2. Identify event type (message vs status)
         3. Filter irrelevant events
         4. Claim inbound message for PostgreSQL idempotency
-        5. Return HTTP 200 (always, to acknowledge receipt)
+        5. If new, connect to Flow intake pipeline
+        6. Return HTTP 200 (always, to acknowledge receipt)
         """
         received_at_ms = _epoch_ms()
         raw_body = await request.body()
@@ -94,40 +127,51 @@ class GupshupWhatsAppWebhookController(Controller):
         # --- Inbound messages ---
         if is_inbound_message(payload):
             try:
+                # Step 1: Normalize
+                inbound = normalize_inbound(payload)
+
+                # Step 2: Claim for idempotency
                 claimer = _get_claimer()
-                result = await claimer.claim(payload)
-                if result is None:
-                    # Claimer returned None — payload was filtered
+                claim_result = await claimer.claim(payload)
+
+                if claim_result is None:
                     return {"ok": True, "event_type": "message", "claimed": False}
 
                 logger.info(
                     "GUPSHUP_INBOUND_CLAIMED provider=gupshup channel=whatsapp "
                     "sender=%s message_id=%s is_new=%s conversation_id=%s",
-                    result.sender or "-",
-                    result.provider_message_id or "-",
-                    result.is_new,
-                    result.conversation_id or "-",
+                    claim_result.sender or "-",
+                    claim_result.provider_message_id or "-",
+                    claim_result.is_new,
+                    claim_result.conversation_id or "-",
                 )
 
-                # TODO: CHECKPOINT 6 — if result.is_new, connect to Flow Intake
-                # if result.is_new:
-                #     await flow_intake.process(...)
+                # Step 3: If new, connect to Flow intake
+                flow_result = None
+                if claim_result.is_new:
+                    bridge = _get_bridge()
+                    flow_result = await bridge.process(
+                        inbound,
+                        claim_result.conversation_id,
+                        "RECEIVED",
+                    )
 
                 return {
                     "ok": True,
                     "event_type": "message",
-                    "is_new": result.is_new,
-                    "provider_message_id": result.provider_message_id,
-                    "sender": result.sender,
-                    "conversation_id": result.conversation_id,
+                    "is_new": claim_result.is_new,
+                    "provider_message_id": claim_result.provider_message_id,
+                    "sender": claim_result.sender,
+                    "conversation_id": claim_result.conversation_id,
+                    "flow_processed": flow_result.processed if flow_result else False,
+                    "flow_candidates": flow_result.candidate_count if flow_result else 0,
                 }
             except Exception as exc:
                 logger.exception(
-                    "GUPSHUP_WEBHOOK_CLAIM_FAILED event_type=%s error=%s",
+                    "GUPSHUP_WEBHOOK_PROCESSING_FAILED event_type=%s error=%s",
                     event_type or "-",
                     exc,
                 )
-                # Still return 200 to avoid Gupshup retries on our internal errors
                 return {"ok": True, "event_type": "message", "error": str(exc)}
 
         # --- Unknown/ignored events ---

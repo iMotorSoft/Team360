@@ -52,9 +52,15 @@ WEBHOOK_PATH = "/webhooks/messaging/gupshup/whatsapp"
 # ---------------------------------------------------------------------------
 
 
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_bridge")
 @patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
-def test_webhook_minimal_inbound_new(mock_get_claimer, client) -> None:
+def test_webhook_minimal_inbound_new(mock_get_claimer, mock_get_bridge, client) -> None:
     mock_get_claimer.return_value = _mock_claimer(is_new=True)
+    mock_bridge = MagicMock()
+    mock_bridge.process = AsyncMock(return_value=MagicMock(
+        processed=True, candidate_count=1, confirmed_count=0
+    ))
+    mock_get_bridge.return_value = mock_bridge
     payload = {
         "payload": {
             "from": "5491122334455",
@@ -72,6 +78,10 @@ def test_webhook_minimal_inbound_new(mock_get_claimer, client) -> None:
     assert data["is_new"] is True
     assert data["provider_message_id"] == "msg-123"
     assert data["sender"] == "5491122334455"
+    assert data["flow_processed"] is True
+    assert data["flow_candidates"] == 1
+    # Bridge should be called with conversation_id and state
+    mock_bridge.process.assert_called_once()
 
 
 # ---------------------------------------------------------------------------
@@ -97,6 +107,8 @@ def test_webhook_duplicate_inbound(mock_get_claimer, client) -> None:
     assert data["ok"] is True
     assert data["is_new"] is False
     assert data["provider_message_id"] == "msg-123"
+    # Duplicate should NOT trigger flow processing
+    assert data.get("flow_processed") is None or data.get("flow_processed") is False
 
 
 # ---------------------------------------------------------------------------
@@ -104,9 +116,15 @@ def test_webhook_duplicate_inbound(mock_get_claimer, client) -> None:
 # ---------------------------------------------------------------------------
 
 
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_bridge")
 @patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
-def test_webhook_wrapper_message(mock_get_claimer, client) -> None:
+def test_webhook_wrapper_message(mock_get_claimer, mock_get_bridge, client) -> None:
     mock_get_claimer.return_value = _mock_claimer(is_new=True)
+    mock_bridge = MagicMock()
+    mock_bridge.process = AsyncMock(return_value=MagicMock(
+        processed=True, candidate_count=1, confirmed_count=0
+    ))
+    mock_get_bridge.return_value = mock_bridge
     payload = {
         "app": "team360dev",
         "timestamp": 1770565000000,
@@ -133,9 +151,15 @@ def test_webhook_wrapper_message(mock_get_claimer, client) -> None:
 # ---------------------------------------------------------------------------
 
 
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_bridge")
 @patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
-def test_webhook_event_wrapper_live(mock_get_claimer, client) -> None:
+def test_webhook_event_wrapper_live(mock_get_claimer, mock_get_bridge, client) -> None:
     mock_get_claimer.return_value = _mock_claimer(is_new=True)
+    mock_bridge = MagicMock()
+    mock_bridge.process = AsyncMock(return_value=MagicMock(
+        processed=True, candidate_count=1, confirmed_count=0
+    ))
+    mock_get_bridge.return_value = mock_bridge
     payload = {
         "app": "team360dev",
         "timestamp": 1770565000000,

@@ -7,7 +7,7 @@ from typing import Protocol
 
 from psycopg_pool import AsyncConnectionPool
 
-from modules.db.transaction import transaction
+from modules.db.transaction import fetch_one, transaction
 from modules.messaging.domain import InboundMessage, OutboundMessageReceipt
 
 from .domain.models import CandidateRequest
@@ -73,16 +73,68 @@ class FlowIntakeService:
             claimed = await self._repository.claim_inbound(conn, message)
             if not claimed.is_new:
                 return ProcessResult(False, claimed.conversation_id, claimed.state)
-            if claimed.state == ConversationState.RECEIVED:
-                return await self._process_initial(conn, claimed, message)
-            if claimed.state in {
-                ConversationState.PENDING_CONFIRMATION,
-                ConversationState.PENDING_CLARIFICATION,
-                ConversationState.CORRECTED,
-                ConversationState.INTERPRETED,
-            }:
-                return await self._process_reply(conn, claimed, message)
-            return ProcessResult(True, claimed.conversation_id, claimed.state)
+            return await self._process_from_claimed(conn, claimed, message)
+
+    async def process_whatsapp(
+        self, message: InboundMessage, conversation_id: str, state: str
+    ) -> ProcessResult:
+        """Process a WhatsApp message already claimed by the webhook.
+
+        The webhook already created the conversation and message via
+        claim_whatsapp_inbound(). This method runs the Flow intake
+        logic (interpretation, candidates) without re-claiming.
+        """
+        async with transaction(self._pool) as conn:
+            row = await fetch_one(
+                conn,
+                """
+                SELECT c.id::text, c.state, c.candidate_revision,
+                       m.id::text as message_id
+                FROM flow_conversations c
+                LEFT JOIN flow_messages m ON m.conversation_id = c.id
+                    AND m.direction = 'inbound'
+                WHERE c.id = %(id)s
+                ORDER BY m.created_at_utc DESC
+                LIMIT 1
+                """,
+                {"id": conversation_id},
+            )
+            if row is None:
+                return ProcessResult(
+                    False, conversation_id, ConversationState(state)
+                )
+
+            @dataclass(frozen=True, slots=True)
+            class _Claimed:
+                is_new: bool
+                message_id: str | None
+                conversation_id: str
+                state: ConversationState
+                revision: int
+
+            claimed = _Claimed(
+                is_new=True,
+                message_id=row.get("message_id"),
+                conversation_id=row["id"],
+                state=ConversationState(row["state"]),
+                revision=int(row["candidate_revision"]),
+            )
+            return await self._process_from_claimed(conn, claimed, message)
+
+    async def _process_from_claimed(
+        self, conn, claimed, message: InboundMessage
+    ) -> ProcessResult:
+        """Shared processing logic for both email and WhatsApp intake."""
+        if claimed.state == ConversationState.RECEIVED:
+            return await self._process_initial(conn, claimed, message)
+        if claimed.state in {
+            ConversationState.PENDING_CONFIRMATION,
+            ConversationState.PENDING_CLARIFICATION,
+            ConversationState.CORRECTED,
+            ConversationState.INTERPRETED,
+        }:
+            return await self._process_reply(conn, claimed, message)
+        return ProcessResult(True, claimed.conversation_id, claimed.state)
 
     async def _process_initial(self, conn, claimed, message: InboundMessage) -> ProcessResult:
         interpretation = self._interpreter.interpret_initial(message)
