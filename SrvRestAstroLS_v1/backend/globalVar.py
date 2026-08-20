@@ -109,6 +109,135 @@ def get_team360_db_url() -> str:
     return TEAM360_DB_URL or TEAM360_DB_URL_PSQL or _derive_team360_db_url()
 
 
+# =========================
+# Messaging / Gupshup WhatsApp (Team360)
+# =========================
+# Read from existing V360-compatible env vars (GUPSHUP_*) when available,
+# fall back to TEAM360_-prefixed vars.
+TEAM360_GUPSHUP_BASE_URL: str = os.environ.get(
+    "TEAM360_GUPSHUP_BASE_URL",
+    os.environ.get("GUPSHUP_BASE_URL", "https://api.gupshup.io"),
+)
+TEAM360_GUPSHUP_APP_NAME_DEV: str = os.environ.get(
+    "TEAM360_GUPSHUP_APP_NAME_DEV",
+    os.environ.get("GUPSHUP_APP_NAME_DEV", ""),
+)
+TEAM360_GUPSHUP_APP_NAME_PRO: str = os.environ.get(
+    "TEAM360_GUPSHUP_APP_NAME_PRO",
+    os.environ.get("GUPSHUP_APP_NAME_PRO", ""),
+)
+TEAM360_GUPSHUP_API_KEY_DEV: str = os.environ.get(
+    "TEAM360_GUPSHUP_API_KEY_DEV",
+    os.environ.get("GUPSHUP_API_KEY_DEV", ""),
+)
+TEAM360_GUPSHUP_API_KEY_PRO: str = os.environ.get(
+    "TEAM360_GUPSHUP_API_KEY_PRO",
+    os.environ.get("GUPSHUP_API_KEY_PRO", ""),
+)
+TEAM360_GUPSHUP_SRC_NUMBER_DEV: str = os.environ.get(
+    "TEAM360_GUPSHUP_SRC_NUMBER_DEV",
+    os.environ.get("GUPSHUP_SRC_NUMBER_DEV", ""),
+)
+TEAM360_GUPSHUP_SRC_NUMBER_PRO: str = os.environ.get(
+    "TEAM360_GUPSHUP_SRC_NUMBER_PRO",
+    os.environ.get("GUPSHUP_SRC_NUMBER_PRO", ""),
+)
+TEAM360_GUPSHUP_WA_SENDER: str = os.environ.get(
+    "TEAM360_GUPSHUP_WA_SENDER",
+    os.environ.get("GUPSHUP_WA_SENDER", ""),
+).strip()
+TEAM360_GUPSHUP_BASE_URL_DEV: str = os.environ.get(
+    "TEAM360_GUPSHUP_BASE_URL_DEV",
+    os.environ.get("GUPSHUP_BASE_URL_DEV", TEAM360_GUPSHUP_BASE_URL),
+)
+TEAM360_GUPSHUP_BASE_URL_PRO: str = os.environ.get(
+    "TEAM360_GUPSHUP_BASE_URL_PRO",
+    os.environ.get("GUPSHUP_BASE_URL_PRO", TEAM360_GUPSHUP_BASE_URL_DEV),
+)
+
+# =========================
+# Messaging / Meta WhatsApp Cloud (Team360)
+# =========================
+TEAM360_META_WABA_TOKEN: str = os.environ.get(
+    "META_VERTICE360_WABA_TOKEN", ""
+)
+TEAM360_META_WABA_ID: str = os.environ.get(
+    "META_VERTICE360_WABA_ID", ""
+)
+TEAM360_META_PHONE_NUMBER_ID: str = os.environ.get(
+    "META_VERTICE360_PHONE_NUMBER_ID", ""
+)
+TEAM360_META_VERIFY_TOKEN: str = os.environ.get(
+    "META_VERTICE360_VERIFY_TOKEN", ""
+)
+TEAM360_META_APP_SECRET: str = os.environ.get(
+    "META_APP_SECRET_IMOTORSOFT", ""
+)
+TEAM360_META_GRAPH_VERSION: str = os.environ.get(
+    "META_GRAPH_VERSION", "v20.0"
+)
+
+
+# =========================
+# Gupshup environment-aware selection
+# =========================
+def _team360_pick_env(dev: str, pro: str) -> str:
+    """Select value based on DEFAULT_ENV."""
+    return pro if DEFAULT_ENV == "production" else dev
+
+
+def get_team360_gupshup_config() -> dict[str, str]:
+    """Return resolved Gupshup config for the current environment."""
+    app_name = _team360_pick_env(
+        TEAM360_GUPSHUP_APP_NAME_DEV, TEAM360_GUPSHUP_APP_NAME_PRO
+    )
+    api_key = _team360_pick_env(
+        TEAM360_GUPSHUP_API_KEY_DEV, TEAM360_GUPSHUP_API_KEY_PRO
+    )
+    src_number = _team360_pick_env(
+        TEAM360_GUPSHUP_SRC_NUMBER_DEV, TEAM360_GUPSHUP_SRC_NUMBER_PRO
+    )
+    base_url = _team360_pick_env(
+        TEAM360_GUPSHUP_BASE_URL_DEV, TEAM360_GUPSHUP_BASE_URL_PRO
+    )
+    sender = TEAM360_GUPSHUP_WA_SENDER
+    return {
+        "app_name": app_name,
+        "api_key": api_key,
+        "source_number": src_number,
+        "base_url": base_url,
+        "sender": sender,
+    }
+
+
+def get_team360_gupshup_config_masked() -> dict[str, str]:
+    """Return Gupshup config with secrets masked for diagnostics."""
+    cfg = get_team360_gupshup_config()
+    return {
+        "configured": bool(cfg["api_key"] and cfg["app_name"]),
+        "app_name_present": bool(cfg["app_name"]),
+        "api_key_present": bool(cfg["api_key"]),
+        "source_present": bool(cfg["source_number"]),
+        "base_url_present": bool(cfg["base_url"]),
+        "sender_present": bool(cfg["sender"]),
+    }
+
+
+def team360_gupshup_enabled() -> bool:
+    """True when Gupshup provider is configured for outbound."""
+    cfg = get_team360_gupshup_config()
+    return bool(cfg["api_key"] and cfg["app_name"] and cfg["source_number"])
+
+
+def team360_meta_whatsapp_enabled() -> bool:
+    """True when Meta WhatsApp provider is configured."""
+    return bool(
+        TEAM360_META_WABA_TOKEN
+        and TEAM360_META_PHONE_NUMBER_ID
+        and TEAM360_META_VERIFY_TOKEN
+    )
+
+
 def get_team360_db_url_psql() -> str:
     """Return a psql-compatible Team360 backend database DSN."""
     return _to_psql_dsn(get_team360_db_url())
