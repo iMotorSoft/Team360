@@ -298,10 +298,94 @@ async def flow_configuration_update(
     return configuration
 
 
+# --- Operational settings endpoints ---
+
+
+@get("/api/team360-flow/operational-settings")
+async def flow_operational_settings_get(
+    request: Request | None = None,
+) -> dict[str, Any]:
+    """Read Flow operational settings (automation, scheduler, intake)."""
+    await _require_flow_actor(request, capability=FLOW_CONFIGURATION_READ)
+    pool = get_pool()
+    service = _configuration_service(pool)
+    return await service.get_operational_settings()
+
+
+@patch("/api/team360-flow/operational-settings")
+async def flow_operational_settings_update(
+    data: dict[str, Any],
+    request: Request | None = None,
+) -> dict[str, Any]:
+    """Update Flow operational settings."""
+    await _require_flow_actor(
+        request, capability=FLOW_CONFIGURATION_WRITE, write=True
+    )
+
+    allowed = {
+        "automation_enabled",
+        "scheduler_interval_seconds",
+        "mail_intake_enabled",
+        "mail_batch_limit",
+        "mail_after_cutoff",
+    }
+    unknown_fields = set(data) - allowed
+    if unknown_fields:
+        raise HTTPException(
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"campos no permitidos: {sorted(unknown_fields)}",
+        )
+
+    pool = get_pool()
+    service = _configuration_service(pool)
+    try:
+        return await service.update_operational_settings(
+            automation_enabled=data.get("automation_enabled"),
+            scheduler_interval_seconds=data.get("scheduler_interval_seconds"),
+            mail_intake_enabled=data.get("mail_intake_enabled"),
+            mail_batch_limit=data.get("mail_batch_limit"),
+            mail_after_cutoff=data.get("mail_after_cutoff"),
+        )
+    except FlowConfigurationValidationError as exc:
+        raise HTTPException(
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        )
+
+
+# --- Scheduler status endpoint ---
+
+
+@get("/api/team360-flow/scheduler/status")
+async def flow_scheduler_status(
+    request: Request | None = None,
+) -> dict[str, Any]:
+    """Return scheduler execution state from PostgreSQL."""
+    await _require_flow_actor(request, capability=FLOW_CONFIGURATION_READ)
+    from .operational_settings_repository import (
+        FlowSchedulerStateRepository,
+    )
+
+    pool = get_pool()
+    repo = FlowSchedulerStateRepository()
+    async with transaction(pool) as conn:
+        state = await repo.get_state(conn)
+    return {
+        "last_started_at_utc": state.get("last_started_at_utc"),
+        "last_finished_at_utc": state.get("last_finished_at_utc"),
+        "last_result": state.get("last_result"),
+        "last_error_class": state.get("last_error_class"),
+        "processed_count": state.get("processed_count", 0),
+        "cycle_count": state.get("cycle_count", 0),
+    }
+
+
 ROUTE_HANDLERS: tuple[Any, ...] = (
     executive_audit_query,
     executive_case_list,
     flow_configuration_list,
     flow_configuration_get,
     flow_configuration_update,
+    flow_operational_settings_get,
+    flow_operational_settings_update,
+    flow_scheduler_status,
 )

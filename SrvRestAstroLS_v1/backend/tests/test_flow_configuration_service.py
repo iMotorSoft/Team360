@@ -80,6 +80,32 @@ class _FakeRepository:
                 item["destination"] = destination
         return 1
 
+    async def update_first_response_sla(self, conn, *, sector_id, level, first_response_sla_seconds):
+        if self.fail_update:
+            raise RuntimeError("boom")
+        for item in self.levels:
+            if item["level"] == level:
+                item["first_response_sla_seconds"] = first_response_sla_seconds
+        return 1
+
+    async def get_operational_settings(self, conn):
+        return {
+            "automation_enabled": False,
+            "scheduler_interval_seconds": 15,
+            "mail_intake_enabled": True,
+            "mail_batch_limit": 500,
+            "mail_after_cutoff": True,
+        }
+
+    async def update_operational_settings(self, conn, **kwargs):
+        return {
+            "automation_enabled": False,
+            "scheduler_interval_seconds": 15,
+            "mail_intake_enabled": True,
+            "mail_batch_limit": 500,
+            "mail_after_cutoff": True,
+        }
+
     async def update_closure_approval_level(self, conn, *, sector_id, closure_approval_level):
         self.closure_writes.append(closure_approval_level)
         self.sector["closure_approval_level"] = closure_approval_level

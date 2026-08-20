@@ -23,6 +23,34 @@ _MAX_DESTINATION_LENGTH = 254
 
 _ALLOWED_UPDATE_FIELDS = {"levels", "closure_approval_level"}
 
+# Operational settings validation bounds.
+_MIN_SCHEDULER_INTERVAL = 5
+_MAX_SCHEDULER_INTERVAL = 3600
+_MIN_BATCH_LIMIT = 1
+_MAX_BATCH_LIMIT = 10000
+
+
+def _validate_sla_seconds(value: Any) -> int | None:
+    """Validate and normalize SLA seconds value.
+
+    Returns None (no SLA) or a positive integer.
+    """
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        raise FlowConfigurationValidationError("first_response_sla_seconds inválido")
+    if isinstance(value, float):
+        if value != int(value):
+            raise FlowConfigurationValidationError(
+                "first_response_sla_seconds debe ser un entero"
+            )
+        value = int(value)
+    if not isinstance(value, int) or value <= 0:
+        raise FlowConfigurationValidationError(
+            "first_response_sla_seconds debe ser positivo o null"
+        )
+    return value
+
 
 class FlowSectorNotFoundError(RuntimeError):
     pass
@@ -75,7 +103,7 @@ def _validate_levels_payload(
     for entry in levels:
         if not isinstance(entry, dict):
             raise FlowConfigurationValidationError("cada nivel debe ser un objeto")
-        unknown = set(entry) - {"level", "destination"}
+        unknown = set(entry) - {"level", "destination", "first_response_sla_seconds"}
         if unknown:
             raise FlowConfigurationValidationError(
                 f"campos no permitidos en nivel: {sorted(unknown)}"
@@ -95,7 +123,12 @@ def _validate_levels_payload(
                 f"el nivel {level} no existe en el sector"
             )
         destination = _validate_destination(entry["destination"])
-        validated.append({"level": level, "destination": destination})
+        sla = entry.get("first_response_sla_seconds")
+        validated.append({
+            "level": level,
+            "destination": destination,
+            "first_response_sla_seconds": _validate_sla_seconds(sla),
+        })
     return validated
 
 
@@ -124,6 +157,7 @@ class FlowConfigurationService:
                     "channel": item["channel"],
                     "destination": item["destination"],
                     "active": item["active"],
+                    "first_response_sla_seconds": item.get("first_response_sla_seconds"),
                 }
                 for item in levels
             ],
@@ -180,6 +214,12 @@ class FlowConfigurationService:
                     level=item["level"],
                     destination=item["destination"],
                 )
+                await self._repository.update_first_response_sla(
+                    conn,
+                    sector_id=sector_id,
+                    level=item["level"],
+                    first_response_sla_seconds=item["first_response_sla_seconds"],
+                )
             await self._repository.update_closure_approval_level(
                 conn,
                 sector_id=sector_id,
@@ -190,3 +230,47 @@ class FlowConfigurationService:
             after_levels = await self._repository.get_levels(conn, sector_id)
         assert after is not None
         return self._canonical_sector(after, after_levels)
+
+    # --- Operational settings ---
+
+    async def get_operational_settings(self) -> dict[str, Any]:
+        async with transaction(self._pool) as conn:
+            return await self._repository.get_operational_settings(conn)
+
+    async def update_operational_settings(
+        self,
+        *,
+        automation_enabled: bool | None = None,
+        scheduler_interval_seconds: int | None = None,
+        mail_intake_enabled: bool | None = None,
+        mail_batch_limit: int | None = None,
+        mail_after_cutoff: bool | None = None,
+    ) -> dict[str, Any]:
+        """Validate and persist Flow operational settings."""
+        if scheduler_interval_seconds is not None:
+            if (
+                not isinstance(scheduler_interval_seconds, int)
+                or scheduler_interval_seconds < _MIN_SCHEDULER_INTERVAL
+                or scheduler_interval_seconds > _MAX_SCHEDULER_INTERVAL
+            ):
+                raise FlowConfigurationValidationError(
+                    f"scheduler_interval_seconds debe estar entre {_MIN_SCHEDULER_INTERVAL} y {_MAX_SCHEDULER_INTERVAL}"
+                )
+        if mail_batch_limit is not None:
+            if (
+                not isinstance(mail_batch_limit, int)
+                or mail_batch_limit < _MIN_BATCH_LIMIT
+                or mail_batch_limit > _MAX_BATCH_LIMIT
+            ):
+                raise FlowConfigurationValidationError(
+                    f"mail_batch_limit debe estar entre {_MIN_BATCH_LIMIT} y {_MAX_BATCH_LIMIT}"
+                )
+        async with transaction(self._pool) as conn:
+            return await self._repository.update_operational_settings(
+                conn,
+                automation_enabled=automation_enabled,
+                scheduler_interval_seconds=scheduler_interval_seconds,
+                mail_intake_enabled=mail_intake_enabled,
+                mail_batch_limit=mail_batch_limit,
+                mail_after_cutoff=mail_after_cutoff,
+            )

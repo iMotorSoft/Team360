@@ -23,6 +23,16 @@ _LEVEL_COLUMNS = (
 )
 
 
+# Default operational settings (used before migration 023 is applied).
+_DEFAULT_OPERATIONAL_SETTINGS: dict = {
+    "automation_enabled": False,
+    "scheduler_interval_seconds": 15,
+    "mail_intake_enabled": True,
+    "mail_batch_limit": 500,
+    "mail_after_cutoff": True,
+}
+
+
 class FlowConfigurationPostgresRepository:
     """Configuration SQL with caller-owned connections and transactions."""
 
@@ -97,6 +107,30 @@ class FlowConfigurationPostgresRepository:
             },
         )
 
+    async def update_first_response_sla(
+        self,
+        conn: AsyncConnection,
+        *,
+        sector_id: str,
+        level: int,
+        first_response_sla_seconds: int | None,
+    ) -> int | None:
+        return await execute(
+            conn,
+            """
+            update flow_sector_levels
+            set first_response_sla_seconds = %(first_response_sla_seconds)s,
+                updated_at_utc = now()
+            where sector_id = %(sector_id)s
+              and level = %(level)s
+            """,
+            {
+                "sector_id": sector_id,
+                "level": level,
+                "first_response_sla_seconds": first_response_sla_seconds,
+            },
+        )
+
     async def update_closure_approval_level(
         self,
         conn: AsyncConnection,
@@ -117,3 +151,67 @@ class FlowConfigurationPostgresRepository:
                 "closure_approval_level": closure_approval_level,
             },
         )
+
+    # --- Operational settings ---
+
+    async def get_operational_settings(self, conn: AsyncConnection) -> dict:
+        try:
+            return await fetch_one(
+                conn,
+                """
+                select
+                    automation_enabled,
+                    scheduler_interval_seconds,
+                    mail_intake_enabled,
+                    mail_batch_limit,
+                    mail_after_cutoff
+                from flow_operational_settings
+                where id = 1
+                """,
+            )
+        except Exception:
+            # Migration 023 not yet applied; return defaults.
+            return dict(_DEFAULT_OPERATIONAL_SETTINGS)
+
+    async def update_operational_settings(
+        self,
+        conn: AsyncConnection,
+        *,
+        automation_enabled: bool | None = None,
+        scheduler_interval_seconds: int | None = None,
+        mail_intake_enabled: bool | None = None,
+        mail_batch_limit: int | None = None,
+        mail_after_cutoff: bool | None = None,
+    ) -> dict:
+        sets = []
+        params: dict = {}
+        if automation_enabled is not None:
+            sets.append("automation_enabled = %(automation_enabled)s")
+            params["automation_enabled"] = automation_enabled
+        if scheduler_interval_seconds is not None:
+            sets.append(
+                "scheduler_interval_seconds = %(scheduler_interval_seconds)s"
+            )
+            params["scheduler_interval_seconds"] = scheduler_interval_seconds
+        if mail_intake_enabled is not None:
+            sets.append("mail_intake_enabled = %(mail_intake_enabled)s")
+            params["mail_intake_enabled"] = mail_intake_enabled
+        if mail_batch_limit is not None:
+            sets.append("mail_batch_limit = %(mail_batch_limit)s")
+            params["mail_batch_limit"] = mail_batch_limit
+        if mail_after_cutoff is not None:
+            sets.append("mail_after_cutoff = %(mail_after_cutoff)s")
+            params["mail_after_cutoff"] = mail_after_cutoff
+        if not sets:
+            return await self.get_operational_settings(conn)
+        sets.append("updated_at_utc = now()")
+        try:
+            await execute(
+                conn,
+                f"update flow_operational_settings set {', '.join(sets)} where id = 1",
+                params,
+            )
+        except Exception:
+            # Migration 023 not yet applied; return defaults.
+            return dict(_DEFAULT_OPERATIONAL_SETTINGS)
+        return await self.get_operational_settings(conn)

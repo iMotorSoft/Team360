@@ -60,8 +60,14 @@ def test_current_backend_routes_remain_registered_with_flow_module() -> None:
 def test_registry_composition_preserves_lifecycle_and_cors() -> None:
     app = backend_entrypoint.create_app()
 
-    assert app.on_startup == [backend_entrypoint._open_db_pool]
-    assert app.on_shutdown == [backend_entrypoint._close_db_pool]
+    assert app.on_startup == [
+        backend_entrypoint._open_db_pool,
+        backend_entrypoint._start_flow_scheduler,
+    ]
+    assert app.on_shutdown == [
+        backend_entrypoint._stop_flow_scheduler,
+        backend_entrypoint._close_db_pool,
+    ]
     assert app.cors_config is not None
     assert app.cors_config.allow_methods == ["*"]
     assert app.cors_config.allow_headers == ["*"]
