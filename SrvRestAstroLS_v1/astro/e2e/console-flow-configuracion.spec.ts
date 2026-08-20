@@ -28,6 +28,13 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(overflow, `overflow horizontal: ${overflow}`).toBeLessThanOrEqual(1);
 }
 
+async function expectEditableConfigurationFields(page: Page) {
+  const editor = page.locator('[data-flow-config-editor]');
+  await expect(editor.getByLabel("Destinatario", { exact: true })).toHaveCount(3);
+  await expect(editor.getByRole("spinbutton", { name: /Tiempo máximo de primera respuesta/ })).toHaveCount(3);
+  await expect(editor.getByRole("textbox", { name: /Email del supervisor/ })).toHaveCount(1);
+}
+
 test.describe("Flow Configuración — MVP sin login (datos reales)", () => {
   test("sin token carga la configuración real de PostgreSQL", async ({ page }) => {
     const errors: string[] = [];
@@ -102,6 +109,45 @@ test.describe("Flow Configuración — MVP sin login (datos reales)", () => {
     await expect(page.getByText("Configuración preparada", { exact: true })).toHaveCount(0);
     await expect(page.getByText("alumbrado.n1@alquimiablue.com", { exact: true })).toHaveCount(0);
   });
+
+  test("persist operational settings and render scheduler status", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+
+    const endpoint = "/api/team360-flow/operational-settings";
+    const beforeResponse = await page.request.get(endpoint);
+    expect(beforeResponse.ok()).toBe(true);
+    const original = await beforeResponse.json();
+    const temporary = {
+      automation_enabled: false,
+      scheduler_interval_seconds: 20,
+      mail_intake_enabled: false,
+      mail_batch_limit: 17,
+      mail_after_cutoff: false,
+    };
+
+    try {
+      const saveResponse = await page.request.patch(endpoint, { data: temporary });
+      expect(saveResponse.ok()).toBe(true);
+      await page.reload();
+      await waitForRealConfig(page);
+
+      const scheduler = page.locator("section").filter({
+        has: page.getByRole("heading", { name: "Configuración del scheduler" }),
+      });
+      await expect(scheduler.getByText("INACTIVA", { exact: true })).toHaveCount(2);
+      await expect(scheduler.getByText("20s", { exact: true })).toBeVisible();
+      await expect(scheduler.getByText("INACTIVO", { exact: true })).toBeVisible();
+      await expect(scheduler.getByText("17", { exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Último ciclo ejecutado" })).toBeVisible();
+
+      const persistedResponse = await page.request.get(endpoint);
+      expect(await persistedResponse.json()).toEqual(temporary);
+    } finally {
+      const restoreResponse = await page.request.patch(endpoint, { data: original });
+      expect(restoreResponse.ok()).toBe(true);
+    }
+  });
 });
 
 test.describe("Flow Configuración — vista y navegación", () => {
@@ -143,7 +189,7 @@ test.describe("Flow Configuración — draft y validación", () => {
     await expect(page.getByText("Sin cambios", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Guardar cambios" })).toBeDisabled();
     await expect(page.getByRole("button", { name: "Cancelar" })).toBeVisible();
-    await expect(page.locator('[data-flow-config-editor] input')).toHaveCount(4);
+    await expectEditableConfigurationFields(page);
   });
 
   test("cambio válido activa dirty y un email inválido queda asociado al campo", async ({ page }) => {
@@ -178,6 +224,22 @@ test.describe("Flow Configuración — draft y validación", () => {
     await first.fill("@alquimiablue.com");
     await first.blur();
     await expect(page.getByText("Ingresá un email válido", { exact: true })).toBeVisible();
+  });
+
+  test("SLA inválido muestra validación y no habilita Guardar", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+
+    const firstSla = page.getByRole("spinbutton", { name: /Tiempo máximo de primera respuesta/ }).first();
+    await firstSla.fill("0");
+    await firstSla.blur();
+    await expect(page.getByText("El SLA debe ser un entero positivo", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Guardar cambios" })).toBeDisabled();
+
+    await firstSla.fill("45");
+    await firstSla.blur();
+    await expect(page.getByText("El SLA debe ser un entero positivo", { exact: true })).toHaveCount(0);
   });
 
   test("Cancelar descarta el draft y restaura la configuración guardada", async ({ page }) => {
@@ -391,7 +453,7 @@ test.describe("Flow Configuración — responsive y consola", () => {
       await waitForRealConfig(page);
       await expectNoHorizontalOverflow(page);
       await page.getByRole("button", { name: "Editar configuración" }).click();
-      await expect(page.locator('[data-flow-config-editor] input')).toHaveCount(4);
+      await expectEditableConfigurationFields(page);
       await expectNoHorizontalOverflow(page);
       await page.locator('#flow-destination-alumbrado-level-1').fill("direccion.muy.larga.para.validar.el.layout@alquimiablue.com");
       await page.locator('#flow-destination-alumbrado-level-1').blur();
