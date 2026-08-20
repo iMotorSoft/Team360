@@ -20,6 +20,7 @@ export interface FlowApiLevel {
   channel: string;
   destination: string;
   active: boolean;
+  first_response_sla_seconds: number | null;
 }
 
 export interface FlowApiSector {
@@ -35,7 +36,7 @@ export interface FlowApiConfiguration {
 }
 
 export interface FlowApiUpdatePayload {
-  levels: { level: number; destination: string }[];
+  levels: { level: number; destination: string; first_response_sla_seconds?: number | null }[];
   closure_approval_level: number | null;
 }
 
@@ -61,6 +62,7 @@ function mapApiSector(sector: FlowApiSector): FlowSectorConfiguration {
       destination: level.destination,
       active: level.active,
       role: level.level === 1 ? "Primera respuesta" : level.level === 2 ? "Escalamiento" : "Escalamiento avanzado",
+      firstResponseSlaSeconds: level.first_response_sla_seconds ?? null,
     })),
   };
 }
@@ -122,6 +124,66 @@ export async function updateFlowConfiguration(
       body: JSON.stringify(payload),
     });
     return handleResponse<FlowApiSector>(res);
+  } catch {
+    return { data: null, error: "unavailable" };
+  }
+}
+
+// --- Operational Settings API ---
+
+const OPS_API_BASE = "/api/team360-flow/operational-settings";
+const SCHEDULER_API_BASE = "/api/team360-flow/scheduler/status";
+
+export interface FlowOperationalSettings {
+  automation_enabled: boolean;
+  scheduler_interval_seconds: number;
+  mail_intake_enabled: boolean;
+  mail_batch_limit: number;
+  mail_after_cutoff: boolean;
+}
+
+export interface FlowSchedulerState {
+  last_started_at_utc: string | null;
+  last_finished_at_utc: string | null;
+  last_result: string | null;
+  last_error_class: string | null;
+  processed_count: number;
+  cycle_count: number;
+}
+
+export async function fetchOperationalSettings(
+  token?: string,
+): Promise<FlowApiResult<FlowOperationalSettings>> {
+  try {
+    const res = await fetch(OPS_API_BASE, { headers: headers(token) });
+    return handleResponse<FlowOperationalSettings>(res);
+  } catch {
+    return { data: null, error: "unavailable" };
+  }
+}
+
+export async function updateOperationalSettings(
+  payload: Partial<FlowOperationalSettings>,
+  token?: string,
+): Promise<FlowApiResult<FlowOperationalSettings>> {
+  try {
+    const res = await fetch(OPS_API_BASE, {
+      method: "PATCH",
+      headers: headers(token),
+      body: JSON.stringify(payload),
+    });
+    return handleResponse<FlowOperationalSettings>(res);
+  } catch {
+    return { data: null, error: "unavailable" };
+  }
+}
+
+export async function fetchSchedulerStatus(
+  token?: string,
+): Promise<FlowApiResult<FlowSchedulerState>> {
+  try {
+    const res = await fetch(SCHEDULER_API_BASE, { headers: headers(token) });
+    return handleResponse<FlowSchedulerState>(res);
   } catch {
     return { data: null, error: "unavailable" };
   }

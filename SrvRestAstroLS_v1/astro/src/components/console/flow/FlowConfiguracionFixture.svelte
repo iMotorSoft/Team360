@@ -22,6 +22,7 @@
         destination: `nivel${level}@${sectorId}.demo.local`,
         active: true,
         role: flowLevelRole(level),
+        firstResponseSlaSeconds: null,
       };
     });
   }

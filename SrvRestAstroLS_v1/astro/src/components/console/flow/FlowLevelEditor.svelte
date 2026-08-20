@@ -9,6 +9,9 @@
     touched = {},
     onDestinationInput = () => undefined,
     onDestinationBlur = () => undefined,
+    onSlaInput = () => undefined,
+    onSlaBlur = () => undefined,
+    slaErrors = {},
   }: {
     levels: FlowConfigurationLevel[];
     editing?: boolean;
@@ -17,7 +20,23 @@
     touched?: Record<string, boolean>;
     onDestinationInput?: (levelId: string, value: string) => void;
     onDestinationBlur?: (levelId: string) => void;
+    onSlaInput?: (levelId: string, value: string) => void;
+    onSlaBlur?: (levelId: string) => void;
+    slaErrors?: Record<string, string | null>;
   } = $props();
+
+  function formatSlaDisplay(seconds: number | null): string {
+    if (seconds === null || seconds === undefined) return "Sin límite";
+    if (seconds < 60) return `${seconds}s`;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+  }
+
+  function slaToInput(seconds: number | null): string {
+    if (seconds === null || seconds === undefined) return "";
+    return String(seconds);
+  }
 </script>
 
 <section aria-labelledby="flow-circuit-title">
@@ -70,10 +89,49 @@
                     <span id={`flow-error-${level.id}`} class="mt-1.5 block text-xs font-semibold text-[#9b3328]">{error}</span>
                   {/if}
                 </label>
+
+                {@const slaError = slaErrors[level.id]}
+                <label class="mt-3 block" for={`flow-sla-${level.id}`}>
+                  <span class="mb-1.5 block text-xs font-bold uppercase tracking-[0.1em] text-[#587184]">Tiempo máximo de primera respuesta</span>
+                  <div class="flex items-center gap-2">
+                    <input
+                      id={`flow-sla-${level.id}`}
+                      name={`sla-${level.id}`}
+                      type="number"
+                      min="1"
+                      step="1"
+                      placeholder="Sin límite"
+                      value={slaToInput(level.firstResponseSlaSeconds)}
+                      disabled={disabled}
+                      aria-invalid={Boolean(slaError && touched[`sla:${level.id}`])}
+                      aria-describedby={slaError && touched[`sla:${level.id}`] ? `flow-sla-error-${level.id}` : undefined}
+                      oninput={(event) => onSlaInput(level.id, event.currentTarget.value)}
+                      onblur={() => onSlaBlur(level.id)}
+                      class="w-32 min-w-0 rounded-xl border border-[#d5e0e2] bg-white px-3.5 py-3 text-sm text-[#31536b] outline-none transition placeholder:text-[#91a2ad] disabled:opacity-60 focus-visible:border-[#168b88] focus-visible:ring-2 focus-visible:ring-[#168b88]/20 aria-[invalid=true]:border-[#b54a3d] aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-[#b54a3d]/15"
+                    />
+                    <span class="text-xs font-bold text-[#78909f]">segundos</span>
+                  </div>
+                  {#if slaError && touched[`sla:${level.id}`]}
+                    <span id={`flow-sla-error-${level.id}`} class="mt-1.5 block text-xs font-semibold text-[#9b3328]">{slaError}</span>
+                  {/if}
+                  <span class="mt-1 block text-[0.62rem] leading-4 text-[#78909f]">
+                    {#if level.firstResponseSlaSeconds !== null && level.firstResponseSlaSeconds !== undefined}
+                      Formato actual: {formatSlaDisplay(level.firstResponseSlaSeconds)}. Dejá vacío para quitar el límite.
+                    {:else}
+                      Sin límite de tiempo configurado. Ingresá segundos para activar SLA.
+                    {/if}
+                  </span>
+                </label>
               {:else}
                 <div class="mt-4 flex min-w-0 items-center gap-2 rounded-xl border border-[#e3eaeb] bg-[#f8fbfa] px-3.5 py-3">
                   <span class="min-w-0 flex-1 truncate font-mono text-sm text-[#31536b]" title={level.destination}>{level.destination}</span>
                   <span class="shrink-0 text-xs text-[#91a2ad]" aria-hidden="true">✉</span>
+                </div>
+                <div class="mt-2 flex min-w-0 items-center gap-2 rounded-xl border border-[#e3eaeb] bg-[#f8fbfa] px-3.5 py-2.5">
+                  <span class="min-w-0 flex-1 text-xs text-[#587184]">
+                    Tiempo máximo: <span class="font-bold text-[#31536b]">{formatSlaDisplay(level.firstResponseSlaSeconds)}</span>
+                  </span>
+                  <span class="shrink-0 text-xs text-[#91a2ad]" aria-hidden="true">⏱</span>
                 </div>
               {/if}
             </div>

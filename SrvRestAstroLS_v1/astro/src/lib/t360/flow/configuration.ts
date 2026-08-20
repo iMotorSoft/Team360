@@ -11,6 +11,7 @@ export interface FlowConfigurationLevel {
   destination: string;
   active: boolean;
   role: string;
+  firstResponseSlaSeconds: number | null;
 }
 
 export interface FlowSectorConfiguration {
@@ -40,6 +41,7 @@ export const FLOW_CONFIGURATION_DEMO: FlowSectorConfiguration[] = [
         destination: "alumbrado.n1@alquimiablue.com",
         active: true,
         role: "Primera respuesta",
+        firstResponseSlaSeconds: 30,
       },
       {
         id: "alumbrado-level-2",
@@ -49,6 +51,7 @@ export const FLOW_CONFIGURATION_DEMO: FlowSectorConfiguration[] = [
         destination: "alumbrado.n2@alquimiablue.com",
         active: true,
         role: "Escalamiento",
+        firstResponseSlaSeconds: 30,
       },
       {
         id: "alumbrado-level-3",
@@ -58,6 +61,7 @@ export const FLOW_CONFIGURATION_DEMO: FlowSectorConfiguration[] = [
         destination: "alumbrado.n3@alquimiablue.com",
         active: true,
         role: "Escalamiento avanzado",
+        firstResponseSlaSeconds: null,
       },
     ],
   },
