@@ -118,7 +118,18 @@ class FlowScheduler:
                 await self._sleep_with_cancel(interval)
                 continue
 
-            await self._run_cycle(settings, interval)
+            try:
+                await self._run_cycle(settings, interval)
+            except Exception:
+                # Keep the scheduler alive even if an unexpected failure
+                # escapes the finite-cycle guard.  The pacing wait below is
+                # deliberately shared by PASS, DEGRADED and ERROR paths.
+                logger.exception("Unexpected Flow scheduler cycle failure")
+            finally:
+                # Operational semantics: cycle finishes, then wait the
+                # configured interval before the next settings read/cycle.
+                # This is also the failure backoff; never retry in a spin loop.
+                await self._sleep_with_cancel(interval)
 
         self._running = False
 
@@ -197,14 +208,15 @@ class FlowScheduler:
 
         # Reuse the existing poll_once + automatic_runner pipeline.
         inbox_processed = 0
+        gmail = None
         if mail_intake_enabled:
             sync_result = await poll_once(
                 account=account, query=query, limit=mail_batch_limit
             )
             inbox_processed = sync_result["processed"]
+            gmail = GmailClient(account)
 
         pool = get_pool()
-        gmail = GmailClient(account)
         citizen_service = FlowCitizenNotificationService(
             pool=pool,
             repository=CitizenNotificationPostgresRepository(),

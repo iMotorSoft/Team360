@@ -326,3 +326,299 @@ def test_scheduler_interval_configurable():
     # Verify the sleep method exists
     assert hasattr(scheduler, "_sleep_with_cancel")
     assert asyncio.iscoroutinefunction(scheduler._sleep_with_cancel)
+
+
+# ---------------------------------------------------------------------------
+# Runtime pacing and Gmail intake isolation regressions
+# ---------------------------------------------------------------------------
+
+
+def _run_virtual_scheduler(scheduler, settings_sequence, cycle_callback):
+    """Run the real scheduler loop with a virtual monotonic clock.
+
+    The loop and its settings transitions are real; only the one-second sleep
+    helper is replaced so these tests assert observable cycle timestamps
+    without waiting in wall-clock time.
+    """
+
+    async def run():
+        clock = 0
+        sleeps: list[int] = []
+        starts: list[int] = []
+        settings = iter(settings_sequence)
+
+        async def read_settings():
+            return next(settings)
+
+        async def virtual_sleep(seconds: int):
+            nonlocal clock
+            sleeps.append(seconds)
+            clock += seconds
+
+        async def run_cycle(current_settings, interval):
+            starts.append(clock)
+            await cycle_callback(current_settings, interval, len(starts))
+
+        scheduler._read_settings = read_settings
+        scheduler._sleep_with_cancel = virtual_sleep
+        scheduler._run_cycle = run_cycle
+        await scheduler._loop()
+        return starts, sleeps, clock
+
+    return asyncio.run(run())
+
+
+def test_scheduler_success_cycles_wait_configured_interval():
+    """A successful cycle is followed by the configured wait, never a spin."""
+    from modules.flow.scheduler import FlowScheduler
+
+    scheduler = FlowScheduler()
+
+    async def cycle_callback(_settings, _interval, number):
+        if number == 2:
+            scheduler._stop_event.set()
+
+    starts, sleeps, _clock = _run_virtual_scheduler(
+        scheduler,
+        [
+            {"automation_enabled": True, "scheduler_interval_seconds": 3},
+            {"automation_enabled": True, "scheduler_interval_seconds": 3},
+        ],
+        cycle_callback,
+    )
+
+    assert starts == [0, 3]
+    assert sleeps == [3, 3]
+
+
+def test_scheduler_error_cycles_wait_configured_interval():
+    """An unexpected cycle error is paced before the next retry."""
+    from modules.flow.scheduler import FlowScheduler
+
+    scheduler = FlowScheduler()
+
+    async def cycle_callback(_settings, _interval, number):
+        if number == 1:
+            raise RuntimeError("controlled scheduler failure")
+        scheduler._stop_event.set()
+
+    starts, sleeps, _clock = _run_virtual_scheduler(
+        scheduler,
+        [
+            {"automation_enabled": True, "scheduler_interval_seconds": 4},
+            {"automation_enabled": True, "scheduler_interval_seconds": 4},
+        ],
+        cycle_callback,
+    )
+
+    assert starts == [0, 4]
+    assert sleeps == [4, 4]
+
+
+def test_scheduler_dynamic_interval_applies_to_subsequent_waits():
+    """A settings change is observed without restarting the scheduler."""
+    from modules.flow.scheduler import FlowScheduler
+
+    scheduler = FlowScheduler()
+
+    async def cycle_callback(_settings, _interval, number):
+        if number == 3:
+            scheduler._stop_event.set()
+
+    starts, sleeps, _clock = _run_virtual_scheduler(
+        scheduler,
+        [
+            {"automation_enabled": True, "scheduler_interval_seconds": 2},
+            {"automation_enabled": True, "scheduler_interval_seconds": 5},
+            {"automation_enabled": True, "scheduler_interval_seconds": 5},
+        ],
+        cycle_callback,
+    )
+
+    assert starts == [0, 2, 7]
+    assert sleeps == [2, 5, 5]
+
+
+def test_scheduler_disabled_is_idle_and_does_not_execute_cycles():
+    """Disabled automation polls at a bounded cadence, not a busy loop."""
+    from modules.flow.scheduler import FlowScheduler
+
+    scheduler = FlowScheduler()
+    reads = 0
+
+    async def run():
+        nonlocal reads
+        clock = 0
+        sleeps: list[int] = []
+
+        async def read_settings():
+            nonlocal reads
+            reads += 1
+            return {"automation_enabled": False, "scheduler_interval_seconds": 5}
+
+        async def virtual_sleep(seconds: int):
+            nonlocal clock
+            sleeps.append(seconds)
+            clock += seconds
+            if len(sleeps) == 3:
+                scheduler._stop_event.set()
+
+        async def fail_if_cycle_runs(*_args, **_kwargs):
+            raise AssertionError("disabled scheduler executed a cycle")
+
+        scheduler._read_settings = read_settings
+        scheduler._sleep_with_cancel = virtual_sleep
+        scheduler._run_cycle = fail_if_cycle_runs
+        await scheduler._loop()
+        return sleeps
+
+    sleeps = asyncio.run(run())
+    assert reads == 3
+    assert sleeps == [5, 5, 5]
+
+
+def test_scheduler_enable_and_disable_transitions_without_restart():
+    """Settings transitions take effect on later loop iterations."""
+    from modules.flow.scheduler import FlowScheduler
+
+    scheduler = FlowScheduler()
+    settings = iter(
+        [
+            {"automation_enabled": False, "scheduler_interval_seconds": 1},
+            {"automation_enabled": True, "scheduler_interval_seconds": 1},
+            {"automation_enabled": False, "scheduler_interval_seconds": 1},
+        ]
+    )
+    starts: list[int] = []
+    sleeps: list[int] = []
+    clock = 0
+
+    async def run():
+        nonlocal clock
+
+        async def read_settings():
+            return next(settings)
+
+        async def virtual_sleep(seconds: int):
+            nonlocal clock
+            sleeps.append(seconds)
+            clock += seconds
+            if len(sleeps) == 3:
+                scheduler._stop_event.set()
+
+        async def run_cycle(_current_settings, _interval):
+            starts.append(clock)
+
+        scheduler._read_settings = read_settings
+        scheduler._sleep_with_cancel = virtual_sleep
+        scheduler._run_cycle = run_cycle
+        await scheduler._loop()
+
+    asyncio.run(run())
+    assert starts == [1]
+    assert sleeps == [1, 1, 1]
+
+
+def test_scheduler_mail_intake_off_does_not_construct_gmail(monkeypatch):
+    """DB/SLA processing remains available when Gmail intake is disabled."""
+    from modules.flow import scheduler as scheduler_module
+    from modules.flow.scheduler import FlowScheduler
+
+    class _Summary:
+        def as_dict(self):
+            return {"failed": 0, "inbox_processed": 0}
+
+    runner = MagicMock()
+    runner.run_once = AsyncMock(return_value=_Summary())
+    runner_factory = MagicMock(return_value=runner)
+    poll = AsyncMock()
+    gmail = MagicMock(side_effect=AssertionError("Gmail must stay unused"))
+
+    monkeypatch.setattr(scheduler_module, "poll_once", poll)
+    monkeypatch.setattr(scheduler_module, "GmailClient", gmail)
+    monkeypatch.setattr(scheduler_module, "get_pool", MagicMock(return_value=MagicMock()))
+    monkeypatch.setattr(scheduler_module, "FlowAutomaticRunner", runner_factory)
+
+    result = asyncio.run(
+        FlowScheduler()._execute_cycle(
+            {
+                "mail_intake_enabled": False,
+                "mail_batch_limit": 7,
+                "mail_after_cutoff": True,
+            }
+        )
+    )
+
+    assert result["inbox_processed"] == 0
+    poll.assert_not_awaited()
+    gmail.assert_not_called()
+    runner.run_once.assert_awaited_once_with(confirm_send=True)
+    assert runner_factory.call_args.kwargs["sender"] is None
+
+
+def test_scheduler_mail_intake_on_preserves_cutoff_and_batch(monkeypatch):
+    """Enabled intake still calls Gmail with the existing safe query/limit."""
+    from modules.flow import scheduler as scheduler_module
+    from modules.flow.scheduler import FlowScheduler
+
+    class _Summary:
+        def as_dict(self):
+            return {"failed": 0}
+
+    runner = MagicMock()
+    runner.run_once = AsyncMock(return_value=_Summary())
+    runner_factory = MagicMock(return_value=runner)
+    poll = AsyncMock(return_value={"processed": 2})
+    gmail = MagicMock()
+
+    monkeypatch.delenv("TEAM360_FLOW_GMAIL_QUERY", raising=False)
+    monkeypatch.setattr(scheduler_module, "poll_once", poll)
+    monkeypatch.setattr(scheduler_module, "GmailClient", gmail)
+    monkeypatch.setattr(scheduler_module, "get_pool", MagicMock(return_value=MagicMock()))
+    monkeypatch.setattr(scheduler_module, "FlowAutomaticRunner", runner_factory)
+
+    result = asyncio.run(
+        FlowScheduler()._execute_cycle(
+            {
+                "mail_intake_enabled": True,
+                "mail_batch_limit": 7,
+                "mail_after_cutoff": True,
+            }
+        )
+    )
+
+    assert result["inbox_processed"] == 2
+    poll.assert_awaited_once_with(
+        account=None,
+        query="in:inbox -after:2026/08/12",
+        limit=7,
+    )
+    gmail.assert_called_once_with(None)
+    runner.run_once.assert_awaited_once_with(confirm_send=True)
+
+
+def test_scheduler_error_then_success_recovers_with_pacing():
+    """A failed cycle does not kill the task and the next cycle can pass."""
+    from modules.flow.scheduler import FlowScheduler
+
+    scheduler = FlowScheduler()
+    outcomes = iter(["ERROR", "PASS"])
+
+    async def cycle_callback(_settings, _interval, number):
+        outcome = next(outcomes)
+        if outcome == "ERROR":
+            raise RuntimeError("controlled failure")
+        assert number == 2
+        scheduler._stop_event.set()
+
+    starts, sleeps, _clock = _run_virtual_scheduler(
+        scheduler,
+        [
+            {"automation_enabled": True, "scheduler_interval_seconds": 2},
+            {"automation_enabled": True, "scheduler_interval_seconds": 2},
+        ],
+        cycle_callback,
+    )
+
+    assert starts == [0, 2]
+    assert sleeps == [2, 2]
