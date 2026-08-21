@@ -360,6 +360,8 @@ class AssistantConversationRuntime:
                     safe_to_show=True,
                 ))
 
+        state.last_sources = list(chunks)
+
         events.append(ProgressiveEvent(
             event_type="team360.sources.ready",
             payload={"chunk_count": len(chunks)},

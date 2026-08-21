@@ -26,7 +26,7 @@ from modules.sales_diagnosis_runtime.knowledge_scope_resolver import (
 
 @dataclass
 class FakeCursor:
-    _rows: list[tuple[Any, ...]]
+    _rows: list[Any]
     _executed: list[tuple[str, dict]] | None = None
     _result_index: int = 0
 
@@ -41,7 +41,7 @@ class FakeCursor:
             self._executed.append((query, params or {}))
         self._result_index = 0
 
-    async def fetchone(self) -> tuple[Any, ...] | None:
+    async def fetchone(self) -> Any | None:
         if self._result_index < len(self._rows):
             row = self._rows[self._result_index]
             self._result_index += 1
@@ -51,7 +51,7 @@ class FakeCursor:
 
 @dataclass
 class FakeConnection:
-    rows: list[tuple[Any, ...]]
+    rows: list[Any]
     executed: list[tuple[str, dict]] | None = None
     closed: bool = False
 
@@ -63,12 +63,31 @@ class FakeConnection:
 
 
 @dataclass
-class FakePool:
-    rows: list[tuple[Any, ...]]
-    executed: list[tuple[str, dict]] | None = None
+class FakePoolConnectionContext:
+    connection: FakeConnection
+    entered: bool = False
+    exited: bool = False
 
-    def connection(self) -> FakeConnection:
-        return FakeConnection(self.rows, executed=self.executed)
+    async def __aenter__(self) -> FakeConnection:
+        self.entered = True
+        return self.connection
+
+    async def __aexit__(self, *args: Any) -> None:
+        self.exited = True
+
+
+class FakePool:
+    def __init__(
+        self,
+        rows: list[Any],
+        executed: list[tuple[str, dict]] | None = None,
+    ) -> None:
+        self.context = FakePoolConnectionContext(
+            FakeConnection(rows, executed=executed)
+        )
+
+    def connection(self) -> FakePoolConnectionContext:
+        return self.context
 
 
 # ---------------------------------------------------------------------------
@@ -128,6 +147,68 @@ class TestPostgresKnowledgeScopeResolver:
 
         assert result == SCOPE_UUID
         assert len(conn.executed) == 2
+
+    @pytest.mark.anyio
+    async def test_resolve_valid_scope_with_dict_rows(self):
+        conn = FakeConnection(
+            rows=[{"scope_id": SCOPE_UUID}, {"binding_exists": 1}],
+            executed=[],
+        )
+        resolver = PostgresKnowledgeScopeResolver(_connection=conn)
+        ctx = KnowledgeScopeContext(
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+        )
+
+        result = await resolver.resolve_scope_id(ctx)
+
+        assert result == SCOPE_UUID
+        assert len(conn.executed) == 2
+
+    @pytest.mark.anyio
+    async def test_resolve_valid_scope_through_pool_context(self):
+        executed: list[tuple[str, dict]] = []
+        pool = FakePool(rows=[(SCOPE_UUID,), (1,)], executed=executed)
+        resolver = PostgresKnowledgeScopeResolver(pool=pool)
+        ctx = KnowledgeScopeContext(
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+        )
+
+        result = await resolver.resolve_scope_id(ctx)
+
+        assert result == SCOPE_UUID
+        assert len(executed) == 2
+        assert pool.context.entered is True
+        assert pool.context.exited is True
+
+    @pytest.mark.anyio
+    async def test_pool_acquisition_error_is_controlled(self):
+        class FailingPoolContext:
+            async def __aenter__(self):
+                raise RuntimeError("pool unavailable")
+
+            async def __aexit__(self, *args):
+                raise AssertionError("unacquired connection must not be released")
+
+        class FailingPool:
+            def connection(self):
+                return FailingPoolContext()
+
+        resolver = PostgresKnowledgeScopeResolver(pool=FailingPool())
+        ctx = KnowledgeScopeContext(
+            organization_code="team360_live",
+            workspace_code="team360_public_site",
+            package_code="pkg_sales_diagnosis",
+            knowledge_scope_code="ks_team360_sales_diagnosis",
+        )
+
+        with pytest.raises(ScopeResolutionError, match="Failed to resolve"):
+            await resolver.resolve_scope_id(ctx)
 
     @pytest.mark.anyio
     async def test_resolve_nonexistent_scope_returns_none(self):

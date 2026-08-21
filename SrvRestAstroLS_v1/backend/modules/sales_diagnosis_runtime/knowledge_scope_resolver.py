@@ -16,6 +16,7 @@ Archives:
 from __future__ import annotations
 
 import time
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
@@ -54,7 +55,7 @@ class KnowledgeScopeResolver(Protocol):
 
 
 _RESOLVE_SCOPE_SQL = """
-select ks.id::text
+select ks.id::text as scope_id
 from knowledge_scopes ks
 join core_workspaces w on w.id = ks.workspace_id
 where w.slug = %(workspace_code)s
@@ -105,56 +106,58 @@ class PostgresKnowledgeScopeResolver:
         if not context.knowledge_scope_code:
             return None
 
-        conn = await self._get_connection()
         try:
-            async with conn.cursor() as cur:
-                await cur.execute(
-                    _RESOLVE_SCOPE_SQL,
-                    {
-                        "workspace_code": context.workspace_code,
-                        "knowledge_scope_code": context.knowledge_scope_code,
-                        "organization_code": context.organization_code,
-                    },
+            if self._connection is not None:
+                return await self._resolve_with_connection(
+                    self._connection, context
                 )
-                row = await cur.fetchone()
-                if row is None:
-                    return None
-                scope_id: str = row[0]
-
-                if context.package_code:
-                    await cur.execute(
-                        _VERIFY_PACKAGE_BINDING_SQL,
-                        {
-                            "scope_id": scope_id,
-                            "package_code": context.package_code,
-                        },
-                    )
-                    binding = await cur.fetchone()
-                    if binding is None:
-                        return None
-
-                return scope_id
+            if self.pool is not None:
+                async with self.pool.connection() as conn:
+                    return await self._resolve_with_connection(conn, context)
+            raise ScopeResolutionError(
+                "PostgresKnowledgeScopeResolver has no pool or connection configured."
+            )
+        except ScopeResolutionError:
+            raise
         except Exception as exc:
             raise ScopeResolutionError(
                 f"Failed to resolve knowledge scope: {exc}"
             ) from exc
-        finally:
-            await self._release_connection(conn)
 
-    async def _get_connection(self) -> Any:
-        if self._connection is not None:
-            return self._connection
-        if self.pool is not None:
-            return self.pool.connection()
-        raise ScopeResolutionError(
-            "PostgresKnowledgeScopeResolver has no pool or connection configured."
-        )
+    async def _resolve_with_connection(
+        self,
+        conn: Any,
+        context: KnowledgeScopeContext,
+    ) -> str | None:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                _RESOLVE_SCOPE_SQL,
+                {
+                    "workspace_code": context.workspace_code,
+                    "knowledge_scope_code": context.knowledge_scope_code,
+                    "organization_code": context.organization_code,
+                },
+            )
+            row = await cur.fetchone()
+            if row is None:
+                return None
+            scope_id = str(
+                row["scope_id"] if isinstance(row, Mapping) else row[0]
+            )
 
-    async def _release_connection(self, conn: Any) -> None:
-        if self._connection is not None:
-            return
-        if self.pool is not None:
-            await conn.close()
+            if context.package_code:
+                await cur.execute(
+                    _VERIFY_PACKAGE_BINDING_SQL,
+                    {
+                        "scope_id": scope_id,
+                        "package_code": context.package_code,
+                    },
+                )
+                binding = await cur.fetchone()
+                if binding is None:
+                    return None
+
+            return scope_id
 
 
 # ---------------------------------------------------------------------------

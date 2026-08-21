@@ -83,6 +83,30 @@ class RecordingLLMProvider:
         return self.response_text
 
 
+class RecordingRetrievalProvider:
+    def __init__(self, chunks: list[RetrievedChunk]) -> None:
+        self.chunks = chunks
+        self.calls = 0
+
+    def retrieve(self, input, state, top_k=None, top_n=None):
+        self.calls += 1
+        return list(self.chunks)
+
+
+def _retrieved_chunk(chunk_id: str = "chunk-real-1") -> RetrievedChunk:
+    return RetrievedChunk(
+        chunk_id=chunk_id,
+        document_id="document-real-1",
+        knowledge_scope_id="scope-real-1",
+        source_uri="knowledge://document-real-1",
+        title="Knowledge source",
+        node_path="diagnosis/runtime",
+        score=0.91,
+        content_preview="Safe source preview",
+        content="Safe source content",
+    )
+
+
 # ---------------------------------------------------------------------------
 # 1. Contracts
 # ---------------------------------------------------------------------------
@@ -216,6 +240,56 @@ class TestRuntimeSkeleton:
         loaded = repo.load(sample_input.session_id)
         assert loaded is not None
         assert loaded.session_id == sample_input.session_id
+
+    def test_runtime_persists_retrieved_chunks_as_last_sources(self, sample_input):
+        chunks = [_retrieved_chunk(), _retrieved_chunk("chunk-real-2")]
+        retrieval = RecordingRetrievalProvider(chunks)
+        repo = InMemoryStateRepository()
+        runtime = AssistantConversationRuntime(
+            state_repository=repo,
+            retrieval_provider=retrieval,
+            llm_provider=RecordingLLMProvider(),
+        )
+
+        output = runtime.handle_turn(sample_input)
+        persisted = repo.load(sample_input.session_id)
+
+        assert retrieval.calls == 1
+        assert [chunk.chunk_id for chunk in output.retrieved_sources] == [
+            "chunk-real-1",
+            "chunk-real-2",
+        ]
+        assert output.next_state is not None
+        assert [chunk.chunk_id for chunk in output.next_state.last_sources] == [
+            "chunk-real-1",
+            "chunk-real-2",
+        ]
+        assert persisted is not None
+        assert [chunk.chunk_id for chunk in persisted.last_sources] == [
+            "chunk-real-1",
+            "chunk-real-2",
+        ]
+
+    def test_runtime_persists_empty_last_sources_when_retrieval_is_empty(
+        self, sample_input
+    ):
+        retrieval = RecordingRetrievalProvider([])
+        repo = InMemoryStateRepository()
+        runtime = AssistantConversationRuntime(
+            state_repository=repo,
+            retrieval_provider=retrieval,
+            llm_provider=RecordingLLMProvider(),
+        )
+
+        output = runtime.handle_turn(sample_input)
+        persisted = repo.load(sample_input.session_id)
+
+        assert retrieval.calls == 1
+        assert output.retrieved_sources == []
+        assert output.next_state is not None
+        assert output.next_state.last_sources == []
+        assert persisted is not None
+        assert persisted.last_sources == []
 
     def test_runtime_does_not_activate_future_capabilities(
         self, runtime, sample_input
