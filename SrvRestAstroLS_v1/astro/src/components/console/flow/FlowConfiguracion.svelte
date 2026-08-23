@@ -54,9 +54,11 @@
   let schedulerState = $state<FlowSchedulerState | null>(null);
   let opsSaving = $state(false);
   let opsSaveMessage = $state("");
+  let schedulerStatusRefreshPromise: Promise<void> | null = null;
 
   const MIN_MAIL_CUTOFF_EPOCH = 1577836800;
   const MAX_MAIL_CUTOFF_EPOCH = 1893456000;
+  const SCHEDULER_STATUS_REFRESH_MS = 10_000;
 
   function formatCutoffEpoch(epoch: number | undefined): string {
     if (!Number.isInteger(epoch)) return "Corte inválido";
@@ -162,12 +164,28 @@
     }
   }
 
-  async function loadSchedulerStatus() {
-    if (!useRealApi) return;
-    const result = await fetchSchedulerStatus(token ?? undefined);
-    if (result.data) {
-      schedulerState = result.data;
+  function loadSchedulerStatus(): Promise<void> {
+    if (!useRealApi) return Promise.resolve();
+    if (schedulerStatusRefreshPromise) return schedulerStatusRefreshPromise;
+
+    schedulerStatusRefreshPromise = (async () => {
+      try {
+        const result = await fetchSchedulerStatus(token ?? undefined);
+        if (result.data) {
+          schedulerState = result.data;
+        }
+      } finally {
+        schedulerStatusRefreshPromise = null;
+      }
+    })();
+    return schedulerStatusRefreshPromise;
+  }
+
+  async function refreshSchedulerStatusAfterSave() {
+    if (schedulerStatusRefreshPromise) {
+      await schedulerStatusRefreshPromise;
     }
+    await loadSchedulerStatus();
   }
 
   onMount(() => {
@@ -175,6 +193,11 @@
       void loadRealConfiguration();
       void loadOperationalSettings();
       void loadSchedulerStatus();
+      const schedulerStatusRefreshId = window.setInterval(() => {
+        void loadSchedulerStatus();
+      }, SCHEDULER_STATUS_REFRESH_MS);
+
+      return () => window.clearInterval(schedulerStatusRefreshId);
     }
   });
 
@@ -296,6 +319,7 @@
       operationalSettings = result.data;
       opsDraft = null;
       opsSaveMessage = "Ajustes operacionales guardados.";
+      await refreshSchedulerStatusAfterSave();
     }
   }
 

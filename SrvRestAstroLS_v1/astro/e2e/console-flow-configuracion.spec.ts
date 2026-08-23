@@ -3,6 +3,26 @@ import { expect, test, type Page } from "@playwright/test";
 const CONFIG_URL = "/w/ws-team360-control/flow/configuracion";
 const FIXTURE_URL = "/demo/flow/configuracion-fixtures";
 const REAL_LIST_URL = "**/api/team360-flow/configuration";
+const OPERATIONAL_SETTINGS_URL = "**/api/team360-flow/operational-settings";
+const SCHEDULER_STATUS_URL = "**/api/team360-flow/scheduler/status";
+
+function schedulerStatus(cycleCount: number, overrides: Record<string, unknown> = {}) {
+  return {
+    last_started_at_utc: "2026-08-23T22:28:12.333278Z",
+    last_finished_at_utc: "2026-08-23T22:28:13.575496Z",
+    last_result: "PASS",
+    last_error_class: null,
+    processed_count: 3,
+    cycle_count: cycleCount,
+    ...overrides,
+  };
+}
+
+function schedulerStatusPanel(page: Page) {
+  return page.locator("section").filter({
+    has: page.getByRole("heading", { name: "Último ciclo ejecutado" }),
+  });
+}
 
 async function openConfiguration(page: Page, url = CONFIG_URL) {
   await page.goto(url);
@@ -176,6 +196,156 @@ test.describe("Flow Configuración — MVP sin login (datos reales)", () => {
     await expect(page.getByText("El corte debe ser un epoch UTC válido entre 2020 y 2030.", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Guardar operación" })).toBeDisabled();
     await page.getByRole("button", { name: "Cancelar" }).last().click();
+  });
+});
+
+test.describe("Flow Configuración — estado vivo del scheduler", () => {
+  test("carga el estado inicial y actualiza ciclos, resultado y último ciclo sin reload", async ({ page }) => {
+    await page.clock.install();
+    let statusRequests = 0;
+    await page.route(SCHEDULER_STATUS_URL, async (route) => {
+      statusRequests += 1;
+      const response = statusRequests === 1
+        ? schedulerStatus(42)
+        : schedulerStatus(43, {
+            last_started_at_utc: "2026-08-23T22:28:22.333278Z",
+            last_finished_at_utc: "2026-08-23T22:28:23.575496Z",
+            last_result: "DEGRADED",
+            processed_count: 4,
+          });
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(response) });
+    });
+
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+    const panel = schedulerStatusPanel(page);
+    await expect(panel.getByText("42", { exact: true })).toBeVisible();
+    await expect(panel.getByText("PASS", { exact: true })).toBeVisible();
+    const initialLastCycle = await panel.locator("div").filter({ hasText: "Último ciclo" }).last().innerText();
+
+    await page.clock.fastForward(10_000);
+
+    await expect.poll(() => statusRequests).toBe(2);
+    await expect(panel.getByText("43", { exact: true })).toBeVisible();
+    await expect(panel.getByText("DEGRADED", { exact: true })).toBeVisible();
+    await expect(panel.getByText("4", { exact: true })).toBeVisible();
+    await expect.poll(async () => panel.locator("div").filter({ hasText: "Último ciclo" }).last().innerText())
+      .not.toBe(initialLastCycle);
+  });
+
+  test("conserva el último estado válido y se recupera de un error temporal", async ({ page }) => {
+    await page.clock.install();
+    let statusRequests = 0;
+    await page.route(SCHEDULER_STATUS_URL, async (route) => {
+      statusRequests += 1;
+      if (statusRequests === 2) {
+        await route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ detail: "temporary" }) });
+        return;
+      }
+      const response = statusRequests === 1
+        ? schedulerStatus(42)
+        : schedulerStatus(44, { processed_count: 5 });
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(response) });
+    });
+
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+    const panel = schedulerStatusPanel(page);
+    await expect(panel.getByText("42", { exact: true })).toBeVisible();
+
+    await page.clock.fastForward(10_000);
+    await expect.poll(() => statusRequests).toBe(2);
+    await expect(panel.getByText("42", { exact: true })).toBeVisible();
+
+    await page.clock.fastForward(10_000);
+    await expect.poll(() => statusRequests).toBe(3);
+    await expect(panel.getByText("44", { exact: true })).toBeVisible();
+    await expect(panel.getByText("5", { exact: true })).toBeVisible();
+  });
+
+  test("refresca el status inmediatamente después de guardar operación", async ({ page }) => {
+    await page.clock.install();
+    const requestOrder: string[] = [];
+    let statusRequests = 0;
+    let operationalSettings = {
+      automation_enabled: false,
+      scheduler_interval_seconds: 15,
+      mail_intake_enabled: true,
+      mail_batch_limit: 500,
+      mail_after_cutoff: true,
+      mail_cutoff_epoch: 1787239323,
+    };
+
+    await page.route(SCHEDULER_STATUS_URL, async (route) => {
+      statusRequests += 1;
+      requestOrder.push("status");
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(schedulerStatus(statusRequests === 1 ? 42 : 43)),
+      });
+    });
+    await page.route(OPERATIONAL_SETTINGS_URL, async (route) => {
+      if (route.request().method() === "PATCH") {
+        requestOrder.push("patch");
+        operationalSettings = { ...operationalSettings, ...(route.request().postDataJSON() as object) };
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(operationalSettings),
+      });
+    });
+
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+    const panel = schedulerStatusPanel(page);
+    await expect(panel.getByText("42", { exact: true })).toBeVisible();
+    expect(statusRequests).toBe(1);
+
+    await page.getByRole("button", { name: "Editar operación" }).click();
+    await page.getByRole("switch", { name: "Automatización habilitada" }).click();
+    await page.getByRole("button", { name: "Guardar operación" }).click();
+
+    await expect(page.getByText("Ajustes operacionales guardados.", { exact: true })).toBeVisible();
+    await expect.poll(() => statusRequests).toBe(2);
+    expect(requestOrder.slice(-2)).toEqual(["patch", "status"]);
+    await expect(panel.getByText("43", { exact: true })).toBeVisible();
+  });
+
+  test("evita fetches superpuestos y cancela el polling al desmontar", async ({ page }) => {
+    await page.clock.install();
+    let statusRequests = 0;
+    let releasePendingRequest: (() => void) | undefined;
+    await page.route(SCHEDULER_STATUS_URL, async (route) => {
+      statusRequests += 1;
+      if (statusRequests === 2) {
+        await new Promise<void>((resolve) => {
+          releasePendingRequest = resolve;
+        });
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(schedulerStatus(statusRequests === 1 ? 42 : 43)),
+      });
+    });
+
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+    await expect(schedulerStatusPanel(page).getByText("42", { exact: true })).toBeVisible();
+
+    await page.clock.fastForward(10_000);
+    await expect.poll(() => statusRequests).toBe(2);
+    await page.clock.fastForward(20_000);
+    expect(statusRequests).toBe(2);
+
+    releasePendingRequest?.();
+    await expect(schedulerStatusPanel(page).getByText("43", { exact: true })).toBeVisible();
+    await page.getByRole("navigation", { name: "Navegación de consola" }).getByRole("link", { name: "Directorio" }).click();
+    await expect(page).toHaveURL(/\/flow\/?$/);
+    await page.clock.fastForward(30_000);
+    expect(statusRequests).toBe(2);
   });
 });
 
