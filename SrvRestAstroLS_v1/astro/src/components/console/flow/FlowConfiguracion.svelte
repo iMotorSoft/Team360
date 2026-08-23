@@ -55,6 +55,18 @@
   let opsSaving = $state(false);
   let opsSaveMessage = $state("");
 
+  const MIN_MAIL_CUTOFF_EPOCH = 1577836800;
+  const MAX_MAIL_CUTOFF_EPOCH = 1893456000;
+
+  function formatCutoffEpoch(epoch: number | undefined): string {
+    if (!Number.isInteger(epoch)) return "Corte inválido";
+    return new Intl.DateTimeFormat("es-AR", {
+      dateStyle: "medium",
+      timeStyle: "medium",
+      timeZone: "UTC",
+    }).format(new Date((epoch as number) * 1000));
+  }
+
   // MVP: la ruta productiva usa la API real (default_admin) sin requerir token.
   // `apiEnabled={false}` se usa en fixtures controlados.
   const useRealApi = $derived(apiEnabled);
@@ -249,13 +261,29 @@
     opsSaveMessage = "";
   }
 
-  // Safe defaults for template access (TypeScript can't see Svelte if-block scoping)
-  const opsAutomation = $derived(opsDraft?.automation_enabled ?? operationalSettings?.automation_enabled ?? false);
-  const opsIntake = $derived(opsDraft?.mail_intake_enabled ?? operationalSettings?.mail_intake_enabled ?? true);
-  const opsCutoff = $derived(opsDraft?.mail_after_cutoff ?? operationalSettings?.mail_after_cutoff ?? true);
+  const opsValidationError = $derived.by(() => {
+    if (!opsDraft) return null;
+    const interval = opsDraft.scheduler_interval_seconds;
+    if (!Number.isInteger(interval) || (interval as number) < 5 || (interval as number) > 3600) {
+      return "El intervalo debe ser un entero entre 5 y 3600 segundos.";
+    }
+    const batch = opsDraft.mail_batch_limit;
+    if (!Number.isInteger(batch) || (batch as number) < 1 || (batch as number) > 10000) {
+      return "El lote debe ser un entero entre 1 y 10000 mensajes.";
+    }
+    const cutoff = opsDraft.mail_cutoff_epoch;
+    if (
+      !Number.isInteger(cutoff)
+      || (cutoff as number) < MIN_MAIL_CUTOFF_EPOCH
+      || (cutoff as number) > MAX_MAIL_CUTOFF_EPOCH
+    ) {
+      return "El corte debe ser un epoch UTC válido entre 2020 y 2030.";
+    }
+    return null;
+  });
 
   async function saveOpsSettings() {
-    if (!opsDraft || !useRealApi) return;
+    if (!opsDraft || !useRealApi || opsValidationError) return;
     opsSaving = true;
     opsSaveMessage = "";
     const result = await updateOperationalSettings(opsDraft, token ?? undefined);
@@ -589,7 +617,7 @@
             <button type="button" class="inline-flex min-h-11 items-center justify-center rounded-full border border-[#cddbdd] bg-white px-5 py-2.5 text-sm font-bold text-[#47657b] transition hover:border-[#9fb6bb] hover:bg-[#f4f8f8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88]" onclick={cancelOpsEdit}>
               Cancelar
             </button>
-            <button type="button" class="inline-flex min-h-11 items-center justify-center rounded-full border border-[#168b88] bg-[#168b88] px-5 py-2.5 text-sm font-bold text-white transition hover:border-[#126d6b] hover:bg-[#126d6b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] disabled:cursor-not-allowed disabled:opacity-50" disabled={opsSaving} onclick={saveOpsSettings}>
+            <button type="button" class="inline-flex min-h-11 items-center justify-center rounded-full border border-[#168b88] bg-[#168b88] px-5 py-2.5 text-sm font-bold text-white transition hover:border-[#126d6b] hover:bg-[#126d6b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] disabled:cursor-not-allowed disabled:opacity-50" disabled={opsSaving || Boolean(opsValidationError)} onclick={saveOpsSettings}>
               {opsSaving ? "Guardando..." : "Guardar operación"}
             </button>
           </div>
@@ -602,6 +630,12 @@
         </div>
       {/if}
 
+      {#if opsValidationError}
+        <div class="mt-4 rounded-2xl border border-[#f1c7c2] bg-[#fdf0ee] p-4" role="alert">
+          <p class="text-sm font-semibold text-[#9b3328]">{opsValidationError}</p>
+        </div>
+      {/if}
+
       <div class="mt-5 space-y-4">
         <!-- Automation Toggle -->
         <div class="flex items-center justify-between rounded-xl border border-[#e3eaeb] bg-[#f8fbfa] px-4 py-3">
@@ -610,7 +644,7 @@
             <p class="text-xs text-[#78909f]">Activa el scheduler que ejecuta ciclos automáticos de Flow.</p>
           </div>
           {#if opsDraft}
-            <button type="button" role="switch" aria-checked={opsDraft.automation_enabled ?? operationalSettings?.automation_enabled}
+            <button type="button" role="switch" aria-label="Automatización habilitada" aria-checked={opsDraft.automation_enabled ?? operationalSettings?.automation_enabled}
               onclick={() => updateOpsField("automation_enabled", !(opsDraft?.automation_enabled ?? operationalSettings?.automation_enabled))}
               class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] ${(opsDraft?.automation_enabled ?? operationalSettings?.automation_enabled) ? "bg-[#168b88]" : "bg-[#bccdd0]"}`}
             >
@@ -631,7 +665,7 @@
           </div>
           {#if opsDraft}
             <div class="flex items-center gap-2">
-              <input type="number" min="5" max="3600" step="1" value={opsDraft.scheduler_interval_seconds ?? operationalSettings?.scheduler_interval_seconds}
+              <input type="number" aria-label="Frecuencia del scheduler" min="5" max="3600" step="1" value={opsDraft.scheduler_interval_seconds ?? operationalSettings?.scheduler_interval_seconds}
                 oninput={(e) => updateOpsField("scheduler_interval_seconds", parseInt(e.currentTarget.value, 10))}
                 class="w-24 rounded-xl border border-[#d5e0e2] bg-white px-3 py-2 text-sm text-[#31536b] outline-none focus-visible:border-[#168b88] focus-visible:ring-2 focus-visible:ring-[#168b88]/20"
               />
@@ -649,7 +683,7 @@
             <p class="text-xs text-[#78909f]">Procesa emails entrantes del buzón configurado.</p>
           </div>
           {#if opsDraft}
-            <button type="button" role="switch" aria-checked={opsDraft.mail_intake_enabled ?? operationalSettings?.mail_intake_enabled}
+            <button type="button" role="switch" aria-label="Intake de correo habilitado" aria-checked={opsDraft.mail_intake_enabled ?? operationalSettings?.mail_intake_enabled}
               onclick={() => updateOpsField("mail_intake_enabled", !(opsDraft?.mail_intake_enabled ?? operationalSettings?.mail_intake_enabled))}
               class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] ${(opsDraft?.mail_intake_enabled ?? operationalSettings?.mail_intake_enabled) ? "bg-[#168b88]" : "bg-[#bccdd0]"}`}
             >
@@ -669,7 +703,7 @@
             <p class="text-xs text-[#78909f]">Máximo de mensajes procesados por ciclo.</p>
           </div>
           {#if opsDraft}
-            <input type="number" min="1" max="10000" step="1" value={opsDraft.mail_batch_limit ?? operationalSettings?.mail_batch_limit}
+            <input type="number" aria-label="Lote máximo de correo" min="1" max="10000" step="1" value={opsDraft.mail_batch_limit ?? operationalSettings?.mail_batch_limit}
               oninput={(e) => updateOpsField("mail_batch_limit", parseInt(e.currentTarget.value, 10))}
               class="w-24 rounded-xl border border-[#d5e0e2] bg-white px-3 py-2 text-sm text-[#31536b] outline-none focus-visible:border-[#168b88] focus-visible:ring-2 focus-visible:ring-[#168b88]/20"
             />
@@ -678,14 +712,14 @@
           {/if}
         </div>
 
-        <!-- Historical Cutoff -->
+        <!-- Historical Cutoff Toggle -->
         <div class="flex items-center justify-between rounded-xl border border-[#e3eaeb] bg-[#f8fbfa] px-4 py-3">
           <div>
             <p class="text-sm font-bold text-[#31536b]">Protección histórica</p>
             <p class="text-xs text-[#78909f]">Evita procesar emails anteriores al corte productivo.</p>
           </div>
           {#if opsDraft}
-            <button type="button" role="switch" aria-checked={opsDraft.mail_after_cutoff ?? operationalSettings?.mail_after_cutoff}
+            <button type="button" role="switch" aria-label="Protección histórica" aria-checked={opsDraft.mail_after_cutoff ?? operationalSettings?.mail_after_cutoff}
               onclick={() => updateOpsField("mail_after_cutoff", !(opsDraft?.mail_after_cutoff ?? operationalSettings?.mail_after_cutoff))}
               class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168b88] ${(opsDraft?.mail_after_cutoff ?? operationalSettings?.mail_after_cutoff) ? "bg-[#168b88]" : "bg-[#bccdd0]"}`}
             >
@@ -695,6 +729,32 @@
             <span class={`rounded-full px-3 py-1.5 text-xs font-bold ${operationalSettings?.mail_after_cutoff ? "border border-[#b9e7cc] bg-[#e8f8ef] text-[#17663d]" : "border border-[#dce6e8] bg-white text-[#587184]"}`}>
               {operationalSettings?.mail_after_cutoff ? "ACTIVA" : "INACTIVA"}
             </span>
+          {/if}
+        </div>
+
+        {#if !(opsDraft?.mail_after_cutoff ?? operationalSettings?.mail_after_cutoff)}
+          <div class="rounded-xl border border-[#f1dfa2] bg-[#fffaf0] px-4 py-3" role="status">
+            <p class="text-xs font-semibold text-[#765d00]">Protección desactivada: todo el inbox queda elegible por decisión explícita del operador.</p>
+          </div>
+        {/if}
+
+        <!-- Cutoff Epoch -->
+        <div class="flex flex-col gap-3 rounded-xl border border-[#e3eaeb] bg-[#f8fbfa] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm font-bold text-[#31536b]">Corte histórico (UTC)</p>
+            <p class="text-xs text-[#78909f]">Solo emails posteriores a este instante son elegibles.</p>
+            <p class="mt-1 text-xs font-semibold text-[#47657b]">
+              {formatCutoffEpoch(opsDraft?.mail_cutoff_epoch ?? operationalSettings?.mail_cutoff_epoch)} UTC
+            </p>
+          </div>
+          {#if opsDraft}
+            <input type="number" aria-label="Corte histórico epoch UTC" min="1577836800" max="1893456000" step="1" value={opsDraft.mail_cutoff_epoch ?? operationalSettings?.mail_cutoff_epoch}
+              oninput={(e) => updateOpsField("mail_cutoff_epoch", parseInt(e.currentTarget.value, 10))}
+              aria-invalid={Boolean(opsValidationError?.includes("corte"))}
+              class="w-full rounded-xl border border-[#d5e0e2] bg-white px-3 py-2 text-sm text-[#31536b] outline-none focus-visible:border-[#168b88] focus-visible:ring-2 focus-visible:ring-[#168b88]/20 sm:w-44"
+            />
+          {:else}
+            <span class="text-sm font-bold text-[#31536b]">{operationalSettings?.mail_cutoff_epoch}</span>
           {/if}
         </div>
       </div>

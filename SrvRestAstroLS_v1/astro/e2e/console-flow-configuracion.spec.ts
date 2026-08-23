@@ -118,27 +118,45 @@ test.describe("Flow Configuración — MVP sin login (datos reales)", () => {
     const beforeResponse = await page.request.get(endpoint);
     expect(beforeResponse.ok()).toBe(true);
     const original = await beforeResponse.json();
+    const temporaryCutoff = Math.min(original.mail_cutoff_epoch + 45, 1893456000);
     const temporary = {
       automation_enabled: false,
       scheduler_interval_seconds: 20,
       mail_intake_enabled: false,
       mail_batch_limit: 17,
-      mail_after_cutoff: false,
+      mail_after_cutoff: true,
+      mail_cutoff_epoch: temporaryCutoff,
     };
 
     try {
-      const saveResponse = await page.request.patch(endpoint, { data: temporary });
-      expect(saveResponse.ok()).toBe(true);
+      await page.getByRole("button", { name: "Editar operación" }).click();
+
+      async function setSwitch(name: string, expected: boolean) {
+        const control = page.getByRole("switch", { name });
+        const current = (await control.getAttribute("aria-checked")) === "true";
+        if (current !== expected) await control.click();
+      }
+
+      await setSwitch("Automatización habilitada", temporary.automation_enabled);
+      await setSwitch("Intake de correo habilitado", temporary.mail_intake_enabled);
+      await setSwitch("Protección histórica", temporary.mail_after_cutoff);
+      await page.getByRole("spinbutton", { name: "Frecuencia del scheduler" }).fill("20");
+      await page.getByRole("spinbutton", { name: "Lote máximo de correo" }).fill("17");
+      await page.getByRole("spinbutton", { name: "Corte histórico epoch UTC" }).fill(String(temporaryCutoff));
+      await page.getByRole("button", { name: "Guardar operación" }).click();
+      await expect(page.getByText("Ajustes operacionales guardados.", { exact: true })).toBeVisible();
+
       await page.reload();
       await waitForRealConfig(page);
 
       const scheduler = page.locator("section").filter({
         has: page.getByRole("heading", { name: "Configuración del scheduler" }),
       });
-      await expect(scheduler.getByText("INACTIVA", { exact: true })).toHaveCount(2);
+      await expect(scheduler.getByText("INACTIVA", { exact: true })).toBeVisible();
       await expect(scheduler.getByText("20s", { exact: true })).toBeVisible();
       await expect(scheduler.getByText("INACTIVO", { exact: true })).toBeVisible();
       await expect(scheduler.getByText("17", { exact: true })).toBeVisible();
+      await expect(scheduler.getByText(String(temporaryCutoff), { exact: true })).toBeVisible();
       await expect(page.getByRole("heading", { name: "Último ciclo ejecutado" })).toBeVisible();
 
       const persistedResponse = await page.request.get(endpoint);
@@ -147,6 +165,17 @@ test.describe("Flow Configuración — MVP sin login (datos reales)", () => {
       const restoreResponse = await page.request.patch(endpoint, { data: original });
       expect(restoreResponse.ok()).toBe(true);
     }
+  });
+
+  test("cutoff inválido bloquea el guardado operacional", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+    await page.getByRole("button", { name: "Editar operación" }).click();
+    const cutoff = page.getByRole("spinbutton", { name: "Corte histórico epoch UTC" });
+    await cutoff.fill("0");
+    await expect(page.getByText("El corte debe ser un epoch UTC válido entre 2020 y 2030.", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Guardar operación" })).toBeDisabled();
+    await page.getByRole("button", { name: "Cancelar" }).last().click();
   });
 });
 

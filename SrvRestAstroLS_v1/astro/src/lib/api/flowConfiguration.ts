@@ -140,6 +140,7 @@ export interface FlowOperationalSettings {
   mail_intake_enabled: boolean;
   mail_batch_limit: number;
   mail_after_cutoff: boolean;
+  mail_cutoff_epoch: number;
 }
 
 export interface FlowSchedulerState {
