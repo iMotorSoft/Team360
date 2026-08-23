@@ -21,7 +21,7 @@ Lifecycle:
 Failure isolation:
     - Scheduler init failure: caught by global wrapper, backend continues
     - Cycle failure: caught internally, logged, next cycle proceeds
-    - Migration 023 absent: settings fallback to defaults (automation_enabled=False)
+    - Migration 023/024 absent: settings fallback to defaults (automation_enabled=False)
     - Gmail unavailable: cycle fails gracefully, scheduler continues
     - Flow disabled (automation_enabled=False): no Gmail required, no cycles
 """
@@ -44,6 +44,7 @@ from .citizen_notifications import (
 )
 from .configuration_repository import FlowConfigurationPostgresRepository
 from .escalation_repository import FlowEscalationPostgresRepository
+from .mail_query import build_mail_query_from_settings
 from .poll_once import poll_once
 from .routing_repository import FlowRoutingPostgresRepository
 from .sla_repository import FlowSLARepository
@@ -191,18 +192,9 @@ class FlowScheduler:
         """Run one finite automatic cycle using existing run_automatic_once."""
         mail_intake_enabled = settings.get("mail_intake_enabled", True)
         mail_batch_limit = settings.get("mail_batch_limit", 500)
-        mail_after_cutoff = settings.get("mail_after_cutoff", True)
 
-        # Determine Gmail query based on cutoff setting.
-        if mail_after_cutoff:
-            query = os.environ.get(
-                "TEAM360_FLOW_GMAIL_QUERY",
-                "in:inbox -after:2026/08/12",
-            )
-        else:
-            query = os.environ.get(
-                "TEAM360_FLOW_GMAIL_QUERY", "in:inbox"
-            )
+        # Build the canonical fail-safe Gmail query from PostgreSQL settings.
+        query = build_mail_query_from_settings(settings)
 
         account = os.environ.get("TEAM360_FLOW_GMAIL_ACCOUNT")
 

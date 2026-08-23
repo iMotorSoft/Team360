@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import os
 
 from modules.db.pool import close_pool, create_pool, open_pool
 from modules.db.settings import get_database_settings
+from modules.db.transaction import transaction
 from modules.messaging.providers.gmail import GmailClient
 
 from .approval_ai import LiteLLMApprovalInterpreter
@@ -18,8 +18,10 @@ from .citizen_notifications import (
 )
 from .closure_repository import FlowClosurePostgresRepository
 from .closure_service import FlowClosureService
+from .configuration_repository import FlowConfigurationPostgresRepository
 from .domain import is_automated_message
 from .intake.ai import LiteLLMFlowIntakeInterpreter
+from .mail_query import build_mail_query_from_settings
 from .operational_ai import LiteLLMOperationalInterpreter
 from .operational_repository import FlowOperationalPostgresRepository
 from .operational_service import FlowOperationalReplyService
@@ -28,19 +30,27 @@ from .service import FlowIntakeService
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run one finite Team360 Flow Gmail intake cycle.")
-    parser.add_argument("--account", help="Delegated Gmail mailbox; defaults to configured env.")
+    parser = argparse.ArgumentParser(
+        description="Run one finite Team360 Flow Gmail intake cycle."
+    )
+    parser.add_argument(
+        "--account", help="Delegated Gmail mailbox; defaults to configured env."
+    )
     parser.add_argument(
         "--query",
-        default=os.environ.get("TEAM360_FLOW_GMAIL_QUERY", "in:inbox"),
-        help="Gmail search query; idempotency does not depend on UNREAD.",
+        default=None,
+        help=(
+            "Explicit Gmail search query for controlled recovery. By default "
+            "the safe cutoff is loaded from PostgreSQL."
+        ),
     )
     parser.add_argument("--limit", type=int, default=25)
     return parser
 
 
-async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str, int]:
-    gmail = GmailClient(account)
+async def poll_once(
+    *, account: str | None, query: str | None, limit: int
+) -> dict[str, int]:
     pool = create_pool(get_database_settings(min_size=1, max_size=3))
     await open_pool(pool)
     processed = 0
@@ -64,6 +74,12 @@ async def poll_once(*, account: str | None, query: str, limit: int) -> dict[str,
     citizen_skipped = 0
     citizen_failed = 0
     try:
+        if query is None:
+            async with transaction(pool) as conn:
+                repository = FlowConfigurationPostgresRepository()
+                settings = await repository.get_operational_settings(conn)
+            query = build_mail_query_from_settings(settings)
+        gmail = GmailClient(account)
         service = FlowIntakeService(
             pool=pool,
             repository=FlowPostgresRepository(),
@@ -249,7 +265,9 @@ def main() -> int:
     args = _parser().parse_args()
     if args.limit < 1 or args.limit > 500:
         raise SystemExit("--limit must be between 1 and 500")
-    result = asyncio.run(poll_once(account=args.account, query=args.query, limit=args.limit))
+    result = asyncio.run(
+        poll_once(account=args.account, query=args.query, limit=args.limit)
+    )
     print(
         "TEAM360_FLOW_POLL_ONCE_PASS "
         + " ".join(f"{key}={value}" for key, value in result.items())

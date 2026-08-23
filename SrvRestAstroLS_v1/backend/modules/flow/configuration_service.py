@@ -17,6 +17,7 @@ from psycopg_pool import AsyncConnectionPool
 from modules.db.transaction import transaction
 
 from .configuration_repository import FlowConfigurationPostgresRepository
+from .mail_query import MAX_MAIL_CUTOFF_EPOCH, MIN_MAIL_CUTOFF_EPOCH
 
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _MAX_DESTINATION_LENGTH = 254
@@ -48,6 +49,33 @@ def _validate_sla_seconds(value: Any) -> int | None:
     if not isinstance(value, int) or value <= 0:
         raise FlowConfigurationValidationError(
             "first_response_sla_seconds debe ser positivo o null"
+        )
+    return value
+
+
+def _validate_cutoff_epoch(value: Any) -> int | None:
+    """Validate and normalize cutoff epoch value.
+
+    Returns None (no cutoff change) or a valid epoch within bounds.
+    """
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        raise FlowConfigurationValidationError("mail_cutoff_epoch inválido")
+    if isinstance(value, float):
+        if value != int(value):
+            raise FlowConfigurationValidationError(
+                "mail_cutoff_epoch debe ser un entero"
+            )
+        value = int(value)
+    if not isinstance(value, int):
+        raise FlowConfigurationValidationError(
+            "mail_cutoff_epoch debe ser un entero"
+        )
+    if value < MIN_MAIL_CUTOFF_EPOCH or value > MAX_MAIL_CUTOFF_EPOCH:
+        raise FlowConfigurationValidationError(
+            "mail_cutoff_epoch debe estar entre "
+            f"{MIN_MAIL_CUTOFF_EPOCH} y {MAX_MAIL_CUTOFF_EPOCH}"
         )
     return value
 
@@ -245,11 +273,22 @@ class FlowConfigurationService:
         mail_intake_enabled: bool | None = None,
         mail_batch_limit: int | None = None,
         mail_after_cutoff: bool | None = None,
+        mail_cutoff_epoch: int | None = None,
     ) -> dict[str, Any]:
         """Validate and persist Flow operational settings."""
+        for field, value in (
+            ("automation_enabled", automation_enabled),
+            ("mail_intake_enabled", mail_intake_enabled),
+            ("mail_after_cutoff", mail_after_cutoff),
+        ):
+            if value is not None and not isinstance(value, bool):
+                raise FlowConfigurationValidationError(
+                    f"{field} debe ser booleano"
+                )
         if scheduler_interval_seconds is not None:
             if (
-                not isinstance(scheduler_interval_seconds, int)
+                isinstance(scheduler_interval_seconds, bool)
+                or not isinstance(scheduler_interval_seconds, int)
                 or scheduler_interval_seconds < _MIN_SCHEDULER_INTERVAL
                 or scheduler_interval_seconds > _MAX_SCHEDULER_INTERVAL
             ):
@@ -258,13 +297,15 @@ class FlowConfigurationService:
                 )
         if mail_batch_limit is not None:
             if (
-                not isinstance(mail_batch_limit, int)
+                isinstance(mail_batch_limit, bool)
+                or not isinstance(mail_batch_limit, int)
                 or mail_batch_limit < _MIN_BATCH_LIMIT
                 or mail_batch_limit > _MAX_BATCH_LIMIT
             ):
                 raise FlowConfigurationValidationError(
                     f"mail_batch_limit debe estar entre {_MIN_BATCH_LIMIT} y {_MAX_BATCH_LIMIT}"
                 )
+        normalized_cutoff_epoch = _validate_cutoff_epoch(mail_cutoff_epoch)
         async with transaction(self._pool) as conn:
             return await self._repository.update_operational_settings(
                 conn,
@@ -273,4 +314,5 @@ class FlowConfigurationService:
                 mail_intake_enabled=mail_intake_enabled,
                 mail_batch_limit=mail_batch_limit,
                 mail_after_cutoff=mail_after_cutoff,
+                mail_cutoff_epoch=normalized_cutoff_epoch,
             )

@@ -88,12 +88,34 @@ class _Authz:
 
 
 class _Service:
-    def __init__(self, *, list_result=None, get_result=None, update_result=None, error=None):
+    def __init__(
+        self,
+        *,
+        list_result=None,
+        get_result=None,
+        update_result=None,
+        operational_result=None,
+        error=None,
+    ):
         self.list_result = list_result or {"sectors": []}
         self.get_result = get_result
         self.update_result = update_result
+        self.operational_result = operational_result or {
+            "automation_enabled": False,
+            "scheduler_interval_seconds": 15,
+            "mail_intake_enabled": True,
+            "mail_batch_limit": 500,
+            "mail_after_cutoff": True,
+            "mail_cutoff_epoch": 1787239323,
+        }
         self.error = error
-        self.calls = {"list": 0, "get": 0, "update": 0}
+        self.calls = {
+            "list": 0,
+            "get": 0,
+            "update": 0,
+            "get_operational": 0,
+            "update_operational": 0,
+        }
 
     async def list_configurations(self):
         self.calls["list"] += 1
@@ -110,6 +132,17 @@ class _Service:
         if self.error is not None:
             raise self.error
         return self.update_result
+
+    async def get_operational_settings(self):
+        self.calls["get_operational"] += 1
+        return self.operational_result
+
+    async def update_operational_settings(self, **changes):
+        self.calls["update_operational"] += 1
+        if self.error is not None:
+            raise self.error
+        self.operational_result = {**self.operational_result, **changes}
+        return self.operational_result
 
 
 def _canonical_sector():
@@ -377,3 +410,55 @@ def test_default_admin_unknown_sector_404(monkeypatch):
     with _client() as client:
         response = client.get("/api/team360-flow/configuration/inexistente")
     assert response.status_code == 404
+
+
+def test_default_admin_operational_settings_get_and_patch(monkeypatch):
+    service = _Service()
+    _default_admin(monkeypatch)
+    _patch_config(monkeypatch, _Authz(can_read=False, can_write=False), service)
+    path = "/api/team360-flow/operational-settings"
+    with _client() as client:
+        read = client.get(path)
+        updated = client.patch(
+            path,
+            json={
+                "automation_enabled": False,
+                "scheduler_interval_seconds": 20,
+                "mail_intake_enabled": True,
+                "mail_batch_limit": 17,
+                "mail_after_cutoff": True,
+                "mail_cutoff_epoch": 1787239368,
+            },
+        )
+    assert read.status_code == 200
+    assert read.json()["mail_cutoff_epoch"] == 1787239323
+    assert updated.status_code == 200
+    assert updated.json()["scheduler_interval_seconds"] == 20
+    assert updated.json()["mail_cutoff_epoch"] == 1787239368
+    assert service.calls["get_operational"] == 1
+    assert service.calls["update_operational"] == 1
+
+
+def test_default_admin_scheduler_status_get(monkeypatch):
+    class _SchedulerRepository:
+        async def get_state(self, conn):
+            return {
+                "last_started_at_utc": None,
+                "last_finished_at_utc": None,
+                "last_result": "PASS",
+                "last_error_class": None,
+                "processed_count": 2,
+                "cycle_count": 3,
+            }
+
+    _default_admin(monkeypatch)
+    _fake_pool(monkeypatch)
+    monkeypatch.setattr(
+        "modules.flow.operational_settings_repository.FlowSchedulerStateRepository",
+        _SchedulerRepository,
+    )
+    with _client() as client:
+        response = client.get("/api/team360-flow/scheduler/status")
+    assert response.status_code == 200
+    assert response.json()["last_result"] == "PASS"
+    assert response.json()["cycle_count"] == 3

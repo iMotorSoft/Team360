@@ -328,6 +328,7 @@ async def flow_operational_settings_update(
         "mail_intake_enabled",
         "mail_batch_limit",
         "mail_after_cutoff",
+        "mail_cutoff_epoch",
     }
     unknown_fields = set(data) - allowed
     if unknown_fields:
@@ -345,6 +346,7 @@ async def flow_operational_settings_update(
             mail_intake_enabled=data.get("mail_intake_enabled"),
             mail_batch_limit=data.get("mail_batch_limit"),
             mail_after_cutoff=data.get("mail_after_cutoff"),
+            mail_cutoff_epoch=data.get("mail_cutoff_epoch"),
         )
     except FlowConfigurationValidationError as exc:
         raise HTTPException(

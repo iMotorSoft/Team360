@@ -1126,6 +1126,45 @@ def test_real_postgres_config_update_does_not_alter_other_sectors():
     asyncio.run(exercise())
 
 
+@pytest.mark.skipif(
+    os.environ.get("TEAM360_FLOW_CONFIGURATION_POSTGRES_TEST") != "1",
+    reason=REQUIRE,
+)
+def test_real_postgres_operational_settings_roundtrip_without_restart():
+    """Operational settings, including cutoff, persist and restore in PostgreSQL."""
+
+    async def exercise():
+        settings = _settings()
+        pool = create_pool(settings)
+        await open_pool(pool)
+        service = FlowConfigurationService(pool=pool)
+        original = await service.get_operational_settings()
+        try:
+            changed = await service.update_operational_settings(
+                automation_enabled=False,
+                scheduler_interval_seconds=20,
+                mail_intake_enabled=False,
+                mail_batch_limit=17,
+                mail_after_cutoff=True,
+                mail_cutoff_epoch=1787239368,
+            )
+            assert changed == {
+                "automation_enabled": False,
+                "scheduler_interval_seconds": 20,
+                "mail_intake_enabled": False,
+                "mail_batch_limit": 17,
+                "mail_after_cutoff": True,
+                "mail_cutoff_epoch": 1787239368,
+            }
+            reread = await service.get_operational_settings()
+            assert reread == changed
+        finally:
+            await service.update_operational_settings(**original)
+            await close_pool(pool)
+
+    asyncio.run(exercise())
+
+
 async def _fetch_approval(conn, approval_id: str) -> dict:
     async with conn.cursor() as cur:
         await cur.execute(

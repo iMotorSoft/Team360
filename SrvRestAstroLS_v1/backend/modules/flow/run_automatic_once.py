@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import os
 
 from modules.db.pool import close_pool, create_pool, open_pool
 from modules.db.settings import get_database_settings
@@ -32,8 +31,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--account", help="Delegated mesaentrada Gmail account.")
     parser.add_argument(
         "--query",
-        default=os.environ.get("TEAM360_FLOW_GMAIL_QUERY", "in:inbox"),
-        help="Inbox query used for the pre-send operational synchronization.",
+        default=None,
+        help=(
+            "Explicit inbox query for controlled recovery. By default the "
+            "safe cutoff is loaded from PostgreSQL."
+        ),
     )
     parser.add_argument("--limit", type=int, default=25)
     parser.add_argument(
@@ -45,7 +47,7 @@ def _parser() -> argparse.ArgumentParser:
 
 
 async def run_automatic_once(
-    *, account: str | None, query: str, limit: int, confirm_send: bool
+    *, account: str | None, query: str | None, limit: int, confirm_send: bool
 ) -> dict[str, object]:
     inbox_processed = 0
     if confirm_send:

@@ -95,6 +95,7 @@ class _FakeRepository:
             "mail_intake_enabled": True,
             "mail_batch_limit": 500,
             "mail_after_cutoff": True,
+            "mail_cutoff_epoch": 1787239323,
         }
 
     async def update_operational_settings(self, conn, **kwargs):
@@ -104,6 +105,7 @@ class _FakeRepository:
             "mail_intake_enabled": True,
             "mail_batch_limit": 500,
             "mail_after_cutoff": True,
+            "mail_cutoff_epoch": kwargs.get("mail_cutoff_epoch", 1787239323),
         }
 
     async def update_closure_approval_level(self, conn, *, sector_id, closure_approval_level):
@@ -332,3 +334,41 @@ def test_update_failure_rolls_back_no_partial_writes(monkeypatch):
             )
         )
     assert repo.destination_writes == []
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("automation_enabled", "true"),
+        ("mail_intake_enabled", 1),
+        ("mail_after_cutoff", None),
+        ("scheduler_interval_seconds", True),
+        ("mail_batch_limit", False),
+    ],
+)
+def test_invalid_operational_types_rejected(monkeypatch, field, value):
+    if field == "mail_after_cutoff" and value is None:
+        value = "false"
+    service = _service(monkeypatch)
+    with pytest.raises(FlowConfigurationValidationError):
+        asyncio.run(service.update_operational_settings(**{field: value}))
+
+
+@pytest.mark.parametrize(
+    "cutoff",
+    [True, 0, -1, 1577836799, 1893456001, 1.5, "1787239323"],
+)
+def test_invalid_mail_cutoff_epoch_rejected(monkeypatch, cutoff):
+    service = _service(monkeypatch)
+    with pytest.raises(FlowConfigurationValidationError):
+        asyncio.run(
+            service.update_operational_settings(mail_cutoff_epoch=cutoff)
+        )
+
+
+def test_valid_mail_cutoff_epoch_is_persisted(monkeypatch):
+    service = _service(monkeypatch)
+    result = asyncio.run(
+        service.update_operational_settings(mail_cutoff_epoch=1787239368)
+    )
+    assert result["mail_cutoff_epoch"] == 1787239368

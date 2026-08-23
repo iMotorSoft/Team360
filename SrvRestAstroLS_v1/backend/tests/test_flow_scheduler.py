@@ -159,6 +159,7 @@ def test_scheduler_migration_023_absent_settings_fallback():
     assert defaults["mail_intake_enabled"] is True
     assert defaults["mail_batch_limit"] == 500
     assert defaults["mail_after_cutoff"] is True
+    assert defaults["mail_cutoff_epoch"] == 1787239323
 
 
 # ---------------------------------------------------------------------------
@@ -590,7 +591,7 @@ def test_scheduler_mail_intake_on_preserves_cutoff_and_batch(monkeypatch):
     assert result["inbox_processed"] == 2
     poll.assert_awaited_once_with(
         account=None,
-        query="in:inbox -after:2026/08/12",
+        query="in:inbox after:1787239323",
         limit=7,
     )
     gmail.assert_called_once_with(None)

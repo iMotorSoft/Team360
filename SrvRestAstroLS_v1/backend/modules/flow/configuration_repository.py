@@ -16,6 +16,8 @@ from psycopg import AsyncConnection
 
 from modules.db.transaction import execute, fetch_all, fetch_one
 
+from .mail_query import DEFAULT_MAIL_CUTOFF_EPOCH
+
 _SECTOR_COLUMNS = "sector_id, display_name, active, closure_approval_level::int"
 _LEVEL_COLUMNS = (
     "id::text, sector_id, level::int, channel, destination, active, "
@@ -23,13 +25,14 @@ _LEVEL_COLUMNS = (
 )
 
 
-# Default operational settings (used before migration 023 is applied).
+# Default operational settings (used before migration 023/024 is applied).
 _DEFAULT_OPERATIONAL_SETTINGS: dict = {
     "automation_enabled": False,
     "scheduler_interval_seconds": 15,
     "mail_intake_enabled": True,
     "mail_batch_limit": 500,
     "mail_after_cutoff": True,
+    "mail_cutoff_epoch": DEFAULT_MAIL_CUTOFF_EPOCH,
 }
 
 
@@ -164,13 +167,14 @@ class FlowConfigurationPostgresRepository:
                     scheduler_interval_seconds,
                     mail_intake_enabled,
                     mail_batch_limit,
-                    mail_after_cutoff
+                    mail_after_cutoff,
+                    mail_cutoff_epoch
                 from flow_operational_settings
                 where id = 1
                 """,
             )
         except Exception:
-            # Migration 023 not yet applied; return defaults.
+            # Migration 023/024 not yet applied; return defaults.
             return dict(_DEFAULT_OPERATIONAL_SETTINGS)
 
     async def update_operational_settings(
@@ -182,6 +186,7 @@ class FlowConfigurationPostgresRepository:
         mail_intake_enabled: bool | None = None,
         mail_batch_limit: int | None = None,
         mail_after_cutoff: bool | None = None,
+        mail_cutoff_epoch: int | None = None,
     ) -> dict:
         sets = []
         params: dict = {}
@@ -202,16 +207,15 @@ class FlowConfigurationPostgresRepository:
         if mail_after_cutoff is not None:
             sets.append("mail_after_cutoff = %(mail_after_cutoff)s")
             params["mail_after_cutoff"] = mail_after_cutoff
+        if mail_cutoff_epoch is not None:
+            sets.append("mail_cutoff_epoch = %(mail_cutoff_epoch)s")
+            params["mail_cutoff_epoch"] = mail_cutoff_epoch
         if not sets:
             return await self.get_operational_settings(conn)
         sets.append("updated_at_utc = now()")
-        try:
-            await execute(
-                conn,
-                f"update flow_operational_settings set {', '.join(sets)} where id = 1",
-                params,
-            )
-        except Exception:
-            # Migration 023 not yet applied; return defaults.
-            return dict(_DEFAULT_OPERATIONAL_SETTINGS)
+        await execute(
+            conn,
+            f"update flow_operational_settings set {', '.join(sets)} where id = 1",
+            params,
+        )
         return await self.get_operational_settings(conn)
