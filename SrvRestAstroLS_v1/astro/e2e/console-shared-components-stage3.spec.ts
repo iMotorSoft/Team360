@@ -16,6 +16,7 @@ test.describe("Console Etapa 3 - componentes compartidos", () => {
 
   test("reportes conserva tabla desktop, acciones y listado mobile", async ({ page }) => {
     await page.goto(`${CONSOLE_ROOT}/reports`);
+    await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
 
     const tableRegion = page.getByRole("region", { name: "Reportes disponibles" });
     await expect(tableRegion).toBeVisible();
