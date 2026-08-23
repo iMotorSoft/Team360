@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-19 (Flow comunicacion ciudadana MVP validada)
+Ultima actualizacion: 2026-08-23 (Flow demo production readiness validada en DEV)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -24,7 +24,8 @@ Este documento es un tablero del estado vigente. La bitacora detallada previa, i
 - La politica DB vigente exige `psycopg 3 async`, pools separados y SQL dentro de repositories.
 - El commit `e2e0a54` incorporó `backend/modules/module_registry.py`; `ls_iMotorSoft_Srv01.py` consume sus handlers y Flow está registrado allí una sola vez.
 - La política modular vigente permite agentes concurrentes solo en scopes `MODULE_LOCAL` asignados y disjuntos, con coordinación `SHARED` y ventanas exclusivas para `GLOBAL`, Git y producción protegida.
-- Flow expone `ROUTE_HANDLERS` desde su `routes.py`; el tuple permanece vacío mientras el módulo no tenga APIs HTTP y podrá crecer localmente sin nuevos cambios del registry. El inventario JSON y el coordinador Python de locks siguen pendientes.
+- Flow expone sus APIs desde `ROUTE_HANDLERS` en `routes.py`; el module registry
+  las monta una sola vez sin cambios nuevos en el entrypoint común.
 
 Referencias canonicas:
 
@@ -33,6 +34,91 @@ Referencias canonicas:
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
 - `lat.md/team360-global-orchestration.md`
+
+## Gate 2026-08-23 — Flow demo production readiness V1
+
+Estado: PASS en desarrollo
+(`TEAM360_FLOW_DEMO_PRODUCTION_READINESS_V1_PASS`). La demo queda lista para
+una ventana de deploy posterior; esta validación no modificó producción.
+
+### Baseline y migraciones
+
+El baseline productivo de Flow permanece desplegado. Las migraciones `011` a
+`022` están aplicadas en producción según el estado canónico previo. La
+migración `023_team360_flow_operational_settings_v1.sql` está validada en DEV y
+todavía no fue aplicada en producción. La migración aditiva
+`024_team360_flow_safe_mail_cutoff_v1.sql` fue aplicada y validada únicamente
+en DEV; producción no fue modificada.
+
+### Capacidades de la demo
+
+Flow Configuración administra y persiste en PostgreSQL, sin reinicio del
+backend común:
+
+- sectores, emails y SLA por nivel operativo;
+- nivel de aprobación de cierre;
+- `automation_enabled`, intervalo del scheduler, intake de correo y batch;
+- protección histórica mediante `mail_after_cutoff` + `mail_cutoff_epoch`;
+- estado, último ciclo y resultado del scheduler embebido.
+
+El scheduler es un `asyncio.Task` module-local con `asyncio.Lock`, contrato de
+un único proceso y pacing `RUN -> FINISH -> WAIT -> NEXT`. Ante error registra,
+espera y reintenta; no hace spin. Relee PostgreSQL en cada ciclo, por lo que
+los cambios de email, SLA y operación se observan sin variables Flow nuevas ni
+restart. `automation_enabled=false` sigue siendo el default seguro.
+
+### Seguridad de Gmail
+
+El default anterior `in:inbox -after:2026/08/12` era inseguro porque excluía
+los mensajes posteriores y podía seleccionar histórico. Existe ahora un único
+builder usado por el scheduler: con protección activa produce
+`in:inbox after:<epoch>`. Un cutoff ausente, vacío, inválido, fuera de rango o
+una lectura de schema anterior falla de forma segura al epoch canónico
+`1787239323` (`2026-08-20T15:22:03Z`); nunca degrada a `in:inbox` ni genera
+`-after:`. Solo `mail_after_cutoff=false` explícito desactiva el filtro.
+
+### Política de acceso demo/MVP
+
+La política es deliberada y no se considera un bug de este gate:
+
+- autenticación: deshabilitada para la demo;
+- rol efectivo: Administrador implícito (`flow-mvp-administrator`);
+- acceso a Configuración: abierto en demo;
+- login, usuarios, roles y RBAC enterprise: fase futura.
+
+### Evidencia 2026-08-23
+
+La evidencia se obtuvo con backend y Astro levantados mediante los launchers
+oficiales de desarrollo:
+
+- scheduler y contratos Flow: `439 passed`, `39 skipped`, `0 failed`; sus 20
+  tests existentes permanecen verdes;
+- configuración con PostgreSQL real: `12 passed`, `0 failed`, con roundtrip y
+  restauración de valores;
+- Flow Configuración E2E: `27 passed`, `0 failed`;
+- Directorio E2E: `45 passed`, `0 failed` con fixtures determinísticos luego
+  eliminados;
+- Console compartida: `28 passed`, `0 failed`;
+- frontend: `pnpm check` con `0 errors`, `0 warnings`, 7 hints conocidos;
+  `pnpm build` PASS, 161 páginas;
+- backend completo: `1735 passed`, `49 skipped`, `0 failed`;
+- Diagnosis smoke real: scope PostgreSQL resuelto y estado de 6 turnos
+  persistido; retrieval Milvus con `last_sources=5`; LiteLLM
+  `openai_gpt-5.4-nano` PASS; `fallback=false`; diagnóstico estructurado PASS
+  en el turno 5. Diagnosis permanece en el commit baseline `e21a429` y no fue
+  modificado;
+- configuración dinámica DEV: SLA N1/N2/N3 `30/60/120`, aprobación N2 y
+  valores operativos observados por API sin restart;
+- producción: intacta; automation productiva no desplegada ni habilitada;
+- WhatsApp: fuera de alcance, sin actividad.
+
+### Deuda no bloqueante
+
+Quedan para hardening posterior autenticación/RBAC, coordinación multiworker
+del scheduler, logging persistente y la migración futura desde APIs ORM de
+PyMilvus antes de 3.1. Las referencias antiguas a ausencia de scheduler en los
+gates históricos describen el alcance de aquellas fechas; este gate es la
+fuente vigente.
 
 ## Gate 2026-08-16 — Flow rol Directorio / autorización mínima V1
 
