@@ -26,7 +26,45 @@ from .operational_ai import LiteLLMOperationalInterpreter
 from .operational_repository import FlowOperationalPostgresRepository
 from .operational_service import FlowOperationalReplyService
 from .repository import FlowPostgresRepository
+from .routing_repository import FlowRoutingPostgresRepository
+from .routing_service import FlowRoutingService
 from .service import FlowIntakeService
+
+
+async def _route_confirmed_requests(
+    *, pool, sender, conversation_id: str
+) -> tuple[str, ...]:
+    """Route requests confirmed by this intake transaction.
+
+    The routing service remains the single owner of sector resolution, N1
+    assignment, notification and SLA initialization.  This function only
+    bridges the previously missing post-confirmation trigger.
+    """
+    async with transaction(pool) as conn:
+        repository = FlowPostgresRepository()
+        confirmed_ids = await repository.confirmed_request_ids(
+            conn, conversation_id
+        )
+
+    routing = FlowRoutingService(
+        pool=pool,
+        repository=FlowRoutingPostgresRepository(),
+        sender=sender,
+    )
+    routed: list[str] = []
+    for request_id in confirmed_ids:
+        result = await routing.route_confirmed_request(
+            request_id, confirm_send=True
+        )
+        print(
+            "flow confirmed request routed "
+            f"request_id={request_id} status={result.status} "
+            f"sector={result.assignment.sector_id if result.assignment else None} "
+            f"level={result.assignment.level if result.assignment else None} "
+            f"idempotent={result.idempotent} reason={result.reason_code}"
+        )
+        routed.append(result.status)
+    return tuple(routed)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -225,6 +263,11 @@ async def poll_once(
                             citizen_failed += 1
                         else:
                             citizen_skipped += 1
+                    await _route_confirmed_requests(
+                        pool=pool,
+                        sender=gmail,
+                        conversation_id=result.conversation_id,
+                    )
                 print(
                     "flow message processed "
                     f"message_id={message.external_message_id} "

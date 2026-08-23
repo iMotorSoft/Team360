@@ -370,6 +370,29 @@ class FlowPostgresRepository:
         )
         return len(rows)
 
+    async def confirmed_request_ids(
+        self, conn: AsyncConnection, conversation_id: str
+    ) -> tuple[str, ...]:
+        """Return confirmed requests created for a conversation.
+
+        Confirmation persists requests before the intake transaction closes;
+        the automatic cycle then uses these ids to hand them to the existing
+        idempotent routing service.  Keeping the lookup here avoids coupling
+        routing to the citizen-notification repository.
+        """
+        rows = await fetch_all(
+            conn,
+            """
+            select id::text as request_id
+            from flow_requests
+            where conversation_id = %(conversation_id)s
+              and status = 'CONFIRMED'
+            order by confirmed_at_utc
+            """,
+            {"conversation_id": conversation_id},
+        )
+        return tuple(row["request_id"] for row in rows)
+
     async def conversation_evidence(
         self, conn: AsyncConnection, external_thread_id: str
     ) -> dict[str, Any] | None:
