@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from litestar import get, patch
+from litestar import get, patch, post
 from litestar.connection import Request
 from litestar.exceptions import HTTPException
 from litestar.status_codes import (
@@ -50,6 +50,7 @@ from .access_mode import (
     flow_access_mode,
 )
 from .audit_repository import FlowAuditRepository
+from .case_cleanup_service import FlowCaseCleanupService
 from .closure_repository import FlowClosurePostgresRepository
 from .configuration_auth import FlowConfigurationAuthorizationService
 from .configuration_service import (
@@ -108,6 +109,10 @@ def _configuration_authorization_service() -> FlowConfigurationAuthorizationServ
 
 def _configuration_service(pool: Any) -> FlowConfigurationService:
     return FlowConfigurationService(pool=pool)
+
+
+def _case_cleanup_service(pool: Any) -> FlowCaseCleanupService:
+    return FlowCaseCleanupService(pool=pool)
 
 
 def _authenticate(request: Request | None) -> str:
@@ -354,6 +359,23 @@ async def flow_operational_settings_update(
         )
 
 
+@post("/api/team360-flow/cases/clear", status_code=200)
+async def flow_cases_clear(
+    data: dict[str, Any], request: Request | None = None
+) -> dict[str, Any]:
+    """Delete Flow case data after an explicit administrative confirmation."""
+    await _require_flow_actor(
+        request, capability=FLOW_CONFIGURATION_WRITE, write=True
+    )
+    if set(data) != {"confirm"} or data.get("confirm") is not True:
+        raise HTTPException(
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="se requiere confirm=true para borrar casos de Flow",
+        )
+    pool = get_pool()
+    return await _case_cleanup_service(pool).clear_cases()
+
+
 # --- Scheduler status endpoint ---
 
 
@@ -389,5 +411,6 @@ ROUTE_HANDLERS: tuple[Any, ...] = (
     flow_configuration_update,
     flow_operational_settings_get,
     flow_operational_settings_update,
+    flow_cases_clear,
     flow_scheduler_status,
 )

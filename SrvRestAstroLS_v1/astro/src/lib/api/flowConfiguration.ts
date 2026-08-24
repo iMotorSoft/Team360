@@ -152,6 +152,15 @@ export interface FlowSchedulerState {
   cycle_count: number;
 }
 
+export interface FlowCaseCleanupResult {
+  status: "cleared";
+  cases_before: number;
+  cases_after: number;
+  before: Record<string, number>;
+  deleted: Record<string, number>;
+  after: Record<string, number>;
+}
+
 export async function fetchOperationalSettings(
   token?: string,
 ): Promise<FlowApiResult<FlowOperationalSettings>> {
@@ -185,6 +194,21 @@ export async function fetchSchedulerStatus(
   try {
     const res = await fetch(SCHEDULER_API_BASE, { headers: headers(token) });
     return handleResponse<FlowSchedulerState>(res);
+  } catch {
+    return { data: null, error: "unavailable" };
+  }
+}
+
+export async function clearFlowCases(
+  token?: string,
+): Promise<FlowApiResult<FlowCaseCleanupResult>> {
+  try {
+    const res = await fetch("/api/team360-flow/cases/clear", {
+      method: "POST",
+      headers: headers(token),
+      body: JSON.stringify({ confirm: true }),
+    });
+    return handleResponse<FlowCaseCleanupResult>(res);
   } catch {
     return { data: null, error: "unavailable" };
   }

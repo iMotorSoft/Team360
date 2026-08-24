@@ -12,6 +12,7 @@
     fetchFlowConfigurations,
     fetchOperationalSettings,
     fetchSchedulerStatus,
+    clearFlowCases,
     mapFlowSectors,
     updateFlowConfiguration,
     updateOperationalSettings,
@@ -55,6 +56,9 @@
   let opsSaving = $state(false);
   let opsSaveMessage = $state("");
   let schedulerStatusRefreshPromise: Promise<void> | null = null;
+  let cleanupDialogOpen = $state(false);
+  let cleanupState = $state<"idle" | "clearing" | "success" | "error">("idle");
+  let cleanupMessage = $state("");
 
   const MIN_MAIL_CUTOFF_EPOCH = 1577836800;
   const MAX_MAIL_CUTOFF_EPOCH = 1893456000;
@@ -321,6 +325,33 @@
       opsSaveMessage = "Ajustes operacionales guardados.";
       await refreshSchedulerStatusAfterSave();
     }
+  }
+
+  function openCleanupDialog() {
+    if (cleanupState === "clearing") return;
+    cleanupDialogOpen = true;
+    cleanupState = "idle";
+    cleanupMessage = "";
+  }
+
+  function closeCleanupDialog() {
+    if (cleanupState === "clearing") return;
+    cleanupDialogOpen = false;
+  }
+
+  async function clearCases() {
+    if (cleanupState === "clearing") return;
+    cleanupState = "clearing";
+    cleanupMessage = "Borrando casos y datos operativos asociados...";
+    const result = await clearFlowCases(token ?? undefined);
+    if (result.error || !result.data) {
+      cleanupState = "error";
+      cleanupMessage = "No se pudieron borrar los casos. No se confirmó ningún cambio.";
+      return;
+    }
+    cleanupState = "success";
+    cleanupMessage = `Limpieza completada: ${result.data.cases_before} caso${result.data.cases_before === 1 ? "" : "s"} eliminado${result.data.cases_before === 1 ? "" : "s"}. Flow quedó listo para una demo desde cero.`;
+    cleanupDialogOpen = false;
   }
 
   function updateClosureDestination(value: string) {
@@ -821,5 +852,43 @@
     </section>
     {/if}
   </div>
+  {/if}
+
+  {#if useRealApi}
+    <section class="rounded-2xl border border-[#f0d8d1] bg-[#fffaf8] p-5 shadow-[0_18px_45px_-42px_rgba(16,45,79,0.7)] sm:p-6" aria-labelledby="flow-cleanup-title">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div class="min-w-0">
+          <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#b65345]">Preparación de demo</p>
+          <h2 id="flow-cleanup-title" class="mt-1 text-xl font-bold tracking-[-0.025em] text-[#173b5b]">Limpiar casos de Flow</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-[#78909f]">Eliminá los casos y sus datos operativos asociados para comenzar una demo desde cero. La configuración de Flow y los sectores no se modifican.</p>
+        </div>
+        <button type="button" data-flow-clear-cases-button onclick={openCleanupDialog} disabled={cleanupState === "clearing"} class="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-[#c96858] bg-white px-5 py-2.5 text-sm font-bold text-[#a33e30] transition hover:bg-[#fff0ec] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c96858] disabled:cursor-not-allowed disabled:opacity-50">
+          Borrar casos existentes
+        </button>
+      </div>
+
+      {#if cleanupState === "success" || cleanupState === "error"}
+        <div class={`mt-4 rounded-xl border p-3 ${cleanupState === "success" ? "border-[#b9e7cc] bg-[#e8f8ef] text-[#17663d]" : "border-[#f1c7c2] bg-[#fdf0ee] text-[#9b3328]"}`} role={cleanupState === "error" ? "alert" : "status"} data-flow-cleanup-result>
+          <p class="text-sm font-semibold">{cleanupMessage}</p>
+        </div>
+      {/if}
+    </section>
+  {/if}
+
+  {#if cleanupDialogOpen}
+    <div class="fixed inset-0 z-50 grid place-items-center bg-[#173b5b]/35 p-4" role="presentation">
+      <div class="w-full max-w-lg rounded-2xl border border-card-border bg-card-bg p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="flow-cleanup-dialog-title" aria-describedby="flow-cleanup-dialog-description" data-flow-clear-cases-dialog>
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#b65345]">Acción administrativa</p>
+        <h2 id="flow-cleanup-dialog-title" class="mt-2 text-xl font-bold text-[#173b5b]">¿Borrar los casos existentes?</h2>
+        <p id="flow-cleanup-dialog-description" class="mt-3 text-sm leading-6 text-[#587184]">Esta acción eliminará los casos existentes de Flow y sus datos operativos asociados. No afecta la configuración de Flow.</p>
+        <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button type="button" data-flow-clear-cases-cancel onclick={closeCleanupDialog} disabled={cleanupState === "clearing"} class="inline-flex min-h-11 items-center justify-center rounded-full border border-[#cddbdd] bg-white px-5 py-2.5 text-sm font-bold text-[#47657b] transition hover:bg-[#f4f8f8] disabled:cursor-not-allowed disabled:opacity-50">Cancelar</button>
+          <button type="button" data-flow-clear-cases-confirm onclick={clearCases} disabled={cleanupState === "clearing"} class="inline-flex min-h-11 items-center justify-center rounded-full border border-[#c96858] bg-[#c96858] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#a33e30] disabled:cursor-not-allowed disabled:opacity-60">{cleanupState === "clearing" ? "Borrando..." : "Sí, borrar casos"}</button>
+        </div>
+        {#if cleanupState === "clearing"}
+          <p class="mt-4 text-xs font-semibold text-[#587184]" role="status">{cleanupMessage}</p>
+        {/if}
+      </div>
+    </div>
   {/if}
 </div>

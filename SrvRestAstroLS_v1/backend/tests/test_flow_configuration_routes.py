@@ -115,6 +115,7 @@ class _Service:
             "update": 0,
             "get_operational": 0,
             "update_operational": 0,
+            "clear_cases": 0,
         }
 
     async def list_configurations(self):
@@ -144,6 +145,17 @@ class _Service:
         self.operational_result = {**self.operational_result, **changes}
         return self.operational_result
 
+    async def clear_cases(self):
+        self.calls["clear_cases"] += 1
+        return {
+            "status": "cleared",
+            "cases_before": 3,
+            "cases_after": 0,
+            "before": {"flow_requests": 3},
+            "deleted": {"flow_requests": 3},
+            "after": {"flow_requests": 0},
+        }
+
 
 def _canonical_sector():
     return {
@@ -168,6 +180,10 @@ def _patch_config(monkeypatch, authz, service):
     )
     monkeypatch.setattr(
         "modules.flow.routes._configuration_service",
+        lambda pool: service,
+    )
+    monkeypatch.setattr(
+        "modules.flow.routes._case_cleanup_service",
         lambda pool: service,
     )
 
@@ -462,3 +478,51 @@ def test_default_admin_scheduler_status_get(monkeypatch):
     assert response.status_code == 200
     assert response.json()["last_result"] == "PASS"
     assert response.json()["cycle_count"] == 3
+
+
+# --------------------------------------------------------------- case cleanup -
+
+def test_clear_cases_no_token_401(monkeypatch):
+    _keys(monkeypatch)
+    _fake_pool(monkeypatch)
+    with _client() as client:
+        response = client.post(
+            "/api/team360-flow/cases/clear", json={"confirm": True}
+        )
+    assert response.status_code == 401
+
+
+def test_clear_cases_read_permission_does_not_imply_write(monkeypatch):
+    service = _Service()
+    _patch_config(monkeypatch, _Authz(can_read=True, can_write=False), service)
+    with _client() as client:
+        response = client.post(
+            "/api/team360-flow/cases/clear",
+            headers=_auth_headers("reader"),
+            json={"confirm": True},
+        )
+    assert response.status_code == 403
+    assert service.calls["clear_cases"] == 0
+
+
+def test_default_admin_clear_cases_returns_zero(monkeypatch):
+    service = _Service()
+    _default_admin(monkeypatch)
+    _patch_config(monkeypatch, _Authz(can_read=False, can_write=False), service)
+    with _client() as client:
+        response = client.post(
+            "/api/team360-flow/cases/clear", json={"confirm": True}
+        )
+    assert response.status_code == 200
+    assert response.json()["cases_after"] == 0
+    assert service.calls["clear_cases"] == 1
+
+
+def test_clear_cases_requires_explicit_confirmation(monkeypatch):
+    service = _Service()
+    _default_admin(monkeypatch)
+    _patch_config(monkeypatch, _Authz(can_read=False, can_write=False), service)
+    with _client() as client:
+        response = client.post("/api/team360-flow/cases/clear", json={})
+    assert response.status_code == 422
+    assert service.calls["clear_cases"] == 0

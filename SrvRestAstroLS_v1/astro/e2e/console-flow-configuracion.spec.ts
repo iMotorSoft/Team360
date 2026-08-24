@@ -662,3 +662,42 @@ test.describe("Flow Configuración — responsive y consola", () => {
     });
   }
 });
+
+test.describe("Flow Configuración — limpieza controlada de casos", () => {
+  test("requiere confirmación explícita y evita doble submit", async ({ page }) => {
+    let clearRequests = 0;
+    await page.route("**/api/team360-flow/cases/clear", async (route) => {
+      clearRequests += 1;
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          status: "cleared",
+          cases_before: 3,
+          cases_after: 0,
+          before: { flow_requests: 3 },
+          deleted: { flow_requests: 3 },
+          after: { flow_requests: 0 },
+        }),
+      });
+    });
+
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+    const clearButton = page.getByRole("button", { name: "Borrar casos existentes" });
+    await expect(clearButton).toBeVisible();
+    await clearButton.click();
+
+    await expect(page.getByRole("dialog", { name: "¿Borrar los casos existentes?" })).toBeVisible();
+    await expect(page.getByText(/Esta acción eliminará los casos existentes/)).toBeVisible();
+    expect(clearRequests).toBe(0);
+
+    const confirmButton = page.locator("[data-flow-clear-cases-confirm]");
+    await confirmButton.click();
+    await expect(confirmButton).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Borrando..." })).toHaveCount(1);
+    await expect(page.getByText(/Limpieza completada: 3 casos eliminados/)).toBeVisible();
+    expect(clearRequests).toBe(1);
+  });
+});
