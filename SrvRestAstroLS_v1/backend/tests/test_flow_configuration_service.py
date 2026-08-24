@@ -302,6 +302,43 @@ def test_update_null_closure_level_allowed(monkeypatch):
     assert repo.closure_writes == [None]
 
 
+def test_update_single_level_sector_does_not_require_upper_levels(monkeypatch):
+    sector = {
+        "sector_id": "baches",
+        "display_name": "Baches",
+        "active": True,
+        "closure_approval_level": None,
+    }
+    levels = [
+        {
+            "id": "baches-l1",
+            "sector_id": "baches",
+            "level": 1,
+            "channel": "email",
+            "destination": "baches.n1@alquimiablue.com",
+            "active": True,
+            "first_response_sla_seconds": 30,
+        }
+    ]
+    repo = _FakeRepository(sector=sector, levels=levels)
+    service = _service(monkeypatch, repo)
+    result = asyncio.run(
+        service.update_configuration(
+            "baches",
+            levels=[
+                {
+                    "level": 1,
+                    "destination": "baches.n1@alquimiablue.com",
+                    "first_response_sla_seconds": 30,
+                }
+            ],
+            closure_approval_level=None,
+        )
+    )
+    assert [item["level"] for item in result["levels"]] == [1]
+    assert result["closure_approval_level"] is None
+
+
 def test_update_unknown_sector_raises_not_found(monkeypatch):
     repo = _FakeRepository(sector=None, levels=[])
     service = _service(monkeypatch, repo)

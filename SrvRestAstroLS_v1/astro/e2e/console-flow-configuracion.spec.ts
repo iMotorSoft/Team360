@@ -377,6 +377,36 @@ test.describe("Flow Configuración — vista y navegación", () => {
     await expect(page).toHaveURL(/\/flow\/?$/);
     await expect(page.getByRole("heading", { name: "Vista Ejecutiva" })).toBeVisible();
   });
+
+  test("representa sectores single-level sin controles N2/N3 ni aprobación ficticia", async ({ page }) => {
+    await openConfiguration(page);
+    await waitForRealConfig(page);
+
+    const sectors = page.getByRole("listbox", { name: "Seleccionar sector" });
+    await expect(sectors.getByRole("option", { name: "Baches" })).toBeVisible();
+    await expect(sectors.getByRole("option", { name: "Residuos" })).toBeVisible();
+
+    await sectors.getByRole("option", { name: "Baches" }).click();
+    await expect(page.getByRole("heading", { name: "Baches" })).toBeVisible();
+    await expect(page.getByText("1 nivel", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    await expect(page.locator("#flow-destination-baches-level-1")).toHaveCount(1);
+    await expect(page.locator("#flow-destination-baches-level-2")).toHaveCount(0);
+    await expect(page.getByText("Sin aprobación de cierre configurada para este sector.", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Cancelar" }).click();
+
+    await sectors.getByRole("option", { name: "Residuos" }).click();
+    await expect(page.getByRole("heading", { name: "Residuos" })).toBeVisible();
+    await expect(page.getByText("1 nivel", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Editar configuración" }).click();
+    await expect(page.locator("#flow-destination-residuos-level-1")).toHaveCount(1);
+    await expect(page.locator("#flow-destination-residuos-level-2")).toHaveCount(0);
+    await page.getByRole("button", { name: "Cancelar" }).click();
+
+    await sectors.getByRole("option", { name: "Alumbrado Público" }).click();
+    await expect(page.locator("#flow-destination-alumbrado-level-3")).toHaveCount(1);
+    await expect(page.getByText("Autoriza la resolución final del caso.", { exact: true })).toBeVisible();
+  });
 });
 
 test.describe("Flow Configuración — draft y validación", () => {

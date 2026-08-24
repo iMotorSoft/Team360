@@ -26,6 +26,13 @@ from modules.flow.intake.ai import _SYSTEM_PROMPT
         ("luminaria", "alumbrado"),
         ("poste_de_luz", "alumbrado"),
         ("street_lighting", "alumbrado"),
+        ("baches", "baches"),
+        ("bache", "baches"),
+        ("pozo", "baches"),
+        ("pavimento roto", "baches"),
+        ("residuos", "residuos"),
+        ("basura", "residuos"),
+        ("contenedor desbordado", "residuos"),
         # compound safe labels that lead with a catalog label -> canonical
         ("Alumbrado público - luminaria apagada", "alumbrado"),
         ("Alumbrado público / luminaria apagada", "alumbrado"),
@@ -42,7 +49,6 @@ def test_resolve_sector_id_resolves_known_and_compound_labels(value, expected):
     [
         # unknown category -> unresolved
         "arbolado",
-        "pozo",
         "vereda rota",
         # ambiguous / out-of-catalog -> unresolved (leading token not in catalog)
         "robo de luminaria",
@@ -60,11 +66,18 @@ def test_resolve_sector_id_empty_or_null_is_unresolved(value):
 
 
 @pytest.mark.parametrize(
-    "value",
-    ["ALUMBRADO", "Luminaria", "  Alumbrado Público  ", "Alumbrado  público"],
+    ("value", "expected"),
+    [
+        ("ALUMBRADO", "alumbrado"),
+        ("Luminaria", "alumbrado"),
+        ("  Alumbrado Público  ", "alumbrado"),
+        ("Alumbrado  público", "alumbrado"),
+        ("BACHES", "baches"),
+        ("Residuos", "residuos"),
+    ],
 )
-def test_resolve_sector_id_handles_case_and_whitespace(value):
-    assert resolve_sector_id(value) == "alumbrado"
+def test_resolve_sector_id_handles_case_and_whitespace(value, expected):
+    assert resolve_sector_id(value) == expected
 
 
 def test_normalize_routing_category_strips_accents_case_and_punctuation():
@@ -75,6 +88,8 @@ def test_normalize_routing_category_strips_accents_case_and_punctuation():
 
 
 def test_canonical_categories_is_closed_and_used_by_prompt():
-    assert CANONICAL_CATEGORIES == ("alumbrado",)
+    assert CANONICAL_CATEGORIES == ("alumbrado", "baches", "residuos")
     assert '"alumbrado"' in _SYSTEM_PROMPT
+    assert '"baches"' in _SYSTEM_PROMPT
+    assert '"residuos"' in _SYSTEM_PROMPT
     assert "vocabulario cerrado" in _SYSTEM_PROMPT

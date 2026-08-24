@@ -194,6 +194,34 @@ test.describe("Flow Directorio LIVE smoke — dynamic detail", () => {
     await expect(detail.getByText("Registro final auditado", { exact: false })).toHaveCount(0);
     expect(errors).toEqual([]);
   });
+
+  test("single-level sectors expose only their configured N1", async ({ page }) => {
+    const errors: string[] = [];
+    trackErrors(page, errors);
+    await openFlow(page);
+
+    for (const sectorId of ["baches", "residuos"]) {
+      const payload = await listCases(page.request, `?page=1&page_size=100&sector_id=${sectorId}`);
+      const fixture = payload.items[0];
+      if (!fixture) {
+        test.info().annotations.push({ type: "NO_TEST_DATA", description: `No ${sectorId} case available` });
+        continue;
+      }
+
+      expect(fixture.sector_id).toBe(sectorId);
+      expect(fixture.current_level).toBe(1);
+      const detailResponse = await page.request.get(`/api/team360-flow/executive/${fixture.request_id}`);
+      expect(detailResponse.ok()).toBeTruthy();
+      const detail = await detailResponse.json();
+      expect(detail.routing_history.every((routing: Record<string, unknown>) => Number(routing.level) === 1)).toBe(true);
+      expect(detail.escalations).toHaveLength(0);
+
+      await selectCaseById(page, fixture.request_id);
+      await expect(page.locator('[data-selected="yes"]').getByText("Nivel 1", { exact: false }).first()).toBeVisible();
+    }
+
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe("Flow Directorio LIVE smoke — responsive and races", () => {

@@ -279,6 +279,26 @@ def test_missing_or_inactive_n2_is_typed_and_does_not_send():
         assert sender.send_calls == []
 
 
+def test_single_level_sector_sla_breach_does_not_invent_n2():
+    candidate = replace(
+        _candidate(), sector_id="baches", sector_display_name="Baches"
+    )
+    sender = _Sender()
+    result = asyncio.run(
+        _service(
+            _EscalationRepo(candidate=candidate),
+            _RoutingRepo(levels=()),
+            sender,
+        ).escalate_once(confirm_send=True)
+    )
+    assert result.eligible == 1
+    assert result.completed == 0
+    assert result.failed == 0
+    assert result.outcomes[0].reason_code == "NEXT_LEVEL_UNAVAILABLE"
+    assert result.outcomes[0].to_level is None
+    assert sender.send_calls == []
+
+
 def test_late_n1_response_is_reported_and_does_not_block_escalation():
     candidate = _candidate(first_response_at=T0 + timedelta(seconds=35))
     email = build_escalation_email(candidate, _RoutingRepo().levels[0])
