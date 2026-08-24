@@ -1,7 +1,8 @@
 """Transactional deletion of Flow case data.
 
-This repository deliberately names every case-owned table.  Flow configuration,
-scheduler state, Gmail data, Diagnosis and other modules are outside this list.
+Case data is deliberately separated from the intake history that provides
+Gmail idempotency.  Flow configuration, scheduler state, Gmail data, Diagnosis
+and other modules are outside the deletion scope.
 """
 
 from __future__ import annotations
@@ -13,9 +14,12 @@ from psycopg import AsyncConnection
 from modules.db.transaction import execute, fetch_one
 
 
-FLOW_CASE_TABLES: tuple[str, ...] = (
+FLOW_INTAKE_HISTORY_TABLES: tuple[str, ...] = (
     "flow_conversations",
     "flow_messages",
+)
+
+FLOW_CASE_TABLES: tuple[str, ...] = (
     "flow_interpretations",
     "flow_request_candidates",
     "flow_requests",
@@ -49,8 +53,6 @@ _DELETE_ORDER: tuple[str, ...] = (
     "flow_requests",
     "flow_request_candidates",
     "flow_interpretations",
-    "flow_messages",
-    "flow_conversations",
 )
 
 _RESOLUTION_GUARD = "trg_flow_request_resolution_guard"
@@ -58,9 +60,14 @@ _RESOLUTION_EVIDENCE_CHECK = "chk_flow_request_resolution_evidence"
 
 
 class FlowCaseCleanupPostgresRepository:
-    """SQL for clearing all persisted Flow cases in one caller transaction."""
+    """SQL for clearing cases while preserving intake idempotency history."""
 
     async def clear_cases(self, conn: AsyncConnection) -> dict[str, Any]:
+        preserved_before: dict[str, int] = {}
+        for table in FLOW_INTAKE_HISTORY_TABLES:
+            row = await fetch_one(conn, f"select count(*)::int as count from {table}")
+            preserved_before[table] = int(row["count"] if row else 0)
+
         before: dict[str, int] = {}
         for table in FLOW_CASE_TABLES:
             row = await fetch_one(conn, f"select count(*)::int as count from {table}")
@@ -110,12 +117,20 @@ class FlowCaseCleanupPostgresRepository:
             row = await fetch_one(conn, f"select count(*)::int as count from {table}")
             after[table] = int(row["count"] if row else 0)
 
+        preserved_after: dict[str, int] = {}
+        for table in FLOW_INTAKE_HISTORY_TABLES:
+            row = await fetch_one(conn, f"select count(*)::int as count from {table}")
+            preserved_after[table] = int(row["count"] if row else 0)
+
         return {
             "status": "cleared",
             "tables": FLOW_CASE_TABLES,
+            "preserved_tables": FLOW_INTAKE_HISTORY_TABLES,
             "before": before,
             "deleted": deleted,
             "after": after,
+            "preserved_before": preserved_before,
+            "preserved_after": preserved_after,
             "cases_before": before["flow_requests"],
             "cases_after": after["flow_requests"],
         }

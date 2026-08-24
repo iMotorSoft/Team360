@@ -6,6 +6,7 @@ import pytest
 
 from modules.flow.case_cleanup_repository import (
     FLOW_CASE_TABLES,
+    FLOW_INTAKE_HISTORY_TABLES,
     FlowCaseCleanupPostgresRepository,
 )
 from modules.flow.case_cleanup_service import FlowCaseCleanupService
@@ -20,6 +21,48 @@ def test_cleanup_scope_contains_only_case_tables():
     assert "flow_requests" in FLOW_CASE_TABLES
     assert "flow_case_audit_records" in FLOW_CASE_TABLES
     assert "flow_citizen_notifications" in FLOW_CASE_TABLES
+
+
+def test_cleanup_preserves_gmail_idempotency_history():
+    assert FLOW_INTAKE_HISTORY_TABLES == ("flow_conversations", "flow_messages")
+    assert set(FLOW_INTAKE_HISTORY_TABLES).isdisjoint(FLOW_CASE_TABLES)
+    implementation = __import__("inspect").getsource(
+        FlowCaseCleanupPostgresRepository.clear_cases
+    )
+    assert 'delete from {table}' in implementation
+    assert '"flow_messages"' not in implementation
+    assert '"flow_conversations"' not in implementation
+
+
+def test_cleanup_regression_never_deletes_intake_history(monkeypatch):
+    import modules.flow.case_cleanup_repository as cleanup_module
+
+    executed: list[str] = []
+    fetch_count = 0
+
+    async def fake_fetch_one(_conn, sql):
+        nonlocal fetch_count
+        fetch_count += 1
+        return {"count": 1 if fetch_count <= len(FLOW_INTAKE_HISTORY_TABLES) + len(FLOW_CASE_TABLES) else 0}
+
+    async def fake_execute(_conn, sql):
+        executed.append(sql)
+        return 1
+
+    monkeypatch.setattr(cleanup_module, "fetch_one", fake_fetch_one)
+    monkeypatch.setattr(cleanup_module, "execute", fake_execute)
+
+    result = asyncio.run(
+        FlowCaseCleanupPostgresRepository().clear_cases(object())
+    )
+
+    assert result["cases_after"] == 0
+    assert result["preserved_tables"] == FLOW_INTAKE_HISTORY_TABLES
+    assert not any(
+        sql.lower().startswith("delete from flow_messages")
+        or sql.lower().startswith("delete from flow_conversations")
+        for sql in executed
+    )
 
 
 def test_cleanup_repository_uses_explicit_safe_deletes():
