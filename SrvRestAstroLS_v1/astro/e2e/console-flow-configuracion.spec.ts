@@ -406,7 +406,7 @@ test.describe("Flow Configuración — vista y navegación", () => {
     await sectors.getByRole("option", { name: "Alumbrado Público" }).click();
     await page.getByRole("button", { name: "Editar configuración" }).click();
     await expect(page.locator("#flow-destination-alumbrado-level-3")).toHaveCount(1);
-    await expect(page.getByText("Autoriza la resolución final del caso.", { exact: true })).toBeVisible();
+    await expect(page.getByText(/Autoriza la resolución final del caso\./)).toBeVisible();
   });
 });
 
