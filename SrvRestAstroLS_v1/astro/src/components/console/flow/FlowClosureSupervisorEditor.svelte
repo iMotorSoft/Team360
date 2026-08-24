@@ -22,6 +22,8 @@
     onDestinationBlur?: () => void;
     onApprovalLevelChange?: (level: number) => void;
   } = $props();
+
+  const requiresApproval = $derived(approvalLevel !== null);
 </script>
 
 <section class="rounded-2xl border border-[#c5e5dc] bg-[#f4fbf8] p-4 sm:p-5" aria-labelledby="flow-closure-title">
@@ -31,10 +33,14 @@
       <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#238454]">Autorización de cierre</p>
       <h2 id="flow-closure-title" class="mt-1 text-xl font-bold tracking-[-0.025em] text-[#173b5b]">Supervisor de cierre</h2>
       <p class="mt-1 max-w-2xl text-sm leading-5 text-[#587184]">
-        Autoriza la resolución final del caso. Es una autoridad de cierre, no un nivel adicional de escalamiento.
+        {#if requiresApproval}
+          Autoriza la resolución final del caso. Es una autoridad de cierre, no un nivel adicional de escalamiento.
+        {:else}
+          Este sector opera con sus niveles configurados y no requiere aprobación de cierre.
+        {/if}
       </p>
 
-      {#if editing}
+      {#if requiresApproval && editing}
         <fieldset class="mt-4" disabled={disabled}>
           <legend class="mb-2 block text-xs font-bold uppercase tracking-[0.1em] text-[#587184]">
             Nivel que aprueba el cierre
@@ -89,12 +95,16 @@
             El supervisor usa el destino del nivel elegido. Si cambiás el email del nivel, el supervisor lo toma automáticamente.
           </span>
         </label>
-      {:else}
+      {:else if requiresApproval}
         <div class="mt-4 flex min-w-0 flex-wrap items-center gap-2">
           <span class="min-w-0 max-w-full truncate rounded-xl border border-[#b9dfd0] bg-white px-3.5 py-3 font-mono text-sm text-[#17663d]" title={destination}>{destination || "Sin destinatario definido"}</span>
           {#if approvalLevel}
             <span class="rounded-full border border-[#b9dfd0] bg-[#e5f7ee] px-2.5 py-1 text-xs font-bold text-[#238454]">Autoridad N{approvalLevel}</span>
           {/if}
+        </div>
+      {:else}
+        <div class="mt-4 rounded-xl border border-[#b9dfd0] bg-white px-3.5 py-3 text-sm font-semibold text-[#17663d]" role="status">
+          Sin aprobación de cierre configurada para este sector.
         </div>
       {/if}
     </div>

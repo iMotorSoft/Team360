@@ -91,12 +91,24 @@ _CATEGORY_TO_SECTOR = {
     "reparacion_de_alumbrado_publico_poste_de_luz": "alumbrado",
     "alumbrado_publico_reparacion_de_luminaria": "alumbrado",
     "street_lighting": "alumbrado",
+    "baches": "baches",
+    "bache": "baches",
+    "pozo": "baches",
+    "pozos": "baches",
+    "pavimento_roto": "baches",
+    "agujero_en_la_calzada": "baches",
+    "residuos": "residuos",
+    "residuo": "residuos",
+    "basura": "residuos",
+    "recoleccion_de_basura": "residuos",
+    "residuos_acumulados": "residuos",
+    "contenedor_desbordado": "residuos",
 }
 
 # Closed vocabulary offered to the intake interpreter. `tentative_category`
 # must be one of these canonical values or null; descriptive detail belongs in
 # `description` / `context_notes`, never in `tentative_category`.
-CANONICAL_CATEGORIES: tuple[str, ...] = ("alumbrado",)
+CANONICAL_CATEGORIES: tuple[str, ...] = ("alumbrado", "baches", "residuos")
 
 
 def normalize_routing_category(value: str | None) -> str:

@@ -93,6 +93,11 @@ compuestas ni descriptivas (por ejemplo "Alumbrado público - luminaria
 apagada"); usá la categoría canónica y poné el detalle en description o
 context_notes. Si la solicitud no corresponde a una categoría del catálogo,
 usá null.
+
+Orientación de clasificación:
+- "alumbrado": luminaria apagada, farola rota, poste sin luz o calle sin luz.
+- "baches": pozo en la calle, bache en el asfalto, pavimento roto o agujero en la calzada.
+- "residuos": basura no retirada, residuos acumulados, contenedor desbordado o recolección demorada.
 """.replace("__CANONICAL_CATEGORIES__", json.dumps(list(CANONICAL_CATEGORIES))).strip()
 
 
