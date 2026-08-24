@@ -97,6 +97,14 @@
     if (!localFiltering) onFilterChange(next);
   }
 
+  function selectCase(requestId: string) {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+      debounceTimer = null;
+    }
+    onSelect(requestId);
+  }
+
   function selectSector(event: Event) {
     const value = (event.currentTarget as HTMLSelectElement).value;
     onSectorChange(value || undefined);
@@ -187,7 +195,7 @@
         <li>
           <button
             type="button"
-            onclick={() => onSelect(item.request_id)}
+            onclick={() => selectCase(item.request_id)}
             aria-pressed={selectedId === item.request_id}
             class={`flex w-full items-center gap-4 px-4 py-4 text-start transition ${
               selectedId === item.request_id ? "bg-[#e4f5f3]/60" : "hover:bg-base-200/60"
