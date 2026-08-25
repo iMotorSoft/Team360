@@ -1,5 +1,6 @@
 <script lang="ts">
   import { flowDateTime } from "../../../lib/t360/flow/format";
+  import { resendApprovalRequest, type ApprovalResendError } from "../../../lib/api/flowExecutive";
   import { currentAssignee, currentLevel } from "../../../lib/t360/flow/types";
   import type { ExecutiveView } from "../../../lib/t360/flow/types";
   import type { ExecutiveFetchError } from "../../../lib/api/flowExecutive";
@@ -13,12 +14,19 @@
     loading = false,
     error = null,
     onBack = () => undefined,
+    onApprovalResent = () => undefined,
   }: {
     view: ExecutiveView | null;
     loading?: boolean;
     error?: ExecutiveFetchError | null;
     onBack?: () => void;
+    onApprovalResent?: () => void | Promise<void>;
   } = $props();
+
+  let resendConfirming = $state(false);
+  let resendLoading = $state(false);
+  let resendMessage = $state<string | null>(null);
+  let resendError = $state<ApprovalResendError | null>(null);
 
   const errorCopy = $derived.by(() => {
     switch (error) {
@@ -34,6 +42,39 @@
   });
 
   const levelText = $derived(view ? (currentLevel(view) > 0 ? `Nivel ${currentLevel(view)}` : "Sin nivel asignado") : "");
+
+  const canResendApproval = $derived(
+    view?.data_source === "LIVE"
+      && view.status_fact === "pending_approval"
+      && (view.closure_approval?.decision === "PENDING" || view.closure_approval?.decision === null),
+  );
+
+  function resendErrorCopy(error: ApprovalResendError): string {
+    switch (error) {
+      case "forbidden": return "No tenés permiso para reenviar aprobaciones.";
+      case "not_found": return "El caso ya no está disponible.";
+      case "conflict": return "El caso ya no está pendiente de aprobación.";
+      case "invalid": return "La aprobación no tiene un destinatario válido.";
+      case "unauthorized": return "La sesión ya no está autorizada.";
+      default: return "No se pudo reenviar la solicitud. Intentá nuevamente.";
+    }
+  }
+
+  async function resendApproval() {
+    if (!view || resendLoading || !canResendApproval) return;
+    resendConfirming = false;
+    resendLoading = true;
+    resendMessage = null;
+    resendError = null;
+    const result = await resendApprovalRequest(view.request_id);
+    resendLoading = false;
+    if (result.error || !result.data) {
+      resendError = result.error ?? "unavailable";
+      return;
+    }
+    resendMessage = `Solicitud reenviada a ${result.data.approver_destination}.`;
+    await onApprovalResent();
+  }
 </script>
 
 <div class="space-y-5">
@@ -171,6 +212,46 @@
               <p class="mt-1 text-sm font-bold text-[#765d00]">Pendiente de decisión</p>
               {#if view.status_fact === "pending_approval"}
                 <p class="mt-1 text-xs leading-5 text-[#587184]">El caso sigue abierto hasta la decisión del supervisor.</p>
+              {/if}
+              {#if canResendApproval}
+                <div class="mt-4 rounded-xl border border-[#d8e9e8] bg-[#f5fbfa] p-3">
+                  {#if resendConfirming}
+                    <p class="text-xs leading-5 text-[#31536b]">Se reenviará la solicitud al aprobador configurado. El caso, la aprobación y el SLA no cambiarán.</p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onclick={resendApproval}
+                        disabled={resendLoading}
+                        class="rounded-full bg-[#168b88] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#126d6b] disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {resendLoading ? "Reenviando…" : "Confirmar reenvío"}
+                      </button>
+                      <button
+                        type="button"
+                        onclick={() => { resendConfirming = false; }}
+                        disabled={resendLoading}
+                        class="rounded-full border border-[#cddede] bg-white px-3 py-2 text-xs font-bold text-[#587184] disabled:opacity-60"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  {:else}
+                    <button
+                      type="button"
+                      onclick={() => { resendConfirming = true; resendMessage = null; resendError = null; }}
+                      disabled={resendLoading}
+                      class="rounded-full border border-[#9ed4d0] bg-white px-3 py-2 text-xs font-bold text-[#126d6b] transition hover:bg-[#e4f5f3] disabled:cursor-wait disabled:opacity-60"
+                    >
+                      {resendLoading ? "Reenviando…" : "Reenviar solicitud de aprobación"}
+                    </button>
+                  {/if}
+                  {#if resendMessage}
+                    <p class="mt-2 text-xs font-semibold text-[#17663d]" role="status">{resendMessage}</p>
+                  {/if}
+                  {#if resendError}
+                    <p class="mt-2 text-xs font-semibold text-[#9b3328]" role="alert">{resendErrorCopy(resendError)}</p>
+                  {/if}
+                </div>
               {/if}
             {/if}
             {#if view.closure_approval.decision_reason && view.closure_approval.decision !== "REJECTED"}

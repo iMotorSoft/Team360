@@ -18,6 +18,7 @@ Authorization happens before any data access or mutation.
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from litestar import get, patch, post
@@ -38,6 +39,7 @@ from modules.console.auth import (
 )
 from modules.db.pool import get_pool
 from modules.db.transaction import transaction
+from modules.messaging.providers.gmail import GmailClient
 from modules.security.paseto_tokens import get_dev_public_keys_by_id, paseto_console_settings_from_env
 
 from .access_mode import (
@@ -52,6 +54,14 @@ from .access_mode import (
 from .audit_repository import FlowAuditRepository
 from .case_cleanup_service import FlowCaseCleanupService
 from .closure_repository import FlowClosurePostgresRepository
+from .closure_service import (
+    ApprovalResendConflictError,
+    ApprovalResendError,
+    ApprovalResendNotFoundError,
+    ApprovalResendValidationError,
+    FlowClosureService,
+)
+from .approval_ai import LiteLLMApprovalInterpreter
 from .configuration_auth import FlowConfigurationAuthorizationService
 from .configuration_service import (
     FlowConfigurationService,
@@ -113,6 +123,16 @@ def _configuration_service(pool: Any) -> FlowConfigurationService:
 
 def _case_cleanup_service(pool: Any) -> FlowCaseCleanupService:
     return FlowCaseCleanupService(pool=pool)
+
+
+def _closure_service(pool: Any) -> FlowClosureService:
+    return FlowClosureService(
+        pool=pool,
+        repository=FlowClosurePostgresRepository(),
+        audit_repository=FlowAuditRepository(),
+        interpreter=LiteLLMApprovalInterpreter(),
+        sender=GmailClient(os.environ.get("TEAM360_FLOW_GMAIL_ACCOUNT")),
+    )
 
 
 def _authenticate(request: Request | None) -> str:
@@ -376,6 +396,39 @@ async def flow_cases_clear(
     return await _case_cleanup_service(pool).clear_cases()
 
 
+@post("/api/team360-flow/executive/{request_id:str}/resend-approval")
+async def flow_resend_approval(
+    request_id: str, request: Request | None = None
+) -> dict[str, Any]:
+    """Re-send the existing pending approval notification for one case."""
+    await _require_flow_actor(
+        request, capability=FLOW_CONFIGURATION_WRITE, write=True
+    )
+    pool = get_pool()
+    try:
+        result = await _closure_service(pool).resend_pending_approval(request_id)
+    except ApprovalResendNotFoundError as exc:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(exc))
+    except ApprovalResendConflictError as exc:
+        raise HTTPException(status_code=HTTP_409_CONFLICT, detail=str(exc))
+    except ApprovalResendValidationError as exc:
+        raise HTTPException(
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        )
+    except ApprovalResendError as exc:
+        raise HTTPException(status_code=HTTP_409_CONFLICT, detail=str(exc))
+    return {
+        "request_id": result.request_id,
+        "approval_id": result.approval_id,
+        "status": result.status,
+        "approver_level": result.approver_level,
+        "approver_destination": result.approver_destination,
+        "subject": result.subject,
+        "outbound_external_message_id": result.outbound_external_message_id,
+        "correlation_preserved": result.correlation_preserved,
+    }
+
+
 # --- Scheduler status endpoint ---
 
 
@@ -412,5 +465,6 @@ ROUTE_HANDLERS: tuple[Any, ...] = (
     flow_operational_settings_get,
     flow_operational_settings_update,
     flow_cases_clear,
+    flow_resend_approval,
     flow_scheduler_status,
 )

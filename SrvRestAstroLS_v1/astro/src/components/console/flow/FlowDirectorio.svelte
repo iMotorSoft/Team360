@@ -174,6 +174,15 @@
     detailError = result.error;
   }
 
+  async function refreshSelectedCase() {
+    if (!selectedId || mode === "demo") return;
+    const generation = ++detailGen;
+    const result = await fetchExecutiveCase(selectedId);
+    if (generation !== detailGen) return;
+    detail = result.data;
+    detailError = result.error;
+  }
+
   function clearSelection() {
     selectedId = null;
     detail = null;
@@ -285,7 +294,7 @@
             <div class="h-3 w-1/2 rounded bg-base-200"></div>
           </div>
         {:else if selectedId}
-          <FlowCaseDetail view={selected} error={detailError} onBack={clearSelection} />
+          <FlowCaseDetail view={selected} error={detailError} onBack={clearSelection} onApprovalResent={refreshSelectedCase} />
         {:else}
           <div class="hidden rounded-2xl border border-dashed border-[#d7e3e5] bg-white/70 p-8 text-center lg:block">
             <p class="text-sm font-bold text-[#31536b]">Seleccioná un caso</p>

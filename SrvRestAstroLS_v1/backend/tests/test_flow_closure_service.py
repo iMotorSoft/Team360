@@ -142,6 +142,7 @@ class _ClosureRepo:
         self.active_transitions = 0
         self.apply_approve_calls = 0
         self.apply_reject_calls = 0
+        self.resend_events = []
 
     async def get_request_lifecycle_for_update(self, conn, request_id):
         return {"status": self.request_status}
@@ -196,6 +197,15 @@ class _ClosureRepo:
     async def find_approval_by_resolution(self, conn, resolution_id):
         return self.approval_by_resolution.get(resolution_id)
 
+    async def get_approval_by_request_for_update(self, conn, request_id):
+        return next(
+            (approval for approval in self.approvals.values() if approval.request_id == request_id),
+            None,
+        )
+
+    async def get_resolution(self, conn, resolution_id):
+        return self.resolutions.get(resolution_id)
+
     async def find_approval_by_token(self, conn, token):
         return self.approval_by_token.get(token)
 
@@ -211,10 +221,11 @@ class _ClosureRepo:
     async def get_approval_for_decision(self, conn, approval_id):
         return self.approvals.get(approval_id)
 
-    async def mark_approval_sent(self, conn, approval_id, external_message_id, observed_rfc):
+    async def mark_approval_sent(self, conn, approval_id, external_message_id, observed_rfc, outbound_rfc_message_id=None):
         approval = self.approvals[approval_id]
         updated = replace(
             approval,
+            outbound_rfc_message_id=outbound_rfc_message_id or approval.outbound_rfc_message_id,
             outbound_external_message_id=external_message_id,
             outbound_observed_rfc_message_id=observed_rfc or approval.outbound_observed_rfc_message_id,
         )
@@ -230,6 +241,9 @@ class _ClosureRepo:
         self.approval_by_resolution[updated.resolution_id] = updated
         self.uncertain.append(approval_id)
         return updated
+
+    async def record_approval_resend(self, conn, **event):
+        self.resend_events.append(event)
 
     async def mark_request_resolution_pending(self, conn, request_id):
         self.pending_transitions += 1
@@ -331,6 +345,71 @@ def test_propose_resolution_creates_proposal_approval_send_and_transition():
     assert repo.pending_transitions == 1
     assert sender.sent[0]["to"] == APPROVER
     assert "APROBAR" in sender.sent[0]["body"]
+
+
+def test_resend_pending_approval_reuses_record_token_and_status():
+    repo = _ClosureRepo(request_status="RESOLUTION_PENDING_APPROVAL")
+    sender = _Sender()
+    service = _service(repo, sender=sender)
+    resolution = asyncio.run(
+        repo.upsert_resolution(
+            _Connection(),
+            request_id=REQUEST_ID,
+            routing_id="routing-1",
+            proposed_by="alumbrado.n1@alquimiablue.com",
+            proposed_at=_dt(),
+            source_provider="gmail",
+            source_external_message_id="resolution-1",
+            resolution_text="Trabajo terminado.",
+        )
+    )
+    approval = asyncio.run(
+        repo.upsert_approval(
+            _Connection(),
+            request_id=REQUEST_ID,
+            resolution_id=resolution.id,
+            approver_level=2,
+            approver_destination=APPROVER,
+            approval_token="a1b2c3d4e5f60718",
+        )
+    )
+    approval = replace(approval, outbound_external_message_id="original-send")
+    repo.approvals[approval.id] = approval
+    repo.approval_by_resolution[resolution.id] = approval
+    result = asyncio.run(service.resend_pending_approval(REQUEST_ID))
+
+    assert result.request_id == REQUEST_ID
+    assert result.approval_id == approval.id
+    assert result.status == "RESOLUTION_PENDING_APPROVAL"
+    assert result.approval_token == approval.approval_token
+    assert result.approver_destination == APPROVER
+    assert repo.request_status == "RESOLUTION_PENDING_APPROVAL"
+    assert len(repo.approvals) == 1
+    assert len(sender.sent) == 1
+    assert sender.sent[0]["to"] == APPROVER
+    assert "R:a1b2c3d4e5f60718" in sender.sent[0]["subject"]
+    assert "-resend-" in sender.sent[0]["rfc"]
+    assert len(repo.resend_events) == 1
+
+    second = asyncio.run(service.resend_pending_approval(REQUEST_ID))
+    assert second.approval_id == approval.id
+    assert len(repo.approvals) == 1
+    assert len(sender.sent) == 2
+    assert len(repo.resend_events) == 2
+
+
+def test_resend_rejects_non_pending_case_without_sending():
+    repo = _ClosureRepo(request_status="RESOLVED")
+    sender = _Sender()
+    service = _service(repo, sender=sender)
+
+    try:
+        asyncio.run(service.resend_pending_approval(REQUEST_ID))
+    except Exception as exc:
+        assert type(exc).__name__ == "ApprovalResendConflictError"
+    else:
+        raise AssertionError("resolved cases must not resend approval")
+    assert sender.sent == []
 
 
 def test_propose_resolution_skips_when_resolved_terminal():

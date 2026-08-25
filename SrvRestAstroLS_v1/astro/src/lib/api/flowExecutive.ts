@@ -27,6 +27,25 @@ export type ExecutiveFetchError =
 
 export type ExecutiveListFetchError = ExecutiveFetchError | "validation";
 
+export type ApprovalResendError =
+  | "unauthorized"
+  | "forbidden"
+  | "not_found"
+  | "conflict"
+  | "invalid"
+  | "unavailable";
+
+export interface ApprovalResendResult {
+  request_id: string;
+  approval_id: string;
+  status: string;
+  approver_level: number;
+  approver_destination: string;
+  subject: string;
+  outbound_external_message_id: string;
+  correlation_preserved: boolean;
+}
+
 export interface ExecutiveFetchResult {
   data: ExecutiveView | null;
   error: ExecutiveFetchError | null;
@@ -130,6 +149,35 @@ export async function fetchExecutiveCaseList(
       },
       error: null,
     };
+  } catch {
+    return { data: null, error: "unavailable" };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function resendApprovalRequest(
+  requestId: string,
+  options: { token?: string; timeoutMs?: number } = {},
+): Promise<{ data: ApprovalResendResult | null; error: ApprovalResendError | null }> {
+  const url = new URL(
+    `${API_BASE}/executive/${encodeURIComponent(requestId)}/resend-approval`,
+    window.location.origin,
+  );
+  const headers: Record<string, string> = {};
+  if (options.token) headers.Authorization = `Bearer ${options.token}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(url.toString(), { method: "POST", headers, signal: controller.signal });
+    if (res.status === 401) return { data: null, error: "unauthorized" };
+    if (res.status === 403) return { data: null, error: "forbidden" };
+    if (res.status === 404) return { data: null, error: "not_found" };
+    if (res.status === 409) return { data: null, error: "conflict" };
+    if (res.status === 422) return { data: null, error: "invalid" };
+    if (!res.ok) return { data: null, error: "unavailable" };
+    return { data: (await res.json()) as ApprovalResendResult, error: null };
   } catch {
     return { data: null, error: "unavailable" };
   } finally {

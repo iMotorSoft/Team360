@@ -235,6 +235,39 @@ test.describe("Flow Directorio — detalle", () => {
     expect(errors).toEqual([]);
   });
 
+  test("caso pendiente permite reenviar la aprobación sin duplicar el caso", async ({ page }) => {
+    const resendRequests: string[] = [];
+    await page.route("**/api/team360-flow/executive/d16a0a08-315b-47a8-9790-aaece91bde5f/resend-approval", async (route) => {
+      resendRequests.push(route.request().method());
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          request_id: "d16a0a08-315b-47a8-9790-aaece91bde5f",
+          approval_id: "apr-d16a",
+          status: "RESOLUTION_PENDING_APPROVAL",
+          approver_level: 2,
+          approver_destination: "alumbrado.n2@alquimiablue.com",
+          subject: "[Team360 Flow][CIERRE][R:a1b2c3d4][d16a0a08-315b-47a8-9790-aaece91bde5f] Aprobación de cierre",
+          outbound_external_message_id: "gmail-resend-1",
+          correlation_preserved: true,
+        }),
+      });
+    });
+    await openFlow(page);
+    const detail = detailSection(page);
+    await selectCaseByText(page, "Poste de luz dañado por temporal");
+
+    await expect(detail.getByRole("button", { name: "Reenviar solicitud de aprobación" })).toBeVisible();
+    await detail.getByRole("button", { name: "Reenviar solicitud de aprobación" }).click();
+    await expect(detail.getByText(/Se reenviará la solicitud/)).toBeVisible();
+    await detail.getByRole("button", { name: "Confirmar reenvío" }).click();
+
+    await expect(detail.getByText("Solicitud reenviada a alumbrado.n2@alquimiablue.com.", { exact: true })).toBeVisible();
+    expect(resendRequests).toEqual(["POST"]);
+    await expect(detail.getByText("Pendiente de decisión", { exact: true })).toBeVisible();
+  });
+
   test("caso LIVE con cierre rechazado muestra motivo y estado activo", async ({ page }) => {
     const errors: string[] = [];
     trackErrors(page, errors);

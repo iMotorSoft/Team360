@@ -28,6 +28,8 @@
         return { label: "Escalamiento de nivel", icon: "up", tone: "warning" };
       case "RESOLUTION_PROPOSED":
         return { label: "Resolución propuesta por el técnico", icon: "propose", tone: "brand" };
+      case "APPROVAL_NOTIFICATION_RESENT":
+        return { label: "Solicitud de aprobación reenviada", icon: "send", tone: "brand" };
       case "CLOSURE_APPROVED":
         return { label: "Cierre autorizado por supervisor", icon: "approve", tone: "success" };
       case "REQUEST_RESOLVED":
@@ -68,6 +70,9 @@
           {flowDateTime(event.timestamp ?? null)}
           {#if event.level !== null && event.level !== undefined && ["ROUTING_ASSIGNED", "SLA_STARTED", "SLA_MET", "SLA_BREACHED", "ESCALATED"].includes(event.event_type)}
             · Nivel {event.level}
+          {/if}
+          {#if event.event_type === "APPROVAL_NOTIFICATION_RESENT" && event.recipient}
+            · {event.recipient}
           {/if}
         </p>
       </div>

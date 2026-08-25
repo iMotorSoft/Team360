@@ -94,6 +94,7 @@ export interface TimelineEvent {
   routing_id?: string | null;
   level?: number | null;
   reference_id?: string | null;
+  recipient?: string | null;
 }
 
 export interface ExecutiveMetrics {

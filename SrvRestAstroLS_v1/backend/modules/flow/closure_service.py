@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from uuid import uuid4
 
 from psycopg import AsyncConnection
 from psycopg_pool import AsyncConnectionPool
@@ -82,6 +83,7 @@ def build_approval_email(
     resolution_text: str,
     proposed_at,
     brief: dict,
+    rfc_message_id: str | None = None,
 ) -> ApprovalEmail:
     destination = brief.get("approver_destination") or ""
     lines = [
@@ -124,8 +126,45 @@ def build_approval_email(
             "Aprobación de cierre"
         ),
         body="\n".join(lines),
-        rfc_message_id=approval_rfc_message_id(approval_token),
+        rfc_message_id=rfc_message_id or approval_rfc_message_id(approval_token),
     )
+
+
+def approval_resend_rfc_message_id(approval_token: str) -> str:
+    """Return a new transport id while keeping the domain approval token."""
+    return (
+        f"<team360-flow-closure-{approval_token}-resend-"
+        f"{uuid4().hex}@alquimiablue.com>"
+    )
+
+
+class ApprovalResendError(RuntimeError):
+    """Base error for the guarded pending-approval resend operation."""
+
+
+class ApprovalResendNotFoundError(ApprovalResendError):
+    pass
+
+
+class ApprovalResendConflictError(ApprovalResendError):
+    pass
+
+
+class ApprovalResendValidationError(ApprovalResendError):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
+class ApprovalResendResult:
+    request_id: str
+    approval_id: str
+    status: str
+    approver_level: int
+    approver_destination: str
+    approval_token: str
+    subject: str
+    outbound_external_message_id: str
+    correlation_preserved: bool = True
 
 
 class FlowClosureService:
@@ -143,6 +182,129 @@ class FlowClosureService:
         self._audit_repository = audit_repository
         self._interpreter = interpreter
         self._sender = sender
+
+    async def resend_pending_approval(
+        self, request_id: str
+    ) -> ApprovalResendResult:
+        """Re-send one existing pending approval without changing workflow state."""
+        if self._sender is None:
+            raise ApprovalResendValidationError(
+                "No hay un emisor de correo disponible para reenviar la aprobación."
+            )
+
+        async with transaction(self._pool) as conn:
+            lifecycle = await self._repository.get_request_lifecycle_for_update(
+                conn, request_id
+            )
+            if lifecycle is None:
+                raise ApprovalResendNotFoundError(
+                    f"Flow request not found: {request_id}"
+                )
+            if lifecycle["status"] != "RESOLUTION_PENDING_APPROVAL":
+                raise ApprovalResendConflictError(
+                    "La solicitud de aprobación sólo puede reenviarse cuando el "
+                    "caso está pendiente de aprobación."
+                )
+
+            approval = await self._repository.get_approval_by_request_for_update(
+                conn, request_id
+            )
+            if approval is None:
+                raise ApprovalResendValidationError(
+                    "El caso no tiene una aprobación pendiente."
+                )
+            if approval.status not in {
+                ClosureApprovalStatus.PENDING,
+                ClosureApprovalStatus.DELIVERY_UNCERTAIN,
+            }:
+                raise ApprovalResendConflictError(
+                    "La aprobación del caso ya no está pendiente."
+                )
+
+            resolution = await self._repository.get_resolution(
+                conn, approval.resolution_id
+            )
+            if resolution is None or resolution.status != ResolutionStatus.PROPOSED:
+                raise ApprovalResendValidationError(
+                    "El caso no tiene una propuesta de resolución pendiente."
+                )
+            if not approval.approver_destination or "@" not in approval.approver_destination:
+                raise ApprovalResendValidationError(
+                    "La aprobación no tiene un destinatario válido."
+                )
+
+            brief = dict(await self._repository.get_case_brief(conn, request_id))
+            brief["approver_destination"] = approval.approver_destination
+            email = build_approval_email(
+                request_id=request_id,
+                approval_token=approval.approval_token,
+                reported_level=approval.approver_level,
+                responder=resolution.proposed_by,
+                resolution_text=resolution.resolution_text,
+                proposed_at=resolution.proposed_at,
+                brief=brief,
+                rfc_message_id=approval_resend_rfc_message_id(
+                    approval.approval_token
+                ),
+            )
+            try:
+                external_id = self._sender.send_message(
+                    to=email.destination,
+                    subject=email.subject,
+                    body=email.body,
+                    rfc_message_id=email.rfc_message_id,
+                )
+                observed = _safe_observed_rfc_message_id(
+                    self._sender, external_id
+                )
+                approval = await self._repository.mark_approval_sent(
+                    conn,
+                    approval.id,
+                    external_id,
+                    observed,
+                    outbound_rfc_message_id=email.rfc_message_id,
+                )
+                context = await self._repository.get_request_context(
+                    conn, request_id
+                )
+                if context is None:
+                    raise ApprovalResendValidationError(
+                        "No se pudo resolver la conversación del caso."
+                    )
+                await self._repository.record_approval_resend(
+                    conn,
+                    request_id=request_id,
+                    conversation_id=context["conversation_id"],
+                    approval_id=approval.id,
+                    approver_level=approval.approver_level,
+                    recipient=email.destination,
+                    external_message_id=external_id,
+                    subject=email.subject,
+                    body=email.body,
+                    sender_address=getattr(
+                        self._sender, "sender_address", "mesaentrada@alquimiablue.com"
+                    ),
+                )
+            except ApprovalResendError:
+                raise
+            except Exception as exc:
+                await self._repository.mark_approval_delivery_uncertain(
+                    conn, approval.id
+                )
+                raise ApprovalResendError(
+                    "No se pudo reenviar la solicitud de aprobación."
+                ) from exc
+
+            return ApprovalResendResult(
+                request_id=request_id,
+                approval_id=approval.id,
+                status=lifecycle["status"],
+                approver_level=approval.approver_level,
+                approver_destination=email.destination,
+                approval_token=approval.approval_token,
+                subject=email.subject,
+                outbound_external_message_id=external_id,
+            )
 
     async def propose_resolution(
         self,

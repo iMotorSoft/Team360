@@ -58,13 +58,22 @@ def compute_metrics(
     }
 
 
-def _event(timestamp, event_type, *, routing_id=None, level=None, reference_id=None):
+def _event(
+    timestamp,
+    event_type,
+    *,
+    routing_id=None,
+    level=None,
+    reference_id=None,
+    recipient=None,
+):
     return {
         "timestamp": _iso(timestamp),
         "event_type": event_type,
         "routing_id": routing_id,
         "level": level,
         "reference_id": reference_id,
+        "recipient": recipient,
     }
 
 
@@ -77,6 +86,7 @@ def build_timeline(
     escalations: list[dict[str, Any]],
     resolution: dict[str, Any] | None,
     approval: dict[str, Any] | None,
+    approval_resends: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
     items.append(_event(received_at, "REQUEST_RECEIVED"))
@@ -129,6 +139,16 @@ def build_timeline(
                 routing_id=escalation.get("to_routing_id"),
                 level=escalation.get("to_level"),
                 reference_id=escalation.get("escalation_id"),
+            )
+        )
+    for resend in approval_resends or []:
+        items.append(
+            _event(
+                resend.get("occurred_at"),
+                "APPROVAL_NOTIFICATION_RESENT",
+                level=resend.get("approver_level"),
+                reference_id=resend.get("approval_id"),
+                recipient=resend.get("recipient"),
             )
         )
     if resolution is not None:
@@ -269,6 +289,27 @@ class FlowAuditRepository:
             {"request_id": request_id},
         )
 
+        approval_resends = await fetch_all(
+            conn,
+            """
+            select fm.occurred_at_utc,
+                   fm.metadata_jsonb->>'approval_id' as approval_id,
+                   (fm.metadata_jsonb->>'approver_level')::int as approver_level,
+                   fm.metadata_jsonb->>'recipient' as recipient
+            from flow_messages fm
+            where fm.conversation_id = %(conversation_id)s
+              and fm.direction = 'outbound'
+              and fm.metadata_jsonb->>'flow_event' =
+                  'APPROVAL_NOTIFICATION_RESENT'
+              and fm.metadata_jsonb->>'request_id' = %(request_id)s
+            order by fm.occurred_at_utc
+            """,
+            {
+                "conversation_id": request["conversation_id"],
+                "request_id": request_id,
+            },
+        )
+
         approval = await fetch_one(
             conn,
             """
@@ -407,6 +448,15 @@ class FlowAuditRepository:
             escalations=escalation_list,
             resolution=resolution_snapshot,
             approval=approval_snapshot,
+            approval_resends=[
+                {
+                    "occurred_at": row["occurred_at_utc"],
+                    "approval_id": row["approval_id"],
+                    "approver_level": row["approver_level"],
+                    "recipient": row["recipient"],
+                }
+                for row in approval_resends
+            ],
         )
 
         snapshot: dict[str, Any] = {

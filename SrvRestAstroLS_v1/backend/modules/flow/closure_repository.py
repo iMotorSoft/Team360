@@ -223,6 +223,39 @@ class FlowClosurePostgresRepository:
             )
         )
 
+    async def get_approval_by_request_for_update(
+        self, conn: AsyncConnection, request_id: str
+    ) -> ClosureApproval | None:
+        return _approval(
+            await fetch_one(
+                conn,
+                f"""
+                select {_APPROVAL_COLUMNS}
+                from flow_closure_approvals
+                where request_id = %(request_id)s
+                order by created_at_utc desc
+                limit 1
+                for update
+                """,
+                {"request_id": request_id},
+            )
+        )
+
+    async def get_resolution(
+        self, conn: AsyncConnection, resolution_id: str
+    ) -> ResolutionProposal | None:
+        return _resolution(
+            await fetch_one(
+                conn,
+                f"""
+                select {_RESOLUTION_COLUMNS}
+                from flow_request_resolutions
+                where id = %(resolution_id)s
+                """,
+                {"resolution_id": resolution_id},
+            )
+        )
+
     async def find_approval_by_token(
         self, conn: AsyncConnection, token: str
     ) -> ClosureApproval | None:
@@ -282,12 +315,16 @@ class FlowClosurePostgresRepository:
         approval_id: str,
         external_message_id: str,
         observed_rfc: str | None,
+        outbound_rfc_message_id: str | None = None,
     ) -> ClosureApproval:
         row = await fetch_one(
             conn,
             f"""
             update flow_closure_approvals
-            set outbound_external_message_id = %(external_message_id)s,
+            set outbound_rfc_message_id = coalesce(
+                    %(outbound_rfc_message_id)s, outbound_rfc_message_id
+                ),
+                outbound_external_message_id = %(external_message_id)s,
                 outbound_observed_rfc_message_id = coalesce(
                     %(observed_rfc)s, outbound_observed_rfc_message_id
                 ),
@@ -303,12 +340,60 @@ class FlowClosurePostgresRepository:
                 "approval_id": approval_id,
                 "external_message_id": external_message_id,
                 "observed_rfc": observed_rfc,
+                "outbound_rfc_message_id": outbound_rfc_message_id,
             },
         )
         result = _approval(row)
         if result is None:
             raise RuntimeError("Flow approval send update returned no row.")
         return result
+
+    async def record_approval_resend(
+        self,
+        conn: AsyncConnection,
+        *,
+        request_id: str,
+        conversation_id: str,
+        approval_id: str,
+        approver_level: int,
+        recipient: str,
+        external_message_id: str,
+        subject: str,
+        body: str,
+        sender_address: str,
+    ) -> None:
+        await execute(
+            conn,
+            """
+            insert into flow_messages (
+                conversation_id, provider, external_message_id, direction,
+                sender_address, recipients_jsonb, subject, text_body,
+                occurred_at_utc, metadata_jsonb, processed_at_utc
+            ) values (
+                %(conversation_id)s, 'gmail', %(external_message_id)s,
+                'outbound', %(sender_address)s, %(recipients)s, %(subject)s,
+                %(body)s, now(), %(metadata)s, now()
+            )
+            on conflict (provider, external_message_id) do nothing
+            """,
+            {
+                "conversation_id": conversation_id,
+                "external_message_id": external_message_id,
+                "sender_address": sender_address,
+                "recipients": Jsonb([recipient]),
+                "subject": subject,
+                "body": body,
+                "metadata": Jsonb(
+                    {
+                        "flow_event": "APPROVAL_NOTIFICATION_RESENT",
+                        "request_id": request_id,
+                        "approval_id": approval_id,
+                        "approver_level": approver_level,
+                        "recipient": recipient,
+                    }
+                ),
+            },
+        )
 
     async def mark_approval_delivery_uncertain(
         self, conn: AsyncConnection, approval_id: str

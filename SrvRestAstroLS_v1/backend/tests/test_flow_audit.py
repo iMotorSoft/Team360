@@ -153,3 +153,32 @@ def test_build_timeline_pending_approval_has_no_closure_events():
     assert types == ["REQUEST_RECEIVED", "REQUEST_CONFIRMED", "RESOLUTION_PROPOSED"]
     assert "CLOSURE_APPROVED" not in types
     assert "REQUEST_RESOLVED" not in types
+
+
+def test_build_timeline_records_approval_resend_without_closing_case():
+    timeline = build_timeline(
+        received_at=_dt("2026-08-13T00:00:00Z"),
+        confirmed_at=_dt("2026-08-13T00:01:00Z"),
+        routings=[],
+        slas=[],
+        escalations=[],
+        resolution={
+            "resolution_id": "res1",
+            "proposed_at": "2026-08-13T00:10:00+00:00",
+            "routing_id": "r1",
+        },
+        approval={"approval_id": "a1", "decision_at": None, "status": "PENDING"},
+        approval_resends=[
+            {
+                "approval_id": "a1",
+                "approver_level": 2,
+                "recipient": "alumbrado.n2@alquimiablue.com",
+                "occurred_at": "2026-08-13T00:11:00+00:00",
+            }
+        ],
+    )
+
+    resend = next(item for item in timeline if item["event_type"] == "APPROVAL_NOTIFICATION_RESENT")
+    assert resend["level"] == 2
+    assert resend["recipient"] == "alumbrado.n2@alquimiablue.com"
+    assert "REQUEST_RESOLVED" not in [item["event_type"] for item in timeline]

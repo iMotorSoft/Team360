@@ -5,7 +5,7 @@ from modules.flow.routes import ROUTE_HANDLERS
 
 def test_flow_exports_explicit_route_handlers() -> None:
     assert isinstance(ROUTE_HANDLERS, tuple)
-    assert len(ROUTE_HANDLERS) == 9
+    assert len(ROUTE_HANDLERS) == 10
 
 
 def test_flow_executive_route_path_and_method() -> None:
@@ -48,4 +48,14 @@ def test_flow_case_cleanup_route_exported() -> None:
         for path in handler.paths
     }
     handler = handlers["/api/team360-flow/cases/clear"]
+    assert "POST" in handler.http_methods
+
+
+def test_flow_approval_resend_route_exported() -> None:
+    handlers = {
+        path: handler
+        for handler in ROUTE_HANDLERS
+        for path in handler.paths
+    }
+    handler = handlers["/api/team360-flow/executive/{request_id:str}/resend-approval"]
     assert "POST" in handler.http_methods
