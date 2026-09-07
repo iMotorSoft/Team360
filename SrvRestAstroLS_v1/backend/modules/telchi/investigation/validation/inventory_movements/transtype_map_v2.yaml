@@ -1,0 +1,341 @@
+trans_type_map:
+- trans_type: 13
+  official_object_type: arInvoice
+  official_name: A/R Invoice
+  header_table: OINV
+  line_table: INV1
+  business_category: SALES
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: BASE_REF → OINV.DocEntry
+  link_target_field: INV1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → OINV.DocEntry → INV1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Primary document. ApplObj=-1 means movement IS the invoice.
+  annual_2023:
+    rows: 137493
+    abs_value: 5436770.96
+- trans_type: 14
+  official_object_type: arCreditNote
+  official_name: A/R Credit Memo
+  header_table: ORIN
+  line_table: RIN1
+  business_category: SALES_RETURN
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: BASE_REF → ORIN.DocEntry
+  link_target_field: RIN1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → ORIN.DocEntry → RIN1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: ApplObj=15 when referencing Delivery. ApplObj=-1 for direct credit.
+  annual_2023:
+    rows: 1260
+    abs_value: 217831.66
+- trans_type: 15
+  official_object_type: arDeliveryNote
+  official_name: Delivery
+  header_table: ODLN
+  line_table: DLN1
+  business_category: SALES
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: BASE_REF → ODLN.DocEntry
+  link_target_field: DLN1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → ODLN.DocEntry → DLN1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Primary delivery document.
+  annual_2023:
+    rows: 9492
+    abs_value: 3192564.39
+- trans_type: 16
+  official_object_type: arReturn
+  official_name: A/R Return
+  header_table: ORPD
+  line_table: RPD1
+  business_category: SALES_RETURN
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: PARTIAL
+  link_source_field: BASE_REF → ORPD.DocEntry
+  link_target_field: RPD1.LineNum
+  line_link_status: PARTIAL
+  link_quality: DOCUMENT_NUMBER_LINK
+  confidence: HIGH
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → ORPD.DocEntry → RPD1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Customer return to warehouse.
+  annual_2023:
+    rows: 64
+    abs_value: 14786.81
+- trans_type: 18
+  official_object_type: apInvoice
+  official_name: A/P Invoice
+  header_table: OPCH
+  line_table: PCH1
+  business_category: PURCHASE
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: BASE_REF → OPCH.DocEntry
+  link_target_field: PCH1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → OPCH.DocEntry → PCH1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Purchase invoice. Very low volume in Telchi.
+  annual_2023:
+    rows: 1
+    abs_value: 1020.0
+- trans_type: 19
+  official_object_type: apCreditNote
+  official_name: A/P Credit Memo
+  header_table: ORPC
+  line_table: RPC1
+  business_category: PURCHASE_RETURN
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: AppObjAbs → RPC1.DocEntry
+  link_target_field: RPC1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: 20
+  primary_appl_name: oPurchaseDeliveryNotes
+  link_strategy: ApplObj=20 (oPurchaseDeliveryNotes); AppObjAbs=DocEntry, AppObjLine=LineNum
+  docnum_collision_rate: 1.0
+  notes: ApplObj=20 when referencing Goods Receipt PO.
+  annual_2023:
+    rows: 27
+    abs_value: 38496.55
+- trans_type: 20
+  official_object_type: apDeliveryNote
+  official_name: Goods Receipt PO
+  header_table: OPDN
+  line_table: PDN1
+  business_category: PURCHASE
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: BASE_REF → OPDN.DocEntry
+  link_target_field: PDN1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → OPDN.DocEntry → PDN1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Purchase goods receipt. Large value.
+  annual_2023:
+    rows: 3492
+    abs_value: 785746868.81
+- trans_type: 21
+  official_object_type: apReturn
+  official_name: Goods Return
+  header_table: OPDN
+  line_table: PDN1
+  business_category: PURCHASE_RETURN
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: BASE_REF → OPDN.DocEntry
+  link_target_field: PDN1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → OPDN.DocEntry → PDN1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Return to vendor. Uses same tables as TT=20.
+  annual_2023:
+    rows: 174
+    abs_value: 50811.11
+- trans_type: 59
+  official_object_type: oInventoryGenEntry
+  official_name: Inventory Goods Receipt
+  header_table: OIGN
+  line_table: IGN1
+  business_category: INVENTORY_RECEIPT
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: AppObjAbs → IGN1.DocEntry
+  link_target_field: IGN1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: 202
+  primary_appl_name: oProductionOrders
+  link_strategy: ApplObj=202 (oProductionOrders); AppObjAbs=DocEntry, AppObjLine=LineNum
+  docnum_collision_rate: 1.0
+  notes: ApplObj=202 when from Production Order. AppObjType P=Production, C=Component.
+  annual_2023:
+    rows: 1321
+    abs_value: 57277672.54
+- trans_type: 60
+  official_object_type: oInventoryGenExit
+  official_name: Inventory Goods Issue
+  header_table: OIGE
+  line_table: IGE1
+  business_category: INVENTORY_ISSUE
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: AppObjAbs → IGE1.DocEntry
+  link_target_field: IGE1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: 202
+  primary_appl_name: oProductionOrders
+  link_strategy: ApplObj=202 (oProductionOrders); AppObjAbs=DocEntry, AppObjLine=LineNum
+  docnum_collision_rate: 1.0
+  notes: ApplObj=202 when from Production Order. AppObjType C=Component consumption.
+  annual_2023:
+    rows: 5674
+    abs_value: 57409247.47
+- trans_type: 67
+  official_object_type: oStockTransfer
+  official_name: Inventory Transfer
+  header_table: OWTR
+  line_table: WTR1
+  business_category: TRANSFER
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: CONFIRMED_EXACT
+  link_source_field: BASE_REF → OWTR.DocEntry
+  link_target_field: WTR1.LineNum
+  line_link_status: CONFIRMED_EXACT
+  link_quality: EXACT_ID_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → OWTR.DocEntry → WTR1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Largest by rows and value. ApplObj=-1. InQty=OutQty balanced.
+  annual_2023:
+    rows: 149242
+    abs_value: 1601312537.84
+- trans_type: 69
+  official_object_type: oLandedCosts
+  official_name: Landed Costs
+  header_table: OIGN
+  line_table: IGN1
+  business_category: LANDED_COST
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: PARTIAL
+  link_source_field: BASE_REF → OIGN.DocEntry
+  link_target_field: IGN1.LineNum
+  line_link_status: PARTIAL
+  link_quality: DOCUMENT_NUMBER_LINK
+  confidence: HIGH
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → OIGN.DocEntry → IGN1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Value-only cost allocation. InQty=OutQty=0.
+  annual_2023:
+    rows: 29
+    abs_value: 443419.45
+- trans_type: 162
+  official_object_type: oInventoryRevaluation
+  official_name: Inventory Revaluation
+  header_table: OINM
+  line_table: OINM
+  business_category: VALUATION
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: SELF_REFERENCING
+  link_source_field: BASE_REF → OINM.DocEntry
+  link_target_field: self-referencing
+  line_link_status: NOT_APPLICABLE
+  link_quality: HEURISTIC_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → OINM.DocEntry → OINM.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Value-only revaluation. Self-referencing.
+  annual_2023:
+    rows: 6
+    abs_value: 7169.5
+- trans_type: 202
+  official_object_type: oProductionOrders
+  official_name: Production Order
+  header_table: OWOR
+  line_table: WOR1
+  business_category: PRODUCTION
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: PENDING
+  link_source_field: BASE_REF → OWOR.DocEntry
+  link_target_field: WOR1.LineNum
+  line_link_status: NOT_APPLICABLE
+  link_quality: DOCUMENT_NUMBER_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → OWOR.DocEntry → WOR1.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: DocLineNum=-1 indicates header-level movement.
+  annual_2023:
+    rows: 48
+    abs_value: 2374.3
+- trans_type: 10000071
+  official_object_type: customExtended
+  official_name: Inventory Posting (Custom)
+  header_table: OINM
+  line_table: OINM
+  business_category: OTHER
+  raw_preserved: true
+  semantic_status: CONFIRMED
+  link_status: SELF_REFERENCING
+  link_source_field: BASE_REF → OINM.DocEntry
+  link_target_field: self-referencing
+  line_link_status: NOT_APPLICABLE
+  link_quality: HEURISTIC_LINK
+  confidence: CONFIRMED
+  primary_appl_obj: -1
+  primary_appl_name: NO_LINK
+  link_strategy: BASE_REF=DocNum → OINM.DocEntry → OINM.LineNum=DocLineNum
+  docnum_collision_rate: 1.0
+  notes: Extended range. Self-referencing.
+  annual_2023:
+    rows: 1
+    abs_value: 0.0
+corrections: []
+methodology:
+  semantic_source: SAP B1 SDK Official Documentation
+  appl_obj_source: OINM.ApplObj field (official SAP metadata)
+  line_link_strategy_a: 'When ApplObj > 0: AppObjAbs = source DocEntry, AppObjLine
+    = source LineNum'
+  line_link_strategy_b: 'When ApplObj = -1: BASE_REF → HEADER.DocNum → HEADER.DocEntry
+    → LINE.DocEntry + LINE.LineNum = DocLineNum'
+  collision_handling: DocNum collision rate tracked per TransType; composite key (TransType
+    + BASE_REF) preferred over DocNum alone

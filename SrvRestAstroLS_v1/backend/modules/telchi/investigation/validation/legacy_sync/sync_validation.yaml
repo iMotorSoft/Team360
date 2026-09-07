@@ -1,0 +1,299 @@
+baseline_name: telchi_legacy_sync_baseline
+baseline_version: "1"
+status: TEAM360_TELCHI_LEGACY_SYNC_BASELINE_PARTIAL
+scope: LEGACY_READ_ONLY
+validated_at: "2026-08-17"
+hana:
+  host: 192.168.20.20
+  port: 30015
+  schema: TELCHI
+  driver: hdbcli-2.29.25
+  authentication: PASS
+  read_only: true
+  version: 2.00.056.00.1624618329
+  legacy_endpoint_detected: 192.168.21.4
+  note: "The legacy endpoint was not used."
+vpn:
+  service: active
+  tcp: PASS
+  route_table_220: PASS
+  final_state: active_by_explicit_user_instruction
+window:
+  month: 2023-02
+  sales: [2023-02-01, 2023-02-02]
+  credit_notes: [2023-02-01, 2023-02-02]
+  inventory_movements: [2023-02-01, 2023-02-02]
+  payments: [2023-02-01, 2023-02-02]
+  reconciliation: [2023-02-01, 2023-02-02]
+  note: "Windows are bounded smoke samples, not full historical scans."
+static_source:
+  file:
+    root_key: LEGACY_DATA_ROOT
+    relative_path: SrvRest/srvSyncTelchiSB101.py
+  syntax: PASS
+  required_functions: PASS
+  hardcoded_legacy_endpoint: LEGACY_ENDPOINT
+  parquet_writer_wrappers: PRESENT
+  fillna_without_assignment: 10
+  except_e_present: true
+  except_e_dynamic_failure: true
+  price_087_present: true
+  product_case_mismatch: true
+  legacy_modified: false
+datasets:
+  - dataset: sales
+    legacy_function: makeSaleDFRange
+    source_tables: [TELCHI.OINV, TELCHI.INV1, TELCHI.OSLP]
+    current_hana_query_pass: true
+    source_rows: 3328
+    documents: 1389
+    legacy_transform_pass: true
+    schema_parity: PARTIAL
+    pk_parity: PARTIAL
+    business_parity: CONTENT_DRIFT_OBSERVED
+    parquet_parity:
+      status: CONTENT_DRIFT_OBSERVED
+      parquet_rows: 65999
+      hana_rows_same_window: 66089
+      row_delta: -90
+      hana_only_documents: [10817796, 10818993]
+      hana_only_line_groups: 70
+      max_common_document_total_delta: 0.0000000000072759576
+      note: "Common document totals agree within floating-point tolerance; current HANA has 90 additional rows."
+    line_num_available_in_hana: true
+    docentry_itemcode_duplicate_rows: 14
+    zero_sum_documents: 0
+    max_document_total_delta: 0.00000000000000000000001
+    canceled_in_sample: {N: 1389}
+    canceled_in_month: {N: 28899}
+    warehouse_mapping:
+      file:
+        root_key: LEGACY_DATA_ROOT
+        relative_path: DS/sapWhsOfficeName.xlsx
+      status: PASS
+      rows: 60
+      unique_whs_codes: 60
+      duplicate_whs_codes: 0
+    legacy_parquet_available: true
+    parquet_sample: saleSB1Product-2023-02-28.parq
+    parquet_metadata: "pyarrow 9.0.0; pandas 1.4.2"
+    known_bugs: ["LineNum is dropped from legacy output", "CANCELED is not selected"]
+    undocumented_rules: ["Discount distributed by GTotal coefficient", "BaseRef forced to VACIO"]
+    migration_recommendation: REUSE_SEMANTICS_ONLY
+    status: VALIDATED_WITH_KNOWN_BUGS
+
+  - dataset: credit_notes
+    legacy_function: makeNCDFRange
+    source_tables: [TELCHI.ORIN, TELCHI.RIN1, TELCHI.OSLP]
+    current_hana_query_pass: true
+    source_rows: 50
+    documents: 12
+    legacy_transform_pass: true
+    schema_parity: PARTIAL
+    pk_parity: PARTIAL
+    business_parity: CONTENT_DRIFT_OBSERVED
+    parquet_parity:
+      status: CONTENT_DRIFT_OBSERVED
+      parquet_rows: 500
+      hana_rows_same_window: 501
+      row_delta: -1
+      hana_only_documents: [19661]
+      hana_only_line_groups: 1
+      max_common_document_total_delta: 0.0000000000002273737
+      note: "Common document totals agree within floating-point tolerance; current HANA has one additional row."
+    line_num_available_in_hana: true
+    base_ref_null_rows: 0
+    max_document_total_delta: 0.0000000000000000000000002
+    canceled_in_sample: {N: 12}
+    canceled_in_month: {N: 147}
+    legacy_parquet_available: true
+    parquet_sample: ncB1Product-2023-02-28.parq
+    parquet_metadata: "pyarrow 9.0.0; pandas 1.4.2"
+    known_bugs: ["LineNum is dropped from legacy output", "CANCELED is not selected"]
+    undocumented_rules: ["Document and line amounts are negated", "BaseRef null becomes VACIO"]
+    migration_recommendation: REUSE_SEMANTICS_ONLY
+    status: VALIDATED_WITH_KNOWN_BUGS
+
+  - dataset: inventory_movements
+    legacy_function: makeMoveProductRange
+    source_tables: [TELCHI.OINM, TELCHI.OINV, TELCHI.ODLN, TELCHI.DLN1, TELCHI.OCRD, TELCHI.OUSR, TELCHI.OSLP]
+    current_hana_query_pass: true
+    source_rows: 6454
+    trans_type_counts: {13: 3027, 14: 48, 15: 139, 16: 1, 18: 1, 20: 78, 21: 1, 59: 35, 60: 123, 67: 2998, 202: 3}
+    legacy_transform_pass: PARTIAL
+    schema_parity: PARTIAL
+    pk_parity: UNKNOWN
+    business_parity: CONTENT_DRIFT_OBSERVED
+    parquet_parity:
+      status: CONTENT_DRIFT_OBSERVED
+      parquet_rows: 137914
+      hana_rows_same_window: 133689
+      row_delta: 4225
+      trans_type_counts_match: false
+      hana_only_transnum: 230
+      parquet_only_transnum: 0
+      hana_item_sale_u_formula_max_delta: 0.000000000988507
+      note: "Both ranges are 2023-02; current HANA contains additional or changed movement rows."
+    source_column: BASE_REF
+    expected_legacy_merge_column: base_ref
+    df15_rows: 17
+    df15_distinct_base_ref: 7
+    df15_duplicate_full_rows: 10
+    df15_after_drop_duplicates: 7
+    fillna_without_assignment: CONFIRMED
+    item_sale_u_formula: "Price / 0.87"
+    item_sale_u_null_rows: 0
+    item_sale_u_negative_rows: 0
+    legacy_parquet_available: true
+    parquet_sample: movProductSB1-2023-02-28.parq
+    parquet_metadata: "pyarrow 9.0.0; pandas 1.4.2"
+    known_bugs:
+      - "BASE_REF is returned by current HANA DBAPI while legacy merge expects base_ref"
+      - "drop_duplicates removes 10 of 17 DF15 rows in the sample"
+      - "fillna calls do not mutate the DataFrame"
+    undocumented_rules: ["Price / 0.87", "Special handling only for TransType 14"]
+    migration_recommendation: REWRITE_COMPLETE
+    status: VALIDATED_WITH_KNOWN_BUGS
+
+  - dataset: products
+    legacy_function: makeProduct + makeProductPropiety
+    source_tables: [TELCHI.OITM, TELCHI.OITB, TELCHI.OMRC, TELCHI.OINM, TELCHI.OITT, TELCHI.OITG]
+    current_hana_query_pass: true
+    rows: 16731
+    sample_rows: 5000
+    legacy_transform_pass: PARTIAL
+    schema_parity: INSPECTED
+    pk_parity: ItemCode
+    business_parity: NOT_COMPARABLE_CURRENT_SNAPSHOT
+    itemun_distribution: {Litel: 2010, Medi: 389, Otros: 2601}
+    last_purchase_nulls_in_sample: 0
+    calcprice_60d_item_count: 6346
+    qrygroup_columns: 64
+    latest_towh_rows: 1040
+    legacy_parquet_available: true
+    parquet_sample: productSB1.parq
+    parquet_metadata: "pyarrow 9.0.0; pandas 1.4.2"
+    known_bugs:
+      - "Current HANA DBAPI exposes U_PRODUCE; legacy accesses u_produce"
+      - "makeProduct writes Parquet and was not executed"
+    undocumented_rules: ["ItemCode prefix maps to ItemUN", "CalcPrice uses rolling CURRENT_DATE minus 60 days"]
+    migration_recommendation: REUSE_SEMANTICS_ONLY
+    status: VALIDATED_WITH_KNOWN_BUGS
+
+  - dataset: customers
+    legacy_function: makeClient + makeClientPropiety
+    source_tables: [TELCHI.OCRD, TELCHI.OPLN, TELCHI.OCQG]
+    current_hana_query_pass: true
+    rows: 13973
+    sample_rows: 5000
+    legacy_transform_pass: PARTIAL
+    schema_parity: INSPECTED
+    pk_parity: CardCode
+    business_parity: NOT_COMPARABLE_CURRENT_SNAPSHOT
+    cardtype_sample: {C: 4935, S: 65}
+    qrygroup_columns: 64
+    legacy_parquet_available: true
+    parquet_sample: clientSB1.parq
+    parquet_metadata: "pyarrow 9.0.0; pandas 1.4.2"
+    known_bugs: ["except e: raises NameError while handling an exception"]
+    undocumented_rules: ["Client properties concatenate QryGroup1..64 values"]
+    migration_recommendation: REUSE_SEMANTICS_ONLY
+    status: VALIDATED_WITH_KNOWN_BUGS
+
+  - dataset: warehouses
+    legacy_function: makeWhareHouse
+    source_tables: [TELCHI.OITW]
+    current_hana_query_pass: true
+    rows: 1357702
+    distinct_item_whs_keys: 1357702
+    duplicate_composite_keys: 0
+    create_date_nulls: 0
+    update_date_nulls: 0
+    legacy_transform_pass: PARTIAL
+    schema_parity: INSPECTED
+    pk_parity: ItemCode+WhsCode
+    business_parity: NOT_COMPARABLE_CURRENT_SNAPSHOT
+    legacy_parquet_available: true
+    parquet_sample: wareHouseSB1.parq
+    parquet_metadata: "pyarrow 9.0.0; pandas 1.4.2"
+    known_bugs: ["createDate/updateDate fillna calls do not mutate the DataFrame"]
+    undocumented_rules: []
+    migration_recommendation: REUSE_SEMANTICS_ONLY
+    status: VALIDATED_WITH_KNOWN_BUGS
+
+  - dataset: incoming_payments
+    legacy_function: makePaymentRange
+    source_tables: [TELCHI.ORCT]
+    current_hana_query_pass: true
+    source_rows: 1384
+    docentry_unique: 1384
+    canceled_in_sample: {N: 1379, Y: 5}
+    legacy_transform_pass: true
+    schema_parity: INSPECTED
+    pk_parity: DocEntry
+    business_parity: CONTENT_DRIFT_OBSERVED
+    parquet_parity:
+      status: CONTENT_DRIFT_OBSERVED
+      parquet_rows: 29310
+      hana_rows_same_window: 29319
+      row_delta: -9
+      hana_only_docentries: [478999, 789304, 789311, 789316, 1065236, 1501881, 1549620, 1691424, 2178752]
+      canceled_value_mismatches_on_common_keys: 3
+      note: "Current HANA has nine additional DocEntry values and three cancellation-state changes."
+    legacy_parquet_available: true
+    parquet_sample: paymentB1-2023-02-28.parq
+    parquet_metadata: "pyarrow 11.0.0; pandas 1.5.3"
+    known_bugs: []
+    undocumented_rules: ["Canceled is selected and retained"]
+    migration_recommendation: REUSE_QUERY_AND_SEMANTICS
+    status: VALIDATED_BASELINE
+
+  - dataset: reconciliation
+    legacy_function: makeReconRange
+    source_tables: [TELCHI.OITR, TELCHI.ITR1, TELCHI.OUSR]
+    current_hana_query_pass: true
+    source_rows: 3333
+    reconnum_unique: 1615
+    canceled_in_sample: {C: 14, N: 3309, Y: 10}
+    legacy_transform_pass: true
+    schema_parity: INSPECTED
+    pk_parity: ReconNum+LineSeq
+    business_parity: CONTENT_DRIFT_OBSERVED
+    parquet_parity:
+      status: CONTENT_DRIFT_OBSERVED
+      parquet_rows: 69254
+      hana_rows_same_window: 72969
+      row_delta: -3715
+      hana_only_keys: 3715
+      parquet_only_keys: 0
+      note: "Current HANA contains additional reconciliation lines; both ranges are 2023-02."
+    legacy_parquet_available: true
+    parquet_sample: reconB1-2023-02-28.parq
+    parquet_metadata: "pyarrow 11.0.0; pandas 1.5.3"
+    known_bugs: []
+    undocumented_rules: ["ReconNum and line fields are preserved"]
+    migration_recommendation: REUSE_QUERY_AND_SEMANTICS
+    status: VALIDATED_BASELINE
+
+  - dataset: sales_targets
+    legacy_function: tb1/i-MotorSoft/SrvRest/faTB1Srv02.py::getObjetiveSale
+    source_tables: [TELCHI.@OBJ_VENTAS_C, TELCHI.@OBJ_VENTAS_L, TELCHI.OSLP, TELCHI.OHEM, TELCHI.OUBR]
+    current_hana_query_pass: true
+    legacy_transform_pass: BLOCKED_EXTERNAL_DATA
+    schema_parity: PASS
+    pk_parity: UNKNOWN
+    business_parity: BLOCKED_EXTERNAL_DATA
+    current_rows: {"@OBJ_VENTAS_C": 8, "@OBJ_VENTAS_L": 0, OSLP: 251, OHEM: 489, OUBR: 15}
+    known_bugs: []
+    undocumented_rules: ["Legacy melts U_ENERO..U_DICIEMBRE into YYYY-MM targets"]
+    migration_recommendation: REWRITE_QUERY
+    status: BLOCKED_EXTERNAL_DATA
+
+parquet:
+  legacy_files_present: true
+  content_read_engine: "pyarrow 25.0.1 / pandas 3.0.3"
+  file_created_by_versions: [9.0.0, 11.0.0]
+  content_parity: PARTIAL_DRIFT_OBSERVED
+  rewritten: false
+  note: "Read-only monthly comparisons completed. Historical files are not exact snapshots of current HANA; no Parquet was rewritten."
+global_changes: NONE

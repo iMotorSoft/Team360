@@ -1,0 +1,250 @@
+# =============================================================================
+# REPORT CONTRACT — TEAM360 TELCHI FINANCIAL REPORTING
+# =============================================================================
+# Defines logical reports (not UI). Each report answers specific business questions.
+# =============================================================================
+# Version: 1.0.0
+# Date: 2026-08-21
+# Status: ACTIVE
+# =============================================================================
+
+reports:
+
+  # ===========================================================================
+  # OWNER FINANCIAL SUMMARY
+  # ===========================================================================
+  - id: OWNER_FINANCIAL_SUMMARY
+    name: "Resumen Financiero del Dueño"
+    business_name_es: "Resumen Ejecutivo"
+    audience: "Owner, CEO"
+    description: "High-level financial snapshot for executive decision-making"
+    period_semantics: "Stock (AS_OF) for AR, Flow (period) for Sales"
+    metrics:
+      - SALES_NET
+      - AR_OUTSTANDING
+      - AR_NOT_DUE
+      - AR_OVERDUE
+      - AR_OVERDUE_RATE
+      - AR_OPEN_INVOICES
+      - AR_CUSTOMERS_WITH_DEBT
+    dimensions: ["DATE"]
+    drill_down: "AR → Customer → Invoice → ReconNum"
+    audit_path: "Portfolio → Customer → Invoice → ReconNum → SAP document"
+    notes: "Must be simple. Few indicators, high clarity."
+
+  # ===========================================================================
+  # SALES PERFORMANCE
+  # ===========================================================================
+  - id: SALES_PERFORMANCE
+    name: "Rendimiento de Ventas"
+    business_name_es: "Reporte de Ventas"
+    audience: "Sales Manager, Owner"
+    description: "Sales analysis by period, seller, customer, channel"
+    period_semantics: "Flow (DocDate within period)"
+    metrics:
+      - SALES_GROSS
+      - SALES_VALID_GROSS
+      - SALES_CREDIT_NOTES
+      - SALES_NET
+      - SALES_CREDIT_NOTE_RATE
+      - SALES_CANCELED_COUNT
+      - SALES_CANCELED_AMOUNT
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    drill_down: "Period → Seller → Customer → Invoice → LineNum"
+    audit_path: "Invoice DocEntry → LineNum → SAP document"
+    notes: "Flow metric. Shows what was sold in period."
+
+  # ===========================================================================
+  # COLLECTION PERFORMANCE
+  # ===========================================================================
+  - id: COLLECTION_PERFORMANCE
+    name: "Rendimiento de Cobranza"
+    business_name_es: "Reporte de Cobranza"
+    audience: "Collections Manager, Owner"
+    description: "Collection analysis including payments and settlement"
+    period_semantics: "Flow (DocDate for payments, ReconDate for settlement)"
+    metrics:
+      - PAYMENT_DOCUMENTS_VALID
+      - PAYMENT_DOCUMENTS_CANCELED_COUNT
+      - PAYMENT_DOCUMENTS_CANCELED_AMOUNT
+      - SETTLEMENT_PAYMENT
+      - SETTLEMENT_CREDIT
+      - SETTLEMENT_DOWN_PAYMENT
+      - SETTLEMENT_JOURNAL
+      - SETTLEMENT_OTHER
+      - SETTLEMENT_TOTAL
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    drill_down: "Period → Payment → Reconciliation → Invoice"
+    audit_path: "Payment DocEntry → ReconNum → Invoice DocEntry"
+    notes: "Flow metric. Shows what was collected in period."
+    critical_distinction: |
+      Payments received during period != Settlement against sales cohort.
+      A payment in August can pay an invoice from July.
+
+  # ===========================================================================
+  # ACCOUNTS RECEIVABLE
+  # ===========================================================================
+  - id: ACCOUNTS_RECEIVABLE
+    name: "Cuentas por Cobrar"
+    business_name_es: "Reporte de Cartera"
+    audience: "Finance, Owner, Auditor"
+    description: "Current AR position with aging analysis"
+    period_semantics: "Stock (AS_OF_DATE mandatory)"
+    metrics:
+      - AR_OUTSTANDING
+      - AR_NOT_DUE
+      - AR_OVERDUE
+      - AR_OVERDUE_RATE
+      - AR_OPEN_INVOICES
+      - AR_CUSTOMERS_WITH_DEBT
+      - AR_SELLERS_WITH_PORTFOLIO
+      - AR_CREDIT_BALANCE
+      - AR_AGING_NOT_DUE
+      - AR_AGING_1_30
+      - AR_AGING_31_60
+      - AR_AGING_61_90
+      - AR_AGING_91_120
+      - AR_AGING_120_PLUS
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    drill_down: "Portfolio → Channel → Customer → Invoice → ReconNum"
+    audit_path: "Portfolio → CardCode → DocEntry → ReconNum → SAP document"
+    notes: "STOCK metric. Always report with AS_OF_DATE."
+
+  # ===========================================================================
+  # CUSTOMER AR DETAIL
+  # ===========================================================================
+  - id: CUSTOMER_AR_DETAIL
+    name: "Detalle de Cartera por Cliente"
+    business_name_es: "Cartera por Cliente"
+    audience: "Collections, Sales, Finance"
+    description: "Customer-level AR with invoice detail"
+    period_semantics: "Stock (AS_OF_DATE)"
+    metrics:
+      - AR_OUTSTANDING
+      - AR_NOT_DUE
+      - AR_OVERDUE
+      - AR_DAYS_OVERDUE
+      - AR_OPEN_INVOICES
+    dimensions: ["CUSTOMER", "SELLER", "CUSTOMER_CHANNEL"]
+    drill_down: "Customer → Invoice → Settlement → ReconNum"
+    audit_path: "CardCode → DocEntry → ReconNum → SAP document"
+    customer_fields:
+      - CardCode
+      - CardName
+      - OutstandingAR
+      - NotDueAR
+      - OverdueAR
+      - OldestDueDate
+      - MaxDaysOverdue
+      - OpenInvoiceCount
+
+  # ===========================================================================
+  # SELLER PORTFOLIO
+  # ===========================================================================
+  - id: SELLER_PORTFOLIO
+    name: "Cartera por Vendedor"
+    business_name_es: "Portafolio de Vendedor"
+    audience: "Sales Manager, Owner"
+    description: "Seller-level AR analysis"
+    period_semantics: "Stock (AS_OF_DATE)"
+    metrics:
+      - SALES_NET
+      - AR_OUTSTANDING
+      - AR_NOT_DUE
+      - AR_OVERDUE
+      - AR_OVERDUE_RATE
+    dimensions: ["SELLER"]
+    drill_down: "Seller → Customer → Invoice → ReconNum"
+    audit_path: "SlpCode → CardCode → DocEntry → ReconNum"
+    seller_fields:
+      - SlpCode
+      - SellerName
+      - NetSales
+      - OutstandingAR
+      - NotDueAR
+      - OverdueAR
+      - OverdueRate
+    notes: "Analytical dimension. Debt belongs to customer, not seller."
+
+  # ===========================================================================
+  # CHANNEL PORTFOLIO
+  # ===========================================================================
+  - id: CHANNEL_PORTFOLIO
+    name: "Cartera por Canal"
+    business_name_es: "Portafolio de Canal"
+    audience: "Commercial Manager, Owner"
+    description: "Channel-level AR analysis"
+    period_semantics: "Stock (AS_OF_DATE)"
+    metrics:
+      - SALES_NET
+      - AR_OUTSTANDING
+      - AR_NOT_DUE
+      - AR_OVERDUE
+      - AR_OVERDUE_RATE
+      - AR_CUSTOMERS_WITH_DEBT
+    dimensions: ["CUSTOMER_CHANNEL"]
+    drill_down: "Channel → Customer → Invoice → ReconNum"
+    audit_path: "U_CANAL_VENTAS → CardCode → DocEntry → ReconNum"
+    channel_fields:
+      - CustomerChannelCode
+      - CustomerChannelName
+      - NetSales
+      - OutstandingAR
+      - NotDueAR
+      - OverdueAR
+      - OverdueRate
+      - CustomersWithDebt
+    notes: "For 2026+ using OCRD.U_CANAL_VENTAS. NULL = Sin Clasificar."
+
+  # ===========================================================================
+  # SALES COHORT
+  # ===========================================================================
+  - id: SALES_COHORT
+    name: "Cohorte de Ventas"
+    business_name_es: "Análisis de Cohorte"
+    audience: "Finance, Owner"
+    description: "Track settlement of sales cohort over time"
+    period_semantics: "Flow (sales period) + Stock (as-of evaluation)"
+    metrics:
+      - COHORT_GROSS_SALES
+      - COHORT_SETTLED_AS_OF
+      - COHORT_OUTSTANDING_AS_OF
+      - COHORT_COLLECTION_RATE
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL"]
+    drill_down: "Cohort → Customer → Invoice → ReconNum"
+    audit_path: "Period → DocEntry → ReconNum → SAP document"
+    notes: |
+      Critical distinction:
+      - "Cobros de agosto" = payments received in August (FLOW)
+      - "Cuánto cobramos de ventas de agosto" = cohort settlement (STOCK as-of)
+
+  # ===========================================================================
+  # FINANCIAL AUDIT
+  # ===========================================================================
+  - id: FINANCIAL_AUDIT
+    name: "Auditoría Financiera"
+    business_name_es: "Reporte de Auditoría"
+    audience: "Auditor, Finance"
+    description: "Audit flags and anomalies"
+    period_semantics: "Current state or AS_OF_DATE"
+    metrics:
+      - AUDIT_NEGATIVE_BALANCE
+      - AUDIT_CANCELED_INVOICE_OPEN
+      - AUDIT_MISSING_DUE_DATE
+      - SALES_CANCELED_COUNT
+      - SALES_CANCELED_AMOUNT
+      - PAYMENT_DOCUMENTS_CANCELED_COUNT
+      - PAYMENT_DOCUMENTS_CANCELED_AMOUNT
+    dimensions: ["DATE"]
+    drill_down: "Flag → Document → Detail"
+    audit_path: "Flag → DocEntry/ReconNum → SAP document"
+    notes: "Never use fraud language. Use REVIEW_REQUIRED with evidence."
+
+# =============================================================================
+# REPORT COUNT SUMMARY
+# =============================================================================
+# Total reports: 9
+# Stock reports: 5 (AR, Customer, Seller, Channel, Audit)
+# Flow reports: 3 (Sales, Collection, Cohort)
+# Hybrid reports: 1 (Owner Summary)
+# =============================================================================

@@ -1,0 +1,166 @@
+{
+  "baseline_id": "KPI_BASELINE_2026_08",
+  "version": "1.0.0",
+  "date": "2026-08-21",
+  "as_of_date": "2026-08-21",
+  "status": "VALIDATED",
+  "source": "FINANCIAL-005 validation results",
+
+  "ar_metrics": {
+    "AR_OUTSTANDING": {
+      "value": 3847327.43,
+      "currency": "BS",
+      "count": 1861,
+      "note": "Total outstanding AR for all open invoices"
+    },
+    "AR_NOT_DUE": {
+      "value": 2358370.21,
+      "currency": "BS",
+      "count": 841,
+      "pct_of_total": 61.3
+    },
+    "AR_OVERDUE": {
+      "value": 1488957.22,
+      "currency": "BS",
+      "count": 1020,
+      "pct_of_total": 38.7
+    },
+    "AR_OVERDUE_RATE": {
+      "value": 38.7,
+      "unit": "percent"
+    },
+    "AR_OPEN_INVOICES": {
+      "value": 1861,
+      "unit": "count"
+    },
+    "AR_CUSTOMERS_WITH_DEBT": {
+      "value": 344,
+      "unit": "count"
+    },
+    "AR_SELLERS_WITH_PORTFOLIO": {
+      "value": 96,
+      "unit": "count"
+    },
+    "AR_CREDIT_BALANCE": {
+      "value": 0.00,
+      "currency": "BS",
+      "count": 0,
+      "note": "Currently zero, maintained as KPI"
+    }
+  },
+
+  "aging_buckets": {
+    "NOT_DUE": {
+      "count": 841,
+      "amount": 2358370.21,
+      "pct": 61.3
+    },
+    "1-30": {
+      "count": 235,
+      "amount": 508352.89,
+      "pct": 13.2
+    },
+    "31-60": {
+      "count": 84,
+      "amount": 117047.87,
+      "pct": 3.0
+    },
+    "61-90": {
+      "count": 58,
+      "amount": 39994.62,
+      "pct": 1.0
+    },
+    "91-120": {
+      "count": 24,
+      "amount": 11797.47,
+      "pct": 0.3
+    },
+    "120+": {
+      "count": 619,
+      "amount": 811764.37,
+      "pct": 21.1
+    }
+  },
+
+  "settlement_components": {
+    "SETTLEMENT_PAYMENT": {
+      "value": 16049268.51,
+      "pct": 93.6
+    },
+    "SETTLEMENT_CREDIT": {
+      "value": 82875.54,
+      "pct": 0.5
+    },
+    "SETTLEMENT_DOWN_PAYMENT": {
+      "value": 0.00,
+      "pct": 0.0
+    },
+    "SETTLEMENT_JOURNAL": {
+      "value": 159663.85,
+      "pct": 0.9
+    },
+    "SETTLEMENT_OTHER": {
+      "value": 1005319.50,
+      "pct": 5.8
+    },
+    "SETTLEMENT_TOTAL": {
+      "value": 17297127.40,
+      "pct": 100.0
+    }
+  },
+
+  "dimension_reconciliation": {
+    "AR_TOTAL": 3847327.43,
+    "CUSTOMER_TOTAL": 3847327.43,
+    "SELLER_TOTAL": 3847327.43,
+    "CHANNEL_TOTAL": 3847327.43,
+    "reconciles": true
+  },
+
+  "top_customers": [
+    {"CardCode": "S0001", "Outstanding": 428328.82, "Overdue": 414385.66},
+    {"CardCode": "C000061", "Outstanding": 338305.80, "Overdue": 0.00},
+    {"CardCode": "C000143", "Outstanding": 314625.64, "Overdue": 300.00},
+    {"CardCode": "C010264", "Outstanding": 160541.73, "Overdue": 0.00},
+    {"CardCode": "C003450", "Outstanding": 142637.17, "Overdue": 34922.91}
+  ],
+
+  "top_sellers": [
+    {"SlpCode": 11, "NetSales": 1188885.51, "Outstanding": 1154514.11},
+    {"SlpCode": 139, "NetSales": 549355.96, "Outstanding": 549355.96},
+    {"SlpCode": -1, "NetSales": 468364.47, "Outstanding": 465325.36},
+    {"SlpCode": 116, "NetSales": 294634.13, "Outstanding": 251959.39},
+    {"SlpCode": 13, "NetSales": 210251.46, "Outstanding": 210020.71}
+  ],
+
+  "channels": {
+    "Sin Clasificar": {"outstanding": 980479.94},
+    "3": {"outstanding": 830944.72},
+    "8": {"outstanding": 797741.81},
+    "4": {"outstanding": 452239.95},
+    "6": {"outstanding": 304967.25},
+    "5": {"outstanding": 277282.97},
+    "2": {"outstanding": 124121.87},
+    "1": {"outstanding": 46801.97},
+    "7": {"outstanding": 32746.95}
+  },
+
+  "audit_flags": {
+    "AUDIT_AR_NEGATIVE_BALANCE": {"count": 0, "amount": 0},
+    "AUDIT_AR_CANCELED_INVOICE_OPEN": {"count": 0},
+    "AUDIT_AR_MISSING_DUE_DATE": {"count": 0}
+  },
+
+  "validation_gates": {
+    "TELCHI_FINANCIAL_INVOICE_CONTRACT_PASS": "PASS",
+    "TELCHI_FINANCIAL_CREDIT_NOTE_PASS": "PASS",
+    "TELCHI_FINANCIAL_PAYMENT_APPLICATION_PASS": "PASS",
+    "TELCHI_FINANCIAL_RECONCILIATION_PASS": "PASS",
+    "TELCHI_FINANCIAL_CURRENT_AR_PASS": "PASS",
+    "TELCHI_FINANCIAL_AGING_PASS": "PASS",
+    "TELCHI_FINANCIAL_CUSTOMER_AR_PASS": "PASS",
+    "TELCHI_FINANCIAL_SELLER_AR_PASS": "PASS",
+    "TELCHI_FINANCIAL_CHANNEL_AR_PASS": "PASS",
+    "TELCHI_FINANCIAL_AR_DIMENSION_RECONCILIATION_PASS": "PASS"
+  }
+}

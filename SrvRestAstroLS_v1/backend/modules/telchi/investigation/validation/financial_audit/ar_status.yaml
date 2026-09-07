@@ -1,0 +1,152 @@
+# =============================================================================
+# AR STATUS CONTRACT — TEAM360 TELCHI
+# =============================================================================
+# Defines the possible states of an invoice in the Accounts Receivable lifecycle.
+# Each status has exact criteria that must be met.
+# =============================================================================
+
+statuses:
+
+  # ===========================================================================
+  # CANCELED
+  # ===========================================================================
+  - name: CANCELED
+    description: "Invoice was canceled in SAP"
+    criteria:
+      CANCELED: "IN ('Y', 'C')"
+    financial_impact: "Excluded from net sales calculations"
+    notes:
+      - "Y = original invoice marked as canceled"
+      - "C = reversal/cancellation document"
+      - "PaidToDate may still show historical payments"
+      - "Maintained for audit purposes, not for sales metrics"
+
+  # ===========================================================================
+  # PAID
+  # ===========================================================================
+  - name: PAID
+    description: "Invoice fully paid, zero outstanding"
+    criteria:
+      CANCELED: "= 'N'"
+      DocStatus: "IN ('O', 'C')"  # Can be closed by payment
+      outstanding: "<= 0"  # DocTotal - PaidToDate <= 0
+    financial_impact: "Fully settled, no AR remaining"
+    notes:
+      - "DocStatus may be 'C' (closed) when fully paid"
+      - "PaidToDate >= DocTotal"
+      - "May include credit note applications"
+
+  # ===========================================================================
+  # PARTIALLY_PAID
+  # ===========================================================================
+  - name: PARTIALLY_PAID
+    description: "Invoice has partial payment, outstanding remains"
+    criteria:
+      CANCELED: "= 'N'"
+      PaidToDate: "> 0"
+      outstanding: "> 0"  # DocTotal - PaidToDate > 0
+    financial_impact: "Partial AR remaining"
+    notes:
+      - "PaidToDate > 0 but insufficient to close"
+      - "May be open or closed depending on business rules"
+      - "Requires payment application analysis"
+
+  # ===========================================================================
+  # OPEN_NOT_DUE
+  # ===========================================================================
+  - name: OPEN_NOT_DUE
+    description: "Invoice open, not yet past due date"
+    criteria:
+      CANCELED: "= 'N'"
+      DocStatus: "= 'O'"
+      outstanding: "> 0"
+      days_overdue: "< 0"  # DocDueDate > AS_OF_DATE
+    financial_impact: "AR expected, not yet overdue"
+    notes:
+      - "Standard credit term behavior"
+      - "Aging bucket: NOT_DUE"
+
+  # ===========================================================================
+  # OVERDUE
+  # ===========================================================================
+  - name: OVERDUE
+    description: "Invoice open, past due date"
+    criteria:
+      CANCELED: "= 'N'"
+      DocStatus: "= 'O'"
+      outstanding: "> 0"
+      days_overdue: ">= 0"  # DocDueDate <= AS_OF_DATE
+    financial_impact: "AR past due, collection risk"
+    notes:
+      - "Sub-classified by aging bucket (1-30, 31-60, etc.)"
+      - "Requires collection attention"
+      - "Aging bucket depends on days_overdue"
+
+  # ===========================================================================
+  # CREDIT_BALANCE
+  # ===========================================================================
+  - name: CREDIT_BALANCE
+    description: "Invoice has credit (overpayment or credit note)"
+    criteria:
+      CANCELED: "= 'N'"
+      outstanding: "< 0"  # DocTotal - PaidToDate < 0
+    financial_impact: "Credit owed to customer"
+    notes:
+      - "May indicate overpayment"
+      - "May indicate credit note applied exceeding invoice"
+      - "Requires investigation"
+      - "AUDIT_NEGATIVE_BALANCE flag"
+
+  # ===========================================================================
+  # RECONCILED
+  # ===========================================================================
+  - name: RECONCILED
+    description: "Invoice settled through reconciliation"
+    criteria:
+      CANCELED: "= 'N'"
+      reconciliation: "EXISTS with active ReconNum"
+    financial_impact: "Settled through internal reconciliation"
+    notes:
+      - "Requires OITR/ITR1 analysis"
+      - "May offset against other documents"
+      - "Reconciliation status must be active (not canceled)"
+
+  # ===========================================================================
+  # UNKNOWN
+  # ===========================================================================
+  - name: UNKNOWN
+    description: "Status cannot be determined from available data"
+    criteria:
+      note: "Fallback when criteria don't match any defined status"
+    financial_impact: "Requires manual review"
+    notes:
+      - "Should be rare"
+      - "AUDIT_UNKNOWN_STATUS flag"
+
+# =============================================================================
+# STATUS TRANSITION RULES
+# =============================================================================
+# An invoice moves through states based on:
+# 1. CANCELED flag (set at document level)
+# 2. Payments applied (PaidToDate increases)
+# 3. Credit notes applied (PaidToDate increases)
+# 4. Reconciliation (internal settlement)
+# 5. Aging (time-based, relative to AS_OF_DATE)
+#
+# Status is evaluated at a point in time (AS_OF_DATE).
+# Historical status requires reconstructing payment state.
+# =============================================================================
+
+# =============================================================================
+# STATUS DETERMINATION PRIORITY
+# =============================================================================
+# When multiple criteria could apply, use this priority:
+# 1. CANCELED (highest - takes precedence)
+# 2. CREDIT_BALANCE (negative outstanding)
+# 3. PAID (zero outstanding)
+# 4. PARTIALLY_PAID (partial payment)
+# 5. RECONCILED (reconciliation exists)
+# 6. OVERDUE (past due, no payment)
+# 7. OPEN_NOT_DUE (future due date)
+# 8. UNKNOWN (lowest - fallback)
+# =============================================================================

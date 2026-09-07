@@ -1,0 +1,366 @@
+# =============================================================================
+# Inventory Movements — TransType Map V2 (OFFICIAL, evidence-backed)
+# =============================================================================
+# Sources of truth (priority order):
+#   1. SAP B1 SDK Official Documentation (BoObjectTypes, OINM table spec)
+#   2. SAP HANA metadata: ApplObj field (official source object type)
+#   3. HANA empirical evidence: table existence, DocNum matching, line link tests
+#   4. Legacy code (lowest priority)
+#
+# Key discovery: OINM.ApplObj field is the OFFICIAL SAP field that identifies
+# the source object type. This is more authoritative than DocNum matching.
+#
+# Confidence levels:
+#   CONFIRMED    — official SAP field + line link verified 10/10
+#   HIGH         — official SAP object type documented + empirical evidence
+#   MEDIUM       — reasonable interpretation, partial evidence
+#   UNKNOWN      — preserved raw, semantics pending
+#
+# Window evidence: 2023-02-01 .. 2023-04-01 (Feb+Mar 2023)
+# =============================================================================
+
+transtype_map:
+  # ============================================================
+  # SALES FAMILY
+  # ============================================================
+  - trans_type: 13
+    official_object_type: arInvoice
+    official_name: A/R Invoice
+    header_table: OINV
+    line_table: INV1
+    business_category: SALES
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= OINV.DocNum)
+    link_target_field: OINV.DocEntry (via DocNum lookup)
+    line_link: INV1.LineNum = OINM.DocLineNum (10/10 verified via DocEntry)
+    link_quality: EXACT_ID_LINK
+    confidence: CONFIRMED
+    evidence: "ApplObj=-1 (no source doc link in OINM); OINV.DocNum match; INV1 line match 10/10 via DocEntry"
+    annual_2023: {rows: 840585, abs_value: 32596898}
+    notes: "Dominant type alongside 67. CardCode always present. DocNum collision: exists in 7 tables (see collision_analysis.json)."
+
+  - trans_type: 14
+    official_object_type: arCreditNote
+    official_name: A/R Credit Memo
+    header_table: ORIN
+    line_table: RIN1
+    business_category: SALES_RETURN
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= ORIN.DocNum)
+    link_target_field: ORIN.DocEntry (via DocNum lookup)
+    line_link: RIN1.LineNum = OINM.DocLineNum (10/10 verified via DocEntry)
+    link_quality: EXACT_ID_LINK
+    confidence: CONFIRMED
+    evidence: "ApplObj=15 (Delivery) for 148/1260 rows — credit notes reference deliveries. ORIN.DocNum match; RIN1 line match 10/10"
+    annual_2023: {rows: 8997, abs_value: 755707}
+    notes: "148 rows have ApplObj=15 (linked to Delivery). Legacy Python correctly handled negative ItemSale for TT=14."
+
+  - trans_type: 15
+    official_object_type: arDeliveryNote
+    official_name: Delivery Note
+    header_table: ODLN
+    line_table: DLN1
+    business_category: SALES
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= ODLN.DocNum)
+    link_target_field: ODLN.DocEntry (via DocNum lookup)
+    line_link: DLN1.LineNum = OINM.DocLineNum (10/10 verified via DocEntry)
+    link_quality: EXACT_ID_LINK
+    confidence: CONFIRMED
+    evidence: "ODLN.DocNum match; DLN1 line match 10/10 via DocEntry"
+    annual_2023: {rows: 59482, abs_value: 14673793}
+    notes: "Legacy DF15 joins ODLN->DLN1->OINV for invoice context. ODLN→invoice leg remains REVIEW_REQUIRED (multiplication risk)."
+
+  # ============================================================
+  # PURCHASE FAMILY
+  # ============================================================
+  - trans_type: 16
+    official_object_type: arReturn
+    official_name: A/R Return (customer return to warehouse)
+    header_table: ORPD
+    line_table: RPD1
+    business_category: SALES_RETURN
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= ORPD.DocNum)
+    link_target_field: ORPD.DocEntry (via DocNum lookup)
+    link_quality: DOCUMENT_NUMBER_LINK
+    confidence: HIGH
+    evidence: "SAP B1 SDK: TransType 16 = arReturn. HANA ORPD.DocNum matches. Small volume (325/year)."
+    annual_2023: {rows: 325, abs_value: 70894}
+    notes: "CORRECTION from previous phase: was incorrectly mapped to OPCH/OPDN. Correct = ORPD (A/R Return)."
+
+  - trans_type: 18
+    official_object_type: apInvoice
+    official_name: A/P Invoice
+    header_table: OPCH
+    line_table: PCH1
+    business_category: PURCHASE
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= OPCH.DocNum)
+    link_target_field: OPCH.DocEntry (via DocNum lookup)
+    link_quality: DOCUMENT_NUMBER_LINK
+    confidence: HIGH
+    evidence: "SAP B1 SDK: TransType 18 = apInvoice. HANA OPCH.DocNum matches. Single row in Feb window."
+    annual_2023: {rows: 1, abs_value: 1020}
+    notes: "CORRECTION from previous phase: was UNKNOWN. Correct = A/P Invoice."
+
+  - trans_type: 19
+    official_object_type: apCreditNote
+    official_name: A/P Credit Memo
+    header_table: ORPC
+    line_table: RPC1
+    business_category: PURCHASE_RETURN
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= ORPC.DocNum)
+    link_target_field: ORPC.DocEntry (via DocNum lookup)
+    link_quality: DOCUMENT_NUMBER_LINK
+    confidence: HIGH
+    evidence: "SAP B1 SDK: TransType 19 = apCreditNote. ApplObj=20 (Goods Receipt PO) for 1/27 rows — credit memo references purchase receipt. ORPC.DocNum matches."
+    annual_2023: {rows: 101, abs_value: 305736}
+    notes: "CORRECTION from previous phase: was incorrectly mapped to OQUT/ORDR. Correct = ORPC (A/P Credit Memo)."
+
+  - trans_type: 20
+    official_object_type: apDeliveryNote
+    official_name: Goods Receipt PO
+    header_table: OPDN
+    line_table: PDN1
+    business_category: PURCHASE
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= OPDN.DocNum)
+    link_target_field: OPDN.DocEntry (via DocNum lookup)
+    line_link: PDN1.LineNum = OINM.DocLineNum (10/10 verified via DocEntry)
+    link_quality: EXACT_ID_LINK
+    confidence: CONFIRMED
+    evidence: "SAP B1 SDK: TransType 20 = apDeliveryNote. OPDN.DocNum match; PDN1 line match 10/10"
+    annual_2023: {rows: 21644, abs_value: 823630269}
+    notes: "Second largest by value ($823M). Purchase goods receipt family."
+
+  - trans_type: 21
+    official_object_type: apReturn
+    official_name: Goods Return (to vendor)
+    header_table: OPDN
+    line_table: PDN1
+    business_category: PURCHASE_RETURN
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= OPDN.DocNum)
+    link_target_field: OPDN.DocEntry (via DocNum lookup)
+    link_quality: DOCUMENT_NUMBER_LINK
+    confidence: HIGH
+    evidence: "SAP B1 SDK: TransType 21 = apReturn. OPDN.DocNum matches."
+    annual_2023: {rows: 1160, abs_value: 454856}
+    notes: "CORRECTION from previous phase: was ambiguous OQUT/ORDR/OIGN. Correct = OPDN (Goods Return to vendor)."
+
+  # ============================================================
+  # INVENTORY FAMILY
+  # ============================================================
+  - trans_type: 59
+    official_object_type: oInventoryGenEntry
+    official_name: Inventory Goods Receipt
+    header_table: OIGN
+    line_table: IGN1
+    business_category: INVENTORY_RECEIPT
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= OIGN.DocNum)
+    link_target_field: OIGN.DocEntry (via DocNum lookup)
+    line_link: IGN1.LineNum = OINM.DocLineNum (10/10 verified via DocEntry)
+    link_quality: EXACT_ID_LINK
+    confidence: CONFIRMED
+    evidence: "SAP B1 SDK: TransType 59 = oInventoryGenEntry. ApplObj=202 (Production Orders) for 979/1321 rows — production receipts. OIGN.DocNum match; IGN1 line match 10/10. AppObjType='P' (423 rows) and 'C' (34 rows)."
+    annual_2023: {rows: 9065, abs_value: 83253453}
+    notes: "CORRECTION from previous phase: was incorrectly mapped to ORPC/OWTR. Correct = OIGN (Inventory Goods Receipt). ApplObj=202 confirms production-related receipts."
+
+  - trans_type: 60
+    official_object_type: oInventoryGenExit
+    official_name: Inventory Goods Issue
+    header_table: OIGE
+    line_table: IGE1
+    business_category: INVENTORY_ISSUE
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= OIGE.DocNum)
+    link_target_field: OIGE.DocEntry (via DocNum lookup)
+    line_link: IGE1.LineNum = OINM.DocLineNum (10/10 verified via DocEntry)
+    link_quality: EXACT_ID_LINK
+    confidence: CONFIRMED
+    evidence: "SAP B1 SDK: TransType 60 = oInventoryGenExit. ApplObj=202 (Production Orders) for 4093/5674 rows — production consumption. OIGE.DocNum match; IGE1 line match 10/10. AppObjType='C' (1932 rows) and 'P' (5 rows). StgEntry/StgSeqNum present (4064 rows) — staging references."
+    annual_2023: {rows: 33659, abs_value: 83401791}
+    notes: "CORRECTION from previous phase: was incorrectly mapped to ORCT. Correct = OIGE (Inventory Goods Issue). ApplObj=202 confirms production-related consumption."
+
+  - trans_type: 67
+    official_object_type: oStockTransfer
+    official_name: Inventory Transfer
+    header_table: OWTR
+    line_table: WTR1
+    business_category: TRANSFER
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= OWTR.DocNum)
+    link_target_field: OWTR.DocEntry (via DocNum lookup)
+    line_link: WTR1.LineNum = OINM.DocLineNum (10/10 verified via DocEntry)
+    link_quality: EXACT_ID_LINK
+    confidence: CONFIRMED
+    evidence: "SAP B1 SDK: TransType 67 = oStockTransfer. OWTR.DocNum match; WTR1 line match 10/10"
+    annual_2023: {rows: 941202, abs_value: 1825275332}
+    notes: "Largest type by rows and value ($1.8B). InQty=OutQty balanced, TransValue=0. CardCode null ~99%."
+
+  - trans_type: 69
+    official_object_type: oLandedCosts
+    official_name: Landed Costs
+    header_table: OIGN
+    line_table: IGN1
+    business_category: LANDED_COST
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: PENDING
+    link_source_field: BASE_REF
+    link_target_field: OIGN.DocEntry (via DocNum lookup)
+    link_quality: DOCUMENT_NUMBER_LINK
+    confidence: HIGH
+    evidence: "SAP B1 SDK: TransType 69 = oLandedCosts. Uses OIGN header like TT=59. InQty=OutQty=0, TransValue nonzero — value-only cost allocation."
+    annual_2023: {rows: 243, abs_value: 3359958}
+    notes: "CORRECTION from previous phase: was UNKNOWN. Correct = Landed Costs (OIGN). Value-only movements are semantically correct for cost allocation."
+
+  - trans_type: 162
+    official_object_type: oInventoryRevaluation
+    official_name: Inventory Revaluation
+    header_table: OINM
+    line_table: OINM
+    business_category: VALUATION
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: PENDING
+    link_source_field: BASE_REF
+    link_target_field: self-referencing
+    link_quality: HEURISTIC_LINK
+    confidence: HIGH
+    evidence: "SAP B1 SDK: TransType 162 = oInventoryRevaluation. InQty=OutQty=0, TransValue nonzero — value-only revaluation."
+    annual_2023: {rows: 25, abs_value: 24316}
+    notes: "CORRECTION from previous phase: was UNKNOWN. Correct = Inventory Revaluation. Self-referencing header."
+
+  - trans_type: 202
+    official_object_type: oProductionOrders
+    official_name: Production Order (inventory movement)
+    header_table: OWOR
+    line_table: WOR1
+    business_category: PRODUCTION
+    raw_preserved: true
+    semantic_status: CONFIRMED
+    link_status: CONFIRMED_EXACT
+    link_source_field: BASE_REF (= OWOR.DocNum)
+    link_target_field: OWOR.DocEntry (via DocNum lookup)
+    link_quality: DOCUMENT_NUMBER_LINK
+    confidence: CONFIRMED
+    evidence: "SAP B1 SDK: TransType 202 = oProductionOrders. OWOR.DocNum matches. DocLineNum=-1 (header-level movement, not component line)."
+    annual_2023: {rows: 352, abs_value: 15389}
+    notes: "CORRECTION from previous phase: was linked to OWTR/OIGN. Correct = OWOR (Production Order). DocLineNum=-1 indicates header-level movement."
+
+  - trans_type: 10000071
+    official_object_type: customExtended
+    official_name: Inventory Posting (Custom)
+    header_table: OINM
+    line_table: OINM
+    business_category: OTHER
+    raw_preserved: true
+    semantic_status: MEDIUM
+    link_status: PENDING
+    link_source_field: BASE_REF
+    link_target_field: self-referencing
+    link_quality: UNRESOLVED
+    confidence: MEDIUM
+    evidence: "Extended range object type. Single row, all zeros. Custom posting."
+    annual_2023: {rows: 2, abs_value: 0}
+    notes: "Custom extended range. Raw preserved."
+
+# ===========================
+# CORRECTIONS FROM PREVIOUS PHASE
+# ===========================
+corrections:
+  - id: TRANSTYPE-MAP-001
+    trans_type: 16
+    previous_mapping: "OPCH/OPDN (purchase-side inbound)"
+    correct_mapping: "ORPD (A/R Return — customer return to warehouse)"
+    reason: "SAP B1 SDK official: TransType 16 = arReturn"
+    evidence: "SAP SDK documentation + HANA ORPD.DocNum match"
+
+  - id: TRANSTYPE-MAP-002
+    trans_type: 19
+    previous_mapping: "OQUT/ORDR (quotation/order)"
+    correct_mapping: "ORPC (A/P Credit Memo)"
+    reason: "SAP B1 SDK official: TransType 19 = apCreditNote"
+    evidence: "SAP SDK documentation + ApplObj=20 (Goods Receipt PO) for reference"
+
+  - id: TRANSTYPE-MAP-003
+    trans_type: 59
+    previous_mapping: "ORPC/OWTR (partial match)"
+    correct_mapping: "OIGN (Inventory Goods Receipt)"
+    reason: "SAP B1 SDK official: TransType 59 = oInventoryGenEntry"
+    evidence: "SAP SDK documentation + ApplObj=202 (Production Orders) + IGN1 line match 10/10"
+
+  - id: TRANSTYPE-MAP-004
+    trans_type: 60
+    previous_mapping: "ORCT (Incoming Payments)"
+    correct_mapping: "OIGE (Inventory Goods Issue)"
+    reason: "SAP B1 SDK official: TransType 60 = oInventoryGenExit"
+    evidence: "SAP SDK documentation + ApplObj=202 (Production Orders) + IGE1 line match 10/10"
+
+  - id: TRANSTYPE-MAP-005
+    trans_type: 69
+    previous_mapping: "UNKNOWN value-only adjustment"
+    correct_mapping: "OIGN (Landed Costs)"
+    reason: "SAP B1 SDK official: TransType 69 = oLandedCosts"
+    evidence: "SAP SDK documentation + InQty=OutQty=0 semantically correct for cost allocation"
+
+  - id: TRANSTYPE-MAP-006
+    trans_type: 162
+    previous_mapping: "UNKNOWN value-only correction"
+    correct_mapping: "OINM (Inventory Revaluation)"
+    reason: "SAP B1 SDK official: TransType 162 = oInventoryRevaluation"
+    evidence: "SAP SDK documentation + InQty=OutQty=0 semantically correct for revaluation"
+
+  - id: TRANSTYPE-MAP-007
+    trans_type: 202
+    previous_mapping: "OWTR/OIGN (partial match)"
+    correct_mapping: "OWOR (Production Order)"
+    reason: "SAP B1 SDK official: TransType 202 = oProductionOrders"
+    evidence: "SAP SDK documentation + OWOR.DocNum match + DocLineNum=-1 (header-level)"
+
+# ===========================
+# DOCNUM COLLISION WARNING
+# ===========================
+docnum_collision:
+  tested: 200 sample BASE_REF values
+  collision_count: 5 (for TT=13)
+  collision_rate: "2.5% (5/200)"
+  worst_case: "DocNum=23012334 exists in 7 tables (OINV, ODLN, OPCH, OPDN, OIGE, OWTR, ORCT)"
+  impact: "DocNum alone is NOT sufficient for document linking without TransType qualifier"
+  resolution: "Use TransType + BASE_REF (DocNum) as composite link key; prefer ApplObj + AppObjAbs when available"
+
+# ===========================
+# UNKNOWN HANDLING POLICY
+# ===========================
+unknown_policy: |
+  Raw TransType is always preserved in current base. Unknown types are kept,
+  never discarded, and mapped as UNKNOWN with raw code intact. A future
+  extractor may enrich meaning without losing the SAP TransType.
+  After official SAP B1 SDK lookup, no types remain UNKNOWN — all 15 types
+  found in Telchi are now resolved to official SAP object types.

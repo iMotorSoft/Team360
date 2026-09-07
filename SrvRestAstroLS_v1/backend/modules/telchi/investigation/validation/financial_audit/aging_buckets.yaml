@@ -1,0 +1,144 @@
+# =============================================================================
+# AGING BUCKETS CONTRACT — TEAM360 TELCHI
+# =============================================================================
+# Defines the buckets for Accounts Receivable aging analysis.
+# Each bucket is defined by min_days and max_days (exclusive).
+# days_overdue = AS_OF_DATE - DocDueDate
+# =============================================================================
+# Last validated: 2026-08-21
+# AS_OF_DATE: 2026-08-21
+# =============================================================================
+
+buckets:
+  - name: NOT_DUE
+    min_days: null  # null means no lower bound
+    max_days: 0     # exclusive: days_overdue < 0 (future due date)
+    description: "Invoice not yet due (DocDueDate > AS_OF_DATE)"
+    color: "green"
+    validated:
+      count: 841
+      amount: 2358370.21
+      pct_of_total: 61.3
+
+  - name: "1-30"
+    min_days: 1     # inclusive: days_overdue >= 1
+    max_days: 31    # exclusive: days_overdue < 31
+    description: "1 to 30 days past due"
+    color: "yellow"
+    validated:
+      count: 235
+      amount: 508352.89
+      pct_of_total: 13.2
+
+  - name: "31-60"
+    min_days: 31    # inclusive
+    max_days: 61    # exclusive
+    description: "31 to 60 days past due"
+    color: "orange-light"
+    validated:
+      count: 84
+      amount: 117047.87
+      pct_of_total: 3.0
+
+  - name: "61-90"
+    min_days: 61    # inclusive
+    max_days: 91    # exclusive
+    description: "61 to 90 days past due"
+    color: "orange"
+    validated:
+      count: 58
+      amount: 39994.62
+      pct_of_total: 1.0
+
+  - name: "91-120"
+    min_days: 91    # inclusive
+    max_days: 121   # exclusive
+    description: "91 to 120 days past due"
+    color: "red-light"
+    validated:
+      count: 24
+      amount: 11797.47
+      pct_of_total: 0.3
+
+  - name: "120+"
+    min_days: 121   # inclusive
+    max_days: null   # null means no upper bound
+    description: "More than 120 days past due"
+    color: "red"
+    validated:
+      count: 619
+      amount: 811764.37
+      pct_of_total: 21.1
+
+# =============================================================================
+# VALIDATION SUMMARY
+# =============================================================================
+# Total positive outstanding: $3,847,327.43
+# Total invoices: 1,861
+# Invariant: SUM(buckets.amount) = total_positive_outstanding → PASS
+# =============================================================================
+
+# =============================================================================
+# SEMANTICS
+# =============================================================================
+# - days_overdue = AS_OF_DATE - DocDueDate
+# - Positive days_overdue = invoice is past due
+# - Negative days_overdue = invoice is not yet due
+# - AS_OF_DATE is MANDATORY for any aging calculation
+# - A historical aging requires reconstructing payment state as of that date
+# - Current aging uses current DocStatus and settlement from ITR1
+# =============================================================================
+
+# =============================================================================
+# SQL TEMPLATE (HANA)
+# =============================================================================
+# WITH as_of AS (
+#     SELECT MAX("ReconDate") AS "AS_OF_DATE" FROM TELCHI."OITR"
+# ),
+# invoice_settlement AS (
+#     SELECT
+#         I."SrcObjAbs" AS "InvoiceDocEntry",
+#         SUM(I."ReconSum") AS "TotalSettlement"
+#     FROM TELCHI."ITR1" AS I
+#     INNER JOIN TELCHI."OITR" AS O ON I."ReconNum" = O."ReconNum"
+#     WHERE I."SrcObjTyp" = 13 AND O."Canceled" = 'N'
+#     GROUP BY I."SrcObjAbs"
+# )
+# SELECT
+#     CASE
+#         WHEN (OINV."DocTotal" - COALESCE(IS2."TotalSettlement", 0)) <= 0.01 THEN 'SETTLED'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 0 THEN 'NOT_DUE'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 30 THEN '1-30'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 60 THEN '31-60'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 90 THEN '61-90'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 120 THEN '91-120'
+#         ELSE '120+'
+#     END AS aging_bucket,
+#     COUNT(*) AS invoice_count,
+#     SUM(OINV."DocTotal" - COALESCE(IS2."TotalSettlement", 0)) AS outstanding_amount
+# FROM TELCHI."OINV"
+# LEFT JOIN invoice_settlement AS IS2 ON OINV."DocEntry" = IS2."InvoiceDocEntry"
+# WHERE OINV."CANCELED" = 'N'
+#   AND OINV."DocStatus" = 'O'
+#   AND (OINV."DocTotal" - COALESCE(IS2."TotalSettlement", 0)) > 0.01
+# GROUP BY
+#     CASE
+#         WHEN (OINV."DocTotal" - COALESCE(IS2."TotalSettlement", 0)) <= 0.01 THEN 'SETTLED'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 0 THEN 'NOT_DUE'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 30 THEN '1-30'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 60 THEN '31-60'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 90 THEN '61-90'
+#         WHEN DAYS_BETWEEN(OINV."DocDueDate", (SELECT "AS_OF_DATE" FROM as_of)) <= 120 THEN '91-120'
+#         ELSE '120+'
+#     END
+# ORDER BY
+#     CASE
+#         WHEN aging_bucket = 'NOT_DUE' THEN 0
+#         WHEN aging_bucket = '1-30' THEN 1
+#         WHEN aging_bucket = '31-60' THEN 2
+#         WHEN aging_bucket = '61-90' THEN 3
+#         WHEN aging_bucket = '91-120' THEN 4
+#         WHEN aging_bucket = '120+' THEN 5
+#         ELSE 6
+#     END
+# =============================================================================

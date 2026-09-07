@@ -1,0 +1,169 @@
+# =============================================================================
+# SOURCE AUTHORITY MATRIX — TEAM360 TELCHI FINANCIAL REPORTING
+# =============================================================================
+# Maps each KPI family to its authoritative SQL/artifact source.
+# No duplicate logic. Each metric has ONE source of truth.
+# =============================================================================
+# Version: 1.0.0
+# Date: 2026-08-21
+# Status: ACTIVE
+# =============================================================================
+
+source_authority:
+
+  # ===========================================================================
+  # SALES FAMILY
+  # ===========================================================================
+  - family: SALES
+    authority:
+      sql: "sql/current/sales/"
+      notes: "Sales SQL validated in pre-financial gates"
+    kpis:
+      - SALES_GROSS
+      - SALES_VALID_GROSS
+      - SALES_CREDIT_NOTES
+      - SALES_NET
+      - SALES_CREDIT_NOTE_RATE
+      - SALES_CANCELED_COUNT
+      - SALES_CANCELED_AMOUNT
+    tables:
+      - TELCHI.OINV
+      - TELCHI.ORIN
+      - TELCHI.INV1
+      - TELCHI.RIN1
+
+  # ===========================================================================
+  # COLLECTION FAMILY
+  # ===========================================================================
+  - family: COLLECTION
+    authority:
+      sql: "sql/current/financial/payment_contract_v1.sql"
+      notes: "Payment contract validated in FINANCIAL-003"
+    kpis:
+      - PAYMENT_DOCUMENTS_VALID
+      - PAYMENT_DOCUMENTS_CANCELED_COUNT
+      - PAYMENT_DOCUMENTS_CANCELED_AMOUNT
+    tables:
+      - TELCHI.ORCT
+      - TELCHI.RCT1
+      - TELCHI.RCT2
+
+  # ===========================================================================
+  # SETTLEMENT FAMILY
+  # ===========================================================================
+  - family: SETTLEMENT
+    authority:
+      sql: "sql/current/financial/ar/settlement_aggregation_v1.sql"
+      notes: "Settlement aggregation validated in FINANCIAL-005"
+    kpis:
+      - SETTLEMENT_PAYMENT
+      - SETTLEMENT_CREDIT
+      - SETTLEMENT_DOWN_PAYMENT
+      - SETTLEMENT_JOURNAL
+      - SETTLEMENT_OTHER
+      - SETTLEMENT_TOTAL
+    tables:
+      - TELCHI.OITR
+      - TELCHI.ITR1
+
+  # ===========================================================================
+  # AR FAMILY
+  # ===========================================================================
+  - family: AR
+    authority:
+      sql: "sql/current/financial/ar/current_ar_v1.sql"
+      notes: "Current AR validated in FINANCIAL-005, 100% match vs PaidToDate"
+    kpis:
+      - AR_OUTSTANDING
+      - AR_NOT_DUE
+      - AR_OVERDUE
+      - AR_OVERDUE_RATE
+      - AR_OPEN_INVOICES
+      - AR_CUSTOMERS_WITH_DEBT
+      - AR_SELLERS_WITH_PORTFOLIO
+      - AR_CREDIT_BALANCE
+      - AR_DAYS_OVERDUE
+    tables:
+      - TELCHI.OINV
+      - TELCHI.ITR1
+      - TELCHI.OITR
+      - TELCHI.OCRD
+      - TELCHI.OSLP
+
+  # ===========================================================================
+  # COHORT FAMILY
+  # ===========================================================================
+  - family: COHORT
+    authority:
+      sql: "Derived from AR + Sales SQL"
+      notes: "Combines sales period with AR as-of evaluation"
+    kpis:
+      - COHORT_GROSS_SALES
+      - COHORT_SETTLED_AS_OF
+      - COHORT_OUTSTANDING_AS_OF
+      - COHORT_COLLECTION_RATE
+    tables:
+      - TELCHI.OINV
+      - TELCHI.ITR1
+      - TELCHI.OITR
+
+  # ===========================================================================
+  # AGING FAMILY
+  # ===========================================================================
+  - family: AGING
+    authority:
+      sql: "sql/current/financial/ar/current_ar_v1.sql"
+      notes: "Aging derived from current AR calculation"
+    kpis:
+      - AR_AGING_NOT_DUE
+      - AR_AGING_1_30
+      - AR_AGING_31_60
+      - AR_AGING_61_90
+      - AR_AGING_91_120
+      - AR_AGING_120_PLUS
+    tables:
+      - TELCHI.OINV
+      - TELCHI.ITR1
+      - TELCHI.OITR
+
+  # ===========================================================================
+  # AUDIT FAMILY
+  # ===========================================================================
+  - family: AUDIT
+    authority:
+      sql: "Derived from AR + Invoice SQL"
+      notes: "Audit flags computed during AR validation"
+    kpis:
+      - AUDIT_NEGATIVE_BALANCE
+      - AUDIT_CANCELED_INVOICE_OPEN
+      - AUDIT_MISSING_DUE_DATE
+    tables:
+      - TELCHI.OINV
+      - TELCHI.ITR1
+      - TELCHI.OITR
+
+# =============================================================================
+# SAP TABLE AUTHORITY
+# =============================================================================
+# Each SAP table has ONE authoritative purpose:
+#
+# OINV: Invoice header (DocEntry grain)
+# INV1: Invoice lines (DocEntry + LineNum grain)
+# ORIN: Credit note header
+# RIN1: Credit note lines
+# ORCT: Payment header
+# RCT1: Payment checks detail
+# RCT2: On-account payments only (NOT settlement authority)
+# OITR: Reconciliation header (ReconNum grain)
+# ITR1: Reconciliation members (settlement authority)
+# OCRD: Customer master
+# OSLP: Seller master
+# =============================================================================
+
+# =============================================================================
+# REGRESSION RULE
+# =============================================================================
+# No new SQL may contradict an already-validated SQL.
+# If a conflict is found, STOP and report.
+# The financial audit model (FINANCIAL-001..005) is the baseline.
+# =============================================================================

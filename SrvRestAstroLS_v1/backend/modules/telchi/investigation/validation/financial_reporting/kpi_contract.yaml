@@ -1,0 +1,778 @@
+# =============================================================================
+# KPI CONTRACT — TEAM360 TELCHI FINANCIAL REPORTING
+# =============================================================================
+# Machine-readable KPI definitions.
+# Each KPI has a unique ID, official formula, source, and semantics.
+# =============================================================================
+# Version: 1.0.0
+# Date: 2026-08-21
+# Status: ACTIVE
+# =============================================================================
+
+kpis:
+
+  # ===========================================================================
+  # FAMILY A: VENTAS (SALES)
+  # ===========================================================================
+
+  - id: SALES_GROSS
+    name: GROSS_SALES
+    business_name_es: "Ventas brutas"
+    description: "Total amount of invoices issued in period, including canceled"
+    family: SALES
+    formula: "SUM(OINV.DocTotal) WHERE DocDate IN period"
+    numerator: "OINV.DocTotal"
+    denominator: null
+    source: "TELCHI.OINV"
+    grain: "OINV.DocEntry"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "OINV.DocCur (document currency)"
+    canceled_policy: "INCLUDE canceled"
+    null_policy: "EXCLUDE null DocTotal"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry", "OINV.DocNum"]
+    status: DEFINED
+
+  - id: SALES_CANCELED_COUNT
+    name: CANCELED_INVOICES_COUNT
+    business_name_es: "Facturas anuladas (cantidad)"
+    description: "Count of invoices marked as canceled"
+    family: SALES
+    formula: "COUNT(OINV.DocEntry) WHERE CANCELED IN ('Y', 'C') AND DocDate IN period"
+    numerator: "OINV.DocEntry"
+    denominator: null
+    source: "TELCHI.OINV"
+    grain: "OINV.DocEntry"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "N/A (count)"
+    canceled_policy: "INCLUDE only canceled"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: DEFINED
+
+  - id: SALES_CANCELED_AMOUNT
+    name: CANCELED_INVOICES_AMOUNT
+    business_name_es: "Facturas anuladas (monto)"
+    description: "Total amount of invoices marked as canceled"
+    family: SALES
+    formula: "SUM(OINV.DocTotal) WHERE CANCELED IN ('Y', 'C') AND DocDate IN period"
+    numerator: "OINV.DocTotal"
+    denominator: null
+    source: "TELCHI.OINV"
+    grain: "OINV.DocEntry"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "OINV.DocCur"
+    canceled_policy: "INCLUDE only canceled"
+    null_policy: "EXCLUDE null DocTotal"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: DEFINED
+
+  - id: SALES_VALID_GROSS
+    name: VALID_GROSS_SALES
+    business_name_es: "Ventas brutas válidas"
+    description: "Total amount of valid (non-canceled) invoices issued in period"
+    family: SALES
+    formula: "SUM(OINV.DocTotal) WHERE CANCELED = 'N' AND DocDate IN period"
+    numerator: "OINV.DocTotal"
+    denominator: null
+    source: "TELCHI.OINV"
+    grain: "OINV.DocEntry"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "OINV.DocCur (document currency)"
+    canceled_policy: "EXCLUDE canceled (CANCELED IN ('Y', 'C'))"
+    null_policy: "EXCLUDE null DocTotal"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry", "OINV.DocNum"]
+    status: DEFINED
+
+  - id: SALES_CREDIT_NOTES
+    name: CREDIT_NOTES
+    business_name_es: "Notas de crédito"
+    description: "Total amount of valid (non-canceled) credit notes issued in period"
+    family: SALES
+    formula: "SUM(ORIN.DocTotal) WHERE CANCELED = 'N' AND DocDate IN period"
+    numerator: "ORIN.DocTotal"
+    denominator: null
+    source: "TELCHI.ORIN"
+    grain: "ORIN.DocEntry"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "ORIN.DocCur (document currency)"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE null DocTotal"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["ORIN.DocEntry", "ORIN.DocNum"]
+    notes: "DocTotal is POSITIVE in SAP; negate for commercial calculations"
+    status: DEFINED
+
+  - id: SALES_NET
+    name: NET_SALES
+    business_name_es: "Ventas netas"
+    description: "Valid gross sales minus valid credit notes"
+    family: SALES
+    formula: "SALES_VALID_GROSS - SALES_CREDIT_NOTES"
+    numerator: "SALES_VALID_GROSS"
+    denominator: "SALES_CREDIT_NOTES"
+    source: "TELCHI.OINV + TELCHI.ORIN"
+    grain: "Period level"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "Document currency"
+    canceled_policy: "Both exclude canceled"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry", "ORIN.DocEntry"]
+    notes: "Commercial metric. Does NOT include payment status."
+    status: DEFINED
+
+  - id: SALES_CREDIT_NOTE_RATE
+    name: CREDIT_NOTE_RATE
+    business_name_es: "Tasa de notas de crédito"
+    description: "Credit notes as percentage of valid gross sales"
+    family: SALES
+    formula: "SALES_CREDIT_NOTES / SALES_VALID_GROSS * 100"
+    numerator: "SALES_CREDIT_NOTES"
+    denominator: "SALES_VALID_GROSS"
+    source: "TELCHI.OINV + TELCHI.ORIN"
+    grain: "Period level"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "Percentage"
+    canceled_policy: "Both exclude canceled"
+    null_policy: "EXCLUDE if denominator = 0"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry", "ORIN.DocEntry"]
+    status: DEFINED
+
+  # ===========================================================================
+  # FAMILY B: COBRANZA (COLLECTION)
+  # ===========================================================================
+
+  - id: PAYMENT_DOCUMENTS_VALID
+    name: VALID_PAYMENT_DOCUMENTS
+    business_name_es: "Documentos de pago válidos"
+    description: "Total amount of valid (non-canceled) payment documents received in period"
+    family: COLLECTION
+    formula: "SUM(ORCT.DocTotal) WHERE Canceled = 'N' AND DocDate IN period"
+    numerator: "ORCT.DocTotal"
+    denominator: null
+    source: "TELCHI.ORCT"
+    grain: "ORCT.DocEntry"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "ORCT.DocCurr (document currency)"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE null DocTotal"
+    dimensions: ["DATE"]
+    audit_trace: ["ORCT.DocEntry", "ORCT.DocNum"]
+    notes: "Payment document amount. Does NOT mean applied to specific invoices."
+    status: DEFINED
+
+  - id: PAYMENT_DOCUMENTS_CANCELED_COUNT
+    name: CANCELED_PAYMENTS_COUNT
+    business_name_es: "Pagos anulados (cantidad)"
+    description: "Count of payment documents marked as canceled"
+    family: COLLECTION
+    formula: "COUNT(ORCT.DocEntry) WHERE Canceled = 'Y' AND DocDate IN period"
+    numerator: "ORCT.DocEntry"
+    denominator: null
+    source: "TELCHI.ORCT"
+    grain: "ORCT.DocEntry"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "N/A (count)"
+    canceled_policy: "INCLUDE only canceled"
+    null_policy: "N/A"
+    dimensions: ["DATE"]
+    audit_trace: ["ORCT.DocEntry"]
+    status: DEFINED
+
+  - id: PAYMENT_DOCUMENTS_CANCELED_AMOUNT
+    name: CANCELED_PAYMENTS_AMOUNT
+    business_name_es: "Pagos anulados (monto)"
+    description: "Total amount of payment documents marked as canceled"
+    family: COLLECTION
+    formula: "SUM(ORCT.DocTotal) WHERE Canceled = 'Y' AND DocDate IN period"
+    numerator: "ORCT.DocTotal"
+    denominator: null
+    source: "TELCHI.ORCT"
+    grain: "ORCT.DocEntry"
+    date_semantics: "DocDate within period"
+    as_of_required: false
+    currency: "ORCT.DocCurr"
+    canceled_policy: "INCLUDE only canceled"
+    null_policy: "EXCLUDE null DocTotal"
+    dimensions: ["DATE"]
+    audit_trace: ["ORCT.DocEntry"]
+    status: DEFINED
+
+  # ===========================================================================
+  # FAMILY C: SETTLEMENT
+  # ===========================================================================
+
+  - id: SETTLEMENT_PAYMENT
+    name: PAYMENT_SETTLEMENT
+    business_name_es: "Liquidación por pago"
+    description: "Amount settled against invoices through payment reconciliation"
+    family: SETTLEMENT
+    formula: "SUM(ITR1.ReconSum) WHERE SrcObjTyp IN (24, 46) AND OITR.Canceled = 'N' AND ReconDate IN period"
+    numerator: "ITR1.ReconSum"
+    denominator: null
+    source: "TELCHI.ITR1 + TELCHI.OITR"
+    grain: "ITR1.ReconNum + ITR1.LineSeq"
+    date_semantics: "ReconDate within period"
+    as_of_required: false
+    currency: "OITR.ReconCurr"
+    canceled_policy: "EXCLUDE canceled reconciliations"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    audit_trace: ["OITR.ReconNum", "ITR1.SrcObjAbs"]
+    notes: "Settlement amount, not payment document amount"
+    status: DEFINED
+
+  - id: SETTLEMENT_CREDIT
+    name: CREDIT_SETTLEMENT
+    business_name_es: "Liquidación por nota de crédito"
+    description: "Amount settled against invoices through credit note reconciliation"
+    family: SETTLEMENT
+    formula: "SUM(ITR1.ReconSum) WHERE SrcObjTyp = 14 AND OITR.Canceled = 'N' AND ReconDate IN period"
+    numerator: "ITR1.ReconSum"
+    denominator: null
+    source: "TELCHI.ITR1 + TELCHI.OITR"
+    grain: "ITR1.ReconNum + ITR1.LineSeq"
+    date_semantics: "ReconDate within period"
+    as_of_required: false
+    currency: "OITR.ReconCurr"
+    canceled_policy: "EXCLUDE canceled reconciliations"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    audit_trace: ["OITR.ReconNum", "ITR1.SrcObjAbs"]
+    notes: "Credit note application through reconciliation"
+    status: DEFINED
+
+  - id: SETTLEMENT_DOWN_PAYMENT
+    name: DOWN_PAYMENT_SETTLEMENT
+    business_name_es: "Liquidación por anticipo"
+    description: "Amount settled against invoices through down payment reconciliation"
+    family: SETTLEMENT
+    formula: "SUM(ITR1.ReconSum) WHERE SrcObjTyp = 25 AND OITR.Canceled = 'N' AND ReconDate IN period"
+    numerator: "ITR1.ReconSum"
+    denominator: null
+    source: "TELCHI.ITR1 + TELCHI.OITR"
+    grain: "ITR1.ReconNum + ITR1.LineSeq"
+    date_semantics: "ReconDate within period"
+    as_of_required: false
+    currency: "OITR.ReconCurr"
+    canceled_policy: "EXCLUDE canceled reconciliations"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    audit_trace: ["OITR.ReconNum", "ITR1.SrcObjAbs"]
+    status: DEFINED
+
+  - id: SETTLEMENT_JOURNAL
+    name: JOURNAL_SETTLEMENT
+    business_name_es: "Liquidación por asiento contable"
+    description: "Amount settled against invoices through journal entry reconciliation"
+    family: SETTLEMENT
+    formula: "SUM(ITR1.ReconSum) WHERE SrcObjTyp = 30 AND OITR.Canceled = 'N' AND ReconDate IN period"
+    numerator: "ITR1.ReconSum"
+    denominator: null
+    source: "TELCHI.ITR1 + TELCHI.OITR"
+    grain: "ITR1.ReconNum + ITR1.LineSeq"
+    date_semantics: "ReconDate within period"
+    as_of_required: false
+    currency: "OITR.ReconCurr"
+    canceled_policy: "EXCLUDE canceled reconciliations"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    audit_trace: ["OITR.ReconNum", "ITR1.SrcObjAbs"]
+    status: DEFINED
+
+  - id: SETTLEMENT_OTHER
+    name: OTHER_SETTLEMENT
+    business_name_es: "Otras liquidaciones"
+    description: "Amount settled against invoices through other reconciliation types"
+    family: SETTLEMENT
+    formula: "SUM(ITR1.ReconSum) WHERE SrcObjTyp NOT IN (13, 14, 24, 25, 30, 46) AND OITR.Canceled = 'N' AND ReconDate IN period"
+    numerator: "ITR1.ReconSum"
+    denominator: null
+    source: "TELCHI.ITR1 + TELCHI.OITR"
+    grain: "ITR1.ReconNum + ITR1.LineSeq"
+    date_semantics: "ReconDate within period"
+    as_of_required: false
+    currency: "OITR.ReconCurr"
+    canceled_policy: "EXCLUDE canceled reconciliations"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    audit_trace: ["OITR.ReconNum", "ITR1.SrcObjAbs"]
+    status: DEFINED
+
+  - id: SETTLEMENT_TOTAL
+    name: TOTAL_SETTLEMENT
+    business_name_es: "Liquidación total"
+    description: "Total amount settled against invoices through all reconciliation types"
+    family: SETTLEMENT
+    formula: "SETTLEMENT_PAYMENT + SETTLEMENT_CREDIT + SETTLEMENT_DOWN_PAYMENT + SETTLEMENT_JOURNAL + SETTLEMENT_OTHER"
+    numerator: "All settlement components"
+    denominator: null
+    source: "TELCHI.ITR1 + TELCHI.OITR"
+    grain: "Invoice level"
+    date_semantics: "ReconDate within period"
+    as_of_required: false
+    currency: "OITR.ReconCurr"
+    canceled_policy: "EXCLUDE canceled reconciliations"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    audit_trace: ["OITR.ReconNum"]
+    status: DEFINED
+
+  # ===========================================================================
+  # FAMILY D: CUENTAS POR COBRAR (ACCOUNTS RECEIVABLE)
+  # ===========================================================================
+
+  - id: AR_OUTSTANDING
+    name: OUTSTANDING_AR
+    business_name_es: "Saldo pendiente"
+    description: "Remaining receivable amount for valid open invoices"
+    family: AR
+    formula: "SUM(OINV.DocTotal - TotalSettlement) WHERE CANCELED = 'N' AND DocStatus = 'O' AND Outstanding > tolerance"
+    numerator: "OINV.DocTotal - TotalSettlement"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur (document currency)"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if Outstanding <= tolerance"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry", "OITR.ReconNum"]
+    notes: "STOCK metric. Always report with AS_OF_DATE."
+    status: VALIDATED
+
+  - id: AR_NOT_DUE
+    name: NOT_DUE_AR
+    business_name_es: "Deuda no vencida"
+    description: "Outstanding AR where DocDueDate >= AS_OF_DATE"
+    family: AR
+    formula: "SUM(Outstanding) WHERE Outstanding > tolerance AND DocDueDate >= AS_OF_DATE"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if Outstanding <= tolerance"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AR_OVERDUE
+    name: OVERDUE_AR
+    business_name_es: "Deuda vencida"
+    description: "Outstanding AR where DocDueDate < AS_OF_DATE"
+    family: AR
+    formula: "SUM(Outstanding) WHERE Outstanding > tolerance AND DocDueDate < AS_OF_DATE"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if Outstanding <= tolerance"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AR_OVERDUE_RATE
+    name: OVERDUE_RATE
+    business_name_es: "Porcentaje de cartera vencida"
+    description: "Percentage of positive outstanding AR that is past due"
+    family: AR
+    formula: "AR_OVERDUE / AR_OUTSTANDING * 100"
+    numerator: "AR_OVERDUE"
+    denominator: "AR_OUTSTANDING"
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "Portfolio level"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "Percentage"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if AR_OUTSTANDING = 0"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AR_OPEN_INVOICES
+    name: OPEN_INVOICES
+    business_name_es: "Facturas abiertas"
+    description: "Count of valid invoices with positive outstanding"
+    family: AR
+    formula: "COUNT(OINV.DocEntry) WHERE CANCELED = 'N' AND DocStatus = 'O' AND Outstanding > tolerance"
+    numerator: "OINV.DocEntry"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "N/A (count)"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AR_CUSTOMERS_WITH_DEBT
+    name: CUSTOMERS_WITH_DEBT
+    business_name_es: "Clientes con deuda"
+    description: "Count of distinct customers with positive outstanding AR"
+    family: AR
+    formula: "COUNT(DISTINCT CardCode) WHERE Outstanding > tolerance"
+    numerator: "CardCode"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR + TELCHI.OCRD"
+    grain: "Customer level"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "N/A (count)"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "N/A"
+    dimensions: ["CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OCRD.CardCode"]
+    status: VALIDATED
+
+  - id: AR_SELLERS_WITH_PORTFOLIO
+    name: SELLERS_WITH_PORTFOLIO
+    business_name_es: "Vendedores con cartera"
+    description: "Count of distinct sellers with invoices contributing positive AR"
+    family: AR
+    formula: "COUNT(DISTINCT SlpCode) WHERE Outstanding > tolerance"
+    numerator: "SlpCode"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR + TELCHI.OSLP"
+    grain: "Seller level"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "N/A (count)"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "N/A"
+    dimensions: ["DATE"]
+    audit_trace: ["OSLP.SlpCode"]
+    status: VALIDATED
+
+  - id: AR_CREDIT_BALANCE
+    name: CREDIT_BALANCE
+    business_name_es: "Saldo a favor"
+    description: "Total outstanding AR where outstanding is negative (overpayment/credit)"
+    family: AR
+    formula: "SUM(Outstanding) WHERE Outstanding < -tolerance"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if no negative outstanding"
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    notes: "Currently $0.00 in baseline. Maintained as KPI."
+    status: VALIDATED
+
+  - id: AR_DAYS_OVERDUE
+    name: DAYS_OVERDUE
+    business_name_es: "Días de mora"
+    description: "Number of days past due date for each invoice"
+    family: AR
+    formula: "DAYS_BETWEEN(DocDueDate, AS_OF_DATE) WHERE Outstanding > tolerance AND DocDueDate < AS_OF_DATE"
+    numerator: "DAYS_BETWEEN(DocDueDate, AS_OF_DATE)"
+    denominator: null
+    source: "TELCHI.OINV"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "N/A (days)"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: DEFINED
+
+  # ===========================================================================
+  # FAMILY E: COHORTS
+  # ===========================================================================
+
+  - id: COHORT_GROSS_SALES
+    name: COHORT_GROSS_SALES
+    business_name_es: "Ventas brutas de cohorte"
+    description: "Gross sales of invoices issued in specific period"
+    family: COHORT
+    formula: "SALES_VALID_GROSS WHERE DocDate IN cohort_period"
+    numerator: "OINV.DocTotal"
+    denominator: null
+    source: "TELCHI.OINV"
+    grain: "Cohort period"
+    date_semantics: "DocDate defines cohort"
+    as_of_required: false
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE null DocTotal"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL"]
+    audit_trace: ["OINV.DocEntry"]
+    status: DEFINED
+
+  - id: COHORT_SETTLED_AS_OF
+    name: COHORT_SETTLED_AS_OF
+    business_name_es: "Cohorte liquidada a fecha"
+    description: "Amount of cohort invoices settled as of specific date"
+    family: COHORT
+    formula: "SUM(TotalSettlement) WHERE DocDate IN cohort_period AND AS_OF_DATE evaluation"
+    numerator: "TotalSettlement"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "Cohort period"
+    date_semantics: "DocDate defines cohort, AS_OF_DATE for settlement"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL"]
+    audit_trace: ["OINV.DocEntry", "OITR.ReconNum"]
+    status: DEFINED
+
+  - id: COHORT_OUTSTANDING_AS_OF
+    name: COHORT_OUTSTANDING_AS_OF
+    business_name_es: "Cohorte pendiente a fecha"
+    description: "Amount of cohort invoices still outstanding as of specific date"
+    family: COHORT
+    formula: "SUM(Outstanding) WHERE DocDate IN cohort_period AND Outstanding > tolerance"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "Cohort period"
+    date_semantics: "DocDate defines cohort, AS_OF_DATE for outstanding"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if Outstanding <= tolerance"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL"]
+    audit_trace: ["OINV.DocEntry"]
+    status: DEFINED
+
+  - id: COHORT_COLLECTION_RATE
+    name: COHORT_COLLECTION_RATE
+    business_name_es: "Tasa de cobranza de cohorte"
+    description: "Percentage of cohort invoices settled as of date"
+    family: COHORT
+    formula: "COHORT_SETTLED_AS_OF / COHORT_GROSS_SALES * 100"
+    numerator: "COHORT_SETTLED_AS_OF"
+    denominator: "COHORT_GROSS_SALES"
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "Cohort period"
+    date_semantics: "DocDate defines cohort, AS_OF_DATE for calculation"
+    as_of_required: true
+    currency: "Percentage"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if COHORT_GROSS_SALES = 0"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL"]
+    audit_trace: ["OINV.DocEntry"]
+    status: DEFINED
+
+  # ===========================================================================
+  # FAMILY F: AGING
+  # ===========================================================================
+
+  - id: AR_AGING_NOT_DUE
+    name: AGING_NOT_DUE
+    business_name_es: "Aging: No vencido"
+    description: "Outstanding AR in NOT_DUE aging bucket"
+    family: AGING
+    formula: "SUM(Outstanding) WHERE AgingBucket = 'NOT_DUE'"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if no NOT_DUE invoices"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AR_AGING_1_30
+    name: AGING_1_30
+    business_name_es: "Aging: 1-30 días"
+    description: "Outstanding AR in 1-30 days overdue bucket"
+    family: AGING
+    formula: "SUM(Outstanding) WHERE AgingBucket = '1-30'"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if no 1-30 invoices"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AR_AGING_31_60
+    name: AGING_31_60
+    business_name_es: "Aging: 31-60 días"
+    description: "Outstanding AR in 31-60 days overdue bucket"
+    family: AGING
+    formula: "SUM(Outstanding) WHERE AgingBucket = '31-60'"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if no 31-60 invoices"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AR_AGING_61_90
+    name: AGING_61_90
+    business_name_es: "Aging: 61-90 días"
+    description: "Outstanding AR in 61-90 days overdue bucket"
+    family: AGING
+    formula: "SUM(Outstanding) WHERE AgingBucket = '61-90'"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if no 61-90 invoices"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AR_AGING_91_120
+    name: AGING_91_120
+    business_name_es: "Aging: 91-120 días"
+    description: "Outstanding AR in 91-120 days overdue bucket"
+    family: AGING
+    formula: "SUM(Outstanding) WHERE AgingBucket = '91-120'"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if no 91-120 invoices"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AR_AGING_120_PLUS
+    name: AGING_120_PLUS
+    business_name_es: "Aging: más de 120 días"
+    description: "Outstanding AR in 120+ days overdue bucket"
+    family: AGING
+    formula: "SUM(Outstanding) WHERE AgingBucket = '120+'"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE (stock metric)"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "EXCLUDE if no 120+ invoices"
+    dimensions: ["SELLER", "CUSTOMER", "CUSTOMER_CHANNEL", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  # ===========================================================================
+  # FAMILY G: AUDIT
+  # ===========================================================================
+
+  - id: AUDIT_NEGATIVE_BALANCE
+    name: AUDIT_AR_NEGATIVE_BALANCE
+    business_name_es: "Auditoría: saldos negativos"
+    description: "Count and amount of invoices with negative outstanding"
+    family: AUDIT
+    formula: "COUNT(*), SUM(Outstanding) WHERE Outstanding < -tolerance"
+    numerator: "Outstanding"
+    denominator: null
+    source: "TELCHI.OINV + TELCHI.ITR1 + TELCHI.OITR"
+    grain: "OINV.DocEntry"
+    date_semantics: "AS_OF_DATE"
+    as_of_required: true
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "N/A"
+    dimensions: ["SELLER", "CUSTOMER", "DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AUDIT_CANCELED_INVOICE_OPEN
+    name: AUDIT_AR_CANCELED_INVOICE_OPEN
+    business_name_es: "Auditoría: facturas anuladas en estado abierto"
+    description: "Count of canceled invoices still showing open status"
+    family: AUDIT
+    formula: "COUNT(*) WHERE CANCELED IN ('Y', 'C') AND DocStatus = 'O'"
+    numerator: "OINV.DocEntry"
+    denominator: null
+    source: "TELCHI.OINV"
+    grain: "OINV.DocEntry"
+    date_semantics: "Current state"
+    as_of_required: false
+    currency: "N/A (count)"
+    canceled_policy: "INCLUDE only canceled"
+    null_policy: "N/A"
+    dimensions: ["DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+  - id: AUDIT_MISSING_DUE_DATE
+    name: AUDIT_AR_MISSING_DUE_DATE
+    business_name_es: "Auditoría: facturas sin fecha de vencimiento"
+    description: "Count of open invoices missing due date"
+    family: AUDIT
+    formula: "COUNT(*) WHERE CANCELED = 'N' AND DocStatus = 'O' AND DocDueDate IS NULL"
+    numerator: "OINV.DocEntry"
+    denominator: null
+    source: "TELCHI.OINV"
+    grain: "OINV.DocEntry"
+    date_semantics: "Current state"
+    as_of_required: false
+    currency: "N/A (count)"
+    canceled_policy: "EXCLUDE canceled"
+    null_policy: "INCLUDE null DocDueDate"
+    dimensions: ["DATE"]
+    audit_trace: ["OINV.DocEntry"]
+    status: VALIDATED
+
+# =============================================================================
+# KPI COUNT SUMMARY
+# =============================================================================
+# Total KPIs: 40
+# Families: SALES (7), COLLECTION (4), SETTLEMENT (6), AR (11), COHORT (4), AGING (6), AUDIT (3)
+# Validated: 20
+# Defined: 20
+# =============================================================================

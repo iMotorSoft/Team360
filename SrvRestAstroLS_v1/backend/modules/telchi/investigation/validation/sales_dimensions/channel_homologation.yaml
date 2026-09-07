@@ -1,0 +1,90 @@
+homologation_id: TELCHI_CHANNEL_HOMOLOGATION
+description: Mapping between legacy and current channel taxonomies
+legacy_fields:
+  PriceTypeCode: NOT_AVAILABLE in current SAP (U_TIPOVENTA always 0)
+  ClientSegmentationCode: Corresponds to OCRD.GroupCode (partial) and clientSB1.parq
+    ClientSLPropertyName
+  SellerType: Historical per-sale classification (0/21/22), not directly mappable
+    to current channels
+current_field: OCRD.U_CANAL_VENTAS (bulk-loaded Jan-Mar 2026)
+mappings:
+- legacy_category: HORIZONTAL
+  legacy_rule: PriceTypeCode == 11
+  current_channel: Multiple (1, 2, 6, 7)
+  comparable_family: NON_HOMOLOGABLE
+  confidence: LOW
+  evidence: PriceTypeCode=11 in Cruzada Excel (2020) maps to SellerType 0/21/22 —
+    no single current channel equivalent
+  notes: Legacy HORIZONTAL was a pricing-based classification, not a customer channel
+- legacy_category: LICITACION
+  legacy_rule: PriceTypeCode == 10
+  current_channel: 3 (Corporativo Grande) — partial
+  comparable_family: LICITACION
+  confidence: LOW
+  evidence: PriceTypeCode=10 appears in corporate context but not exclusively. Only
+    26 rows in Cruzada Excel
+  notes: Very low volume. May correspond to canal=3 for large corporate tenders
+- legacy_category: ESPECIAL
+  legacy_rule: ClientSegmentationCode IN (51, 6)
+  current_channel: 8 (Especiales) — partial
+  comparable_family: ESPECIAL
+  confidence: MEDIUM
+  evidence: ClientSLPropertyName 'Especiales' maps mostly to canal=8. But segmentation
+    codes 51/6 not directly available in current GroupCode
+  notes: GroupCode=117 maps to canal=8 (Especiales)
+- legacy_category: SALON
+  legacy_rule: ClientSegmentationCode IN (100, NULL)
+  current_channel: 1 (Farmacias) + 7 (Publico/Retail) + NULL
+  comparable_family: RETAIL
+  confidence: LOW
+  evidence: GroupCode=100 maps to canal=NULL/6. GroupCode=106 (largest) maps to canal=NULL/1/2/6.
+    No clean mapping
+  notes: SALON was the catch-all for retail. Current taxonomy split this into multiple
+    channels
+- legacy_category: CORPORATIVO
+  legacy_rule: Rest (after removing HORIZONTAL, LICITACION, ESPECIAL, SALON)
+  current_channel: 2 (Corporativo) + 3 (Corporativo Grande) — partial
+  comparable_family: CORPORATE_FAMILY
+  confidence: MEDIUM
+  evidence: GroupCode=104 maps to canal=2/3. ClientSLPropertyName 'Ferreterias'/'Veterinarias'/'Clinicas'
+    map to canal=2
+  notes: Legacy CORPORATIVO was broader than current canal=2. May include canal=3
+    and some canal=5/6
+- legacy_category: SellerType=22
+  legacy_rule: Per-sale classification in Cruzada Excel (2020)
+  current_channel: NOT DIRECTLY MAPPABLE
+  comparable_family: UNKNOWN
+  confidence: LOW
+  evidence: Only 2 sellers had SellerType=22 in 2020 (Herrera, Sanchez). Different
+    from current 420 corporate customers
+  notes: SellerType classified sales, not customers. Cannot map to customer channel
+comparable_families:
+  CORPORATE_FAMILY:
+    description: Corporate sales family for cross-period comparison
+    includes:
+    - channel_2
+    - channel_3
+    current_definition: OCRD.U_CANAL_VENTAS IN (2, 3)
+    legacy_equivalent: CORPORATIVO (partial — legacy was broader)
+    confidence: MEDIUM
+    notes: May not capture all legacy corporate sales. Some GroupCode=108 (Regional)
+      customers may have been corporate
+  RETAIL:
+    description: Retail/salon sales family
+    includes:
+    - channel_1
+    - channel_7
+    - 'NULL'
+    current_definition: OCRD.U_CANAL_VENTAS IN (1, 7) OR NULL
+    legacy_equivalent: SALON
+    confidence: LOW
+  ESPECIAL:
+    description: Special channel
+    includes:
+    - channel_8
+    current_definition: OCRD.U_CANAL_VENTAS = 8
+    legacy_equivalent: ESPECIAL
+    confidence: MEDIUM
+conclusion: The legacy and current taxonomies are NOT directly homologable at detail
+  level. Cross-period comparison requires using comparable families at a higher abstraction
+  level, with explicit acknowledgment of mapping uncertainty.

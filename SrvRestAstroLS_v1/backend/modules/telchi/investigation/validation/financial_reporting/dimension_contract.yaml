@@ -1,0 +1,226 @@
+# =============================================================================
+# DIMENSION CONTRACT — TEAM360 TELCHI FINANCIAL REPORTING
+# =============================================================================
+# Defines all analytical dimensions for financial reporting.
+# Each dimension has a key, source, and behavioral rules.
+# =============================================================================
+# Version: 1.0.0
+# Date: 2026-08-21
+# Status: ACTIVE
+# =============================================================================
+
+dimensions:
+
+  # ===========================================================================
+  # INVOICE
+  # ===========================================================================
+  - id: INVOICE
+    name: "Invoice"
+    business_name_es: "Factura"
+    key: "DocEntry"
+    source: "TELCHI.OINV"
+    label: "DocNum"
+    valid_period: "ALL"
+    null_behavior: "N/A (key is always present)"
+    historical_limitation: "None"
+    notes: "Grain of financial model. One row per invoice."
+    fields:
+      - name: DocEntry
+        type: INTEGER
+        description: "Unique invoice identifier"
+      - name: DocNum
+        type: INTEGER
+        description: "Invoice number (display)"
+      - name: CardCode
+        type: VARCHAR
+        description: "Customer code"
+      - name: SlpCode
+        type: INTEGER
+        description: "Seller code"
+      - name: DocDate
+        type: DATE
+        description: "Invoice date"
+      - name: DocDueDate
+        type: DATE
+        description: "Due date"
+      - name: DocTotal
+        type: DECIMAL
+        description: "Total invoice amount"
+      - name: DocCur
+        type: VARCHAR
+        description: "Document currency"
+      - name: CANCELED
+        type: VARCHAR
+        description: "Cancellation status (N, Y, C)"
+      - name: DocStatus
+        type: VARCHAR
+        description: "Document status (O=open, C=closed)"
+
+  # ===========================================================================
+  # CUSTOMER
+  # ===========================================================================
+  - id: CUSTOMER
+    name: "Customer"
+    business_name_es: "Cliente"
+    key: "CardCode"
+    source: "TELCHI.OCRD"
+    label: "CardName"
+    valid_period: "ALL"
+    null_behavior: "N/A (key is always present)"
+    historical_limitation: "Channel (U_CANAL_VENTAS) only available from 2026+"
+    notes: "Business partner identity. Customer owns the debt."
+    fields:
+      - name: CardCode
+        type: VARCHAR
+        description: "Unique customer identifier"
+      - name: CardName
+        type: VARCHAR
+        description: "Customer name (display only)"
+      - name: U_CANAL_VENTAS
+        type: VARCHAR
+        description: "Sales channel code (2026+)"
+      - name: CreditLine
+        type: DECIMAL
+        description: "Credit limit"
+      - name: Balance
+        type: DECIMAL
+        description: "Current balance"
+
+  # ===========================================================================
+  # SELLER
+  # ===========================================================================
+  - id: SELLER
+    name: "Seller"
+    business_name_es: "Vendedor"
+    key: "SlpCode"
+    source: "TELCHI.OSLP"
+    label: "SlpName"
+    valid_period: "ALL"
+    null_behavior: "SlpCode = -1 indicates no seller assigned"
+    historical_limitation: "None"
+    notes: "Analytical dimension. Debt belongs to customer, not seller."
+    fields:
+      - name: SlpCode
+        type: INTEGER
+        description: "Unique seller identifier"
+      - name: SlpName
+        type: VARCHAR
+        description: "Seller name (display only)"
+
+  # ===========================================================================
+  # CUSTOMER_CHANNEL
+  # ===========================================================================
+  - id: CUSTOMER_CHANNEL
+    name: "Customer Channel"
+    business_name_es: "Canal del cliente"
+    key: "U_CANAL_VENTAS"
+    source: "TELCHI.OCRD"
+    label: "ChannelName"
+    valid_period: "2026+"
+    null_behavior: "NULL = 'Sin Clasificar'"
+    historical_limitation: "Pre-2026 requires legacy reconstruction"
+    notes: "Channel belongs to customer, not to seller or transaction."
+    values:
+      - code: "1"
+        name: "Farmacias"
+      - code: "2"
+        name: "Corporativo"
+      - code: "3"
+        name: "Corporativo Grande"
+      - code: "4"
+        name: "Supermercados"
+      - code: "5"
+        name: "Distribuidoras"
+      - code: "6"
+        name: "Regional"
+      - code: "7"
+        name: "Público / Retail"
+      - code: "8"
+        name: "Especiales"
+      - code: null
+        name: "Sin Clasificar"
+
+  # ===========================================================================
+  # RECONCILIATION
+  # ===========================================================================
+  - id: RECONCILIATION
+    name: "Reconciliation"
+    business_name_es: "Conciliación"
+    key: "ReconNum"
+    source: "TELCHI.OITR + TELCHI.ITR1"
+    label: "ReconNum"
+    valid_period: "ALL"
+    null_behavior: "N/A (key is always present)"
+    historical_limitation: "None"
+    notes: "Settlement mechanism. Links invoices to payments/credits."
+    fields:
+      - name: ReconNum
+        type: INTEGER
+        description: "Unique reconciliation identifier"
+      - name: ReconDate
+        type: DATE
+        description: "Reconciliation date"
+      - name: Total
+        type: DECIMAL
+        description: "Reconciliation total amount"
+      - name: Canceled
+        type: VARCHAR
+        description: "Cancellation status (N, C, Y)"
+
+  # ===========================================================================
+  # DATE (TEMPORAL)
+  # ===========================================================================
+  - id: DATE
+    name: "Date"
+    business_name_es: "Fecha"
+    key: "varies_by_metric"
+    source: "Multiple tables"
+    label: "Date"
+    valid_period: "ALL"
+    null_behavior: "N/A"
+    historical_limitation: "None"
+    notes: "Temporal dimension. Semantic field varies by metric family."
+    semantics:
+      SALES: "DocDate (OINV/ORIN)"
+      COLLECTION: "DocDate (ORCT)"
+      SETTLEMENT: "ReconDate (OITR)"
+      AR: "AS_OF_DATE (mandatory, not from data)"
+      COHORT: "DocDate defines cohort, AS_OF_DATE for evaluation"
+
+  # ===========================================================================
+  # PERIOD
+  # ===========================================================================
+  - id: PERIOD
+    name: "Period"
+    business_name_es: "Período"
+    key: "period_filter"
+    source: "Application layer"
+    label: "Period"
+    valid_period: "ALL"
+    null_behavior: "N/A"
+    historical_limitation: "None"
+    notes: "Reporting period filter. Not a database dimension."
+    filters:
+      - id: DAY
+        description: "Single day"
+        example: "2026-08-21"
+      - id: MONTH
+        description: "Full month"
+        example: "2026-08"
+      - id: YTD
+        description: "Year to date"
+        example: "2026-01-01 to 2026-08-21"
+      - id: CUSTOM_RANGE
+        description: "Custom date range"
+        example: "2026-07-01 to 2026-08-21"
+      - id: AS_OF
+        description: "Point in time (for stock metrics)"
+        example: "AS_OF_DATE = 2026-08-21"
+
+# =============================================================================
+# DIMENSION COUNT SUMMARY
+# =============================================================================
+# Total dimensions: 7
+# Database dimensions: 5 (INVOICE, CUSTOMER, SELLER, RECONCILIATION, CUSTOMER_CHANNEL)
+# Temporal dimensions: 2 (DATE, PERIOD)
+# =============================================================================

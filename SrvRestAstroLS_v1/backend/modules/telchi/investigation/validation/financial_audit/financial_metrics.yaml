@@ -1,0 +1,237 @@
+# =============================================================================
+# FINANCIAL METRICS CONTRACT — TEAM360 TELCHI
+# =============================================================================
+# Each metric with:
+#   name: unique identifier
+#   definition: what it measures
+#   source: SAP tables/fields
+#   formula: exact calculation
+#   grain: level of aggregation
+#   currency: which currency field is used
+#   canceled_policy: how canceled documents are handled
+#   as_of semantics: date reference behavior
+#   notes: important caveats
+# =============================================================================
+
+metrics:
+
+  # ===========================================================================
+  # GROSS INVOICED SALES
+  # ===========================================================================
+  - name: GROSS_INVOICED_SALES
+    definition: "Total amount of valid (non-canceled) invoices issued"
+    source: "OINV.DocTotal WHERE CANCELED = 'N'"
+    formula: "SUM(OINV.DocTotal) WHERE CANCELED = 'N'"
+    grain: "OINV.DocEntry (header level)"
+    currency: "OINV.DocCur (document currency)"
+    canceled_policy: "EXCLUDE canceled (CANCELED IN ('Y', 'C'))"
+    as_of_semantics: "DocDate within period"
+    notes: "Header-level DocTotal, not line-level sum"
+
+  # ===========================================================================
+  # CANCELED INVOICES
+  # ===========================================================================
+  - name: CANCELED_INVOICES
+    definition: "Total amount of invoices marked as canceled"
+    source: "OINV.DocTotal WHERE CANCELED IN ('Y', 'C')"
+    formula: "SUM(OINV.DocTotal) WHERE CANCELED IN ('Y', 'C')"
+    grain: "OINV.DocEntry"
+    currency: "OINV.DocCur"
+    canceled_policy: "INCLUDE only canceled"
+    as_of_semantics: "DocDate within period"
+    notes: "Y = original canceled, C = reversal document. Both have PaidToDate > 0"
+
+  # ===========================================================================
+  # VALID GROSS INVOICED SALES
+  # ===========================================================================
+  - name: VALID_GROSS_INVOICED_SALES
+    definition: "Gross sales excluding canceled invoices"
+    source: "OINV"
+    formula: "SUM(OINV.DocTotal) WHERE CANCELED = 'N'"
+    grain: "OINV.DocEntry"
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "DocDate within period"
+    notes: "Same as GROSS_INVOICED_SALES; alias for clarity"
+
+  # ===========================================================================
+  # CREDIT NOTES (VALID)
+  # ===========================================================================
+  - name: VALID_CREDIT_NOTES
+    definition: "Total amount of valid (non-canceled) credit notes"
+    source: "ORIN.DocTotal WHERE CANCELED = 'N'"
+    formula: "SUM(ORIN.DocTotal * -1) WHERE CANCELED = 'N'"
+    grain: "ORIN.DocEntry"
+    currency: "ORIN.DocCur (if exists)"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "DocDate within period"
+    notes: "Legacy negates amounts. Net effect reduces receivables."
+
+  # ===========================================================================
+  # CANCELED CREDIT NOTES
+  # ===========================================================================
+  - name: CANCELED_CREDIT_NOTES
+    definition: "Total amount of credit notes marked as canceled"
+    source: "ORIN.DocTotal WHERE CANCELED IN ('Y', 'C')"
+    formula: "SUM(ORIN.DocTotal * -1) WHERE CANCELED IN ('Y', 'C')"
+    grain: "ORIN.DocEntry"
+    currency: "ORIN.DocCur"
+    canceled_policy: "INCLUDE only canceled"
+    as_of_semantics: "DocDate within period"
+    notes: "Canceled credit notes should not reduce net sales"
+
+  # ===========================================================================
+  # NET COMMERCIAL SALES
+  # ===========================================================================
+  - name: NET_COMMERCIAL_SALES
+    definition: "Valid gross invoices minus valid credit notes"
+    source: "OINV + ORIN"
+    formula: "VALID_GROSS_INVOICED_SALES - VALID_CREDIT_NOTES"
+    grain: "Period level"
+    currency: "Document currency"
+    canceled_policy: "Both excl canceled"
+    as_of_semantics: "DocDate within period"
+    notes: "Commercial metric. Does NOT include payment status."
+
+  # ===========================================================================
+  # PAYMENTS RECEIVED (VALID)
+  # ===========================================================================
+  - name: VALID_PAYMENTS_RECEIVED
+    definition: "Total amount of valid (non-canceled) incoming payments"
+    source: "ORCT.DocTotal WHERE Canceled = 'N'"
+    formula: "SUM(ORCT.DocTotal) WHERE Canceled = 'N'"
+    grain: "ORCT.DocEntry"
+    currency: "ORCT.DocCur (if exists)"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "DocDate within period"
+    notes: "ORCT is the payment document. Does NOT mean applied to specific invoices."
+
+  # ===========================================================================
+  # CANCELED PAYMENTS
+  # ===========================================================================
+  - name: CANCELED_PAYMENTS
+    definition: "Total amount of payments marked as canceled"
+    source: "ORCT.DocTotal WHERE Canceled = 'Y'"
+    formula: "SUM(ORCT.DocTotal) WHERE Canceled = 'Y'"
+    grain: "ORCT.DocEntry"
+    currency: "ORCT.DocCur"
+    canceled_policy: "INCLUDE only canceled"
+    as_of_semantics: "DocDate within period"
+    notes: "Canceled payments should not count as receipts"
+
+  # ===========================================================================
+  # OUTSTANDING AR (CURRENT)
+  # ===========================================================================
+  - name: OUTSTANDING_AR
+    definition: "Remaining receivable amount for valid open invoices"
+    source: "OINV WHERE CANCELED = 'N' AND DocStatus = 'O'"
+    formula: "SUM(OINV.DocTotal - OINV.PaidToDate) WHERE CANCELED = 'N' AND DocStatus = 'O'"
+    grain: "OINV.DocEntry"
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "AS_OF_DATE for DocStatus evaluation"
+    notes: "DocStatus 'O' = open, 'C' = closed. PaidToDate includes all payments applied."
+
+  # ===========================================================================
+  # PAID AMOUNT
+  # ===========================================================================
+  - name: PAID_AMOUNT
+    definition: "Total amount paid against valid invoices"
+    source: "OINV.PaidToDate WHERE CANCELED = 'N'"
+    formula: "SUM(OINV.PaidToDate) WHERE CANCELED = 'N'"
+    grain: "OINV.DocEntry"
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "Current state (PaidToDate is cumulative)"
+    notes: "PaidToDate reflects total payments applied to invoice, including partial"
+
+  # ===========================================================================
+  # FULLY PAID INVOICES
+  # ===========================================================================
+  - name: FULLY_PAID_INVOICES
+    definition: "Count of valid invoices with zero outstanding"
+    source: "OINV"
+    formula: "COUNT(OINV.DocEntry) WHERE CANCELED = 'N' AND (DocTotal - PaidToDate) <= 0"
+    grain: "OINV.DocEntry"
+    currency: "N/A (count)"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "Current state"
+    notes: "Uses PaidToDate as payment indicator"
+
+  # ===========================================================================
+  # PARTIALLY PAID INVOICES
+  # ===========================================================================
+  - name: PARTIALLY_PAID_INVOICES
+    definition: "Count of valid invoices with partial payment"
+    source: "OINV"
+    formula: "COUNT(OINV.DocEntry) WHERE CANCELED = 'N' AND PaidToDate > 0 AND (DocTotal - PaidToDate) > 0"
+    grain: "OINV.DocEntry"
+    currency: "N/A (count)"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "Current state"
+    notes: "PaidToDate > 0 but not enough to close"
+
+  # ===========================================================================
+  # UNPAID INVOICES
+  # ===========================================================================
+  - name: UNPAID_INVOICES
+    definition: "Count of valid open invoices with no payment"
+    source: "OINV"
+    formula: "COUNT(OINV.DocEntry) WHERE CANCELED = 'N' AND DocStatus = 'O' AND PaidToDate = 0"
+    grain: "OINV.DocEntry"
+    currency: "N/A (count)"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "Current state"
+    notes: "Open invoices with zero payment"
+
+  # ===========================================================================
+  # INVOICE CANCELLATION RATE
+  # ===========================================================================
+  - name: INVOICE_CANCELLATION_RATE
+    definition: "Percentage of issued invoices that were canceled"
+    source: "OINV"
+    formula: "COUNT(CANCELED IN ('Y','C')) / COUNT(*) * 100"
+    grain: "Period level"
+    currency: "N/A (percentage)"
+    canceled_policy: "Compare canceled vs total"
+    as_of_semantics: "DocDate within period"
+    notes: "Based on count, not amount"
+
+  # ===========================================================================
+  # CREDIT NOTE RATE
+  # ===========================================================================
+  - name: CREDIT_NOTE_RATE
+    definition: "Credit notes as percentage of gross invoiced sales"
+    source: "OINV + ORIN"
+    formula: "VALID_CREDIT_NOTES / VALID_GROSS_INVOICED_SALES * 100"
+    grain: "Period level"
+    currency: "Document currency"
+    canceled_policy: "Both excl canceled"
+    as_of_semantics: "DocDate within period"
+    notes: "Amount-based, not count-based"
+
+  # ===========================================================================
+  # COLLECTION RATE
+  # ===========================================================================
+  - name: COLLECTION_RATE
+    definition: "Percentage of valid invoice amount that has been paid"
+    source: "OINV"
+    formula: "SUM(PaidToDate) / SUM(DocTotal) * 100 WHERE CANCELED = 'N'"
+    grain: "Period level"
+    currency: "Document currency"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "Current state (PaidToDate is cumulative)"
+    notes: "Based on PaidToDate field. May include payments from different periods."
+
+  # ===========================================================================
+  # AGING BUCKETS
+  # ===========================================================================
+  - name: AR_AGING
+    definition: "Distribution of outstanding AR by days past due"
+    source: "OINV WHERE CANCELED = 'N' AND DocStatus = 'O'"
+    formula: "Bucket based on (AS_OF_DATE - DocDueDate)"
+    grain: "OINV.DocEntry"
+    currency: "OINV.DocCur"
+    canceled_policy: "EXCLUDE canceled"
+    as_of_semantics: "MANDATORY AS_OF_DATE"
+    notes: "See aging_buckets.yaml for bucket definitions"

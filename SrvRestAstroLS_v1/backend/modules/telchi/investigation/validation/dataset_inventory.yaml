@@ -1,0 +1,452 @@
+inventory_name: telchi_canonical_dataset_inventory
+inventory_version: "1"
+status: PARTIAL
+scope: DATACLIENT_LOCAL
+generated_from:
+  - TEAM360_TELCHI_DATASCIENCE_STRUCTURE_AUDIT_PARTIAL
+  - root_key: LEGACY_DATA_ROOT
+  - static_legacy_code_inspection
+source_of_truth_for_current_state: SAP_HANA
+notes:
+  - "This inventory is declarative and contains no credentials or executable SQL."
+  - "UNKNOWN means that static inspection did not prove the value; it is not a null business value."
+  - "Legacy paths are references only. Legacy code and Parquet were not modified."
+  - "No historical/current cut is selected by this inventory."
+
+datasets:
+  - dataset: sales
+    domain: sales
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchiSB101.py::makeSaleDFRange
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OINV, TELCHI.INV1, TELCHI.OSLP]
+    sap_object: OINV
+    sap_pk: DocEntry
+    secondary_ids: [DocNum, TransId, CardCode, ItemCode, WhsCode]
+    business_date: DocDate
+    update_date: UpdateDate
+    cancellation_field: CANCELED
+    cancellation_semantics: "UNKNOWN; main legacy query does not select CANCELED"
+    amount_fields: [DocTotal, DiscSum, PaidSum, GTotal, ItemSale]
+    currency_fields: [UNKNOWN]
+    legacy_output: saleSB1Product-YYYY-MM-DD.parq
+    historical_range: "2018-01 through 2022-04 for -h converted files; SAP-family files continue through 2024-04 in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally; sampled 9.0.0 for saleSB1Product-2023-02-28"
+    dependencies: [HANA_SQLAlchemy_legacy, sapWhsOfficeName.xlsx]
+    status: CHANGE_REQUIRED
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Preserve DocEntry and distinguish current HANA state from historical Parquet."
+
+  - dataset: credit_notes
+    domain: credit_notes
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchiSB101.py::makeNCDFRange
+    source_system: SAP_HANA
+    source_tables: [TELCHI.ORIN, TELCHI.RIN1, TELCHI.OSLP]
+    sap_object: ORIN
+    sap_pk: DocEntry
+    secondary_ids: [DocNum, CardCode, ItemCode, WhsCode, BaseRef]
+    business_date: DocDate
+    update_date: UpdateDate
+    cancellation_field: CANCELED
+    cancellation_semantics: "UNKNOWN; main legacy query does not select CANCELED"
+    amount_fields: [DocTotal, DiscSum, PaidSum, GTotal, ItemSale]
+    currency_fields: [UNKNOWN]
+    legacy_output: ncB1Product-YYYY-MM-DD.parq
+    historical_range: "2022-04 through 2024-06 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy, sapWhsOfficeName.xlsx]
+    status: CHANGE_REQUIRED
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Legacy negates document and line amounts; cancellation semantics must be verified."
+
+  - dataset: inventory_movements
+    domain: inventory_movements
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchiSB101.py::makeMoveProductRange
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OINM, TELCHI.OINV, TELCHI.ODLN, TELCHI.DLN1, TELCHI.OCRD, TELCHI.OSLP, TELCHI.OUSR]
+    sap_object: OINM
+    sap_pk: TransNum
+    secondary_ids: [BASE_REF, DocLineNum, ItemCode, Warehouse, CardCode]
+    business_date: DocDate
+    update_date: UNKNOWN
+    cancellation_field: CANCELED
+    cancellation_semantics: "ODLN join filters CANCELED=N in legacy branch; OINM cancellation semantics UNKNOWN"
+    amount_fields: [TransValue, CalcPrice, ItemSale]
+    currency_fields: [UNKNOWN]
+    legacy_output: movProductSB1-YYYY-MM-DD.parq
+    historical_range: "2022-04 through 2024-04 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: CHANGE_REQUIRED
+    migration_action: REWRITE_EXTRACTOR
+    notes: "The legacy implementation contains multiple alternative queries and a fixed Price/0.87 transformation."
+
+  - dataset: products
+    domain: products
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchiSB101.py::makeProduct
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OITM, TELCHI.OITB, TELCHI.OMRC, TELCHI.OINM, TELCHI.OITT, TELCHI.OITG]
+    sap_object: OITM
+    sap_pk: ItemCode
+    secondary_ids: [ItmsGrpCod, FirmCode, U_CODACTIVE]
+    business_date: UNKNOWN
+    update_date: LastPurDat
+    cancellation_field: frozenFor
+    cancellation_semantics: "Product freeze flag, not document cancellation"
+    amount_fields: [LastPurPrc, OnHand, CostoUAvg60]
+    currency_fields: [LastPurCur]
+    legacy_output: productSB1.parq
+    historical_range: UNKNOWN
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: REUSE_SEMANTICS
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Product properties query expands QryGroup1..64 and should remain traceable to ItemCode."
+
+  - dataset: product_properties
+    domain: products
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchiSB101.py::makeProductPropiety
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OITM, TELCHI.OITG]
+    sap_object: OITM
+    sap_pk: ItemCode
+    secondary_ids: [ItmsTypCod, QryGroup1..QryGroup64]
+    business_date: UNKNOWN
+    update_date: UNKNOWN
+    cancellation_field: UNKNOWN
+    cancellation_semantics: UNKNOWN
+    amount_fields: []
+    currency_fields: []
+    legacy_output: embedded_in_productSB1.parq
+    historical_range: UNKNOWN
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: REUSE_SEMANTICS
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Not a standalone Parquet output in the legacy implementation."
+
+  - dataset: customers
+    domain: customers
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchiSB101.py::makeClient
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OCRD, TELCHI.OPLN, TELCHI.OCQG]
+    sap_object: OCRD
+    sap_pk: CardCode
+    secondary_ids: [GroupCode, ListNum]
+    business_date: UNKNOWN
+    update_date: UNKNOWN
+    cancellation_field: frozenFor
+    cancellation_semantics: "Business-partner freeze semantics; document cancellation not applicable"
+    amount_fields: [Balance, CreditLine]
+    currency_fields: [UNKNOWN]
+    legacy_output: clientSB1.parq
+    historical_range: UNKNOWN
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: REUSE_SEMANTICS
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Legacy uses CardCode as the customer traceability key."
+
+  - dataset: warehouses
+    domain: warehouses
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchiSB101.py::makeWhareHouse
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OITW, TELCHI.OWHS]
+    sap_object: OITW
+    sap_pk: "ItemCode+WhsCode"
+    secondary_ids: [WhsCode, ItemCode]
+    business_date: UNKNOWN
+    update_date: updateDate
+    cancellation_field: Locked
+    cancellation_semantics: "Warehouse lock/status, not document cancellation"
+    amount_fields: [OnHand, IsCommited, OnOrder, AvgPrice, StockValue]
+    currency_fields: [UNKNOWN]
+    legacy_output: wareHouseSB1.parq
+    historical_range: UNKNOWN
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: REUSE_SEMANTICS
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Composite key must remain explicit for item-by-warehouse snapshots."
+
+  - dataset: reconciliation
+    domain: reconciliation
+    legacy_extractor: Insiding/DataScience/sapb1Tools01.py::makeReconRange
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OITR, TELCHI.ITR1, TELCHI.OUSR]
+    sap_object: OITR
+    sap_pk: ReconNum
+    secondary_ids: [LineSeq, TransId, TransRowId, SrcObjAbs, CancelAbs]
+    business_date: ReconDate
+    update_date: UpdateTS
+    cancellation_field: Canceled
+    cancellation_semantics: "Cancellation state is retained in source output"
+    amount_fields: [Total, ReconSum, ReconSumFC, ReconSumSC, SumMthCurr, CashDisSum]
+    currency_fields: [ReconCurr]
+    legacy_output: reconB1-YYYY-MM-DD.parq
+    historical_range: "2022-04 through 2023-05 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: REUSE_SEMANTICS
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Use ReconNum plus line identity for reconciliation; do not collapse canceled records."
+
+  - dataset: incoming_payments
+    domain: incoming_payments
+    legacy_extractor: Insiding/DataScience/sapb1Tools01.py::makePaymentRange
+    source_system: SAP_HANA
+    source_tables: [TELCHI.ORCT]
+    sap_object: ORCT
+    sap_pk: DocEntry
+    secondary_ids: [TransId, DocNum, ClientCode]
+    business_date: DocDate
+    update_date: UNKNOWN
+    cancellation_field: Canceled
+    cancellation_semantics: "Legacy selects and preserves Canceled without filtering"
+    amount_fields: [CashSum, TrsfrSum, CreditSum, CheckSum, DocTotal, DocTotalFC]
+    currency_fields: [DocTotalFC]
+    legacy_output: paymentB1-YYYY-MM-DD.parq
+    historical_range: "2022-04 through 2023-05 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally; sampled 11.0.0 for paymentB1-2023-05-31"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: CHANGE_REQUIRED
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Must preserve the known historical reconciliation classifications without inference."
+
+  - dataset: item_groups
+    domain: products
+    legacy_extractor: Insiding/DataScience/sapb1Tools01.py::makeOITB
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OITB]
+    sap_object: OITB
+    sap_pk: ItmsGrpCod
+    secondary_ids: [UserSign, userSign2]
+    business_date: createDate
+    update_date: updateDate
+    cancellation_field: Locked
+    cancellation_semantics: "Group lock/status"
+    amount_fields: [BalInvntAc, SaleCostAc, TransferAc, RevenuesAc]
+    currency_fields: [UNKNOWN]
+    legacy_output: oitbSB1.parq
+    historical_range: UNKNOWN
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: REUSE_SEMANTICS
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Master-data output."
+
+  - dataset: chart_of_accounts
+    domain: accounting
+    legacy_extractor: Insiding/DataScience/sapb1Tools01.py::makeOACT
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OACT]
+    sap_object: OACT
+    sap_pk: AcctCode
+    secondary_ids: [FatherNum, AccntntCod]
+    business_date: UNKNOWN
+    update_date: UNKNOWN
+    cancellation_field: Frozen
+    cancellation_semantics: "Account frozen/status"
+    amount_fields: [CurrTotal, EndTotal, Budget]
+    currency_fields: [RateTrans]
+    legacy_output: oactSB1.parq
+    historical_range: UNKNOWN
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: REUSE_SEMANTICS
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Master-data output."
+
+  - dataset: warehouse_master
+    domain: warehouses
+    legacy_extractor: Insiding/DataScience/sapb1Tools01.py::makeOWHS
+    source_system: SAP_HANA
+    source_tables: [TELCHI.OWHS]
+    sap_object: OWHS
+    sap_pk: WhsCode
+    secondary_ids: [Locked]
+    business_date: UNKNOWN
+    update_date: UNKNOWN
+    cancellation_field: Locked
+    cancellation_semantics: "Warehouse lock/status"
+    amount_fields: [BalInvntAc, SaleCostAc, TransferAc, RevenuesAc]
+    currency_fields: [UNKNOWN]
+    legacy_output: owhsSB1.parq
+    historical_range: UNKNOWN
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [HANA_SQLAlchemy_legacy]
+    status: REUSE_SEMANTICS
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Master-data output."
+
+  - dataset: sales_legacy
+    domain: sales
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchi02.py::makeSaleDFRange
+    source_system: LEGACY_SQL_SERVER
+    source_tables: [vttrn, vthpf, vtdpf, gblog, ivprd, gbper, Gbofi, ivlpr]
+    sap_object: UNKNOWN
+    sap_pk: SaleCode
+    secondary_ids: [ProductCode, ClientCode, SellerCode, OfficeCode]
+    business_date: SaleDate
+    update_date: TSSale
+    cancellation_field: SaleStatus1/SaleStatus2/SaleStatus3
+    cancellation_semantics: "Legacy operational status fields; mapping to SAP cancellation UNKNOWN"
+    amount_fields: [ProductUnitPrice, ProductUnitPriceNet, ProductSalePriceNet, ProductSalePrice, ProductUnitCost]
+    currency_fields: [UNKNOWN]
+    legacy_output: saleProduct-YYYY-MM-DD.parq
+    historical_range: "2018-01 through 2022-04 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally; sampled 1.0.0 for saleProduct-2018-01-31"
+    dependencies: [FTelchi_SQL_Server, legacy_absolute_DS_path]
+    status: DEPRECATED
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Historical evidence only until the SAP/HANA boundary is defined."
+
+  - dataset: purchases
+    domain: purchases
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchi02.py::makePurchaseDFRange
+    source_system: LEGACY_SQL_SERVER
+    source_tables: [cohor, codor, ivprd, gbofi, ivalm, gbper, ivcon, ivmar, ivcat]
+    sap_object: UNKNOWN
+    sap_pk: NroOrden
+    secondary_ids: [SupplierCode, PurchaseProductCode, WareHouseCode, OfficeCode]
+    business_date: OrderDate
+    update_date: UNKNOWN
+    cancellation_field: cohorstat/codorstat
+    cancellation_semantics: "Rows filter legacy status=0; business cancellation mapping UNKNOWN"
+    amount_fields: [PurchaseProductCant, PurchaseProductUnitCost, PurchaseProductPriceFinal, PurchaseProductPriceFinalUSD, PurchaseProductPriceFinalBS]
+    currency_fields: [Currency, TypeChange]
+    legacy_output: purchase-YYYY-MM-DD.parq
+    historical_range: "2012-03 through 2022-03 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [FTelchi_SQL_Server, legacy_absolute_DS_path]
+    status: CHANGE_REQUIRED
+    migration_action: REWRITE_EXTRACTOR
+    notes: "No SAP purchase equivalent was identified in DataScience legacy; do not infer one."
+
+  - dataset: purchase_expenses
+    domain: purchases
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchi02.py::makePurchaseExpenseDFRange
+    source_system: LEGACY_SQL_SERVER
+    source_tables: [codor, cngas, cndga, gblog]
+    sap_object: UNKNOWN
+    sap_pk: "NroOrden+ProductCode"
+    secondary_ids: [ProductCode, NroOrden]
+    business_date: PurchaseExpenseDate
+    update_date: PurchaseExpenseTS
+    cancellation_field: codorstat/cngasStat
+    cancellation_semantics: "Legacy status filters; business cancellation mapping UNKNOWN"
+    amount_fields: [Expense]
+    currency_fields: [Coin]
+    legacy_output: purchaseExpense-YYYY-MM-DD.parq
+    historical_range: "2012-01 through 2022-04 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [FTelchi_SQL_Server, legacy_absolute_DS_path]
+    status: CHANGE_REQUIRED
+    migration_action: REWRITE_EXTRACTOR
+    notes: "Expense-to-cost allocation must be decided before migration."
+
+  - dataset: cash
+    domain: cash
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchi02.py::makeCashDFRange
+    source_system: LEGACY_SQL_SERVER
+    source_tables: [cjtrn, cjcja, cjdpc, cjddc, gbper, Gbofi, cjtmv, gbcon, gblog]
+    sap_object: UNKNOWN
+    sap_pk: NroTransaccion
+    secondary_ids: [SaleCode, ClientCode, SellerCode, SubsidiaryCode]
+    business_date: CashDate
+    update_date: TSCash
+    cancellation_field: cjtrnstat/cjdpcstat
+    cancellation_semantics: "Legacy active-row filters; cancellation mapping UNKNOWN"
+    amount_fields: [CashTotal, CashTotalU$s, TC]
+    currency_fields: [CodMoneda, Moneda]
+    legacy_output: cash-YYYY-MM-DD.parq
+    historical_range: "2019-01 through 2022-04 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [FTelchi_SQL_Server, legacy_absolute_DS_path]
+    status: CHANGE_REQUIRED
+    migration_action: BLOCKED
+    notes: "SAP current equivalent and reconciliation key are not established."
+
+  - dataset: accounts_receivable
+    domain: accounts_receivable
+    legacy_extractor: Insiding/DataScience/SrvRest/srvSyncTelchi02.py::makeCuentasxCobrarDFRange
+    source_system: LEGACY_SQL_SERVER
+    source_tables: [occli, octpc, ocmpc, gblog, gbofn, gbper, cjdpc, cntrb, cncba, cnbco, ocvia]
+    sap_object: UNKNOWN
+    sap_pk: CuentaxCobrarCode
+    secondary_ids: [CreditoNumber, CreditoNumberOrigen, PersonCode, OperationType]
+    business_date: CuentaxCobrarCodeDate
+    update_date: TSCuentaxCobrar
+    cancellation_field: OccliStat/OcmpcStat
+    cancellation_semantics: "Legacy active-row filters; cancellation mapping UNKNOWN"
+    amount_fields: [Importe]
+    currency_fields: [MoneyType]
+    legacy_output: cuentasxCobrar-YYYY-MM-DD.parq
+    historical_range: "2020-01 through 2022-02 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [FTelchi_SQL_Server, legacy_absolute_DS_path]
+    status: CHANGE_REQUIRED
+    migration_action: BLOCKED
+    notes: "Do not equate this directly with ORCT without a documented reconciliation."
+
+  - dataset: product_sale_cost_day
+    domain: costs
+    legacy_extractor: Insiding/DataScience/SrvRest/syncCosto01.py::makeCostDay
+    source_system: LEGACY_SQL_SERVER_AND_ARANGODB
+    source_tables: [purchase_parquet, purchaseExpense_parquet, ArangoDB.ivkit, ArangoDB.ivkitInsumos]
+    sap_object: UNKNOWN
+    sap_pk: ProductCode
+    secondary_ids: [TS]
+    business_date: TS
+    update_date: TS
+    cancellation_field: UNKNOWN
+    cancellation_semantics: UNKNOWN
+    amount_fields: [CostU, PurchaseProductPriceFinal, ExpenseBS]
+    currency_fields: [Currency, TypeChange]
+    legacy_output: ProductSaleCostDay-YYYY-MM-DD.parq
+    historical_range: "2021-12 through 2022-03 observed in legacy DS"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: "UNKNOWN globally"
+    dependencies: [purchase_parquet, purchaseExpense_parquet, ArangoDB, Dask]
+    status: CHANGE_REQUIRED
+    migration_action: DEPRECATED
+    notes: "Uses fixed ExpenseBS factor 6.97 and mutates ArangoDB; not a read-only extractor."
+
+  - dataset: sales_targets
+    domain: sales_targets
+    legacy_extractor: tb1/i-MotorSoft/SrvRest/faTB1Srv02.py::getObjetiveSale
+    source_system: SAP_HANA
+    source_tables: [TELCHI.@OBJ_VENTAS_C, TELCHI.@OBJ_VENTAS_L, TELCHI.OSLP, TELCHI.OHEM, TELCHI.OUBR]
+    sap_object: "@OBJ_VENTAS_C/@OBJ_VENTAS_L"
+    sap_pk: "Code+Codigo_Vendedor+Month"
+    secondary_ids: [Codigo_Vendedor, empID, branch, Categoria_Vendedor]
+    business_date: Month
+    update_date: UNKNOWN
+    cancellation_field: UNKNOWN
+    cancellation_semantics: UNKNOWN
+    amount_fields: [ObjetivoM]
+    currency_fields: [UNKNOWN]
+    legacy_output: in_memory_dataframe_only
+    historical_range: "Current HANA headers: 8 rows, Code range observed L1-2023..S2-2025; current line table has 0 rows"
+    current_source: SAP_HANA
+    parquet_pyarrow_version: NOT_APPLICABLE
+    dependencies: [HANA_SQLAlchemy_legacy, faTB1Srv02]
+    status: BLOCKED
+    migration_action: CHANGE_REQUIRED
+    notes: "HANA validation 2026-08-17: all five objects exist; @OBJ_VENTAS_C has 8 rows, @OBJ_VENTAS_L has 0 rows, no U_VENDEDOR rows and monthly bounds are NULL. The legacy getObjetiveSale semantics cannot be reproduced from current data."

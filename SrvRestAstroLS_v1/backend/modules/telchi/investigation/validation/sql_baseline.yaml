@@ -1,0 +1,643 @@
+baseline_name: telchi_hana2_sql_baseline
+baseline_version: '1'
+status: TEAM360_TELCHI_HANA_SQL_VALIDATION_PARTIAL
+generated_from:
+- static_legacy_code_inspection
+- srvSyncTelchiSB101.py
+- sapb1Tools01.py
+- faTB1Srv02.py
+legacy_modified: false
+sql_files_extracted: 25
+domains:
+  sales:
+    legacy_functions:
+    - file: srvSyncTelchiSB101.py
+      function: makeSaleDFRange
+      variant: A (primary production)
+    - file: sapb1Tools01.py
+      function: makeSaleDFRange
+      variant: B (evolved, adds TransId/UserSign/DocDueDate)
+    sql_files:
+      legacy: sql/legacy_hana2/sales/sales_legacy.sql
+      legacy_evolved: sql/legacy_hana2/sales/sales_legacy_evolved.sql
+    sap_objects:
+    - OINV
+    - INV1
+    - OSLP
+    grain: DocEntry + line
+    sap_identifiers:
+    - DocEntry
+    - DocNum
+    - CardCode
+    - ItemCode
+    - WhsCode
+    date_filter: OINV.DocDate
+    fields:
+    - DocEntry
+    - NumAtCard
+    - Series
+    - DocNum
+    - CardCode
+    - CardName
+    - DocTotal
+    - DiscSum
+    - PaidSum
+    - SellerCodeSB1 (SlpCode)
+    - SellerNameSB1 (OSLP.SlpName subquery)
+    - UpdateDate
+    - UpdateTS
+    - DocDate
+    - DocTime
+    - DocStatus
+    - U_ESTADOFC
+    - DocSubType
+    - ItemCode
+    - Dscription (aliased as ItemName in Python)
+    - GPBefDisc
+    - Quantity (aliased as ItemSaleCant in Python)
+    - GTotal (aliased as ItemSale after Python transform)
+    - U_DESCLINEA
+    - WhsCode
+    - U_TYPE
+    python_transforms:
+    - SumGTotal = groupby(DocEntry).sum(GTotal)
+    - CoefGTotal = GTotal / SumGTotal
+    - DescLineR = (SumGTotal - DocTotal) * CoefGTotal
+    - GtotalR = GTotal - DescLineR (aliased as ItemSale)
+    - YMD, YM, Y = date parts
+    - BaseRef = "VACIO" (hardcoded)
+    - merge with sapWhsOfficeName.xlsx on WhsCode
+    candidate_changes:
+    - id: SALES-001
+      description: Add LineNum for stable line identity
+      status: ACCEPTED
+      file: sql/current/sales/sales_v1_linenum.sql
+    - id: SALES-002
+      description: Expose CANCELED instead of silently including all
+      status: DOCUMENTED_PENDING
+    - id: SALES-003
+      description: Replace hardcoded BaseRef="VACIO" with actual value if available
+      status: DOCUMENTED_PENDING
+    issues:
+    - Legacy does NOT select LineNum; DocEntry+ItemCode has duplicates.
+    - Legacy does NOT select CANCELED.
+    - BaseRef is hardcoded as "VACIO" in Python, not from SQL.
+    - sapb1Tools01 variant adds TransId, UserSign, DocDueDate.
+    validation_status: CURRENT_VALIDATED
+    hana_validation: PASS
+    report: validation/sql_baseline/reports/sales_validation.json
+  credit_notes:
+    legacy_functions:
+    - file: srvSyncTelchiSB101.py
+      function: makeNCDFRange
+    - file: sapb1Tools01.py
+      function: makeNCDFRange
+    sql_files:
+      legacy: sql/legacy_hana2/credit_notes/credit_notes_legacy.sql
+    sap_objects:
+    - ORIN
+    - RIN1
+    - OSLP
+    grain: DocEntry + line
+    sap_identifiers:
+    - FDocEntry
+    - FDocNum
+    - CardCode
+    - BaseRef
+    date_filter: ORIN.DocDate
+    fields:
+    - FDocEntry (aliased from DocEntry)
+    - FNumAtCard
+    - FSeries
+    - FDocNum
+    - CardCode
+    - CardName
+    - FDocTotal (DocTotal * -1)
+    - FDiscSum
+    - FPaidSum
+    - SellerCodeSB1
+    - SellerNameSB1
+    - UpdateDate
+    - UpdateTS
+    - DocDate
+    - DocTime
+    - DocStatus
+    - FU_ESTADOFC
+    - ItemCode
+    - Dscription
+    - GPBefDisc
+    - Quantity (Quantity * -1)
+    - GTotal (GTotal * -1)
+    - FU_DESCLINEA
+    - WhsCode
+    - U_TYPE
+    - BaseRef (from RIN1)
+    python_transforms:
+    - SumGTotal = groupby(FDocEntry).sum(GTotal)
+    - CoefGTotal = GTotal / SumGTotal
+    - DescLineR = (abs(SumGTotal) - abs(FDocTotal)) * CoefGTotal
+    - GtotalR = (abs(GTotal) - abs(DescLineR)) * -1
+    - YMD, YM, Y = date parts
+    - NumAtCard fillna "VACIO"
+    - BaseRef fillna "VACIO"
+    - merge with sapWhsOfficeName.xlsx
+    candidate_changes:
+    - id: CREDIT_NOTES-001
+      description: Add LineNum for stable line identity
+      status: ACCEPTED
+      file: sql/current/credit_notes/credit_notes_v1_linenum.sql
+    - id: CREDIT_NOTES-002
+      description: Expose CANCELED field
+      status: DOCUMENTED_PENDING
+    - id: CREDIT_NOTES-003
+      description: Add BaseEntry/BaseLine for document linkage
+      status: DOCUMENTED_PENDING
+    issues:
+    - Amounts negated in SQL (DocTotal*-1, Quantity*-1, GTotal*-1).
+    - Legacy does NOT select LineNum.
+    - Legacy does NOT select CANCELED.
+    - BaseRef has null rows and requires SAP linkage evaluation.
+    validation_status: CURRENT_VALIDATED
+    hana_validation: PASS
+    report: validation/sql_baseline/reports/credit_notes_validation.json
+  inventory_movements:
+    legacy_functions:
+    - file: srvSyncTelchiSB101.py
+      function: makeMoveProductRange
+    - file: sapb1Tools01.py
+      function: makeMoveProductRange
+    sql_files:
+      base: sql/legacy_hana2/inventory_movements/inventory_base.sql
+      aux_invoice_context: sql/legacy_hana2/inventory_movements/inventory_aux_invoice_context.sql
+      aux_delivery_context: sql/legacy_hana2/inventory_movements/inventory_aux_delivery_context.sql
+      aux_customer_financial: sql/legacy_hana2/inventory_movements/inventory_aux_customer_financial.sql
+      aux_users: sql/legacy_hana2/inventory_movements/inventory_aux_users.sql
+      aux_sellers: sql/legacy_hana2/inventory_movements/inventory_aux_sellers.sql
+    sap_objects:
+    - OINM
+    - OINV
+    - ODLN
+    - DLN1
+    - OCRD
+    - OUSR
+    - OSLP
+    grain: TransNum
+    sap_identifiers:
+    - TransNum
+    - BASE_REF
+    - DocLineNum
+    - ItemCode
+    - Warehouse
+    date_filter: OINM.DocDate
+    fields:
+    - TransNum
+    - TransType
+    - BASE_REF
+    - DocLineNum
+    - Ref1
+    - Ref2
+    - Comments
+    - JrnlMemo
+    - DocDate
+    - DocDueDate
+    - DocTime
+    - ClientCode (CardCode)
+    - ClientName (CardName)
+    - ItemCode
+    - ItemName (Dscription)
+    - InQty
+    - OutQty
+    - CostTotal (TransValue)
+    - CostU (CalcPrice)
+    - ItemSaleU (Price / 0.87)
+    - Balance
+    - DManCode (SlpCode)
+    - Warehouse
+    - UserSign
+    auxiliary_queries:
+    - DF13: Invoice context (TransType=13) from OINV
+    - DF15: Delivery context (TransType=15) from ODLN/DLN1/OINV
+    - DFOCRD: Customer financial from OCRD
+    - DFOUSR: Users from OUSR
+    - DFOSLP: Sellers from OSLP
+    python_transforms:
+    - concat DF13 + DF15
+    - merge with base on TransType + base_ref
+    - merge with OCRD, OUSR, OSLP
+    - drop_duplicates()
+    - TransTypeStr = str(TransType)
+    - YMD, YM, Y = date parts
+    - fillna(0) on InQty, OutQty (INEFFECTIVE — no assignment)
+    - ItemSale = ItemSaleU * OutQty
+    - ItemName fillna 'VACIO'
+    - SalePlazo = SaleDocDueDate - SaleDocDate
+    - DeliveryDays = DocDate - SaleDocDate
+    - TransType==14: ItemSale = ItemSaleU * InQty * (-1)
+    known_bugs:
+    - id: LEGACY_BUG_BASE_REF_CASE_MISMATCH
+      description: SQL column is BASE_REF but Python merge uses lowercase base_ref
+      impact: CONFIRMED runtime KeyError; the active makeMoveProductRange returns
+        None so document-context enrichment never executed in this variant
+      status: CONFIRMED
+    - id: LEGACY_BUG_FILLNA_INEFFECTIVE
+      description: fillna(0) without assignment does nothing
+      impact: CONFIRMED; InQty/OutQty/ItemName/date-diff fills are no-ops
+      status: CONFIRMED
+    - id: LEGACY_BUG_PRICE_087
+      description: Price/0.87 formula is hardcoded, origin unknown
+      impact: ItemSaleU/legacy_adjusted_price derivation; origin not evidenced
+      status: ORIGIN_UNKNOWN - isolated as legacy_adjusted_price in current, raw Price
+        preserved
+    candidate_changes:
+    - id: INVENTORY-001
+      description: current v1 base contract on OINM - raw fields, BaseRef naming,
+        legacy_adjusted_price isolated, no joins
+      status: IMPLEMENTED_AND_VALIDATED (gate TELCHI_INVENTORY_CURRENT_BASE_PASS on
+        Feb+Mar)
+    - id: INVENTORY-002
+      description: Resolve enrichment join safety one at a time (OCRD/OUSR/OSLP/header
+        links) - all key-unique; delivery->invoice leg is the only multiplication-risk
+        point
+      status: JOIN_SAFETY_ASSESSED - PENDING_INCREMENTAL_IMPLEMENTATION
+    - id: INVENTORY-003
+      description: Explicit TransType mapping (transtype_map.yaml); raw TransType
+        preserved; unknown types kept
+      status: MAPPING_RESOLVED_MAIN - UNKNOWN_TYPES_PRESERVED
+    issues:
+    - Multiple auxiliary queries execute successfully but have duplicate merge keys
+      (legacy simulation).
+    - Legacy Python merge contract fails at runtime (BASE_REF vs base_ref): document-context
+        enrichment never executed in active variant.
+    - TransType values beyond 13/14/15 are present (14 distinct codes) and now explicitly
+      mapped with evidence; UNKNOWN types preserved raw.
+    validation_status: CURRENT_VALIDATED
+    hana_validation: PASS
+    grain_evidence:
+      base_grain: 'TransNum unique per row (CONFIRMED Feb 2023: 133689/133689; Mar
+        2023: 174635/174635)'
+      source_grain: TransNum
+      analytical_grain: TransNum
+      synthetic_pk: NOT_REQUIRED
+      transtype_resolved:
+      - 13
+      - 14
+      - 15
+      - 16
+      - 20
+      - 21
+      - 59
+      - 60
+      - 67
+      transtype_unknown_preserved:
+      - 18
+      - 19
+      - 69
+      - 162
+      - 202
+      - 10000071
+    current_sql: sql/current/inventory_movements/inventory_movements_v1_base.sql
+    reports_dir: validation/inventory_movements/
+    report: validation/sql_baseline/reports/inventory_movements_validation.json
+    transtype_semantic_status: TRANSTYPE_MAP_VALIDATED
+    transtype_confirmed: 14
+    transtype_medium: 1
+    transtype_unknown: 0
+    corrections_from_previous_phase: 7
+    docnum_collision_rate: 2.5%
+    line_link_pass_rate: 7/8 types (TT=202 DocLineNum=-1 is expected)
+  products:
+    legacy_functions:
+    - file: srvSyncTelchiSB101.py
+      function: makeProduct
+    - file: srvSyncTelchiSB101.py
+      function: makeProductPropiety
+    - file: sapb1Tools01.py
+      function: makeProduct
+    - file: sapb1Tools01.py
+      function: makeProductPropiety
+    sql_files:
+      base: sql/legacy_hana2/products/products_base.sql
+      cost_avg_60d: sql/legacy_hana2/products/products_cost_avg_60d.sql
+      properties_template: sql/legacy_hana2/products/products_properties_template.sql
+      bom_towh: sql/legacy_hana2/products/products_bom_towh.sql
+    sap_objects:
+    - OITM
+    - OITB
+    - OMRC
+    - OINM
+    - OITT
+    - OITG
+    grain: ItemCode
+    sap_identifiers:
+    - ItemCode
+    - ItmsGrpCod
+    - FirmCode
+    - U_CODACTIVE
+    fields:
+    - ItemCode
+    - ItemName
+    - U_CODACTIVE
+    - U_PRODUCE
+    - LastPurPrc
+    - LastPurCur
+    - LastPurDat
+    - OnHand
+    - ItmsGrpCod
+    - Grupo (OITB.ItmsGrpNam subquery)
+    - InvntryUom
+    - FirmCode
+    - Linea (OMRC.FirmName subquery)
+    - frozenFor
+    - U_FormaFarmac
+    - SubGrupo (U_SUBGRUPO)
+    auxiliary_queries:
+    - CostoUAvg60: AVG(CalcPrice) from OINM where DocDate >= ADD_DAYS(CURRENT_DATE,
+        -60)
+    - Properties: QryGroup1..64 expansion via OITG
+    - ToWH: Latest warehouse from OITT using ROW_NUMBER()
+    python_transforms:
+    - assign_value(): ItemUN from first letter of ItemCode (L=Litel, M=Medi, else=Otros)
+    - u_produce fillna 'Vacio' then rename to MatrizE
+    - FormaFarmac mapping via DictFF
+    - merge with properties, cost, ToWH
+    known_bugs:
+    - id: LEGACY_BUG_U_PRODUCE_CASE
+      description: SQL selects U_PRODUCE but Python accesses u_produce (lowercase)
+      impact: Column access may fail or return unexpected results
+    candidate_changes: []
+    issues:
+    - Properties query executes 64 separate queries.
+    - ToWH uses ROW_NUMBER() to get latest; uniqueness validated.
+    - Cost query uses CURRENT_DATE and does not reproduce February 2023.
+    validation_status: VALIDATED
+    hana_validation: PASS
+    report: validation/sql_baseline/reports/products_validation.json
+  customers:
+    legacy_functions:
+    - file: srvSyncTelchiSB101.py
+      function: makeClient
+    - file: srvSyncTelchiSB101.py
+      function: makeClientPropiety
+    - file: sapb1Tools01.py
+      function: makeClient
+    - file: sapb1Tools01.py
+      function: makeClientPropiety
+    sql_files:
+      base: sql/legacy_hana2/customers/customers_base.sql
+      properties_template: sql/legacy_hana2/customers/customers_properties_template.sql
+    sap_objects:
+    - OCRD
+    - OPLN
+    - OCQG
+    grain: CardCode
+    sap_identifiers:
+    - CardCode (aliased as ClientCode)
+    fields:
+    - ClientCode (CardCode)
+    - ClientName (CardName)
+    - ClientType (CardType)
+    - ClientGroupCode (GroupCode)
+    - ClientCity (City)
+    - ListNum
+    - PriceListName (OPLN.ListName subquery)
+    auxiliary_queries:
+    - Properties: QryGroup1..64 expansion via OCQG
+    python_transforms:
+    - ClientCode fillna 'Vacio'
+    - ClientName fillna 'Vacio'
+    - ListNum fillna 0
+    - PriceListName fillna 'Vacio'
+    - merge with properties
+    known_bugs:
+    - id: LEGACY_BUG_EXCEPT_E
+      description: 'except e: instead of except Exception as e:'
+      impact: NameError at runtime if exception occurs
+    candidate_changes: []
+    issues:
+    - Properties query executes 64 separate queries.
+    validation_status: VALIDATED
+    hana_validation: PASS
+    report: validation/sql_baseline/reports/customers_validation.json
+  warehouses:
+    legacy_functions:
+    - file: srvSyncTelchiSB101.py
+      function: makeWhareHouse
+    - file: sapb1Tools01.py
+      function: makeWhareHouse
+    sql_files:
+      base: sql/legacy_hana2/warehouses/warehouses_base.sql
+    sap_objects:
+    - OITW
+    grain: ItemCode + WhsCode (composite)
+    sap_identifiers:
+    - ItemCode
+    - WhsCode
+    fields:
+    - ItemCode
+    - WhsCode
+    - OnHand
+    - IsCommited
+    - OnOrder
+    - MinStock
+    - MaxStock
+    - AvgPrice
+    - createDate
+    - updateDate
+    - userSign2
+    - RevenuesAc
+    - StockValue
+    - WipAcct
+    python_transforms:
+    - fillna on createDate/updateDate (INEFFECTIVE — no assignment)
+    known_bugs:
+    - id: LEGACY_BUG_FILLNA_INEFFECTIVE
+      description: fillna without assignment does nothing
+      impact: Null dates remain null
+    candidate_changes: []
+    issues:
+    - No date filter — full table scan.
+    - fillna on dates is ineffective in legacy Python, but SQL contract is valid.
+    validation_status: VALIDATED
+    hana_validation: PASS
+    report: validation/sql_baseline/reports/warehouses_validation.json
+  payments:
+    legacy_functions:
+    - file: sapb1Tools01.py
+      function: makePaymentRange
+    sql_files:
+      base: sql/legacy_hana2/payments/payments_base.sql
+    sap_objects:
+    - ORCT
+    grain: DocEntry
+    sap_identifiers:
+    - DocEntry
+    - DocNum
+    - TransId
+    - CardCode
+    date_filter: ORCT.DocDate
+    fields:
+    - TransId
+    - CashSum
+    - TrsfrSum
+    - CreditSum
+    - CheckSum
+    - DocTotal
+    - DocTotalFC
+    - DocEntry
+    - DocNum
+    - DocType
+    - Canceled
+    - DocDate
+    - DocTime
+    - DocDueDate
+    - TaxDate
+    - ClientCode (CardCode)
+    - ClientName (CardName)
+    - Ref1
+    - Comments
+    - JrnlMemo
+    python_transforms:
+    - YMD, YM, Y = date parts
+    candidate_changes:
+    - id: PAYMENTS-001
+      description: Preserve Canceled and expose cancellation profile
+      status: ACCEPTED_NO_SQL_CHANGE
+    issues:
+    - Canceled field is preserved (not filtered), as required for analysis.
+    - 155 canceled payments exist in the February 2023 window; 1929 in 2023.
+    validation_status: VALIDATED
+    hana_validation: PASS
+    report: validation/sql_baseline/reports/payments_validation.json
+  reconciliation:
+    legacy_functions:
+    - file: sapb1Tools01.py
+      function: makeReconRange
+    sql_files:
+      base: sql/legacy_hana2/reconciliation/reconciliation_base.sql
+    sap_objects:
+    - OITR
+    - ITR1
+    - OUSR
+    grain: ReconNum + LineSeq
+    sap_identifiers:
+    - ReconNum
+    - TransId
+    - TransRowId
+    - SrcObjAbs
+    - CancelAbs
+    date_filter: OITR.ReconDate
+    fields:
+    - ReconNum
+    - IsCard
+    - ReconType
+    - ReconDate
+    - Total
+    - ReconCurr
+    - Canceled
+    - CancelAbs
+    - IsSystem
+    - InitObjTyp
+    - CreateDate
+    - CreateTime
+    - UserSign
+    - OUSR-USER_CODE
+    - IsMultiBP
+    - IsElectr
+    - CreateTS
+    - UpdateTS
+    - ObjType
+    - ITR1-ReconNum
+    - LineSeq
+    - ShortName
+    - TransId
+    - TransRowId
+    - SrcObjTyp
+    - SrcObjAbs
+    - ReconSum
+    - ReconSumFC
+    - ReconSumSC
+    - SumMthCurr
+    - IsCredit
+    - Account
+    - CashDisSum
+    - InstID
+    python_transforms:
+    - YMD, YM, Y = date parts from ReconDate
+    candidate_changes: []
+    issues:
+    - Inner join OITR-ITR1 means only reconciliations with lines.
+    - Cancellation states N/C/Y are preserved and profiled.
+    validation_status: VALIDATED
+    hana_validation: PASS
+    report: validation/sql_baseline/reports/reconciliation_validation.json
+  sales_targets:
+    legacy_functions:
+    - file: faTB1Srv02.py
+      function: getObjetiveSale
+    sql_files:
+      header: sql/legacy_hana2/sales_targets/sales_targets_header.sql
+      lines: sql/legacy_hana2/sales_targets/sales_targets_lines.sql
+    sap_objects:
+    - '@OBJ_VENTAS_C'
+    - '@OBJ_VENTAS_L'
+    - OSLP
+    - OHEM
+    - OUBR
+    grain: Code + Codigo_Vendedor + Month (expected)
+    status: BLOCKED_EXTERNAL_DATA
+    notes:
+    - '@OBJ_VENTAS_C has headers (8 rows observed)'
+    - '@OBJ_VENTAS_L has 0 rows — cannot reproduce full semantics'
+    - Connectivity is not the blocker; data availability is
+    validation_status: BLOCKED_EXTERNAL_DATA
+    hana_validation: PASS_DATA_BLOCKED
+    report: validation/sql_baseline/reports/sales_targets_validation.json
+  masters:
+    legacy_functions:
+    - file: sapb1Tools01.py
+      function: makeOITB
+    - file: sapb1Tools01.py
+      function: makeOACT
+    - file: sapb1Tools01.py
+      function: makeOWHS
+    sql_files:
+      oitb: sql/legacy_hana2/masters/masters_oitb.sql
+      oact: sql/legacy_hana2/masters/masters_oact.sql
+      owhs: sql/legacy_hana2/masters/masters_owhs.sql
+      oslp: sql/legacy_hana2/masters/masters_oslp.sql
+      ousr: sql/legacy_hana2/masters/masters_ousr.sql
+    sap_objects:
+    - OITB
+    - OACT
+    - OWHS
+    - OSLP
+    - OUSR
+    validation_status: VALIDATED
+    hana_validation: PASS
+    report: validation/sql_baseline/reports/masters_validation.json
+summary:
+  total_domains: 10
+  domains_with_sql_extracted: 10
+  domains_pending_hana_validation: 0
+  domains_blocked: 1
+  domains_validated: 9
+  domains_partial: 0
+  total_sql_files: 25
+  known_bugs_identified:
+  - LEGACY_BUG_BASE_REF_CASE_MISMATCH
+  - LEGACY_BUG_FILLNA_INEFFECTIVE
+  - LEGACY_BUG_PRICE_087
+  - LEGACY_BUG_U_PRODUCE_CASE
+  - LEGACY_BUG_EXCEPT_E
+  candidate_changes_total: 9
+  migration_recommendations:
+    sales: REUSE_QUERY_WITH_SMALL_FIXES
+    credit_notes: REUSE_QUERY_WITH_SMALL_FIXES
+    inventory_movements: REUSE_SEMANTICS_ONLY
+    products: REUSE_QUERY_AND_SEMANTICS
+    customers: REUSE_QUERY_AND_SEMANTICS
+    warehouses: REUSE_QUERY_AND_SEMANTICS
+    payments: REUSE_QUERY_AND_SEMANTICS
+    reconciliation: REUSE_QUERY_AND_SEMANTICS
+    sales_targets: BLOCKED_EXTERNAL_DATA
+    masters: REUSE_QUERY_AND_SEMANTICS
