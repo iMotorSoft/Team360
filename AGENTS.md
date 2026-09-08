@@ -55,6 +55,20 @@ La politica detallada y fuente humana canonica es `lat.md/team360-global-orchest
 | Deploy frontend/backend | politica `team360-*-rsync-deploy-policy.md` correspondiente |
 | Diagramas | `lat.md/team360-mermaid-diagram-policy.md` |
 
+## TELCHI CONTEXT
+
+Esta regla aplica a cualquier agente que consuma `AGENTS.md`; la autoridad detallada permanece únicamente en el contexto canónico Telchi.
+
+Para toda tarea Telchi, antes de elegir directorios, ejecutar scripts, crear archivos o tomar decisiones arquitectónicas, leer `SrvRestAstroLS_v1/backend/modules/telchi/CONTEXT.md`. Resolver en orden `ENTITY=TELCHI → DOMAIN → STAGE → SOURCES / OUTPUTS / POLICIES` y solo entonces elegir roots, ejecutar o escribir.
+
+- `INVESTIGATION_BY_DEFAULT=YES`: si Telchi está confirmado y Development o Production no son explícitos, usar `STAGE=INVESTIGATION`.
+- Una intención explícita de construir capacidad usa `STAGE=DEVELOPMENT` bajo el módulo Telchi y fuera de `investigation/`; una promoción explícita usa `STAGE=PRODUCTION` y requiere su gate.
+- SAP/HANA es una source Telchi, no una stage. En conversación Telchi activa, atajos como “SAP ventas”, “HANA compras”, “revisar deudas” o “probar producción” heredan Telchi; fuera de ese contexto, SAP/HANA por sí solos no implican Telchi.
+- Data Lake es infraestructura/output, no development root. `DATA_ROOT` es `DATA ONLY` y nunca `DEVELOPMENT_ROOT`.
+- Los secretos permanecen fuera de Git en `PRIVATE_ROOT`.
+
+No duplicar aquí la arquitectura Telchi detallada; `CONTEXT.md` es la autoridad.
+
 El skill `.agents/skills/team360-project/SKILL.md` conserva workflows detallados. No cargarlo junto con todas las politicas por defecto; usarlo cuando la tarea requiera su flujo especifico.
 
 ## Limites de implementacion
