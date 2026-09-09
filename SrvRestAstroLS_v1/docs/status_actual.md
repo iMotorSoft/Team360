@@ -35,6 +35,88 @@ Referencias canonicas:
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
 - `lat.md/team360-global-orchestration.md`
 
+## Gate 2026-09-02 — Telchi: casos de excepción de crédito V1 (287 ventas con vencido)
+
+Estado: PASS (`TELCHI_CREDIT_EXCEPTION_CASES_V1_PASS`) con degradaciones declaradas
+(`TN_SOURCE_INSPECTION=PARTIAL`, `MANAGEMENT_APPROVAL_TRACEABILITY=EXTERNAL_TO_SAP`,
+`DMS_HUMAN_OPERATOR_IDENTITY=UNRESOLVED`, `HISTORICAL_AUTHORIZATION=UNAVAILABLE`).
+Trabajo en el workspace Telchi (`ai/lab/dataclient/telchi`): reporte
+`docs/credit_exception_cases_v1_report.md`, scripts y evidencia en
+`validation/credit_exception/` y `validation/credit_exception/evidence/`.
+
+Las 287 ventas con vencido impago en la fecha de la venta fueron REVALIDADAS con
+reconstrucción histórica exacta (`OINV/ORIN/ORCT/RCT2/OITR/ITR1`, semántica as-of,
+ventana 2026-01-01..09-01): 287/287 confirmadas, 0 falsos positivos por
+cancelada/pagada/NC previa. Universo exacto resultante: 2,318 ventas con vencido
+en fecha (la cota previa de 287 era inferior porque no podía ver ventas cobradas
+después). Clasificación por causa real: contado Retail One cubierto (825/2318; 58/287),
+flag excepción VENCREVENC (522/2318; 12/287), flujo entrega `DlnLimit=N` (363/2318;
+140/287), autorización FULL/override en motor SAP (351/2318; 40/287), pedido previo
+sin vencidos (188/2318; 15/287), log de autorización Retail (108/2318), canal técnico
+DMS (14), nota de crédito (12). UNEXPLAINED=0; UNRESOLVED=19/287 y 43/2,318 con
+DocEntry preservado (microventas R1 sin liquidar en SAP). Pago: 106 liquidadas / 181
+abiertas (concilia el conteo previo de 86 cobradas; la diferencia es por NC y
+reconciliaciones no-ORCT). 39 sobre límite reconstruidos (exacto as-of: 178).
+`@SO1_01LOGAUTORIZA` inventariado completo (16,401 eventos; join VENTA→folio
+1,501/1,710 emparejadas; 108 autorizaciones retail). Tests: 35 nuevos LOOP TEST +
+78 previos = 113 PASS; cardinalidad NO_SILENT_FANOUT; SAP/HANA writes = 0.
+
+## Gate 2026-09-02 — Telchi: agrupación económica de las 268 ventas explicadas V1
+
+Estado: PASS (`TELCHI_CREDIT_EXPLAINED_CASES_ECONOMIC_GROUPING_V1_PASS`), continuando
+`TELCHI_CREDIT_EXCEPTION_CASES_V1_PASS`. Reporte `docs/credit_explained_cases_economic_grouping_v1_report.md`,
+scripts/evidencia en `validation/credit_exception_economic/`.
+
+Las **268 ventas explicadas** (287 baseline − 19 UNRESOLVED) se agruparon en 5 grupos de negocio
+únicos (sin doble conteo): Usuario FULL 40 · Flujo previo (entrega/pedido) 155 · Contado Retail One 58 ·
+Cliente excepción 12 · Integración/ajuste 3 = **268**. Monto bruto **Bs 318,051.61**; cobrado
+Bs 63,686.61 (20.0%); por NC Bs 1,392.00; **abierto Bs 252,973.00** (79.5%). Período
+2026-01-12 → 2026-09-01. Moneda **BS** única (DocCur='BS' verificado en HANA) → suma directa válida.
+Riesgo abierto por mecanismo: **Usuario FULL Bs 180,396.95 (71.3%)** (8 usuarios, SAP Direct 37/40;
+lzarraga/yardaya/cvallejos/jirahola principales) + **Entrega previa Bs 71,282.55 (28.2%)**
+(`DlnLimit=N`; cliente clave C010341 LA REJA 40 ventas Bs 47,259 abierto) = 99.5% del abierto;
+excepción Bs 1,293.50 y contado 0. CUSTOMER EXCEPTION: solo **C000398 PEDIDOSYA** (VENCREVENC='Y');
+revalidado C011358 YANGO con flag pero 0 ventas en ventana. Ist. previa en la venta (FULL+excepción):
+vencido Bs 596,866 · exposición Bs 1,407,688 · 6 sobre límite. Evolución mensual crece hacia jul-ago
+(ago 168 ventas, Bs 215,711 = 67.8%); no estable. Tests: 26 nuevos económicos + 113 previos = 139 PASS;
+smoke HANA real 12/12 (3+3+3+3 por grupo); SAP/HANA writes = 0.
+
+## Gate 2026-09-02 — Telchi: riesgo/aging del saldo abierto (open vs vencido) V1
+
+Estado: PASS (`TELCHI_CREDIT_OPEN_RISK_AGING_V1_PASS`), continuando
+`TELCHI_CREDIT_EXPLAINED_CASES_ECONOMIC_GROUPING_V1_PASS`. Reporte
+`docs/credit_open_risk_aging_v1_report.md`, scripts/evidencia en `validation/credit_open_risk/`.
+
+De los **Bs 252,973 abiertos** (baseline 2026-09-01, reconciliado Δ=0.00; INV6 1 cuota
+validada 162/162): **Bs 175,928.88 no vencidos** (69.5%) · **Bs 77,044.12 YA vencidos** (30.5%).
+El riesgo está invertido vs el open: el vencido lo domina **Entrega previa (Bs 58,043.85=
+75.3%)** frente a **Usuario FULL (Bs 19,000.27=24.7%)**, porque FULL es venta reciente aún en
+plazo (no vencido 161,396.68). USER FULL: jirahola 11,790 (A3TEK) + cvallejos 5,302 (C011750)
++ soluone 963 + lzarraga 944. DELIVERY: LA REJA C010341 = 47,259 vencido = **61.3% del total**,
+40 ventas todas abiertas/vencidas, máx 184d (timing entrega→factura 0d, vencido=impago).
+Concentración: Top 5 clientes ≈94% del vencido. Vendedores (≠usuario): Mariela Irigoyen 25,606 ·
+Maria F. Menacho 12,165 · Karla Cabello 8,649. Cohorte feb-jul 100% vencida; ago 7.1%.
+Collection rate madurado 41.86% vs 20.02% crudo. Tests 29 nuevos + 139 previos = **168 PASS**;
+smoke HANA real 13/13; `SAP_WRITE_COUNT=0`.
+
+## Gate 2026-09-01 — Telchi: control de crédito × autorizaciones × HANA blocking V1
+
+Estado: PASS (`TELCHI_CREDIT_CONTROL_AUTHORIZATION_TRACEABILITY_V1_PASS`) con
+`TN_SOURCE_INSPECTION=PARTIAL` (SQL del Transaction Notification no legible con la
+cuenta READ ONLY) y las degradaciones autorizadas (historica de permisos, aprobacion,
+operador DMS, posicion crediticia parcial). Trabajo ejecutado en el workspace Telchi
+(`ai/lab/dataclient/telchi`): reporte
+`docs/credit_control_authorization_traceability_v1_report.md`, scripts y evidencia
+en `validation/credit_control/` y `validation/credit_control/evidence/`.
+
+Hallazgos clave: `Autorizaciones_xGrupos.xlsx` reconciliado 170/170 con OUSR;
+"Confirmar desviacion de linea de credito" FULL en 9 de 11 grupos (Almacenes y
+Produccion sin ella); OADM `CreditLimt=Y` / `DlnLimit=N`; TN despacha a 24
+`ACB_TN_*` y OINV/ORDR referencian OCRD+OINV+OCTG; en 2026 hubo 287 ventas con
+vencido impago en la fecha de la venta y 39 sobre limite (86/287 con cobro
+trazado); sin excepcion tecnica registrada; aprobacion de gerencias queda fuera de
+SAP. Tests 26 nuevos + 52 regresion previa PASS; SAP/HANA writes = 0.
+
 ## Gate 2026-08-23 — Flow demo production readiness V1
 
 Estado: PASS en desarrollo
@@ -2960,6 +3042,14 @@ Fecha de corte: `2026-08-17`.
 - No se modificó SAP.
 - No se escribieron Parquet.
 - La VPN quedó activa.
+
+### Método canónico para análisis de vitaminas
+
+- Procedimiento reproducible y reglas de consulta: `/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/telchi_vitamins_lab/README.md`.
+- Implementación del pipeline: `/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/telchi_vitamins_lab/src/` (`catalog.py`, `sales.py`, `metrics.py`, `vitamins_discovery.py` y `build_report.py`).
+- Resultados y reportes derivados: `/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/telchi_vitamins_lab/output/`; el reporte inicial es `reporte_citrato.md` y el volumen por familias está en `data/vitamins_family_volume.csv`.
+- Regla de alcance: `DS/` es entrada inmutable; el análisis separa producto terminado (unidades comerciales) de materia prima (kg), conserva `OBSERVED`/`ASSUMPTION`/`PROJECTED` y no interpreta el PDF técnico como demanda.
+- Para extender el análisis a otra vitamina o suplemento se reutiliza este laboratorio y se agrega el universo normalizado de candidatos, sin crear consultas paralelas.
 
 ## Gate 2026-08-19 — Flow comunicación ciudadana mínima y segura V1
 
