@@ -2,7 +2,7 @@
 """Profilado de grain de OINM (inventory_movements).
 
 Solo ejecutable con HANA accesible (127.0.0.1:30015).
-No usa sudo ni Podman; credenciales desde access/sap/hana.env.
+No usa sudo ni Podman; credenciales desde el secret root privado configurado.
 
 Mide (seccion 8-9 spec):
   - rows total por ventana

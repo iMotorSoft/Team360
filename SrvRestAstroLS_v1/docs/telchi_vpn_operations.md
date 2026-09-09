@@ -14,16 +14,20 @@ La validación de red se limita al perfil `VPN-TELCHI` y al endpoint actual de S
 
 ## Archivos operativos
 
-El XML externo permanece fuera del repositorio y los scripts contienen solo lógica y parámetros no secretos.
+El XML externo permanece fuera del repositorio y del Data Root; los scripts contienen solo lógica y parámetros no secretos. Antes de operar, configurar el root privado absoluto:
+
+```bash
+export TEAM360_TELCHI_SECRET_ROOT=/ruta/privada/externa/telchi
+```
 
 ```text
-/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/access/fortinet/InsidingConfig.conf.txt
+$TEAM360_TELCHI_SECRET_ROOT/fortinet/InsidingConfig.conf.txt
 SrvRestAstroLS_v1/scripts/telchi/fortinet/configure.sh
 SrvRestAstroLS_v1/scripts/telchi/fortinet/connect-strongswan.sh
 SrvRestAstroLS_v1/scripts/telchi/fortinet/validate.sh
 ```
 
-No modificar el XML, copiarlo al repositorio ni imprimir su contenido completo.
+El root y sus subdirectorios deben usar modo `0700`; el XML y los archivos de credenciales, `0600`. No modificar el XML, copiarlo al repositorio ni imprimir su contenido completo. No existe fallback al Data Root.
 
 ## Tipos de credenciales
 
@@ -90,7 +94,8 @@ sudo systemctl enable --now forticlient.service
 El script es idempotente: importa solo si falta el perfil y pide las claves mediante TTY.
 
 ```bash
-SrvRestAstroLS_v1/scripts/telchi/fortinet/configure.sh
+TEAM360_TELCHI_SECRET_ROOT=/ruta/privada/externa/telchi \
+  SrvRestAstroLS_v1/scripts/telchi/fortinet/configure.sh
 ```
 
 La conexión directa, cuando el perfil ya existe, es:
@@ -170,13 +175,14 @@ sudo systemctl disable --now strongswan.service
 El conector traduce en memoria gateway, IKEv1, proposals, DH, ModeConfig y selectors del XML. El PSK se conserva solo en el storage privado externo y XAuth no se persiste.
 
 ```bash
-SrvRestAstroLS_v1/scripts/telchi/fortinet/connect-strongswan.sh
+TEAM360_TELCHI_SECRET_ROOT=/ruta/privada/externa/telchi \
+  SrvRestAstroLS_v1/scripts/telchi/fortinet/connect-strongswan.sh
 ```
 
 En la primera ejecución, el conector solicita el PSK IKE original y crea `strongswan.env` fuera del repositorio con modo `600`. En cada conexión solicita la contraseña VPN/XAuth. No usar la contraseña de backup ni credenciales HANA como PSK.
 
 ```text
-/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/access/fortinet/strongswan.env
+$TEAM360_TELCHI_SECRET_ROOT/fortinet/strongswan.env
 ```
 
 El archivo contiene únicamente `TELCHI_VPN_PSK` y `TELCHI_VPN_USER`; nunca debe copiarse, imprimirse ni agregarse a Git. Las credenciales se cargan mediante archivos root-only efímeros bajo `/etc/swanctl` y se eliminan inmediatamente.
@@ -224,7 +230,8 @@ La validación debe ejecutarse primero sin credenciales HANA y solo contra el en
 El script vigente detecta sesiones e interfaces FortiClient y ejecuta el TCP únicamente si confirma ruta por el túnel.
 
 ```bash
-SrvRestAstroLS_v1/scripts/telchi/fortinet/validate.sh
+TEAM360_TELCHI_SECRET_ROOT=/ruta/privada/externa/telchi \
+  SrvRestAstroLS_v1/scripts/telchi/fortinet/validate.sh
 ```
 
 Debe informar el target exacto:

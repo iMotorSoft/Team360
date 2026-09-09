@@ -1,18 +1,18 @@
 """Shared READ-ONLY HANA connection (project convention).
 
-Never writes. Never hardcodes credentials — reads access/sap/hana.env.
+Never writes. Never hardcodes credentials — reads the configured private HANA env file.
 """
 from __future__ import annotations
 
 import shlex
 from pathlib import Path
 
-from modules.telchi.investigation.paths import INVESTIGATION_ROOT, SECRET_ROOT
+from modules.telchi.investigation.paths import HANA_ENV_FILE, INVESTIGATION_ROOT
 
 from hdbcli import dbapi
 
 TELCHI_ROOT = INVESTIGATION_ROOT
-HANA_ENV = SECRET_ROOT / "sap" / "hana.env"
+HANA_ENV = HANA_ENV_FILE
 
 
 def load_hana_config() -> dict[str, str]:

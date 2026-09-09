@@ -1,8 +1,8 @@
 """Stable locations used by the relocated Telchi investigation.
 
-Python and SQL source live in this package. Physical data, evidence and secrets
-remain external until their dedicated isolation gates are completed. External
-roots are centralized here so investigation modules never depend on the CWD.
+Python and SQL source live in this package. Physical data, evidence and secrets remain external. External roots are
+centralized here so investigation modules never depend on the CWD or place
+private configuration below the physical Data Root.
 """
 from __future__ import annotations
 
@@ -38,8 +38,9 @@ EVIDENCE_ROOT = _external_root(
 )
 SECRET_ROOT = _external_root(
     "TEAM360_TELCHI_SECRET_ROOT",
-    DATA_ROOT / "access",
+    Path("/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi"),
 )
+HANA_ENV_FILE = SECRET_ROOT / "sap" / "hana.env"
 EXTERNAL_FILES_ROOT = _external_root(
     "TEAM360_TELCHI_EXTERNAL_FILES_ROOT",
     Path("/home/issajar/Downloads"),

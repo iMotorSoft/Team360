@@ -5,10 +5,13 @@ set -uo pipefail
 set +x
 umask 077
 
-DEFAULT_TELCHI_ROOT="/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi"
-TELCHI_ROOT="${TELCHI_DATA_ROOT:-$DEFAULT_TELCHI_ROOT}"
-CONFIG_FILE="$TELCHI_ROOT/access/fortinet/InsidingConfig.conf.txt"
-SECRETS_FILE="$TELCHI_ROOT/access/fortinet/strongswan.env"
+: "${TEAM360_TELCHI_SECRET_ROOT:?TEAM360_TELCHI_SECRET_ROOT must point to the external Telchi private root}"
+if [[ "$TEAM360_TELCHI_SECRET_ROOT" != /* ]]; then
+  printf '%s\n' 'SECRET_ROOT_INVALID: TEAM360_TELCHI_SECRET_ROOT must be absolute.' >&2
+  exit 3
+fi
+CONFIG_FILE="$TEAM360_TELCHI_SECRET_ROOT/fortinet/InsidingConfig.conf.txt"
+SECRETS_FILE="$TEAM360_TELCHI_SECRET_ROOT/fortinet/strongswan.env"
 VPN_USERNAME="insiding_vpn"
 SAP_HANA_HOST="192.168.20.20"
 

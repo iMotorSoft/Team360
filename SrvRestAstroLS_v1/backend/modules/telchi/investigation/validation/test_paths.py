@@ -26,6 +26,13 @@ class TestInvestigationPaths(unittest.TestCase):
             with self.assertRaises(ValueError):
                 paths._external_root("TEST_TELCHI_ROOT", Path("/tmp/unused"))
 
+    def test_secret_root_is_independent_from_data_root(self):
+        self.assertNotEqual(paths.SECRET_ROOT, paths.DATA_ROOT / "access")
+        self.assertEqual(
+            paths.HANA_ENV_FILE,
+            paths.SECRET_ROOT / "sap" / "hana.env",
+        )
+
     def test_reference_rejects_escape(self):
         with self.assertRaises(ValueError):
             paths.resolve_path_reference(

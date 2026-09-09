@@ -14,15 +14,14 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from modules.telchi.investigation.paths import HANA_ENV_FILE
+
 
 HANA_HOST = "192.168.20.20"
 HANA_PORT = 30015
 HANA_SCHEMA = "TELCHI"
 HANA_USER = "insiding_hana"
-PRIVATE_ENV_FILE = Path(
-    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/"
-    "telchi/access/sap/hana.env"
-)
+PRIVATE_ENV_FILE = HANA_ENV_FILE
 
 CORE_TABLES = (
     "OINV",

@@ -789,7 +789,9 @@ Si HANA no responde: `STOP_MANUAL_PODMAN_START_REQUIRED`
 | Database | `NDB` |
 | Schema | `TELCHI` |
 | User | `INSIDING_HANA` |
-| Config file | `access/sap/hana.env` |
+| Config file vigente | `$TEAM360_TELCHI_SECRET_ROOT/sap/hana.env` |
+
+> Nota histórica: las secciones de arquitectura posteriores describen el workspace previo a la migración de secretos; `access/` ya no es una instrucción operativa vigente.
 
 **DataScience NO debe:** start/stop Podman, modify VPN, modify networking.
 
