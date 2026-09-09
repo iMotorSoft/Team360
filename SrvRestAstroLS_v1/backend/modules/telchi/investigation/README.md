@@ -1,46 +1,68 @@
 # Telchi Investigation
 
-Este árbol preserva investigación, auditoría, experimentación y evidencia reproducible de Telchi con una estructura reconocible respecto del workspace original.
+**THIS IS INVESTIGATION, NOT DEVELOPMENT OR PRODUCTION RUNTIME.** La autoridad del modelo `ENTITY → DOMAIN → STAGE → SOURCES / OUTPUTS / POLICIES`, la arquitectura y las ubicaciones es [`../CONTEXT.md`](../CONTEXT.md).
 
 ## Propósito
 
-Aquí viven reverse engineering SAP, SQL, contratos descubiertos, semántica, reglas, validadores, tests, backtests, gates, reconciliaciones, documentación y runners HANA de solo lectura.
+Este root contiene la investigación Telchi: reverse engineering, análisis y auditoría SAP, atomicidad, SQL experimental, validación, tests, gates, backtests, reconciliación, reglas descubiertas, inferencias experimentales, documentación y legacy parity.
 
-**NOT PRODUCTION API.** Este package no registra endpoints, schedulers, frontend ni runtime productivo.
+No registra endpoints, routes, schedulers, frontend ni runtime productivo.
 
-## Estructura preservada
+## Estructura actual
 
-La consolidación mantiene `atomic/`, `sql/`, `validation/`, `docs/` y `datalake/commercial_opportunities/`. No distribuye todavía la lógica entre `domain/`, `services/`, `inference/` o adapters productivos.
+La estructura conserva responsabilidades de investigación sin anticipar capas productivas.
 
-## Límites externos temporales
+| PATH | PURPOSE |
+| --- | --- |
+| `atomic/` | Contratos, semántica y extractores atómicos de investigación |
+| `sql/current/` | SQL HANA vigente y validado para investigación |
+| `sql/legacy_hana2/` | SQL legacy preservado como baseline |
+| `validation/` | Tests, gates, auditorías, backtests y reconciliaciones |
+| `docs/` | Reportes y evidencia documental de análisis |
+| `datalake/commercial_opportunities/` | Package Python histórico de investigación; no es el Data Lake físico |
+| `LAT.md`, `DECISIONS.md`, `STATUS_ACTUAL.md` | Decisiones y estado histórico; `../CONTEXT.md` prevalece para arquitectura actual |
 
-El código Python y SQL se resuelven desde este package. Los secretos continúan en el secret root legado aprobado; los datos físicos y la evidencia continúan fuera de Git. `paths.py` hace explícita esa separación temporal sin copiar datos al package.
+## Nueva investigación
 
-La evidencia del gate de consolidación se preserva externamente en `ai/evidence/telchi/investigation-consolidation-v1/`, con clasificación y SHA-256. El safety snapshot está en `ai/backups/telchi-safety-20260902-investigation-consolidation-v1/`.
+No escribir nuevos scripts Telchi de investigación fuera de este root, salvo tooling operacional explícitamente autorizado.
 
-## Ejecución segura
+Los scripts y módulos nuevos deben quedar junto al dominio de investigación correspondiente. Los gates y tests focalizados deben ubicarse en `validation/`, y la documentación analítica en `docs/` cuando no sea documentación operativa del root.
 
-Los imports deben realizarse desde el root de `SrvRestAstroLS_v1/backend`, por ejemplo con `modules.telchi.investigation...`. Los runners HANA conservan intención READ ONLY; no deben ejecutarse sin preflight y verificación de `SAP_WRITE_COUNT=0`.
+## SQL y validation
 
-Los generadores de JSON deben dirigir sus outputs a un evidence root externo antes de usarse de forma habitual. Los artefactos JSON históricos no se versionaron en este package y están preservados en el evidence root.
+El SQL fuente de investigación vive bajo `sql/`; no debe copiarse al Data Root.
 
-## Regla de promoción Investigation → Productive
+Toda semántica nueva debe conservar trazabilidad SAP, cardinalidad, reglas anti-fanout, tests focalizados y evidencia reproducible. Los gates no deben declarar PASS solo por conectividad o HTTP 200.
 
-Una capacidad solo puede salir de `investigation/` mediante promoción explícita cuando cumple todos estos criterios:
+## HANA read-only
 
-1. semántica cerrada;
-2. atomicidad validada;
-3. gate PASS;
-4. contratos definidos;
-5. tests suficientes;
-6. responsabilidad productiva concreta;
-7. servicio, endpoint o consumidor real definido;
-8. independencia de evidence de investigación;
-9. performance adecuada;
-10. lineage preservado.
+SAP Business One / HANA es la fuente operacional y se consulta `READ ONLY` por defecto.
 
-El código productivo no puede importar runners de `investigation/`. La investigación permanece como baseline histórico y regresión reproducible después de cada promoción.
+Antes de ejecutar runners HANA se exige preflight y confirmación de `SAP_WRITE_COUNT=0`. La investigación puede consultar, auditar, reconciliar, validar, medir y extraer datasets aprobados, pero no modificar SAP.
 
-## Próximo gate
+## Datos, secretos y evidencia externa
 
-`TELCHI_DATA_ROOT_ISOLATION_V1` podrá preparar el Data Root físico con `raw/`, `staging/`, `atomic/`, `business/`, `decision/`, `snapshots/` y `manifests/`, sin borrar el source original antes de verificar esta consolidación.
+El código Python, SQL fuente, tests y Markdown viven aquí; los datos y la configuración privada viven fuera de este root.
+
+- Data Root físico: `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi`, exclusivamente `DATA ONLY`.
+- Private Root: `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi`, exclusivamente configuración HANA/VPN y secretos fuera de Git.
+- Legacy Root: `/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience`, consulta histórica read-only.
+- Evidencia externa aprobada: debe escribirse en su evidence root, nunca confundirse con source versionado.
+
+No desarrollar Python o SQL fuente en el Data Root, no almacenar Parquet pesado aquí y no copiar secretos dentro de la investigación.
+
+## Ejecución conceptual
+
+Los imports deben realizarse desde `SrvRestAstroLS_v1/backend` mediante `modules.telchi.investigation...` y usando los paths centralizados del módulo.
+
+Cada ejecución debe resolver su output al destino autorizado, evitar defaults hacia el source tree y mantener SAP en modo read-only.
+
+## Promotion rule
+
+La promoción es `INVESTIGATION → DEVELOPMENT → PRODUCTION`; cada transición requiere intención y gate explícitos.
+
+Development toma conocimiento validado y crea una implementación separada bajo `modules/telchi/`, fuera de `investigation/`. Debe tener semántica y contratos validados, tests suficientes, responsabilidad concreta, consumidor real e independencia de evidencia experimental.
+
+Production habilita una capacidad Development ya validada; crear un endpoint no equivale a desplegarlo. El código Development o Production no debe importar runners de `investigation/`.
+
+Investigation no se mueve ni se destruye: permanece como baseline, prueba, auditoría, evidencia semántica y regresión. Deudas bajo `CRÉDITO_Y_DEUDORES` es el ejemplo canónico detallado en [`../CONTEXT.md`](../CONTEXT.md).
