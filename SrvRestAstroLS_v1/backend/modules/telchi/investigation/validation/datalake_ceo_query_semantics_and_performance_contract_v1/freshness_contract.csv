@@ -1,0 +1,6 @@
+freshness_class,target_lag,query_families
+REALTIME_LIKE,seconds/minutes,not required by this gate; explicit provider SLA needed
+NEAR_REALTIME,<= 15 minutes target,"stock current, sales today, production today"
+INTRADAY,"same business day, bounded lag","credit current, open purchases, cash"
+DAILY,daily close or scheduled refresh,"historical sales, margin, customer recency"
+HISTORICAL,as-of snapshot/build governed,"credit history, long comparisons"

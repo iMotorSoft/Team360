@@ -1,0 +1,12 @@
+field,requirement,contract
+source_relative_path,REQUIRED,POSIX path relative to LEGACY_ROOT; must not escape root.
+source_filename,REQUIRED,"Original filename, byte-for-byte spelling preserved."
+destination_relative_path,REQUIRED,raw/legacy/parquet/<source_relative_path>.
+size_bytes,REQUIRED,Source size and verified destination size.
+sha256,REQUIRED,Lowercase SHA-256 computed independently on source and destination; values must match.
+family,REQUIRED,Inventory family; UNKNOWN allowed but not blank.
+filename_date,OPTIONAL,Parsed filename date; never treated as business or snapshot truth without family policy.
+schema_fingerprint,REQUIRED,Fingerprint from ordered physical Parquet schema metadata without rewriting payload.
+row_count,REQUIRED,Footer row count read without transformation.
+copied_at,REQUIRED_ON_SUCCESS,UTC completion timestamp.
+copy_status,REQUIRED,"PENDING, COPIED_UNVERIFIED, VERIFIED, FAILED or SOURCE_CHANGED."

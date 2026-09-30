@@ -1,0 +1,8 @@
+probe,p50_ms,p95_ms,max_ms,source,notes
+entity_resolution_raw_parquet_probe,5.657,8.841,8.841,measured_warm_readonly_duckdb,reference/crosswalk parquet; no writes
+external_reference_lookup,7.092,8.099,8.099,measured_warm_readonly_duckdb,reference/crosswalk parquet; no writes
+crosswalk_lookup,0.507,0.704,0.704,measured_warm_readonly_duckdb,reference/crosswalk parquet; no writes
+semantic_catalog_lookup,0.000109,0.000116,0.004537,measured_in_memory_catalog,1000 deterministic dictionary lookups
+entity_resolution,5.0,7.959,7.959,TELCHI_DATALAKE_REFERENCE_AND_CROSSWALK_V1 evidence,approved warm entity resolver baseline; raw parquet probe retained separately
+ducklake_warm_query,7.7755,10.0535,39.1666,TELCHI_DUCKLAKE_POSTGRES18_FOUNDATION_V1 evidence,carried forward; no attach in this gate
+ducklake_attach_cold,169.2687,170.0556,170.5355,TELCHI_DUCKLAKE_POSTGRES18_FOUNDATION_V1 evidence,not in query budget; connection reuse required

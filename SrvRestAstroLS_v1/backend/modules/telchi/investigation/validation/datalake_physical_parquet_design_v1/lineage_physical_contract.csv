@@ -1,0 +1,22 @@
+contract_profile,requirement,fields,rule
+source_file,REQUIRED,source_relative_path;destination_relative_path;size_bytes;sha256;copy_status,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+source_file,OPTIONAL,schema_fingerprint;row_count;filename_date;family,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+source_file,NOT_APPLICABLE,row-level canonical lineage,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+sap_raw,REQUIRED,_source_system;_source_dataset;_source_native_key;_source_extracted_at;_ingested_at,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+sap_raw,OPTIONAL,_source_document_type;_source_document_id;_source_line_id;_source_transaction_id,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+sap_raw,NOT_APPLICABLE,_source_file unless exported via an intermediate file,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+reference,REQUIRED,_source_system;_source_dataset;_source_native_key;_source_extracted_at;_ingested_at;_transformation_version;_semantic_version;_lineage_quality,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+reference,OPTIONAL,_source_file;_source_snapshot_at,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+reference,NOT_APPLICABLE,document/transaction fields unless source supports them,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+crosswalk,REQUIRED,mapping_source;confidence;status;_source_system;_source_dataset;_source_native_key;_ingested_at;_transformation_version;_semantic_version,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+crosswalk,OPTIONAL,_source_file;_source_snapshot_at;_source_extracted_at,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+crosswalk,NOT_APPLICABLE,document line fields,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+event,REQUIRED,_source_system;_source_dataset;_source_native_key;_source_extracted_at;_ingested_at;_transformation_version;_semantic_version;_lineage_quality,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+event,OPTIONAL,_source_document_type;_source_document_id;_source_line_id;_source_transaction_id;_source_file;_source_snapshot_at,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+event,NOT_APPLICABLE,none; applicability depends on native source,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+snapshot,REQUIRED,snapshot_at;_source_system;_source_dataset;_source_native_key;_source_snapshot_at;_source_extracted_at;_ingested_at;_transformation_version;_semantic_version;_lineage_quality,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+snapshot,OPTIONAL,_source_file,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+snapshot,NOT_APPLICABLE,document/transaction fields unless supported,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+derived,REQUIRED,_source_system=DERIVED;_source_dataset;_source_native_key;_source_extracted_at;_ingested_at;_transformation_version;_semantic_version;_lineage_quality,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+derived,OPTIONAL,_source_document_type;_source_document_id;_source_line_id;_source_transaction_id;_source_file;_source_snapshot_at,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.
+derived,NOT_APPLICABLE,none,Technical columns use a leading underscore; business keys do not. Null never fabricates unavailable lineage.

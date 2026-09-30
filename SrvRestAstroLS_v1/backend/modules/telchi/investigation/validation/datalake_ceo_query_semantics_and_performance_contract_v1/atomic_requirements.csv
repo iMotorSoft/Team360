@@ -1,0 +1,14 @@
+atomic_requirement,business_truth,p0_p1_coverage,dependencies,build_priority,priority_class,materialize_now
+atomic.sales_document,commercial document header,P0 sales/credit classification,sales_line and document terms,1,HIGH,NO
+atomic.sales_line,canonical commercial line,P0 sales/quantity/product/customer,"sales_document, product, customer, branch",2,HIGH,NO
+atomic.credit_note,credit note and return line,net sales and reconciliation,sales_document/line,3,HIGH,NO
+atomic.inventory_movement,inventory movement event,stock history and reconciliation,"product,warehouse,document",4,HIGH,NO
+atomic.inventory_snapshot,business stock as-of observation,current stock and history,"product,warehouse,as_of",5,HIGH,NO
+atomic.payment,payment/receipt event,cash vs received and credit,"customer,document,receipt",6,HIGH,NO
+atomic.reconciliation,payment/document reconciliation,open balance authority,"payment,invoice,credit note",7,HIGH,NO
+atomic.production_order,production order lifecycle,production counts/open orders,"product,warehouse,status",8,MEDIUM,NO
+atomic.production_component,planned/actual component consumption,production variance,"production_order,component",9,MEDIUM,NO
+atomic.production_receipt,finished goods receipt,production quantity,"production_order,product,warehouse",10,MEDIUM,NO
+atomic.purchase_order,purchase document header/lifecycle,open purchases/lead time,"supplier,warehouse",11,MEDIUM,NO
+atomic.purchase_line,purchase line and receipt state,pending material,"purchase_order,product",12,MEDIUM,NO
+atomic.cost_observation,cost observation with basis and validity,profitability after semantic decision,"product,date,cost_basis",13,LOW,NO

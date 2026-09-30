@@ -1,0 +1,6 @@
+layout_id,mode,logical_location,unit,partition_policy,ownership,segment_not_file,notes
+RAW_INITIAL_LAYOUT,INITIAL_INGESTION,"raw/sap/<domain>/year=YYYY/month=MM/extraction=<id>",bounded extraction window,NO_PARTITION_BY_DEFAULT,RAW_PRESERVED,YES,"month is operational unit; no required one-file-per-month contract"
+RAW_UPDATE_LAYOUT,INCREMENTAL_UPDATE,"raw/sap/<domain>/date=YYYY-MM-DD/extraction=<id>",bounded extraction or micro-batch,NO_PARTITION_BY_DEFAULT,RAW_PRESERVED,YES,"manifest carries watermark and affected keys; equivalent contractual layout allowed"
+ATOMIC,INITIAL_INGESTION_AND_INCREMENTAL_UPDATE,"atomic/<dataset_id>/...",canonical fact build,DuckLake-managed partitioning only when proven,DUCKLAKE,YES,"same source record and transform versions yield same Atomic ID/content"
+MICRO_BATCH,INCREMENTAL_UPDATE,logical control unit,change batch,NOT_A_FILE_CONTRACT,MANIFEST_CONTROLLED,YES,"one micro-batch need not equal one Parquet file"
+MONTH,INITIAL_INGESTION,logical control unit,historical month,NOT_A_FILE_CONTRACT,MANIFEST_CONTROLLED,YES,"one month need not equal one Atomic Parquet file"

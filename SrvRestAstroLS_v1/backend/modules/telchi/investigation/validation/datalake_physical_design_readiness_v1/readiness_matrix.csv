@@ -1,0 +1,9 @@
+area,status,evidence,physical_impact
+Canonical grain,READY,canonical_grain.csv defines 25 CORE_V1 grains and candidate native keys; ambiguous legacy rows cannot become atomic facts.,Physical schemas can represent one declared grain per atomic entity.
+Identity,READY,"Seven crosswalk contracts preserve canonical/native IDs, validity, source, confidence and UNMAPPED/UNKNOWN behavior.",Surrogate identity and source-native identity remain separate.
+Temporal model,READY,"Event, document, posting, due, as-of, snapshot, extraction, validity and system semantics are separated.","Supports current, known-at-T, later events and restated derived truth."
+Snapshot policy,READY,Sixteen source policies prohibit implicit concatenation and distinguish event/current/full/period/derived observations.,Prevents snapshot concatenation and event duplication by contract.
+Legacy ↔ SAP,READY,Authority roles and versioned crosswalks exist; no silent cutover or forced equivalence.,Partial mappings remain nullable/UNMAPPED without identity collision.
+Lineage,READY,Eight profiles assign REQUIRED/OPTIONAL/NOT_APPLICABLE to the canonical lineage envelope.,Every future row can preserve source evidence and trace quality.
+Security scope,READY,"Nine domains define product, organizational scope, sensitive columns/metrics and aggregation policy.",Security-before-retrieval remains implementable.
+Atomic vs Business,READY,movProductSB1 is business-denormalized; movProduct is period stock evidence; atomic facts remain independent.,No denormalized observation becomes canonical atomic truth.

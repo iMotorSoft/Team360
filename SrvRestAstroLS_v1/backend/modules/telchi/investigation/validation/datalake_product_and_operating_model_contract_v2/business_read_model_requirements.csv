@@ -1,0 +1,4 @@
+data_product,grain,required_dimensions,required_metrics,semantic_guard,materialize_now
+business.sales_flow,canonical sales line,portfolio_family|product_business_type|brand|business_unit|sales_channel|operating_model|production_origin|branch|product,net_sales|gross_sales|document_count|customer_count|business_volume,IDs/relations are authority; text may be cached only,NO
+business.industrial_production_flow,production order and movements,contract_customer|product|brand|brand_owner|production_site|warehouse|arrangement,produced_quantity|component_quantity|cost_evidence|yield,white-label remains industrial,NO
+business.pharmacy_compounding_flow,magistral preparation,drug_or_preparation|customer|botica_site,preparation_count|sales|average_ticket|repeat_rate|ingredient_cost|partial_margin,emit PARTIAL_ECONOMIC_EVALUATION when full cost/capacity/waste missing,NO

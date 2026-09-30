@@ -1,0 +1,8 @@
+crosswalk_id,canonical_entity,canonical_id_contract,legacy_native_id,sap_native_id,mapping_status,confidence,validity_contract,mapping_source_and_rule
+XW-001,PRODUCT,canonical_product_id,legacy_product_code,sap_item_code,PROPOSED_CONTRACT,UNKNOWN,valid_from/valid_to,manual+evidence mapping; never coalesce code changes silently
+XW-002,CUSTOMER,canonical_customer_id,legacy_customer_code,sap_card_code,PROPOSED_CONTRACT,UNKNOWN,valid_from/valid_to,CardCode likely stable only within SAP; historical identity needs reconciliation
+XW-003,SUPPLIER,canonical_supplier_id,legacy_supplier_code,sap_card_code,PROPOSED_CONTRACT,UNKNOWN,valid_from/valid_to,OCRD is SAP authority; legacy equivalence not closed
+XW-004,WAREHOUSE,canonical_warehouse_id,legacy_warehouse_code,sap_whs_code,PROPOSED_CONTRACT,PARTIAL,valid_from/valid_to,warehouse code systems differ; 51 legacy mapped rows vs 82 current SAP warehouses
+XW-005,BRANCH,canonical_branch_id,legacy_office_code,sap_branch_or_office_code,PROPOSED_CONTRACT,PARTIAL,valid_from/valid_to,almacenOficina.xlsx confirms current observed mapping without history
+XW-006,SALESPERSON,canonical_salesperson_id,legacy_salesperson_code,sap_slp_code,PROPOSED_CONTRACT,PARTIAL,valid_from/valid_to,OSLP and attribution evidence current; legacy identity not fully closed
+XW-007,USER,canonical_user_id,legacy_user_id_or_name,sap_user_id/login,PROPOSED_CONTRACT,PARTIAL,valid_from/valid_to,current OUSR/employee attribution exists; historical authorization unavailable

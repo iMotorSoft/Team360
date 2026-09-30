@@ -1,0 +1,8 @@
+data_product,grain,coverage,freshness,semantic_guard
+business.sales_flow,canonical commercial line,"sales, comparisons, customer/product/branch dimensions",NEAR_REALTIME/DAILY,"tax, currency, credit classification fields only when validated"
+business.inventory_flow,inventory event + approved snapshots,"stock trends, coverage, movements",DAILY,must preserve event types/signs
+business.production_flow,separate order/receipt/consumption facts,production and variance,INTRADAY,no incompatible event fusion
+business.customer_credit_history,customer × as_of business state,historical credit,HISTORICAL,snapshot/reconstruction lineage
+business.cash_flow,payment/allocation event,collections and reconciliation,INTRADAY,no sale-payment-term substitution
+business.purchase_flow,purchase/receipt event,purchase totals and lead time,DAILY,order vs receipt distinction
+business.profitability,sales × selected cost basis,margin/rentability,DAILY,blocked until cost policy

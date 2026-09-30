@@ -1,0 +1,11 @@
+relationship,from_entity,to_entity,required_fields,temporal,cardinality,notes
+product_brand,product,brand,canonical_product_id|brand_id|valid_from|valid_to|source|confidence|status,YES,many-to-many over time,Commercial brand only
+product_business_unit,product,business_unit,canonical_product_id|business_unit_id|valid_from|valid_to|source|confidence|status,YES,many-to-many over time,Organizational assignment
+product_portfolio_family,product,portfolio_family,canonical_product_id|portfolio_family_id|valid_from|valid_to|source|confidence|status,YES,many-to-many over time,Litel and medication comparison
+product_business_type,product,product_business_type,canonical_product_id|product_business_type_id|valid_from|valid_to|source|confidence|status,YES,many-to-many over time,Litel subsegment
+product_operating_model,product,operating_model,canonical_product_id|operating_model_id|valid_from|valid_to|source|confidence|status,YES,many-to-many over time,Supports resale to manufacturing transitions
+product_production_site,product,production_site,canonical_product_id|production_site_id|operating_model_id|valid_from|valid_to|source|confidence|status,YES,many-to-many,No primary-site-only authority
+production_site_warehouse,production_site,warehouse,production_site_id|warehouse_id|warehouse_role|valid_from|valid_to|source|confidence|status,YES,many-to-many,Never assume 1:1
+product_manufacturer,product,party,canonical_product_id|manufacturer_party_id|valid_from|valid_to|source|confidence|status,YES,many-to-many over time,Physical manufacturer
+brand_owner,brand,party,brand_id|brand_owner_party_id|valid_from|valid_to|source|confidence|status,YES,many-to-many over time,Brand ownership
+manufacturing_arrangement,production_order,party,production_order_id|arrangement_type_id|contract_customer_id|valid_from|valid_to|source|confidence|status,YES,many-to-one per evidenced arrangement,Contract manufacturing and white-label without schema change

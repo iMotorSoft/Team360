@@ -1,0 +1,6 @@
+concept,grain,required_evidence,domain,build_now
+industrial_formula_bom,formula/BOM version,formula_id|product_id|component_id|quantity|uom|validity|lineage,INDUSTRIAL_MANUFACTURING,NO
+production_order,one industrial production order,order_id|product_id|formula_id|site_id|status|dates|batch_lot|produced_for_party|lineage,INDUSTRIAL_MANUFACTURING,NO
+component_issue,one component issue/consumption,order_id|component_id|quantity|uom|warehouse_id|date|cost_evidence|lineage,INDUSTRIAL_MANUFACTURING,NO
+finished_receipt,one finished-product receipt,order_id|product_id|quantity|uom|warehouse_id|date|batch_lot|cost_evidence|lineage,INDUSTRIAL_MANUFACTURING,NO
+manufacturing_arrangement,one evidenced arrangement for order/validity,arrangement_type|contract_customer|manufacturer|brand|brand_owner|source|confidence|status,INDUSTRIAL_MANUFACTURING,NO

@@ -1,0 +1,16 @@
+decision_id,decision,status,rationale
+PD-001,Use one DATA_ROOT with source and derived separation.,ACCEPTED,Avoid permanent dependency on external roots while preserving evidence.
+PD-002,Preserve legacy mirror at raw/legacy/parquet/<source_relative_path>.,ACCEPTED,Prevents filename collisions and proves byte identity without renaming.
+PD-003,"Do not keep durable staging, generic snapshots or decision layers in V1.",ACCEPTED,They add duplication without a concrete consumer; staging is process-local.
+PD-004,Use ZSTD by default for generated Parquet.,ACCEPTED,Good compression/read performance and broad DuckDB/PyArrow support; raw mirror is never recompressed.
+PD-005,"Use decimal128(38,6) money, decimal128(38,12) quantity/rate.",ACCEPTED,Avoid float and avoid precision below known source; overflow/scale incompatibility stops the affected dataset.
+PD-006,Store canonical and native IDs separately as strings.,ACCEPTED,Business codes retain zeros/semantics; optional SAP numeric trace may coexist.
+PD-007,"Use 128-512 MiB generated files and 64-128 MiB row groups as targets, not hard limits.",ACCEPTED,Fits moderate machines and avoids premature micro-partitioning.
+PD-008,Partition only temporal high-volume datasets.,ACCEPTED,YEAR_MONTH or SNAPSHOT_DATE supports pruning without product/customer/warehouse fanout.
+PD-009,Represent current stock and current credit as DuckDB views over latest authorized snapshots.,ACCEPTED,Avoid redundant materialization until a measured latency need exists.
+PD-010,Replace ambiguous 360 names with grain-bearing business names.,ACCEPTED,"product_flow, inventory_position, sales_line_read_model, purchase_cycle_line, production_order_flow and customer_credit_state expose grain."
+PD-011,Registry source is CSV plus generated JSON at deployment/build time.,ACCEPTED,CSV is reviewable and dependency-free; JSON is the runtime-friendly projection; no SQLite/Python config split.
+PD-012,Raw keeps Legacy and SAP overlap; atomic selects authority per concept/window and quarantines unresolved overlap.,ACCEPTED,Preserves evidence and prevents silent double count.
+PD-013,Generated Parquet uses immutable run manifests and partition replacement only after validation.,ACCEPTED,Supports rollback/rebuild without mutating preserved source.
+PD-014,DuckDB resolves dataset IDs through registry-backed views.,ACCEPTED,"Consumers use logical names; views call read_parquet(path, hive_partitioning=true, union_by_name=false)."
+PD-015,Schema evolution is explicit and union_by_name is disabled by default.,ACCEPTED,Prevents silent schema drift; compatibility views are versioned.

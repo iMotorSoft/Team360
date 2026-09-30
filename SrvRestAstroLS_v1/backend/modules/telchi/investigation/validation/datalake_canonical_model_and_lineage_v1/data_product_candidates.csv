@@ -1,0 +1,30 @@
+data_product,layer,canonical_entities,shape,security_domain,scope_dimension,business_justification,lineage_profile
+product_master,REFERENCE,PRODUCT/PRODUCT_GROUP,atomic,inventory,product_id,identity and master attributes,reference_master
+customer_master,REFERENCE,CUSTOMER,atomic,credit;sales,customer_id,customer identity,reference_master
+supplier_master,REFERENCE,SUPPLIER,atomic,purchases,supplier_id,supplier identity,reference_master
+warehouse_master,REFERENCE,WAREHOUSE/WAREHOUSE_ROLE,atomic,inventory,warehouse_id,warehouse identity and role,reference_master
+warehouse_branch_mapping,REFERENCE,WAREHOUSE_BRANCH_MAPPING/BRANCH,atomic,inventory;sales,warehouse_id;branch_id;valid_from,temporal organization map,reference_master
+sales_documents,ATOMIC,SALE_DOCUMENT,atomic,sales,sale_document_id,document state and dates,document_line
+sales_lines,ATOMIC,SALE_LINE,atomic,sales,sale_line_id,gross sale lines,document_line
+credit_notes,ATOMIC,CREDIT_NOTE/CREDIT_NOTE_LINE,atomic,sales;credit,credit_note_line_id,credit reductions,reference_master
+inventory_movements,ATOMIC,INVENTORY_MOVEMENT,atomic,inventory,inventory_movement_id,movement events,reference_master
+stock_snapshots,ATOMIC,STOCK_SNAPSHOT,atomic,inventory,product_id;warehouse_id;snapshot_at,dated stock state,state_snapshot
+stock_current,ATOMIC,STOCK_CURRENT,atomic,inventory,product_id;warehouse_id,current state,state_snapshot
+purchase_cycle,ATOMIC+BUSINESS,PURCHASE_REQUEST/PURCHASE_ORDER/GOODS_RECEIPT/SUPPLIER_INVOICE/PURCHASE_RETURN,mixed,purchases,document_line_id,cycle view over atomic facts,document_line
+purchase_requests,ATOMIC,PURCHASE_REQUEST,atomic,purchases,request_line_id,requested procurement,document_line
+bom,ATOMIC,BOM/BOM_COMPONENT,atomic,production,bom_component_id,formula/version,reference_master
+production_orders,ATOMIC,PRODUCTION_ORDER,atomic,production,production_order_id,planned production,document_line
+production_consumption,ATOMIC,COMPONENT_CONSUMPTION,atomic,production,consumption_id,actual component issues,reference_master
+production_output,ATOMIC,PRODUCTION_OUTPUT,atomic,production,output_id,actual receipts,reference_master
+warehouse_transfers,ATOMIC,TRANSFER/TRANSFER_LINE,atomic,inventory,transfer_line_id,accounting transfer event,reference_master
+payments,ATOMIC,PAYMENT,atomic,credit;finance,payment_id,cash settlement events,document_line
+reconciliations,ATOMIC,RECONCILIATION,atomic,credit;finance,reconciliation_member_id,settlement evidence,document_line
+customer_credit_state,DERIVED,CUSTOMER_CREDIT_STATE,derived,credit,customer_id;as_of_date,historical customer state,reference_master
+forecast,CORE_LATER,FORECAST_DEFINITION/FORECAST_LINE,atomic+derived,configuration,forecast_line_id,"configured/observed forecast, never inferred behavior",reference_master
+mrp_configuration,CORE_LATER,MRP_PARAMETER,atomic,configuration,product_id;warehouse_id;parameter;valid_from,planning parameters,reference_master
+user_access_reference,REFERENCE,USER/SALESPERSON/EMPLOYEE,atomic,users,user_id,current identity/capability reference,reference_master
+product_flow,BUSINESS,PRODUCT + SALE_LINE + INVENTORY_MOVEMENT + TRANSFER_LINE,denormalized,inventory;sales,product_id;event_id,fast product flow questions,business_denormalized
+product_360,BUSINESS,PRODUCT + masters + sales + stock + purchase,denormalized,inventory;sales;purchases,product_id,product-centric conversational read model,business_denormalized
+inventory_360,BUSINESS,stock + movements + warehouse mapping,denormalized,inventory,product_id;warehouse_id,inventory questions without runtime fanout,business_denormalized
+sales_360,BUSINESS,sale document/line + customer + seller + credit/payment,denormalized,sales;credit,sale_line_id,sales and receivable questions,business_denormalized
+purchase_360,BUSINESS,purchase cycle + supplier + stock impact,denormalized,purchases;inventory,purchase_line_id,procurement questions,business_denormalized

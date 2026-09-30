@@ -1,0 +1,1 @@
+"""TELCHI_DATALAKE_LEGACY_PARQUET_MIRROR_V1 validation package."""

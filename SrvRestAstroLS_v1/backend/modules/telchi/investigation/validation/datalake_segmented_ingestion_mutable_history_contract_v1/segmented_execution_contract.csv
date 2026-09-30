@@ -1,0 +1,7 @@
+execution_type,execution_unit,bounded_required,checkpoint_required,resource_guards_required,publication_scope,monolithic_allowed
+INITIAL_INGESTION,BOUNDED_SEGMENT,YES,YES,YES,segment_then_coverage_map,NO
+INCREMENTAL_UPDATE,BOUNDED_MICRO_BATCH,YES,YES,YES,micro_batch_then_affected_scope,NO
+RECONCILIATION,BOUNDED_SEGMENT,YES,YES,YES,declared_reconciliation_scope,NO
+REBUILD,BOUNDED_SEGMENT,YES,YES,YES,logical_full_coverage_by_segments,NO
+DIRTY_REPROCESSING,BOUNDED_SEGMENT,YES,YES,YES,smallest_authoritative_dirty_scope,NO
+BACKFILL,BOUNDED_SEGMENT,YES,YES,YES,declared_historical_scope,NO

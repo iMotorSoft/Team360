@@ -1,0 +1,6 @@
+trust_state,can_publish,can_serve,requires_as_of_disclosure,watermark_can_advance,reconciliation_action,coverage_state_separate
+AUTHORITATIVE_SYNCED,YES,YES,YES,YES,"record successful source reconciliation and continue from published trusted watermark",YES
+AUTHORITATIVE_LAGGING,YES,YES,YES,NO,"retain last trusted state; disclose data_as_of and catch up without serving a candidate",YES
+VALIDATED_DERIVED,YES,YES,YES,NO,"verify input lineage and derived validation; never treat derived state as SAP source authority",YES
+STALE,YES,RESTRICTED,YES,NO,"pause normal freshness promotion; run bounded reconciliation and apply restrictive serving policy",YES
+DIVERGED,NO,NO,YES,NO,"preserve last trusted state, record divergence, run focal reconciliation and retry; do not serve new value as valid",YES

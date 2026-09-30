@@ -1,0 +1,5 @@
+reconciliation_level,belongs_to,trigger,scope,objective,publication_effect,segmented_required
+FAST_FOCAL_RECONCILIATION,INCREMENTAL_UPDATE,after each micro-batch or affected-object candidate,"changed documents, customers, orders, ItemCode×Warehouse or equivalent domain key",high certainty with minimal HANA load,"publish only validated affected state; otherwise retain trusted state",YES
+PERIODIC_AUTHORITATIVE_RECONCILIATION,INCREMENTAL_UPDATE,lower-frequency controlled control,"bounded period, warehouse, customer group or domain",detect drift missed by incremental change detection,"publish only after scope reconciles; no global reconciled claim from partial scope",YES
+INITIAL_BASELINE_RECONCILIATION,INITIAL_INGESTION,each bounded historical window,"window/month and declared source scope",establish trusted baseline correctness,"commit candidate window and then checkpoint",YES
+DIVERGENCE_RECOVERY,INCREMENTAL_UPDATE,on validation mismatch or DIVERGED state,"focal affected scope first, then expanded scope if required",recover consistency without serving the divergent candidate,"no watermark advance until successful validation and publication",YES

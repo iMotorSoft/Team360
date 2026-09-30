@@ -1,0 +1,7 @@
+field,definition,conversion_source,rule,llm_may_invent
+document_unit,unit shown on commercial document,source document,must not be silently converted,NO
+inventory_uom,SAP inventory/base unit,product master + validated conversion,canonical stock measure,NO
+sales_uom,unit used for sale,product master,requires conversion to requested measure,NO
+purchase_uom,unit used for purchase,product master/order,requires approved conversion,NO
+canonical_measure_type,mass|volume|count|length|other,curated reference,no LLM inference,NO
+canonical_measure_unit,L|kg|unit|...,curated reference,only with conversion factor,NO

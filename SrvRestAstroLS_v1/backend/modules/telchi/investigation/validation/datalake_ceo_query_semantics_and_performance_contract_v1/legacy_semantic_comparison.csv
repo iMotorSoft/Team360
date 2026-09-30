@@ -1,0 +1,11 @@
+query_family,legacy_dataset,legacy_fields_or_grain,legacy_filters_or_formula,legacy_runtime_pattern,known_issue,new_semantic_authority,future_read_model
+sales,saleProduct-*.parq,product/date/amount,legacy sales filters and aggregation,per-request scans/joins,"tax, returns, currency and document semantics require SAP authority",SAP validated semantic contract; no automatic legacy authority,business.sales_flow
+sales_branch,saleSB1Product-*.parq,branch/product/date,branch sales,per-request legacy scan,branch/warehouse identity and net sales unclear,SAP validated semantic contract; no automatic legacy authority,business.sales_flow
+credit_notes,ncB1Product-*.parq,credit note/product,subtract notes,separate legacy dataset join,eligibility/sign/tax semantics unresolved,SAP validated semantic contract; no automatic legacy authority,business.sales_flow
+inventory,movProduct-*.parq,product/movement,stock movement,movement reconstruction at runtime,on-hand vs available/committed not equivalent,SAP validated semantic contract; no automatic legacy authority,current.stock_current
+inventory_branch,movProductSB1-*.parq,product/branch movement,branch stock,branch scans,warehouse mapping incomplete,SAP validated semantic contract; no automatic legacy authority,business.inventory_flow
+cash,cash-*.parq,cash rows,collections/cash,Dask per request,payment vs sale condition conflated historically,SAP validated semantic contract; no automatic legacy authority,business.cash_flow
+receivables,cuentasxCobrar-*.parq,customer/open balance,debt and overdue,reconstruct per request,as-of and reconciliation authority need modern SAP model,SAP validated semantic contract; no automatic legacy authority,current.customer_credit_current
+product_uom,productTransform-*.parq,product conversions,unit conversion,ad hoc conversion joins,conversion source/confidence not guaranteed,SAP validated semantic contract; no automatic legacy authority,reference.* / crosswalk.*
+purchases,purchase-*.parq,purchase rows,purchase totals/open,per-request scans,open/receipt semantics incomplete,SAP validated semantic contract; no automatic legacy authority,current.purchase_open
+cost,ProductSaleCostDay-*.parq,product/day/cost,margin/cost,legacy cost lookup,cost basis alternatives conflict,SAP validated semantic contract; no automatic legacy authority,business.sales_flow

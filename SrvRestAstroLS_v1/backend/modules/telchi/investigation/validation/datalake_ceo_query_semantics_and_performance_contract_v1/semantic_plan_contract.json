@@ -1,0 +1,59 @@
+{
+  "contract_id": "TELCHI_DATALAKE_CEO_QUERY_SEMANTICS_AND_PERFORMANCE_CONTRACT_V1",
+  "stage": "INVESTIGATION",
+  "semantic_plan_version": "1.0",
+  "security_order": [
+    "identity",
+    "authorization_context",
+    "entity_resolution_within_scope",
+    "semantic_plan",
+    "authorized_query",
+    "prepared_read_model",
+    "answer"
+  ],
+  "semantic_plan_fields": [
+    "domain",
+    "metrics",
+    "entities",
+    "dimensions",
+    "filters",
+    "time_range",
+    "comparison",
+    "scope",
+    "requested_unit",
+    "currency",
+    "grain",
+    "ranking",
+    "limit",
+    "drilldown_level",
+    "freshness_requirement",
+    "ambiguities"
+  ],
+  "default_period_policy": "ASK_OR_CONTEXT; never silently default to today",
+  "stock_default": "ON_HAND (PROVISIONAL; expose AVAILABLE when relevant)",
+  "timezone": "configured Telchi business timezone; server timezone forbidden",
+  "llm_rule": "LLM interprets and drafts; DuckDB computes",
+  "fallback_path": [
+    "FAST_PATH current/business",
+    "NORMAL_PATH business+small joins",
+    "DEEP_PATH atomic/reconstruction"
+  ],
+  "trace_fields": [
+    "query_id",
+    "semantic_plan_hash",
+    "metric_versions",
+    "dataset_versions",
+    "ducklake_snapshot",
+    "data_as_of",
+    "authorization_scope",
+    "execution_ms",
+    "row_count"
+  ],
+  "dev_prod_logical_names_identical": true,
+  "postgres_catalog_database": "team360_telchi_ducklake",
+  "postgres_runtime_role": "team360_telchi_ducklake",
+  "atomic_tables_created": 0,
+  "business_tables_created": 0,
+  "current_tables_created": 0,
+  "sap_write_count": 0
+}

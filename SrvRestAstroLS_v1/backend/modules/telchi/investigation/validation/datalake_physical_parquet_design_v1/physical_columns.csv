@@ -1,0 +1,1134 @@
+dataset_id,column_position,column_name,physical_type,nullable,semantic_meaning,source_lineage,column_role
+sap_table_extracts,1,extract_id,string,NO,Immutable extraction run ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sap_table_extracts,2,source_native_key,string,NO,Serialized native key,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sap_table_extracts,3,observation_sequence,int64,NO,Stable row sequence in run,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sap_table_extracts,4,_source_extracted_at,"timestamp[us,UTC]",NO,Extraction timestamp,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sap_query_extracts,1,extract_id,string,NO,Immutable extraction run ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sap_query_extracts,2,query_row_key,string,NO,Declared query result key,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sap_query_extracts,3,observation_sequence,int64,NO,Stable row sequence in run,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sap_query_extracts,4,_source_extracted_at,"timestamp[us,UTC]",NO,Extraction timestamp,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,3,product_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,9,product_group_id,string,YES,Canonical product group,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,10,unit_of_measure_id,string,YES,Canonical inventory UOM,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,11,standard_cost,"decimal128(38,6)",YES,Observed standard cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,12,last_purchase_price,"decimal128(38,6)",YES,Observed last purchase price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+products,13,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+products,14,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+products,15,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+products,16,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+products,17,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+products,18,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+products,19,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+products,20,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+products,21,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+products,22,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+product_groups,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_groups,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_groups,3,product_group_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_groups,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_groups,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_groups,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_groups,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_groups,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_groups,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+product_groups,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+product_groups,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+product_groups,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+product_groups,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+product_groups,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+product_groups,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+product_groups,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+product_groups,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+product_groups,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+customers,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,3,customer_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,9,branch_id,string,YES,Owning branch when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,10,tax_id,string,YES,Sensitive tax identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,11,credit_limit,"decimal128(38,6)",YES,Observed credit limit,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,12,payment_term_id,string,YES,Canonical payment term,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customers,13,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+customers,14,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+customers,15,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+customers,16,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+customers,17,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+customers,18,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+customers,19,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+customers,20,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+customers,21,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+customers,22,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+suppliers,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,3,supplier_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,9,branch_id,string,YES,Owning branch when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,10,tax_id,string,YES,Sensitive tax identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,11,payment_term_id,string,YES,Canonical payment term,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+suppliers,12,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+suppliers,13,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+suppliers,14,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+suppliers,15,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+suppliers,16,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+suppliers,17,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+suppliers,18,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+suppliers,19,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+suppliers,20,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+suppliers,21,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+warehouses,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouses,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouses,3,warehouse_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouses,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouses,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouses,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouses,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouses,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouses,9,warehouse_role_id,string,YES,Canonical warehouse role,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouses,10,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+warehouses,11,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+warehouses,12,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+warehouses,13,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+warehouses,14,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+warehouses,15,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+warehouses,16,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+warehouses,17,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+warehouses,18,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+warehouses,19,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+branches,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branches,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branches,3,branch_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branches,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branches,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branches,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branches,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branches,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branches,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+branches,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+branches,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+branches,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+branches,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+branches,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+branches,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+branches,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+branches,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+branches,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+document_types,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+document_types,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+document_types,3,document_type,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+document_types,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+document_types,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+document_types,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+document_types,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+document_types,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+document_types,9,company_id,string,NO,Legal company scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+document_types,10,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+document_types,11,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+document_types,12,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+document_types,13,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+document_types,14,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+document_types,15,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+document_types,16,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+document_types,17,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+document_types,18,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+document_types,19,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+payment_terms,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,3,payment_term_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,9,branch_id,string,YES,Branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,10,credit_days,int32,YES,Contractual credit days,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payment_terms,11,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+payment_terms,12,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+payment_terms,13,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+payment_terms,14,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+payment_terms,15,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+payment_terms,16,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+payment_terms,17,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+payment_terms,18,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+payment_terms,19,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+payment_terms,20,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+channels,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+channels,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+channels,3,channel_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+channels,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+channels,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+channels,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+channels,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+channels,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+channels,9,branch_id,string,YES,Branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+channels,10,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+channels,11,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+channels,12,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+channels,13,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+channels,14,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+channels,15,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+channels,16,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+channels,17,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+channels,18,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+channels,19,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+units_of_measure,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+units_of_measure,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+units_of_measure,3,unit_of_measure_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+units_of_measure,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+units_of_measure,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+units_of_measure,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+units_of_measure,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+units_of_measure,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+units_of_measure,9,company_id,string,NO,Legal company scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+units_of_measure,10,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+units_of_measure,11,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+units_of_measure,12,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+units_of_measure,13,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+units_of_measure,14,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+units_of_measure,15,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+units_of_measure,16,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+units_of_measure,17,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+units_of_measure,18,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+units_of_measure,19,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+warehouse_roles,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_roles,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_roles,3,warehouse_role_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_roles,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_roles,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_roles,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_roles,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_roles,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_roles,9,warehouse_id,string,YES,Warehouse scope when role is local,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_roles,10,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+warehouse_roles,11,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+warehouse_roles,12,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+warehouse_roles,13,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+warehouse_roles,14,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+warehouse_roles,15,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+warehouse_roles,16,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+warehouse_roles,17,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+warehouse_roles,18,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+warehouse_roles,19,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+currencies,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,3,currency_code,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,9,legal_entity_id,string,NO,Legal entity scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,10,decimal_places,int32,YES,Display/accounting decimal places,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+currencies,11,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+currencies,12,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+currencies,13,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+currencies,14,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+currencies,15,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+currencies,16,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+currencies,17,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+currencies,18,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+currencies,19,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+currencies,20,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+users,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+users,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+users,3,user_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+users,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+users,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+users,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+users,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+users,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+users,9,organizational_scope,string,YES,Observed organizational scope; not historical authorization,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+users,10,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+users,11,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+users,12,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+users,13,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+users,14,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+users,15,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+users,16,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+users,17,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+users,18,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+users,19,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+salespersons,1,source_system,string,NO,Source system discriminator,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salespersons,2,source_native_id,string,NO,Unmodified source-native identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salespersons,3,salesperson_id,string,NO,Stable canonical identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salespersons,4,code,string,NO,Business code preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salespersons,5,name,string,YES,Observed display name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salespersons,6,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salespersons,7,valid_to,"timestamp[us,UTC]",YES,Known validity end; null means open or unknown per status,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salespersons,8,status,string,NO,"ACTIVE, INACTIVE or UNKNOWN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salespersons,9,branch_id,string,YES,Branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salespersons,10,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+salespersons,11,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+salespersons,12,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+salespersons,13,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+salespersons,14,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+salespersons,15,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+salespersons,16,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+salespersons,17,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+salespersons,18,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+salespersons,19,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+product_crosswalk,1,canonical_id,string,YES,Canonical ID; nullable only for UNMAPPED,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_crosswalk,2,source_system,string,NO,Source system,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_crosswalk,3,source_native_id,string,NO,Unmodified native ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_crosswalk,4,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_crosswalk,5,valid_to,"timestamp[us,UTC]",YES,Known validity end,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_crosswalk,6,mapping_source,string,NO,Evidence or method,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_crosswalk,7,confidence,"decimal128(38,12)",NO,Confidence from 0 to 1,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_crosswalk,8,status,string,NO,"CONFIRMED, PROPOSED, UNKNOWN or UNMAPPED",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_crosswalk,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+product_crosswalk,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+product_crosswalk,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+product_crosswalk,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+product_crosswalk,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+product_crosswalk,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+product_crosswalk,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+product_crosswalk,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+product_crosswalk,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+product_crosswalk,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+customer_crosswalk,1,canonical_id,string,YES,Canonical ID; nullable only for UNMAPPED,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_crosswalk,2,source_system,string,NO,Source system,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_crosswalk,3,source_native_id,string,NO,Unmodified native ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_crosswalk,4,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_crosswalk,5,valid_to,"timestamp[us,UTC]",YES,Known validity end,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_crosswalk,6,mapping_source,string,NO,Evidence or method,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_crosswalk,7,confidence,"decimal128(38,12)",NO,Confidence from 0 to 1,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_crosswalk,8,status,string,NO,"CONFIRMED, PROPOSED, UNKNOWN or UNMAPPED",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_crosswalk,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+customer_crosswalk,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+customer_crosswalk,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+customer_crosswalk,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+customer_crosswalk,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+customer_crosswalk,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+customer_crosswalk,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+customer_crosswalk,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+customer_crosswalk,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+customer_crosswalk,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+supplier_crosswalk,1,canonical_id,string,YES,Canonical ID; nullable only for UNMAPPED,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_crosswalk,2,source_system,string,NO,Source system,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_crosswalk,3,source_native_id,string,NO,Unmodified native ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_crosswalk,4,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_crosswalk,5,valid_to,"timestamp[us,UTC]",YES,Known validity end,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_crosswalk,6,mapping_source,string,NO,Evidence or method,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_crosswalk,7,confidence,"decimal128(38,12)",NO,Confidence from 0 to 1,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_crosswalk,8,status,string,NO,"CONFIRMED, PROPOSED, UNKNOWN or UNMAPPED",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_crosswalk,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+supplier_crosswalk,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+supplier_crosswalk,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+supplier_crosswalk,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+supplier_crosswalk,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+supplier_crosswalk,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+supplier_crosswalk,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+supplier_crosswalk,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+supplier_crosswalk,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+supplier_crosswalk,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+warehouse_crosswalk,1,canonical_id,string,YES,Canonical ID; nullable only for UNMAPPED,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_crosswalk,2,source_system,string,NO,Source system,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_crosswalk,3,source_native_id,string,NO,Unmodified native ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_crosswalk,4,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_crosswalk,5,valid_to,"timestamp[us,UTC]",YES,Known validity end,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_crosswalk,6,mapping_source,string,NO,Evidence or method,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_crosswalk,7,confidence,"decimal128(38,12)",NO,Confidence from 0 to 1,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_crosswalk,8,status,string,NO,"CONFIRMED, PROPOSED, UNKNOWN or UNMAPPED",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_crosswalk,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+warehouse_crosswalk,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+warehouse_crosswalk,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+warehouse_crosswalk,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+warehouse_crosswalk,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+warehouse_crosswalk,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+warehouse_crosswalk,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+warehouse_crosswalk,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+warehouse_crosswalk,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+warehouse_crosswalk,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+branch_crosswalk,1,canonical_id,string,YES,Canonical ID; nullable only for UNMAPPED,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branch_crosswalk,2,source_system,string,NO,Source system,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branch_crosswalk,3,source_native_id,string,NO,Unmodified native ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branch_crosswalk,4,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branch_crosswalk,5,valid_to,"timestamp[us,UTC]",YES,Known validity end,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branch_crosswalk,6,mapping_source,string,NO,Evidence or method,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branch_crosswalk,7,confidence,"decimal128(38,12)",NO,Confidence from 0 to 1,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branch_crosswalk,8,status,string,NO,"CONFIRMED, PROPOSED, UNKNOWN or UNMAPPED",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+branch_crosswalk,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+branch_crosswalk,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+branch_crosswalk,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+branch_crosswalk,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+branch_crosswalk,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+branch_crosswalk,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+branch_crosswalk,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+branch_crosswalk,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+branch_crosswalk,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+branch_crosswalk,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+salesperson_crosswalk,1,canonical_id,string,YES,Canonical ID; nullable only for UNMAPPED,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salesperson_crosswalk,2,source_system,string,NO,Source system,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salesperson_crosswalk,3,source_native_id,string,NO,Unmodified native ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salesperson_crosswalk,4,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salesperson_crosswalk,5,valid_to,"timestamp[us,UTC]",YES,Known validity end,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salesperson_crosswalk,6,mapping_source,string,NO,Evidence or method,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salesperson_crosswalk,7,confidence,"decimal128(38,12)",NO,Confidence from 0 to 1,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salesperson_crosswalk,8,status,string,NO,"CONFIRMED, PROPOSED, UNKNOWN or UNMAPPED",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+salesperson_crosswalk,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+salesperson_crosswalk,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+salesperson_crosswalk,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+salesperson_crosswalk,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+salesperson_crosswalk,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+salesperson_crosswalk,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+salesperson_crosswalk,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+salesperson_crosswalk,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+salesperson_crosswalk,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+salesperson_crosswalk,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+user_crosswalk,1,canonical_id,string,YES,Canonical ID; nullable only for UNMAPPED,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+user_crosswalk,2,source_system,string,NO,Source system,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+user_crosswalk,3,source_native_id,string,NO,Unmodified native ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+user_crosswalk,4,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+user_crosswalk,5,valid_to,"timestamp[us,UTC]",YES,Known validity end,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+user_crosswalk,6,mapping_source,string,NO,Evidence or method,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+user_crosswalk,7,confidence,"decimal128(38,12)",NO,Confidence from 0 to 1,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+user_crosswalk,8,status,string,NO,"CONFIRMED, PROPOSED, UNKNOWN or UNMAPPED",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+user_crosswalk,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+user_crosswalk,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+user_crosswalk,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+user_crosswalk,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+user_crosswalk,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+user_crosswalk,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+user_crosswalk,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+user_crosswalk,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+user_crosswalk,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+user_crosswalk,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+warehouse_branch_mapping,1,warehouse_id,string,NO,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_branch_mapping,2,branch_id,string,YES,Canonical branch ID; nullable when historical mapping is unknown,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_branch_mapping,3,valid_from,"timestamp[us,UTC]",YES,Known validity start; null when unknown,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_branch_mapping,4,valid_to,"timestamp[us,UTC]",YES,Known validity end; null when unknown,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_branch_mapping,5,mapping_source,string,NO,Mapping evidence source,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_branch_mapping,6,confidence,"decimal128(38,12)",NO,Confidence from 0 to 1,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_branch_mapping,7,status,string,NO,"CONFIRMED, PROPOSED, UNKNOWN or UNMAPPED",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+warehouse_branch_mapping,8,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+warehouse_branch_mapping,9,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+warehouse_branch_mapping,10,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+warehouse_branch_mapping,11,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+warehouse_branch_mapping,12,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+warehouse_branch_mapping,13,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+warehouse_branch_mapping,14,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+warehouse_branch_mapping,15,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+warehouse_branch_mapping,16,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+warehouse_branch_mapping,17,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+sales_documents,1,document_id,string,NO,Canonical document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,2,document_type,string,NO,Business document type,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,3,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,4,posting_date,date32,YES,Accounting posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,5,due_date,date32,YES,Due date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,6,is_cancelled,bool,NO,Cancellation state,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,7,currency_code,string,NO,ISO or preserved business currency code,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,8,exchange_rate,"decimal128(38,12)",YES,Document exchange rate,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,9,customer_id,string,NO,Canonical customer ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,10,branch_id,string,YES,Canonical branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,11,salesperson_id,string,YES,Canonical salesperson ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,12,user_id,string,YES,Canonical user ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,13,gross_amount,"decimal128(38,6)",NO,Gross document amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,14,open_amount,"decimal128(38,6)",YES,Observed open amount; not historical payment truth alone,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_documents,15,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+sales_documents,16,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+sales_documents,17,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+sales_documents,18,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+sales_documents,19,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+sales_documents,20,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+sales_documents,21,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+sales_documents,22,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+sales_documents,23,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+sales_documents,24,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+sales_documents,25,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+sales_documents,26,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+sales_documents,27,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+sales_documents,28,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+sales_lines,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,10,customer_id,string,NO,Canonical customer ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,11,branch_id,string,YES,Canonical branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,12,salesperson_id,string,YES,Canonical salesperson ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,13,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,14,posting_date,date32,YES,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_lines,15,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+sales_lines,16,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+sales_lines,17,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+sales_lines,18,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+sales_lines,19,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+sales_lines,20,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+sales_lines,21,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+sales_lines,22,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+sales_lines,23,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+sales_lines,24,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+sales_lines,25,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+sales_lines,26,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+sales_lines,27,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+sales_lines,28,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+credit_notes,1,document_id,string,NO,Canonical document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,2,document_type,string,NO,Business document type,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,3,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,4,posting_date,date32,YES,Accounting posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,5,due_date,date32,YES,Due date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,6,is_cancelled,bool,NO,Cancellation state,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,7,currency_code,string,NO,ISO or preserved business currency code,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,8,exchange_rate,"decimal128(38,12)",YES,Document exchange rate,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,9,customer_id,string,NO,Canonical customer ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,10,branch_id,string,YES,Canonical branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,11,gross_amount,"decimal128(38,6)",NO,Credit amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_notes,12,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+credit_notes,13,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+credit_notes,14,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+credit_notes,15,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+credit_notes,16,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+credit_notes,17,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+credit_notes,18,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+credit_notes,19,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+credit_notes,20,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+credit_notes,21,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+credit_notes,22,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+credit_notes,23,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+credit_notes,24,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+credit_notes,25,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+credit_note_lines,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,10,customer_id,string,NO,Canonical customer ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,11,branch_id,string,YES,Canonical branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,12,salesperson_id,string,YES,Canonical salesperson ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,13,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,14,posting_date,date32,YES,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+credit_note_lines,15,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+credit_note_lines,16,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+credit_note_lines,17,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+credit_note_lines,18,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+credit_note_lines,19,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+credit_note_lines,20,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+credit_note_lines,21,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+credit_note_lines,22,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+credit_note_lines,23,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+credit_note_lines,24,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+credit_note_lines,25,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+credit_note_lines,26,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+credit_note_lines,27,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+credit_note_lines,28,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+inventory_movements,1,inventory_movement_id,string,NO,Canonical movement ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,2,product_id,string,NO,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,3,warehouse_id,string,NO,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,4,branch_id,string,YES,Mapped branch when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,5,event_at,"timestamp[us,UTC]",YES,Operational event timestamp,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,6,document_date,date32,YES,Source document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,7,posting_date,date32,NO,Accounting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,8,movement_type,string,NO,Controlled movement direction/type,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,9,quantity_in,"decimal128(38,12)",NO,"Inbound quantity, non-negative",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,10,quantity_out,"decimal128(38,12)",NO,"Outbound quantity, non-negative",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,11,unit_cost,"decimal128(38,6)",YES,Unit cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,12,total_cost,"decimal128(38,6)",YES,Extended cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,13,customer_id,string,YES,Customer when applicable,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,14,supplier_id,string,YES,Supplier when applicable,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,15,salesperson_id,string,YES,Salesperson when applicable,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,16,user_id,string,YES,Source user when applicable,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_movements,17,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+inventory_movements,18,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+inventory_movements,19,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+inventory_movements,20,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+inventory_movements,21,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+inventory_movements,22,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+inventory_movements,23,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+inventory_movements,24,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+inventory_movements,25,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+inventory_movements,26,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+inventory_movements,27,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+inventory_movements,28,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+inventory_movements,29,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+inventory_movements,30,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+stock_snapshots,1,stock_snapshot_id,string,NO,Canonical snapshot row ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,2,product_id,string,NO,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,3,warehouse_id,string,NO,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,4,branch_id,string,YES,Mapped branch when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,5,snapshot_at,"timestamp[us,UTC]",NO,Snapshot truth time,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,6,on_hand,"decimal128(38,12)",NO,On-hand quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,7,committed,"decimal128(38,12)",YES,Committed quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,8,ordered,"decimal128(38,12)",YES,Ordered quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,9,available,"decimal128(38,12)",YES,Available quantity under semantic version,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,10,inventory_value,"decimal128(38,6)",YES,Valuation under semantic version,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+stock_snapshots,11,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+stock_snapshots,12,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+stock_snapshots,13,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+stock_snapshots,14,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+stock_snapshots,15,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+stock_snapshots,16,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+stock_snapshots,17,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+stock_snapshots,18,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+stock_snapshots,19,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+stock_snapshots,20,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+purchase_requests,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,10,supplier_id,string,YES,Canonical supplier ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,11,branch_id,string,YES,Canonical branch ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,12,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,13,posting_date,date32,YES,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,14,due_date,date32,YES,Due/requested date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,15,base_document_id,string,YES,Canonical base document when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,16,base_line_id,string,YES,Canonical base line when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,17,open_amount,"decimal128(38,6)",YES,Observed open amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_requests,18,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+purchase_requests,19,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+purchase_requests,20,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+purchase_requests,21,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+purchase_requests,22,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+purchase_requests,23,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+purchase_requests,24,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+purchase_requests,25,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+purchase_requests,26,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+purchase_requests,27,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+purchase_requests,28,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+purchase_requests,29,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_requests,30,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_requests,31,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_orders,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,10,supplier_id,string,YES,Canonical supplier ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,11,branch_id,string,YES,Canonical branch ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,12,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,13,posting_date,date32,YES,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,14,due_date,date32,YES,Due/requested date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,15,base_document_id,string,YES,Canonical base document when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,16,base_line_id,string,YES,Canonical base line when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,17,open_amount,"decimal128(38,6)",YES,Observed open amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_orders,18,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+purchase_orders,19,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+purchase_orders,20,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+purchase_orders,21,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+purchase_orders,22,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+purchase_orders,23,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+purchase_orders,24,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+purchase_orders,25,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+purchase_orders,26,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+purchase_orders,27,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+purchase_orders,28,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+purchase_orders,29,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_orders,30,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_orders,31,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+goods_receipts,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,10,supplier_id,string,YES,Canonical supplier ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,11,branch_id,string,YES,Canonical branch ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,12,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,13,posting_date,date32,YES,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,14,due_date,date32,YES,Due/requested date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,15,base_document_id,string,YES,Canonical base document when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,16,base_line_id,string,YES,Canonical base line when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,17,open_amount,"decimal128(38,6)",YES,Observed open amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+goods_receipts,18,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+goods_receipts,19,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+goods_receipts,20,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+goods_receipts,21,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+goods_receipts,22,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+goods_receipts,23,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+goods_receipts,24,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+goods_receipts,25,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+goods_receipts,26,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+goods_receipts,27,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+goods_receipts,28,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+goods_receipts,29,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+goods_receipts,30,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+goods_receipts,31,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+supplier_invoices,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,10,supplier_id,string,YES,Canonical supplier ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,11,branch_id,string,YES,Canonical branch ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,12,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,13,posting_date,date32,YES,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,14,due_date,date32,YES,Due/requested date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,15,base_document_id,string,YES,Canonical base document when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,16,base_line_id,string,YES,Canonical base line when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,17,open_amount,"decimal128(38,6)",YES,Observed open amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+supplier_invoices,18,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+supplier_invoices,19,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+supplier_invoices,20,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+supplier_invoices,21,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+supplier_invoices,22,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+supplier_invoices,23,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+supplier_invoices,24,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+supplier_invoices,25,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+supplier_invoices,26,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+supplier_invoices,27,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+supplier_invoices,28,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+supplier_invoices,29,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+supplier_invoices,30,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+supplier_invoices,31,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_returns,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,10,supplier_id,string,YES,Canonical supplier ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,11,branch_id,string,YES,Canonical branch ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,12,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,13,posting_date,date32,YES,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,14,due_date,date32,YES,Due/requested date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,15,base_document_id,string,YES,Canonical base document when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,16,base_line_id,string,YES,Canonical base line when evidenced,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,17,open_amount,"decimal128(38,6)",YES,Observed open amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_returns,18,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+purchase_returns,19,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+purchase_returns,20,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+purchase_returns,21,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+purchase_returns,22,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+purchase_returns,23,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+purchase_returns,24,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+purchase_returns,25,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+purchase_returns,26,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+purchase_returns,27,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+purchase_returns,28,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+purchase_returns,29,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_returns,30,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_returns,31,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+transfer_documents,1,document_id,string,NO,Canonical document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,2,document_type,string,NO,Business document type,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,3,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,4,posting_date,date32,YES,Accounting posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,5,due_date,date32,YES,Due date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,6,is_cancelled,bool,NO,Cancellation state,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,7,currency_code,string,NO,ISO or preserved business currency code,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,8,exchange_rate,"decimal128(38,12)",YES,Document exchange rate,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,9,from_warehouse_id,string,NO,Origin warehouse,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,10,to_warehouse_id,string,NO,Destination warehouse,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_documents,11,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+transfer_documents,12,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+transfer_documents,13,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+transfer_documents,14,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+transfer_documents,15,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+transfer_documents,16,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+transfer_documents,17,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+transfer_documents,18,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+transfer_documents,19,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+transfer_documents,20,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+transfer_documents,21,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+transfer_documents,22,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+transfer_documents,23,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+transfer_documents,24,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+transfer_lines,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,10,from_warehouse_id,string,NO,Origin warehouse,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,11,to_warehouse_id,string,NO,Destination warehouse,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,12,event_at,"timestamp[us,UTC]",YES,Transfer event timestamp,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,13,posting_date,date32,NO,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+transfer_lines,14,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+transfer_lines,15,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+transfer_lines,16,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+transfer_lines,17,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+transfer_lines,18,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+transfer_lines,19,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+transfer_lines,20,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+transfer_lines,21,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+transfer_lines,22,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+transfer_lines,23,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+transfer_lines,24,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+transfer_lines,25,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+transfer_lines,26,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+transfer_lines,27,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+boms,1,bom_id,string,NO,Canonical BOM version ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+boms,2,parent_product_id,string,NO,Parent product,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+boms,3,bom_version,string,NO,Version identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+boms,4,valid_from,"timestamp[us,UTC]",YES,Known validity start,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+boms,5,valid_to,"timestamp[us,UTC]",YES,Known validity end,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+boms,6,planned_quantity,"decimal128(38,12)",NO,BOM basis quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+boms,7,warehouse_id,string,YES,Warehouse scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+boms,8,plant_id,string,YES,Plant scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+boms,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+boms,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+boms,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+boms,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+boms,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+boms,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+boms,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+boms,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+boms,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+boms,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+bom_components,1,bom_component_id,string,NO,Canonical component row ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+bom_components,2,bom_id,string,NO,Parent BOM,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+bom_components,3,component_product_id,string,NO,Component product,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+bom_components,4,component_position,string,NO,Source position preserved as identifier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+bom_components,5,required_quantity,"decimal128(38,12)",NO,Required quantity per basis,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+bom_components,6,unit_of_measure_id,string,YES,Canonical UOM,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+bom_components,7,warehouse_id,string,YES,Warehouse scope inherited from versioned BOM,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+bom_components,8,plant_id,string,YES,Plant scope inherited from versioned BOM,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+bom_components,9,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+bom_components,10,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+bom_components,11,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+bom_components,12,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+bom_components,13,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+bom_components,14,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+bom_components,15,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+bom_components,16,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+bom_components,17,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+bom_components,18,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+production_orders,1,document_id,string,NO,Canonical document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,2,document_type,string,NO,Business document type,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,3,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,4,posting_date,date32,YES,Accounting posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,5,due_date,date32,YES,Due date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,6,is_cancelled,bool,NO,Cancellation state,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,7,currency_code,string,NO,ISO or preserved business currency code,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,8,exchange_rate,"decimal128(38,12)",YES,Document exchange rate,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,9,production_order_id,string,NO,Canonical production order ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,10,product_id,string,NO,Output product,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,11,warehouse_id,string,NO,Production warehouse,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,12,plant_id,string,YES,Plant scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,13,order_date,date32,NO,Order date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,14,release_date,date32,YES,Release date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,15,close_date,date32,YES,Close date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,16,planned_quantity,"decimal128(38,12)",NO,Planned output,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,17,completed_quantity,"decimal128(38,12)",YES,Observed completed output,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_orders,18,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+production_orders,19,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+production_orders,20,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+production_orders,21,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+production_orders,22,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+production_orders,23,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+production_orders,24,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+production_orders,25,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+production_orders,26,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+production_orders,27,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+production_orders,28,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+production_orders,29,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+production_orders,30,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+production_orders,31,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+production_component_consumptions,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,10,production_order_id,string,NO,Canonical production order,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,11,event_at,"timestamp[us,UTC]",YES,Operational event timestamp,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,12,posting_date,date32,NO,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,13,plant_id,string,YES,Plant scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,14,unit_cost,"decimal128(38,6)",YES,Unit cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,15,total_cost,"decimal128(38,6)",YES,Extended cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_component_consumptions,16,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+production_component_consumptions,17,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+production_component_consumptions,18,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+production_component_consumptions,19,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+production_component_consumptions,20,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+production_component_consumptions,21,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+production_component_consumptions,22,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+production_component_consumptions,23,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+production_component_consumptions,24,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+production_component_consumptions,25,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+production_component_consumptions,26,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+production_component_consumptions,27,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+production_component_consumptions,28,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+production_component_consumptions,29,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+production_outputs,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,10,production_order_id,string,NO,Canonical production order,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,11,event_at,"timestamp[us,UTC]",YES,Operational event timestamp,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,12,posting_date,date32,NO,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,13,plant_id,string,YES,Plant scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,14,unit_cost,"decimal128(38,6)",YES,Unit cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,15,total_cost,"decimal128(38,6)",YES,Extended cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_outputs,16,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+production_outputs,17,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+production_outputs,18,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+production_outputs,19,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+production_outputs,20,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+production_outputs,21,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+production_outputs,22,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+production_outputs,23,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+production_outputs,24,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+production_outputs,25,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+production_outputs,26,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+production_outputs,27,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+production_outputs,28,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+production_outputs,29,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+payments,1,document_id,string,NO,Canonical document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,2,document_type,string,NO,Business document type,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,3,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,4,posting_date,date32,YES,Accounting posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,5,due_date,date32,YES,Due date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,6,is_cancelled,bool,NO,Cancellation state,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,7,currency_code,string,NO,ISO or preserved business currency code,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,8,exchange_rate,"decimal128(38,12)",YES,Document exchange rate,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,9,payment_id,string,NO,Canonical payment ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,10,payment_direction,string,NO,INCOMING or OUTGOING,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,11,customer_id,string,YES,Canonical customer,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,12,supplier_id,string,YES,Canonical supplier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,13,branch_id,string,YES,Branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,14,amount,"decimal128(38,6)",NO,Payment amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,15,bank_account,string,YES,Sensitive bank account reference,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+payments,16,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+payments,17,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+payments,18,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+payments,19,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+payments,20,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+payments,21,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+payments,22,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+payments,23,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+payments,24,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+payments,25,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+payments,26,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+payments,27,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+payments,28,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+payments,29,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+reconciliations,1,reconciliation_member_id,string,NO,Canonical reconciliation member ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+reconciliations,2,reconciliation_id,string,NO,Canonical reconciliation ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+reconciliations,3,document_id,string,NO,Member document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+reconciliations,4,source_line_number,int32,YES,Member line,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+reconciliations,5,customer_id,string,YES,Canonical customer,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+reconciliations,6,supplier_id,string,YES,Canonical supplier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+reconciliations,7,branch_id,string,YES,Branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+reconciliations,8,reconciliation_date,date32,NO,Reconciliation effective date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+reconciliations,9,reconciled_amount,"decimal128(38,6)",NO,Amount settled by this member,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+reconciliations,10,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+reconciliations,11,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+reconciliations,12,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+reconciliations,13,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+reconciliations,14,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+reconciliations,15,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+reconciliations,16,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+reconciliations,17,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+reconciliations,18,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+reconciliations,19,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+reconciliations,20,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+reconciliations,21,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+reconciliations,22,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+reconciliations,23,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+product_flow,1,flow_event_id,string,NO,Stable derived event ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,2,event_type,string,NO,"SALE, CREDIT_NOTE, MOVEMENT, TRANSFER, RECEIPT, RETURN, CONSUMPTION or OUTPUT",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,3,product_id,string,NO,Canonical product,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,4,document_id,string,YES,Canonical source document,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,5,movement_id,string,YES,Canonical movement,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,6,event_at,"timestamp[us,UTC]",YES,Event timestamp,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,7,document_date,date32,YES,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,8,posting_date,date32,YES,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,9,warehouse_id,string,YES,Warehouse scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,10,branch_id,string,YES,Branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,11,customer_id,string,YES,Customer when applicable,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,12,supplier_id,string,YES,Supplier when applicable,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,13,salesperson_id,string,YES,Salesperson when applicable,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,14,user_id,string,YES,User when applicable,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,15,quantity_in,"decimal128(38,12)",NO,Inbound quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,16,quantity_out,"decimal128(38,12)",NO,Outbound quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,17,unit_cost,"decimal128(38,6)",YES,Unit cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,18,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,19,amount,"decimal128(38,6)",YES,Event amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+product_flow,20,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+product_flow,21,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+product_flow,22,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+product_flow,23,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+product_flow,24,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+product_flow,25,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+product_flow,26,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+product_flow,27,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+product_flow,28,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+product_flow,29,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+product_flow,30,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+product_flow,31,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+product_flow,32,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+product_flow,33,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+inventory_position,1,product_id,string,NO,Canonical product,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_position,2,warehouse_id,string,NO,Canonical warehouse,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_position,3,branch_id,string,YES,Mapped branch,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_position,4,snapshot_at,"timestamp[us,UTC]",NO,Snapshot truth time,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_position,5,on_hand,"decimal128(38,12)",NO,On-hand,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_position,6,committed,"decimal128(38,12)",YES,Committed,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_position,7,ordered,"decimal128(38,12)",YES,Ordered,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_position,8,available,"decimal128(38,12)",YES,Available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_position,9,inventory_value,"decimal128(38,6)",YES,Valuation,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+inventory_position,10,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+inventory_position,11,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+inventory_position,12,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+inventory_position,13,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+inventory_position,14,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+inventory_position,15,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+inventory_position,16,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+inventory_position,17,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+inventory_position,18,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+inventory_position,19,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+inventory_position,20,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+inventory_position,21,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+inventory_position,22,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+inventory_position,23,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+sales_line_read_model,1,line_id,string,NO,Canonical line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,2,document_id,string,NO,Canonical parent document ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,3,source_line_number,int32,YES,Native numeric line number where available,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,4,product_id,string,YES,Canonical product ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,5,warehouse_id,string,YES,Canonical warehouse ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,6,quantity,"decimal128(38,12)",YES,Signed or direction-specific quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,7,unit_price,"decimal128(38,6)",YES,Unit price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,8,line_amount,"decimal128(38,6)",YES,Line amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,9,cost_amount,"decimal128(38,6)",YES,Line cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,10,sale_line_id,string,NO,Canonical sale line,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,11,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,12,posting_date,date32,YES,Posting date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,13,due_date,date32,YES,Due date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,14,customer_id,string,NO,Customer,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,15,customer_name,string,YES,Observed customer name,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,16,branch_id,string,YES,Branch,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,17,salesperson_id,string,YES,Salesperson,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,18,margin_amount,"decimal128(38,6)",YES,Versioned line margin,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+sales_line_read_model,19,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+sales_line_read_model,20,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+sales_line_read_model,21,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+sales_line_read_model,22,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+sales_line_read_model,23,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+sales_line_read_model,24,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+sales_line_read_model,25,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+sales_line_read_model,26,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+sales_line_read_model,27,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+sales_line_read_model,28,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+sales_line_read_model,29,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+sales_line_read_model,30,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+sales_line_read_model,31,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+sales_line_read_model,32,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_cycle_line,1,purchase_cycle_line_id,string,NO,Stable cycle line ID,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,2,cycle_stage,string,NO,"REQUEST, ORDER, RECEIPT, INVOICE or RETURN",SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,3,document_id,string,NO,Stage document,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,4,line_id,string,NO,Stage line,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,5,base_document_id,string,YES,Linked predecessor,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,6,base_line_id,string,YES,Linked predecessor line,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,7,product_id,string,YES,Product,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,8,supplier_id,string,YES,Supplier,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,9,warehouse_id,string,YES,Warehouse,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,10,branch_id,string,YES,Branch,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,11,document_date,date32,NO,Document date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,12,quantity,"decimal128(38,12)",YES,Quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,13,unit_price,"decimal128(38,6)",YES,Price,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,14,line_amount,"decimal128(38,6)",YES,Amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,15,open_amount,"decimal128(38,6)",YES,Open amount,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+purchase_cycle_line,16,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+purchase_cycle_line,17,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+purchase_cycle_line,18,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+purchase_cycle_line,19,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+purchase_cycle_line,20,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+purchase_cycle_line,21,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+purchase_cycle_line,22,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+purchase_cycle_line,23,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+purchase_cycle_line,24,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+purchase_cycle_line,25,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+purchase_cycle_line,26,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+purchase_cycle_line,27,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_cycle_line,28,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+purchase_cycle_line,29,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+production_order_flow,1,production_order_id,string,NO,Production order,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,2,product_id,string,NO,Product/component,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,3,flow_role,string,NO,OUTPUT or COMPONENT,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,4,warehouse_id,string,NO,Warehouse,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,5,plant_id,string,YES,Plant,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,6,order_date,date32,NO,Order date,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,7,planned_quantity,"decimal128(38,12)",YES,Planned quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,8,actual_quantity,"decimal128(38,12)",YES,Actual quantity,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,9,variance_quantity,"decimal128(38,12)",YES,Versioned variance,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,10,cost_amount,"decimal128(38,6)",YES,Cost,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+production_order_flow,11,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+production_order_flow,12,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+production_order_flow,13,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+production_order_flow,14,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+production_order_flow,15,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+production_order_flow,16,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+production_order_flow,17,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+production_order_flow,18,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+production_order_flow,19,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+production_order_flow,20,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+production_order_flow,21,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+production_order_flow,22,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+production_order_flow,23,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+production_order_flow,24,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL
+customer_credit_state,1,customer_id,string,NO,Canonical customer,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,2,branch_id,string,YES,Branch scope,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,3,as_of_date,date32,NO,Semantic cutoff,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,4,credit_limit,"decimal128(38,6)",YES,Observed credit limit,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,5,open_amount,"decimal128(38,6)",NO,Open amount as-of,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,6,overdue_amount,"decimal128(38,6)",NO,Overdue amount as-of,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,7,not_due_amount,"decimal128(38,6)",NO,Not-due amount as-of,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,8,aging_0_30,"decimal128(38,6)",NO,0-30 days overdue,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,9,aging_31_60,"decimal128(38,6)",NO,31-60 days overdue,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,10,aging_61_90,"decimal128(38,6)",NO,61-90 days overdue,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,11,aging_91_plus,"decimal128(38,6)",NO,91+ days overdue,SOURCE_OR_TRANSFORMATION_DECLARED,BUSINESS
+customer_credit_state,12,_source_system,string,NO,Controlled source system.,REQUIRED,TECHNICAL
+customer_credit_state,13,_source_dataset,string,NO,"Source table, query extract, legacy family or upstream dataset.",REQUIRED,TECHNICAL
+customer_credit_state,14,_source_native_key,string,NO,Canonical serialization of the source-native key; never replaced by canonical_id.,REQUIRED,TECHNICAL
+customer_credit_state,15,_source_file,string,YES,Source-relative file path; required for legacy rows.,OPTIONAL,TECHNICAL
+customer_credit_state,16,_source_snapshot_at,"timestamp[us,UTC]",YES,Observed source cutoff; required for snapshot observations.,OPTIONAL,TECHNICAL
+customer_credit_state,17,_source_extracted_at,"timestamp[us,UTC]",NO,Time source was read.,REQUIRED,TECHNICAL
+customer_credit_state,18,_ingested_at,"timestamp[us,UTC]",NO,Time row entered this layer.,REQUIRED,TECHNICAL
+customer_credit_state,19,_transformation_version,string,NO,Build code/contract version.,REQUIRED,TECHNICAL
+customer_credit_state,20,_semantic_version,string,NO,Meaning/metric contract version.,REQUIRED,TECHNICAL
+customer_credit_state,21,_lineage_quality,string,NO,"FULL_DOCUMENT_TRACE, PARTIAL_TRACE, AGGREGATE_ONLY or UNKNOWN.",REQUIRED,TECHNICAL
+customer_credit_state,22,_source_document_type,string,YES,Native document type when applicable.,OPTIONAL,TECHNICAL
+customer_credit_state,23,_source_document_id,string,YES,Native document identifier when applicable.,OPTIONAL,TECHNICAL
+customer_credit_state,24,_source_line_id,string,YES,Native line identifier when applicable.,OPTIONAL,TECHNICAL
+customer_credit_state,25,_source_transaction_id,string,YES,Native transaction identifier when applicable.,OPTIONAL,TECHNICAL

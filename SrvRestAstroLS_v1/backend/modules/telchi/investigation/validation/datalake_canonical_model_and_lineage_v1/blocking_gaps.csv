@@ -1,0 +1,19 @@
+gap_id,classification,evidence_gap,impact_on_next_gate,v1_policy_or_next_action,priority
+GAP-001,BLOCKING_LINEAGE,Formal source metadata is absent for legacy Parquet,Physical rows need a stable nullable lineage envelope,Carry required lineage fields and quarantine UNKNOWN source identity,HIGH
+GAP-002,BLOCKING_TEMPORAL_POLICY,Filename and contained business dates differ,Physical snapshots need cutoff and observation timestamps,Never concatenate overlapping family files without declared cutoff,HIGH
+GAP-003,BLOCKING_CANONICAL_MODEL,movProductSB1 candidate duplicates and non-universal OINM join,Atomic movement key cannot be assumed from short candidate,Preserve source transaction identity; classify unresolved rows,HIGH
+GAP-004,BLOCKING_TEMPORAL_POLICY,Historical validity of masters and warehouse-branch map absent,Physical dimensions need validity columns and unknown history policy,Version identities; do not backfill history silently,HIGH
+GAP-005,NON_BLOCKING,Purchase approval/MRP execution not demonstrated,Does not prevent V1 atomic purchase facts,Keep approval/MRP behavior CORE_LATER,MEDIUM
+GAP-006,NON_BLOCKING,Forecast rows do not prove operational use,"Forecast can remain configured/observed, not behavior",Separate forecast definition from observed usage,HIGH
+GAP-007,NON_BLOCKING,Safety stock semantics not confirmed,MRP is CORE_LATER,Preserve raw parameter and semantic status,HIGH
+GAP-008,NON_BLOCKING,No MRP execution history/versioning,No V1 atomic dependency,No inferred execution events,MEDIUM
+GAP-009,NON_BLOCKING,Lot/serial coverage incomplete,Atomic movement remains valid without complete lot enrichment,Keep lot/serial optional and partial,MEDIUM
+GAP-010,BLOCKING_LINEAGE,Production-to-dispatch link is heuristic,Cannot promise full order-to-dispatch trace,Preserve heuristic link with confidence and no FK assertion,HIGH
+GAP-011,NON_BLOCKING,Transfer accounting is not physical dispatch proof,Transfer event product is still defined,Name physical logistics as unavailable/derived,HIGH
+GAP-012,BLOCKING_SECURITY,Historical authorization unavailable,Security contract must exist before retrieval,Declare domain/scope/column/metric filters in every product,HIGH
+GAP-013,NON_BLOCKING,Management approvals external/heuristic,"Approval event is specialized, not V1 core",Keep external evidence boundary,MEDIUM
+GAP-014,OUT_OF_INITIAL_SCOPE,Detailed payroll object not identified,Individual payroll is excluded from V1,Keep aggregate HR cost separate,HIGH
+GAP-015,OUT_OF_INITIAL_SCOPE,WHT transactional path not established,WHT detail is excluded from V1,Do not represent configuration as transactions,HIGH
+GAP-016,NON_BLOCKING,External bank reconciliation not demonstrated,Treasury source facts can be preserved without external match,Mark external reconciliation unavailable,MEDIUM
+GAP-017,BLOCKING_CANONICAL_MODEL,Legacy purchaseExpense/productTransform/cash mappings incomplete,Cannot silently merge legacy families into SAP facts,Keep specialized legacy products and explicit crosswalk status,MEDIUM
+GAP-018,BLOCKING_TEMPORAL_POLICY,Historical cancellations/payments have differing watermarks,As-of physical design needs source-specific cutoffs,Use source-effective/system-time pair and no cross-source implicit cutover,HIGH

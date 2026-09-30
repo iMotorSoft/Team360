@@ -1,0 +1,16 @@
+drilldown_id,chain,as_of_required,authorization_rechecked
+sales_document,executive -> branch/customer/product -> sales document -> line -> SAP evidence,YES,YES
+stock_evidence,executive -> product/warehouse -> stock snapshot -> movement evidence,YES,YES
+branch,executive -> branch -> warehouse mapping -> stock/sales evidence,YES,YES
+product,executive -> product -> documents/lines -> SAP evidence,YES,YES
+customer,executive -> customer -> documents/payments -> SAP evidence,YES,YES
+customer_credit,executive -> customer ranking -> customer balance -> open documents -> invoice/payment/reconciliation,YES,YES
+customer_credit_evidence,executive -> as_of snapshot -> customer -> document chain -> SAP evidence,YES,YES
+payment,executive -> customer/branch -> receipt/allocation -> reconciliation -> SAP evidence,YES,YES
+production,executive -> status/product -> production order -> receipt/component issue -> SAP evidence,YES,YES
+production_order,executive -> order -> receipt/consumption -> source documents,YES,YES
+purchase,executive -> supplier/product -> purchase document line -> receipt -> SAP evidence,YES,YES
+cost_evidence,executive -> metric/cost basis -> source cost observation -> document evidence,YES,YES
+sap_document,executive -> document -> line -> reconciliation/payment/credit note,YES,YES
+warehouse,executive -> branch/warehouse -> mapping -> current snapshot/movement,YES,YES
+reference,executive -> canonical entity -> alias/source mapping -> reference evidence,YES,YES

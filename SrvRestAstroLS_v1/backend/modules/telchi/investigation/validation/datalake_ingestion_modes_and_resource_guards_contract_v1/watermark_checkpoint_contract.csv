@@ -1,0 +1,11 @@
+mode_or_state,watermark_name,meaning,authoritative_for_resume,advance_condition,checkpoint_grain,on_failure,dirty_gap_behavior
+INITIAL_INGESTION,detected_watermark,maximum source cursor observed for the bounded window,NO,NEVER_BY_DETECTION_ALONE,MONTH_OR_BOUNDED_WINDOW,retain last trusted checkpoint,does not hide dirty historical scopes
+INITIAL_INGESTION,processed_watermark,window extracted and transformed locally,NO,NEVER_BEFORE_VALIDATION,MONTH_OR_BOUNDED_WINDOW,leave candidate untrusted,does not hide dirty historical scopes
+INITIAL_INGESTION,validated_watermark,window passed validation/reconciliation,NO,requires publication,MONTH_OR_BOUNDED_WINDOW,do not publish and do not advance trusted cursor,does not hide dirty historical scopes
+INITIAL_INGESTION,published_trusted_watermark,latest baseline window published as trusted,YES,only after successful validation and publication,MONTH_OR_BOUNDED_WINDOW,keep prior trusted baseline and checkpoint,dirty scopes remain visible in coverage map
+INCREMENTAL_UPDATE,detected_watermark,maximum change cursor detected in a micro-batch,NO,NEVER_BY_EXTRACTION_ALONE,TRUSTED_MICRO_BATCH,repeat lookback safely,does not hide dirty historical scopes
+INCREMENTAL_UPDATE,processed_watermark,affected records transformed into candidate state,NO,never before validation,TRUSTED_MICRO_BATCH,keep candidate out of serving path,does not hide dirty historical scopes
+INCREMENTAL_UPDATE,validated_watermark,micro-batch passed validation and focal reconciliation,NO,requires publication,TRUSTED_MICRO_BATCH,retain last trusted state,does not hide dirty historical scopes
+INCREMENTAL_UPDATE,published_trusted_watermark,latest published and trusted cursor,YES,only after successful validation and publication,TRUSTED_MICRO_BATCH,do not advance; resume from this cursor,dirty scopes remain visible in coverage map
+RECONCILIATION,scope_checkpoint,completed bounded scope/range of a long reconciliation,NO,after scope result is committed,SCOPED_RANGE,retain completed evidence and resume remaining scope,dirty scopes remain visible in coverage map
+SAFE_ABORT,checkpoint,valid last trusted restart point,YES,unchanged by abort,MODE_SPECIFIC,abort without partial publication or watermark advance,dirty scopes remain visible in coverage map

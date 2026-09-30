@@ -1,0 +1,135 @@
+{
+  "gate": "TELCHI_DATALAKE_CEO_QUERY_SEMANTICS_AND_PERFORMANCE_CONTRACT_V1",
+  "ceo_query_families": 10,
+  "ceo_queries_total": 74,
+  "ceo_queries_p0": 15,
+  "ceo_queries_p1": 40,
+  "ceo_queries_p2": 19,
+  "metrics": {
+    "total": 32,
+    "confirmed": 3,
+    "provisional": 19,
+    "semantic_gap": 10,
+    "not_supported": 0
+  },
+  "dimensions_total": 15,
+  "ambiguities_total": 15,
+  "ambiguities_with_default": 9,
+  "ambiguities_requiring_clarification": 9,
+  "p0_with_semantic_plan": [
+    15,
+    15
+  ],
+  "p0_with_data_product": [
+    15,
+    15
+  ],
+  "p0_with_latency_class": [
+    15,
+    15
+  ],
+  "p0_with_freshness_class": [
+    15,
+    15
+  ],
+  "p0_with_drilldown": [
+    15,
+    15
+  ],
+  "performance_targets_ms": {
+    "A": 100,
+    "B": 300,
+    "C": 750
+  },
+  "cash_vs_credit_semantics": "SEMANTIC_GAP",
+  "net_sales_semantics": "SEMANTIC_GAP",
+  "current_receivable_semantics": "PROVISIONAL",
+  "overdue_receivable_semantics": "PROVISIONAL",
+  "stock_default_semantics": "PROVISIONAL",
+  "production_count_default_semantics": "SEMANTIC_GAP",
+  "uom_contract_ready": true,
+  "currency_contract_ready": true,
+  "date_semantics_ready": true,
+  "security_scope_contract_ready": true,
+  "drilldown_contract_ready": true,
+  "dev_prod_logical_names_identical": true,
+  "postgres_catalog_database": "team360_telchi_ducklake",
+  "postgres_runtime_role": "team360_telchi_ducklake",
+  "sap_accessed": false,
+  "sap_write_count": 0,
+  "atomic_tables_created": 0,
+  "business_tables_created": 0,
+  "current_tables_created": 0,
+  "ceo_query_contract_ready": true,
+  "atomic_requirements_derived": true,
+  "atomic_build_priority_defined": true,
+  "status": "DEGRADED",
+  "degraded_reasons": [
+    "CASH_VS_CREDIT_SEMANTIC_GAP",
+    "NET_SALES_SEMANTIC_GAP",
+    "PRODUCTION_COUNT_DEFAULT_SEMANTIC_GAP",
+    "COST_AND_FX_POLICIES_UNRESOLVED"
+  ],
+  "next_gate": "STOP_AND_REVIEW; do not build atomic yet",
+  "entity_resolution_p95_ms": 7.959,
+  "ducklake_warm_query_p95_ms": 10.0535,
+  "semantic_catalog_lookup_p95_ms": 0.000116,
+  "benchmark": [
+    {
+      "probe": "entity_resolution_raw_parquet_probe",
+      "p50_ms": 5.657,
+      "p95_ms": 8.841,
+      "max_ms": 8.841,
+      "source": "measured_warm_readonly_duckdb",
+      "notes": "reference/crosswalk parquet; no writes"
+    },
+    {
+      "probe": "external_reference_lookup",
+      "p50_ms": 7.092,
+      "p95_ms": 8.099,
+      "max_ms": 8.099,
+      "source": "measured_warm_readonly_duckdb",
+      "notes": "reference/crosswalk parquet; no writes"
+    },
+    {
+      "probe": "crosswalk_lookup",
+      "p50_ms": 0.507,
+      "p95_ms": 0.704,
+      "max_ms": 0.704,
+      "source": "measured_warm_readonly_duckdb",
+      "notes": "reference/crosswalk parquet; no writes"
+    },
+    {
+      "probe": "semantic_catalog_lookup",
+      "p50_ms": 0.000109,
+      "p95_ms": 0.000116,
+      "max_ms": 0.004537,
+      "source": "measured_in_memory_catalog",
+      "notes": "1000 deterministic dictionary lookups"
+    },
+    {
+      "probe": "entity_resolution",
+      "p50_ms": 5.0,
+      "p95_ms": 7.959,
+      "max_ms": 7.959,
+      "source": "TELCHI_DATALAKE_REFERENCE_AND_CROSSWALK_V1 evidence",
+      "notes": "approved warm entity resolver baseline; raw parquet probe retained separately"
+    },
+    {
+      "probe": "ducklake_warm_query",
+      "p50_ms": 7.7755,
+      "p95_ms": 10.0535,
+      "max_ms": 39.1666,
+      "source": "TELCHI_DUCKLAKE_POSTGRES18_FOUNDATION_V1 evidence",
+      "notes": "carried forward; no attach in this gate"
+    },
+    {
+      "probe": "ducklake_attach_cold",
+      "p50_ms": 169.2687,
+      "p95_ms": 170.0556,
+      "max_ms": 170.5355,
+      "source": "TELCHI_DUCKLAKE_POSTGRES18_FOUNDATION_V1 evidence",
+      "notes": "not in query budget; connection reuse required"
+    }
+  ]
+}

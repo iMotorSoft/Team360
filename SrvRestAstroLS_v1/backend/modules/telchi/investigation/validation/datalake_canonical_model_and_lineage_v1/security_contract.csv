@@ -1,0 +1,10 @@
+security_domain,data_products,organizational_scope_dimension,sensitive_columns_or_metrics,cross_scope_aggregation_allowed,gate_access,enforcement_contract
+inventory,inventory_movements;stock_snapshots;stock_current;warehouse_transfers,warehouse_id,cost;movement_user;warehouse,YES,administrator/all in this gate,future filter before retrieval
+sales,sales_documents;sales_lines,branch_id;salesperson_id;channel,customer;price;cost;margin,CONDITIONAL,administrator/all in this gate,scope before metrics and retrieval
+purchases,purchase_cycle;purchase_requests,supplier_id;branch_id,supplier;purchase_price;cost,CONDITIONAL,administrator/all in this gate,supplier and organization scope
+production,bom;production_orders;production_consumption;production_output,warehouse_id;plant_id,formulation;cost;output,CONDITIONAL,administrator/all in this gate,BOM/formulation may require column permission
+credit,customer_credit_state;payments;reconciliations,customer_id;portfolio_id,credit_limit;customer_debt,CONDITIONAL,administrator/all in this gate,as-of state filtered before retrieval
+finance,payments;reconciliations;general_ledger,legal_entity_id;branch_id,bank_account;debt;margin,CONDITIONAL,administrator/all in this gate,currency and entity scopes
+hr,employee;payroll_detail,organizational_scope,salary;employee_identity,NO_FOR_V1,administrator/all in this gate,payroll detail out of initial scope
+users,user;approval_event,organizational_scope,user_activity;authorization,CONDITIONAL,administrator/all in this gate,historical authorization unavailable
+configuration,mrp_configuration;forecast,company_id;warehouse_id,forecast;policy;configuration,CONDITIONAL,administrator/all in this gate,configuration is not behavior

@@ -1,0 +1,9 @@
+signal,role,business_time_handling,change_time_handling,authoritative_read,old_period_supported,watermark_policy
+DOC_DATE,business coverage and segmentation only,assign fact to business period,not a change cursor,NO,YES,"BUSINESS_DATE_ONLY_WATERMARK=FORBIDDEN"
+SOURCE_UPDATE_DATETIME,domain change signal,retain affected business period,retrieve changed object keys,NO,YES,advance only after trusted publish
+SOURCE_CREATE_DATETIME,domain create signal,assign created fact business period,detect new source object,NO,YES,advance only after trusted publish
+CHANGE_MARKER,domain-specific source signal,retain affected coverage,read affected authoritative keys,NO,YES,advance only after trusted publish
+SEQUENTIAL_IDENTIFIER,ordered source cursor when validated,retain business period from object,process cursor with bounded lookback,NO,YES,advance only after trusted publish
+CANCEL_MARKER,cancellation or reversal signal,mark original business period dirty,read cancelled object and dependent lines,NO,YES,advance only after trusted publish
+BOUNDED_LOOKBACK,defense for missed or late signals,revisit declared business range,detect changes with bounded source read,NO,YES,never discard because business date is older
+PERIODIC_RECONCILIATION,drift detection control,sample historical coverage,authoritative comparison of bounded scope,YES,YES,does not advance through dirty gap

@@ -1,0 +1,153 @@
+contract_profile,field_name,requirement,applies_to,rule
+reference_master,source_system,REQUIRED,Reference/master rows,"Controlled value: SAP_HANA, LEGACY_DS, LEGACY_DS0, EXTERNAL_FILES, or explicitly derived source."
+reference_master,source_table_or_dataset,REQUIRED,Reference/master rows,"SAP table, legacy family, file dataset, or named upstream product."
+reference_master,source_native_key,REQUIRED,Reference/master rows,Canonical serialized native key; UNKNOWN only with a quality flag.
+reference_master,source_document_type,NOT_APPLICABLE,Reference/master rows,Required when source has a document type; not applicable to pure master rows.
+reference_master,source_document_id,NOT_APPLICABLE,Reference/master rows,SAP DocEntry or legacy document key when available.
+reference_master,source_line_id,NOT_APPLICABLE,Reference/master rows,SAP LineNum/line key; required to avoid header fanout.
+reference_master,source_transaction_id,NOT_APPLICABLE,Reference/master rows,"TransNum, payment key, ReconNum/member, or equivalent."
+reference_master,source_file,OPTIONAL,Reference/master rows,Relative source path/name; immutable source identity.
+reference_master,source_snapshot_at,NOT_APPLICABLE,Reference/master rows,Observed cutoff/extraction declared by source evidence; never inferred from filename alone.
+reference_master,source_extracted_at,REQUIRED,Reference/master rows,Timestamp when upstream was extracted/read.
+reference_master,ingested_at,OPTIONAL,Reference/master rows,Timestamp when canonical pipeline accepted the row.
+reference_master,transformation_version,OPTIONAL,Reference/master rows,Code/transformation contract version.
+reference_master,semantic_version,OPTIONAL,Reference/master rows,Definition version; changes are not silent.
+reference_master,sap_objtype,OPTIONAL,Reference/master rows,SAP ObjType when applicable; null for non-SAP or unavailable trace.
+reference_master,sap_docentry,OPTIONAL,Reference/master rows,SAP DocEntry when available.
+reference_master,sap_linenum,NOT_APPLICABLE,Reference/master rows,SAP LineNum when available.
+reference_master,sap_transnum,NOT_APPLICABLE,Reference/master rows,SAP TransNum when available.
+reference_master,sap_whscode,OPTIONAL,Reference/master rows,SAP WhsCode when applicable.
+reference_master,sap_itemcode,OPTIONAL,Reference/master rows,SAP ItemCode when applicable.
+document_header,source_system,REQUIRED,Atomic document headers,"Controlled value: SAP_HANA, LEGACY_DS, LEGACY_DS0, EXTERNAL_FILES, or explicitly derived source."
+document_header,source_table_or_dataset,REQUIRED,Atomic document headers,"SAP table, legacy family, file dataset, or named upstream product."
+document_header,source_native_key,REQUIRED,Atomic document headers,Canonical serialized native key; UNKNOWN only with a quality flag.
+document_header,source_document_type,OPTIONAL,Atomic document headers,Required when source has a document type; not applicable to pure master rows.
+document_header,source_document_id,REQUIRED,Atomic document headers,SAP DocEntry or legacy document key when available.
+document_header,source_line_id,NOT_APPLICABLE,Atomic document headers,SAP LineNum/line key; required to avoid header fanout.
+document_header,source_transaction_id,NOT_APPLICABLE,Atomic document headers,"TransNum, payment key, ReconNum/member, or equivalent."
+document_header,source_file,NOT_APPLICABLE,Atomic document headers,Relative source path/name; immutable source identity.
+document_header,source_snapshot_at,NOT_APPLICABLE,Atomic document headers,Observed cutoff/extraction declared by source evidence; never inferred from filename alone.
+document_header,source_extracted_at,REQUIRED,Atomic document headers,Timestamp when upstream was extracted/read.
+document_header,ingested_at,REQUIRED,Atomic document headers,Timestamp when canonical pipeline accepted the row.
+document_header,transformation_version,REQUIRED,Atomic document headers,Code/transformation contract version.
+document_header,semantic_version,REQUIRED,Atomic document headers,Definition version; changes are not silent.
+document_header,sap_objtype,OPTIONAL,Atomic document headers,SAP ObjType when applicable; null for non-SAP or unavailable trace.
+document_header,sap_docentry,OPTIONAL,Atomic document headers,SAP DocEntry when available.
+document_header,sap_linenum,NOT_APPLICABLE,Atomic document headers,SAP LineNum when available.
+document_header,sap_transnum,NOT_APPLICABLE,Atomic document headers,SAP TransNum when available.
+document_header,sap_whscode,OPTIONAL,Atomic document headers,SAP WhsCode when applicable.
+document_header,sap_itemcode,OPTIONAL,Atomic document headers,SAP ItemCode when applicable.
+document_line,source_system,REQUIRED,Atomic document lines,"Controlled value: SAP_HANA, LEGACY_DS, LEGACY_DS0, EXTERNAL_FILES, or explicitly derived source."
+document_line,source_table_or_dataset,REQUIRED,Atomic document lines,"SAP table, legacy family, file dataset, or named upstream product."
+document_line,source_native_key,REQUIRED,Atomic document lines,Canonical serialized native key; UNKNOWN only with a quality flag.
+document_line,source_document_type,OPTIONAL,Atomic document lines,Required when source has a document type; not applicable to pure master rows.
+document_line,source_document_id,REQUIRED,Atomic document lines,SAP DocEntry or legacy document key when available.
+document_line,source_line_id,REQUIRED,Atomic document lines,SAP LineNum/line key; required to avoid header fanout.
+document_line,source_transaction_id,NOT_APPLICABLE,Atomic document lines,"TransNum, payment key, ReconNum/member, or equivalent."
+document_line,source_file,NOT_APPLICABLE,Atomic document lines,Relative source path/name; immutable source identity.
+document_line,source_snapshot_at,NOT_APPLICABLE,Atomic document lines,Observed cutoff/extraction declared by source evidence; never inferred from filename alone.
+document_line,source_extracted_at,REQUIRED,Atomic document lines,Timestamp when upstream was extracted/read.
+document_line,ingested_at,REQUIRED,Atomic document lines,Timestamp when canonical pipeline accepted the row.
+document_line,transformation_version,REQUIRED,Atomic document lines,Code/transformation contract version.
+document_line,semantic_version,REQUIRED,Atomic document lines,Definition version; changes are not silent.
+document_line,sap_objtype,OPTIONAL,Atomic document lines,SAP ObjType when applicable; null for non-SAP or unavailable trace.
+document_line,sap_docentry,OPTIONAL,Atomic document lines,SAP DocEntry when available.
+document_line,sap_linenum,OPTIONAL,Atomic document lines,SAP LineNum when available.
+document_line,sap_transnum,NOT_APPLICABLE,Atomic document lines,SAP TransNum when available.
+document_line,sap_whscode,OPTIONAL,Atomic document lines,SAP WhsCode when applicable.
+document_line,sap_itemcode,OPTIONAL,Atomic document lines,SAP ItemCode when applicable.
+movement_event,source_system,REQUIRED,Inventory/production movement events,"Controlled value: SAP_HANA, LEGACY_DS, LEGACY_DS0, EXTERNAL_FILES, or explicitly derived source."
+movement_event,source_table_or_dataset,REQUIRED,Inventory/production movement events,"SAP table, legacy family, file dataset, or named upstream product."
+movement_event,source_native_key,REQUIRED,Inventory/production movement events,Canonical serialized native key; UNKNOWN only with a quality flag.
+movement_event,source_document_type,OPTIONAL,Inventory/production movement events,Required when source has a document type; not applicable to pure master rows.
+movement_event,source_document_id,REQUIRED,Inventory/production movement events,SAP DocEntry or legacy document key when available.
+movement_event,source_line_id,REQUIRED,Inventory/production movement events,SAP LineNum/line key; required to avoid header fanout.
+movement_event,source_transaction_id,REQUIRED,Inventory/production movement events,"TransNum, payment key, ReconNum/member, or equivalent."
+movement_event,source_file,NOT_APPLICABLE,Inventory/production movement events,Relative source path/name; immutable source identity.
+movement_event,source_snapshot_at,NOT_APPLICABLE,Inventory/production movement events,Observed cutoff/extraction declared by source evidence; never inferred from filename alone.
+movement_event,source_extracted_at,REQUIRED,Inventory/production movement events,Timestamp when upstream was extracted/read.
+movement_event,ingested_at,REQUIRED,Inventory/production movement events,Timestamp when canonical pipeline accepted the row.
+movement_event,transformation_version,REQUIRED,Inventory/production movement events,Code/transformation contract version.
+movement_event,semantic_version,REQUIRED,Inventory/production movement events,Definition version; changes are not silent.
+movement_event,sap_objtype,OPTIONAL,Inventory/production movement events,SAP ObjType when applicable; null for non-SAP or unavailable trace.
+movement_event,sap_docentry,OPTIONAL,Inventory/production movement events,SAP DocEntry when available.
+movement_event,sap_linenum,OPTIONAL,Inventory/production movement events,SAP LineNum when available.
+movement_event,sap_transnum,OPTIONAL,Inventory/production movement events,SAP TransNum when available.
+movement_event,sap_whscode,OPTIONAL,Inventory/production movement events,SAP WhsCode when applicable.
+movement_event,sap_itemcode,OPTIONAL,Inventory/production movement events,SAP ItemCode when applicable.
+state_snapshot,source_system,REQUIRED,State/snapshot products,"Controlled value: SAP_HANA, LEGACY_DS, LEGACY_DS0, EXTERNAL_FILES, or explicitly derived source."
+state_snapshot,source_table_or_dataset,REQUIRED,State/snapshot products,"SAP table, legacy family, file dataset, or named upstream product."
+state_snapshot,source_native_key,REQUIRED,State/snapshot products,Canonical serialized native key; UNKNOWN only with a quality flag.
+state_snapshot,source_document_type,NOT_APPLICABLE,State/snapshot products,Required when source has a document type; not applicable to pure master rows.
+state_snapshot,source_document_id,NOT_APPLICABLE,State/snapshot products,SAP DocEntry or legacy document key when available.
+state_snapshot,source_line_id,NOT_APPLICABLE,State/snapshot products,SAP LineNum/line key; required to avoid header fanout.
+state_snapshot,source_transaction_id,NOT_APPLICABLE,State/snapshot products,"TransNum, payment key, ReconNum/member, or equivalent."
+state_snapshot,source_file,REQUIRED,State/snapshot products,Relative source path/name; immutable source identity.
+state_snapshot,source_snapshot_at,REQUIRED,State/snapshot products,Observed cutoff/extraction declared by source evidence; never inferred from filename alone.
+state_snapshot,source_extracted_at,REQUIRED,State/snapshot products,Timestamp when upstream was extracted/read.
+state_snapshot,ingested_at,REQUIRED,State/snapshot products,Timestamp when canonical pipeline accepted the row.
+state_snapshot,transformation_version,REQUIRED,State/snapshot products,Code/transformation contract version.
+state_snapshot,semantic_version,REQUIRED,State/snapshot products,Definition version; changes are not silent.
+state_snapshot,sap_objtype,OPTIONAL,State/snapshot products,SAP ObjType when applicable; null for non-SAP or unavailable trace.
+state_snapshot,sap_docentry,OPTIONAL,State/snapshot products,SAP DocEntry when available.
+state_snapshot,sap_linenum,NOT_APPLICABLE,State/snapshot products,SAP LineNum when available.
+state_snapshot,sap_transnum,NOT_APPLICABLE,State/snapshot products,SAP TransNum when available.
+state_snapshot,sap_whscode,OPTIONAL,State/snapshot products,SAP WhsCode when applicable.
+state_snapshot,sap_itemcode,OPTIONAL,State/snapshot products,SAP ItemCode when applicable.
+derived_state,source_system,REQUIRED,As-of or calculated state,"Controlled value: SAP_HANA, LEGACY_DS, LEGACY_DS0, EXTERNAL_FILES, or explicitly derived source."
+derived_state,source_table_or_dataset,REQUIRED,As-of or calculated state,"SAP table, legacy family, file dataset, or named upstream product."
+derived_state,source_native_key,REQUIRED,As-of or calculated state,Canonical serialized native key; UNKNOWN only with a quality flag.
+derived_state,source_document_type,NOT_APPLICABLE,As-of or calculated state,Required when source has a document type; not applicable to pure master rows.
+derived_state,source_document_id,NOT_APPLICABLE,As-of or calculated state,SAP DocEntry or legacy document key when available.
+derived_state,source_line_id,NOT_APPLICABLE,As-of or calculated state,SAP LineNum/line key; required to avoid header fanout.
+derived_state,source_transaction_id,NOT_APPLICABLE,As-of or calculated state,"TransNum, payment key, ReconNum/member, or equivalent."
+derived_state,source_file,NOT_APPLICABLE,As-of or calculated state,Relative source path/name; immutable source identity.
+derived_state,source_snapshot_at,REQUIRED,As-of or calculated state,Observed cutoff/extraction declared by source evidence; never inferred from filename alone.
+derived_state,source_extracted_at,REQUIRED,As-of or calculated state,Timestamp when upstream was extracted/read.
+derived_state,ingested_at,REQUIRED,As-of or calculated state,Timestamp when canonical pipeline accepted the row.
+derived_state,transformation_version,REQUIRED,As-of or calculated state,Code/transformation contract version.
+derived_state,semantic_version,REQUIRED,As-of or calculated state,Definition version; changes are not silent.
+derived_state,sap_objtype,OPTIONAL,As-of or calculated state,SAP ObjType when applicable; null for non-SAP or unavailable trace.
+derived_state,sap_docentry,OPTIONAL,As-of or calculated state,SAP DocEntry when available.
+derived_state,sap_linenum,NOT_APPLICABLE,As-of or calculated state,SAP LineNum when available.
+derived_state,sap_transnum,NOT_APPLICABLE,As-of or calculated state,SAP TransNum when available.
+derived_state,sap_whscode,OPTIONAL,As-of or calculated state,SAP WhsCode when applicable.
+derived_state,sap_itemcode,OPTIONAL,As-of or calculated state,SAP ItemCode when applicable.
+legacy_observation,source_system,REQUIRED,Legacy family observations,"Controlled value: SAP_HANA, LEGACY_DS, LEGACY_DS0, EXTERNAL_FILES, or explicitly derived source."
+legacy_observation,source_table_or_dataset,REQUIRED,Legacy family observations,"SAP table, legacy family, file dataset, or named upstream product."
+legacy_observation,source_native_key,REQUIRED,Legacy family observations,Canonical serialized native key; UNKNOWN only with a quality flag.
+legacy_observation,source_document_type,OPTIONAL,Legacy family observations,Required when source has a document type; not applicable to pure master rows.
+legacy_observation,source_document_id,REQUIRED,Legacy family observations,SAP DocEntry or legacy document key when available.
+legacy_observation,source_line_id,REQUIRED,Legacy family observations,SAP LineNum/line key; required to avoid header fanout.
+legacy_observation,source_transaction_id,REQUIRED,Legacy family observations,"TransNum, payment key, ReconNum/member, or equivalent."
+legacy_observation,source_file,REQUIRED,Legacy family observations,Relative source path/name; immutable source identity.
+legacy_observation,source_snapshot_at,REQUIRED,Legacy family observations,Observed cutoff/extraction declared by source evidence; never inferred from filename alone.
+legacy_observation,source_extracted_at,REQUIRED,Legacy family observations,Timestamp when upstream was extracted/read.
+legacy_observation,ingested_at,REQUIRED,Legacy family observations,Timestamp when canonical pipeline accepted the row.
+legacy_observation,transformation_version,REQUIRED,Legacy family observations,Code/transformation contract version.
+legacy_observation,semantic_version,REQUIRED,Legacy family observations,Definition version; changes are not silent.
+legacy_observation,sap_objtype,NOT_APPLICABLE,Legacy family observations,SAP ObjType when applicable; null for non-SAP or unavailable trace.
+legacy_observation,sap_docentry,NOT_APPLICABLE,Legacy family observations,SAP DocEntry when available.
+legacy_observation,sap_linenum,NOT_APPLICABLE,Legacy family observations,SAP LineNum when available.
+legacy_observation,sap_transnum,NOT_APPLICABLE,Legacy family observations,SAP TransNum when available.
+legacy_observation,sap_whscode,NOT_APPLICABLE,Legacy family observations,SAP WhsCode when applicable.
+legacy_observation,sap_itemcode,NOT_APPLICABLE,Legacy family observations,SAP ItemCode when applicable.
+business_denormalized,source_system,REQUIRED,Enriched business products,"Controlled value: SAP_HANA, LEGACY_DS, LEGACY_DS0, EXTERNAL_FILES, or explicitly derived source."
+business_denormalized,source_table_or_dataset,REQUIRED,Enriched business products,"SAP table, legacy family, file dataset, or named upstream product."
+business_denormalized,source_native_key,REQUIRED,Enriched business products,Canonical serialized native key; UNKNOWN only with a quality flag.
+business_denormalized,source_document_type,OPTIONAL,Enriched business products,Required when source has a document type; not applicable to pure master rows.
+business_denormalized,source_document_id,OPTIONAL,Enriched business products,SAP DocEntry or legacy document key when available.
+business_denormalized,source_line_id,OPTIONAL,Enriched business products,SAP LineNum/line key; required to avoid header fanout.
+business_denormalized,source_transaction_id,OPTIONAL,Enriched business products,"TransNum, payment key, ReconNum/member, or equivalent."
+business_denormalized,source_file,OPTIONAL,Enriched business products,Relative source path/name; immutable source identity.
+business_denormalized,source_snapshot_at,OPTIONAL,Enriched business products,Observed cutoff/extraction declared by source evidence; never inferred from filename alone.
+business_denormalized,source_extracted_at,REQUIRED,Enriched business products,Timestamp when upstream was extracted/read.
+business_denormalized,ingested_at,REQUIRED,Enriched business products,Timestamp when canonical pipeline accepted the row.
+business_denormalized,transformation_version,REQUIRED,Enriched business products,Code/transformation contract version.
+business_denormalized,semantic_version,REQUIRED,Enriched business products,Definition version; changes are not silent.
+business_denormalized,sap_objtype,OPTIONAL,Enriched business products,SAP ObjType when applicable; null for non-SAP or unavailable trace.
+business_denormalized,sap_docentry,OPTIONAL,Enriched business products,SAP DocEntry when available.
+business_denormalized,sap_linenum,OPTIONAL,Enriched business products,SAP LineNum when available.
+business_denormalized,sap_transnum,OPTIONAL,Enriched business products,SAP TransNum when available.
+business_denormalized,sap_whscode,OPTIONAL,Enriched business products,SAP WhsCode when applicable.
+business_denormalized,sap_itemcode,OPTIONAL,Enriched business products,SAP ItemCode when applicable.

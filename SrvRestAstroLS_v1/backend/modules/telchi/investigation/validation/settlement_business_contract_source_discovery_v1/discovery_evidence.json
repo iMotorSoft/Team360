@@ -1,0 +1,78 @@
+{
+  "gate": "TELCHI_SETTLEMENT_BUSINESS_CONTRACT_AND_SOURCE_DISCOVERY_V1_PASS",
+  "foundation": "foundation_417c860c216805f18341bb741ee026e3",
+  "mode": "INVESTIGATION_READ_ONLY",
+  "sap_query_count": 46,
+  "sap_write_count": 0,
+  "coverage_start": "2022-03-31",
+  "table_counts": {
+    "OINV": 1858531,
+    "ORIN": 10884,
+    "ORCT": 1836181,
+    "RCT2": 1839000,
+    "OITR": 2119291,
+    "ITR1": 4531894,
+    "OCTG": 37
+  },
+  "key_controls": {
+    "OINV_docentry_duplicates": 0,
+    "ORIN_docentry_duplicates": 0,
+    "ORCT_docentry_duplicates": 0,
+    "OITR_reconnum_duplicates": 0,
+    "ITR1_reconnum_lineseq_duplicates": 0,
+    "RCT2_rows": 1839000,
+    "RCT2_aggregate_keys": 1838908
+  },
+  "relationship_controls": {
+    "rct2_docnum_to_orct": 1839000,
+    "rct2_docentry_to_orct_wrong_path": 212619,
+    "rct2_type13_rows": 1837109,
+    "rct2_type13_docentry_to_oinv": 1837109,
+    "rct2_invoiceid_to_oinv": 0,
+    "multi_invoice_payments": 14759,
+    "multi_payment_invoices": 7303,
+    "active_n_to_n_reconciliations": 3076
+  },
+  "payment_method_controls": {
+    "payments": 1836181,
+    "cash": 1352564,
+    "transfer": 289566,
+    "check": 2469,
+    "card": 204210,
+    "mixed": 12623,
+    "canceled": 11150,
+    "active_method_sum_exact_within_0_01": 1825024,
+    "active_method_sum_differences": 7
+  },
+  "current_invoice_status": {
+    "fully_settled_active": 1854288,
+    "partially_paid_active": 45,
+    "unpaid_active": 1968,
+    "canceled": 2230
+  },
+  "reconciliation_cancellation": {
+    "paired_original_reversals": 15450,
+    "reversals_on_later_date": 500,
+    "maximum_days_to_reversal": 1490
+  },
+  "payment_terms": {
+    "sap_octg_rows": 37,
+    "sap_zero_month_and_day_terms": 18,
+    "foundation_payment_terms_rows": 0,
+    "classification": "DATASET_EXISTS_EMPTY_AND_OCTG_WAS_NOT_INGESTED",
+    "settlement_dependency": "NONE"
+  },
+  "real_cases": {
+    "same_day_fully_paid": {"invoice": 11534591, "payment": 2365723, "date": "2026-09-27", "amount_bs": "3.52"},
+    "paid_later": {"invoice": 11530921, "payment": 2365191, "invoice_date": "2026-09-23", "payment_date": "2026-09-26", "amount_bs": "83.16"},
+    "partially_paid": {"invoice": 11526331, "document_total_bs": "100.06", "paid_bs": "100.00", "open_bs": "0.06"},
+    "still_open": {"invoice": 11534790, "document_total_bs": "160.52", "open_bs": "160.52"},
+    "payment_to_many_invoices": {"payment": 2365191, "invoice_count": 3, "amount_bs": "249.48", "invoices": [11530705, 11530918, 11530921]},
+    "invoice_from_many_payments": {"invoice": 11533649, "document_total_bs": "943.80", "payments": [{"payment": 2364806, "amount_bs": "943.00"}, {"payment": 2364808, "amount_bs": "0.80"}]},
+    "credit_memo_application": {"reconciliation": 2654224, "invoice": 11533926, "credit_memo": 21527, "amount_bs": "1915.00"},
+    "manual_internal_reconciliation": {"reconciliation": 2653938, "invoice": 11532585, "payment": 2364794, "amount_bs": "775.00", "members": 3},
+    "mixed_payment_method": {"payment": 2365945, "total_bs": "21.83", "cash_bs": "12.83", "transfer_bs": "9.00"},
+    "canceled_payment": {"payment": 2364901, "invoice": 11533742, "payment_date": "2026-09-26", "cancel_date": "2026-09-26", "amount_bs": "427.00"}
+  },
+  "privacy": "Technical identifiers only; no customer names, tax IDs, bank data or card data."
+}

@@ -1,0 +1,18 @@
+field,representation,authority,required_in_product_row,notes
+canonical_product_id,COLUMN,reference.product,YES,Stable identity
+item_code,COLUMN,source-backed product identity,YES,Preserved business code
+product_name,COLUMN,source-backed product identity,YES,Observed name
+sales_uom_id,FOREIGN_KEY,reference.units_of_measure,YES,Distinct UoM role
+inventory_uom_id,FOREIGN_KEY,reference.units_of_measure,YES,Distinct UoM role
+purchase_uom_id,FOREIGN_KEY,reference.units_of_measure,YES,Distinct UoM role
+brand,VERSIONED_RELATIONSHIP,product_brand,NO,Do not freeze changing ownership/classification
+portfolio_family,VERSIONED_RELATIONSHIP,product_portfolio_family,NO,Canonical replacement for generic product_family
+product_business_type,VERSIONED_RELATIONSHIP,product_business_type,NO,Subclassification
+business_unit,VERSIONED_RELATIONSHIP,product_business_unit,NO,Organizational assignment
+operating_model,VERSIONED_RELATIONSHIP,product_operating_model,NO,Acquisition/transformation model
+production_site,VERSIONED_RELATIONSHIP,product_production_site,NO,May be multiple
+manufacturer_party,VERSIONED_RELATIONSHIP,product_manufacturer,NO,Not brand owner
+is_telchi_product,DERIVED_PREDICATE,approved commercial definition,NO,Definition gap remains open
+manufactured_by_telchi,DERIVED_PREDICATE,product_manufacturer,NO,Independent from Telchi product
+brand_owned_by_telchi,DERIVED_PREDICATE,brand_owner,NO,Independent from manufacturer
+is_l_product,DERIVED_CONVENIENCE,product_portfolio_family,NO,Never primary semantic authority

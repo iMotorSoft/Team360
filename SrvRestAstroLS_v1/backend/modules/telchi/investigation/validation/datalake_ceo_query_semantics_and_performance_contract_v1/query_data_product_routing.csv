@@ -1,0 +1,11 @@
+data_product,path_class,grain,required_fields,required_freshness_class,routing_rule
+current.stock_current,CURRENT_LOOKUP,product × warehouse,"ON_HAND,COMMITTED,ON_ORDER,AVAILABLE",NEAR_REALTIME,materialize current state; no SAP joins at query time
+business.sales_flow,NORMAL_BUSINESS_AGGREGATION,canonical commercial line,"date,document,customer,product,branch,warehouse,seller,quantity,net_amount,tax,currency,unit",NEAR_REALTIME/DAILY,one canonical line with document lineage
+business.production_flow,NORMAL_BUSINESS_AGGREGATION,production fact by event type,"orders,receipts,consumption,warehouse,product,quantity,date,status",INTRADAY,do not collapse incompatible production events
+business.inventory_flow,MULTI_DIMENSION_COMPARATIVE,inventory event/snapshot,"movements,balances,coverage,minimums",DAILY,history plus current projection
+current.customer_credit_current,CURRENT_LOOKUP,customer or customer × document,"total,current,overdue,oldest_due_date,max_days_overdue,credit_limit,over_limit,document_count_open,as_of",NEAR_REALTIME,reconciled read model
+business.customer_credit_history,DEEP_ANALYSIS,customer × as_of snapshot,"open balance,aging,payments,reconciliations,as_of",HISTORICAL,"business snapshot/as-of, not only technical time travel"
+business.cash_flow,NORMAL_BUSINESS_AGGREGATION,payment/allocation event,"payment,receipt,customer,branch,cashbox,method,currency,date",INTRADAY,separate payment from sale terms
+current.purchase_open,CURRENT_LOOKUP,purchase document line,"supplier,product,warehouse,open_qty,amount,due/as_of",INTRADAY,open lines directly queryable
+business.purchase_flow,NORMAL_BUSINESS_AGGREGATION,purchase line/event,"supplier,product,receipt,lead_time,amount,date",DAILY,preserve order and receipt events
+reference.* / crosswalk.*,CURRENT_LOOKUP,canonical entity,"canonical IDs, aliases, mappings, UoM",HISTORICAL,resolve within authorization scope before retrieval

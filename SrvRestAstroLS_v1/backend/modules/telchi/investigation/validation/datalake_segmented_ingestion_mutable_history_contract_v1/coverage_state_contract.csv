@@ -1,0 +1,7 @@
+state,meaning,trusted,requires_reconciliation,can_advance_coverage,can_be_served,expected_action
+OPEN,coverage is eligible for initial or recurring processing,NO,YES,NO,NO,process bounded segments
+QUIET,older coverage has lower expected change frequency but is not immutable,NO,YES,NO,LAST_TRUSTED_ONLY,periodically sample and reconcile
+TRUSTED,declared scope passed validation reconciliation and publication,YES,NO,YES,YES,retain checkpoint and schedule evidence-based revalidation
+DIRTY,coverage or scope has a detected source-affecting change,NO,YES,NO,LAST_TRUSTED_ONLY,reprocess smallest authoritative scope
+RECONCILING,dirty or pending scope is under bounded repair,NO,YES,NO,LAST_TRUSTED_ONLY,hold candidate and reconcile before publish
+DIVERGED,authoritative comparison differs for the same definition scope and as_of,NO,YES,NO,NO,retain last trusted state and repair or escalate

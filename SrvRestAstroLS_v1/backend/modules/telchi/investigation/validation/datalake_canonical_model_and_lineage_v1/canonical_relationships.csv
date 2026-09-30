@@ -1,0 +1,40 @@
+relationship_id,from_entity,to_entity,join_contract,cardinality,confidence,business_meaning,evidence
+REL-001,PRODUCT,PRODUCT_GROUP,product_group_id,N:1,CONFIRMED,Product belongs to product group,OITM/OITB
+REL-002,WAREHOUSE_BRANCH_MAPPING,WAREHOUSE,canonical_warehouse_id,N:1,CONFIRMED,Mapping references warehouse,almacenOficina.xlsx;OWHS
+REL-003,WAREHOUSE_BRANCH_MAPPING,BRANCH,canonical_branch_id,N:1,PROPOSED,Mapping references branch with temporal validity,almacenOficina.xlsx has no validity
+REL-004,SALE_DOCUMENT,SALE_LINE,canonical_sale_document_id,1:N,CONFIRMED,Document header to lines,OINV/INV1;legacy sale families
+REL-005,CREDIT_NOTE,CREDIT_NOTE_LINE,canonical_credit_note_id,1:N,CONFIRMED,Credit-note header to lines,ORIN/RIN1
+REL-006,SALE_DOCUMENT,CUSTOMER,canonical_customer_id,N:1,CONFIRMED,Sales document business partner,OINV.CardCode/OCRD
+REL-007,SALE_LINE,PRODUCT,canonical_product_id,N:1,CONFIRMED,Sold item,INV1.ItemCode/OITM
+REL-008,CREDIT_NOTE_LINE,PRODUCT,canonical_product_id,N:1,CONFIRMED,Credited item,RIN1.ItemCode/OITM
+REL-009,INVENTORY_MOVEMENT,PRODUCT,canonical_product_id,N:1,CONFIRMED,Movement item,OINM.ItemCode
+REL-010,INVENTORY_MOVEMENT,WAREHOUSE,canonical_warehouse_id,N:1,CONFIRMED,Movement warehouse,OINM.Warehouse/OWHS
+REL-011,SALE_LINE,INVENTORY_MOVEMENT,source_document_id/base_reference,1:N,LIKELY,Sale may generate stock movement; not universal,saleSB1Product/movProductSB1;OINV/OINM
+REL-012,STOCK_SNAPSHOT,PRODUCT,canonical_product_id,N:1,CONFIRMED,Snapshot product,movProduct;OITW/OINM
+REL-013,STOCK_SNAPSHOT,WAREHOUSE,canonical_warehouse_id,N:1,CONFIRMED,Snapshot warehouse,movProduct;OITW/OINM
+REL-014,STOCK_CURRENT,PRODUCT,canonical_product_id,N:1,CONFIRMED,Current stock product,OITW
+REL-015,STOCK_CURRENT,WAREHOUSE,canonical_warehouse_id,N:1,CONFIRMED,Current stock warehouse,OITW
+REL-016,PURCHASE_REQUEST,PURCHASE_ORDER,base_request_id,0..N,PROPOSED,Request can precede order; approval not fully evidenced,OPRQ/PRQ1;GAP-005
+REL-017,PURCHASE_ORDER,SUPPLIER_INVOICE,BaseEntry/BaseType,1:N,CONFIRMED,PO to AP invoice line,OPOR/POR1→OPCH/PCH1
+REL-018,SUPPLIER_INVOICE,GOODS_RECEIPT,BaseEntry/BaseType,1:N,CONFIRMED,AP invoice to goods receipt,OPCH/PCH1→OPDN/PDN1
+REL-019,PURCHASE_ORDER,GOODS_RECEIPT,BaseEntry/BaseType,1:N,CONFIRMED,Direct PO to goods receipt,OPOR/POR1→OPDN/PDN1
+REL-020,PURCHASE_RETURN,SUPPLIER_INVOICE,base_document_id,N:0..1,PROPOSED,Return references prior purchase document when present,ORPD/RPD1
+REL-021,TRANSFER,TRANSFER_LINE,canonical_transfer_id,1:N,CONFIRMED,Transfer header to lines,OWTR/WTR1
+REL-022,TRANSFER_LINE,INVENTORY_MOVEMENT,source_document_id/source_line_id,1:2,CONFIRMED,Transfer creates origin out and destination in accounting movements,WTR1→OINM TT67
+REL-023,BOM,BOM_COMPONENT,bom_id,1:N,CONFIRMED,BOM parent to components,OITT/ITT1
+REL-024,PRODUCTION_ORDER,COMPONENT_CONSUMPTION,source_document_id/base_entry,1:N,CONFIRMED,Order to actual issue lines,OWOR/IGE1
+REL-025,PRODUCTION_ORDER,PRODUCTION_OUTPUT,source_document_id/base_entry,1:N,CONFIRMED,Order to actual output lines,OWOR/IGN1
+REL-026,PRODUCTION_ORDER,BOM_COMPONENT,historical_order_component,1:N,CONFIRMED,WOR1 preserves order-time recipe,WOR1
+REL-027,PAYMENT,RECONCILIATION,source_native_id,1:N,CONFIRMED,Payment can participate in settlement,ORCT/OVPM→ITR1/OITR
+REL-028,SALE_DOCUMENT,RECONCILIATION,source_native_id,1:N,CONFIRMED,Receivable settlement member,OINV→ITR1/OITR
+REL-029,RECONCILIATION,CUSTOMER_CREDIT_STATE,as_of_date,N:1,CONFIRMED,Settlement contributes to as-of credit state,OITR/ITR1
+REL-030,CUSTOMER,CUSTOMER_CREDIT_STATE,canonical_customer_id,1:N,CONFIRMED,Customer has dated credit states,credit gates
+REL-031,USER,SALE_DOCUMENT,source_user_id,1:N,CONFIRMED,User of transaction where available,OUSR/UserSign; attribution gates
+REL-032,SALESPERSON,SALE_DOCUMENT,salesperson_id,1:N,CONFIRMED,Salesperson attribution,OSLP/OINV
+REL-033,EMPLOYEE,USER,employee_id,0..1:0..1,CONFIRMED,User-to-employee where populated,OUSR/OHEM
+REL-034,SALESPERSON,EMPLOYEE,salesperson_id,N:1,CONFIRMED,Employee-to-salesperson where populated,OHEM/OSLP
+REL-035,FORECAST_DEFINITION,FORECAST_LINE,forecast_id,1:N,PROPOSED,Forecast header to rows,OFCT/FCT1
+REL-036,MRP_PARAMETER,PRODUCT,canonical_product_id,N:1,PROPOSED,Planning parameter product,OITM/OITW
+REL-037,LOT_SERIAL,INVENTORY_MOVEMENT,item/transaction reference,0..N:1,LIKELY,Batch/serial trace where populated,IBT1/OBTN
+REL-038,GENERAL_LEDGER_ENTRY,PAYMENT,TransId,0..1:1,CONFIRMED,Payment accounting entry,ORCT/OVPM→OJDT/JDT1
+REL-039,BANK_DEPOSIT,GENERAL_LEDGER_ENTRY,TransAbs/TransId,1:1,CONFIRMED,Deposit accounting entry,ODPS→OJDT

@@ -1,0 +1,12 @@
+category,preflight_required,continuous_check_required,threshold_source,action_on_warning,action_on_critical,per_segment_enforced
+RAM,YES,YES,environment-specific resource config and host resource gate,PAUSE_OR_BACKOFF,SAFE_ABORT,YES
+SWAP,YES,YES,environment-specific resource config and host resource gate,BACKOFF,SAFE_ABORT,YES
+LOAD,YES,YES,environment-specific resource config and host resource gate,BACKOFF,SAFE_ABORT,YES
+DISK,YES,YES,environment-specific resource config and host resource gate,PAUSE,SAFE_ABORT,YES
+TEMP_DISK,YES,YES,environment-specific resource config and host resource gate,PAUSE,SAFE_ABORT,YES
+DUCKDB_MEMORY,YES,YES,DuckDB configuration plus host resource gate,BACKOFF,SAFE_ABORT,YES
+DUCKDB_THREADS,YES,YES,DuckDB configuration plus host resource gate,REDUCE_THREADS,SAFE_ABORT,YES
+WORKERS,YES,YES,MAX_INGESTION_WORKERS configuration,REDUCE_CONCURRENCY,SAFE_ABORT,YES
+HANA_CONCURRENCY,YES,YES,MAX_HANA_CONCURRENT_QUERIES configuration,REDUCE_CONCURRENCY,SAFE_ABORT,YES
+QUERY_TIMEOUT,YES,YES,per-operation environment configuration,CANCEL_AND_BACKOFF,SAFE_ABORT,YES
+SPILL,YES,YES,temp policy plus max_temp_directory_size/resource gate,PAUSE_OR_BACKOFF,SAFE_ABORT,YES

@@ -1,0 +1,9 @@
+operation_type,allowed,bounded_required,max_concurrency_configured,full_scan_allowed,user_triggered_allowed,timeout_required,backoff_required,segment_required,notes
+INITIAL_BOUNDED_WINDOW,YES,YES,YES,NO,NO,YES,YES,YES,"historical windows/chunks only; schedule timing remains future decision"
+INCREMENTAL_CHANGE_DETECTION,YES,YES,YES,NO,NO,YES,YES,YES,"use change markers, controlled lookback and shared ingestion"
+AFFECTED_OBJECT_AUTHORITATIVE_READ,YES,YES,YES,NO,NO,YES,YES,YES,"read minimum required columns for affected keys"
+FAST_FOCAL_RECONCILIATION,YES,YES,YES,NO,NO,YES,YES,YES,"changed documents/customers/orders/ItemCode×Warehouse only"
+PERIODIC_AUTHORITATIVE_RECONCILIATION,YES,YES,YES,NO,NO,YES,YES,YES,"bounded period/domain/warehouse scope; frequency is domain-specific"
+CHAT_REQUEST,NO,YES,N_A,NO,NO,N_A,N_A,NO,"chat reads trusted local state and never starts a HANA query"
+RECURRENT_FULL_SCAN_POLLING,NO,NO,NO,NO,NO,YES,YES,NO,"explicitly prohibited"
+DUPLICATE_INDEPENDENT_WORKER_SCAN,NO,NO,NO,NO,NO,YES,YES,NO,"shared ingestion prevents redundant heavy reads"

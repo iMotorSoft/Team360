@@ -1,0 +1,17 @@
+relative_path,responsibility,description,decision
+raw/legacy/parquet,PRESERVED_SOURCE,Byte-identical legacy Parquet mirror; preserve source-relative directories and filenames.,KEEP
+raw/legacy/reference_sources,PRESERVED_SOURCE,Approved reference originals such as almacenOficina.xlsx; copied only by a dedicated later gate.,KEEP
+raw/legacy/auxiliary_sources,PRESERVED_SOURCE,Approved CSV or code provenance; temporary files are inventory-only and excluded by default.,KEEP
+raw/sap/table_extract,PRESERVED_SOURCE,"Immutable SAP table extraction runs, distinguished from query extracts.",KEEP
+raw/sap/query_extract,PRESERVED_SOURCE,Immutable named SAP query extraction runs with query hash and parameters in manifests.,KEEP
+reference,REFERENCE,"Normalized, version-aware dimensions and controlled vocabularies.",KEEP
+crosswalk,REFERENCE,"Versioned source-native to canonical identity mappings, including UNMAPPED.",KEEP
+atomic,REBUILDABLE,Canonical facts at minimum justified grain.,KEEP
+business,REBUILDABLE,Versioned denormalized read models with physical lineage.,KEEP
+manifests/legacy_mirror,METADATA,One manifest row per legacy source file and verification attempt.,KEEP
+manifests/runs,METADATA,"SAP extraction, atomic build, business build and snapshot run manifests.",KEEP
+manifests/watermarks,METADATA,Per-dataset successful and attempted incremental cursors.,KEEP
+manifests/registry,METADATA,Versioned JSON dataset registry generated from the CSV authority.,KEEP
+staging,EPHEMERAL,Use process-local temporary storage only; do not make a durable lake layer.,ELIMINATE_AS_DURABLE_LAYER
+snapshots,REDUNDANT,"Represent snapshot semantics in named atomic/business datasets, not a generic duplicate layer.",ELIMINATE
+decision,DEFERRED,No justified V1 decision data product; add only with a concrete consumer and grain.,ELIMINATE_FOR_V1

@@ -1,0 +1,8 @@
+scope_type,mark_dirty_trigger,reprocess_scope,reconciliation_scope,can_escalate_to_period,clear_condition
+DOCUMENT,validated source change marker for document,document and authoritative lines,document plus lines,YES,authoritative reread validates and publishes
+DOCUMENT_LINES,changed line or line-affecting source event,changed document lines,document line identity and totals,YES,lines and derived totals reconcile
+ITEM_WAREHOUSE,stock-affecting change for ItemCode×Warehouse,affected ItemCode×Warehouse,small authoritative stock scope,YES,authoritative values reconcile
+TRANSACTION_RANGE,change marker within bounded transaction/key range,half-open transaction range,matching source range,YES,all range segments reconcile
+CUSTOMER,customer-affecting document or master change,customer-scoped affected objects,customer scope,YES,customer scope reconciles
+BUSINESS_DAY_RANGE,late or corrected facts for bounded business-day range,affected business-day range,matching source range,YES,range reconciles
+MONTH,period-level evidence or failed focal escalation,month as explicit escalation,month and declared domain,NO,full declared period reconciles

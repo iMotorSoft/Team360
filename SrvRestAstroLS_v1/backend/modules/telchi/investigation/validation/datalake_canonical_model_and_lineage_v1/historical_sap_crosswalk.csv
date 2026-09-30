@@ -1,0 +1,11 @@
+mapping_id,historical_family,sap_source,matching_fields,granularity_comparison,coverage_comparison,semantic_differences,confidence,evidence
+MAP-001,movProductSB1,OINM + source documents,TransNum/DocLineNum vs movement keys; ItemCode; Warehouse/WhsCode; TransType/BASE_REF,legacy enriched line vs SAP ledger,2022-04..2024-05 vs SAP historical/current,No universal document FK; duplicate candidate keys,LIKELY,historical inventory; production/stock/transfer reports
+MAP-002,saleSB1Product,OINV + INV1,DocEntry; ItemCode; document/date/amount,enriched invoice-line observation,2018-01..2024-05 vs SAP extended window,snapshot overlap and no formal extractor lineage,LIKELY,historical inventory; financial invoice contract
+MAP-003,ncB1Product,ORIN + RIN1,DocEntry/line/item/date/amount,legacy NC observation,2022-04..2024-06,fu_* schema variants; equivalence incomplete,POSSIBLE,historical inventory; credit-note evidence
+MAP-004,productSB1,OITM,ItemCode and product attributes,master snapshot vs current master,2022-03..2024-06,historical validity absent,LIKELY,historical inventory; stock/MRP
+MAP-005,clientSB1,OCRD,CardCode/CardName,master snapshot,static historical vs current,customer history absent,LIKELY,historical inventory; customer/credit
+MAP-006,owhsSB1,OWHS,WhsCode/name,small historical master vs current census,unknown vs 82 current warehouses,retired/renamed validity absent,POSSIBLE,historical inventory; production schema
+MAP-007,wareHouseSB1,OWHS,warehouse code/name,enriched warehouse reference,2021-12..2024-06,temporal semantics not formal,POSSIBLE,historical inventory
+MAP-008,paymentB1,ORCT + ITR1/OITR,DocEntry/amount/date/reconciliation,payment snapshot vs settlement ledger,2022-04..2023-05,RCT2 not settlement authority,POSSIBLE,historical inventory; financial reconciliation
+MAP-009,reconB1,OITR + ITR1,ReconNum/LineSeq/date/amount,reconciliation snapshot,2022-04..2023-05,watermark and cancellation history unknown,LIKELY,historical inventory; reconciliation
+MAP-010,productTracking,OBTN/IBT1 and/or legacy-only,product/tracking date/lot,tracking observation,2019-01..2022-04,lot/serial equivalence incomplete,UNKNOWN,historical inventory

@@ -1,0 +1,1 @@
+"""TELCHI_DUCKLAKE_POSTGRES18_FOUNDATION_V1 validation package."""
