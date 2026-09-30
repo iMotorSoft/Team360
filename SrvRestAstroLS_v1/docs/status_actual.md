@@ -2,7 +2,7 @@
 
 Objetivo: `desarrollo`
 
-Ultima actualizacion: 2026-08-23 (Flow demo production readiness validada en DEV)
+Ultima actualizacion: 2026-09-29 (Telchi Receivables & Collections productivo en Foundation V3)
 
 Este documento es un tablero del estado vigente. La bitacora detallada previa, incluidas las fases actuales aun sin commit, se conserva en `status_historico_hasta_2026-06-28.md` y en Git.
 
@@ -34,6 +34,64 @@ Referencias canonicas:
 - `lat.md/service-preflight-methodology.md`
 - `lat.md/diagnosticador-embeddable-component-architecture.md`
 - `lat.md/team360-global-orchestration.md`
+
+## Gate 2026-09-29 — Telchi: Receivables & Collections Foundation Extension V3
+
+Estado: PASS (`TELCHI_RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V3_PASS`). El Data Lake V1 permanece cerrado (`TELCHI_DATALAKE_V1_CLOSED=YES`) y Receivables & Collections queda productivo en Foundation CURRENT `foundation_d222a203801cc84e9a14164d26aa67a0`.
+
+Se reutilizó sin rebuild el componente sellado `receivables_collections_633d1fbbfdd87e6665b1aad3` (fingerprint `633d1fbbfdd87e6665b1aad39719f0c9bf5277ada1be6585ad09f900d65889ae`). El manifiesto productivo contiene 7 componentes lógicos; reference, sales, credit_memo, oinm, oitw y material_supply conservaron identidad exacta. La canonicalización Decimal V3 pasó 14/14 roundtrips JSON; board, collections, settlement e historical fueron iguales entre pinned y productivo en payload y hash, con cero diferencias analíticas inesperadas.
+
+Capacidades: deuda abierta, current/overdue, aging, cobranzas cash/transfer/check/card, métodos mixtos y reconstrucción histórica a cierre diario. QR permanece `UNRESOLVED_SOURCE_EVIDENCE`, no inferido y no bloqueante. Los intentos de publicación Foundation V1 y V2 fueron revertidos; V3 cerró en PASS y es el único estado productivo. Hubo una única promoción V3, sin rollback V3 y sin acceso SAP/HANA. Evidencia en `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/evidence/telchi/TELCHI_RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V3/`.
+
+CG2A V2 cerró `DEGRADED` únicamente por la frontera semántica: SAP/HANA no expone para este caso una operación de negocio nativa explícita llamada `CONTADO`. El Data Lake deriva la semántica comercial desde hechos financieros fuente, sin presentarla como un campo nativo SAP. En la cohorte RAW_MATERIAL analizada hubo 2.136 documentos, 2.136 términos comerciales equivalentes a efectivo, due date igual a document date en el 100 %, 2.134 liquidaciones el mismo día, 2 posteriores y 0 deudas parciales o abiertas al 2026-09-28.
+
+```text
+TELCHI_DATALAKE_V1_CLOSED=YES
+TELCHI_ATOMIC_RECEIVABLES_COLLECTIONS_V1_PASS
+TELCHI_RECEIVABLES_COLLECTIONS_BUSINESS_DERIVATION_V1_PASS
+TELCHI_RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V1_ROLLED_BACK
+TELCHI_RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V2_ROLLED_BACK
+TELCHI_RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V3_PASS
+RECEIVABLES_COLLECTIONS_CAPABILITY=PRODUCTIVE
+TELCHI_DATALAKE_V1_FOUNDATION_CURRENT=foundation_d222a203801cc84e9a14164d26aa67a0
+TELCHI_DATALAKE_V1_LOGICAL_COMPONENT_COUNT=7
+TELCHI_DATALAKE_V1_LOGICAL_COMPONENTS=reference,sales,credit_memo,oinm,oitw,material_supply,receivables_collections
+RECEIVABLES_COLLECTIONS_COMPONENT=receivables_collections_633d1fbbfdd87e6665b1aad3
+TELCHI_CG2A_RAW_MATERIAL_PAYMENT_TERMS_V2_DEGRADED
+```
+
+## Gate 2026-09-28 — Telchi: cierre Data Lake V1 (promoción final de foundation V3)
+
+Estado: PASS (`TELCHI_DATALAKE_FINAL_FOUNDATION_PROMOTION_AND_CLOSURE_V3_PASS`) con
+`TELCHI_DATALAKE_V1_CLOSED=YES`. Evidencia en
+`/media/issajar/DEVELOP/Projects/iMotorSoft/ai/evidence/telchi/TELCHI_DATALAKE_FINAL_FOUNDATION_PROMOTION_AND_CLOSURE_V3/`.
+
+El gate creó un candidato fresco con `update_run_id` único
+(`foundation-republication-v3-20260928T022543540899Z`, id `foundation_417c860c216805f18341bb741ee026e3`),
+copia profunda del manifiesto sellado del target histórico
+`foundation_6a7cc7a99638208002c4f877d998d220` (que permanece `SUPERSEDED` con su failure reason
+intacto), y promovió una sola vez con `CAS_MODE=PROTOCOL_READ_COMPARE_COMMIT` bajo el run lock
+del repositorio. Conteos: `CATALOG_COMPONENT_COUNT=5` / `PINNED_MANIFEST_COMPONENT_COUNT=6`.
+Snapshots: manifest base `838` pinned y productivo (`MANIFEST_BASE_SNAPSHOT_MATCH=YES`),
+primer-CURRENT dinámico `952` (concepto distinto; no se exige igualdad con 838).
+
+Igualdad analítica: huella de componentes y `PINNED_GOLD_RESULT_HASH == PRODUCTIVE_GOLD_RESULT_HASH`,
+con `ANALYTICAL_COMPONENTS_CHANGED_BETWEEN_PINNED_AND_PRODUCTIVE=NO` y
+`PINNED_VS_PRODUCTIVE_RESULT_MATCH=PASS`. Gold productivo: `SUPPLY_RISK_COUNT=16`,
+CG2A `GENERIC_CUSTOMER`, 2A-SAL `SEGUNDO_ANILLO`, L00031 52 docs / Bs 57,469.51 / KG,
+L03192 33 docs / Bs 21,584.70 / KG. Tests `TEST_FAILURES=0` (backend full 1766, Data Lake 177),
+LAT gates y `git diff --check` PASS, `SAP_ACCESSED=NO`, `SAP_QUERY_COUNT=0`, `SAP_WRITE_COUNT=0`,
+sin rollback. Pregunta abierta del dueño `CG2A_RAW_MATERIAL_PAYMENT_TERMS` queda
+`PENDING_BUSINESS_ANALYSIS` (no bloqueante).
+
+```text
+TELCHI_DATALAKE_V1_CLOSED=YES
+TELCHI_DATALAKE_V1_FOUNDATION_CURRENT=foundation_417c860c216805f18341bb741ee026e3
+TELCHI_DATALAKE_V1_MANIFEST_BASE_SNAPSHOT_ID=838
+TELCHI_DATALAKE_V1_FIRST_CURRENT_SNAPSHOT_ID=952
+TELCHI_DATALAKE_V1_CATALOG_COMPONENT_COUNT=5
+TELCHI_DATALAKE_V1_PINNED_MANIFEST_COMPONENT_COUNT=6
+```
 
 ## Gate 2026-09-02 — Telchi: casos de excepción de crédito V1 (287 ventas con vencido)
 

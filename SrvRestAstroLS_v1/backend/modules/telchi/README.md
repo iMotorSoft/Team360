@@ -4,7 +4,13 @@ Telchi es un módulo de Team360. La autoridad sobre sus límites, ubicaciones y 
 
 ## Estado actual
 
-Hoy existe el módulo y su árbol de investigación consolidado. No existe todavía una API o runtime productivo Telchi formal, `routes.py`, scheduler ni frontend.
+Hoy existe el módulo y su árbol de investigación consolidado. No existe todavía una API o runtime productivo Telchi formal, `routes.py`, scheduler ni frontend. La foundation opt-in de ejecución segmentada, sin ingesta real ni startup hook, está documentada en [`RUNTIME_FOUNDATION.md`](RUNTIME_FOUNDATION.md).
+
+El Data Lake Telchi V1 permanece cerrado (`TELCHI_DATALAKE_V1_CLOSED=YES`). El gate `TELCHI_RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V3_PASS` publicó de forma aditiva Receivables & Collections en foundation CURRENT `foundation_d222a203801cc84e9a14164d26aa67a0`, con 7 componentes lógicos y sin modificar los seis existentes.
+
+La capacidad productiva soporta deuda abierta, current/overdue, aging, cierre histórico diario y cobranzas por cash, transfer, check y card, incluidos pagos con métodos mixtos. Reutiliza el componente sellado `receivables_collections_633d1fbbfdd87e6665b1aad3` (fingerprint `633d1fbbfdd87e6665b1aad39719f0c9bf5277ada1be6585ad09f900d65889ae`). Los intentos Foundation V1 y V2 fueron revertidos; V3 es el único resultado productivo. QR permanece `UNRESOLVED_SOURCE_EVIDENCE`, sin inferencia y sin bloquear Foundation.
+
+Para la cohorte CG2A RAW_MATERIAL analizada, los 2.136 documentos tienen términos comerciales equivalentes a efectivo y due date igual a document date; 2.134 se liquidaron el mismo día, 2 después y ninguno quedó parcial o abierto al 2026-09-28. SAP/HANA no expone para este caso una operación de negocio nativa explícita llamada `CONTADO`: el Data Lake deriva la semántica comercial desde hechos financieros fuente y no la presenta como un campo nativo de SAP.
 
 Los gates de consolidación, registro Git, aislamiento del Data Root, migración de secretos y conexión post-migración están en PASS; SAP/HANA permanece read-only con `SAP_WRITE_COUNT=0`.
 
