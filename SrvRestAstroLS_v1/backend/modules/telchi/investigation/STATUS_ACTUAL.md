@@ -1,15 +1,174 @@
 # TELCHI SAP — STATUS ACTUAL
 
 **Módulo:** Telchi SAP
-**Capa actual:** DataScience — Crédito / Excepciones de venta / Control HANA
-**Fecha del estado:** 2026-09-03
+**Capa actual:** DataScience — Contabilidad / Finanzas (forecast y liquidez)
+**Fecha del estado:** 2026-09-29
 **Workspace:** `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi`
-**Estado global:** `TELCHI_CREDIT_RISK_EX_LA_REJA_V1_PASS`
-**Último gate cerrado:** `TELCHI_CREDIT_RISK_EX_LA_REJA_V1_PASS`
-**Freeze:** excepciones de crédito V1 (287 explicadas; económicas 268 agrupadas; aging 252,973 separado; identidad operativa LA REJA C010341 cerrada; riesgo de crédito EX LA REJA recalculado; degradaciones explícitas)
-**Próximo frente opcional:** gate atómico de identidad A3TEK (C005919) / C011750 / C007834, lectura DEFINITION del TN, gestión cobranza del saldo vencido limpio Bs 29,785.13
+**Estado global:** `TELCHI_FINANCIAL_DEBT_AND_FINANCIAL_RESULT_TRACEABILITY_V1_PASS`
+**Último gate cerrado:** `TELCHI_RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V3_PASS`
+**Freeze:** GL + Balance Sheet + P&L + AR + AP + Tesorería + Cash Flow + forecast de liquidez + trazabilidad de deuda financiera, interés y resultado financiero (capital vs gasto, calendario económico heurístico, frontera SAP cerrada)
+**Próximo frente opcional:** `TELCHI_FINANCIAL_FORECAST_LIQUIDITY_SCENARIOS_V1_1` si Telchi entrega el calendario contractual; en su defecto `TELCHI_FINANCIAL_CONTROL_POLICIES_AND_ALERTS_V1`
 
 
+
+## Receivables & Collections Foundation Extension V3 (2026-09-29 — PRODUCTIVO)
+
+| Gate | Estado |
+|------|--------|
+| `TELCHI_RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V3` | ✅ PASS |
+
+- **CURRENT:** `foundation_d222a203801cc84e9a14164d26aa67a0`; 7 componentes lógicos, catálogo físico 5 y los seis componentes previos sin cambios.
+- **Componente reutilizado:** `receivables_collections_633d1fbbfdd87e6665b1aad3`; fingerprint `633d1fbbfdd87e6665b1aad39719f0c9bf5277ada1be6585ad09f900d65889ae`; Atomic y Business Derivation no fueron reconstruidos.
+- **Capacidad:** deuda abierta/current/overdue, aging, cobranzas cash/transfer/check/card, métodos mixtos y as-of histórico a cierre diario. Intradía no soportado.
+- **Representación:** canonicalización Decimal V3 estable en roundtrip JSON (14/14); hashes analíticos pinned/productive idénticos en board, collections, settlement e historical; diferencias de publicación clasificadas solo como `NON_ANALYTICAL_METADATA`.
+- **Limitaciones:** QR `UNRESOLVED_SOURCE_EVIDENCE`, no inferido y no bloqueante. La definición final de negocio de `CONTADO` sigue pendiente.
+- **Seguridad:** una sola promoción, sin rollback, sin SAP/HANA, `SAP_WRITE_COUNT=0`; reader productivo fail-closed.
+- **Evidencia:** `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/evidence/telchi/TELCHI_RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V3/`.
+
+```text
+TELCHI_DATALAKE_V1_CLOSED=YES
+RECEIVABLES_COLLECTIONS_CAPABILITY=PRODUCTIVE
+TELCHI_DATALAKE_V1_FOUNDATION_CURRENT=foundation_d222a203801cc84e9a14164d26aa67a0
+CG2A_V2_STATUS=READY_FOR_ANALYSIS
+```
+
+## Datalake Final Foundation Promotion and Closure V3 (2026-09-28 — CERRADO)
+
+Cierre técnico del Data Lake V1. El gate creó un candidato fresco con `update_run_id` único
+(`foundation-republication-v3-20260928T022543540899Z`), deep-copy del manifiesto sellado del
+target histórico mediante `store.get(id exacto)`, y promovió una sola vez bajo
+`CAS_MODE=PROTOCOL_READ_COMPARE_COMMIT` con el run lock del repositorio como mecanismo
+sole-writer.
+
+| Gate | Estado |
+|------|--------|
+| `TELCHI_DATALAKE_FINAL_FOUNDATION_PROMOTION_AND_CLOSURE_V3` | ✅ PASS |
+
+- **CURRENT:** `foundation_417c860c216805f18341bb741ee026e3`; el target histórico
+  `foundation_6a7cc7a99638208002c4f877d998d220` permanece `SUPERSEDED` con su failure reason
+  intacto (`OLD_TARGET_HISTORY_PRESERVED=YES`, `OLD_TARGET_REUSED=NO`, `OLD_TARGET_MUTATED=NO`).
+- **Conteos:** `CATALOG_COMPONENT_COUNT=5` / `PINNED_MANIFEST_COMPONENT_COUNT=6`.
+- **Snapshots:** manifest base `838` pinned y productivo (`MANIFEST_BASE_SNAPSHOT_MATCH=YES`);
+  primer-CURRENT dinámico `952` (`>951` pre-commit), sin exigir igualdad con 838.
+- **Igualdad analítica:** huella `860cfe541fc5ff6a3...` idéntica pinned/productive;
+  `PINNED_GOLD_RESULT_HASH == PRODUCTIVE_GOLD_RESULT_HASH` (`8dd9bc256ae24da5...`) →
+  `PINNED_VS_PRODUCTIVE_RESULT_MATCH=PASS`; `ANALYTICAL_COMPONENTS_CHANGED_BETWEEN_PINNED_AND_PRODUCTIVE=NO`.
+- **Gold productivo:** `SUPPLY_RISK_COUNT=16` (ACTIVE 78 / HISTORICAL 56 / GLOBAL_NOT_RELEVANT 249 /
+  UNRESOLVED 0 / COVERAGE_LT_60 19; stockouts 6/0/6); CG2A `GENERIC_CUSTOMER`; C010341
+  `INTERNAL_ACCOUNT`; 2A-SAL `SEGUNDO_ANILLO`; L00031 52 docs / Bs 57,469.51 / KG;
+  L03192 33 docs / Bs 21,584.70 / KG.
+- **Tests:** `TEST_FAILURES=0` (backend full 1766 passed, Data Lake 177); LAT gates y
+  `git diff --check` PASS (tracked files only); `SAP_ACCESSED=NO`, `SAP_QUERY_COUNT=0`,
+  `SAP_WRITE_COUNT=0`. Sin rollback (`PROMOTION_ROLLED_BACK=NO`).
+- **Evidencia:** `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/evidence/telchi/TELCHI_DATALAKE_FINAL_FOUNDATION_PROMOTION_AND_CLOSURE_V3/`.
+- **Pregunta abierta del dueño:** `CG2A_RAW_MATERIAL_PAYMENT_TERMS` / `VERIFY_CASH_CONTADO` →
+  `PENDING_BUSINESS_ANALYSIS` (no bloqueante para V1).
+
+```text
+TELCHI_DATALAKE_V1_CLOSED=YES
+TELCHI_DATALAKE_V1_FOUNDATION_CURRENT=foundation_417c860c216805f18341bb741ee026e3
+TELCHI_DATALAKE_V1_REFERENCE=v2_reference_closure_2088d5885204313a
+TELCHI_DATALAKE_V1_REFERENCE_HASH=2088d5885204313a251fb130547e2916744e375f4b7890e68399dbbb75ef773c
+TELCHI_DATALAKE_V1_MANIFEST_BASE_SNAPSHOT_ID=838
+TELCHI_DATALAKE_V1_FIRST_CURRENT_SNAPSHOT_ID=952
+TELCHI_DATALAKE_V1_CATALOG_COMPONENT_COUNT=5
+TELCHI_DATALAKE_V1_PINNED_MANIFEST_COMPONENT_COUNT=6
+TELCHI_DATALAKE_V1_SAP_DEPENDENCY_FOR_SUPPORTED_BUSINESS_QUERIES=NO
+TELCHI_DATALAKE_V1_KNOWN_BLOCKERS=[]
+TELCHI_DATALAKE_V1_OPEN_BUSINESS_QUESTIONS=[CG2A_RAW_MATERIAL_PAYMENT_TERMS]
+TELCHI_DATALAKE_FINAL_FOUNDATION_PROMOTION_AND_CLOSURE_V3_PASS
+```
+
+
+## Datalake Manual Single-Run Update V1 (2026-09-22 — CERRADO, DEGRADED)
+
+| Gate | Estado |
+|------|--------|
+| `TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1` | ⚠️ DEGRADED (datos EXACTOS) |
+
+- **Objetivo:** actualización manual de una sola ejecución de la foundation 2026 (Sales `OINV`/`INV1`, OINM, OITW). Sin scheduler, cron, daemon, queue ni Temporal/LangGraph.
+- **Entrada:** `SrvRestAstroLS_v1/backend/modules/telchi/datalake/update.py` (`--plan-only`, `--dry-run`, `--defer-new-reference-keys`). README en `datalake/UPDATE_README.md`; reporte del gate en `investigation/validation/datalake_manual_single_run_update_v1/REPORT.md`.
+- **Modo SAP:** `READ_ONLY`, `SAP_WRITE_COUNT=0`, `AI_INVOCATIONS=0`, `MAX_HANA_CONCURRENT_QUERIES=1`, `MAX_WORKERS=1`. Relectura segmentada completa del scope 2026; `DocDate` define scope de negocio, nunca change watermark (watermark DocDate-only PROHIBIDO).
+- **Corrida real `manual-update-canonical-1` (2026-09-22):** Sales 327,806→327,883 docs (+77 nuevos, +10 actualizados, 0 desaparecidos); líneas 709,153→709,358; OINM 1,524,770→1,525,024 (+254, 0 desaparecidos); OITW 1,370,242→1,370,313 (+71, 442 cambiadas, 0 removidas). 3 publicaciones transaccionales; 1,370,879 filas publicadas en 4 inserts set-based.
+- **Reconciliación:** `PUBLISHED_VS_CAPTURED_SAP=EXACT`, `TRUE_MISMATCH_COUNT=0`, `UNEXPLAINED_MISMATCH_COUNT=0`, keysets/totales exactos en los 3 dominios. Publicación transaccional; fallo preserva la foundation previa (fault-injection).
+- **Por qué DEGRADED:** SAP creó claves maestras nuevas no resolubles en Reference V2 (`UNRESOLVED_REFERENCE_KEYS=1`, `REFERENCE_NEW_PRODUCTS=1`, `EXISTING_CANONICAL_IDS_CHANGED=0`). Reference V2 se construye offline desde un snapshot V1 y no puede ingerir maestros actuales de SAP. Default = `REFERENCE_REFRESH_REQUIRED_BUT_UNSAFE=YES` (aborto fail-closed, evidencia en `TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1_RUN1_ABORTED`). La publicación requirió autorización explícita.
+- **Tests:** 21 tests de contrato + 22 de regresión del módulo = **43 passing**.
+- **Evidencia:** `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/evidence/telchi/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/` (+ `_SECOND_RUN`, `_RUN1_ABORTED`).
+- **Fuera de alcance (no tocado):** órdenes, entregas, notas de crédito, devoluciones, histórico 2022–2025, Business Assistant, runtime productivo protegido.
+
+
+
+## Financial Debt / Interest / Financial Result Traceability V1 (2026-09-10 — CERRADO)
+
+| Gate | Estado |
+|------|--------|
+| `TELCHI_FINANCIAL_DEBT_AND_FINANCIAL_RESULT_TRACEABILITY_V1_PASS` | ✅ PASS |
+
+- **AS_OF:** 2026-09-10 · READ ONLY · `SAP_WRITE_COUNT=0`.
+- **FINANCING reproducido:** **Bs 4.827.924,39** = **PRINCIPAL Bs 4.813.161,03** + **ACCRUED_INTEREST Bs 14.503,36** + **BANK_FEES Bs 260,00**. Entidades: **BANCO FIE S.A. (PL000212) Bs 3.737.302,96** (top1 77,4%), **BANCO MERCANTIL SANTA CRUZ S.A. (PL000288) Bs 1.090.611,43**, **BANCO GANADERO (PL000640) Bs 10,00**. Moneda 100% **BS**.
+- **DEBT TYPE:** 8 préstamos abiertos (BANK_LOAN/CREDIT_LINE) en **2210101 Préstamos bancarios Bs 3.923.981,24** + 1 préstamo en **2110101 Cuentas por pagar MN (DocEntry 42098, MSC 6014485521) Bs 889.179,79** = 9 préstamos. `PRINCIPAL REPAYMENT ≠ P&L EXPENSE`.
+- **Calendario:** `FINANCIAL_DEBT_SCHEDULE=HEURISTIC`, `DEBT_MATURITY_CLASSIFICATION_DEGRADED`; **INV6 con 0 cuotas** para los OPCH de capital abiertos. Cada préstamo es UN OPCH con el capital remanente y fecha final o marcador. Cuota mensual reconstruida desde la historia de pagos (Bs 70.992,22 FIE 7018-11907/10002618651 · 8.116,67 · 27.777,78 ×2 · 9.305,56 · 50.000,00 · 3.486,67 MSC 6014236751 · 83.250,00 MSC 6014435342 · 222.294,95 MSC 6014485521).
+- **Overdue documental vs económico:** 4 préstamos con DueDate >90 días atrasado por **Bs 2.943.409,06** (3639 con DueDate 2022-03-31, 35149/37812 con 2025-12-31, 29956 con 2024-12-31). NO son cuotas vencidas: son préstamos vigentes. `SAP_DOCUMENT_OVERDUE ≠ ECONOMIC_INSTALLMENT_OVERDUE`.
+- **Pagos 2026 YTD:** 210 OVPM a bancos; **capital pagado Bs 2.601.933,45** (2210101, neto de reversas); movimiento en cuenta control AP Bs 5.953.581,89 (interés + capital en 2110101 + reversas, no separable sin contrato). El pago de interés cancela la provisión 2110101 creada por el OPCH de interés; no debita 6020101 en caja.
+- **Resultado financiero −Bs 1.414.305,12 reproducido:** `BANK_CHARGES −1.138.220,44` (80,5%; de los cuales **6020105 giros al exterior Bs 1.090.697,04 = 77,1%**), `INTEREST_EXPENSE −303.803,60` (21,5%), `INTEREST_INCOME +26.280,50`, `FX` neto `+1.438,42`, `OTHER_FINANCIAL 0,00`. Valor vivo HANA −1.414.409,71; bridge post-cierre **−104,59** (asiento 6020104 creado el día del corte con RefDate 2026-08-31, posterior al gate BSPNL).
+- **Roll-forward 2210101 2026:** apertura **−6.225.914,69** · créditos **+641.963,35** (nuevo financiamiento Bs 300.000 DocEntry 48492 + reversas) · débitos **−2.943.896,80** (pagos de capital) · cierre **−3.923.981,24** = suma de OPCH de capital abiertos en 2210101 (FD14 EXACT).
+- **Debt service económico heurístico:** 7d **213.983,35** · 30d **628.971,67** · 60d **965.438,67** · 90d **1.405.816,13** (capital 1.342.504,89 + interés 63.311,24) · 365d **3.225.389,10**.
+- **Impacto forecast V1:** V1 trató como pagable **Bs 3.041.422,42** en 90d, concentrando **Bs 2.943.409,06** en ~30d. Con cronograma económico, 90d baja a **Bs 1.405.816,13** (**Bs 1.635.606,29 menos**). El déficit documental (−Bs 3.05M) está dominado por la falta del calendario contractual, no por un vencimiento real concentrado. **NO se modifica el gate forecast V1** (`PASS` preservado).
+- **Ratios descriptivos:** `Total Liabilities/Equity 0,3327` · `Financial Debt/Equity 0,0747` · `Financial Result/Operating Result −12,3%` · `Interest/Operating 2,64%` · `Financial Expense/Revenue 1,95%` · `Accounting Financial Cost Rate ≈4,2%` (no contractual).
+- **Casos reales A–H:** capital (3639), pago de capital (2210101), pago de interés (2110101), comisión (50929), FX, entidad multi-documento (FIE 13 docs), vencido no económico (3639), nuevo financiamiento (48492).
+- **Invariantes FD01–FD15 PASS**; `SAP_WRITE_COUNT=0`; cronograma HEURISTIC declarado. **Limitación:** SAP no conserva el calendario de cuotas; se requiere contrato/estado de deuda por préstamo para `V1_1`.
+- **Tests/evidencia:** 21 tests focalizados PASS; `SAP_WRITE_COUNT=0`; reporte `docs/telchi_financial_debt_and_financial_result_v1_report.md`; JSON, runner y tests en `validation/financial_debt_and_financial_result/`.
+
+
+
+## Financial Forecast / Liquidity / Scenarios V1 (2026-09-10 — CERRADO)
+
+| Gate | Estado |
+|------|--------|
+| `TELCHI_FINANCIAL_FORECAST_LIQUIDITY_SCENARIOS_V1_PASS` | ✅ PASS |
+
+- **AS_OF:** 2026-09-10 · `STARTING_SAP_TREASURY_POSITION` = Financial Position V1.1: **BS 2,595,009.35** · **USD 492,943.69** · **SC_ONLY 2,602,091.90** (no comparable). Control GL tesorería LC Bs 5,871,671.74.
+- **AR contractual:** 2,067 documentos abiertos · **Bs 4,092,786.95** (vencido Bs 1,477,647.75). **AP contractual:** 636 documentos · BS 9,547,420.94 + USD FC 148,291.25 (vencido BS 4,506,018.60). **PO abiertas:** 27 docs · BS 746,590.52 + USD FC 133,336.66.
+- **Comportamiento de cobro (ponderado por monto, 24m, solo crédito):** percentiles de mora vs vencimiento **p25 -15 · p50 -3 · p75 +5 · p90 +19 días**; 60.5% cobra antes de vencer. Curva de recuperación de vencidos (cohortes maduradas, impagas incluidas): **R0 58.0% · R30 84.6% · R90 89.7% · R365 92.4%**. Pago proveedor: **p50 0 · p75 +4 · p90 +23 días**.
+- **Expected collections 90d:** BS **Bs 2,985,003.61** (cobertura 72.9% del AR abierto; **UNRESOLVED/unrecovered Bs 1,107,783.34**). **Expected payments 90d:** TRADE_PAYABLE BS 4,719,496.55 + USD FC 148,291.25 · **FINANCING (proveedores bancarios) BS 4,827,924.39**.
+- **BASE (document-driven, BS):** 7d **+2,106,669.24** · 30d **-2,836,799.48** · 90d **-3,051,694.76**; mínimo **-3,085,957.21** (día +61); **primer déficit día +30**; necesidad máxima **Bs 3.09M**. **Excluyendo FINANCING**, el 90d documental queda **+113,925.98**: el déficit está dominado por deuda bancaria vencida.
+- **Escenarios 90d (BS):** CONSERVATIVE **-3,643,076.61** · UPSIDE **-2,650,745.54** · STRESS_COLLECTION_DELAY **-3,821,393.71** · STRESS_SUPPLIER_ACCELERATION **-3,484,948.64**. Supuestos explícitos (percentil de cobro/pago, factor de recuperación, overlay) por escenario.
+- **Backtest (5 cutoffs -30/-60/-90/-180/-365, sin leakage):** modelos A (DueDate), B (DueDate+p50), C (DueDate+p75). Seleccionado **MODEL_C_GLOBAL_P75** por treasury MAE Bs 2,029,481.58 (34.7%); A 2,816,098.79, B 2,935,952.71; precisión direccional 60%. Error material declarado: el forecast documental no captura toda la operación continua.
+- **Concentración:** cash-in Top1/Top5/Top10 10.5%/33.0%/46.2%; cash-out BS Top1 36.3% (BANCO FIE), USD Top1 53.7%. No se suman BS y USD.
+- **Invariantes FC01–FC19 PASS**, incluidos starting treasury vs Financial Position, AR/AP abiertos al corte, no doble conteo AP+PO, no ORCT/ODPS, separación por moneda, supuestos explícitos, cobertura medida y unresolved cuantificado.
+- **Limitaciones:** forecast document-driven (solo AR/AP/PO existentes al corte); sin nómina/impuestos/CAPEX nuevos (DEGRADED); WHT excluido; sin conciliación bancaria externa; la deuda bancaria AP se trata como pagable (SAP no expone calendario de cuotas).
+- **Tests/evidencia:** 23 tests focalizados PASS; `SAP_WRITE_COUNT=0`; reporte `docs/telchi_financial_forecast_liquidity_scenarios_v1_report.md`; JSON, runner y tests en `validation/financial_forecast_liquidity_scenarios/`.
+
+
+
+## Balance Sheet / P&L Reconstruction V1 (2026-09-10 — CERRADO)
+
+| Gate | Estado |
+|------|--------|
+| `TELCHI_BALANCE_SHEET_PNL_RECONSTRUCTION_V1_PASS` | ✅ PASS |
+
+- **AS_OF:** 2026-09-10 · local `BS` · sistema `USD` · período 2026-09 abierto.
+- **Balance Sheet (LC):** Activos **Bs 86,107,745.15** · Pasivos **Bs 21,498,186.57** · Patrimonio **Bs 64,609,558.58** · `gap 0,00`; en moneda sistema `gap 0,00`.
+- **P&L 2026 YTD:** ingresos **72,353,270.20** · COGS **37,336,987.20** · margen bruto **35,016,283.00** · OPEX **23,521,443.56** · resultado financiero **-1,414,305.12** · resultado neto **10,080,617.83**. 2025 mismo período resultado neto 9,474,031.60; 2025 FY 12,901,142.59.
+- **Clasificación:** 824 cuentas OACT; 586 con movimiento; cobertura BS 100,0% y P&L 100,0%; `UNRESOLVED=0`. Clasificación SAP (`GroupMask`/`FatherNode`) intacta y separada de la clasificación financiera Team360.
+- **Mecanismo de cierre:** `-3` cierra y `-2` reabre el trial balance en el límite de ejercicio; `3110502 Resultados del periodo` = 0; sin duplicar el resultado corriente. Los flujos P&L excluyen `-2/-3`.
+- **Reconciliación:** caja/banco concilian con `OACT.CurrTotal` exacto y con el gate de tesorería; AR documental vs GL 1120101 con bridge de Bs 382,349.43; AP documental vs GL 21101/21102 con bridge de Bs 3,177,576.44 (3,7% de activos), explicado por cuentas control secundarias, asientos manuales y reconciliación interna; subledger AP/AR preservado desde gates previos.
+- **Inventario GL:** Bs 46,713,822.51; activos fijos netos desde GL (DEGRADED acotado); impuestos y deuda mapeados desde cuentas.
+- **Tests/evidencia:** 10 tests focalizados PASS; `SAP_WRITE_COUNT=0`; reporte `docs/telchi_balance_sheet_pnl_reconstruction_v1_report.md`; JSON y runner en `validation/balance_sheet_pnl_reconstruction/`.
+
+## Treasury / Cash / Bank / Deposit V1 (2026-09-09 — CERRADO)
+
+| Gate | Estado |
+|------|--------|
+| `TELCHI_TREASURY_CASH_BANK_DEPOSIT_V1_PASS` | ✅ PASS |
+
+- **Cadena contable:** ORCT→OJDT por `TransId`, OVPM→OJDT por `TransId`, ODPS→OJDT por `TransAbs`; 0 huérfanos en los tres universos.
+- **Tesorería:** 33 cuentas CASH + 5 PETTY_CASH, 20 BANK, 3 TRANSIT_CLEARING y 1 CHECKS_IN_HAND clasificadas con OACT y movimientos; `CurrTotal == Σ(JDT1.Debit-Credit)` en 111 cuentas con movimiento.
+- **Volúmenes:** ORCT activo 1,804,931; OVPM activo 40,272; ODPS activo 14,593. Cancelaciones separadas. Medios, monedas, cheques, tarjetas y configuración ODSC/DSC1 inventariados.
+- **Depósito:** cash/check/card separados por `ODPS.DeposType`; cadena cheque `ORCT→RCT1→OCHH→ODPS→OJDT` probada en casos reales. Cash→deposit no tiene FK directa; matching agregado único conserva 171 casos fuertes y 178 con múltiples candidatos; el resto queda sin enlace disponible.
+- **Conciliación externa:** OBNK inspeccionado, pero no se declara saldo bancario externo; `BANK_RECONCILIATION_NOT_AVAILABLE_OR_UNUSED`.
+- **AP contrast:** se preservan 154 `SAP_OTHER_COMPENSATION_REVIEW` por Bs 380,679.38; 2 casos tienen contraparte `SrcObjTyp=46` sin VPM2 y quedan como contraste, sin reinterpretar retención.
+- **Tests/evidencia:** 5 tests focalizados + smoke HANA real PASS; `SAP_WRITE_COUNT=0`; reporte `docs/telchi_treasury_cash_bank_deposit_v1_report.md`; JSON y runner en `validation/treasury_cash_bank_deposit/`.
 
 ## Credit Risk EX La Reja V1 (2026-09-03 — CERRADO)
 
@@ -1201,3 +1360,29 @@ Parquet writes: NONE
 UI changes: NONE
 Infrastructure: UNCHANGED
 Team360: GLOBAL CHANGES NONE
+
+## HR / Payroll / Accounting Traceability V1 (2026-09-10)
+
+**TELCHI_HR_PAYROLL_ACCOUNTING_TRACEABILITY_V1_PASS** — INVESTIGATION / SAP_HANA READ ONLY / `SAP_WRITE_COUNT=0`.
+
+- OHEM: 490 empleados; 465 ACTIVE, 25 INACTIVE; no se infieren bajas por falta de actividad. OHEM→OUSR: 33/490; usuarios SAP sin empleado: 139. OHEM→OSLP válido: 201 empleados; vendedores sin empleado: 253.
+- SAP conserva maestro OHEM y GL laboral, pero no se probó un objeto de payroll detallado por empleado/período/importe: los objetos candidatos de metadata son tablas de denominaciones/cortes POS o vacías, sin campos transaccionales payroll fuertes. Estado: `PAYROLL_DETAIL_NOT_STORED_IN_SAP` / payroll externo a reconciliar.
+- Costo HR YTD 2026: **Bs 13.600.311,25**; 2025 mismo período: **Bs 11.905.383,82**; 2025 completo: **Bs 18.733.872,07**; últimos 12 meses: **Bs 20.435.359,40**. P&L OPEX YTD: Bs 23.521.443,56; HR es subconjunto contable. Pasivos HR candidatos cierre: **Bs -1.031.844,31** firmado por GL.
+- Categorías observadas: salarios, bonos/aguinaldo, cargas patronales, vacaciones, indemnizaciones, comisiones de ventas y otros personales; anticipos a empleados candidatos: Bs 5.248.339,37 de saldo GL. No se afirma identidad empleado→pago: OVPM no tiene links BP empleado observados.
+- Cobertura YTD de HR expense: `ProfitCode` **99,63%**, no asignado **0,37%**; `BPLId` **0%**; no se distribuye central por heurística. Casos A–J, metadata, monthly 24m, TransType 30/46, reversas y JSON en `validation/hr_payroll_accounting_traceability/`.
+- Próximo gate: `TELCHI_EXTERNAL_PAYROLL_TO_SAP_RECONCILIATION_V1`.
+
+## External Payroll → SAP / GL / Liability / Bank Reconciliation V1 (2026-09-10 — CERRADO)
+
+| Gate | Estado |
+|------|--------|
+| `TELCHI_EXTERNAL_PAYROLL_TO_SAP_RECONCILIATION_V1_PASS` | ✅ PASS |
+
+- **AS_OF:** 2026-09-10 · SAP_HANA READ ONLY · `SAP_WRITE_COUNT=0`.
+- **SAP-side cerrado:** memos y GL prueban devengamientos agregados, períodos, reversas y pagos; no existe detalle reconciliable empleado → concepto → neto.
+- **HR Expense YTD:** **Bs 13.600.311,25**; **pasivos candidatos:** **Bs -1.031.844,31**; `ProfitCode` **99,63%**; `BPLId` **0%**.
+- **Pasivo → banco:** **93 pagos YTD** identificados por débito de pasivo/TransType 46; cash-out HR YTD **Bs 7.749.365,81**. Timing de períodos identificados: promedio **0,7 días**, mediana **0**, p90 **1**; 23 períodos emparejados.
+- **Fuente externa:** `EXTERNAL_PAYROLL_SOURCE_REQUIRED`; no se encontró archivo payroll autorizado en Downloads, docs/validation del workspace ni Data Root. No se abrieron ni modificaron archivos externos.
+- **Invariantes EPR01–EPR16:** PASS. Se preservan privacidad, no inferencia de empleado desde GL agregado y frontera BPLId 0%.
+- **Artefactos:** reporte `docs/telchi_external_payroll_to_sap_reconciliation_v1_report.md`; runner, JSON y tests en `validation/external_payroll_to_sap_reconciliation/`.
+- **Siguiente gate:** con fuente externa `TELCHI_PAYROLL_EMPLOYEE_LEVEL_RECONCILIATION_V1`; sin ella `TELCHI_HR_COST_HEADCOUNT_PRODUCTIVITY_V1`; pasivos antiguos materiales `TELCHI_HR_LIABILITIES_BENEFITS_CONTROL_V1`.

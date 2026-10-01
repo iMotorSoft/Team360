@@ -1,0 +1,569 @@
+column,dataset,nullable,type
+source_system,reference.branches,YES,VARCHAR
+source_native_id,reference.branches,YES,VARCHAR
+branch_id,reference.branches,YES,VARCHAR
+code,reference.branches,YES,VARCHAR
+name,reference.branches,YES,VARCHAR
+valid_from,reference.branches,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.branches,YES,TIMESTAMP WITH TIME ZONE
+status,reference.branches,YES,VARCHAR
+_source_system,reference.branches,YES,VARCHAR
+_source_dataset,reference.branches,YES,VARCHAR
+_source_native_key,reference.branches,YES,VARCHAR
+_source_file,reference.branches,YES,VARCHAR
+_source_snapshot_at,reference.branches,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.branches,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.branches,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.branches,YES,VARCHAR
+_semantic_version,reference.branches,YES,VARCHAR
+_lineage_quality,reference.branches,YES,VARCHAR
+brand_id,reference.brand,YES,VARCHAR
+code,reference.brand,YES,VARCHAR
+name,reference.brand,YES,VARCHAR
+description,reference.brand,YES,VARCHAR
+active,reference.brand,YES,BOOLEAN
+valid_from,reference.brand,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.brand,YES,TIMESTAMP WITH TIME ZONE
+source,reference.brand,YES,VARCHAR
+confidence,reference.brand,YES,"DECIMAL(10,6)"
+status,reference.brand,YES,VARCHAR
+semantic_version,reference.brand,YES,VARCHAR
+business_unit_id,reference.business_unit,YES,VARCHAR
+code,reference.business_unit,YES,VARCHAR
+name,reference.business_unit,YES,VARCHAR
+description,reference.business_unit,YES,VARCHAR
+active,reference.business_unit,YES,BOOLEAN
+valid_from,reference.business_unit,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.business_unit,YES,TIMESTAMP WITH TIME ZONE
+source,reference.business_unit,YES,VARCHAR
+confidence,reference.business_unit,YES,"DECIMAL(10,6)"
+status,reference.business_unit,YES,VARCHAR
+semantic_version,reference.business_unit,YES,VARCHAR
+source_system,reference.currencies,YES,VARCHAR
+source_native_id,reference.currencies,YES,VARCHAR
+currency_code,reference.currencies,YES,VARCHAR
+code,reference.currencies,YES,VARCHAR
+name,reference.currencies,YES,VARCHAR
+valid_from,reference.currencies,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.currencies,YES,TIMESTAMP WITH TIME ZONE
+status,reference.currencies,YES,VARCHAR
+legal_entity_id,reference.currencies,YES,VARCHAR
+decimal_places,reference.currencies,YES,INTEGER
+_source_system,reference.currencies,YES,VARCHAR
+_source_dataset,reference.currencies,YES,VARCHAR
+_source_native_key,reference.currencies,YES,VARCHAR
+_source_file,reference.currencies,YES,VARCHAR
+_source_snapshot_at,reference.currencies,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.currencies,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.currencies,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.currencies,YES,VARCHAR
+_semantic_version,reference.currencies,YES,VARCHAR
+_lineage_quality,reference.currencies,YES,VARCHAR
+source_system,reference.customers,YES,VARCHAR
+source_native_id,reference.customers,YES,VARCHAR
+customer_id,reference.customers,YES,VARCHAR
+code,reference.customers,YES,VARCHAR
+name,reference.customers,YES,VARCHAR
+valid_from,reference.customers,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.customers,YES,TIMESTAMP WITH TIME ZONE
+status,reference.customers,YES,VARCHAR
+branch_id,reference.customers,YES,VARCHAR
+tax_id,reference.customers,YES,VARCHAR
+credit_limit,reference.customers,YES,"DECIMAL(38,6)"
+payment_term_id,reference.customers,YES,VARCHAR
+_source_system,reference.customers,YES,VARCHAR
+_source_dataset,reference.customers,YES,VARCHAR
+_source_native_key,reference.customers,YES,VARCHAR
+_source_file,reference.customers,YES,VARCHAR
+_source_snapshot_at,reference.customers,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.customers,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.customers,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.customers,YES,VARCHAR
+_semantic_version,reference.customers,YES,VARCHAR
+_lineage_quality,reference.customers,YES,VARCHAR
+source_system,reference.document_types,YES,VARCHAR
+source_native_id,reference.document_types,YES,VARCHAR
+document_type,reference.document_types,YES,VARCHAR
+code,reference.document_types,YES,VARCHAR
+name,reference.document_types,YES,VARCHAR
+valid_from,reference.document_types,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.document_types,YES,TIMESTAMP WITH TIME ZONE
+status,reference.document_types,YES,VARCHAR
+company_id,reference.document_types,YES,VARCHAR
+_source_system,reference.document_types,YES,VARCHAR
+_source_dataset,reference.document_types,YES,VARCHAR
+_source_native_key,reference.document_types,YES,VARCHAR
+_source_file,reference.document_types,YES,VARCHAR
+_source_snapshot_at,reference.document_types,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.document_types,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.document_types,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.document_types,YES,VARCHAR
+_semantic_version,reference.document_types,YES,VARCHAR
+_lineage_quality,reference.document_types,YES,VARCHAR
+entity_type,reference.entity_alias,YES,VARCHAR
+canonical_id,reference.entity_alias,YES,VARCHAR
+alias,reference.entity_alias,YES,VARCHAR
+normalized_alias,reference.entity_alias,YES,VARCHAR
+alias_source,reference.entity_alias,YES,VARCHAR
+priority,reference.entity_alias,YES,INTEGER
+active,reference.entity_alias,YES,BOOLEAN
+confidence,reference.entity_alias,YES,"DECIMAL(38,12)"
+resolution_status,reference.entity_alias,YES,VARCHAR
+_source_system,reference.entity_alias,YES,VARCHAR
+_source_dataset,reference.entity_alias,YES,VARCHAR
+_source_native_key,reference.entity_alias,YES,VARCHAR
+_source_file,reference.entity_alias,YES,VARCHAR
+_source_extracted_at,reference.entity_alias,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.entity_alias,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.entity_alias,YES,VARCHAR
+_semantic_version,reference.entity_alias,YES,VARCHAR
+operating_domain_id,reference.operating_domain,YES,VARCHAR
+code,reference.operating_domain,YES,VARCHAR
+name,reference.operating_domain,YES,VARCHAR
+description,reference.operating_domain,YES,VARCHAR
+active,reference.operating_domain,YES,BOOLEAN
+valid_from,reference.operating_domain,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.operating_domain,YES,TIMESTAMP WITH TIME ZONE
+source,reference.operating_domain,YES,VARCHAR
+confidence,reference.operating_domain,YES,"DECIMAL(10,6)"
+status,reference.operating_domain,YES,VARCHAR
+semantic_version,reference.operating_domain,YES,VARCHAR
+operating_model_id,reference.operating_model,YES,VARCHAR
+code,reference.operating_model,YES,VARCHAR
+name,reference.operating_model,YES,VARCHAR
+description,reference.operating_model,YES,VARCHAR
+active,reference.operating_model,YES,BOOLEAN
+valid_from,reference.operating_model,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.operating_model,YES,TIMESTAMP WITH TIME ZONE
+source,reference.operating_model,YES,VARCHAR
+confidence,reference.operating_model,YES,"DECIMAL(10,6)"
+status,reference.operating_model,YES,VARCHAR
+semantic_version,reference.operating_model,YES,VARCHAR
+party_id,reference.party,YES,VARCHAR
+party_type,reference.party,YES,VARCHAR
+code,reference.party,YES,VARCHAR
+name,reference.party,YES,VARCHAR
+valid_from,reference.party,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.party,YES,TIMESTAMP WITH TIME ZONE
+source,reference.party,YES,VARCHAR
+confidence,reference.party,YES,"DECIMAL(10,6)"
+status,reference.party,YES,VARCHAR
+source_system,reference.payment_terms,YES,VARCHAR
+source_native_id,reference.payment_terms,YES,VARCHAR
+payment_term_id,reference.payment_terms,YES,VARCHAR
+code,reference.payment_terms,YES,VARCHAR
+name,reference.payment_terms,YES,VARCHAR
+valid_from,reference.payment_terms,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.payment_terms,YES,TIMESTAMP WITH TIME ZONE
+status,reference.payment_terms,YES,VARCHAR
+branch_id,reference.payment_terms,YES,VARCHAR
+credit_days,reference.payment_terms,YES,INTEGER
+_source_system,reference.payment_terms,YES,VARCHAR
+_source_dataset,reference.payment_terms,YES,VARCHAR
+_source_native_key,reference.payment_terms,YES,VARCHAR
+_source_file,reference.payment_terms,YES,VARCHAR
+_source_snapshot_at,reference.payment_terms,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.payment_terms,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.payment_terms,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.payment_terms,YES,VARCHAR
+_semantic_version,reference.payment_terms,YES,VARCHAR
+_lineage_quality,reference.payment_terms,YES,VARCHAR
+portfolio_family_id,reference.portfolio_family,YES,VARCHAR
+code,reference.portfolio_family,YES,VARCHAR
+name,reference.portfolio_family,YES,VARCHAR
+description,reference.portfolio_family,YES,VARCHAR
+active,reference.portfolio_family,YES,BOOLEAN
+valid_from,reference.portfolio_family,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.portfolio_family,YES,TIMESTAMP WITH TIME ZONE
+source,reference.portfolio_family,YES,VARCHAR
+confidence,reference.portfolio_family,YES,"DECIMAL(10,6)"
+status,reference.portfolio_family,YES,VARCHAR
+semantic_version,reference.portfolio_family,YES,VARCHAR
+product_business_type_id,reference.product_business_type,YES,VARCHAR
+code,reference.product_business_type,YES,VARCHAR
+name,reference.product_business_type,YES,VARCHAR
+description,reference.product_business_type,YES,VARCHAR
+active,reference.product_business_type,YES,BOOLEAN
+valid_from,reference.product_business_type,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.product_business_type,YES,TIMESTAMP WITH TIME ZONE
+source,reference.product_business_type,YES,VARCHAR
+confidence,reference.product_business_type,YES,"DECIMAL(10,6)"
+status,reference.product_business_type,YES,VARCHAR
+semantic_version,reference.product_business_type,YES,VARCHAR
+production_site_id,reference.production_site,YES,VARCHAR
+code,reference.production_site,YES,VARCHAR
+name,reference.production_site,YES,VARCHAR
+description,reference.production_site,YES,VARCHAR
+active,reference.production_site,YES,BOOLEAN
+valid_from,reference.production_site,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.production_site,YES,TIMESTAMP WITH TIME ZONE
+source,reference.production_site,YES,VARCHAR
+confidence,reference.production_site,YES,"DECIMAL(10,6)"
+status,reference.production_site,YES,VARCHAR
+semantic_version,reference.production_site,YES,VARCHAR
+canonical_product_id,reference.products,YES,VARCHAR
+source_system,reference.products,YES,VARCHAR
+source_native_id,reference.products,YES,VARCHAR
+item_code,reference.products,YES,VARCHAR
+canonical_name,reference.products,YES,VARCHAR
+product_name,reference.products,YES,VARCHAR
+inventory_uom_id,reference.products,YES,VARCHAR
+sales_uom_id,reference.products,YES,VARCHAR
+purchase_uom_id,reference.products,YES,VARCHAR
+active,reference.products,YES,BOOLEAN
+valid_from,reference.products,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.products,YES,TIMESTAMP WITH TIME ZONE
+status,reference.products,YES,VARCHAR
+_source_system,reference.products,YES,VARCHAR
+_source_dataset,reference.products,YES,VARCHAR
+_source_native_key,reference.products,YES,VARCHAR
+_source_file,reference.products,YES,VARCHAR
+_source_snapshot_at,reference.products,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.products,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.products,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.products,YES,VARCHAR
+_semantic_version,reference.products,YES,VARCHAR
+_lineage_quality,reference.products,YES,VARCHAR
+sales_channel_id,reference.sales_channel,YES,VARCHAR
+code,reference.sales_channel,YES,VARCHAR
+name,reference.sales_channel,YES,VARCHAR
+description,reference.sales_channel,YES,VARCHAR
+active,reference.sales_channel,YES,BOOLEAN
+valid_from,reference.sales_channel,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.sales_channel,YES,TIMESTAMP WITH TIME ZONE
+source,reference.sales_channel,YES,VARCHAR
+confidence,reference.sales_channel,YES,"DECIMAL(10,6)"
+status,reference.sales_channel,YES,VARCHAR
+semantic_version,reference.sales_channel,YES,VARCHAR
+source_system,reference.salespersons,YES,VARCHAR
+source_native_id,reference.salespersons,YES,VARCHAR
+salesperson_id,reference.salespersons,YES,VARCHAR
+code,reference.salespersons,YES,VARCHAR
+name,reference.salespersons,YES,VARCHAR
+valid_from,reference.salespersons,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.salespersons,YES,TIMESTAMP WITH TIME ZONE
+status,reference.salespersons,YES,VARCHAR
+branch_id,reference.salespersons,YES,VARCHAR
+_source_system,reference.salespersons,YES,VARCHAR
+_source_dataset,reference.salespersons,YES,VARCHAR
+_source_native_key,reference.salespersons,YES,VARCHAR
+_source_file,reference.salespersons,YES,VARCHAR
+_source_snapshot_at,reference.salespersons,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.salespersons,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.salespersons,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.salespersons,YES,VARCHAR
+_semantic_version,reference.salespersons,YES,VARCHAR
+_lineage_quality,reference.salespersons,YES,VARCHAR
+source_system,reference.suppliers,YES,VARCHAR
+source_native_id,reference.suppliers,YES,VARCHAR
+supplier_id,reference.suppliers,YES,VARCHAR
+code,reference.suppliers,YES,VARCHAR
+name,reference.suppliers,YES,VARCHAR
+valid_from,reference.suppliers,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.suppliers,YES,TIMESTAMP WITH TIME ZONE
+status,reference.suppliers,YES,VARCHAR
+branch_id,reference.suppliers,YES,VARCHAR
+tax_id,reference.suppliers,YES,VARCHAR
+payment_term_id,reference.suppliers,YES,VARCHAR
+_source_system,reference.suppliers,YES,VARCHAR
+_source_dataset,reference.suppliers,YES,VARCHAR
+_source_native_key,reference.suppliers,YES,VARCHAR
+_source_file,reference.suppliers,YES,VARCHAR
+_source_snapshot_at,reference.suppliers,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.suppliers,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.suppliers,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.suppliers,YES,VARCHAR
+_semantic_version,reference.suppliers,YES,VARCHAR
+_lineage_quality,reference.suppliers,YES,VARCHAR
+source_system,reference.units_of_measure,YES,VARCHAR
+source_native_id,reference.units_of_measure,YES,VARCHAR
+unit_of_measure_id,reference.units_of_measure,YES,VARCHAR
+code,reference.units_of_measure,YES,VARCHAR
+name,reference.units_of_measure,YES,VARCHAR
+valid_from,reference.units_of_measure,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.units_of_measure,YES,TIMESTAMP WITH TIME ZONE
+status,reference.units_of_measure,YES,VARCHAR
+company_id,reference.units_of_measure,YES,VARCHAR
+_source_system,reference.units_of_measure,YES,VARCHAR
+_source_dataset,reference.units_of_measure,YES,VARCHAR
+_source_native_key,reference.units_of_measure,YES,VARCHAR
+_source_file,reference.units_of_measure,YES,VARCHAR
+_source_snapshot_at,reference.units_of_measure,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.units_of_measure,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.units_of_measure,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.units_of_measure,YES,VARCHAR
+_semantic_version,reference.units_of_measure,YES,VARCHAR
+_lineage_quality,reference.units_of_measure,YES,VARCHAR
+source_system,reference.users,YES,VARCHAR
+source_native_id,reference.users,YES,VARCHAR
+user_id,reference.users,YES,VARCHAR
+code,reference.users,YES,VARCHAR
+name,reference.users,YES,VARCHAR
+valid_from,reference.users,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.users,YES,TIMESTAMP WITH TIME ZONE
+status,reference.users,YES,VARCHAR
+organizational_scope,reference.users,YES,VARCHAR
+_source_system,reference.users,YES,VARCHAR
+_source_dataset,reference.users,YES,VARCHAR
+_source_native_key,reference.users,YES,VARCHAR
+_source_file,reference.users,YES,VARCHAR
+_source_snapshot_at,reference.users,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.users,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.users,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.users,YES,VARCHAR
+_semantic_version,reference.users,YES,VARCHAR
+_lineage_quality,reference.users,YES,VARCHAR
+source_system,reference.warehouse_roles,YES,VARCHAR
+source_native_id,reference.warehouse_roles,YES,VARCHAR
+warehouse_role_id,reference.warehouse_roles,YES,VARCHAR
+code,reference.warehouse_roles,YES,VARCHAR
+name,reference.warehouse_roles,YES,VARCHAR
+valid_from,reference.warehouse_roles,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.warehouse_roles,YES,TIMESTAMP WITH TIME ZONE
+status,reference.warehouse_roles,YES,VARCHAR
+warehouse_id,reference.warehouse_roles,YES,VARCHAR
+_source_system,reference.warehouse_roles,YES,VARCHAR
+_source_dataset,reference.warehouse_roles,YES,VARCHAR
+_source_native_key,reference.warehouse_roles,YES,VARCHAR
+_source_file,reference.warehouse_roles,YES,VARCHAR
+_source_snapshot_at,reference.warehouse_roles,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.warehouse_roles,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.warehouse_roles,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.warehouse_roles,YES,VARCHAR
+_semantic_version,reference.warehouse_roles,YES,VARCHAR
+_lineage_quality,reference.warehouse_roles,YES,VARCHAR
+source_system,reference.warehouses,YES,VARCHAR
+source_native_id,reference.warehouses,YES,VARCHAR
+warehouse_id,reference.warehouses,YES,VARCHAR
+code,reference.warehouses,YES,VARCHAR
+name,reference.warehouses,YES,VARCHAR
+valid_from,reference.warehouses,YES,TIMESTAMP WITH TIME ZONE
+valid_to,reference.warehouses,YES,TIMESTAMP WITH TIME ZONE
+status,reference.warehouses,YES,VARCHAR
+warehouse_role_id,reference.warehouses,YES,VARCHAR
+_source_system,reference.warehouses,YES,VARCHAR
+_source_dataset,reference.warehouses,YES,VARCHAR
+_source_native_key,reference.warehouses,YES,VARCHAR
+_source_file,reference.warehouses,YES,VARCHAR
+_source_snapshot_at,reference.warehouses,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,reference.warehouses,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,reference.warehouses,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,reference.warehouses,YES,VARCHAR
+_semantic_version,reference.warehouses,YES,VARCHAR
+_lineage_quality,reference.warehouses,YES,VARCHAR
+canonical_id,crosswalk.branch_crosswalk,YES,VARCHAR
+source_system,crosswalk.branch_crosswalk,YES,VARCHAR
+source_native_id,crosswalk.branch_crosswalk,YES,VARCHAR
+valid_from,crosswalk.branch_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.branch_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+mapping_source,crosswalk.branch_crosswalk,YES,VARCHAR
+confidence,crosswalk.branch_crosswalk,YES,"DECIMAL(38,12)"
+status,crosswalk.branch_crosswalk,YES,VARCHAR
+_source_system,crosswalk.branch_crosswalk,YES,VARCHAR
+_source_dataset,crosswalk.branch_crosswalk,YES,VARCHAR
+_source_native_key,crosswalk.branch_crosswalk,YES,VARCHAR
+_source_file,crosswalk.branch_crosswalk,YES,VARCHAR
+_source_snapshot_at,crosswalk.branch_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,crosswalk.branch_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,crosswalk.branch_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,crosswalk.branch_crosswalk,YES,VARCHAR
+_semantic_version,crosswalk.branch_crosswalk,YES,VARCHAR
+_lineage_quality,crosswalk.branch_crosswalk,YES,VARCHAR
+brand_id,crosswalk.brand_owner,YES,VARCHAR
+brand_owner_party_id,crosswalk.brand_owner,YES,VARCHAR
+valid_from,crosswalk.brand_owner,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.brand_owner,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.brand_owner,YES,VARCHAR
+confidence,crosswalk.brand_owner,YES,"DECIMAL(10,6)"
+status,crosswalk.brand_owner,YES,VARCHAR
+canonical_id,crosswalk.customer_crosswalk,YES,VARCHAR
+source_system,crosswalk.customer_crosswalk,YES,VARCHAR
+source_native_id,crosswalk.customer_crosswalk,YES,VARCHAR
+valid_from,crosswalk.customer_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.customer_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+mapping_source,crosswalk.customer_crosswalk,YES,VARCHAR
+confidence,crosswalk.customer_crosswalk,YES,"DECIMAL(38,12)"
+status,crosswalk.customer_crosswalk,YES,VARCHAR
+_source_system,crosswalk.customer_crosswalk,YES,VARCHAR
+_source_dataset,crosswalk.customer_crosswalk,YES,VARCHAR
+_source_native_key,crosswalk.customer_crosswalk,YES,VARCHAR
+_source_file,crosswalk.customer_crosswalk,YES,VARCHAR
+_source_snapshot_at,crosswalk.customer_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,crosswalk.customer_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,crosswalk.customer_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,crosswalk.customer_crosswalk,YES,VARCHAR
+_semantic_version,crosswalk.customer_crosswalk,YES,VARCHAR
+_lineage_quality,crosswalk.customer_crosswalk,YES,VARCHAR
+production_order_id,crosswalk.manufacturing_arrangement,YES,VARCHAR
+arrangement_type_id,crosswalk.manufacturing_arrangement,YES,VARCHAR
+contract_customer_id,crosswalk.manufacturing_arrangement,YES,VARCHAR
+valid_from,crosswalk.manufacturing_arrangement,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.manufacturing_arrangement,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.manufacturing_arrangement,YES,VARCHAR
+confidence,crosswalk.manufacturing_arrangement,YES,"DECIMAL(10,6)"
+status,crosswalk.manufacturing_arrangement,YES,VARCHAR
+canonical_product_id,crosswalk.product_brand,YES,VARCHAR
+brand_id,crosswalk.product_brand,YES,VARCHAR
+valid_from,crosswalk.product_brand,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.product_brand,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.product_brand,YES,VARCHAR
+confidence,crosswalk.product_brand,YES,"DECIMAL(10,6)"
+status,crosswalk.product_brand,YES,VARCHAR
+canonical_product_id,crosswalk.product_business_type,YES,VARCHAR
+product_business_type_id,crosswalk.product_business_type,YES,VARCHAR
+valid_from,crosswalk.product_business_type,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.product_business_type,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.product_business_type,YES,VARCHAR
+confidence,crosswalk.product_business_type,YES,"DECIMAL(10,6)"
+status,crosswalk.product_business_type,YES,VARCHAR
+canonical_product_id,crosswalk.product_business_unit,YES,VARCHAR
+business_unit_id,crosswalk.product_business_unit,YES,VARCHAR
+valid_from,crosswalk.product_business_unit,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.product_business_unit,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.product_business_unit,YES,VARCHAR
+confidence,crosswalk.product_business_unit,YES,"DECIMAL(10,6)"
+status,crosswalk.product_business_unit,YES,VARCHAR
+canonical_id,crosswalk.product_crosswalk,YES,VARCHAR
+source_system,crosswalk.product_crosswalk,YES,VARCHAR
+source_native_id,crosswalk.product_crosswalk,YES,VARCHAR
+valid_from,crosswalk.product_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.product_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+mapping_source,crosswalk.product_crosswalk,YES,VARCHAR
+confidence,crosswalk.product_crosswalk,YES,"DECIMAL(38,12)"
+status,crosswalk.product_crosswalk,YES,VARCHAR
+_source_system,crosswalk.product_crosswalk,YES,VARCHAR
+_source_dataset,crosswalk.product_crosswalk,YES,VARCHAR
+_source_native_key,crosswalk.product_crosswalk,YES,VARCHAR
+_source_file,crosswalk.product_crosswalk,YES,VARCHAR
+_source_snapshot_at,crosswalk.product_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,crosswalk.product_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,crosswalk.product_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,crosswalk.product_crosswalk,YES,VARCHAR
+_semantic_version,crosswalk.product_crosswalk,YES,VARCHAR
+_lineage_quality,crosswalk.product_crosswalk,YES,VARCHAR
+canonical_product_id,crosswalk.product_manufacturer,YES,VARCHAR
+manufacturer_party_id,crosswalk.product_manufacturer,YES,VARCHAR
+valid_from,crosswalk.product_manufacturer,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.product_manufacturer,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.product_manufacturer,YES,VARCHAR
+confidence,crosswalk.product_manufacturer,YES,"DECIMAL(10,6)"
+status,crosswalk.product_manufacturer,YES,VARCHAR
+canonical_product_id,crosswalk.product_operating_model,YES,VARCHAR
+operating_model_id,crosswalk.product_operating_model,YES,VARCHAR
+valid_from,crosswalk.product_operating_model,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.product_operating_model,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.product_operating_model,YES,VARCHAR
+confidence,crosswalk.product_operating_model,YES,"DECIMAL(10,6)"
+status,crosswalk.product_operating_model,YES,VARCHAR
+canonical_product_id,crosswalk.product_portfolio_family,YES,VARCHAR
+portfolio_family_id,crosswalk.product_portfolio_family,YES,VARCHAR
+valid_from,crosswalk.product_portfolio_family,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.product_portfolio_family,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.product_portfolio_family,YES,VARCHAR
+confidence,crosswalk.product_portfolio_family,YES,"DECIMAL(10,6)"
+status,crosswalk.product_portfolio_family,YES,VARCHAR
+canonical_product_id,crosswalk.product_production_site,YES,VARCHAR
+production_site_id,crosswalk.product_production_site,YES,VARCHAR
+operating_model_id,crosswalk.product_production_site,YES,VARCHAR
+valid_from,crosswalk.product_production_site,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.product_production_site,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.product_production_site,YES,VARCHAR
+confidence,crosswalk.product_production_site,YES,"DECIMAL(10,6)"
+status,crosswalk.product_production_site,YES,VARCHAR
+production_site_id,crosswalk.production_site_warehouse,YES,VARCHAR
+warehouse_id,crosswalk.production_site_warehouse,YES,VARCHAR
+warehouse_role,crosswalk.production_site_warehouse,YES,VARCHAR
+valid_from,crosswalk.production_site_warehouse,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.production_site_warehouse,YES,TIMESTAMP WITH TIME ZONE
+source,crosswalk.production_site_warehouse,YES,VARCHAR
+confidence,crosswalk.production_site_warehouse,YES,"DECIMAL(10,6)"
+status,crosswalk.production_site_warehouse,YES,VARCHAR
+canonical_id,crosswalk.salesperson_crosswalk,YES,VARCHAR
+source_system,crosswalk.salesperson_crosswalk,YES,VARCHAR
+source_native_id,crosswalk.salesperson_crosswalk,YES,VARCHAR
+valid_from,crosswalk.salesperson_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.salesperson_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+mapping_source,crosswalk.salesperson_crosswalk,YES,VARCHAR
+confidence,crosswalk.salesperson_crosswalk,YES,"DECIMAL(38,12)"
+status,crosswalk.salesperson_crosswalk,YES,VARCHAR
+_source_system,crosswalk.salesperson_crosswalk,YES,VARCHAR
+_source_dataset,crosswalk.salesperson_crosswalk,YES,VARCHAR
+_source_native_key,crosswalk.salesperson_crosswalk,YES,VARCHAR
+_source_file,crosswalk.salesperson_crosswalk,YES,VARCHAR
+_source_snapshot_at,crosswalk.salesperson_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,crosswalk.salesperson_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,crosswalk.salesperson_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,crosswalk.salesperson_crosswalk,YES,VARCHAR
+_semantic_version,crosswalk.salesperson_crosswalk,YES,VARCHAR
+_lineage_quality,crosswalk.salesperson_crosswalk,YES,VARCHAR
+canonical_id,crosswalk.supplier_crosswalk,YES,VARCHAR
+source_system,crosswalk.supplier_crosswalk,YES,VARCHAR
+source_native_id,crosswalk.supplier_crosswalk,YES,VARCHAR
+valid_from,crosswalk.supplier_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.supplier_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+mapping_source,crosswalk.supplier_crosswalk,YES,VARCHAR
+confidence,crosswalk.supplier_crosswalk,YES,"DECIMAL(38,12)"
+status,crosswalk.supplier_crosswalk,YES,VARCHAR
+_source_system,crosswalk.supplier_crosswalk,YES,VARCHAR
+_source_dataset,crosswalk.supplier_crosswalk,YES,VARCHAR
+_source_native_key,crosswalk.supplier_crosswalk,YES,VARCHAR
+_source_file,crosswalk.supplier_crosswalk,YES,VARCHAR
+_source_snapshot_at,crosswalk.supplier_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,crosswalk.supplier_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,crosswalk.supplier_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,crosswalk.supplier_crosswalk,YES,VARCHAR
+_semantic_version,crosswalk.supplier_crosswalk,YES,VARCHAR
+_lineage_quality,crosswalk.supplier_crosswalk,YES,VARCHAR
+canonical_id,crosswalk.user_crosswalk,YES,VARCHAR
+source_system,crosswalk.user_crosswalk,YES,VARCHAR
+source_native_id,crosswalk.user_crosswalk,YES,VARCHAR
+valid_from,crosswalk.user_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.user_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+mapping_source,crosswalk.user_crosswalk,YES,VARCHAR
+confidence,crosswalk.user_crosswalk,YES,"DECIMAL(38,12)"
+status,crosswalk.user_crosswalk,YES,VARCHAR
+_source_system,crosswalk.user_crosswalk,YES,VARCHAR
+_source_dataset,crosswalk.user_crosswalk,YES,VARCHAR
+_source_native_key,crosswalk.user_crosswalk,YES,VARCHAR
+_source_file,crosswalk.user_crosswalk,YES,VARCHAR
+_source_snapshot_at,crosswalk.user_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,crosswalk.user_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,crosswalk.user_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,crosswalk.user_crosswalk,YES,VARCHAR
+_semantic_version,crosswalk.user_crosswalk,YES,VARCHAR
+_lineage_quality,crosswalk.user_crosswalk,YES,VARCHAR
+warehouse_id,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+branch_id,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+valid_from,crosswalk.warehouse_branch_mapping,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.warehouse_branch_mapping,YES,TIMESTAMP WITH TIME ZONE
+mapping_source,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+confidence,crosswalk.warehouse_branch_mapping,YES,"DECIMAL(38,12)"
+status,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+_source_system,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+_source_dataset,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+_source_native_key,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+_source_file,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+_source_snapshot_at,crosswalk.warehouse_branch_mapping,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,crosswalk.warehouse_branch_mapping,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,crosswalk.warehouse_branch_mapping,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+_semantic_version,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+_lineage_quality,crosswalk.warehouse_branch_mapping,YES,VARCHAR
+canonical_id,crosswalk.warehouse_crosswalk,YES,VARCHAR
+source_system,crosswalk.warehouse_crosswalk,YES,VARCHAR
+source_native_id,crosswalk.warehouse_crosswalk,YES,VARCHAR
+valid_from,crosswalk.warehouse_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+valid_to,crosswalk.warehouse_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+mapping_source,crosswalk.warehouse_crosswalk,YES,VARCHAR
+confidence,crosswalk.warehouse_crosswalk,YES,"DECIMAL(38,12)"
+status,crosswalk.warehouse_crosswalk,YES,VARCHAR
+_source_system,crosswalk.warehouse_crosswalk,YES,VARCHAR
+_source_dataset,crosswalk.warehouse_crosswalk,YES,VARCHAR
+_source_native_key,crosswalk.warehouse_crosswalk,YES,VARCHAR
+_source_file,crosswalk.warehouse_crosswalk,YES,VARCHAR
+_source_snapshot_at,crosswalk.warehouse_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_source_extracted_at,crosswalk.warehouse_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_ingested_at,crosswalk.warehouse_crosswalk,YES,TIMESTAMP WITH TIME ZONE
+_transformation_version,crosswalk.warehouse_crosswalk,YES,VARCHAR
+_semantic_version,crosswalk.warehouse_crosswalk,YES,VARCHAR
+_lineage_quality,crosswalk.warehouse_crosswalk,YES,VARCHAR

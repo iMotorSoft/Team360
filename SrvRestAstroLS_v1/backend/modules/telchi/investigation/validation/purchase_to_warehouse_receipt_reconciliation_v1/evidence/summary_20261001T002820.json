@@ -1,0 +1,3049 @@
+{
+  "gate": "TELCHI_PURCHASE_TO_WAREHOUSE_RECEIPT_RECONCILIATION_V1",
+  "started_at": "2026-10-01T00:28:20.177063+00:00",
+  "finished_at": "2026-10-01T00:28:22.062584+00:00",
+  "source": "DATA_LAKE_ONLY",
+  "foundation_current": [
+    [
+      "foundation_d222a203801cc84e9a14164d26aa67a0",
+      "CURRENT"
+    ]
+  ],
+  "oinm_window": [
+    "2026-01-01T00:00:00",
+    "2026-09-24T00:00:00",
+    1536724
+  ],
+  "tt18_2026": [
+    64,
+    18,
+    "2026-01-14T00:00:00",
+    "2026-05-19T00:00:00"
+  ],
+  "tt21_2026": {
+    "movements": 739,
+    "qty_out_base": "54585.0",
+    "suppliers": 25,
+    "window": [
+      "2026-01-06T00:00:00",
+      "2026-09-16T00:00:00"
+    ]
+  },
+  "universe": {
+    "po_documents_total": 3337,
+    "po_documents_cancelled": 118,
+    "po_documents_valid": 3219,
+    "po_lines_total": 18584,
+    "po_lines_cancelled_docs": 1451,
+    "po_lines_non_inventory": 778,
+    "po_lines_main_universe": 16355,
+    "receipt_documents_total": 3471,
+    "receipt_documents_cancelled": 112,
+    "receipt_documents_valid": 3359,
+    "receipt_lines_total": 16921,
+    "receipt_lines_cancelled": 702,
+    "receipt_lines_valid": 16219,
+    "receipt_lines_linked_to_po": 16076,
+    "receipt_lines_unresolved_valid": 143,
+    "receipt_lines_unresolved_by_path": {
+      "AP_LINE_NOT_MATERIALIZED": 99,
+      "VIA_AP_INVOICE": 16107,
+      "NO_BASE_DOCUMENT": 6,
+      "DIRECT_PO": 7
+    },
+    "receipt_lines_resolved_po_out_of_extract": 38,
+    "invoice_documents_total": 6169,
+    "invoice_lines_total": 21679,
+    "invoice_window": [
+      "2026-01-01",
+      "2026-09-23"
+    ],
+    "po_window": [
+      "2026-01-01",
+      "2026-09-23"
+    ],
+    "receipt_window": [
+      "2026-01-05",
+      "2026-09-23"
+    ],
+    "products_reference": 42073,
+    "warehouses_reference": 133,
+    "suppliers_reference": 2130,
+    "suppliers_in_purchases": 223,
+    "receipt_lines_linked_to_cancelled_po": 0
+  },
+  "class_stats": {
+    "EXACT_RECEIPT": {
+      "lines": 15460,
+      "purchased_base": "11390091.4337",
+      "received_base": "11390091.4337",
+      "comparable_lines": 15460
+    },
+    "MULTI_RECEIPT_COMPLETE": {
+      "lines": 11,
+      "purchased_base": "191003",
+      "received_base": "191003",
+      "comparable_lines": 11
+    },
+    "PARTIAL_RECEIPT": {
+      "lines": 16,
+      "purchased_base": "361780",
+      "received_base": "97055.22",
+      "comparable_lines": 16
+    },
+    "MULTI_RECEIPT_PARTIAL": {
+      "lines": 15,
+      "purchased_base": "1065624",
+      "received_base": "736193.20",
+      "comparable_lines": 15
+    },
+    "OVER_RECEIPT": {
+      "lines": 8,
+      "purchased_base": "66830",
+      "received_base": "69091.52",
+      "comparable_lines": 8
+    },
+    "NO_RECEIPT": {
+      "lines": 845,
+      "purchased_base": "1784658",
+      "received_base": "0",
+      "comparable_lines": 845
+    },
+    "NOT_DETERMINABLE": {
+      "lines": 0,
+      "purchased_base": "0",
+      "received_base": "0",
+      "comparable_lines": 0
+    }
+  },
+  "totals": {
+    "main_universe_lines": 16355,
+    "purchased_base_total": "14859986.4337",
+    "received_base_total": "12483434.3737",
+    "delta_base_total": "-2376552.0600",
+    "uom_compatible_lines": 16355,
+    "uom_incompatible_lines": 0,
+    "fully_reconciled_lines": 15471,
+    "fully_reconciled_pct": 94.59,
+    "multi_receipt_lines": 29,
+    "multi_warehouse_lines": 3,
+    "no_receipt_open_lines": 779,
+    "no_receipt_closed_lines": 66,
+    "lead_days_p50": 0,
+    "lead_days_p90": 4,
+    "lead_days_max": 197
+  },
+  "controls": {
+    "link_paths": {
+      "AP_LINE_NOT_MATERIALIZED": 99,
+      "VIA_AP_INVOICE": 16107,
+      "NO_BASE_DOCUMENT": 6,
+      "DIRECT_PO": 7
+    },
+    "item_match_links": 16076,
+    "item_mismatch_links": 0,
+    "uom_incompatible_pairs": 0,
+    "fanout_violations_receipt_line_to_multi_po": 0,
+    "movement_controls": {
+      "matched": 15561,
+      "qty_equal": 15561,
+      "whs_equal": 15561,
+      "no_movement": 515
+    },
+    "receipts_docs_without_movement": [
+      "262000034",
+      "262000089",
+      "262000091",
+      "262000092",
+      "262000108",
+      "262000166",
+      "262000175",
+      "262000184",
+      "262000185",
+      "262000186",
+      "262000187",
+      "262000188",
+      "262000189",
+      "262000190",
+      "262000191",
+      "262000192",
+      "262000193",
+      "262000194",
+      "262000195",
+      "262000196",
+      "262000197",
+      "262000206",
+      "262000209",
+      "262000235",
+      "262000244",
+      "262000245",
+      "262000246",
+      "262000252",
+      "262000253",
+      "262000254",
+      "262000263",
+      "262000271",
+      "262000272",
+      "262000286",
+      "262000287",
+      "262000288",
+      "262000290",
+      "262000291",
+      "262000311",
+      "262000339",
+      "262000340",
+      "262000341",
+      "262000342",
+      "262000343",
+      "262000344",
+      "262000347",
+      "262000381",
+      "262000382",
+      "262000383",
+      "262000384"
+    ],
+    "receipts_docs_without_movement_count": 368,
+    "cancelled_receipt_lines_excluded": 702,
+    "aggregate_vs_documental": {
+      "aggregate_purchased_base": "14859986.4337",
+      "aggregate_received_base": "12483434.3737",
+      "aggregate_delta_base": "-2376552.0600",
+      "lines_no_receipt": 845,
+      "lines_over_receipt": 8,
+      "reconciled_subset_purchased_base": "11581094.4337",
+      "reconciled_subset_received_base": "11581094.4337",
+      "reconciled_subset_delta_base": "0.0000",
+      "line_level_anomalies_total": 884
+    },
+    "unresolved_receipt_samples": [
+      {
+        "receipt_doc": "262000001",
+        "date": "2026-01-05",
+        "item": "L00236",
+        "warehouse": "SAA-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41891",
+        "base_line": "5"
+      },
+      {
+        "receipt_doc": "262000001",
+        "date": "2026-01-05",
+        "item": "L00097",
+        "warehouse": "SAA-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41891",
+        "base_line": "6"
+      },
+      {
+        "receipt_doc": "262000002",
+        "date": "2026-01-05",
+        "item": "L00967",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41890",
+        "base_line": "3"
+      },
+      {
+        "receipt_doc": "262000002",
+        "date": "2026-01-05",
+        "item": "L00236",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41890",
+        "base_line": "5"
+      },
+      {
+        "receipt_doc": "262000003",
+        "date": "2026-01-05",
+        "item": "L00239",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41892",
+        "base_line": "5"
+      },
+      {
+        "receipt_doc": "262000004",
+        "date": "2026-01-05",
+        "item": "L03553",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41894",
+        "base_line": "0"
+      },
+      {
+        "receipt_doc": "262000004",
+        "date": "2026-01-05",
+        "item": "L03285",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41894",
+        "base_line": "1"
+      },
+      {
+        "receipt_doc": "262000004",
+        "date": "2026-01-05",
+        "item": "L00102",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41894",
+        "base_line": "2"
+      },
+      {
+        "receipt_doc": "262000004",
+        "date": "2026-01-05",
+        "item": "L03586",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41894",
+        "base_line": "3"
+      },
+      {
+        "receipt_doc": "262000005",
+        "date": "2026-01-05",
+        "item": "L00002",
+        "warehouse": "SAA-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "40525",
+        "base_line": "0"
+      },
+      {
+        "receipt_doc": "262000007",
+        "date": "2026-01-06",
+        "item": "L03073",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41903",
+        "base_line": "0"
+      },
+      {
+        "receipt_doc": "262000007",
+        "date": "2026-01-06",
+        "item": "L03673",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41903",
+        "base_line": "1"
+      },
+      {
+        "receipt_doc": "262000007",
+        "date": "2026-01-06",
+        "item": "L03674",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41903",
+        "base_line": "2"
+      },
+      {
+        "receipt_doc": "262000007",
+        "date": "2026-01-06",
+        "item": "L03675",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41903",
+        "base_line": "3"
+      },
+      {
+        "receipt_doc": "262000007",
+        "date": "2026-01-06",
+        "item": "L03676",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41903",
+        "base_line": "4"
+      },
+      {
+        "receipt_doc": "262000008",
+        "date": "2026-01-06",
+        "item": "L03660",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41905",
+        "base_line": "0"
+      },
+      {
+        "receipt_doc": "262000008",
+        "date": "2026-01-06",
+        "item": "L03661",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41905",
+        "base_line": "1"
+      },
+      {
+        "receipt_doc": "262000008",
+        "date": "2026-01-06",
+        "item": "L03662",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41905",
+        "base_line": "2"
+      },
+      {
+        "receipt_doc": "262000008",
+        "date": "2026-01-06",
+        "item": "L03663",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41905",
+        "base_line": "3"
+      },
+      {
+        "receipt_doc": "262000008",
+        "date": "2026-01-06",
+        "item": "L03665",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41905",
+        "base_line": "4"
+      },
+      {
+        "receipt_doc": "262000008",
+        "date": "2026-01-06",
+        "item": "L03664",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41905",
+        "base_line": "5"
+      },
+      {
+        "receipt_doc": "262000008",
+        "date": "2026-01-06",
+        "item": "L03068",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41905",
+        "base_line": "6"
+      },
+      {
+        "receipt_doc": "262000009",
+        "date": "2026-01-06",
+        "item": "L03667",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41904",
+        "base_line": "0"
+      },
+      {
+        "receipt_doc": "262000009",
+        "date": "2026-01-06",
+        "item": "L03668",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41904",
+        "base_line": "1"
+      },
+      {
+        "receipt_doc": "262000009",
+        "date": "2026-01-06",
+        "item": "L03669",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41904",
+        "base_line": "2"
+      },
+      {
+        "receipt_doc": "262000009",
+        "date": "2026-01-06",
+        "item": "L03670",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41904",
+        "base_line": "3"
+      },
+      {
+        "receipt_doc": "262000009",
+        "date": "2026-01-06",
+        "item": "L03671",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41904",
+        "base_line": "4"
+      },
+      {
+        "receipt_doc": "262000009",
+        "date": "2026-01-06",
+        "item": "L03672",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41904",
+        "base_line": "5"
+      },
+      {
+        "receipt_doc": "262000009",
+        "date": "2026-01-06",
+        "item": "L03666",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41904",
+        "base_line": "6"
+      },
+      {
+        "receipt_doc": "262000011",
+        "date": "2026-01-06",
+        "item": "L00169",
+        "warehouse": "LAB-M1",
+        "path": "PO_LINE_OUT_OF_EXTRACT",
+        "po_entry": "22763",
+        "po_line": "0"
+      },
+      {
+        "receipt_doc": "262000011",
+        "date": "2026-01-06",
+        "item": "L00860",
+        "warehouse": "LAB-M1",
+        "path": "PO_LINE_OUT_OF_EXTRACT",
+        "po_entry": "22763",
+        "po_line": "2"
+      },
+      {
+        "receipt_doc": "262000011",
+        "date": "2026-01-06",
+        "item": "L02828",
+        "warehouse": "LAB-M1",
+        "path": "PO_LINE_OUT_OF_EXTRACT",
+        "po_entry": "22763",
+        "po_line": "4"
+      },
+      {
+        "receipt_doc": "262000011",
+        "date": "2026-01-06",
+        "item": "L00189",
+        "warehouse": "LAB-M1",
+        "path": "PO_LINE_OUT_OF_EXTRACT",
+        "po_entry": "22763",
+        "po_line": "5"
+      },
+      {
+        "receipt_doc": "262000012",
+        "date": "2026-01-06",
+        "item": "L00219",
+        "warehouse": "LAB-M1",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "33117",
+        "base_line": "0"
+      },
+      {
+        "receipt_doc": "262000035",
+        "date": "2026-01-10",
+        "item": "L01110",
+        "warehouse": "ALM-IMP",
+        "path": "AP_LINE_NOT_MATERIALIZED",
+        "base_entry": "41382",
+        "base_line": "0"
+      },
+      {
+        "receipt_doc": "262000038",
+        "date": "2026-01-12",
+        "item": "L03680",
+        "warehouse": "2A-MAG",
+        "path": "NO_BASE_DOCUMENT",
+        "base_entry": null,
+        "base_line": null
+      },
+      {
+        "receipt_doc": "262000038",
+        "date": "2026-01-12",
+        "item": "L03573",
+        "warehouse": "2A-MAG",
+        "path": "NO_BASE_DOCUMENT",
+        "base_entry": null,
+        "base_line": null
+      },
+      {
+        "receipt_doc": "262000038",
+        "date": "2026-01-12",
+        "item": "L03468",
+        "warehouse": "2A-MAG",
+        "path": "NO_BASE_DOCUMENT",
+        "base_entry": null,
+        "base_line": null
+      },
+      {
+        "receipt_doc": "262000038",
+        "date": "2026-01-12",
+        "item": "L03679",
+        "warehouse": "2A-MAG",
+        "path": "NO_BASE_DOCUMENT",
+        "base_entry": null,
+        "base_line": null
+      },
+      {
+        "receipt_doc": "262000038",
+        "date": "2026-01-12",
+        "item": "L03677",
+        "warehouse": "2A-MAG",
+        "path": "NO_BASE_DOCUMENT",
+        "base_entry": null,
+        "base_line": null
+      }
+    ]
+  },
+  "warehouse_rows": [
+    {
+      "warehouse": "2A-AMD",
+      "warehouse_name": "Almacén Medicamentos 2A",
+      "receipt_documents": 1982,
+      "receipt_lines": 11221,
+      "po_lines_received": 11217,
+      "qty_base_by_uom": {
+        "FCOx1": "63100",
+        "PZA": "47185",
+        "ENV": "16490",
+        "UNI": "16367",
+        "TBO": "16159",
+        "CAJAx1": "15866",
+        "CAJAx30": "14980",
+        "CAJAx100": "13560",
+        "CAJAx50": "11561",
+        "CAJAx10": "10755",
+        "FCO": "8697",
+        "CAJAx20": "7489",
+        "POTE": "4475",
+        "AMP": "3507",
+        "LATA": "3351",
+        "BOLSA": "2958",
+        "PQTE": "2466",
+        "F/A": "2112",
+        "CAJAx40": "1733",
+        "FCOX1": "1698",
+        "CAJAx4": "1605",
+        "CAJAx60": "1596",
+        "CAJAx2": "1357",
+        "PQTEx100": "1280",
+        "CAJAX30": "1194",
+        "COMP": "1020",
+        "CJA": "1000",
+        "CAJAX8": "940",
+        "CAJAx98": "850",
+        "CAJAx25": "816",
+        "CAJAx14": "816",
+        "CAJAx5": "792",
+        "CAJAx3": "773",
+        "(sin uom)": "765",
+        "CAJAx500": "738",
+        "SOB": "700",
+        "CAJAx48": "668",
+        "CAJAx6": "648",
+        "CAJAx8": "532",
+        "CAJAX100": "516",
+        "CAJAx12": "507",
+        "CAJAx320": "404",
+        "CAJAx400": "380",
+        "CAJAx28": "287",
+        "CAJAx200": "243",
+        "CAJAx56": "224",
+        "CAJAx7": "209",
+        "CAJAX10": "204",
+        "CAJAx24": "198",
+        "CAJAx15": "189",
+        "CAJA": "184",
+        "CAJAx150": "181",
+        "CAJAX60": "163",
+        "CAJAX16": "161",
+        "PQTEx1": "160",
+        "PQTEX1": "132",
+        "TBOx1": "130",
+        "CAJAx144": "127",
+        "BOLSAx1": "117",
+        "CAJAx18": "115",
+        "CAJAx240": "111",
+        "CAJAX20": "105",
+        "CAJAX50": "103",
+        "CAJAx16": "88",
+        "CAJAx35": "84",
+        "AMPx1": "76",
+        "CAJAx32": "70",
+        "BLISTERx20": "70",
+        "CAJAx36": "69",
+        "CAJx25": "62",
+        "CAJAX12": "60",
+        "CAJAx120": "51",
+        "CAJAX1": "51",
+        "CAJAx250": "49",
+        "CAJx30": "47",
+        "AMPX1": "47",
+        "CAJAx300": "45",
+        "CAJAX5": "33",
+        "CAJAx225": "31",
+        "CAJAX200": "30",
+        "CAJAX15": "27",
+        "FRASCO": "26",
+        "CAJAx9": "25",
+        "CAJAx80": "24",
+        "PAQ": "24",
+        "CAJAX28": "22",
+        "CAJX25": "22",
+        "CAJAX25": "21",
+        "CAJAX4": "21",
+        "BLISTERx1": "21",
+        "CAJAx33": "20",
+        "FRASCOx1": "20",
+        "CAJAx140": "19",
+        "CAJx20": "19",
+        "CAJAx45": "13",
+        "CAJAX300": "10",
+        "cajaX14": "10",
+        "CAJAX2": "10",
+        "CAJAX6": "10",
+        "CAJAx72": "10",
+        "CAJx3": "9",
+        "BOLSAx100": "8",
+        "CAJAX14": "6",
+        "SOBREx3": "6",
+        "CAJAX36": "5",
+        "TBOX1": "5",
+        "CAJAX7": "5",
+        "CAJAx21": "5",
+        "CAJAX150": "4",
+        "FCOx30": "4",
+        "PQTEX8": "3",
+        "PQTEx8": "3",
+        "CAJAx90": "2",
+        "SOBRE": "2",
+        "CAJAx1000": "1",
+        "CAJAx580": "1"
+      },
+      "difference_po_lines": 1
+    },
+    {
+      "warehouse": "2A-AMK",
+      "warehouse_name": "Almacén  TelchiMarket 2A",
+      "receipt_documents": 407,
+      "receipt_lines": 3316,
+      "po_lines_received": 3316,
+      "qty_base_by_uom": {
+        "UNI": "15472",
+        "PAQx6": "2242",
+        "UNID": "429",
+        "FCOx1": "191",
+        "CAJA": "167",
+        "PAQx12": "147",
+        "CAJAx1": "96",
+        "CAJAx6": "89",
+        "BOLSA": "60",
+        "LATA": "51",
+        "LATAx1": "45",
+        "BOLSAx9": "35",
+        "CAJAx16": "27",
+        "CAJAx12": "26",
+        "PQTE": "26",
+        "CAJAx30": "19",
+        "CAJAx60": "18",
+        "CAJAx40": "17",
+        "BOLSAx6": "17",
+        "CAJAx5": "16",
+        "PAQx10": "16",
+        "BOLSAx46": "13",
+        "CAJAx10": "13",
+        "CAJAx24": "13",
+        "CAJAX16": "8",
+        "CAJAx100": "8",
+        "PAQx2": "8",
+        "CAJAx48": "8",
+        "BOLSAx24": "8",
+        "BOLSAx10": "7",
+        "CAJAx9": "7",
+        "FCO": "6",
+        "CAJAx80": "6",
+        "CAJAx50": "5",
+        "CAJAx180": "5",
+        "CAJAx18": "4",
+        "PAQx5": "4",
+        "PAQx20": "3",
+        "PZA": "3",
+        "CAJAx250": "2",
+        "CAJAx135": "2",
+        "CAJAx44": "1"
+      },
+      "difference_po_lines": 0
+    },
+    {
+      "warehouse": "LAB-M1",
+      "warehouse_name": "Almacén Materia Prima",
+      "receipt_documents": 356,
+      "receipt_lines": 693,
+      "po_lines_received": 657,
+      "qty_base_by_uom": {
+        "UNI": "6343450",
+        "LT": "102001.92",
+        "ENV": "80000",
+        "KG": "26405.1737",
+        "GR": "12800",
+        "PZA": "1200"
+      },
+      "difference_po_lines": 33
+    },
+    {
+      "warehouse": "ALM-IMP",
+      "warehouse_name": "Almacén de Importación",
+      "receipt_documents": 28,
+      "receipt_lines": 92,
+      "po_lines_received": 92,
+      "qty_base_by_uom": {
+        "UNI": "412773",
+        "KG": "391093",
+        "gr": "25000",
+        "PZA": "15000"
+      },
+      "difference_po_lines": 0
+    },
+    {
+      "warehouse": "LAB-T4",
+      "warehouse_name": "Almacén Producto Terminado MAGISTRAL",
+      "receipt_documents": 49,
+      "receipt_lines": 66,
+      "po_lines_received": 62,
+      "qty_base_by_uom": {
+        "UNI": "83540",
+        "BOLSA": "2630",
+        "FCO": "1248",
+        "PZA": "747",
+        "PQTE": "200"
+      },
+      "difference_po_lines": 3
+    },
+    {
+      "warehouse": "SAA-M1",
+      "warehouse_name": "Almacén Prod. a Granel Procesadora Saavedra",
+      "receipt_documents": 37,
+      "receipt_lines": 66,
+      "po_lines_received": 62,
+      "qty_base_by_uom": {
+        "UNI": "298338",
+        "LT": "72000",
+        "ENV": "55000",
+        "KG": "8538.24",
+        "PZA": "60"
+      },
+      "difference_po_lines": 2
+    },
+    {
+      "warehouse": "LAB-C1",
+      "warehouse_name": "Almacén Control de Calidad",
+      "receipt_documents": 20,
+      "receipt_lines": 47,
+      "po_lines_received": 47,
+      "qty_base_by_uom": {
+        "ML": "38030",
+        "GR": "15625",
+        "UNI": "13710",
+        "LT": "12",
+        "PZA": "2"
+      },
+      "difference_po_lines": 0
+    },
+    {
+      "warehouse": "2A-MEI",
+      "warehouse_name": "Almacén Material de Escritorio e Insumos",
+      "receipt_documents": 19,
+      "receipt_lines": 21,
+      "po_lines_received": 21,
+      "qty_base_by_uom": {
+        "UNI": "4488",
+        "KG": "765",
+        "METRO": "200",
+        "LT": "10.8"
+      },
+      "difference_po_lines": 0
+    },
+    {
+      "warehouse": "2A-MAG",
+      "warehouse_name": "Almacén Magistral",
+      "receipt_documents": 9,
+      "receipt_lines": 14,
+      "po_lines_received": 14,
+      "qty_base_by_uom": {
+        "GR": "8000",
+        "UNI": "3200",
+        "ML": "3000",
+        "LT": "16.2",
+        "KG": "2.04"
+      },
+      "difference_po_lines": 0
+    },
+    {
+      "warehouse": "LAB-T2",
+      "warehouse_name": "Almacén Producto Terminado SENASAG",
+      "receipt_documents": 10,
+      "receipt_lines": 11,
+      "po_lines_received": 11,
+      "qty_base_by_uom": {
+        "KG": "87000"
+      },
+      "difference_po_lines": 0
+    },
+    {
+      "warehouse": "2A-MKT",
+      "warehouse_name": "Almacén Marketing 2A",
+      "receipt_documents": 3,
+      "receipt_lines": 7,
+      "po_lines_received": 7,
+      "qty_base_by_uom": {
+        "UNI": "30"
+      },
+      "difference_po_lines": 0
+    },
+    {
+      "warehouse": "LAB-T3",
+      "warehouse_name": "Almacén Producto Terminado INDUSTRIAL",
+      "receipt_documents": 6,
+      "receipt_lines": 6,
+      "po_lines_received": 6,
+      "qty_base_by_uom": {
+        "KG": "31945",
+        "UNI": "150"
+      },
+      "difference_po_lines": 0
+    },
+    {
+      "warehouse": "SAA-T1",
+      "warehouse_name": "Almacén Producto Terminado Proc. Saavedra",
+      "receipt_documents": 1,
+      "receipt_lines": 1,
+      "po_lines_received": 1,
+      "qty_base_by_uom": {
+        "UNI": "75"
+      },
+      "difference_po_lines": 0
+    }
+  ],
+  "uom_rows": [
+    {
+      "uom": "UNI",
+      "lines": 3040,
+      "purchased_qty": "8835740",
+      "received_qty": "7191593"
+    },
+    {
+      "uom": "FCOx1",
+      "lines": 2788,
+      "purchased_qty": "70172",
+      "received_qty": "63291"
+    },
+    {
+      "uom": "CAJAx30",
+      "lines": 1473,
+      "purchased_qty": "16680",
+      "received_qty": "14999"
+    },
+    {
+      "uom": "CAJAx100",
+      "lines": 1010,
+      "purchased_qty": "14511",
+      "received_qty": "13568"
+    },
+    {
+      "uom": "TBO",
+      "lines": 820,
+      "purchased_qty": "17955",
+      "received_qty": "16159"
+    },
+    {
+      "uom": "PAQx6",
+      "lines": 793,
+      "purchased_qty": "2242",
+      "received_qty": "2242"
+    },
+    {
+      "uom": "PZA",
+      "lines": 773,
+      "purchased_qty": "68424",
+      "received_qty": "64197"
+    },
+    {
+      "uom": "CAJAx10",
+      "lines": 713,
+      "purchased_qty": "11812",
+      "received_qty": "10768"
+    },
+    {
+      "uom": "CAJAx20",
+      "lines": 493,
+      "purchased_qty": "8080",
+      "received_qty": "7489"
+    },
+    {
+      "uom": "FCO",
+      "lines": 424,
+      "purchased_qty": "10930",
+      "received_qty": "9951"
+    },
+    {
+      "uom": "CAJAx1",
+      "lines": 414,
+      "purchased_qty": "17438",
+      "received_qty": "15962"
+    },
+    {
+      "uom": "CAJAx50",
+      "lines": 322,
+      "purchased_qty": "12442",
+      "received_qty": "11566"
+    },
+    {
+      "uom": "KG",
+      "lines": 215,
+      "purchased_qty": "859722.5137",
+      "received_qty": "545748.4537"
+    },
+    {
+      "uom": "LATA",
+      "lines": 204,
+      "purchased_qty": "4480",
+      "received_qty": "3402"
+    },
+    {
+      "uom": "CAJAX30",
+      "lines": 133,
+      "purchased_qty": "1258",
+      "received_qty": "1194"
+    },
+    {
+      "uom": "CAJAx60",
+      "lines": 133,
+      "purchased_qty": "1748",
+      "received_qty": "1614"
+    },
+    {
+      "uom": "CAJAx25",
+      "lines": 125,
+      "purchased_qty": "967",
+      "received_qty": "816"
+    },
+    {
+      "uom": "ENV",
+      "lines": 124,
+      "purchased_qty": "200370",
+      "received_qty": "151490"
+    },
+    {
+      "uom": "FCOX1",
+      "lines": 123,
+      "purchased_qty": "1761",
+      "received_qty": "1698"
+    },
+    {
+      "uom": "CAJAx5",
+      "lines": 107,
+      "purchased_qty": "846",
+      "received_qty": "808"
+    },
+    {
+      "uom": "CAJAx6",
+      "lines": 105,
+      "purchased_qty": "772",
+      "received_qty": "737"
+    },
+    {
+      "uom": "F/A",
+      "lines": 96,
+      "purchased_qty": "2302",
+      "received_qty": "2112"
+    },
+    {
+      "uom": "CAJAx40",
+      "lines": 90,
+      "purchased_qty": "2285",
+      "received_qty": "1750"
+    },
+    {
+      "uom": "CAJAx28",
+      "lines": 83,
+      "purchased_qty": "335",
+      "received_qty": "287"
+    },
+    {
+      "uom": "PAQx12",
+      "lines": 81,
+      "purchased_qty": "147",
+      "received_qty": "147"
+    },
+    {
+      "uom": "CAJAx12",
+      "lines": 81,
+      "purchased_qty": "554",
+      "received_qty": "533"
+    },
+    {
+      "uom": "CAJAx14",
+      "lines": 80,
+      "purchased_qty": "909",
+      "received_qty": "816"
+    },
+    {
+      "uom": "PQTE",
+      "lines": 79,
+      "purchased_qty": "2692",
+      "received_qty": "2692"
+    },
+    {
+      "uom": "AMP",
+      "lines": 77,
+      "purchased_qty": "3755",
+      "received_qty": "3507"
+    },
+    {
+      "uom": "CAJAx500",
+      "lines": 72,
+      "purchased_qty": "768",
+      "received_qty": "738"
+    },
+    {
+      "uom": "BOLSA",
+      "lines": 68,
+      "purchased_qty": "5646",
+      "received_qty": "5648"
+    },
+    {
+      "uom": "CAJAx3",
+      "lines": 61,
+      "purchased_qty": "849",
+      "received_qty": "773"
+    },
+    {
+      "uom": "CAJAx2",
+      "lines": 56,
+      "purchased_qty": "1473",
+      "received_qty": "1357"
+    },
+    {
+      "uom": "CAJA",
+      "lines": 53,
+      "purchased_qty": "376",
+      "received_qty": "351"
+    },
+    {
+      "uom": "CAJAx24",
+      "lines": 48,
+      "purchased_qty": "245",
+      "received_qty": "211"
+    },
+    {
+      "uom": "CAJAX100",
+      "lines": 41,
+      "purchased_qty": "546",
+      "received_qty": "516"
+    },
+    {
+      "uom": "CAJAx200",
+      "lines": 38,
+      "purchased_qty": "350",
+      "received_qty": "243"
+    },
+    {
+      "uom": "CAJAx16",
+      "lines": 38,
+      "purchased_qty": "115",
+      "received_qty": "115"
+    },
+    {
+      "uom": "CAJAx7",
+      "lines": 37,
+      "purchased_qty": "215",
+      "received_qty": "209"
+    },
+    {
+      "uom": "GR",
+      "lines": 36,
+      "purchased_qty": "36425",
+      "received_qty": "36425"
+    },
+    {
+      "uom": "UNID",
+      "lines": 34,
+      "purchased_qty": "429",
+      "received_qty": "429"
+    },
+    {
+      "uom": "CAJAx15",
+      "lines": 33,
+      "purchased_qty": "189",
+      "received_qty": "189"
+    },
+    {
+      "uom": "CAJAx35",
+      "lines": 30,
+      "purchased_qty": "92",
+      "received_qty": "84"
+    },
+    {
+      "uom": "CAJAX10",
+      "lines": 30,
+      "purchased_qty": "246",
+      "received_qty": "204"
+    },
+    {
+      "uom": "CAJAx4",
+      "lines": 29,
+      "purchased_qty": "1605",
+      "received_qty": "1605"
+    },
+    {
+      "uom": "CAJAx150",
+      "lines": 28,
+      "purchased_qty": "187",
+      "received_qty": "181"
+    },
+    {
+      "uom": "CAJAX50",
+      "lines": 24,
+      "purchased_qty": "143",
+      "received_qty": "103"
+    },
+    {
+      "uom": "POTE",
+      "lines": 24,
+      "purchased_qty": "4505",
+      "received_qty": "4475"
+    },
+    {
+      "uom": "CAJAx32",
+      "lines": 22,
+      "purchased_qty": "77",
+      "received_qty": "70"
+    },
+    {
+      "uom": "CAJAX20",
+      "lines": 21,
+      "purchased_qty": "115",
+      "received_qty": "105"
+    },
+    {
+      "uom": "CAJAX12",
+      "lines": 20,
+      "purchased_qty": "62",
+      "received_qty": "60"
+    },
+    {
+      "uom": "LT",
+      "lines": 20,
+      "purchased_qty": "219040.92",
+      "received_qty": "174040.92"
+    },
+    {
+      "uom": "CAJAx250",
+      "lines": 19,
+      "purchased_qty": "51",
+      "received_qty": "51"
+    },
+    {
+      "uom": "CAJAX16",
+      "lines": 18,
+      "purchased_qty": "169",
+      "received_qty": "169"
+    },
+    {
+      "uom": "CAJAx56",
+      "lines": 18,
+      "purchased_qty": "224",
+      "received_qty": "224"
+    },
+    {
+      "uom": "ML",
+      "lines": 16,
+      "purchased_qty": "41030",
+      "received_qty": "41030"
+    },
+    {
+      "uom": "CAJAx320",
+      "lines": 15,
+      "purchased_qty": "404",
+      "received_qty": "404"
+    },
+    {
+      "uom": "CJA",
+      "lines": 14,
+      "purchased_qty": "1000",
+      "received_qty": "1000"
+    },
+    {
+      "uom": "CAJAx48",
+      "lines": 14,
+      "purchased_qty": "676",
+      "received_qty": "676"
+    },
+    {
+      "uom": "PQTEx100",
+      "lines": 14,
+      "purchased_qty": "1280",
+      "received_qty": "1280"
+    },
+    {
+      "uom": "CAJAx240",
+      "lines": 13,
+      "purchased_qty": "111",
+      "received_qty": "111"
+    },
+    {
+      "uom": "CAJAX60",
+      "lines": 12,
+      "purchased_qty": "163",
+      "received_qty": "163"
+    },
+    {
+      "uom": "CAJAx120",
+      "lines": 11,
+      "purchased_qty": "56",
+      "received_qty": "51"
+    },
+    {
+      "uom": "CAJAx18",
+      "lines": 11,
+      "purchased_qty": "119",
+      "received_qty": "119"
+    },
+    {
+      "uom": "SOB",
+      "lines": 11,
+      "purchased_qty": "800",
+      "received_qty": "700"
+    },
+    {
+      "uom": "CAJAX5",
+      "lines": 10,
+      "purchased_qty": "33",
+      "received_qty": "33"
+    },
+    {
+      "uom": "CAJAX25",
+      "lines": 10,
+      "purchased_qty": "41",
+      "received_qty": "21"
+    },
+    {
+      "uom": "CAJAx36",
+      "lines": 10,
+      "purchased_qty": "81",
+      "received_qty": "69"
+    },
+    {
+      "uom": "TBOx1",
+      "lines": 10,
+      "purchased_qty": "230",
+      "received_qty": "130"
+    },
+    {
+      "uom": "PAQx10",
+      "lines": 10,
+      "purchased_qty": "16",
+      "received_qty": "16"
+    },
+    {
+      "uom": "LATAx1",
+      "lines": 9,
+      "purchased_qty": "45",
+      "received_qty": "45"
+    },
+    {
+      "uom": "CAJAX1",
+      "lines": 9,
+      "purchased_qty": "61",
+      "received_qty": "51"
+    },
+    {
+      "uom": "CAJAx8",
+      "lines": 9,
+      "purchased_qty": "535",
+      "received_qty": "532"
+    },
+    {
+      "uom": "AMPX1",
+      "lines": 9,
+      "purchased_qty": "47",
+      "received_qty": "47"
+    },
+    {
+      "uom": "CAJAx98",
+      "lines": 8,
+      "purchased_qty": "950",
+      "received_qty": "850"
+    },
+    {
+      "uom": "CAJAX15",
+      "lines": 8,
+      "purchased_qty": "27",
+      "received_qty": "27"
+    },
+    {
+      "uom": "PQTEX1",
+      "lines": 8,
+      "purchased_qty": "132",
+      "received_qty": "132"
+    },
+    {
+      "uom": "CAJAx80",
+      "lines": 8,
+      "purchased_qty": "30",
+      "received_qty": "30"
+    },
+    {
+      "uom": "CAJx25",
+      "lines": 7,
+      "purchased_qty": "62",
+      "received_qty": "62"
+    },
+    {
+      "uom": "CAJx30",
+      "lines": 7,
+      "purchased_qty": "47",
+      "received_qty": "47"
+    },
+    {
+      "uom": "PQTEx1",
+      "lines": 7,
+      "purchased_qty": "160",
+      "received_qty": "160"
+    },
+    {
+      "uom": "BOLSAx1",
+      "lines": 7,
+      "purchased_qty": "117",
+      "received_qty": "117"
+    },
+    {
+      "uom": "(sin uom)",
+      "lines": 6,
+      "purchased_qty": "765",
+      "received_qty": "765"
+    },
+    {
+      "uom": "BOLSAx10",
+      "lines": 6,
+      "purchased_qty": "7",
+      "received_qty": "7"
+    },
+    {
+      "uom": "BOLSAx46",
+      "lines": 6,
+      "purchased_qty": "13",
+      "received_qty": "13"
+    },
+    {
+      "uom": "CAJAX8",
+      "lines": 6,
+      "purchased_qty": "940",
+      "received_qty": "940"
+    },
+    {
+      "uom": "AMPx1",
+      "lines": 6,
+      "purchased_qty": "76",
+      "received_qty": "76"
+    },
+    {
+      "uom": "PAQx2",
+      "lines": 6,
+      "purchased_qty": "8",
+      "received_qty": "8"
+    },
+    {
+      "uom": "BOLSAx9",
+      "lines": 5,
+      "purchased_qty": "35",
+      "received_qty": "35"
+    },
+    {
+      "uom": "BOLSAx6",
+      "lines": 5,
+      "purchased_qty": "17",
+      "received_qty": "17"
+    },
+    {
+      "uom": "CAJAx9",
+      "lines": 5,
+      "purchased_qty": "37",
+      "received_qty": "32"
+    },
+    {
+      "uom": "CAJAx300",
+      "lines": 5,
+      "purchased_qty": "45",
+      "received_qty": "45"
+    },
+    {
+      "uom": "MG",
+      "lines": 5,
+      "purchased_qty": "950",
+      "received_qty": "0"
+    },
+    {
+      "uom": "FRASCO",
+      "lines": 4,
+      "purchased_qty": "26",
+      "received_qty": "26"
+    },
+    {
+      "uom": "CAJAX28",
+      "lines": 4,
+      "purchased_qty": "22",
+      "received_qty": "22"
+    },
+    {
+      "uom": "CAJAx225",
+      "lines": 4,
+      "purchased_qty": "31",
+      "received_qty": "31"
+    },
+    {
+      "uom": "CAJAx400",
+      "lines": 4,
+      "purchased_qty": "380",
+      "received_qty": "380"
+    },
+    {
+      "uom": "CAJAX200",
+      "lines": 4,
+      "purchased_qty": "30",
+      "received_qty": "30"
+    },
+    {
+      "uom": "CAJAx45",
+      "lines": 4,
+      "purchased_qty": "15",
+      "received_qty": "13"
+    },
+    {
+      "uom": "CAJAx180",
+      "lines": 4,
+      "purchased_qty": "5",
+      "received_qty": "5"
+    },
+    {
+      "uom": "BOLSAx24",
+      "lines": 4,
+      "purchased_qty": "8",
+      "received_qty": "8"
+    },
+    {
+      "uom": "BOLSAx100",
+      "lines": 4,
+      "purchased_qty": "8",
+      "received_qty": "8"
+    },
+    {
+      "uom": "CAJAX300",
+      "lines": 3,
+      "purchased_qty": "10",
+      "received_qty": "10"
+    },
+    {
+      "uom": "CAJAX4",
+      "lines": 3,
+      "purchased_qty": "21",
+      "received_qty": "21"
+    },
+    {
+      "uom": "PAQx20",
+      "lines": 3,
+      "purchased_qty": "3",
+      "received_qty": "3"
+    },
+    {
+      "uom": "CAJX25",
+      "lines": 3,
+      "purchased_qty": "22",
+      "received_qty": "22"
+    },
+    {
+      "uom": "cajaX14",
+      "lines": 3,
+      "purchased_qty": "25",
+      "received_qty": "10"
+    },
+    {
+      "uom": "BLISTERx20",
+      "lines": 3,
+      "purchased_qty": "70",
+      "received_qty": "70"
+    },
+    {
+      "uom": "CAJAx140",
+      "lines": 3,
+      "purchased_qty": "19",
+      "received_qty": "19"
+    },
+    {
+      "uom": "CAJx20",
+      "lines": 3,
+      "purchased_qty": "19",
+      "received_qty": "19"
+    },
+    {
+      "uom": "PAQx5",
+      "lines": 3,
+      "purchased_qty": "4",
+      "received_qty": "4"
+    },
+    {
+      "uom": "CAJAX14",
+      "lines": 2,
+      "purchased_qty": "11",
+      "received_qty": "6"
+    },
+    {
+      "uom": "CAJAx135",
+      "lines": 2,
+      "purchased_qty": "2",
+      "received_qty": "2"
+    },
+    {
+      "uom": "FCOx30",
+      "lines": 2,
+      "purchased_qty": "4",
+      "received_qty": "4"
+    },
+    {
+      "uom": "CAJx3",
+      "lines": 2,
+      "purchased_qty": "9",
+      "received_qty": "9"
+    },
+    {
+      "uom": "CAJAX7",
+      "lines": 2,
+      "purchased_qty": "5",
+      "received_qty": "5"
+    },
+    {
+      "uom": "COMP",
+      "lines": 2,
+      "purchased_qty": "1020",
+      "received_qty": "1020"
+    },
+    {
+      "uom": "CAJAx144",
+      "lines": 2,
+      "purchased_qty": "127",
+      "received_qty": "127"
+    },
+    {
+      "uom": "CAJAx21",
+      "lines": 2,
+      "purchased_qty": "5",
+      "received_qty": "5"
+    },
+    {
+      "uom": "CAJAX36",
+      "lines": 1,
+      "purchased_qty": "5",
+      "received_qty": "5"
+    },
+    {
+      "uom": "TBOX1",
+      "lines": 1,
+      "purchased_qty": "5",
+      "received_qty": "5"
+    },
+    {
+      "uom": "CAJAX150",
+      "lines": 1,
+      "purchased_qty": "4",
+      "received_qty": "4"
+    },
+    {
+      "uom": "CAJAX2",
+      "lines": 1,
+      "purchased_qty": "10",
+      "received_qty": "10"
+    },
+    {
+      "uom": "gr",
+      "lines": 1,
+      "purchased_qty": "25000",
+      "received_qty": "25000"
+    },
+    {
+      "uom": "BLISTERx1",
+      "lines": 1,
+      "purchased_qty": "21",
+      "received_qty": "21"
+    },
+    {
+      "uom": "CAJAX6",
+      "lines": 1,
+      "purchased_qty": "10",
+      "received_qty": "10"
+    },
+    {
+      "uom": "PQTEX8",
+      "lines": 1,
+      "purchased_qty": "3",
+      "received_qty": "3"
+    },
+    {
+      "uom": "PAQ",
+      "lines": 1,
+      "purchased_qty": "24",
+      "received_qty": "24"
+    },
+    {
+      "uom": "CAJAx1000",
+      "lines": 1,
+      "purchased_qty": "1",
+      "received_qty": "1"
+    },
+    {
+      "uom": "CAJAx90",
+      "lines": 1,
+      "purchased_qty": "2",
+      "received_qty": "2"
+    },
+    {
+      "uom": "PQTEx8",
+      "lines": 1,
+      "purchased_qty": "3",
+      "received_qty": "3"
+    },
+    {
+      "uom": "CAJAx33",
+      "lines": 1,
+      "purchased_qty": "20",
+      "received_qty": "20"
+    },
+    {
+      "uom": "CAJAx44",
+      "lines": 1,
+      "purchased_qty": "1",
+      "received_qty": "1"
+    },
+    {
+      "uom": "FRASCOx1",
+      "lines": 1,
+      "purchased_qty": "20",
+      "received_qty": "20"
+    },
+    {
+      "uom": "CAJAx580",
+      "lines": 1,
+      "purchased_qty": "1",
+      "received_qty": "1"
+    },
+    {
+      "uom": "METRO",
+      "lines": 1,
+      "purchased_qty": "200",
+      "received_qty": "200"
+    },
+    {
+      "uom": "CAJAx72",
+      "lines": 1,
+      "purchased_qty": "10",
+      "received_qty": "10"
+    },
+    {
+      "uom": "CAJAx 160",
+      "lines": 1,
+      "purchased_qty": "4",
+      "received_qty": "0"
+    },
+    {
+      "uom": "SOBREx3",
+      "lines": 1,
+      "purchased_qty": "6",
+      "received_qty": "6"
+    },
+    {
+      "uom": "SOBRE",
+      "lines": 1,
+      "purchased_qty": "2",
+      "received_qty": "2"
+    }
+  ],
+  "invoice_view": {
+    "invoice_lines_total": 21679,
+    "invoice_lines_cancelled": 1748,
+    "invoice_lines_po_based": 16399,
+    "invoice_lines_direct": 3509,
+    "invoice_lines_with_receipt": 16100,
+    "invoice_lines_without_receipt": 3831,
+    "invoice_lines_comparable": 16100,
+    "exact": 16098,
+    "partial": 2,
+    "over": 0,
+    "none": 0,
+    "positive_gaps": 0,
+    "negative_gaps": 2,
+    "invoice_to_receipt_days": {
+      "n": 16100,
+      "min": -15,
+      "p50": 1,
+      "max": 118,
+      "same_day": 4055,
+      "receipt_before_invoice": 23,
+      "receipt_after_invoice": 12022
+    }
+  },
+  "non_inventory_count": 778,
+  "exceptions": {
+    "no_receipt_top": [
+      {
+        "po_docnum": "262002813",
+        "po_entry": "27889",
+        "line_num": "0",
+        "item_code": "L00219",
+        "supplier": "PL000068",
+        "po_date": "2026-08-19",
+        "uom": "UNI",
+        "purchased_base": "504000",
+        "received_base": "0",
+        "gap_base": "-504000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262002387",
+        "po_entry": "27262",
+        "line_num": "0",
+        "item_code": "L01010",
+        "supplier": "PE000011",
+        "po_date": "2026-07-25",
+        "uom": "KG",
+        "purchased_base": "108000",
+        "received_base": "0",
+        "gap_base": "-108000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262002667",
+        "po_entry": "27687",
+        "line_num": "0",
+        "item_code": "L01821",
+        "supplier": "PE000002",
+        "po_date": "2026-08-13",
+        "uom": "KG",
+        "purchased_base": "92000",
+        "received_base": "0",
+        "gap_base": "-92000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262000460",
+        "po_entry": "24058",
+        "line_num": "1",
+        "item_code": "L00097",
+        "supplier": "PL000063",
+        "po_date": "2026-02-19",
+        "uom": "UNI",
+        "purchased_base": "50000",
+        "received_base": "0",
+        "gap_base": "-50000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262000460",
+        "po_entry": "24058",
+        "line_num": "0",
+        "item_code": "L00236",
+        "supplier": "PL000063",
+        "po_date": "2026-02-19",
+        "uom": "UNI",
+        "purchased_base": "46000",
+        "received_base": "0",
+        "gap_base": "-46000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262001399",
+        "po_entry": "25612",
+        "line_num": "12",
+        "item_code": "L00236",
+        "supplier": "PL000063",
+        "po_date": "2026-04-25",
+        "uom": "UNI",
+        "purchased_base": "45000",
+        "received_base": "0",
+        "gap_base": "-45000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262001399",
+        "po_entry": "25612",
+        "line_num": "13",
+        "item_code": "L00097",
+        "supplier": "PL000063",
+        "po_date": "2026-04-25",
+        "uom": "ENV",
+        "purchased_base": "45000",
+        "received_base": "0",
+        "gap_base": "-45000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262001399",
+        "po_entry": "25612",
+        "line_num": "5",
+        "item_code": "L03428",
+        "supplier": "PL000063",
+        "po_date": "2026-04-25",
+        "uom": "UNI",
+        "purchased_base": "40800",
+        "received_base": "0",
+        "gap_base": "-40800",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262001399",
+        "po_entry": "25612",
+        "line_num": "6",
+        "item_code": "L03429",
+        "supplier": "PL000063",
+        "po_date": "2026-04-25",
+        "uom": "UNI",
+        "purchased_base": "40800",
+        "received_base": "0",
+        "gap_base": "-40800",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262001399",
+        "po_entry": "25612",
+        "line_num": "7",
+        "item_code": "L03427",
+        "supplier": "PL000063",
+        "po_date": "2026-04-25",
+        "uom": "UNI",
+        "purchased_base": "40800",
+        "received_base": "0",
+        "gap_base": "-40800",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262001399",
+        "po_entry": "25612",
+        "line_num": "4",
+        "item_code": "L00968",
+        "supplier": "PL000063",
+        "po_date": "2026-04-25",
+        "uom": "UNI",
+        "purchased_base": "30000",
+        "received_base": "0",
+        "gap_base": "-30000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262001421",
+        "po_entry": "25640",
+        "line_num": "4",
+        "item_code": "L00968",
+        "supplier": "PL000063",
+        "po_date": "2026-04-29",
+        "uom": "UNI",
+        "purchased_base": "30000",
+        "received_base": "0",
+        "gap_base": "-30000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262002376",
+        "po_entry": "27236",
+        "line_num": "0",
+        "item_code": "L01108",
+        "supplier": "PE000011",
+        "po_date": "2026-07-23",
+        "uom": "KG",
+        "purchased_base": "25970",
+        "received_base": "0",
+        "gap_base": "-25970",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262001614",
+        "po_entry": "25976",
+        "line_num": "0",
+        "item_code": "L01094",
+        "supplier": "PE000002",
+        "po_date": "2026-05-19",
+        "uom": "KG",
+        "purchased_base": "25200",
+        "received_base": "0",
+        "gap_base": "-25200",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      },
+      {
+        "po_docnum": "262003269",
+        "po_entry": "28593",
+        "line_num": "0",
+        "item_code": "M07781",
+        "supplier": "PL000551",
+        "po_date": "2026-09-21",
+        "uom": "CAJAx50",
+        "purchased_base": "25000",
+        "received_base": "0",
+        "gap_base": "-25000",
+        "n_receipts": 0,
+        "warehouses_received": [],
+        "status": "NO_RECEIPT",
+        "line_status": "O",
+        "lead_days_first_receipt": null
+      }
+    ],
+    "no_receipt_by_month": {
+      "2026-01": 1,
+      "2026-02": 7,
+      "2026-03": 18,
+      "2026-04": 37,
+      "2026-05": 8,
+      "2026-06": 13,
+      "2026-07": 4,
+      "2026-08": 23,
+      "2026-09": 734
+    },
+    "partial_top": [
+      {
+        "po_docnum": "262001403",
+        "po_entry": "25618",
+        "line_num": "0",
+        "item_code": "L00219",
+        "supplier": "PL000068",
+        "po_date": "2026-04-28",
+        "uom": "UNI",
+        "purchased_base": "301500",
+        "received_base": "214390",
+        "gap_base": "-87110",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 80
+      },
+      {
+        "po_docnum": "262001393",
+        "po_entry": "25603",
+        "line_num": "4",
+        "item_code": "L03590",
+        "supplier": "PL000153",
+        "po_date": "2026-04-22",
+        "uom": "UNI",
+        "purchased_base": "100000",
+        "received_base": "48500",
+        "gap_base": "-51500",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 20
+      },
+      {
+        "po_docnum": "262001393",
+        "po_entry": "25603",
+        "line_num": "5",
+        "item_code": "L03591",
+        "supplier": "PL000153",
+        "po_date": "2026-04-22",
+        "uom": "UNI",
+        "purchased_base": "100000",
+        "received_base": "48500",
+        "gap_base": "-51500",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 20
+      },
+      {
+        "po_docnum": "262001393",
+        "po_entry": "25603",
+        "line_num": "6",
+        "item_code": "L00222",
+        "supplier": "PL000153",
+        "po_date": "2026-04-22",
+        "uom": "UNI",
+        "purchased_base": "100000",
+        "received_base": "48500",
+        "gap_base": "-51500",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 20
+      },
+      {
+        "po_docnum": "262000249",
+        "po_entry": "23726",
+        "line_num": "0",
+        "item_code": "L03429",
+        "supplier": "PL000063",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "50000",
+        "received_base": "12000",
+        "gap_base": "-38000",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "PARTIAL_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 4
+      },
+      {
+        "po_docnum": "262000249",
+        "po_entry": "23726",
+        "line_num": "1",
+        "item_code": "L03428",
+        "supplier": "PL000063",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "50000",
+        "received_base": "12000",
+        "gap_base": "-38000",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "PARTIAL_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 4
+      },
+      {
+        "po_docnum": "262000249",
+        "po_entry": "23726",
+        "line_num": "2",
+        "item_code": "L03427",
+        "supplier": "PL000063",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "50000",
+        "received_base": "12000",
+        "gap_base": "-38000",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "PARTIAL_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 4
+      },
+      {
+        "po_docnum": "262001421",
+        "po_entry": "25640",
+        "line_num": "5",
+        "item_code": "L03428",
+        "supplier": "PL000063",
+        "po_date": "2026-04-29",
+        "uom": "UNI",
+        "purchased_base": "40800",
+        "received_base": "6000",
+        "gap_base": "-34800",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "PARTIAL_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 1
+      },
+      {
+        "po_docnum": "262001421",
+        "po_entry": "25640",
+        "line_num": "6",
+        "item_code": "L03429",
+        "supplier": "PL000063",
+        "po_date": "2026-04-29",
+        "uom": "UNI",
+        "purchased_base": "40800",
+        "received_base": "6000",
+        "gap_base": "-34800",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "PARTIAL_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 1
+      },
+      {
+        "po_docnum": "262001421",
+        "po_entry": "25640",
+        "line_num": "7",
+        "item_code": "L03427",
+        "supplier": "PL000063",
+        "po_date": "2026-04-29",
+        "uom": "UNI",
+        "purchased_base": "40800",
+        "received_base": "6000",
+        "gap_base": "-34800",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "PARTIAL_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 1
+      },
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "5",
+        "item_code": "L00252",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "40000",
+        "received_base": "13800",
+        "gap_base": "-26200",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 23
+      },
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "1",
+        "item_code": "L03591",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "100000",
+        "received_base": "85000",
+        "gap_base": "-15000",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 11
+      },
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "2",
+        "item_code": "L03590",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "100000",
+        "received_base": "85000",
+        "gap_base": "-15000",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 11
+      },
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "3",
+        "item_code": "L00222",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "100000",
+        "received_base": "85000",
+        "gap_base": "-15000",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 11
+      },
+      {
+        "po_docnum": "262000054",
+        "po_entry": "23389",
+        "line_num": "0",
+        "item_code": "L02203",
+        "supplier": "PL000153",
+        "po_date": "2026-01-15",
+        "uom": "UNI",
+        "purchased_base": "20000",
+        "received_base": "8000",
+        "gap_base": "-12000",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-T4"
+        ],
+        "status": "PARTIAL_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 5
+      }
+    ],
+    "over_top": [
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "0",
+        "item_code": "L00172",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "65000",
+        "received_base": "67000",
+        "gap_base": "2000",
+        "n_receipts": 5,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 22
+      },
+      {
+        "po_docnum": "262001527",
+        "po_entry": "25837",
+        "line_num": "0",
+        "item_code": "L03727",
+        "supplier": "PL000133",
+        "po_date": "2026-05-12",
+        "uom": "UNI",
+        "purchased_base": "600",
+        "received_base": "750",
+        "gap_base": "150",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "2A-AMD"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 0
+      },
+      {
+        "po_docnum": "262000384",
+        "po_entry": "23946",
+        "line_num": "6",
+        "item_code": "L00255",
+        "supplier": "PL000182",
+        "po_date": "2026-02-13",
+        "uom": "KG",
+        "purchased_base": "250",
+        "received_base": "313.42",
+        "gap_base": "63.42",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 15
+      },
+      {
+        "po_docnum": "262000384",
+        "po_entry": "23946",
+        "line_num": "2",
+        "item_code": "L00253",
+        "supplier": "PL000182",
+        "po_date": "2026-02-13",
+        "uom": "KG",
+        "purchased_base": "200",
+        "received_base": "223.62",
+        "gap_base": "23.62",
+        "n_receipts": 2,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 19
+      },
+      {
+        "po_docnum": "262000384",
+        "po_entry": "23946",
+        "line_num": "1",
+        "item_code": "L00159",
+        "supplier": "PL000182",
+        "po_date": "2026-02-13",
+        "uom": "KG",
+        "purchased_base": "300",
+        "received_base": "310.42",
+        "gap_base": "10.42",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 14
+      },
+      {
+        "po_docnum": "262000384",
+        "po_entry": "23946",
+        "line_num": "3",
+        "item_code": "L00160",
+        "supplier": "PL000182",
+        "po_date": "2026-02-13",
+        "uom": "KG",
+        "purchased_base": "300",
+        "received_base": "307.24",
+        "gap_base": "7.24",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "SAA-M1"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 19
+      },
+      {
+        "po_docnum": "262000384",
+        "po_entry": "23946",
+        "line_num": "0",
+        "item_code": "L00708",
+        "supplier": "PL000182",
+        "po_date": "2026-02-13",
+        "uom": "KG",
+        "purchased_base": "100",
+        "received_base": "104.82",
+        "gap_base": "4.82",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 14
+      },
+      {
+        "po_docnum": "262000259",
+        "po_entry": "23755",
+        "line_num": "2",
+        "item_code": "L02075",
+        "supplier": "PL000102",
+        "po_date": "2026-02-05",
+        "uom": "BOLSA",
+        "purchased_base": "80",
+        "received_base": "82",
+        "gap_base": "2",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "LAB-T4"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 22
+      }
+    ],
+    "late_receipts_over_30_days": [
+      {
+        "po_docnum": "262000196",
+        "po_entry": "23623",
+        "line_num": "0",
+        "item_code": "L01129",
+        "supplier": "PE000011",
+        "po_date": "2026-01-29",
+        "uom": "KG",
+        "purchased_base": "50000",
+        "received_base": "50000",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 197
+      },
+      {
+        "po_docnum": "262001033",
+        "po_entry": "25061",
+        "line_num": "0",
+        "item_code": "L01772",
+        "supplier": "PE000011",
+        "po_date": "2026-04-07",
+        "uom": "KG",
+        "purchased_base": "26000",
+        "received_base": "26000",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 156
+      },
+      {
+        "po_docnum": "262001032",
+        "po_entry": "25060",
+        "line_num": "0",
+        "item_code": "L00018",
+        "supplier": "PE000011",
+        "po_date": "2026-04-07",
+        "uom": "KG",
+        "purchased_base": "5000",
+        "received_base": "5000",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 146
+      },
+      {
+        "po_docnum": "262001056",
+        "po_entry": "25099",
+        "line_num": "0",
+        "item_code": "L01770",
+        "supplier": "PE000013",
+        "po_date": "2026-04-08",
+        "uom": "KG",
+        "purchased_base": "13995",
+        "received_base": "13995",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 145
+      },
+      {
+        "po_docnum": "262000823",
+        "po_entry": "24714",
+        "line_num": "0",
+        "item_code": "L01094",
+        "supplier": "PE000002",
+        "po_date": "2026-03-24",
+        "uom": "KG",
+        "purchased_base": "25200",
+        "received_base": "25200",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 141
+      },
+      {
+        "po_docnum": "262000998",
+        "po_entry": "24997",
+        "line_num": "0",
+        "item_code": "L01785",
+        "supplier": "PE000002",
+        "po_date": "2026-04-02",
+        "uom": "KG",
+        "purchased_base": "11000",
+        "received_base": "11000",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 141
+      },
+      {
+        "po_docnum": "262000998",
+        "po_entry": "24997",
+        "line_num": "1",
+        "item_code": "L01763",
+        "supplier": "PE000002",
+        "po_date": "2026-04-02",
+        "uom": "KG",
+        "purchased_base": "6000",
+        "received_base": "6000",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 141
+      },
+      {
+        "po_docnum": "262000998",
+        "po_entry": "24997",
+        "line_num": "2",
+        "item_code": "L01778",
+        "supplier": "PE000002",
+        "po_date": "2026-04-02",
+        "uom": "KG",
+        "purchased_base": "400",
+        "received_base": "400",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 141
+      },
+      {
+        "po_docnum": "262000998",
+        "po_entry": "24997",
+        "line_num": "3",
+        "item_code": "L01796",
+        "supplier": "PE000002",
+        "po_date": "2026-04-02",
+        "uom": "KG",
+        "purchased_base": "300",
+        "received_base": "300",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 141
+      },
+      {
+        "po_docnum": "262000998",
+        "po_entry": "24997",
+        "line_num": "4",
+        "item_code": "L01508",
+        "supplier": "PE000002",
+        "po_date": "2026-04-02",
+        "uom": "KG",
+        "purchased_base": "150",
+        "received_base": "150",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 141
+      },
+      {
+        "po_docnum": "262001055",
+        "po_entry": "25098",
+        "line_num": "0",
+        "item_code": "L01053",
+        "supplier": "PE000002",
+        "po_date": "2026-04-08",
+        "uom": "KG",
+        "purchased_base": "24000",
+        "received_base": "24000",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 139
+      },
+      {
+        "po_docnum": "262001220",
+        "po_entry": "25340",
+        "line_num": "0",
+        "item_code": "L01094",
+        "supplier": "PE000011",
+        "po_date": "2026-04-17",
+        "uom": "KG",
+        "purchased_base": "25200",
+        "received_base": "25200",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 136
+      },
+      {
+        "po_docnum": "262000808",
+        "po_entry": "24684",
+        "line_num": "0",
+        "item_code": "L01089",
+        "supplier": "PE000011",
+        "po_date": "2026-03-23",
+        "uom": "KG",
+        "purchased_base": "14000",
+        "received_base": "14000",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 130
+      },
+      {
+        "po_docnum": "262001319",
+        "po_entry": "25497",
+        "line_num": "0",
+        "item_code": "L01094",
+        "supplier": "PE000002",
+        "po_date": "2026-04-27",
+        "uom": "KG",
+        "purchased_base": "25200",
+        "received_base": "25200",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 126
+      },
+      {
+        "po_docnum": "262001057",
+        "po_entry": "25100",
+        "line_num": "0",
+        "item_code": "L02054",
+        "supplier": "PE000002",
+        "po_date": "2026-04-08",
+        "uom": "KG",
+        "purchased_base": "27000",
+        "received_base": "27000",
+        "gap_base": "0",
+        "n_receipts": 1,
+        "warehouses_received": [
+          "ALM-IMP"
+        ],
+        "status": "EXACT_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 114
+      }
+    ],
+    "multi_warehouse_sample": [
+      {
+        "po_docnum": "262001421",
+        "po_entry": "25640",
+        "line_num": "2",
+        "item_code": "L03475",
+        "supplier": "PL000063",
+        "po_date": "2026-04-29",
+        "uom": "UNI",
+        "purchased_base": "2000",
+        "received_base": "2000",
+        "gap_base": "0",
+        "n_receipts": 2,
+        "warehouses_received": [
+          "LAB-M1",
+          "SAA-M1"
+        ],
+        "status": "MULTI_RECEIPT_COMPLETE",
+        "line_status": "C",
+        "lead_days_first_receipt": 1
+      },
+      {
+        "po_docnum": "262001421",
+        "po_entry": "25640",
+        "line_num": "12",
+        "item_code": "L00236",
+        "supplier": "PL000063",
+        "po_date": "2026-04-29",
+        "uom": "UNI",
+        "purchased_base": "45000",
+        "received_base": "45000",
+        "gap_base": "0",
+        "n_receipts": 4,
+        "warehouses_received": [
+          "LAB-M1",
+          "SAA-M1"
+        ],
+        "status": "MULTI_RECEIPT_COMPLETE",
+        "line_status": "C",
+        "lead_days_first_receipt": 1
+      },
+      {
+        "po_docnum": "262001421",
+        "po_entry": "25640",
+        "line_num": "13",
+        "item_code": "L00097",
+        "supplier": "PL000063",
+        "po_date": "2026-04-29",
+        "uom": "ENV",
+        "purchased_base": "45000",
+        "received_base": "45000",
+        "gap_base": "0",
+        "n_receipts": 4,
+        "warehouses_received": [
+          "LAB-M1",
+          "SAA-M1"
+        ],
+        "status": "MULTI_RECEIPT_COMPLETE",
+        "line_status": "C",
+        "lead_days_first_receipt": 1
+      }
+    ],
+    "multi_receipt_sample": [
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "0",
+        "item_code": "L00172",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "65000",
+        "received_base": "67000",
+        "gap_base": "2000",
+        "n_receipts": 5,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 22
+      },
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "1",
+        "item_code": "L03591",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "100000",
+        "received_base": "85000",
+        "gap_base": "-15000",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 11
+      },
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "2",
+        "item_code": "L03590",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "100000",
+        "received_base": "85000",
+        "gap_base": "-15000",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 11
+      },
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "3",
+        "item_code": "L00222",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "100000",
+        "received_base": "85000",
+        "gap_base": "-15000",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 11
+      },
+      {
+        "po_docnum": "262000248",
+        "po_entry": "23725",
+        "line_num": "5",
+        "item_code": "L00252",
+        "supplier": "PL000153",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "40000",
+        "received_base": "13800",
+        "gap_base": "-26200",
+        "n_receipts": 3,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 23
+      },
+      {
+        "po_docnum": "262000256",
+        "po_entry": "23737",
+        "line_num": "0",
+        "item_code": "L00240",
+        "supplier": "PL000218",
+        "po_date": "2026-02-02",
+        "uom": "UNI",
+        "purchased_base": "11353",
+        "received_base": "11353",
+        "gap_base": "0",
+        "n_receipts": 2,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_COMPLETE",
+        "line_status": "C",
+        "lead_days_first_receipt": 25
+      },
+      {
+        "po_docnum": "262000259",
+        "po_entry": "23755",
+        "line_num": "0",
+        "item_code": "L02081",
+        "supplier": "PL000102",
+        "po_date": "2026-02-05",
+        "uom": "BOLSA",
+        "purchased_base": "900",
+        "received_base": "900",
+        "gap_base": "0",
+        "n_receipts": 4,
+        "warehouses_received": [
+          "LAB-T4"
+        ],
+        "status": "MULTI_RECEIPT_COMPLETE",
+        "line_status": "C",
+        "lead_days_first_receipt": 6
+      },
+      {
+        "po_docnum": "262000259",
+        "po_entry": "23755",
+        "line_num": "3",
+        "item_code": "L01950",
+        "supplier": "PL000102",
+        "po_date": "2026-02-05",
+        "uom": "FCO",
+        "purchased_base": "150",
+        "received_base": "150",
+        "gap_base": "0",
+        "n_receipts": 2,
+        "warehouses_received": [
+          "LAB-T4"
+        ],
+        "status": "MULTI_RECEIPT_COMPLETE",
+        "line_status": "C",
+        "lead_days_first_receipt": 6
+      },
+      {
+        "po_docnum": "262000384",
+        "po_entry": "23946",
+        "line_num": "2",
+        "item_code": "L00253",
+        "supplier": "PL000182",
+        "po_date": "2026-02-13",
+        "uom": "KG",
+        "purchased_base": "200",
+        "received_base": "223.62",
+        "gap_base": "23.62",
+        "n_receipts": 2,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "OVER_RECEIPT",
+        "line_status": "C",
+        "lead_days_first_receipt": 19
+      },
+      {
+        "po_docnum": "262000384",
+        "po_entry": "23946",
+        "line_num": "5",
+        "item_code": "L00254",
+        "supplier": "PL000182",
+        "po_date": "2026-02-13",
+        "uom": "KG",
+        "purchased_base": "300",
+        "received_base": "285.20",
+        "gap_base": "-14.80",
+        "n_receipts": 2,
+        "warehouses_received": [
+          "LAB-M1"
+        ],
+        "status": "MULTI_RECEIPT_PARTIAL",
+        "line_status": "C",
+        "lead_days_first_receipt": 15
+      }
+    ]
+  },
+  "thresholds": {
+    "receipt_line_link_resolution_rate": 0.98,
+    "movement_corroboration_rate_inventory_items": 0.95,
+    "max_fanout_violations": 0,
+    "max_item_mismatch_links": 0,
+    "max_uom_incompatible_pairs": 0
+  },
+  "sap": {
+    "SAP_ACCESSED": "NO",
+    "SAP_QUERY_COUNT": 0,
+    "SAP_WRITE_COUNT": 0
+  },
+  "gate_result": "TELCHI_PURCHASE_TO_WAREHOUSE_RECEIPT_RECONCILIATION_V1_PASS",
+  "gate_reasons": [
+    "receipt line link resolution 0.9912 OK (unresolved=143)",
+    "movement corroboration 0.9594 OK (qty_equal=15561, whs_equal=15561)",
+    "join fanout = 0",
+    "item match on links = 100%",
+    "UoM incompatible pairs = 0"
+  ]
+}

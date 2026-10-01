@@ -1,0 +1,32 @@
+left_table,left_key,right_table,right_key,relationship_type,business_meaning,validated_by,confidence
+OINV,DocEntry,INV1,DocEntry,1:N,invoice header to lines,sales/financial gates + SQL invoice contract,CONFIRMED
+ORIN,DocEntry,RIN1,DocEntry,1:N,credit note header to lines,financial credit-note gate,CONFIRMED
+OQUT,DocEntry,QUT1,DocEntry,1:N,quotation header to lines,proforma/pricing investigation,CONFIRMED
+OWOR,DocEntry,WOR1,DocEntry,1:N,production order to historical component snapshot,production schema + BOM gates,CONFIRMED
+OITT,Code,ITT1,Father,1:N,current BOM header to components,recipe/BOM gate,CONFIRMED
+OPOR,DocEntry,PCH1,BaseEntry,1:N,"PO to vendor invoice lines, BaseType=22",purchase discovery P0.1,CONFIRMED
+OPCH,DocEntry,PDN1,BaseEntry,1:N,"vendor invoice to goods receipt lines, BaseType=18",purchase discovery P0.1,CONFIRMED
+OPOR,DocEntry,PDN1,BaseEntry,1:N,"direct PO to goods receipt, BaseType=22",purchase discovery,CONFIRMED
+OINV,DocEntry,ITR1,SrcObjAbs,1:N,"invoice settlement member, SrcObjTyp=13",financial reconciliation + credit gates,CONFIRMED
+ORCT,DocEntry,ITR1,SrcObjAbs,1:N,"incoming payment settlement member, SrcObjTyp=24",financial reconciliation gate,CONFIRMED
+OITR,ReconNum,ITR1,ReconNum,1:N,reconciliation header to members and ReconDate,financial reconciliation gate,CONFIRMED
+OINV,TransId,OJDT,TransId,1:1,invoice accounting entry when present,financial/traceability gates,LIKELY
+ORCT,TransId,OJDT,TransId,1:1,incoming payment accounting entry,treasury and cross traceability,CONFIRMED
+OVPM,TransId,OJDT,TransId,1:1,outgoing payment accounting entry,AP/treasury gates,CONFIRMED
+ODPS,TransAbs,OJDT,TransId,1:1,deposit accounting entry,treasury gate,CONFIRMED
+IGE1,BaseEntry,OWOR,DocEntry,N:1,"actual component issue to production order, BaseType=202",production schema gate,CONFIRMED
+IGN1,BaseEntry,OWOR,DocEntry,N:1,"actual finished output to production order, BaseType=202",production schema gate,CONFIRMED
+IGE1,BaseRef,OINM,BASE_REF,N:0..1,issue to inventory ledger where populated,production output/consumption gates,LIKELY
+IGN1,BaseRef,OINM,BASE_REF,N:0..1,receipt to inventory ledger where populated,production output/consumption gates,LIKELY
+OWTR,DocEntry,WTR1,DocEntry,1:N,transfer header to lines,warehouse transfer gate,CONFIRMED
+WTR1,DocEntry+LineNum,OINM,source movement,1:2,transfer origin out and destination in,warehouse transfer gate TT67,CONFIRMED
+OITW,ItemCode+WhsCode,OINM,ItemCode+Warehouse,1:N,current stock reconciled to movement ledger,material stock gate,CONFIRMED
+OUSR,USERID,OHEM,userCode/employee link,0..1:0..1,SAP user to employee where populated,users and attribution gate,CONFIRMED
+OHEM,salesPrson,OSLP,SlpCode,N:1,employee to salesperson,users and attribution gate,CONFIRMED
+OUSR,USERID,USR5,USERID,1:N,user to activity events,users gate; aggregate before joins,CONFIRMED
+OUSR,USERID,USR3,USERID,1:N,direct permissions,users gate; current only,CONFIRMED
+OUGR,GroupId,UGR1,GroupId,1:N,group permissions,users gate; current only,CONFIRMED
+OINV,CardCode,OCRD,CardCode,N:1,invoice business partner,sales/credit/customer gates,CONFIRMED
+OWTR,DocEntry,IBT1,BaseEntry,1:N,batch trace for transfer when batch data exists,transfer gate,LIKELY
+OPCH,DocEntry,ITR1,SrcObjAbs,1:N,AP settlement members,AP reconciliation gate,CONFIRMED
+OVPM,DocEntry,ITR1,SrcObjAbs,1:N,outgoing payment settlement members,AP reconciliation gate,CONFIRMED

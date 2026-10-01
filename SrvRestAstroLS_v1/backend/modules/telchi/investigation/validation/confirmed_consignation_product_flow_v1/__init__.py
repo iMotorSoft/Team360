@@ -1,0 +1,1 @@
+"""TELCHI confirmed-consignation (OCRD.U_CONSIGNACION=1) product-flow gate."""

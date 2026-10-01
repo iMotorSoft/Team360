@@ -1,0 +1,80 @@
+table_name,business_domain,purpose,primary_or_candidate_key,important_columns,used_in_gates,join_targets,confidence
+OITM,PRODUCTOS,item master and MRP/product attributes,ItemCode,"ItemCode,ItemName,InvntItem,PrchseItem,LeadTime,PlaningSys,PrcrmntMtd,ReorderPnt,MinLevel,MaxLevel,OrdrMulti","stock,production,mrp,seasonality,purchases","OITW,ITT1,OWOR,OCRD",CONFIRMED
+OITW,STOCK_E_INVENTARIOS,current item-by-warehouse position and policy,ItemCode+WhsCode,"ItemCode,WhsCode,OnHand,IsCommited,OnOrder,MinStock,MaxStock,MinOrder","stock,mrp,coverage","OITM,OWHS,OINM",CONFIRMED
+OWHS,ALMACENES,warehouse master,WhsCode,"WhsCode,WhsName,Inactive","stock,transfers,production","OITW,WTR1,OINM",CONFIRMED
+OITB,PRODUCTOS,item group used in product/business classification,ItmsGrpCod,"ItmsGrpCod,ItmsGrpNam","stock,La Reja,production",OITM,CONFIRMED
+OINV,VENTAS,sales invoice header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,DocDueDate,DocTotal,PaidToDate,CANCELED,UserSign,TransId,U_ORIGIN,U_SO1_01RETAILONE","sales,credit,temporal,users,finance","INV1,OCRD,ORCT,OINM,OJDT",CONFIRMED
+INV1,VENTAS,sales invoice lines and document lineage,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,Price,DiscPrcnt,BaseType,BaseEntry,BaseLine,WhsCode,GTotal","sales,credit,proforma,delivery,temporal","OINV,ODLN,ORDR,OQUT,OINM",CONFIRMED
+INV6,CRÉDITO_Y_DEUDORES,invoice installment/due-date mirror,DocEntry+InstlmntID,"DocEntry,InstlmntID,DueDate,InsTotal,Status","credit,aging,temporal","OINV,ITR1,OITR",CONFIRMED
+ORIN,NOTAS_DE_CREDITO,credit note header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,DocTotal,CANCELED,TransId","credit,financial,temporal","RIN1,OINV,ITR1,OJDT",CONFIRMED
+RIN1,NOTAS_DE_CREDITO,credit note lines and base document lineage,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,BaseType,BaseEntry,BaseLine","credit,temporal","ORIN,OINV,INV1,OINM",CONFIRMED
+ODLN,VENTAS,delivery header,DocEntry,"DocEntry,CardCode,DocDate,DocTotal,CANCELED,UserSign","delivery,credit,warehouse_exit","DLN1,OCRD,OINM,INV1",CONFIRMED
+DLN1,VENTAS,delivery lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,WhsCode,BaseType,BaseEntry","delivery,warehouse_exit","ODLN,OINV,OINM",CONFIRMED
+ORDR,VENTAS,sales order header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,DocStatus,CANCELED,UserSign","credit,order_delivery","RDR1,OINV,ODLN,OCRD",CONFIRMED
+RDR1,VENTAS,sales order lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,BaseType,BaseEntry,BaseLine","credit,order_delivery","ORDR,ODLN,OINV",CONFIRMED
+OQUT,COTIZACIONES_PROFORMAS,quotation/proforma header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,DocTotal,CANCELED","proforma,pricing","QUT1,OCRD,INV1",CONFIRMED
+QUT1,COTIZACIONES_PROFORMAS,quotation/proforma lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,Price,DiscPrcnt,GTotal","proforma,pricing","OQUT,INV1",CONFIRMED
+OCRD,CLIENTES_PROVEEDORES,business partner master for customers and suppliers,CardCode,"CardCode,CardName,CardType,LicTradNum,CreditLine,Balance,GroupCode,Country,U_CATCLIENTE,U_CANAL_VENTAS,U_TIPOCLIENTE","credit,customers,purchases,La_Reja","OINV,ORIN,ORCT,OPOR,OPCH,OCRG,OCTG",CONFIRMED
+OCRG,CLIENTES_PROVEEDORES,business partner group,GroupCode,"GroupCode,GroupName","customers,La_Reja",OCRD,CONFIRMED
+OCTG,CRÉDITO_Y_DEUDORES,payment terms/group,GroupNum,"GroupNum,PymntGroup,ExtraDays","credit,aging","OCRD,OINV",CONFIRMED
+OSLP,VENDEDORES,salesperson master,SlpCode,"SlpCode,SlpName,Active","sales,users,AR","OINV,OCRD,OHEM",CONFIRMED
+ORCT,COBRANZAS,incoming payment header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,DocTotal,Canceled,TransId","credit,payments,treasury","RCT2,ITR1,OJDT,OCRD",CONFIRMED
+RCT2,COBRANZAS,incoming payment invoice references (not settlement authority),DocNum+InvType+DocEntry,"DocNum,InvType,DocEntry,SumApplied","payments,credit","ORCT,OINV,ITR1",CONFIRMED
+OITR,RECONCILIACIONES,internal reconciliation header and as-of date,ReconNum,"ReconNum,ReconDate,Canceled,Total","credit,temporal,reconciliation","ITR1,OINV,ORCT,ORIN",CONFIRMED
+ITR1,RECONCILIACIONES,reconciliation members and settlement amounts,ReconNum+LineSeq,"ReconNum,LineSeq,SrcObjTyp,SrcObjAbs,ReconSum","credit,temporal,reconciliation","OITR,OINV,ORCT,ORIN,OPCH,OVPM",CONFIRMED
+OPOR,COMPRAS_Y_ABASTECIMIENTO,purchase order header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,DocDueDate,DocStatus,CANCELED,DocCur,U_TIPOCOMPRA","purchases,lead_time,mrp","POR1,OCRD",CONFIRMED
+POR1,COMPRAS_Y_ABASTECIMIENTO,purchase order lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,OpenQty,BaseType,BaseEntry,BaseRef,BaseDocNum","purchases,lead_time,coverage","OPOR,OPCH,OPDN,OITM",CONFIRMED
+OPRQ,SOLICITUDES_DE_COMPRA,purchase request header,DocEntry,"DocEntry,DocNum,DocDate,DocStatus,CANCELED",purchases,"PRQ1,POR1",CONFIRMED
+PRQ1,SOLICITUDES_DE_COMPRA,purchase request lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,BaseType,BaseEntry",purchases,"OPRQ,OPOR",CONFIRMED
+OPCH,FACTURAS_DE_PROVEEDOR,AP/vendor invoice header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,DocDueDate,DocTotal,PaidToDate,DocStatus,CANCELED,TransId","purchases,AP,finance,debt","PCH1,OCRD,ITR1,OVPM,OJDT",CONFIRMED
+PCH1,FACTURAS_DE_PROVEEDOR,AP/vendor invoice lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,BaseType,BaseEntry,BaseLine","purchases,AP,lead_time","OPCH,OPOR,OPDN",CONFIRMED
+OPDN,RECEPCIONES,goods receipt header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,CANCELED,TransId","purchases,lead_time","PDN1,OPCH,OPOR,OINM",CONFIRMED
+PDN1,RECEPCIONES,goods receipt lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,BaseType,BaseEntry,BaseLine","purchases,lead_time","OPDN,OPCH,OPOR,OINM",CONFIRMED
+ORPD,DEVOLUCIONES,purchase return header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,CANCELED",purchases,"RPD1,OPCH,OPDN,OCRD",CONFIRMED
+RPD1,DEVOLUCIONES,purchase return lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,BaseType,BaseEntry",purchases,"ORPD,OPCH,OPDN",CONFIRMED
+OITT,BOM_PRODUCCIÓN,current bill-of-material header,Code,"Code,Quantity,Type,TreeType,IssueMthd","production,bom,mrp","ITT1,OITM,OWOR",CONFIRMED
+ITT1,BOM_PRODUCCIÓN,current BOM components,"Father,Code","Father,Code,Quantity,IssueMthd,Warehouse","production,bom,mrp","OITT,OITM",CONFIRMED
+OWOR,PRODUCCIÓN,production order header,DocEntry,"DocEntry,DocNum,ItemCode,PlannedQty,CmpltQty,Status,Type,PostDate,Warehouse","production,reconciliation","WOR1,IGE1,IGN1,OINM",CONFIRMED
+WOR1,PRODUCCIÓN,historical order component snapshot,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,BaseQty,BaseQtyNum,BaseQtyDen,IssuedQty,IssueType","production,bom,reconciliation","OWOR,IGE1,ITT1",CONFIRMED
+OIGE,PRODUCCIÓN,goods issue header,DocEntry,"DocEntry,DocNum,DocDate,CANCELED,TransId",production,"IGE1,OWOR,OINM",CONFIRMED
+IGE1,PRODUCCIÓN,actual component issue lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,BaseType,BaseEntry,BaseLine,BaseRef","production,consumption","OIGE,OWOR,WOR1,OINM",CONFIRMED
+OIGN,PRODUCCIÓN,goods receipt/output header,DocEntry,"DocEntry,DocNum,DocDate,CANCELED,TransId",production,"IGN1,OWOR,OINM",CONFIRMED
+IGN1,PRODUCCIÓN,actual finished-good output lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,BaseType,BaseEntry,BaseRef","production,output","OIGN,OWOR,OINM",CONFIRMED
+OINM,MOVIMIENTOS_DE_INVENTARIO,inventory movement ledger,TransNum+TransSeq,"TransNum,TransSeq,TransType,BASE_REF,DocDate,ItemCode,Warehouse,InQty,OutQty,Price","stock,production,transfers,traceability","OINV,IGE1,IGN1,OWTR,WTR1,OITW",CONFIRMED
+OWTR,TRANSFERENCIAS_Y_DEPÓSITOS,inventory transfer header,DocEntry,"DocEntry,DocNum,DocDate,ToWhsCode,FromWhsCod,CANCELED,UserSign","transfers,warehouse_exit","WTR1,OINM,OWHS",CONFIRMED
+WTR1,TRANSFERENCIAS_Y_DEPÓSITOS,inventory transfer lines,DocEntry+LineNum,"DocEntry,LineNum,ItemCode,Quantity,FromWhsCod,WhsCode,BaseType,BaseRef,U_LOTE","transfers,warehouse_exit","OWTR,OINM,OWHS,IBT1",CONFIRMED
+IBT1,LOTES_SERIES,batch transaction ledger,ItemCode+BatchNum+BaseEntry+BaseLinNum,"ItemCode,BatchNum,Quantity,BaseType,BaseEntry,BaseLinNum","transfers,production,batches","WTR1,OBTN,IGN1",CONFIRMED
+OBTN,LOTES_SERIES,batch master,AbsEntry,"ItemCode,DistNumber,AbsEntry,InDate,ExpDate","production,transfers","IBT1,IGN1",LIKELY
+OFCT,FORECAST_Y_ESTACIONALIDAD,forecast header,AbsID,"AbsID,Name,Code,StartDate,EndDate","mrp,forecast","FCT1,OITM",CONFIRMED
+FCT1,FORECAST_Y_ESTACIONALIDAD,forecast rows,AbsID+LineId,"AbsID,LineId,ItemCode,WhsCode,Date,Quantity","mrp,forecast","OFCT,OITM,OITW",CONFIRMED
+OUSR,USUARIOS_ROLES_Y_PERMISOS,SAP user master,USERID,"USERID,USER_CODE,USER_NAME,Locked,superuser,lastLogin,updateDate","users,authorizations,channel","USR3,USR5,OHEM",CONFIRMED
+USR3,USUARIOS_ROLES_Y_PERMISOS,direct user permissions,USERID+PermId,"USERID,PermId,Permission","users,authorizations","OUSR,UGR1",CONFIRMED
+UGR1,USUARIOS_ROLES_Y_PERMISOS,group permissions,GroupId+PermId,"GroupId,PermId,Permission","users,authorizations","OUGR,OUSR",CONFIRMED
+USR5,ACTIVIDAD_DE_USUARIOS,user activity/session log,USERID+LineNum,"USERID,ClientIP,Action,Date,Time","users,activity","OUSR,OHEM",CONFIRMED
+OUGR,USUARIOS_ROLES_Y_PERMISOS,user groups,GroupId,"GroupId,GroupName","users,authorizations","UGR1,OUSR",CONFIRMED
+OUPT,USUARIOS_ROLES_Y_PERMISOS,permission tree,PermId,"PermId,Name,ParentId","users,authorizations","UGR1,USR3",LIKELY
+OHEM,RRHH,employee master,empID,"empID,firstName,lastName,salesPrson,Active","users,attribution,HR","OUSR,OSLP",CONFIRMED
+OADM,CONFIGURACIÓN_SAP,company-level credit and configuration,singleton,"CreditLimt,OpenCredit,SalesLimit,DlnLimit,CreditDay","credit,configuration","OINV,ORDR,ODLN",CONFIRMED
+OJDT,CONTABILIDAD,journal entry header,TransId,"TransId,RefDate,TransType,UserSign,LocTotal,SyTotal","finance,treasury,users","JDT1,OINV,ORCT,OVPM,ODPS",CONFIRMED
+JDT1,CONTABILIDAD,journal entry lines,TransId+Line_ID,"TransId,Line_ID,Account,Debit,Credit,FCCurrency,FCDebit,FCCredit,ProfitCode","finance,treasury,HR,WHT","OJDT,OACT,ORCT,OVPM",CONFIRMED
+OACT,CONTABILIDAD,chart of accounts and balances,AcctCode,"AcctCode,AcctName,GroupMask,FatherNum,CurrTotal,ActCurr","finance,treasury,HR,WHT","JDT1,OJDT",CONFIRMED
+ODPS,CAJA_BANCOS,deposit header,DeposId,"DeposId,DeposDate,DeposType,Total,AcctCode,TransAbs","treasury,cash_deposit","OJDT,JDT1,OCHH,ORCT",CONFIRMED
+OCHH,CAJA_BANCOS,check history/deposit linkage,CheckKey,"CheckKey,CheckNum,DpstAbs","treasury,cash_deposit","ORCT,ODPS,OCHO",CONFIRMED
+OCHO,CAJA_BANCOS,outgoing checks,CheckKey,"CheckKey,CheckNum,CheckSum",treasury,"OVPM,OCHH",LIKELY
+ODSC,CAJA_BANCOS,bank/house bank configuration,AbsEntry,"AbsEntry,GLAccount,Branch",treasury,"DSC1,OACT",CONFIRMED
+DSC1,CAJA_BANCOS,bank account configuration,AbsEntry+LineId,"AbsEntry,GLAccount,AccountNo",treasury,"ODSC,OACT",CONFIRMED
+OBNK,CAJA_BANCOS,bank statement/reconciliation source,BankMatchNo,"BankMatchNo,DueDate,Debit,Credit,ReconDate",treasury,"OJDT,JDT1",CONFIRMED
+OVPM,CAJA_BANCOS,outgoing payment header,DocEntry,"DocEntry,DocNum,CardCode,DocDate,DocTotal,Canceled,TransId","AP,treasury,debt","VPM2,ITR1,OJDT,OPCH",CONFIRMED
+VPM2,CAJA_BANCOS,outgoing payment invoice application,DocNum+InvType+DocEntry,"DocNum,InvType,DocEntry,SumApplied","AP,treasury","OVPM,OPCH,ITR1",CONFIRMED
+PCH5,RETENCIONES,AP withholding detail,AbsEntry+LineNum,"AbsEntry,WTCode,TaxbleAmnt,WTAmnt",WHT,"OPCH,OWHT,JDT1",CONFIRMED
+PCH6,RETENCIONES,AP withholding totals,AbsEntry,"AbsEntry,WTSum",WHT,"OPCH,PCH5",CONFIRMED
+VPM6,RETENCIONES,payment withholding totals,DocNum,"DocNum,WTSum",WHT,"OVPM,VPM2",CONFIRMED
+OWHT,RETENCIONES,withholding configuration,WTCode,"WTCode,WTName,Account",WHT,"PCH5,PCH6,VPM6",CONFIRMED
+@SO1_01LOGAUTORIZA,USUARIOS_ROLES_Y_PERMISOS,Retail One authorization/activity log,event/folio candidate,"FOLIO,action,station,operator,event_time","credit,users,channel","OINV,@SO1_01VEN...",CONFIRMED
+@SO1_01VENCREVENC,CRÉDITO_Y_DEUDORES,Retail One customer exception flag UDT,CardCode candidate,"CardCode,VENCREVENC",credit,"OCRD,OINV",LIKELY
+@SO1_01COMPRA,COMPRAS_Y_ABASTECIMIENTO,Retail One purchase UDT (observed empty),DocEntry candidate,document fields,purchases,"OPOR,OPCH",CONFIRMED
+@SO1_01COMPRADETALLE,COMPRAS_Y_ABASTECIMIENTO,Retail One purchase detail UDT (observed empty),DocEntry+LineNum candidate,line fields,purchases,POR1,CONFIRMED
+@SO1_01DEVOLCOMPRA,COMPRAS_Y_ABASTECIMIENTO,Retail One purchase return UDT (observed empty),DocEntry candidate,document fields,purchases,"ORPD,RPD1",CONFIRMED
+@SO1_01COMPRAWEB,COMPRAS_Y_ABASTECIMIENTO,Retail One web purchase UDT (observed empty),DocEntry candidate,document fields,purchases,"OPOR,OPCH",CONFIRMED
+@SO1_01FAVPROVEEDOR,COMPRAS_Y_ABASTECIMIENTO,Retail One preferred supplier UDT (observed empty),supplier/item candidate,supplier fields,purchases,"OCRD,OITM",CONFIRMED
+@SO1_01SUGERENCOMPRA,COMPRAS_Y_ABASTECIMIENTO,Retail One purchase suggestion UDT (observed empty),item candidate,suggestion fields,purchases,"OITM,OPOR",CONFIRMED

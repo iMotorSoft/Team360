@@ -1,0 +1,19 @@
+gap_id,gap_class,knowledge,gap,next_action,priority
+GAP-001,LINEAGE_UNKNOWN,All legacy Parquet,"No formal source system, query, extractor identity, watermark, timezone or snapshot contract in footers",next gate lineage contract,HIGH
+GAP-002,TEMPORAL_GAP,Snapshot families,Filename date and contained business dates are distinct; concatenation can double count,snapshot/as-of policy,HIGH
+GAP-003,SEMANTICS_UNKNOWN,movProductSB1 ↔ OINM,"candidate join is rich but not universal; 181,384 duplicate candidate keys",reconcile grain and document coverage,HIGH
+GAP-004,HISTORICAL_NOT_AVAILABLE,master Parquet ↔ SAP masters,historical validity of OITM/OCRD/OWHS and warehouse-office mapping is absent,temporal master policy,HIGH
+GAP-005,SAP_NOT_YET_INVESTIGATED,Purchasing request approval / MRP execution,"tables/configuration discovered, but operational approval and MRP run history are not demonstrated",targeted investigation only if needed,MEDIUM
+GAP-006,SEMANTICS_UNKNOWN,OFCT/FCT1,configured/observed forecast rows do not prove active operational forecast use,forecast contract,HIGH
+GAP-007,SEMANTICS_UNKNOWN,OITM/OITW safety stock,SafetyStock field/operational semantics not confirmed; ReorderPnt is only a labeled proxy,MRP semantics decision,HIGH
+GAP-008,SAP_NOT_YET_INVESTIGATED,MRP/forecast history,no execution log or historical parameter versioning located,point validation with SAP/process owner,MEDIUM
+GAP-009,SAP_NOT_YET_INVESTIGATED,Lotes/series,IBT1/OBTN observed in selected paths; complete sales/production lot/serial coverage not closed,lot/serial scope gate,MEDIUM
+GAP-010,SEMANTICS_UNKNOWN,production → dispatch,no BaseType=202 FK; temporal ItemCode/warehouse/date link is heuristic,business model must preserve heuristic,HIGH
+GAP-011,SEMANTICS_UNKNOWN,physical lead time,OWTR/OINM accounting event does not prove physical dispatch/receipt,logistics evidence contract,HIGH
+GAP-012,SECURITY_PENDING,users/permissions,historical authorization unavailable; future security-before-retrieval not implemented,RBAC/row/column/metric policy,HIGH
+GAP-013,SAP_NOT_YET_INVESTIGATED,approvals/exceptions,management approvals external to SAP; retail log linkage is heuristic in part,external evidence contract,MEDIUM
+GAP-014,SAP_NOT_YET_INVESTIGATED,detailed payroll,"OHEM and GL cost observed, but no detailed SAP payroll object identified",external payroll boundary,HIGH
+GAP-015,SEMANTICS_UNKNOWN,WHT,configured OWHT accounts and WHT columns do not establish an active transactional path,WHT source authority,HIGH
+GAP-016,SEMANTICS_UNKNOWN,bank reconciliation,OBNK exists but no external bank balance reconciliation was demonstrated,bank statement contract,MEDIUM
+GAP-017,HISTORICAL_NOT_AVAILABLE,legacy purchaseExpense/productTransform/cash,SAP equivalents are partial or not yet semantically reconciled,legacy↔SAP mapping gate,MEDIUM
+GAP-018,TEMPORAL_GAP,cancellations and payments,"current SAP can reconstruct selected as-of states, but historical Parquet coverage and watermarks differ",as-of reconciliation,HIGH

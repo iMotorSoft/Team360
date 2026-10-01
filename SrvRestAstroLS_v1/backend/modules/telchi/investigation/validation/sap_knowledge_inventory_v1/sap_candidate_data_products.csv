@@ -1,0 +1,13 @@
+candidate_data_product,domain,knowledge_boundary,state,security_domain,sensitive_fields
+inventory_movements,STOCK_E_INVENTARIOS,OINM + document lineage; movProductSB1 correspondence,CONFIRMED/PARTIAL,inventory,cost; warehouse scope; movement user
+sales_lines,VENTAS,OINV/INV1 with cancellation and channel semantics,CONFIRMED,sales,price; cost; margin; customer
+sales_document_chain,VENTAS,quotation/order/delivery/invoice/credit-note chain,CONFIRMED/PARTIAL,sales,customer; price; discount
+customer_credit_state,CRÉDITO_Y_DEUDORES,as-of invoice/NC/payment/reconciliation/aging,CONFIRMED,credit,credit_limit; customer_debt; customer
+purchase_cycle,COMPRAS_Y_ABASTECIMIENTO,request/order/invoice/receipt/return with BaseEntry lineage,CONFIRMED,purchases,purchase_price; supplier
+production_orders,PRODUCCIÓN,OWOR/WOR1/IGE1/IGN1 and normalized reconciliation,CONFIRMED/PARTIAL,production,cost; output; component
+bom_and_component_usage,BOM_PRODUCCIÓN,OITT/ITT1 plus order-time WOR1,CONFIRMED/PARTIAL,production,cost; formulation
+stock_current_and_history,STOCK_E_INVENTARIOS,OITW current and OINM reconstruction,CONFIRMED,inventory,cost; warehouse
+warehouse_transfers,TRANSFERENCIAS_Y_DEPÓSITOS,OWTR/WTR1/OINM TT67,CONFIRMED/HEURISTIC_PHYSICAL,inventory,warehouse; user
+forecast_and_mrp_parameters,FORECAST_Y_ESTACIONALIDAD,OFCT/FCT1 and OITM/OITW configuration,CONFIGURED_NOT_OPERATIONAL_PROOF,configuration,forecast; policy
+users_activity_and_capabilities,USUARIOS_ROLES_Y_PERMISOS,OUSR/USR3/UGR1/OUGR/USR5/OHEM/OSLP,CONFIRMED_CURRENT_ONLY,users,user_activity; authorization
+gl_ar_ap_treasury,CONTABILIDAD,OACT/OJDT/JDT1 plus AR/AP and treasury chains,CONFIRMED/PARTIAL,finance,bank_account; salary; debt

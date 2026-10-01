@@ -1,0 +1,134 @@
+{
+  "gate": "TELCHI_AP_INVOICED_WITHOUT_WAREHOUSE_RECEIPT_V1",
+  "started_at": "2026-10-01T01:40:33.687743+00:00",
+  "finished_at": "2026-10-01T01:40:35.930618+00:00",
+  "source": "DATA_LAKE_ONLY",
+  "foundation_current": [
+    [
+      "foundation_d222a203801cc84e9a14164d26aa67a0",
+      "CURRENT"
+    ]
+  ],
+  "windows": {
+    "purchase_receipt_window": [
+      "2026-01-01T00:00:00",
+      "2026-09-24T00:00:00"
+    ],
+    "movement_window_2026": [
+      "2022-03-31T00:00:00",
+      "2026-09-24T00:00:00"
+    ],
+    "as_of": "2026-09-24",
+    "tt18_2026": {
+      "movements": 64,
+      "in_qty_base": "6000.0"
+    }
+  },
+  "totals": {
+    "target_lines": 25,
+    "purchased_base": "683025",
+    "lines_with_receipt": 0,
+    "lines_with_inventory_entry": 2,
+    "lines_without_any_movement": 23,
+    "advance_invoice_lines": 4,
+    "import_invoice_lines": 17,
+    "rejected_candidate_lines": 10
+  },
+  "controls": {
+    "target_lines": 25,
+    "target_lines_expected": 25,
+    "purchased_base_total": "683025",
+    "purchased_base_expected": "683025",
+    "duplicate_keys": 0,
+    "item_code_null": 0,
+    "item_code_preserved": 25,
+    "invalid_po_lines": 0,
+    "invalid_invoices": 0,
+    "unclassified": 0,
+    "category_partition_ok": true,
+    "receipts_linked_to_targets": 0,
+    "linked_movement_key_collisions": 0,
+    "linked_movement_item_mismatch": 0,
+    "linked_movement_count": 2,
+    "reversal_detected": 0,
+    "rejected_candidates_total": 30,
+    "base_types_preserved": [
+      "22"
+    ],
+    "base_entries_match_po": 0
+  },
+  "class_stats": {
+    "DIRECT_AP_INVOICE_NO_GRPO": {
+      "lines": 21,
+      "purchased_base": "676910"
+    },
+    "RECEIPT_FOUND_ALTERNATE_LINEAGE": {
+      "lines": 0,
+      "purchased_base": "0"
+    },
+    "INVENTORY_ENTRY_WITHOUT_GRPO": {
+      "lines": 2,
+      "purchased_base": "6000"
+    },
+    "RECEIPT_OUTSIDE_WINDOW": {
+      "lines": 0,
+      "purchased_base": "0"
+    },
+    "HISTORICAL_LINEAGE_GAP": {
+      "lines": 0,
+      "purchased_base": "0"
+    },
+    "CANCELLED_OR_REVERSED": {
+      "lines": 0,
+      "purchased_base": "0"
+    },
+    "NON_INVENTORY_EXCEPTION": {
+      "lines": 0,
+      "purchased_base": "0"
+    },
+    "QUANTITY_UOM_ISSUE": {
+      "lines": 0,
+      "purchased_base": "0"
+    },
+    "TRUE_INVOICED_WITHOUT_RECEIPT": {
+      "lines": 2,
+      "purchased_base": "115"
+    },
+    "NOT_DETERMINABLE": {
+      "lines": 0,
+      "purchased_base": "0"
+    }
+  },
+  "thresholds": {
+    "expected_target_lines": 25,
+    "expected_purchased_base": "683025",
+    "max_duplicate_keys": 0,
+    "max_item_code_null": 0,
+    "max_invalid_po_lines": 0,
+    "max_invalid_invoices": 0,
+    "max_unclassified": 0,
+    "max_linked_movement_key_collisions": 0,
+    "max_linked_movement_item_mismatch": 0,
+    "max_base_entries_not_matching_po": 0
+  },
+  "sap": {
+    "SAP_ACCESSED": "NO",
+    "SAP_QUERY_COUNT": 0,
+    "SAP_WRITE_COUNT": 0
+  },
+  "gate_result": "TELCHI_AP_INVOICED_WITHOUT_WAREHOUSE_RECEIPT_V1_PASS",
+  "gate_reasons": [
+    "target lines=25 OK",
+    "purchased base total=683025 OK",
+    "duplicate keys=0 OK",
+    "ItemCode null=0 OK",
+    "invalid PO lines=0 OK",
+    "invalid invoices=0 OK",
+    "unclassified lines=0 OK",
+    "linked movement collisions=0 OK",
+    "linked movement item mismatch=0 OK",
+    "invoice base not matching PO=0 OK",
+    "exactly one category per line",
+    "receipts linked to targets=0, linked movements=2, reversals=0, rejected candidates=30"
+  ]
+}

@@ -1,0 +1,10 @@
+security_domain,domain,sensitive_fields,organizational_scope_candidate,gate_scope
+inventory,inventory,"warehouse, ItemCode, cost",candidate warehouse/organizational scope,administrator/all in this gate
+sales,sales,"customer, price, cost, margin",customer/branch/channel candidate,administrator/all in this gate
+purchases,purchases,"supplier, purchase_price, cost",supplier/branch candidate,administrator/all in this gate
+production,production,"formulation, cost, output",plant/warehouse candidate,administrator/all in this gate
+credit,credit,"credit_limit, customer_debt",customer/portfolio candidate,administrator/all in this gate
+finance,finance,"bank_account, debt, margin",company/legal-entity candidate,administrator/all in this gate
+hr,hr,"salary, employee identity",organizational candidate,administrator/all in this gate
+users,users,"user_activity, authorization",organizational candidate,administrator/all in this gate
+configuration,configuration,MRP/credit configuration,company/warehouse candidate,administrator/all in this gate
