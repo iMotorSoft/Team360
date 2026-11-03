@@ -1,0 +1,98 @@
+{
+  "timestamp": "2026-10-09T12:45:29.942883+00:00",
+  "config_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/litellm-server/config/litellm_config.yaml",
+  "mode": "read-only current process config path + authenticated management GETs",
+  "models": [
+    {
+      "alias": "openai_gpt-5.4-nano",
+      "upstream": "openai/gpt-5.4-nano",
+      "custom_api_base_present": false
+    },
+    {
+      "alias": "openai_text_embedding_3_small",
+      "upstream": "openai/text-embedding-3-small",
+      "custom_api_base_present": false
+    }
+  ],
+  "fallback_configuration": {
+    "router_settings": {
+      "fallbacks": {
+        "configured": false,
+        "nonempty": false
+      },
+      "default_fallbacks": {
+        "configured": false,
+        "nonempty": false
+      },
+      "context_window_fallbacks": {
+        "configured": false,
+        "nonempty": false
+      },
+      "content_policy_fallbacks": {
+        "configured": false,
+        "nonempty": false
+      }
+    },
+    "litellm_settings": {
+      "fallbacks": {
+        "configured": false,
+        "nonempty": false
+      },
+      "default_fallbacks": {
+        "configured": false,
+        "nonempty": false
+      },
+      "context_window_fallbacks": {
+        "configured": false,
+        "nonempty": false
+      },
+      "content_policy_fallbacks": {
+        "configured": false,
+        "nonempty": false
+      }
+    }
+  },
+  "limits": [
+    "Config file is not proof of in-memory routing after dynamic changes.",
+    "No upstream failure injected; no service restarted or routing changed.",
+    "Classifier/generation/embedding success measured separately by Full Gate."
+  ],
+  "/model/info": {
+    "http_status": 200,
+    "selected_models": [
+      {
+        "alias": "openai_gpt-5.4-nano",
+        "upstream": "openai/gpt-5.4-nano"
+      },
+      {
+        "alias": "openai_text_embedding_3_small",
+        "upstream": "openai/text-embedding-3-small"
+      }
+    ]
+  },
+  "/router/settings": {
+    "http_status": 200,
+    "fallbacks": {
+      "fallbacks": {
+        "present": true,
+        "nonempty": false
+      },
+      "default_fallbacks": {
+        "present": false,
+        "nonempty": false
+      },
+      "context_window_fallbacks": {
+        "present": true,
+        "nonempty": false
+      },
+      "content_policy_fallbacks": {
+        "present": true,
+        "nonempty": false
+      }
+    },
+    "routing_strategy": "simple-shuffle",
+    "model_group_alias_nonempty": false,
+    "default_litellm_params_fallback_nonempty": false
+  },
+  "provider_failure_test": "NOT_TESTED live upstream; deterministic adapter failure tests PASS in supplemental suite"
+}

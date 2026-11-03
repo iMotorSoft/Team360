@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="4" time="0.233" timestamp="2026-10-30T08:45:21.088983-03:00" hostname="ubuntu24"><testcase classname="modules.telchi.datalake.tests.test_sales_promoted_binding" name="test_nominally_promoted_binding_accepted[args0]" time="0.051"><failure message="ValueError: invalid_sales_result">args = ('2026-09-01', '2026-10-01', '11079079.77', '488033.53', '10591046.24')
+
+    @pytest.mark.parametrize('args', [
+        ('2026-09-01', '2026-10-01', '11079079.77', '488033.53', '10591046.24'),
+        ('2026-10-01', '2026-10-30', '11269116.22', '457793.30', '10811322.92'),
+    ])
+    def test_nominally_promoted_binding_accepted(args):
+        options, result = envelope(*args)
+&gt;       assert sales.validate_result(sales.MONETARY_OPERATION, options, result) is result
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+modules/telchi/datalake/tests/test_sales_promoted_binding.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+operation = 'sales.period_billed_amount'
+options = {'currency': 'BS', 'date_from': '2026-09-01', 'date_to_exclusive': '2026-10-01'}
+result = {'capability': 'sales.period_billed_amount.v1', 'currency': 'BS', 'grain': 'document_header', 'period': {'currency': 'BS', 'date_from': '2026-09-01', 'date_to_exclusive': '2026-10-01'}, ...}
+
+    def validate_result(operation, options, result):
+        values = parameters(operation, options)
+        if (result.get('capability') != operation + '.v1' or result.get('read_only') is not True
+                or result.get('sap_accessed') is not False
+                or result.get('source', {}).get('publication_id') != PUBLICATION
+                or result.get('source', {}).get('snapshot_id') != SNAPSHOT
+                or result.get('sql_parameters') != values or not isinstance(result.get('rows'), list)):
+&gt;           raise ValueError('invalid_sales_result')
+E           ValueError: invalid_sales_result
+
+modules/telchi/datalake/sales_query.py:139: ValueError</failure></testcase><testcase classname="modules.telchi.datalake.tests.test_sales_promoted_binding" name="test_nominally_promoted_binding_accepted[args1]" time="0.001"><failure message="ValueError: invalid_sales_result">args = ('2026-10-01', '2026-10-30', '11269116.22', '457793.30', '10811322.92')
+
+    @pytest.mark.parametrize('args', [
+        ('2026-09-01', '2026-10-01', '11079079.77', '488033.53', '10591046.24'),
+        ('2026-10-01', '2026-10-30', '11269116.22', '457793.30', '10811322.92'),
+    ])
+    def test_nominally_promoted_binding_accepted(args):
+        options, result = envelope(*args)
+&gt;       assert sales.validate_result(sales.MONETARY_OPERATION, options, result) is result
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+modules/telchi/datalake/tests/test_sales_promoted_binding.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+operation = 'sales.period_billed_amount'
+options = {'currency': 'BS', 'date_from': '2026-10-01', 'date_to_exclusive': '2026-10-30'}
+result = {'capability': 'sales.period_billed_amount.v1', 'currency': 'BS', 'grain': 'document_header', 'period': {'currency': 'BS', 'date_from': '2026-10-01', 'date_to_exclusive': '2026-10-30'}, ...}
+
+    def validate_result(operation, options, result):
+        values = parameters(operation, options)
+        if (result.get('capability') != operation + '.v1' or result.get('read_only') is not True
+                or result.get('sap_accessed') is not False
+                or result.get('source', {}).get('publication_id') != PUBLICATION
+                or result.get('source', {}).get('snapshot_id') != SNAPSHOT
+                or result.get('sql_parameters') != values or not isinstance(result.get('rows'), list)):
+&gt;           raise ValueError('invalid_sales_result')
+E           ValueError: invalid_sales_result
+
+modules/telchi/datalake/sales_query.py:139: ValueError</failure></testcase><testcase classname="modules.telchi.datalake.tests.test_sales_promoted_binding" name="test_stale_or_unapproved_binding_still_rejected[foundation_afd08d9eca6a725be53cdc3f9d5709c9]" time="0.001"><failure message="Failed: DID NOT RAISE &lt;class 'ValueError'&gt;">publication = 'foundation_afd08d9eca6a725be53cdc3f9d5709c9'
+
+    @pytest.mark.parametrize('publication', [PREVIOUS, 'foundation_unapproved'])
+    def test_stale_or_unapproved_binding_still_rejected(publication):
+        options, result = envelope('2026-09-01', '2026-10-01', '100', '10', '90')
+        result['source']['publication_id'] = publication
+&gt;       with pytest.raises(ValueError, match='invalid_sales_result'):
+E       Failed: DID NOT RAISE &lt;class 'ValueError'&gt;
+
+modules/telchi/datalake/tests/test_sales_promoted_binding.py:37: Failed</failure></testcase><testcase classname="modules.telchi.datalake.tests.test_sales_promoted_binding" name="test_stale_or_unapproved_binding_still_rejected[foundation_unapproved]" time="0.001" /></testsuite></testsuites>

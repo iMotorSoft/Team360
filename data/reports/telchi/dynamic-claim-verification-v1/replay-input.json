@@ -1,0 +1,5751 @@
+{
+  "question": "Durante 2026, ¿en qué mes vendimos más materias primas y cuál fue el cliente al que más le vendimos en ese mes?",
+  "current_date": "2026-10-28",
+  "conversation": [],
+  "catalog": {
+    "dataset": "telchi_authorized_foundation_dev_v1",
+    "organization": "TELCHI",
+    "workspace": "foundation_supervised_dev",
+    "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot": "1408",
+    "tables": [
+      {
+        "name": "credit_memo_document",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_table",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "create_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "update_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canceled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total_foreign",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "series",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "user_sign",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_semantic_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "credit_memo_line",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_table",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "whs_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total_foreign",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "attributed_slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_line",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "material_actual_consumption",
+        "columns": [
+          {
+            "name": "actual_consumption_qty",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "consumption_basis",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "window_end",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "window_start",
+            "sql_type": "DATE",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "material_equivalent_demand",
+        "columns": [
+          {
+            "name": "commercial_daily_equivalent_basis_qty",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "demand_window_end",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "demand_window_start",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "derived_product_raw_material_equivalent",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "direct_raw_material_demand",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "material_lead_time_profile",
+        "columns": [
+          {
+            "name": "confidence",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "lead_time_basis",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "lineage_coverage",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "p50_days",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "p90_days",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "procurement_origin",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sample_count",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "supplier",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "material_supply_status",
+        "columns": [
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "actual_daily_consumption",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "commercial_daily_equivalent_demand",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "committed",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "coverage_band",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "coverage_basis",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "coverage_confidence",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "coverage_days",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "current_stock",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "global_stock_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "global_stockout",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "global_usable_stock",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "inventory_uom",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "is_raw_material",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "item_activity_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "lead_time_basis",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "lead_time_confidence",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "lead_time_days",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "local_stockout",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "material_class",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "material_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "on_order",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "open_po_destination",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "open_po_expected_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "open_po_origin",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "open_po_qty",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "open_po_to_saa",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "other_location_stock",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "other_location_usable_stock",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "procurement_profile",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "production_site",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "recent_saa_consumption",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "recent_saa_m1_movement",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "replenishment_gap_days",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "saa_active_bom",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "saa_m1_history",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "saa_production_link",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "saavedra_relevance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "saavedra_relevance_basis",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "saavedra_relevance_confidence",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "supply_risk",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "target_warehouse_usable_stock",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "warehouse",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "open_purchase_pipeline",
+        "columns": [
+          {
+            "name": "destination_warehouse",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "expected_arrival_source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "expected_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "first_receipt_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "open_qty_source",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "ordered_qty",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "po_docdate",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "po_docentry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "po_linenum",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "procurement_origin",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "receipt_lineage_confidence",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "receipt_lineage_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "received_qty_supported",
+            "sql_type": "DOUBLE",
+            "nullable": true
+          },
+          {
+            "name": "supplier",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "inventory_movement",
+        "columns": [
+          {
+            "name": "canonical_inventory_movement_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_table",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "trans_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "trans_seq",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "instance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "trans_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_ref",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "in_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "out_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "movement_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "price",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "calc_price",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "trans_value",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "created_by",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "app_obj_abs",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "app_obj_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "ref1",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "ref2",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "comments",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "jrnl_memo",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_due_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_time",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "dscription",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "balance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "user_sign",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "appl_obj",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "app_obj_line",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "inventory_balance",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_table",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "whs_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "on_hand",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "is_commited",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "on_order",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ap_invoice",
+        "columns": [
+          {
+            "name": "base_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_line",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canceled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "comments",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "doc_due_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_at_card",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_per_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "object_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "open_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "price",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "ship_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "snapshot_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_json",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_row_hash",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tipo_compra",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "unit_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "uom_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ap_invoice_line",
+        "columns": [
+          {
+            "name": "base_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_line",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canceled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "comments",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "conversion_provenance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "conversion_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "doc_due_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_at_card",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_per_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "object_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "open_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "price",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "ship_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "snapshot_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_json",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_row_hash",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tipo_compra",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "unit_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "uom_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "purchase_inventory_receipt",
+        "columns": [
+          {
+            "name": "base_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_ref",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_ref_candidate_documents",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "business_warehouse_location",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "candidate_count",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "collision_detected",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "conversion_provenance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "direction",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "doc_line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_line_warehouse",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "effective_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "in_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "movement_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "movement_key",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "out_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "provenance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "purchasing_doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "purchasing_line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "quantity_match_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "resolution_method",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "resolution_reason",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "resolution_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "root_resolution_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_line_quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_line_uom",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "target_entity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "trans_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_mapping_provenance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_mapping_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_match_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "purchase_order",
+        "columns": [
+          {
+            "name": "base_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_line",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canceled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "comments",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "doc_due_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_at_card",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_per_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "object_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "open_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "price",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "ship_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "snapshot_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_json",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_row_hash",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tipo_compra",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "unit_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "uom_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "purchase_order_line",
+        "columns": [
+          {
+            "name": "base_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_line",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canceled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "comments",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "conversion_provenance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "conversion_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "doc_due_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_at_card",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_per_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "object_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "open_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "price",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "ship_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "snapshot_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_json",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_row_hash",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tipo_compra",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "unit_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "uom_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "purchase_receipt",
+        "columns": [
+          {
+            "name": "base_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_line",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canceled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "comments",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "doc_due_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_at_card",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_per_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "object_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "open_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "price",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "ship_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "snapshot_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_json",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_row_hash",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tipo_compra",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "unit_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "uom_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "purchase_receipt_line",
+        "columns": [
+          {
+            "name": "base_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_line",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canceled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "comments",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "conversion_provenance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "conversion_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "TIMESTAMP",
+            "nullable": true
+          },
+          {
+            "name": "doc_due_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_at_card",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "num_per_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "object_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "open_qty",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "price",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "ship_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "snapshot_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_json",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_row_hash",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tipo_compra",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "unit_msr",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "uom_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "purchasing_document_lineage",
+        "columns": [
+          {
+            "name": "base_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_line",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "base_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "edge_resolution_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "effective_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_match_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "lineage_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "provenance",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "relation_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "resolution_method",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "resolution_reason",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "resolution_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "snapshot_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_document_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "target_doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "target_document_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "target_line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "uom_match_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "collection_method_fact",
+        "columns": [
+          {
+            "name": "payment_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "payment_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "customer_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "collection_method",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_component_amount",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "source_component_foreign",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "source_component_system",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "source_component_rows",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "cancelled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "pay_no_document",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "on_account_amount_local",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "effective_amount_local",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "effective_amount_system",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "payment_method_component_count",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "is_mixed_payment",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "board_currency_basis",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "commercial_term_classification",
+        "columns": [
+          {
+            "name": "payment_term_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "payment_term_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "pay_due_month",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "extra_months",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "extra_days",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "payment_count",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "installment_count",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "baseline_date_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tolerance_days",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "cash_relevant_source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "commercial_term_class",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "receivable_settlement_status",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "document_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "customer_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "document_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "due_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "document_total_local",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "document_total_foreign",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "document_total_system",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "economic_reduction_local",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "economic_reduction_system",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "payment_settlement_effect_local",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "credit_memo_settlement_effect_local",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "internal_reconciliation_effect_local",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "multi_source_reconciliation_effect_local",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "open_amount_local",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "open_amount_system",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "settlement_state",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "fully_settled_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "days_document_to_full_settlement",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "days_due_to_full_settlement",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "payment_term_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "salesperson_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "branch_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "cancelled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "cancel_date",
+            "sql_type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "board_currency_basis",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_branches",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "branch_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_brand",
+        "columns": [
+          {
+            "name": "brand_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "semantic_version",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_business_locations",
+        "columns": [
+          {
+            "name": "business_location_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "business_location_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "mapping_source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_business_unit",
+        "columns": [
+          {
+            "name": "business_unit_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "semantic_version",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_currencies",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "legal_entity_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "decimal_places",
+            "sql_type": "INTEGER",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_customer_business_type",
+        "columns": [
+          {
+            "name": "customer_business_type_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "semantic_version",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_customers",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "customer_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "branch_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tax_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "credit_limit",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "payment_term_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_card_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_group_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_valid_for",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_frozen_for",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_update_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_document_types",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "document_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "company_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_entity_alias",
+        "columns": [
+          {
+            "name": "entity_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canonical_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "alias",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "normalized_alias",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "alias_source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "priority",
+            "sql_type": "INTEGER",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(38,12)",
+            "nullable": true
+          },
+          {
+            "name": "resolution_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_operating_domain",
+        "columns": [
+          {
+            "name": "operating_domain_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "semantic_version",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_operating_model",
+        "columns": [
+          {
+            "name": "operating_model_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "semantic_version",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_party",
+        "columns": [
+          {
+            "name": "party_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "party_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_payment_terms",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "payment_term_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "branch_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "credit_days",
+            "sql_type": "INTEGER",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_portfolio_family",
+        "columns": [
+          {
+            "name": "portfolio_family_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "semantic_version",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_product_business_type",
+        "columns": [
+          {
+            "name": "product_business_type_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "semantic_version",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_production_site",
+        "columns": [
+          {
+            "name": "production_site_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "semantic_version",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_products",
+        "columns": [
+          {
+            "name": "canonical_product_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canonical_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "product_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "inventory_uom_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_uom_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "purchase_uom_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_item_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_valid_for",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_frozen_for",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_invnt_item",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_sell_item",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_prchse_item",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_itms_grp_cod",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_update_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_sales_channel",
+        "columns": [
+          {
+            "name": "sales_channel_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "active",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "DECIMAL(10,6)",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "semantic_version",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_salespersons",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "salesperson_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "branch_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "salesperson_active",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "salesperson_category_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "salesperson_category_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "is_corporate",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_category_source_label",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_suppliers",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "supplier_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "branch_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tax_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "payment_term_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_card_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_group_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_valid_for",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_frozen_for",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_update_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_units_of_measure",
+        "columns": [
+          {
+            "name": "canonical_uom_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canonical_uom_label",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "physical_dimension",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "mapping_source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_users",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "user_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "organizational_scope",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_warehouse_roles",
+        "columns": [
+          {
+            "name": "warehouse_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "production_site",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_role",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "usable_for_supply_stock",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "classification_source",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "classification_evidence",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "confidence",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "valid_from",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "valid_to",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "ref_warehouses",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_native_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "warehouse_role_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_locked",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_inactive",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_branch_office_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_warehouse_dms",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sap_update_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "sales_document",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_table",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_due_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "tax_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "canceled",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_total_foreign",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "series",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "user_sign",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_semantic_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "sales_line",
+        "columns": [
+          {
+            "name": "source_system",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_table",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "whs_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "quantity",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "price",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "attributed_slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "product_business_classification",
+        "columns": [
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "product_business_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "classification_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "rule_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "classification_evidence",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      },
+      {
+        "name": "sales_operation",
+        "columns": [
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_month",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "card_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "is_raw_material",
+            "sql_type": "BOOLEAN",
+            "nullable": true
+          },
+          {
+            "name": "material_class",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "material_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "product_business_type",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "classification_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "rule_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published schema; business grain and completeness require independent checks."
+        ]
+      }
+    ],
+    "known_relations": [],
+    "synthetic_only": false
+  },
+  "observations": [
+    {
+      "turn": 1,
+      "objective": "Descubrir la cobertura mensual de 2026, las monedas y los valores exactos de la clasificación canónica de producto antes de identificar el mes líder de materias primas.",
+      "hypothesis": "La clasificación canónica contiene una categoría identificable de materias primas y permite comparar sus importes mensuales en BS.",
+      "evidence_manifest": {
+        "result_id": "392a5a6fcbd7418184357a34",
+        "query_id": "1790002b2789b3d354b384e939a3befc39a9d4cac1ffcb35fc180b63083a2e2c",
+        "execution_version": "2d293d9f717145749ab0d495",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "dc677d7ee0cbee585bb2c65a",
+            "alias": "doc_month",
+            "sql_type": "VARCHAR",
+            "expression": "doc_month",
+            "source_fields": [
+              "sales_operation.doc_month"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [
+              "doc_month"
+            ],
+            "unit": null,
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "50d1ff3348f1d72380f3cae5",
+            "alias": "currency",
+            "sql_type": "VARCHAR",
+            "expression": "currency",
+            "source_fields": [
+              "sales_operation.currency"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [
+              "currency"
+            ],
+            "unit": null,
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "868fcf076bd4c370a4fc27d5",
+            "alias": "product_business_type",
+            "sql_type": "VARCHAR",
+            "expression": "product_business_type",
+            "source_fields": [
+              "sales_operation.product_business_type"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [
+              "product_business_type"
+            ],
+            "unit": null,
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "line_count",
+            "sql_type": "BIGINT",
+            "expression": "count(doc_entry)",
+            "source_fields": [
+              "sales_operation.doc_entry"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_count",
+            "metric_definition": "Count of source commercial lines in the identified result group.",
+            "grain": "commercial_line",
+            "transformations": [
+              "count(doc_entry)"
+            ],
+            "unit": "lines",
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "line_amount",
+            "sql_type": "DECIMAL(38,6)",
+            "expression": "sum(line_total)",
+            "source_fields": [
+              "sales_operation.line_total"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_amount_bs",
+            "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+            "grain": "commercial_line",
+            "transformations": [
+              "sum(line_total)"
+            ],
+            "unit": "money",
+            "currency": "BS",
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          }
+        ],
+        "row_ids": [
+          "68c35a8a3d8c4fc5af3e7284",
+          "5e857c84dd0e4e9394468256",
+          "77dc328fdfa04a20af6b05a9",
+          "7f820de8e366475f992a5fa2",
+          "c31759f573ae4237a917b8e8",
+          "831e5f541ea448e59fae599b",
+          "555fab1378d240ac8bef33bf",
+          "c471c1c9e5cb4b0f9d82004e",
+          "e031f62712fe4bef891976d8",
+          "def44588e74747f2bb4bd805",
+          "fb9a181685694a3f9114c453",
+          "6f1b7def30504090b483e549",
+          "1030d432f8c443cfa5d38f64",
+          "0bcb4e8fdd0249ac84ad2447",
+          "40099cd79f274d0ab4708963",
+          "52b49d95c2e947f0b55afd79",
+          "b161a4ad2dbe499a8fd88288",
+          "b60c76f26f6142409f2794cc",
+          "f3c4370fa54f45ee84be38b2",
+          "af8ef0db7d9f45ab9081d3cb",
+          "b17ef50168f249a7bd49d1d2",
+          "0501c7e5555c4bc3aafa6d8a",
+          "40f79e13028e4d2fa660c421",
+          "88b61aa11b1f4099a175e5cd",
+          "42bf6290c73d4437ac56dee1",
+          "d2a9e65f239e49059077de42",
+          "f9bfc040e31142269032f421",
+          "31a160eb15794a62a496ef96",
+          "ee8fa53f14e04afb8c2e6952",
+          "18e977508c754e6f84cb570d"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_GREATERTHANOREQUALTO \"2026-01\",doc_month COMPARE_LESSTHANOREQUALTO \"2026-12\")",
+        "group_expressions": [
+          "doc_month",
+          "currency",
+          "product_business_type"
+        ],
+        "limitations": [
+          "Current materialized publication, not certified historical classification.",
+          "Published rows only; complete calendar coverage is not certified.",
+          "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+          "No classifier rule/version or causal mechanism is accredited.",
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW",
+        "reason": "structurally_valid_supervised_foundation",
+        "query_id": "1790002b2789b3d354b384e939a3befc39a9d4cac1ffcb35fc180b63083a2e2c",
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "schema": [
+        {
+          "name": "doc_month",
+          "sql_type": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "name": "currency",
+          "sql_type": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "name": "product_business_type",
+          "sql_type": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "name": "line_count",
+          "sql_type": "BIGINT",
+          "nullable": true
+        },
+        {
+          "name": "line_amount",
+          "sql_type": "DECIMAL(38,6)",
+          "nullable": true
+        }
+      ],
+      "rows": [
+        [
+          "2026-01",
+          "BS",
+          "FRACTIONATED_PRODUCT",
+          842,
+          "85161.830000"
+        ],
+        [
+          "2026-01",
+          "BS",
+          "OTHER_INPUT",
+          54,
+          "6782.540000"
+        ],
+        [
+          "2026-01",
+          "BS",
+          "PACKAGING",
+          829,
+          "61022.000000"
+        ],
+        [
+          "2026-01",
+          "BS",
+          "RAW_MATERIAL",
+          564,
+          "836764.380000"
+        ],
+        [
+          "2026-01",
+          "BS",
+          "TRADED_PRODUCT",
+          5979,
+          "710837.250000"
+        ],
+        [
+          "2026-01",
+          "BS",
+          null,
+          75020,
+          "8663069.460000"
+        ],
+        [
+          "2026-02",
+          "",
+          null,
+          1,
+          "0.000000"
+        ],
+        [
+          "2026-02",
+          "BS",
+          "FRACTIONATED_PRODUCT",
+          693,
+          "72320.010000"
+        ],
+        [
+          "2026-02",
+          "BS",
+          "OTHER_INPUT",
+          63,
+          "6664.660000"
+        ],
+        [
+          "2026-02",
+          "BS",
+          "PACKAGING",
+          1230,
+          "112725.090000"
+        ],
+        [
+          "2026-02",
+          "BS",
+          "RAW_MATERIAL",
+          457,
+          "684884.050000"
+        ],
+        [
+          "2026-02",
+          "BS",
+          "TRADED_PRODUCT",
+          5896,
+          "754512.090000"
+        ],
+        [
+          "2026-02",
+          "BS",
+          null,
+          65707,
+          "6472720.410000"
+        ],
+        [
+          "2026-03",
+          "BS",
+          "FRACTIONATED_PRODUCT",
+          783,
+          "129340.100000"
+        ],
+        [
+          "2026-03",
+          "BS",
+          "OTHER_INPUT",
+          133,
+          "9675.240000"
+        ],
+        [
+          "2026-03",
+          "BS",
+          "PACKAGING",
+          878,
+          "69255.450000"
+        ],
+        [
+          "2026-03",
+          "BS",
+          "RAW_MATERIAL",
+          562,
+          "805645.790000"
+        ],
+        [
+          "2026-03",
+          "BS",
+          "TRADED_PRODUCT",
+          7057,
+          "839090.110000"
+        ],
+        [
+          "2026-03",
+          "BS",
+          null,
+          78248,
+          "7396214.270000"
+        ],
+        [
+          "2026-04",
+          "BS",
+          "FRACTIONATED_PRODUCT",
+          669,
+          "82575.570000"
+        ],
+        [
+          "2026-04",
+          "BS",
+          "OTHER_INPUT",
+          78,
+          "10164.230000"
+        ],
+        [
+          "2026-04",
+          "BS",
+          "PACKAGING",
+          800,
+          "273330.020000"
+        ],
+        [
+          "2026-04",
+          "BS",
+          "RAW_MATERIAL",
+          490,
+          "510646.560000"
+        ],
+        [
+          "2026-04",
+          "BS",
+          "TRADED_PRODUCT",
+          6557,
+          "786247.710000"
+        ],
+        [
+          "2026-04",
+          "BS",
+          null,
+          78157,
+          "7113154.230000"
+        ],
+        [
+          "2026-05",
+          "BS",
+          "FRACTIONATED_PRODUCT",
+          609,
+          "88459.170000"
+        ],
+        [
+          "2026-05",
+          "BS",
+          "OTHER_INPUT",
+          86,
+          "8138.830000"
+        ],
+        [
+          "2026-05",
+          "BS",
+          "PACKAGING",
+          1853,
+          "73282.220000"
+        ],
+        [
+          "2026-05",
+          "BS",
+          "RAW_MATERIAL",
+          505,
+          "574895.450000"
+        ],
+        [
+          "2026-05",
+          "BS",
+          "TRADED_PRODUCT",
+          7915,
+          "1029494.180000"
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": true,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed"
+    },
+    {
+      "turn": 2,
+      "objective": "Identificar el mes de 2026 con mayor importe comercial de materias primas en BS.",
+      "hypothesis": "El mes líder de ventas de materias primas puede determinarse directamente agrupando sales_operation por doc_month.",
+      "evidence_manifest": {
+        "result_id": "364e815422144300863544ae",
+        "query_id": "2f07a21dff320b9d33f2cefb59a2ade1a0e40d97084b97723a934e2bba21b006",
+        "execution_version": "da7f58df721b49188a2b4ccd",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "dc677d7ee0cbee585bb2c65a",
+            "alias": "doc_month",
+            "sql_type": "VARCHAR",
+            "expression": "doc_month",
+            "source_fields": [
+              "sales_operation.doc_month"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [
+              "doc_month"
+            ],
+            "unit": null,
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "line_amount",
+            "sql_type": "DECIMAL(38,6)",
+            "expression": "sum(line_total)",
+            "source_fields": [
+              "sales_operation.line_total"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_amount_bs",
+            "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+            "grain": "commercial_line",
+            "transformations": [
+              "sum(line_total)"
+            ],
+            "unit": "money",
+            "currency": "BS",
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "line_count",
+            "sql_type": "BIGINT",
+            "expression": "count(doc_entry)",
+            "source_fields": [
+              "sales_operation.doc_entry"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_count",
+            "metric_definition": "Count of source commercial lines in the identified result group.",
+            "grain": "commercial_line",
+            "transformations": [
+              "count(doc_entry)"
+            ],
+            "unit": "lines",
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          }
+        ],
+        "row_ids": [
+          "19b675613d86475298b7f40e",
+          "6a948dde29e04944ab6177de",
+          "3c1b17ff5b8c4edd887afd81",
+          "dd5bda1f00a84cb88af11e94",
+          "cd8fa804662f4b148c0a71e7",
+          "0a73279e943549f79058d862",
+          "99f98ade8fe14caf8e410307",
+          "3c9b107a880346a78ebaf422",
+          "86e102c337a74be1bd6a0d75"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_GREATERTHANOREQUALTO \"2026-01\",doc_month COMPARE_LESSTHANOREQUALTO \"2026-12\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [
+          "doc_month"
+        ],
+        "limitations": [
+          "Current materialized publication, not certified historical classification.",
+          "Published rows only; complete calendar coverage is not certified.",
+          "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+          "No classifier rule/version or causal mechanism is accredited.",
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW",
+        "reason": "structurally_valid_supervised_foundation",
+        "query_id": "2f07a21dff320b9d33f2cefb59a2ade1a0e40d97084b97723a934e2bba21b006",
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "schema": [
+        {
+          "name": "doc_month",
+          "sql_type": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "name": "line_amount",
+          "sql_type": "DECIMAL(38,6)",
+          "nullable": true
+        },
+        {
+          "name": "line_count",
+          "sql_type": "BIGINT",
+          "nullable": true
+        }
+      ],
+      "rows": [
+        [
+          "2026-08",
+          "853568.450000",
+          501
+        ],
+        [
+          "2026-09",
+          "839582.630000",
+          526
+        ],
+        [
+          "2026-01",
+          "836764.380000",
+          564
+        ],
+        [
+          "2026-03",
+          "805645.790000",
+          562
+        ],
+        [
+          "2026-07",
+          "759227.580000",
+          565
+        ],
+        [
+          "2026-06",
+          "751320.740000",
+          564
+        ],
+        [
+          "2026-02",
+          "684884.050000",
+          457
+        ],
+        [
+          "2026-05",
+          "574895.450000",
+          505
+        ],
+        [
+          "2026-04",
+          "510646.560000",
+          490
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": false,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed"
+    },
+    {
+      "turn": 3,
+      "objective": "Identificar el cliente con mayor importe comercial de materias primas en el mes líder de 2026.",
+      "hypothesis": "Un cliente concentra el mayor importe comercial de materias primas en agosto de 2026.",
+      "evidence_manifest": {
+        "result_id": "3217a26b1a0b465db9a173f7",
+        "query_id": "6ca8e0119975748dee2d634ddc160b078ab73f41fd4218e6333e9ba01f181f5f",
+        "execution_version": "d24aeb3622ba4c66ba490dc5",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "0f8e33657775e57354564c1e",
+            "alias": "card_code",
+            "sql_type": "VARCHAR",
+            "expression": "card_code",
+            "source_fields": [
+              "sales_operation.card_code"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [
+              "card_code"
+            ],
+            "unit": null,
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "1e6594e48181f4ad91e979c8",
+            "alias": "card_name",
+            "sql_type": "VARCHAR",
+            "expression": "card_name",
+            "source_fields": [
+              "sales_operation.card_name"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [
+              "card_name"
+            ],
+            "unit": null,
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "line_amount",
+            "sql_type": "DECIMAL(38,6)",
+            "expression": "sum(line_total)",
+            "source_fields": [
+              "sales_operation.line_total"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_amount_bs",
+            "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+            "grain": "commercial_line",
+            "transformations": [
+              "sum(line_total)"
+            ],
+            "unit": "money",
+            "currency": "BS",
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "line_count",
+            "sql_type": "BIGINT",
+            "expression": "count(doc_entry)",
+            "source_fields": [
+              "sales_operation.doc_entry"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_count",
+            "metric_definition": "Count of source commercial lines in the identified result group.",
+            "grain": "commercial_line",
+            "transformations": [
+              "count(doc_entry)"
+            ],
+            "unit": "lines",
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          }
+        ],
+        "row_ids": [
+          "075e8ea546624b29a7c0281c",
+          "7ae14ae6168e421588dca2e1",
+          "46ad053d04ba40d7be329e84"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_EQUAL \"2026-08\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [
+          "card_code",
+          "card_name"
+        ],
+        "limitations": [
+          "Current materialized publication, not certified historical classification.",
+          "Published rows only; complete calendar coverage is not certified.",
+          "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+          "No classifier rule/version or causal mechanism is accredited.",
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW",
+        "reason": "structurally_valid_supervised_foundation",
+        "query_id": "6ca8e0119975748dee2d634ddc160b078ab73f41fd4218e6333e9ba01f181f5f",
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "schema": [
+        {
+          "name": "card_code",
+          "sql_type": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "name": "card_name",
+          "sql_type": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "name": "line_amount",
+          "sql_type": "DECIMAL(38,6)",
+          "nullable": true
+        },
+        {
+          "name": "line_count",
+          "sql_type": "BIGINT",
+          "nullable": true
+        }
+      ],
+      "rows": [
+        [
+          "C012100",
+          "NUTRI-MIX S.R.L.",
+          "139200.000000",
+          2
+        ],
+        [
+          "C005843",
+          "CORPOLAB LTDA",
+          "85956.000000",
+          1
+        ],
+        [
+          "C000340",
+          "CERVECERIA NACIONAL POTOSI LTDA.",
+          "75690.000000",
+          2
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": false,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed"
+    },
+    {
+      "turn": 4,
+      "objective": "Confirmar directamente el cliente con mayor importe comercial facturado de materias primas en agosto de 2026.",
+      "hypothesis": "NUTRI-MIX S.R.L. (C012100) es el cliente con mayor importe comercial de materias primas en agosto de 2026.",
+      "evidence_manifest": {
+        "result_id": "999a43ea9fd34c55ad5ae1f9",
+        "query_id": "596439ffaa3d50130da20044dafb1ce74fb0cff72c100211848a30cdfb373335",
+        "execution_version": "5d27417d997e43749f80f93e",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "0f8e33657775e57354564c1e",
+            "alias": "card_code",
+            "sql_type": "VARCHAR",
+            "expression": "card_code",
+            "source_fields": [
+              "sales_operation.card_code"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [
+              "card_code"
+            ],
+            "unit": null,
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "1e6594e48181f4ad91e979c8",
+            "alias": "card_name",
+            "sql_type": "VARCHAR",
+            "expression": "card_name",
+            "source_fields": [
+              "sales_operation.card_name"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [
+              "card_name"
+            ],
+            "unit": null,
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "line_amount",
+            "sql_type": "DECIMAL(38,6)",
+            "expression": "sum(line_total)",
+            "source_fields": [
+              "sales_operation.line_total"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_amount_bs",
+            "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+            "grain": "commercial_line",
+            "transformations": [
+              "sum(line_total)"
+            ],
+            "unit": "money",
+            "currency": "BS",
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "line_count",
+            "sql_type": "BIGINT",
+            "expression": "count(doc_entry)",
+            "source_fields": [
+              "sales_operation.doc_entry"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_count",
+            "metric_definition": "Count of source commercial lines in the identified result group.",
+            "grain": "commercial_line",
+            "transformations": [
+              "count(doc_entry)"
+            ],
+            "unit": "lines",
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          }
+        ],
+        "row_ids": [
+          "e80cdcfd75dc446ca36f0240"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_EQUAL \"2026-08\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [
+          "card_code",
+          "card_name"
+        ],
+        "limitations": [
+          "Current materialized publication, not certified historical classification.",
+          "Published rows only; complete calendar coverage is not certified.",
+          "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+          "No classifier rule/version or causal mechanism is accredited.",
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW",
+        "reason": "structurally_valid_supervised_foundation",
+        "query_id": "596439ffaa3d50130da20044dafb1ce74fb0cff72c100211848a30cdfb373335",
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "schema": [
+        {
+          "name": "card_code",
+          "sql_type": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "name": "card_name",
+          "sql_type": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "name": "line_amount",
+          "sql_type": "DECIMAL(38,6)",
+          "nullable": true
+        },
+        {
+          "name": "line_count",
+          "sql_type": "BIGINT",
+          "nullable": true
+        }
+      ],
+      "rows": [
+        [
+          "C012100",
+          "NUTRI-MIX S.R.L.",
+          "139200.000000",
+          2
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": false,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed"
+    },
+    {
+      "status": "INDEPENDENT_VERIFICATION_DISCREPANCY",
+      "rejected_claims": [
+        {
+          "claim": {
+            "kind": "measure",
+            "result_id": "364e815422144300863544ae",
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "row_id": "19b675613d86475298b7f40e",
+            "metric": "line_amount_bs",
+            "value": "853568.450000",
+            "unit": "money",
+            "currency": "BS",
+            "grain": "commercial_line",
+            "classification": "observed",
+            "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+            "snapshot": "1408",
+            "temporal_scope": [
+              "published_rows",
+              "not_complete_calendar"
+            ]
+          },
+          "state": "UNVERIFIED",
+          "match": false,
+          "reason": "independent_raw_population_or_semantics_not_accredited",
+          "required": "Use issued evidence IDs and observed semantics; revise, query, or withdraw. Causality requires accredited mechanism evidence.",
+          "evidence": [
+            {
+              "result_id": "364e815422144300863544ae",
+              "column": {
+                "column_id": "8c8b1c8acf2617dccf8c134b",
+                "alias": "line_amount",
+                "sql_type": "DECIMAL(38,6)",
+                "expression": "sum(line_total)",
+                "source_fields": [
+                  "sales_operation.line_total"
+                ],
+                "source_or_calculation": "CALCULATION",
+                "metric": "line_amount_bs",
+                "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+                "grain": "commercial_line",
+                "transformations": [
+                  "sum(line_total)"
+                ],
+                "unit": "money",
+                "currency": "BS",
+                "classification": "DERIVED_NOT_OFFICIAL",
+                "limitations": []
+              },
+              "row_id": "19b675613d86475298b7f40e",
+              "observed": "853568.450000"
+            }
+          ]
+        },
+        {
+          "claim": {
+            "kind": "measure",
+            "result_id": "999a43ea9fd34c55ad5ae1f9",
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "row_id": "e80cdcfd75dc446ca36f0240",
+            "metric": "line_amount_bs",
+            "value": "139200.000000",
+            "unit": "money",
+            "currency": "BS",
+            "grain": "commercial_line",
+            "classification": "observed",
+            "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+            "snapshot": "1408",
+            "temporal_scope": [
+              "published_rows",
+              "not_complete_calendar"
+            ]
+          },
+          "state": "UNVERIFIED",
+          "match": false,
+          "reason": "independent_raw_population_or_semantics_not_accredited",
+          "required": "Use issued evidence IDs and observed semantics; revise, query, or withdraw. Causality requires accredited mechanism evidence.",
+          "evidence": [
+            {
+              "result_id": "999a43ea9fd34c55ad5ae1f9",
+              "column": {
+                "column_id": "8c8b1c8acf2617dccf8c134b",
+                "alias": "line_amount",
+                "sql_type": "DECIMAL(38,6)",
+                "expression": "sum(line_total)",
+                "source_fields": [
+                  "sales_operation.line_total"
+                ],
+                "source_or_calculation": "CALCULATION",
+                "metric": "line_amount_bs",
+                "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+                "grain": "commercial_line",
+                "transformations": [
+                  "sum(line_total)"
+                ],
+                "unit": "money",
+                "currency": "BS",
+                "classification": "DERIVED_NOT_OFFICIAL",
+                "limitations": []
+              },
+              "row_id": "e80cdcfd75dc446ca36f0240",
+              "observed": "139200.000000"
+            }
+          ]
+        }
+      ],
+      "instruction": "Reconsider the hypothesis using the contradiction. Choose a new query, correct semantics or explicitly withdraw. No expected business answer is supplied."
+    },
+    {
+      "turn": 5,
+      "objective": "Verificar de forma directa y no agrupada el importe total de materias primas en BS en agosto de 2026, después de la discrepancia de acreditación del resultado agrupado.",
+      "hypothesis": "El total directo de materias primas en BS en agosto de 2026 coincide con el total observado previamente de 853568.450000 BS.",
+      "evidence_manifest": {
+        "result_id": "dd0bf552126241248abd1633",
+        "query_id": "24f8c352f59951ef350f5322972404b2ea728db67c5b28493dcadb7f03cd3bd4",
+        "execution_version": "4a309edb04a741ef886ebef6",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "aggregate_of_authorized_subset",
+        "columns": [
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "total_amount_bs",
+            "sql_type": "DECIMAL(38,6)",
+            "expression": "sum(line_total)",
+            "source_fields": [
+              "sales_operation.line_total"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_amount_bs",
+            "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+            "grain": "commercial_line",
+            "transformations": [
+              "sum(line_total)"
+            ],
+            "unit": "money",
+            "currency": "BS",
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "total_line_count",
+            "sql_type": "BIGINT",
+            "expression": "count(doc_entry)",
+            "source_fields": [
+              "sales_operation.doc_entry"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_count",
+            "metric_definition": "Count of source commercial lines in the identified result group.",
+            "grain": "commercial_line",
+            "transformations": [
+              "count(doc_entry)"
+            ],
+            "unit": "lines",
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          }
+        ],
+        "row_ids": [
+          "1c98fd6fdaac4332bcd7f0ab"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_EQUAL \"2026-08\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [],
+        "limitations": [
+          "Current materialized publication, not certified historical classification.",
+          "Published rows only; complete calendar coverage is not certified.",
+          "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+          "No classifier rule/version or causal mechanism is accredited.",
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW",
+        "reason": "structurally_valid_supervised_foundation",
+        "query_id": "24f8c352f59951ef350f5322972404b2ea728db67c5b28493dcadb7f03cd3bd4",
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "schema": [
+        {
+          "name": "total_amount_bs",
+          "sql_type": "DECIMAL(38,6)",
+          "nullable": true
+        },
+        {
+          "name": "total_line_count",
+          "sql_type": "BIGINT",
+          "nullable": true
+        }
+      ],
+      "rows": [
+        [
+          "853568.450000",
+          501
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": false,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed"
+    },
+    {
+      "turn": 6,
+      "objective": "Determinar de forma completa el mes de 2026 con mayor venta de materias primas en BS.",
+      "hypothesis": "Un mes de 2026 concentra el máximo importe de line_total de materias primas en BS; el ranking observado previamente no es suficiente para identificarlo.",
+      "evidence_manifest": {
+        "result_id": "41e4c6b3d1d640d8b9644050",
+        "query_id": "fb28127ec1f462ada4d0d42584f3cb3d19690914c02a96def8a9049df6a1d221",
+        "execution_version": "a13c08d3efb848ba808ac3be",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "dc677d7ee0cbee585bb2c65a",
+            "alias": "doc_month",
+            "sql_type": "VARCHAR",
+            "expression": "doc_month",
+            "source_fields": [
+              "sales_operation.doc_month"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [
+              "doc_month"
+            ],
+            "unit": null,
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "total_amount_bs",
+            "sql_type": "DECIMAL(38,6)",
+            "expression": "sum(line_total)",
+            "source_fields": [
+              "sales_operation.line_total"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_amount_bs",
+            "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+            "grain": "commercial_line",
+            "transformations": [
+              "sum(line_total)"
+            ],
+            "unit": "money",
+            "currency": "BS",
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "total_line_count",
+            "sql_type": "BIGINT",
+            "expression": "count(doc_entry)",
+            "source_fields": [
+              "sales_operation.doc_entry"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_count",
+            "metric_definition": "Count of source commercial lines in the identified result group.",
+            "grain": "commercial_line",
+            "transformations": [
+              "count(doc_entry)"
+            ],
+            "unit": "lines",
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          }
+        ],
+        "row_ids": [
+          "062ab3a06a5f428f80b993e4",
+          "a3092c8f6d2648748c3a8639",
+          "0bd32ec50fa6405aa6bed889",
+          "d4e22c3d04f84c71b0a40b0a",
+          "81cea64bd4144fc2aeae18ec",
+          "579c737a9a154e6d9b7f28ba",
+          "68be0a5cf3384d698d154bf3",
+          "3b117063471c4b968842f2be",
+          "40d5f8f40f954d938bd37897"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_GREATERTHANOREQUALTO \"2026-01\",doc_month COMPARE_LESSTHANOREQUALTO \"2026-12\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [
+          "doc_month"
+        ],
+        "limitations": [
+          "Current materialized publication, not certified historical classification.",
+          "Published rows only; complete calendar coverage is not certified.",
+          "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+          "No classifier rule/version or causal mechanism is accredited.",
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW",
+        "reason": "structurally_valid_supervised_foundation",
+        "query_id": "fb28127ec1f462ada4d0d42584f3cb3d19690914c02a96def8a9049df6a1d221",
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "schema": [
+        {
+          "name": "doc_month",
+          "sql_type": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "name": "total_amount_bs",
+          "sql_type": "DECIMAL(38,6)",
+          "nullable": true
+        },
+        {
+          "name": "total_line_count",
+          "sql_type": "BIGINT",
+          "nullable": true
+        }
+      ],
+      "rows": [
+        [
+          "2026-08",
+          "853568.450000",
+          501
+        ],
+        [
+          "2026-09",
+          "839582.630000",
+          526
+        ],
+        [
+          "2026-01",
+          "836764.380000",
+          564
+        ],
+        [
+          "2026-03",
+          "805645.790000",
+          562
+        ],
+        [
+          "2026-07",
+          "759227.580000",
+          565
+        ],
+        [
+          "2026-06",
+          "751320.740000",
+          564
+        ],
+        [
+          "2026-02",
+          "684884.050000",
+          457
+        ],
+        [
+          "2026-05",
+          "574895.450000",
+          505
+        ],
+        [
+          "2026-04",
+          "510646.560000",
+          490
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": false,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed"
+    }
+  ],
+  "execution_closed": false,
+  "remaining_query_budget": 6
+}

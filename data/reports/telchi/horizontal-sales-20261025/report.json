@@ -1,0 +1,110 @@
+{
+  "branch": "feature/console-backend-core",
+  "head": "09d2ec7",
+  "scope": "TELCHI / VENTAS / DEVELOPMENT; historical trace and Foundation investigation READ ONLY; no deployment",
+  "status": "DONE_WITH_CONCERNS_LOCAL_FIX_ONLY",
+  "ROOT_CAUSE": "The exact inbound was correctly interpreted as sales.net_amount, HORIZONTAL, [2026-08-01,2026-09-01). SalesCapabilities.availability categorically rejected every channel for monetary sales as MAPPING_MISSING before any data query. unavailable_response replaced that precise reason with a generic fallback; _next_step requested already-known information. This was not a date failure or a transport success criterion.",
+  "trace": {
+    "event_id": "7b132911-ccb0-431d-91b8-efa29ab2305e",
+    "received_utc": "2026-10-25T16:25:41.068165+00:00",
+    "received_at_utc_minus_3": "2026-10-25T13:25:41.068165-03:00",
+    "exact_text": "cual fue la venta por canal horizontal de agosto",
+    "interpretation": "REFINE / EXECUTE / sales.net_amount / HORIZONTAL / August 2026; clarification=null",
+    "conversational_context": "Previous confirmed state was September 2026 monetary sales without channel, branch, category or product filters. The original before-state and up to 20 preceding persisted confirmed states were recovered read-only and supplied to the local replay.",
+    "context_limit": "The audit preserves the proposal and before/validated/confirmed states, not the original complete compiled LLM prompt or provider response metadata. Retained prior states are reconstructed from bounded persisted events; exact original serialized history/prompt cannot be independently certified.",
+    "capability_selected": "Existing monetary permission telchi.sales.period_billed_amount.read.v1; no execution allowed by catalog",
+    "filters": {"metric":"sales.net_amount","channel":"HORIZONTAL","date_from":"2026-08-01","date_to_exclusive":"2026-09-01"},
+    "actual_data_queries": 0,
+    "capability_calls": 0,
+    "decision": "DIRECT_UNAVAILABLE",
+    "execution_status": "not_executed",
+    "first_failure": "Monetary capability availability rejects channel, after successful interpretation and state validation",
+    "unnecessary_clarification_origin": "Deterministic handler._next_step for MAPPING_MISSING, not an ASK proposed by the model"
+  },
+  "DATA_CAPABILITY": {
+    "operation": "sales.period_billed_amount.v1 extended with optional closed HORIZONTAL filter",
+    "source": "Foundation CURRENT foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408",
+    "updated_at": "2026-09-28T18:18:35.264000",
+    "business_rule": "Owner-established horizontal = DMS = venta de calle; ingestion executive_sales.classify_sales_channel materializes HORIZONTAL from 14 DMS numbering series, CONFIRMED in the observed August rows",
+    "definition": "SAP_B1_HANA active N OINV DocTotal minus active N ORIN DocTotal, each filtered independently by DocDate, BS and materialized HORIZONTAL channel. Source taxes and discounts retained. Not collections or cash balance.",
+    "coverage": "Selected invoice and credit rows run from 2026-08-01 through 2026-08-31. Counts, distinct document IDs and nonnull amounts agree. Complete business/historical coverage is not certified.",
+    "limitations": "Existing investigation regards series classification as conditional pending full DMS/U_ORIGIN census reconciliation. Full cross-channel credit/base-invoice attribution and unposted DMS returns are not certified. The numeric answer is the published channel-tagged documentary net, not a claim of fully reconciled total DMS economic revenue.",
+    "remaining_source_gap": "To certify a complete DMS business total: reconcile DMS/U_ORIGIN and numbering-series census, credit attribution across channels and unposted DMS returns with accredited source evidence. These facts are not inferred or newly extracted here.",
+    "sap_accessed": false,
+    "foundation_modified": false
+  },
+  "REFERENCE_QUERY_RESULT": {
+    "period": ["2026-08-01","2026-09-01 exclusive"],
+    "currency": "BS",
+    "active_invoices": 2665,
+    "active_credit_memos": 142,
+    "billed": "1996773.280000",
+    "credits": "127550.360000",
+    "documentary_net": "1869222.920000",
+    "independent_sql_and_lineage": "live-r2.json#/reference",
+    "method": "Independent grouped aggregation of all channels, currencies and cancellation/semantic statuses; then select confirmed active BS HORIZONTAL aggregates and subtract with Decimal. Does not reuse capability SQL or a model-provided number. No joins to customers/salespersons; no document multiplication."
+  },
+  "FIX_IMPLEMENTED": {
+    "implemented_in_dev_source": true,
+    "deployed_or_loaded_into_existing_runtime": false,
+    "changes": [
+      "Extend existing monetary query with parameterized HORIZONTAL filter on invoices AND credits; reject unconfirmed semantic statuses without silently dropping them",
+      "Enable only this channel in existing catalog, retaining base authorization, commercial monetary permission, whole-workspace scope, publication/snapshot binding and all other filter restrictions",
+      "Validate channel echo/provenance and reject global-result substitution",
+      "Add concept-level DMS/calle/horizontal vocabulary to Luna, no phrase-specific answers or hardcoded amounts",
+      "Present channel net first, then billed/credits, period, update and documentary/data limits; preserve channel for empty-result response",
+      "Keep existing comparison boundary: channel results are not eligible for unsupported monetary comparison"
+    ],
+    "paths_changed_by_this_task": [
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_query.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/capabilities.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_sales_monetary.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_horizontal_sales.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_horizontal_sales.py"
+    ],
+    "blast_radius": "Three existing runtime files, one existing test expectation, one regression module and one opt-in read-only live runner. Sixth file is reproducible business evidence, not another runtime. All paths MODULE_LOCAL Telchi; preserve preexisting untracked/modified work. No handler, shared Messaging, bootstrap, migrations, permissions or production changes."
+  },
+  "REGRESSION_TESTS": {
+    "focused_command": "cd SrvRestAstroLS_v1/backend && uv run pytest modules/telchi/assistant/tests/test_horizontal_sales.py modules/telchi/assistant/tests/test_sales_monetary.py modules/telchi/assistant/tests/test_assistant.py modules/telchi/assistant/tests/test_conversational_quality.py modules/telchi/assistant/tests/test_sales_query_activation.py modules/telchi/assistant/tests/test_sales_business_contract.py -q",
+    "focused_final": "161 passed, 1 skipped (opt-in PostgreSQL test)",
+    "before_fix_proof": "Restored only the original catalog channel-rejection predicate in process memory via inspect/compile, without changing files. All four new resolved-concept handler tests failed with zero data calls, reproducing the audit. After fix they pass.",
+    "offline_scope": "Channel parameterization for both document types, dates/currency/cancellation filters, no global substitution, no unsupported filter widening, confirmed semantic status guard, permission denial, channel continuity to July, no certified-zero claim and no observed generic fallback for the supported case",
+    "live_command": "cd SrvRestAstroLS_v1/backend && uv run python -m modules.telchi.assistant.tests.live_horizontal_sales --output ../../data/reports/telchi/horizontal-sales-20261025/live-r2.json",
+    "live_result": "5/5: exact original text plus all four requested variants, real direct OpenAI gpt-5.6-luna medium verified and real Foundation read-only. One capability call each; exact billed/credit/net parity with independent SQL and identical publication/snapshot/update. No fallback or unnecessary clarification.",
+    "live_limitations": "Identity, RBAC and conversation persistence are explicit fixtures. Historical trace retrieval uses real PostgreSQL read-only. This probe certifies neither a newly authenticated real user's grant chain nor WhatsApp delivery.",
+    "expanded_command": "cd SrvRestAstroLS_v1/backend && uv run pytest modules/telchi/assistant/tests -q",
+    "expanded_result": "684 passed, 4 skipped, 4 failed before adding the final five focal tests; NOT PASS",
+    "expanded_failures": "test_whatsapp_controlled_transport.py: ASK, BLOCK_INVALID_PLAN, BLOCK_IDENTITY, EXECUTE. AttributeError: TransportStore lacks send_identity required by existing shared Messaging sender port. Out-of-scope fixture incompatibility; not modified. Isolated BLOCK_IDENTITY reproduces failure before Telchi interpretation/capabilities, establishing independence from this sales fix.",
+    "diff_check": "git diff --check PASS",
+    "final_review": "Reviewed modified monetary query/parameter/result validation and catalog/rendering changes, plus focused test/live outcomes. Existing worktree changes preserved; untracked preexisting source is not represented by ordinary git diff.",
+    "markdown": "No Markdown created or changed by this task; LAT documentation gates not applicable"
+  },
+  "READY_FOR_HORIZONTAL_SALES_RETEST": "NO",
+  "runtime_readonly_check": {
+    "pid": 73656,
+    "ready_file_reports_admission_open": true,
+    "approval_revoked": false,
+    "runtime_and_gate_digest": "b74977306fd7da9f3468d2d1e90df8acafeb4e712d5113fb21efc71006f01598",
+    "current_source_digest": "56a6084e70590d82f201047a1c013b5ac628b48dfc4cce742c7a6c464769f7d5",
+    "digest_match": false,
+    "interpretation": "Historical closure report is superseded by a later DEV reactivation. Current process was already active when this task began and reports admission open, but it loaded the previous code digest. No reload, restart, admission change or send was performed. Source correction alone must not be advertised as effective WhatsApp behavior."
+  },
+  "WHATSAPP_E2E": "NOT_RUN; no PASS declaration",
+  "next_step": "Coordinate explicit DEV runtime ownership for focused gate reaccreditation and controlled loading of corrected source, retaining transport history and without production/Meta/Cloudflare changes. Resolve or formally account for the independent transport test-fixture blocker. Only then announce readiness for Mario's manual same-question retest and inspect the actual correlated response; do not automatically replay or send.",
+  "cross_module_impact": "None implemented outside Telchi. Existing Messaging monetary permission reused, no grants or configuration changes. Runtime accreditation is invalidated by the source change and needs coordination, not silent renewal.",
+  "host": {
+    "HOST_PREFLIGHT": "SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": "Sequential tests and live turns; two DuckDB threads per own read-only connection, 512 MB limit, spill disabled",
+    "observations": "8 cores, load initially 1.08/1.39/1.83 and later 2.93/1.75/1.81; about 4.9 GB available RAM; swap stable/slightly decreasing; sampled CPU 89-93% idle with no sustained swap-out",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "cleanup": "All synchronous runners exited; capability subprocesses awaited by existing lifecycle. Existing uv/python and shared services untouched. No browsers or servers created."
+  },
+  "preserved": ["Meta", "Cloudflare", "production", "PostgreSQL contents and grants", "Foundation CURRENT", "workspaces and instances", "active DEV process", "other Team360 worktree changes", "Git index and refs"],
+  "commits": 0,
+  "pushes": 0,
+  "messages_sent": 0
+}

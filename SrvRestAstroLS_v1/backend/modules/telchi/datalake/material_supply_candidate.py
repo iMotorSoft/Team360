@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
+from .foundation_manifest import validate_manifest
+
 from .foundation_publication import (
     CURRENT,
     FAILED,
@@ -255,11 +257,12 @@ def resolve_current_material_supply(store: FoundationPublicationStore) -> Pinned
     if publication is None or publication.status != CURRENT:
         raise CandidateValidationError("CURRENT material_supply publication is unresolved (fail closed)")
     manifest = publication.manifest
-    if not isinstance(manifest, dict) or manifest.get("candidate_kind") != CANDIDATE_KIND:
-        raise CandidateValidationError("CURRENT foundation has no Material Supply manifest (fail closed)")
-    components = manifest.get("components")
-    if not isinstance(components, dict) or set(components) != set(CANDIDATE_COMPONENT_NAMES):
-        raise CandidateValidationError("CURRENT Material Supply component set is not exact (fail closed)")
+    try:
+        components = validate_manifest(store, publication)
+    except FoundationReaderError as exc:
+        raise CandidateValidationError(str(exc)) from exc
+    if not set(CANDIDATE_COMPONENT_NAMES).issubset(components):
+        raise CandidateValidationError("CURRENT Material Supply required components are incomplete (fail closed)")
     versions: dict[str, str] = {}
     for name in CANDIDATE_COMPONENT_NAMES:
         entry = components.get(name)

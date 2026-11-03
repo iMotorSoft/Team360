@@ -1,0 +1,153 @@
+{
+  "contract": "full-data-lake-refresh-v1",
+  "implementation_status": "REFERENCE_APPEND_AND_FULL_STOCK_SUCCESSOR_PUBLISHED; OTHER_FACTS_AND_MATERIAL_REDERIVATION_PENDING",
+  "scheduler": {"enabled": false, "installed": false, "frequency": null},
+  "execution": {
+    "sap_mode": "SELECT_ONLY",
+    "hana_concurrency": 1,
+    "source_adapter": "modules.telchi.datalake.source.HanaReadOnlySource",
+    "raw_writer": "modules.telchi.datalake.raw.write_raw",
+    "durability": "sales_incremental.seal + fsync + immutable per-batch receipts",
+    "exclusion": "sales_controlled_block.extraction_lock + cycle/dataset flock",
+    "max_batch_rows": 10000,
+    "duckdb_memory": "256MB capture; 512MB audit",
+    "duckdb_threads": 2,
+    "publication": "Existing FoundationPublicationStore CAS and durable canonical Promotion only; never direct pointer writes",
+    "watermark": "Advance only after canonical publication and reader verification; capture receipts are not published watermarks",
+    "source_time": "Use SAP clock per cycle/statement window; observed UTC offset is not IANA timezone accreditation",
+    "alerts": ["SOURCE_CONTROL_CHANGED_OR_CAPTURE_MISMATCH", "NULL_DUPLICATE_OR_UNORDERED_KEY", "DUPLICATE_LOGICAL_KEYS", "RAW_BYTES_CHANGED", "DOMAIN_SELECT_BUDGET_EXHAUSTED", "DOMAIN_WALL_BUDGET_EXHAUSTED", "RESOURCE_GUARD_ABORT", "FOUNDATION_COMPATIBILITY_ADAPTER_REQUIRED"],
+    "recovery": "Reuse only complete hash-verified statements. An interrupted cursor cannot resume the same SAP snapshot. Explicit native-key prefix reconciliation retains original failure and does not certify the full business window.",
+    "rollback": "No rollback needed before publication; retain all previous Foundation/Reference snapshots. Use canonical journal/CAS rollback only after an actual promotion.",
+    "frequency_candidate": "MANUAL_ONLY; choose a schedule after published-cycle cost, source timezone and per-domain late-change semantics are accredited"
+  },
+  "domains": {
+    "sales": {
+      "source": ["OINV", "INV1", "ORIN", "RIN1"],
+      "mechanism": "sales_refresh_cycle; whole-document upsert and explicit overlap ledger",
+      "late_changes": "Bounded business-date overlap; explicit late dates outside overlap; not global CDC",
+      "checkpoint": "Canonical sales-refresh-cycle-v1 receipts",
+      "budget": "Reuse existing sales_continuity.BUDGET without raising it",
+      "dependencies": ["reference", "material_supply historical projection"],
+      "last_cycle": "incremental-foundation-succession-v1",
+      "last_published_source_cutoff": "2026-11-01T13:55:47.173006+00:00",
+      "updated_by_full_refresh_capture": false
+    },
+    "inventory_stock": {
+      "source": ["OITW"],
+      "grain": ["ItemCode", "WhsCode"],
+      "mechanism": "One ordered statement/server cursor for current state; no movements rebuilt",
+      "late_changes": "New snapshot, not append; preserve disappearances explicitly in candidate diff",
+      "budget": {"selects": 40, "domain_seconds": 2400, "rows_per_statement": 1600000, "statement_seconds": 60, "operation_seconds": 1800},
+      "dependencies": ["reference.products", "reference.warehouses", "material_supply"],
+      "reconciliation": ["exact count and three quantity sums before/captured/after", "native-key uniqueness", "products/warehouses joins"],
+      "last_capture_cycle": "full-refresh-20261101-v1",
+      "last_published_source_cutoff": "2026-11-01T17:43:38.461000+00:00",
+      "publication_status": "FULL_OBSERVED_POSITION_SNAPSHOT_PUBLISHED_NOT_MOVEMENTS_OR_DERIVATIVES",
+      "publication": {
+        "foundation": "foundation_d93234d13af15c1d5bef7f2f09b9335b",
+        "component": "oitw",
+        "adapter": "OBSERVED_STOCK_FULL_REPLACEMENT_V1",
+        "observation_end": "2026-11-01T17:46:05.375000+00:00",
+        "rows": 1385179,
+        "evidence": "data/reports/telchi/full-foundation-facts-succession-v1/report.json",
+        "reader": "LIVE_READER_RAW_AGGREGATES_EXACT",
+        "limitations": ["Not historical stock", "No absent-position zero inference; old identities retained", "22603 position rows have unknown inventory UoM in Reference; do not aggregate different items as one unit", "Material Supply retains its original snapshots and cutoffs"]
+      }
+    },
+    "inventory_movements": {
+      "source": ["OINM"],
+      "grain": ["TransNum", "TransSeq"],
+      "mechanism": "Approved column probes and bounded statement cursor",
+      "capture_window": ["2026-09-17", "2026-11-02"],
+      "late_changes": "Overlap only; corrections before 2026-09-17 are not accredited",
+      "budget": {"selects": 100, "domain_seconds": 2400, "rows_per_statement": 2000000, "statement_seconds": 60, "operation_seconds": 1800},
+      "reconciliation": ["count/InQty/OutQty", "native-key uniqueness", "explicit frozen prefix after detected source advance"],
+      "dependencies": ["reference", "purchasing", "material_supply"],
+      "last_capture_cycle": "full-refresh-20261101-v1",
+      "last_published_source_cutoff": "2026-09-24T13:53:46.471312+00:00",
+      "publication_status": "PREFIX_ONLY; NOT_GLOBAL_WINDOW_COMPLETE; PENDING_ADAPTER"
+    },
+    "production": {
+      "source": ["OITT", "ITT1", "OWOR", "OIGE", "IGE1"],
+      "mechanism": "Existing DatasetSpec projections; current BOM and 2026 order/issue state reconciliation",
+      "budget": {"selects": 80, "domain_seconds": 2400, "rows_per_statement": 300000, "statement_seconds": 60, "operation_seconds": 1200},
+      "late_changes": "2026 document state reread; older orders not claimed refreshed; BOM observation is not historical effectivity",
+      "dependencies": ["reference", "material_supply"],
+      "reconciliation": ["source counts/quantities", "logical keys", "BOM header/line and issue/order native links", "resource lines must not become material consumption by inference"],
+      "last_capture_cycle": "full-refresh-20261101-v1",
+      "last_published_material_supply_cutoff": "2026-09-24T13:53:07.952772+00:00",
+      "publication_status": "RAW_CAPTURED; DERIVATION_AND_FOUNDATION_PENDING",
+      "not_implemented_by_this_contract": ["new production receipt dataset", "new cost accreditation"]
+    },
+    "purchasing": {
+      "source": ["OPOR", "POR1", "OPDN", "PDN1", "OPCH", "PCH1"],
+      "mechanism": "Existing DatasetSpec/AP_INVOICE_DATASETS; 2026 authoritative mutable document-state reconciliation",
+      "budget": {"selects": 100, "domain_seconds": 2400, "rows_per_statement": 300000, "statement_seconds": 60, "operation_seconds": 1200},
+      "late_changes": "Reread bounded 2026 document states; preserve older historical snapshots unchanged",
+      "dependencies": ["reference.suppliers", "inventory_movements", "material_supply"],
+      "reconciliation": ["counts/quantities", "header/line identities", "supplier role", "BaseType/BaseEntry/BaseLine only; no amount/date matching"],
+      "last_capture_cycle": "full-refresh-20261101-v1",
+      "last_published_document_maximum": "2026-09-23",
+      "publication_status": "RAW_CAPTURED; LINEAGE_DERIVATION_AND_FOUNDATION_PENDING",
+      "not_implemented_by_this_contract": ["purchase requests", "new return-document extraction/crosswalk"]
+    },
+    "receivables_collections": {
+      "source": ["OINV", "INV6", "ORCT", "RCT2", "OITR", "ITR1", "RCT1", "RCT3", "OCTG"],
+      "mechanism": "Existing receivables_collections_atomic.SQL projections, no Atomic writes",
+      "capture_window": ["2026-09-21", "2026-11-02"],
+      "budget": {"selects": 100, "domain_seconds": 3600, "rows_per_statement": 500000, "statement_seconds": 60, "operation_seconds": 1800},
+      "late_changes": "This overlap does not refresh balances/applications on all documents since 2022-03-31; affected historical keys require a specific adapter before current aging can be accredited",
+      "dependencies": ["sales", "reference.customers", "payment terms", "currency and temporal contracts"],
+      "reconciliation": ["counts", "NULL-aware source identities", "allocation/payment", "reconciliation event/participant", "prefix revalidation retains original source-advance failure"],
+      "last_capture_cycle": "full-refresh-20261101-v1",
+      "last_published_source_cutoff": "2026-09-28T18:18:35.264000",
+      "publication_status": "PARTIAL_CAPTURE; HISTORICAL_BALANCES_AND_BUSINESS_DERIVATION_PENDING",
+      "known_limitations": ["QR_UNRESOLVED_SOURCE_EVIDENCE", "no intraday aging accreditation"]
+    },
+    "reference": {
+      "source": ["OITM", "OCRD", "OWHS", "OSLP"],
+      "mechanism": "Existing approved source projections; candidate merge must reuse reference_update and canonical Reference publication",
+      "budget": {"selects": 40, "domain_seconds": 1800, "rows_per_statement": 100000, "statement_seconds": 60, "operation_seconds": 1200},
+      "preserve": ["canonical identities", "published customers/products", "unknown attributes", "commercial classification", "SAP physical classification", "crosswalks", "lineage"],
+      "late_changes": "Snapshot masters; no implicit deactivation from absence; no historical physical effectivity inferred",
+      "dependencies": ["all fact readers and sealed classifications"],
+      "last_capture_cycle": "full-refresh-20261101-v1",
+      "last_published_source_cutoff": "2026-11-01T13:59:40.724221+00:00",
+      "publication_status": "APPEND_ONLY_REFERENCE_PUBLISHED; EXISTING_MASTER_ATTRIBUTES_PRESERVED_NOT_REFRESHED",
+      "append_publication": {
+        "foundation": "foundation_9cd0d1a146308f555733d58fb3fda1ff",
+        "reference": "v2_sales_448ae93a960bf7342564a2d0",
+        "new_products": 140,
+        "new_customers": 29,
+        "new_suppliers": 59,
+        "adapter": "CAPTURED_MASTER_APPEND_V1",
+        "evidence": "data/reports/telchi/full-foundation-integration-v1/report.json",
+        "limitation": "Only missing product/customer/supplier identities appended; existing attributes and other Reference datasets retain their previous observation dates"
+      }
+    },
+    "prices": {
+      "status": "NO_PUBLISHED_PRICE_LIST_CONTRACT_ACCREDITED_BY_THIS_CYCLE",
+      "source": [],
+      "sap_selects": 0,
+      "limitation": "OITM AvgPrice/LastPurPrc are not price-list publication or dated commercial conditions; no ITM1/OPLN access added",
+      "next_action": "Accredit exact source fields, identities, currency and current/history semantics before extraction"
+    },
+    "material_supply": {
+      "source": ["sealed sales", "credit memos", "inventory", "production", "purchasing", "Reference"],
+      "mechanism": "Reuse canonical material_supply_derivation and sales_material_revalidation; no parallel engine",
+      "sap_selects": 0,
+      "dependencies": ["all relevant captured/published fact cutoffs", "BOM semantics", "resource-vs-material distinction"],
+      "last_published_source_cutoff": "2026-09-24T13:53:07.952772+00:00",
+      "publication_status": "HISTORICAL_COMPONENT_RETAINED; NEW_MULTI_DOMAIN_DERIVATION_PENDING"
+    },
+    "accounting": {
+      "status": "FUNCTIONAL_EXTENSION_PENDING_NOT_REFRESH",
+      "source_access_added": false,
+      "sap_selects": 0,
+      "journal_published": false,
+      "ledger_published": false,
+      "proposal_authority": "investigation/validation/datalake_accounting_reaccreditation_v1/CONTRACT.md",
+      "next_action": "Accredit metadata and bounded TransId key selection; capture whole OJDT/JDT1 entries and referenced OACT accounts/ancestors; verify LOCAL/SYSTEM bases, opening balance and explicit branch/dimensions. Do not start a mass extraction."
+    }
+  }
+}

@@ -1,0 +1,674 @@
+{
+  "mode": "PLAN_ONLY",
+  "target": {
+    "database": "team360",
+    "system_identifier": "7630993354699489317",
+    "server_address": "172.18.0.2/32",
+    "server_port": 5432
+  },
+  "identities": {
+    "global": {
+      "id": "67a1b108-7c65-4c80-bbca-ffc42891949c",
+      "workspace_id": "d848e051-3dfc-408b-ad5a-94f2ba85ee23",
+      "status": "active"
+    },
+    "admin": {
+      "id": "73d09264-8be2-4402-8023-0142a5f26730",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "status": "active"
+    },
+    "pilot": {
+      "id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "status": "active"
+    },
+    "workspace": {
+      "id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "organization_id": "44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99"
+    }
+  },
+  "security": {
+    "records": {
+      "core_permissions": [
+        {
+          "id": "f42fffa8-4048-4b54-97a4-a033fc19b6c0",
+          "permission_code": "audit.view",
+          "display_name": "Ver auditoria",
+          "description": null,
+          "category": "audit",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "003450f6-caeb-4afd-a4aa-04eb1c96bda1",
+          "permission_code": "telchi.sales.source_quantity.read.v1",
+          "display_name": "Telchi source quantity read V1",
+          "description": "Only telchi.sales_top_items.source_quantity.20260101_20260915.v1; whole Telchi workspace; Foundation only; source invoice quantities, no revenue, SAP, branches, channels or other capabilities.",
+          "category": "business",
+          "created_at_utc": "2026-10-11 23:08:23.335481+00:00"
+        },
+        {
+          "id": "a1401dfb-78e9-40cc-b71d-323520d4815e",
+          "permission_code": "telchi.sales.coverage.read.v1",
+          "display_name": "Telchi active invoice coverage read V1",
+          "description": "Only sales.coverage.v1; whole Telchi workspace; Foundation CURRENT 1408; active OINV N by DocDate, first/last date and month with rows; no certified complete month, revenue, net sales, SAP or entity filters.",
+          "category": "business",
+          "created_at_utc": "2026-10-12 22:20:54.275920+00:00"
+        },
+        {
+          "id": "ed444b2c-b3d8-4af4-9e8b-189829d35249",
+          "permission_code": "telchi.sales.latest_documents.read.v1",
+          "display_name": "Telchi active latest invoices read V1",
+          "description": "Only sales.latest_documents.v1; whole Telchi workspace; Foundation CURRENT 1408; active OINV N by DocDate, limit 1..50; no revenue, net sales, SAP, entity filters or pagination.",
+          "category": "business",
+          "created_at_utc": "2026-10-12 22:20:54.275920+00:00"
+        },
+        {
+          "id": "3baceafc-745c-4fce-b565-9aacdf2f9ac4",
+          "permission_code": "telchi.sales.period_billed_amount.read.v1",
+          "display_name": "Telchi period documentary billing read V1",
+          "description": "Foundation CURRENT 1408; BS active OINV and ORIN DocTotal by bounded DocDate period; gross billing, credit amount and historical SALES_NET; no cash, SAP, entity filters or product allocation.",
+          "category": "business",
+          "created_at_utc": "2026-10-12 22:54:07.070788+00:00"
+        },
+        {
+          "id": "9758ed0d-877f-4bf5-a6a5-ca26361952bf",
+          "permission_code": "telchi.products.search.read.v1",
+          "display_name": "Telchi products.search read V1",
+          "description": "DEV Foundation 1408; bounded read-only SAP product search or active OINV lines by verified natural ItemCodes. No SAP access, physical totals, net line amounts or free SQL.",
+          "category": "business",
+          "created_at_utc": "2026-10-13 11:33:19.054003+00:00"
+        },
+        {
+          "id": "64d010dd-99bf-4e7d-b04f-c29773d6ae55",
+          "permission_code": "telchi.sales.by_products.read.v1",
+          "display_name": "Telchi sales.by_products read V1",
+          "description": "DEV Foundation 1408; bounded read-only SAP product search or active OINV lines by verified natural ItemCodes. No SAP access, physical totals, net line amounts or free SQL.",
+          "category": "business",
+          "created_at_utc": "2026-10-13 11:33:19.054003+00:00"
+        },
+        {
+          "id": "dba4ba22-62ec-4d11-acfb-8fbb0f446cf7",
+          "permission_code": "telchi.sales.invoice_lines.read.v1",
+          "display_name": "Telchi invoice products read V1",
+          "description": "DEV Foundation 1408: products and documentary quantity of one validated active OINV. No native line UoM, amounts, conversions or free SQL.",
+          "category": "business",
+          "created_at_utc": "2026-10-18 16:33:19.013137+00:00"
+        },
+        {
+          "id": "fede9613-62fd-405c-89b9-7a8e0e60c47b",
+          "permission_code": "telchi.sales.invoice_amount.read.v1",
+          "display_name": "Telchi individual invoice amount read V1",
+          "description": "One validated active Foundation OINV header DocTotal in native currency. No line amounts, collections or outstanding balance.",
+          "category": "business",
+          "created_at_utc": "2026-10-19 16:46:20.029829+00:00"
+        },
+        {
+          "id": "f0db303f-75a5-4adf-be8a-397d13bdaf15",
+          "permission_code": "telchi.sales.category_line_amount.read.v1",
+          "display_name": "Telchi category commercial line amount read V1",
+          "description": "Active BS commercial invoice lines by accredited business category and bounded period; line discount included, no line VAT, credit notes, global adjustments, net billing or collections.",
+          "category": "business",
+          "created_at_utc": "2026-10-20 13:06:31.229168+00:00"
+        },
+        {
+          "id": "1cd81dc2-4bb9-42a4-92ea-6267c037157f",
+          "permission_code": "telchi.sales.product_line_amount_ranking.read.v1",
+          "display_name": "Telchi product commercial line amount ranking read V1",
+          "description": "Active BS commercial invoice line amounts by SAP product within accredited category and period; descending amount, ascending code, reconciled full universe before limit. No line VAT, credit notes, header adjustments or unit prices.",
+          "category": "business",
+          "created_at_utc": "2026-10-20 17:12:29.551272+00:00"
+        },
+        {
+          "id": "7813a330-3a5c-4f4f-aa67-16ad514f0550",
+          "permission_code": "telchi.sales.commercial_line_amount_by.read.v1",
+          "display_name": "Telchi commercial breakdown read V1",
+          "description": "Active BS commercial invoice line amounts grouped by SAP product or by billed SAP customer within a closed category, product, customer and period scope; reconciled full universe before limit. No line VAT, credit notes, header adjustments, net billing, collections or commercial customer taxonomy.",
+          "category": "business",
+          "created_at_utc": "2026-10-21 13:06:51.334592+00:00"
+        },
+        {
+          "id": "f4a19d70-bd71-4fa0-a46f-0281f057c9ae",
+          "permission_code": "credential.manage_ref",
+          "display_name": "Gestionar referencias de credenciales",
+          "description": null,
+          "category": "credential",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "5203bfc3-afbc-481a-babf-a8aedbc110e5",
+          "permission_code": "credential.view_ref",
+          "display_name": "Ver referencias de credenciales",
+          "description": null,
+          "category": "credential",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "40205e48-e421-48c9-a0fd-3c8b239f7f4b",
+          "permission_code": "dashboard.view",
+          "display_name": "Ver dashboard",
+          "description": null,
+          "category": "dashboard",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "81aa8dab-bce2-47cb-812e-75f2a314a13a",
+          "permission_code": "flow.executive.read",
+          "display_name": "Flow Executive Read",
+          "description": "Consultar informaci\u00f3n ejecutiva read-only de Team360 Flow.",
+          "category": "flow",
+          "created_at_utc": "2026-08-16 17:15:27.830138+00:00"
+        },
+        {
+          "id": "5fa16dbe-236d-4762-b9fa-8a8a42bac597",
+          "permission_code": "flow.configuration.write",
+          "display_name": "Flow Configuration Write",
+          "description": "Actualizar la configuraci\u00f3n de routing de Team360 Flow.",
+          "category": "flow",
+          "created_at_utc": "2026-08-17 18:39:34.420882+00:00"
+        },
+        {
+          "id": "29bbfb73-810b-4435-a1bc-2443a2f54f61",
+          "permission_code": "flow.configuration.read",
+          "display_name": "Flow Configuration Read",
+          "description": "Leer la configuraci\u00f3n de routing de Team360 Flow.",
+          "category": "flow",
+          "created_at_utc": "2026-08-17 18:39:34.420882+00:00"
+        },
+        {
+          "id": "69471405-2cad-44ef-a9ff-9400d5acd26a",
+          "permission_code": "knowledge.upload",
+          "display_name": "Subir documentos",
+          "description": null,
+          "category": "knowledge",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "b8f6f6aa-0129-4e59-86cb-79430f576253",
+          "permission_code": "knowledge.view",
+          "display_name": "Ver conocimiento",
+          "description": null,
+          "category": "knowledge",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "32f0add3-60fd-4ec7-9fcb-af927f390909",
+          "permission_code": "package.configure",
+          "display_name": "Configurar paquetes",
+          "description": null,
+          "category": "package",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "c45c9c94-20e6-42b1-b675-b3f78b43d359",
+          "permission_code": "package.pause",
+          "display_name": "Pausar paquetes",
+          "description": null,
+          "category": "package",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "3c0a6736-b0ff-4485-82ea-73e2a482081e",
+          "permission_code": "package.view",
+          "display_name": "Ver paquetes",
+          "description": null,
+          "category": "package",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "e3462a0d-649f-40bb-b1f1-620a2c079a8d",
+          "permission_code": "task.approve",
+          "display_name": "Aprobar tareas",
+          "description": null,
+          "category": "task",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "9f93997d-8bfd-479d-bad1-5fa0c6cd71ef",
+          "permission_code": "task.assign",
+          "display_name": "Asignar tareas",
+          "description": null,
+          "category": "task",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "abb6d015-10a6-4dc0-84d1-3b789f0c8df2",
+          "permission_code": "task.comment",
+          "display_name": "Comentar tareas",
+          "description": null,
+          "category": "task",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "cc96569e-697e-4ff1-9810-c82093c3a418",
+          "permission_code": "task.execute",
+          "display_name": "Ejecutar tareas",
+          "description": null,
+          "category": "task",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "88c4c1ab-c625-4534-9f99-80ded8311631",
+          "permission_code": "task.reject",
+          "display_name": "Rechazar tareas",
+          "description": null,
+          "category": "task",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "fc861ef6-107d-4adc-bac0-9de1bf81ba78",
+          "permission_code": "task.view",
+          "display_name": "Ver tareas",
+          "description": null,
+          "category": "task",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "53e8563b-6548-48af-a2ce-43c2d8661a7c",
+          "permission_code": "role.manage",
+          "display_name": "Gestionar roles",
+          "description": null,
+          "category": "user",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "bd2c00f6-b13e-4440-a529-b41809959621",
+          "permission_code": "user.manage",
+          "display_name": "Gestionar usuarios",
+          "description": null,
+          "category": "user",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "57e0d564-bbb0-4d77-bf15-0c946872e1ad",
+          "permission_code": "worker.configure",
+          "display_name": "Configurar workers",
+          "description": null,
+          "category": "worker",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "13c5c330-55c2-4f5c-acd7-7d5307b56898",
+          "permission_code": "worker.execute",
+          "display_name": "Ejecutar workers",
+          "description": null,
+          "category": "worker",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        },
+        {
+          "id": "f387f771-de7f-4b4a-9158-700dfe9a7942",
+          "permission_code": "worker.view",
+          "display_name": "Ver workers",
+          "description": null,
+          "category": "worker",
+          "created_at_utc": "2026-05-29 14:35:24.592168+00:00"
+        }
+      ],
+      "core_roles": [
+        {
+          "id": "e2178ec7-73b1-41a3-8553-9ec4e07e57b8",
+          "workspace_id": "90ff667c-b96b-4dce-aa9c-694b3b6d63e7",
+          "role_code": "director_test_02dadac607e64be79b3c05fca9d7bed9",
+          "display_name": "Director Test",
+          "description": null,
+          "is_system_role": false,
+          "status": "active",
+          "created_at_utc": "2026-08-16 17:19:04.856771+00:00",
+          "updated_at_utc": "2026-08-16 17:19:04.856771+00:00"
+        },
+        {
+          "id": "1f989d33-e982-4624-939c-72f47a8bd72c",
+          "workspace_id": null,
+          "role_code": "platform_admin",
+          "display_name": "Team360 Platform Admin",
+          "description": null,
+          "is_system_role": true,
+          "status": "active",
+          "created_at_utc": "2026-10-11 23:08:23.335481+00:00",
+          "updated_at_utc": "2026-10-11 23:08:23.335481+00:00"
+        },
+        {
+          "id": "b4d73cb0-6ad8-4068-a0e8-836c39cf1cff",
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "role_code": "telchi_source_quantity_reader_v1",
+          "display_name": "Telchi source quantity reader V1",
+          "description": null,
+          "is_system_role": false,
+          "status": "active",
+          "created_at_utc": "2026-10-11 23:08:23.335481+00:00",
+          "updated_at_utc": "2026-10-11 23:08:23.335481+00:00"
+        },
+        {
+          "id": "58c894fe-8e1e-4db8-b11e-9e9d5fa2b8fb",
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "role_code": "telchi_sales_coverage_reader_v1",
+          "display_name": "Telchi active invoice coverage read V1",
+          "description": null,
+          "is_system_role": false,
+          "status": "active",
+          "created_at_utc": "2026-10-12 22:20:54.275920+00:00",
+          "updated_at_utc": "2026-10-12 22:20:54.275920+00:00"
+        },
+        {
+          "id": "93119fd0-33ea-4620-b25a-2ccbc45abc82",
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "role_code": "telchi_sales_latest_documents_reader_v1",
+          "display_name": "Telchi active latest invoices read V1",
+          "description": null,
+          "is_system_role": false,
+          "status": "active",
+          "created_at_utc": "2026-10-12 22:20:54.275920+00:00",
+          "updated_at_utc": "2026-10-12 22:20:54.275920+00:00"
+        },
+        {
+          "id": "5841e6e4-5b45-434b-8e94-d76937680b66",
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "role_code": "telchi_sales_period_billed_amount_reader_v1",
+          "display_name": "Telchi period documentary billing reader V1",
+          "description": null,
+          "is_system_role": false,
+          "status": "active",
+          "created_at_utc": "2026-10-12 22:54:07.070788+00:00",
+          "updated_at_utc": "2026-10-12 22:54:07.070788+00:00"
+        },
+        {
+          "id": "264fba91-fc21-401b-8297-7eb1a8003103",
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "role_code": "telchi_products_search_reader_v1",
+          "display_name": "Telchi products.search reader V1",
+          "description": null,
+          "is_system_role": false,
+          "status": "active",
+          "created_at_utc": "2026-10-13 11:33:19.054003+00:00",
+          "updated_at_utc": "2026-10-13 11:33:19.054003+00:00"
+        },
+        {
+          "id": "11fbc3e0-4494-42b8-9d3c-ac222f2f2c02",
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "role_code": "telchi_sales_by_products_reader_v1",
+          "display_name": "Telchi sales.by_products reader V1",
+          "description": null,
+          "is_system_role": false,
+          "status": "active",
+          "created_at_utc": "2026-10-13 11:33:19.054003+00:00",
+          "updated_at_utc": "2026-10-13 11:33:19.054003+00:00"
+        },
+        {
+          "id": "dd795943-2b55-4691-82bb-e20fabd95d68",
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "role_code": "telchi_sales_invoice_lines_reader_v1",
+          "display_name": "Telchi invoice products reader V1",
+          "description": null,
+          "is_system_role": false,
+          "status": "active",
+          "created_at_utc": "2026-10-18 16:33:19.013137+00:00",
+          "updated_at_utc": "2026-10-18 16:33:19.013137+00:00"
+        },
+        {
+          "id": "7225dc15-00ea-4dea-ac44-1ec5df43a242",
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "role_code": "telchi_sales_invoice_amount_reader_v1",
+          "display_name": "Telchi individual invoice amount reader V1",
+          "description": null,
+          "is_system_role": false,
+          "status": "active",
+          "created_at_utc": "2026-10-19 16:46:20.029829+00:00",
+          "updated_at_utc": "2026-10-19 16:46:20.029829+00:00"
+        }
+      ],
+      "core_role_permissions": [
+        {
+          "id": "9bab0f04-6de4-420a-982e-5b99ba33bcd4",
+          "role_id": "e2178ec7-73b1-41a3-8553-9ec4e07e57b8",
+          "permission_id": "81aa8dab-bce2-47cb-812e-75f2a314a13a",
+          "created_at_utc": "2026-08-16 17:19:04.856771+00:00"
+        },
+        {
+          "id": "03edf263-1194-4f30-be9b-36ce21616cd1",
+          "role_id": "1f989d33-e982-4624-939c-72f47a8bd72c",
+          "permission_id": "bd2c00f6-b13e-4440-a529-b41809959621",
+          "created_at_utc": "2026-10-11 23:08:23.335481+00:00"
+        },
+        {
+          "id": "58662492-0fcf-4bbf-9978-fbe324d9dc9b",
+          "role_id": "1f989d33-e982-4624-939c-72f47a8bd72c",
+          "permission_id": "53e8563b-6548-48af-a2ce-43c2d8661a7c",
+          "created_at_utc": "2026-10-11 23:08:23.335481+00:00"
+        },
+        {
+          "id": "a44a36df-2c35-45c2-9d27-0faabaf22540",
+          "role_id": "b4d73cb0-6ad8-4068-a0e8-836c39cf1cff",
+          "permission_id": "003450f6-caeb-4afd-a4aa-04eb1c96bda1",
+          "created_at_utc": "2026-10-11 23:08:23.335481+00:00"
+        },
+        {
+          "id": "e5d32323-5f78-4d04-b666-c76a22acaed9",
+          "role_id": "1f989d33-e982-4624-939c-72f47a8bd72c",
+          "permission_id": "f42fffa8-4048-4b54-97a4-a033fc19b6c0",
+          "created_at_utc": "2026-10-11 23:08:23.335481+00:00"
+        },
+        {
+          "id": "00341582-5fe6-4ac7-9a1e-f48dfbfe6901",
+          "role_id": "93119fd0-33ea-4620-b25a-2ccbc45abc82",
+          "permission_id": "ed444b2c-b3d8-4af4-9e8b-189829d35249",
+          "created_at_utc": "2026-10-12 22:20:54.275920+00:00"
+        },
+        {
+          "id": "1e40b380-97ee-4f89-80cc-fae4936cfe60",
+          "role_id": "58c894fe-8e1e-4db8-b11e-9e9d5fa2b8fb",
+          "permission_id": "a1401dfb-78e9-40cc-b71d-323520d4815e",
+          "created_at_utc": "2026-10-12 22:20:54.275920+00:00"
+        },
+        {
+          "id": "6d7c987c-c1ca-4dc9-8320-364c806c309e",
+          "role_id": "5841e6e4-5b45-434b-8e94-d76937680b66",
+          "permission_id": "3baceafc-745c-4fce-b565-9aacdf2f9ac4",
+          "created_at_utc": "2026-10-12 22:54:07.070788+00:00"
+        },
+        {
+          "id": "115cc42e-676b-4389-895b-74a4cee3603d",
+          "role_id": "264fba91-fc21-401b-8297-7eb1a8003103",
+          "permission_id": "9758ed0d-877f-4bf5-a6a5-ca26361952bf",
+          "created_at_utc": "2026-10-13 11:33:19.054003+00:00"
+        },
+        {
+          "id": "413a6bfb-ee36-419f-8ec1-60aec0a8c7d1",
+          "role_id": "11fbc3e0-4494-42b8-9d3c-ac222f2f2c02",
+          "permission_id": "64d010dd-99bf-4e7d-b04f-c29773d6ae55",
+          "created_at_utc": "2026-10-13 11:33:19.054003+00:00"
+        },
+        {
+          "id": "4fea3b1e-b677-4ae4-b228-27af852fcbcf",
+          "role_id": "dd795943-2b55-4691-82bb-e20fabd95d68",
+          "permission_id": "dba4ba22-62ec-4d11-acfb-8fbb0f446cf7",
+          "created_at_utc": "2026-10-18 16:33:19.013137+00:00"
+        },
+        {
+          "id": "417d0ebf-8eb5-4d38-b830-52551ec5442e",
+          "role_id": "7225dc15-00ea-4dea-ac44-1ec5df43a242",
+          "permission_id": "fede9613-62fd-405c-89b9-7a8e0e60c47b",
+          "created_at_utc": "2026-10-19 16:46:20.029829+00:00"
+        }
+      ],
+      "core_user_roles": [
+        {
+          "id": "3cb1c3b3-b6f3-4549-87df-86db63c9c81e",
+          "user_id": "e2484cd6-7b73-412a-a374-4e73a0a6d133",
+          "role_id": "e2178ec7-73b1-41a3-8553-9ec4e07e57b8",
+          "created_at_utc": "2026-08-16 17:19:04.856771+00:00"
+        },
+        {
+          "id": "6af06b35-20e1-4b48-b38b-aff2b1918237",
+          "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+          "role_id": "b4d73cb0-6ad8-4068-a0e8-836c39cf1cff",
+          "created_at_utc": "2026-10-11 23:08:23.335481+00:00"
+        },
+        {
+          "id": "9851cfe6-ec34-4b6d-894b-77614eef36e7",
+          "user_id": "67a1b108-7c65-4c80-bbca-ffc42891949c",
+          "role_id": "1f989d33-e982-4624-939c-72f47a8bd72c",
+          "created_at_utc": "2026-10-11 23:08:23.335481+00:00"
+        },
+        {
+          "id": "1dd584c3-503c-4602-b285-fee7baa037d2",
+          "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+          "role_id": "93119fd0-33ea-4620-b25a-2ccbc45abc82",
+          "created_at_utc": "2026-10-12 22:20:54.275920+00:00"
+        },
+        {
+          "id": "29c3cc91-f80f-467f-9d02-f27647612d26",
+          "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+          "role_id": "58c894fe-8e1e-4db8-b11e-9e9d5fa2b8fb",
+          "created_at_utc": "2026-10-12 22:20:54.275920+00:00"
+        },
+        {
+          "id": "a00c8255-6354-40c1-a05c-1ed458813048",
+          "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+          "role_id": "5841e6e4-5b45-434b-8e94-d76937680b66",
+          "created_at_utc": "2026-10-12 22:54:07.070788+00:00"
+        },
+        {
+          "id": "9f883445-fc27-44b7-ba09-bfe99f01a8d5",
+          "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+          "role_id": "11fbc3e0-4494-42b8-9d3c-ac222f2f2c02",
+          "created_at_utc": "2026-10-13 11:33:19.054003+00:00"
+        },
+        {
+          "id": "f0f88ee7-c82a-4ac6-8134-91b74fde61e9",
+          "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+          "role_id": "264fba91-fc21-401b-8297-7eb1a8003103",
+          "created_at_utc": "2026-10-13 11:33:19.054003+00:00"
+        },
+        {
+          "id": "3975d7c3-051f-46dc-9e9a-4925c568dae4",
+          "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+          "role_id": "dd795943-2b55-4691-82bb-e20fabd95d68",
+          "created_at_utc": "2026-10-18 16:33:19.013137+00:00"
+        }
+      ],
+      "core_permission_profiles": [],
+      "core_profile_permissions": [],
+      "core_user_profiles": [],
+      "core_module_full_access_grants": [
+        {
+          "id": "6dc9766a-1a02-456d-b0ec-e18d10face97",
+          "organization_id": "44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99",
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+          "granted_by": "67a1b108-7c65-4c80-bbca-ffc42891949c",
+          "granted_at_utc": "2026-10-19 16:46:20.029829+00:00",
+          "revoked_at_utc": null,
+          "revoked_by": null
+        }
+      ],
+      "core_workspace_capabilities": [
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "products.search.v1",
+          "permission_id": "9758ed0d-877f-4bf5-a6a5-ca26361952bf",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "sales.by_products.v1",
+          "permission_id": "64d010dd-99bf-4e7d-b04f-c29773d6ae55",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "sales.category_line_amount.v1",
+          "permission_id": "f0db303f-75a5-4adf-be8a-397d13bdaf15",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "sales.commercial_line_amount_by.v1",
+          "permission_id": "7813a330-3a5c-4f4f-aa67-16ad514f0550",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "sales.coverage.v1",
+          "permission_id": "a1401dfb-78e9-40cc-b71d-323520d4815e",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "sales.invoice_amount.v1",
+          "permission_id": "fede9613-62fd-405c-89b9-7a8e0e60c47b",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "sales.invoice_lines.v1",
+          "permission_id": "dba4ba22-62ec-4d11-acfb-8fbb0f446cf7",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "sales.latest_documents.v1",
+          "permission_id": "ed444b2c-b3d8-4af4-9e8b-189829d35249",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "sales.period_billed_amount.v1",
+          "permission_id": "3baceafc-745c-4fce-b565-9aacdf2f9ac4",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "sales.product_line_amount_ranking.v1",
+          "permission_id": "1cd81dc2-4bb9-42a4-92ea-6267c037157f",
+          "enabled": true
+        },
+        {
+          "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "module": "telchi",
+          "capability_code": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+          "permission_id": "003450f6-caeb-4afd-a4aa-04eb1c96bda1",
+          "enabled": true
+        }
+      ]
+    },
+    "effective": {
+      "21a8f7e2-29b5-491a-8bc1-4a43a2934760": [],
+      "245d0083-f171-466c-b720-7a6f8fede01a": [],
+      "5015a69d-eb86-4ac9-b97f-c31dc06e2b59": [
+        "telchi.products.search.read.v1",
+        "telchi.sales.by_products.read.v1",
+        "telchi.sales.category_line_amount.read.v1",
+        "telchi.sales.commercial_line_amount_by.read.v1",
+        "telchi.sales.coverage.read.v1",
+        "telchi.sales.invoice_amount.read.v1",
+        "telchi.sales.invoice_lines.read.v1",
+        "telchi.sales.latest_documents.read.v1",
+        "telchi.sales.period_billed_amount.read.v1",
+        "telchi.sales.product_line_amount_ranking.read.v1",
+        "telchi.sales.source_quantity.read.v1"
+      ],
+      "67a1b108-7c65-4c80-bbca-ffc42891949c": [
+        "audit.view",
+        "role.manage",
+        "user.manage"
+      ],
+      "73d09264-8be2-4402-8023-0142a5f26730": [],
+      "80453084-46a4-4f79-9899-8f57c4e55552": [],
+      "ca74ebae-2c24-4867-bb20-5be4011fab9c": [],
+      "e2484cd6-7b73-412a-a374-4e73a0a6d133": [
+        "flow.executive.read"
+      ],
+      "f027f492-7a9b-4a65-b892-0c4f89f7980b": []
+    }
+  }
+}

@@ -1,0 +1,1743 @@
+{
+  "status": "PASS",
+  "metadata": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  },
+  "preflight": {
+    "intent": "NEW_QUERY",
+    "action": "EXECUTE",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/period": {
+          "start": "2026-05-01",
+          "end_exclusive": "2026-06-01"
+        },
+        "/branches": [],
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": [
+        "/sales_channel",
+        "/comparison",
+        "/reference"
+      ]
+    },
+    "clarification": null
+  },
+  "checks": {
+    "committed": true,
+    "both_metrics": true,
+    "priority": true,
+    "entity": true,
+    "latest_month": true,
+    "may": true,
+    "no_execution": true,
+    "no_repeated_selection": true
+  },
+  "turns": [
+    {
+      "text": "dame las ultimas ventas de calenta",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "interpretation_proposed": {
+          "intent": "NEW_QUERY",
+          "action": "ASK",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/sales_channel": null,
+              "/comparison": null,
+              "/reference": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": {
+            "slot": "metric",
+            "question": "¿Querés consultar importe, cantidades o ambas?"
+          }
+        },
+        "validated_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés consultar importe, cantidades o ambas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": null,
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f",
+            "source_turn_id": "smoke-0"
+          }
+        },
+        "confirmed_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés consultar importe, cantidades o ambas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": null,
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f",
+            "source_turn_id": "smoke-0"
+          }
+        },
+        "decision": "ASK",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": null,
+        "timings": {
+          "interpretation_ms": 6167.159461998381,
+          "state_engine_ms": 0.5573189991991967,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 6168.039776996011
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "¿Querés consultar importe, cantidades o ambas?",
+          "classification": "NEEDS_CLARIFICATION"
+        }
+      }
+    },
+    {
+      "text": "las dos",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés consultar importe, cantidades o ambas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": null,
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f",
+            "source_turn_id": "smoke-0"
+          }
+        },
+        "interpretation_proposed": {
+          "intent": "ANSWER_CLARIFICATION",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/metric": "sales.net_amount"
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 12743.374836994917,
+          "state_engine_ms": 0.2293700017617084,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 12743.751648005855
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      }
+    },
+    {
+      "text": "primero dame el importe de las ventas del mes",
+      "audit": {
+        "previous_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "interpretation_proposed": {
+          "intent": "REFINE",
+          "action": "ASK",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/metric": "sales.net_amount"
+            },
+            "unset": []
+          },
+          "clarification": {
+            "slot": "period",
+            "question": "¿De qué mes y año querés el importe de las ventas?"
+          }
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué mes y año querés el importe de las ventas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "1da3b00eadf2927b6ba1ac9cbfe441031f770b88af6a5fd313dcbb7ed01ca6b4",
+            "source_turn_id": "smoke-2"
+          }
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué mes y año querés el importe de las ventas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "1da3b00eadf2927b6ba1ac9cbfe441031f770b88af6a5fd313dcbb7ed01ca6b4",
+            "source_turn_id": "smoke-2"
+          }
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 7409.21706300287,
+          "state_engine_ms": 1.194159995066002,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 7411.0636670011445
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      }
+    },
+    {
+      "text": "ultimo mes registrado",
+      "audit": {
+        "previous_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué mes y año querés el importe de las ventas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "1da3b00eadf2927b6ba1ac9cbfe441031f770b88af6a5fd313dcbb7ed01ca6b4",
+            "source_turn_id": "smoke-2"
+          }
+        },
+        "interpretation_proposed": {
+          "intent": "ANSWER_CLARIFICATION",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": "latest_available_month",
+              "/period": null,
+              "/metric": "sales.net_amount"
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": "latest_available_month",
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": "latest_available_month",
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 6616.468806998455,
+          "state_engine_ms": 0.9273079995182343,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 6617.7547499974025
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) durante el último mes registrado. La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida. Tampoco tengo metadata habilitada para resolver el último mes por entidad y métrica.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      }
+    },
+    {
+      "text": "mayo 2026",
+      "audit": {
+        "previous_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": "latest_available_month",
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "interpretation_proposed": {
+          "intent": "ANSWER_CLARIFICATION",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              }
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 6472.400495993497,
+          "state_engine_ms": 0.9764200003701262,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 6473.758651998651
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      }
+    },
+    {
+      "text": "todo mayo de 2026",
+      "audit": {
+        "previous_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "interpretation_proposed": {
+          "intent": "REFINE",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              }
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 6886.546485999133,
+          "state_engine_ms": 0.22862900368636474,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 6886.923878999369
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      }
+    }
+  ],
+  "variants": [
+    {
+      "text": "ambas",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés consultar importe, cantidades o ambas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": null,
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f",
+            "source_turn_id": "smoke-0"
+          }
+        },
+        "interpretation_proposed": {
+          "intent": "ANSWER_CLARIFICATION",
+          "action": "ASK",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/metric": "sales.net_amount",
+              "/period": null,
+              "/branches": [],
+              "/sales_channel": null,
+              "/comparison": null,
+              "/reference": null
+            },
+            "unset": []
+          },
+          "clarification": {
+            "slot": "period",
+            "question": "¿De qué período querés consultar las ventas?"
+          }
+        },
+        "validated_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué período querés consultar las ventas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f",
+            "source_turn_id": "variant"
+          }
+        },
+        "confirmed_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué período querés consultar las ventas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f",
+            "source_turn_id": "variant"
+          }
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 8709.726487002627,
+          "state_engine_ms": 0.9947180005838163,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 8711.041332004243
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      },
+      "passed": true
+    },
+    {
+      "text": "las dos cosas",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés consultar importe, cantidades o ambas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": null,
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f",
+            "source_turn_id": "smoke-0"
+          }
+        },
+        "interpretation_proposed": {
+          "intent": "ANSWER_CLARIFICATION",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/metric": "sales.net_amount"
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 8026.183980000496,
+          "state_engine_ms": 3.096458996878937,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 8029.482329999155
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      },
+      "passed": true
+    },
+    {
+      "text": "primero la plata",
+      "audit": {
+        "previous_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "interpretation_proposed": {
+          "intent": "REFINE",
+          "action": "ASK",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/metric": "sales.net_amount",
+              "/period": null,
+              "/branches": [],
+              "/sales_channel": null,
+              "/comparison": null,
+              "/reference": null
+            },
+            "unset": []
+          },
+          "clarification": {
+            "slot": "period",
+            "question": "¿De qué período querés consultar las ventas?"
+          }
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué período querés consultar las ventas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "1da3b00eadf2927b6ba1ac9cbfe441031f770b88af6a5fd313dcbb7ed01ca6b4",
+            "source_turn_id": "variant"
+          }
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué período querés consultar las ventas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "1da3b00eadf2927b6ba1ac9cbfe441031f770b88af6a5fd313dcbb7ed01ca6b4",
+            "source_turn_id": "variant"
+          }
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 6044.605296003283,
+          "state_engine_ms": 1.087769000150729,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 6046.036346997425
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      },
+      "passed": true
+    },
+    {
+      "text": "primero dame el importe",
+      "audit": {
+        "previous_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "interpretation_proposed": {
+          "intent": "REFINE",
+          "action": "ASK",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/metric": "sales.net_amount"
+            },
+            "unset": []
+          },
+          "clarification": {
+            "slot": "period",
+            "question": "¿De qué período querés el importe?"
+          }
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué período querés el importe?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "1da3b00eadf2927b6ba1ac9cbfe441031f770b88af6a5fd313dcbb7ed01ca6b4",
+            "source_turn_id": "variant"
+          }
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué período querés el importe?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "1da3b00eadf2927b6ba1ac9cbfe441031f770b88af6a5fd313dcbb7ed01ca6b4",
+            "source_turn_id": "variant"
+          }
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 4497.72501699772,
+          "state_engine_ms": 0.4732290035462938,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4498.502269001619
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      },
+      "passed": true
+    },
+    {
+      "text": "el último mes que tengas",
+      "audit": {
+        "previous_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué mes y año querés el importe de las ventas?"
+            },
+            "proposed": {
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "temporal_reference": null,
+              "metric": "sales.net_amount",
+              "period": null,
+              "branches": [],
+              "sales_channel": null,
+              "comparison": null,
+              "reference": null,
+              "pending": null
+            },
+            "base_state_hash": "1da3b00eadf2927b6ba1ac9cbfe441031f770b88af6a5fd313dcbb7ed01ca6b4",
+            "source_turn_id": "smoke-2"
+          }
+        },
+        "interpretation_proposed": {
+          "intent": "ANSWER_CLARIFICATION",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "/entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "/temporal_reference": "latest_available_month",
+              "/metric": "sales.net_amount"
+            },
+            "unset": [
+              "/period"
+            ]
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": "latest_available_month",
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": "latest_available_month",
+          "metric": "sales.net_amount",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 5633.315854000102,
+          "state_engine_ms": 1.2207820036564954,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5634.786727998289
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) durante el último mes registrado. La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida. Tampoco tengo metadata habilitada para resolver el último mes por entidad y métrica.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      },
+      "passed": true
+    },
+    {
+      "text": "mayo entero",
+      "audit": {
+        "previous_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "interpretation_proposed": {
+          "intent": "REFINE",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              }
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 5013.538559003791,
+          "state_engine_ms": 0.6671839946648106,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5014.488205000816
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      },
+      "passed": true
+    },
+    {
+      "text": "del primero al último día de mayo",
+      "audit": {
+        "previous_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "interpretation_proposed": {
+          "intent": "REFINE",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              }
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "confirmed_state": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "temporal_reference": null,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "execution_result": null,
+        "bmd": {
+          "category": "METRIC_MISSING"
+        },
+        "timings": {
+          "interpretation_ms": 4180.470601997513,
+          "state_engine_ms": 0.21661099890479818,
+          "capability_ms": 0.0,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4180.831751000369
+        },
+        "committed": true,
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      },
+      "passed": true
+    }
+  ],
+  "boundary": "Real Luna; auth/persistence/query doubles; NOT WhatsApp",
+  "evaluation_note": "Pending proposed is the known intention for committed ASK; active state is deliberately protected. Recheck only, no new provider calls."
+}

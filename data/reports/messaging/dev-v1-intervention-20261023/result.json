@@ -1,0 +1,228 @@
+{
+  "branch": "feature/console-backend-core",
+  "observed_at": "2026-10-23T14:21:20.713957+00:00",
+  "V1_INSTALLED_IN_DEV": "NO",
+  "installation_detail": "Srv05/Messaging source and all three schemas installed; existing Evolution container NOT replaced/started until authenticated DEV configuration is provisioned",
+  "THREE_MIGRATIONS": "PASS",
+  "V1_CREDENTIALS": "FAIL",
+  "PRIVATE_CALLBACK": "FAIL",
+  "SRV05_PROVIDER_V1": "FAIL",
+  "BACKUP_RECOVERY": "PASS",
+  "blocked_not_functional_failures": {
+    "V1_CREDENTIALS": "Missing distinct accredited requester/approver identities, public key references and independent approvals; none fabricated",
+    "PRIVATE_CALLBACK": "UDS mount/UID proof PASS; actual signed callback cannot be configured before V1 trust/identities",
+    "SRV05_PROVIDER_V1": "Source composition/no-fallback tests PASS; operational startup blocked by missing authenticated configuration"
+  },
+  "META_UNCHANGED": "YES",
+  "HISTORY_PRESERVED": "YES",
+  "REAL_MESSAGES_SENT": 0,
+  "READY_FOR_WHATSAPP_TEST": "NO",
+  "source_files": [
+    {
+      "path": "SrvRestAstroLS_v1/backend/ls_iMotorSoft_Srv05.py",
+      "sha256": "5a9bba41f65d27d8fa3f9eee993c537ddb37f5005d50037a6a5db922eda7e7be"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/service.py",
+      "sha256": "8094f8d25e086566f4ab6ae0c4544f451e9c438feec5c2b49c7bd20a327e4fca"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/transport_runtime.py",
+      "sha256": "d0fb7ce9214ccc291ea60d0549831b5bb8de6ad8a2d6cdab899af092be0d7c08"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/handlers.py",
+      "sha256": "e0c6164b1cf99db92384f7f48ff1c583a20e8d384c27a74570651fca0f7c0d3c"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/repository.py",
+      "sha256": "c5b7e50b54e36d44a5fa6ea3cc89146c0ccd58a836231dc80ba036e9757592fc"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/transport_profile.py",
+      "sha256": "35a22014fe788b7353b2bc9d69c109d87bb0212dc794e55afff2c6e345e21215"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/transport_repository.py",
+      "sha256": "59f40542c533e17192a24fc6aa37530db8537c7343de1712d57a65e8d7347e8f"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/transport_app.py",
+      "sha256": "ed9032ed74d6204bf653747c6b8b96fcb55746aacf05e11ed094769196746f95"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/transport_callbacks.py",
+      "sha256": "6d9a77237966b6f9c891b4ac702197b7d7104ef0f1d6d4dd398410ecbd76f546"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/domain/egress.py",
+      "sha256": "841796b3e5738244eb3e4fceb48958b0b7e89dc7b97691f9373be410542801db"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/domain/delivery.py",
+      "sha256": "ce48d6d2a64080e01419a7621ea243910f482379f43b9126c552fcb9929f3a72"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/domain/messages.py",
+      "sha256": "b00cfe446da73360a9753f425dbe15dd8c6b55ce6ccb0c9118b1d5ace51cc52e"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/webhooks/evolution_whatsapp.py",
+      "sha256": "ef54d6346559c6354a3603b7df3f2d4aac1072912d46d0b6bdbe46d9f4340e14"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/providers/evolution/provider.py",
+      "sha256": "404e0315ffe5236c2ce7ee7c6427a5c39ed369f728368cff0c311553dbeeb96b"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/modules/messaging/providers/evolution/bound_provider.py",
+      "sha256": "7203fb2205f89e6367b69053426173f73917c3e5af30f7fbec42944ed47fb707"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/tests/test_messaging_evolution.py",
+      "sha256": "38b6279180c50b7457ad137288a7fbdbc265f71c1b55e6c80108164e1ec329e6"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/tests/test_messaging_durable_egress.py",
+      "sha256": "7c345ac64ec7b30a47199367adf478dd0e9ae241c3620982e8748773214147a4"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/tests/test_messaging_horizontal_runtime.py",
+      "sha256": "d37f7066c0a75603b98331361eff94677c22644948736a6742093959f8d2db22"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/tests/test_srv05_horizontal_composition.py",
+      "sha256": "3c975f2c6a0f7c42ff10b26f6d49814d03959856a79c68ca3cfa8c817d0ec513"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/tests/test_srv05_evolution_isolation.py",
+      "sha256": "47ee1a15f3d8f5a4b8f136fd8fbe5d3cf9fb894e62aaed6727129f3dc82c7bba"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/db/migrations/032_team360_transport_evidence_v1.sql",
+      "sha256": "699478217e4eb95c0d36615bb98180d680af48609c0799f689694a1c60d438c2"
+    },
+    {
+      "path": "SrvRestAstroLS_v1/backend/tests/durable_egress_worker.py",
+      "sha256": "6516554dc7e9db6b85eece349fd74b95f76cff0fe70fa8ad59010b7e0db564ad"
+    }
+  ],
+  "databases": {
+    "team360": {
+      "all_original_tables_preserved": "PASS",
+      "new_ot_tables": [
+        "public.ot_inventory",
+        "public.ot_operation",
+        "public.ot_received_callback",
+        "public.ot_revision",
+        "public.ot_target"
+      ],
+      "ot_row_counts": {
+        "public.ot_inventory": 0,
+        "public.ot_operation": 0,
+        "public.ot_received_callback": 0,
+        "public.ot_revision": 0,
+        "public.ot_target": 0
+      }
+    },
+    "evolution_api": {
+      "all_original_tables_preserved": "PASS",
+      "new_ot_tables": [
+        "evolution_api.ot_attempt",
+        "evolution_api.ot_callback",
+        "evolution_api.ot_inventory",
+        "evolution_api.ot_meta_instance",
+        "evolution_api.ot_operation",
+        "evolution_api.ot_received_callback",
+        "evolution_api.ot_revision",
+        "evolution_api.ot_target"
+      ],
+      "ot_row_counts": {
+        "evolution_api.ot_attempt": 0,
+        "evolution_api.ot_callback": 0,
+        "evolution_api.ot_inventory": 0,
+        "evolution_api.ot_meta_instance": 0,
+        "evolution_api.ot_operation": 0,
+        "evolution_api.ot_received_callback": 0,
+        "evolution_api.ot_revision": 0,
+        "evolution_api.ot_target": 0
+      }
+    }
+  },
+  "existing_private_configuration_unchanged": {
+    "evolution.env": true,
+    "image.ref": true,
+    "backend.env": true,
+    "telchi-control.json": true
+  },
+  "production_modified": false,
+  "focused_tests": {
+    "passed": 161,
+    "skipped": 16,
+    "warning": "Existing Diagnosis default in-memory warning; no Diagnosis request",
+    "scope": "modified Messaging and Srv05 tests only; no 427 rerun"
+  },
+  "recovery": "Keep additive tables, audit and UNKNOWN. Admission remains closed; do not start legacy image/launcher or restore live DB. Archives and pre-change source retained privately.",
+  "next_owner_input": "Two distinct authorized requester/approver actor IDs with public Ed25519 key references and independently signed approvals for existing Telchi DEV scope; no private keys in chat",
+  "own_processes_left_running": 0,
+  "real_history_replayed": false,
+  "message_event_counts": [
+    {
+      "channel_id": "3cc01e11-da1c-4630-a9c6-ecc2f79220d4",
+      "n": 164
+    },
+    {
+      "channel_id": "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+      "n": 1335
+    }
+  ],
+  "protected_events": [
+    {
+      "id": "42b57718-2956-421a-9bc1-20e5918f02b5",
+      "status": "running",
+      "transport_status": "received"
+    },
+    {
+      "id": "62c88461-2502-4ab4-8705-ef8395e15dff",
+      "status": "running",
+      "transport_status": "received"
+    },
+    {
+      "id": "9c16bd91-0972-4273-8015-2f54c52d40be",
+      "status": "failed",
+      "transport_status": "unknown"
+    },
+    {
+      "id": "aedf9f66-0a34-4d3a-91d1-60a567d358bc",
+      "status": "failed",
+      "transport_status": "unknown"
+    },
+    {
+      "id": "f8cee1ab-f0f2-4186-bf9d-c45ce574d0ab",
+      "status": "failed",
+      "transport_status": "unknown"
+    }
+  ],
+  "ddl_roles": [
+    {
+      "rolname": "evodevv1_ddl",
+      "rolsuper": false,
+      "rolcreaterole": false,
+      "rolcreatedb": false,
+      "rolinherit": false,
+      "rolcanlogin": false,
+      "rolbypassrls": false
+    },
+    {
+      "rolname": "t360devv1_ddl",
+      "rolsuper": false,
+      "rolcreaterole": false,
+      "rolcreatedb": false,
+      "rolinherit": false,
+      "rolcanlogin": false,
+      "rolbypassrls": false
+    }
+  ],
+  "evolution_existing_container": "created 86142b5f352c2abe141d5a1cffbc13524ec3c351b4a9cb13e3fa6bf4d0eed461",
+  "missing_configuration_fail_closed": "PASS"
+}

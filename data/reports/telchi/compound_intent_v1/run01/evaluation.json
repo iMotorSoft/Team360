@@ -1,0 +1,744 @@
+{
+  "abraham": {
+    "turns": 2,
+    "errors": 0,
+    "baseline": {
+      "preserved": 3,
+      "requirements": 17,
+      "predicted": 5,
+      "recall": 0.17647058823529413,
+      "precision": 0.6,
+      "exact_turns": 0
+    },
+    "candidate": {
+      "preserved": 14,
+      "requirements": 17,
+      "predicted": 18,
+      "recall": 0.8235294117647058,
+      "precision": 0.7777777777777778,
+      "exact_turns": 0
+    },
+    "previously_correct_turn_regressions": [],
+    "baseline_allowed": 0,
+    "candidate_allowed": 0,
+    "new_authorizations": 0,
+    "blocked_previously_allowed": [],
+    "additional_call_latency_ms": {
+      "p50": 12712.100432499938,
+      "p95": 15161.21964299964
+    },
+    "additional_llm_calls": 2,
+    "additional_tokens": {
+      "input_tokens": 4783,
+      "output_tokens": 2163,
+      "total_tokens": 6946
+    },
+    "plan_eligibility_vs_gold": {
+      "baseline": {
+        "true_positive": 0,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2,
+        "precision": null,
+        "recall": null
+      },
+      "candidate": {
+        "true_positive": 0,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2,
+        "precision": null,
+        "recall": null
+      }
+    },
+    "baseline_correct_turns": 0,
+    "per_field": {
+      "metrics": {
+        "expected": 3,
+        "baseline_preserved": 0,
+        "candidate_preserved": 2
+      },
+      "dimensions": {
+        "expected": 1,
+        "baseline_preserved": 0,
+        "candidate_preserved": 1
+      },
+      "segments": {
+        "expected": 1,
+        "baseline_preserved": 0,
+        "candidate_preserved": 0
+      },
+      "granularities": {
+        "expected": 1,
+        "baseline_preserved": 0,
+        "candidate_preserved": 1
+      },
+      "filters": {
+        "expected": 3,
+        "baseline_preserved": 3,
+        "candidate_preserved": 3
+      },
+      "geographies": {
+        "expected": 2,
+        "baseline_preserved": 0,
+        "candidate_preserved": 2
+      },
+      "relations": {
+        "expected": 6,
+        "baseline_preserved": 0,
+        "candidate_preserved": 5
+      }
+    },
+    "diagnostic_end_key_standardized_only": {
+      "preserved": 14,
+      "requirements": 17,
+      "exact_turns": 0,
+      "method": "Scorer-only end -> end_exclusive in time.periods. No changes to raw outputs or eligibility."
+    }
+  },
+  "llmfit": {
+    "turns": 104,
+    "errors": 0,
+    "baseline": {
+      "preserved": 853,
+      "requirements": 883,
+      "predicted": 871,
+      "recall": 0.9660249150622876,
+      "precision": 0.9793340987370838,
+      "exact_turns": 96
+    },
+    "candidate": {
+      "preserved": 723,
+      "requirements": 883,
+      "predicted": 867,
+      "recall": 0.8187995469988675,
+      "precision": 0.8339100346020761,
+      "exact_turns": 12
+    },
+    "previously_correct_turn_regressions": [
+      "TCS_001_T01",
+      "TCS_002_T01",
+      "TCS_002_T02",
+      "TCS_001_T02",
+      "TCS_002_T03",
+      "TCS_001_T03",
+      "TCS_001_T04",
+      "TCS_002_T04",
+      "TCS_004_T01",
+      "TCS_003_T02",
+      "TCS_004_T02",
+      "TCS_004_T03",
+      "TCS_004_T04",
+      "TCS_005_T02",
+      "TCS_006_T03",
+      "TCS_005_T03",
+      "TCS_005_T04",
+      "TCS_008_T01",
+      "TCS_007_T01",
+      "TCS_007_T02",
+      "TCS_007_T03",
+      "TCS_007_T04",
+      "TCS_009_T01",
+      "TCS_010_T01",
+      "TCS_009_T02",
+      "TCS_010_T02",
+      "TCS_009_T03",
+      "TCS_010_T03",
+      "TCS_009_T04",
+      "TCS_010_T04",
+      "TCS_011_T01",
+      "TCS_011_T02",
+      "TCS_012_T02",
+      "TCS_011_T03",
+      "TCS_012_T04",
+      "TCS_011_T04",
+      "TCS_013_T01",
+      "TCS_014_T01",
+      "TCS_013_T02",
+      "TCS_014_T02",
+      "TCS_013_T03",
+      "TCS_014_T03",
+      "TCS_013_T04",
+      "TCS_014_T04",
+      "TCS_016_T01",
+      "TCS_015_T01",
+      "TCS_016_T02",
+      "TCS_016_T03",
+      "TCS_015_T02",
+      "TCS_015_T03",
+      "TCS_016_T04",
+      "TCS_015_T04",
+      "TCS_018_T01",
+      "TCS_017_T01",
+      "TCS_018_T02",
+      "TCS_018_T03",
+      "TCS_018_T04",
+      "TCS_019_T01",
+      "TCS_017_T02",
+      "TCS_017_T03",
+      "TCS_019_T02",
+      "TCS_017_T04",
+      "TCS_019_T03",
+      "TCS_020_T01",
+      "TCS_019_T04",
+      "TCS_020_T02",
+      "TCS_021_T01",
+      "TCS_020_T03",
+      "TCS_020_T04",
+      "TCS_022_T01",
+      "TCS_021_T03",
+      "TCS_022_T02",
+      "TCS_021_T04",
+      "TCS_023_T01",
+      "TCS_022_T03",
+      "TCS_023_T02",
+      "TCS_022_T04",
+      "TCS_023_T03",
+      "TCS_023_T04",
+      "TCS_025_T01",
+      "TCS_025_T02",
+      "TCS_025_T03",
+      "TCS_026_T02",
+      "TCS_025_T04",
+      "TCS_026_T03",
+      "TCS_026_T04"
+    ],
+    "baseline_allowed": 80,
+    "candidate_allowed": 6,
+    "new_authorizations": 0,
+    "blocked_previously_allowed": [
+      "TCS_001_T01",
+      "TCS_002_T01",
+      "TCS_002_T02",
+      "TCS_001_T02",
+      "TCS_002_T03",
+      "TCS_001_T03",
+      "TCS_001_T04",
+      "TCS_002_T04",
+      "TCS_003_T01",
+      "TCS_004_T01",
+      "TCS_004_T02",
+      "TCS_003_T03",
+      "TCS_004_T03",
+      "TCS_003_T04",
+      "TCS_004_T04",
+      "TCS_005_T03",
+      "TCS_005_T04",
+      "TCS_008_T01",
+      "TCS_007_T01",
+      "TCS_007_T02",
+      "TCS_007_T03",
+      "TCS_008_T04",
+      "TCS_007_T04",
+      "TCS_009_T01",
+      "TCS_010_T01",
+      "TCS_009_T02",
+      "TCS_010_T03",
+      "TCS_009_T04",
+      "TCS_010_T04",
+      "TCS_011_T01",
+      "TCS_011_T02",
+      "TCS_011_T03",
+      "TCS_012_T04",
+      "TCS_013_T01",
+      "TCS_014_T01",
+      "TCS_013_T02",
+      "TCS_013_T03",
+      "TCS_014_T03",
+      "TCS_013_T04",
+      "TCS_014_T04",
+      "TCS_016_T01",
+      "TCS_015_T01",
+      "TCS_016_T03",
+      "TCS_015_T03",
+      "TCS_015_T04",
+      "TCS_018_T01",
+      "TCS_017_T01",
+      "TCS_018_T02",
+      "TCS_018_T03",
+      "TCS_018_T04",
+      "TCS_019_T01",
+      "TCS_017_T03",
+      "TCS_017_T04",
+      "TCS_019_T03",
+      "TCS_019_T04",
+      "TCS_020_T02",
+      "TCS_021_T01",
+      "TCS_020_T03",
+      "TCS_020_T04",
+      "TCS_022_T01",
+      "TCS_021_T03",
+      "TCS_021_T04",
+      "TCS_023_T01",
+      "TCS_022_T03",
+      "TCS_022_T04",
+      "TCS_023_T03",
+      "TCS_023_T04",
+      "TCS_024_T01",
+      "TCS_025_T01",
+      "TCS_024_T03",
+      "TCS_024_T04",
+      "TCS_026_T01",
+      "TCS_025_T04",
+      "TCS_026_T03"
+    ],
+    "additional_call_latency_ms": {
+      "p50": 4646.395899500021,
+      "p95": 8937.432113998511
+    },
+    "additional_llm_calls": 104,
+    "additional_tokens": {
+      "input_tokens": 292958,
+      "output_tokens": 44880,
+      "total_tokens": 337838
+    },
+    "plan_eligibility_vs_gold": {
+      "baseline": {
+        "true_positive": 80,
+        "false_positive": 0,
+        "false_negative": 3,
+        "true_negative": 21,
+        "precision": 1.0,
+        "recall": 0.963855421686747
+      },
+      "candidate": {
+        "true_positive": 6,
+        "false_positive": 0,
+        "false_negative": 77,
+        "true_negative": 21,
+        "precision": 1.0,
+        "recall": 0.07228915662650602
+      }
+    },
+    "baseline_correct_turns": 96,
+    "per_field": {
+      "business_domain": {
+        "expected": 103,
+        "baseline_preserved": 99,
+        "candidate_preserved": 99
+      },
+      "comparison": {
+        "expected": 16,
+        "baseline_preserved": 16,
+        "candidate_preserved": 0
+      },
+      "dimensions": {
+        "expected": 119,
+        "baseline_preserved": 115,
+        "candidate_preserved": 118
+      },
+      "filters": {
+        "expected": 212,
+        "baseline_preserved": 196,
+        "candidate_preserved": 188
+      },
+      "limit": {
+        "expected": 2,
+        "baseline_preserved": 2,
+        "candidate_preserved": 2
+      },
+      "measure_context": {
+        "expected": 0,
+        "baseline_preserved": 0,
+        "candidate_preserved": 0
+      },
+      "metrics": {
+        "expected": 103,
+        "baseline_preserved": 99,
+        "candidate_preserved": 93
+      },
+      "reference": {
+        "expected": 23,
+        "baseline_preserved": 23,
+        "candidate_preserved": 0
+      },
+      "scope": {
+        "expected": 22,
+        "baseline_preserved": 22,
+        "candidate_preserved": 22
+      },
+      "sort": {
+        "expected": 4,
+        "baseline_preserved": 4,
+        "candidate_preserved": 4
+      },
+      "time": {
+        "expected": 279,
+        "baseline_preserved": 277,
+        "candidate_preserved": 197
+      }
+    },
+    "diagnostic_end_key_standardized_only": {
+      "preserved": 791,
+      "requirements": 883,
+      "exact_turns": 35,
+      "method": "Scorer-only end -> end_exclusive in time.periods. No changes to raw outputs or eligibility."
+    },
+    "baseline_interpretation_ms": {
+      "p50": 2866.486,
+      "p95": 5045.215
+    },
+    "estimated_serial_candidate_ms": {
+      "p50": 7413.452845000582,
+      "p95": 13535.346372998938
+    },
+    "baseline_llm_calls": 104,
+    "baseline_tokens": {
+      "input_tokens": 409026,
+      "output_tokens": 20780
+    },
+    "candidate_total_llm_calls": 208,
+    "candidate_total_tokens": {
+      "input_tokens": 701984,
+      "output_tokens": 65660
+    }
+  },
+  "simple": {
+    "turns": 8,
+    "errors": 0,
+    "baseline": {
+      "preserved": 22,
+      "requirements": 22,
+      "predicted": 22,
+      "recall": 1.0,
+      "precision": 1.0,
+      "exact_turns": 8
+    },
+    "candidate": {
+      "preserved": 12,
+      "requirements": 22,
+      "predicted": 22,
+      "recall": 0.5454545454545454,
+      "precision": 0.5454545454545454,
+      "exact_turns": 2
+    },
+    "previously_correct_turn_regressions": [
+      "S01_1",
+      "S03_1",
+      "S05_1",
+      "S06_1",
+      "S05_2",
+      "S06_2"
+    ],
+    "baseline_allowed": 7,
+    "candidate_allowed": 0,
+    "new_authorizations": 0,
+    "blocked_previously_allowed": [
+      "S01_1",
+      "S02_1",
+      "S03_1",
+      "S04_1",
+      "S05_1",
+      "S05_2",
+      "S06_2"
+    ],
+    "additional_call_latency_ms": {
+      "p50": 5199.990488999902,
+      "p95": 7831.906695999351
+    },
+    "additional_llm_calls": 8,
+    "additional_tokens": {
+      "input_tokens": 19548,
+      "output_tokens": 3390,
+      "total_tokens": 22938
+    },
+    "plan_eligibility_vs_gold": {
+      "baseline": {
+        "true_positive": 7,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 1,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "candidate": {
+        "true_positive": 0,
+        "false_positive": 0,
+        "false_negative": 7,
+        "true_negative": 1,
+        "precision": null,
+        "recall": 0.0
+      }
+    },
+    "baseline_correct_turns": 8,
+    "per_field": {
+      "metrics": {
+        "expected": 10,
+        "baseline_preserved": 10,
+        "candidate_preserved": 4
+      },
+      "time": {
+        "expected": 12,
+        "baseline_preserved": 12,
+        "candidate_preserved": 8
+      }
+    },
+    "diagnostic_end_key_standardized_only": {
+      "preserved": 16,
+      "requirements": 22,
+      "exact_turns": 2,
+      "method": "Scorer-only end -> end_exclusive in time.periods. No changes to raw outputs or eligibility."
+    },
+    "baseline_interpretation_ms": {
+      "p50": 4027.7324945000146,
+      "p95": 4292.8388609980175
+    },
+    "estimated_serial_candidate_ms": {
+      "p50": 9188.35362649952,
+      "p95": 11620.719506998284
+    }
+  },
+  "recommendation": "REVISE",
+  "cost_usd": null,
+  "cost_limitation": "Direct Responses usage has tokens but no billed USD. No verified price for gpt-5.6-luna; do not invent pricing.",
+  "limitations": [
+    "LlmFit frozen baseline uses its generic experimental contract/catalog, not current Telchi capabilities. Replay has no new LlmFit baseline LLM calls.",
+    "Gold expected_state_after describes accepted intent, not all unsupported requests. Request preservation on blocked/ASK turns is not fully measured by this gold.",
+    "Gold is assistant-authored and not independently reviewed. Structural atoms flatten list membership; relational exact matching reported separately.",
+    "One sample per turn, no statistical significance; live sidecar call with fixed-input frozen LlmFit baseline, sequential sidecar rollout within each conversation.",
+    "Sidecar overhead is additive to baseline latency; no HTTP/SQL/end-to-end or production costs claimed.",
+    "Additional LlmFit eligibility gate is post-run deterministic analysis; extraction/raw rows unchanged. No semantic repair or inferred capabilities."
+  ],
+  "abraham_relations": {
+    "baseline": {
+      "preserved": 0,
+      "expected": 2
+    },
+    "candidate": {
+      "preserved": 0,
+      "expected": 2
+    }
+  },
+  "plan_comparison_method": "LlmFit: conservative frozen-plan eligibility replay. Abraham/simple: unchanged current State Engine + availability, no execution. Not runtime-equivalent catalogs.",
+  "provider_errors": 0,
+  "claims_or_relations_rejected": 0,
+  "all_relations_remain_unverified": true,
+  "raw_time_end_key_turns": [
+    "TCS_001_T01",
+    "TCS_002_T01",
+    "TCS_002_T02",
+    "TCS_001_T02",
+    "TCS_002_T03",
+    "TCS_001_T03",
+    "TCS_001_T04",
+    "TCS_002_T04",
+    "TCS_008_T01",
+    "TCS_007_T01",
+    "TCS_008_T02",
+    "TCS_007_T02",
+    "TCS_008_T03",
+    "TCS_007_T03",
+    "TCS_008_T04",
+    "TCS_007_T04",
+    "TCS_009_T01",
+    "TCS_010_T01",
+    "TCS_009_T02",
+    "TCS_010_T02",
+    "TCS_009_T03",
+    "TCS_010_T03",
+    "TCS_009_T04",
+    "TCS_010_T04",
+    "TCS_013_T01",
+    "TCS_014_T01",
+    "TCS_013_T02",
+    "TCS_014_T02",
+    "TCS_013_T03",
+    "TCS_014_T03",
+    "TCS_013_T04",
+    "TCS_014_T04",
+    "TCS_016_T01",
+    "TCS_015_T01",
+    "TCS_016_T02",
+    "TCS_016_T03",
+    "TCS_015_T02",
+    "TCS_015_T03",
+    "TCS_016_T04",
+    "TCS_015_T04",
+    "TCS_018_T01",
+    "TCS_017_T01",
+    "TCS_018_T02",
+    "TCS_018_T03",
+    "TCS_018_T04",
+    "TCS_019_T01",
+    "TCS_017_T03",
+    "TCS_019_T02",
+    "TCS_017_T04",
+    "TCS_019_T03",
+    "TCS_019_T04",
+    "TCS_021_T01",
+    "TCS_021_T02",
+    "TCS_022_T01",
+    "TCS_021_T03",
+    "TCS_022_T02",
+    "TCS_021_T04",
+    "TCS_023_T01",
+    "TCS_022_T03",
+    "TCS_023_T02",
+    "TCS_022_T04",
+    "TCS_023_T03",
+    "TCS_023_T04",
+    "TCS_025_T01",
+    "TCS_025_T02",
+    "TCS_025_T03",
+    "TCS_025_T04",
+    "S01_1",
+    "S05_1",
+    "S05_2",
+    "S06_2"
+  ],
+  "abraham_semantic_review": {
+    "method": "Analyst semantic adjudication; not independent review. Raw structural scores also reported. No output repair or gate changes.",
+    "cases": {
+      "ABRAHAM_001": {
+        "candidate_fingerprint": "ee166af780622f5e1d5bc4348e3316988c279495364354ad93839ce6569b6e68",
+        "manual_review_applies": true,
+        "requirements": 9,
+        "baseline_preserved": 3,
+        "candidate_preserved": 8,
+        "checks": [
+          {
+            "requirement": "customer_count",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "candidate.metrics"
+          },
+          {
+            "requirement": "horizontal_channel",
+            "baseline": true,
+            "candidate": true,
+            "evidence": "candidate.filters"
+          },
+          {
+            "requirement": "pharmacy_focus_not_certified_membership",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "candidate.segments + unresolved_requirements: prioritizes pharmacies"
+          },
+          {
+            "requirement": "monthly_granularity",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "candidate.granularities"
+          },
+          {
+            "requirement": "sales_magnitude_request",
+            "baseline": true,
+            "candidate": true,
+            "evidence": "metrics; not certification of net definition"
+          },
+          {
+            "requirement": "period_unresolved_not_invented",
+            "baseline": true,
+            "candidate": true,
+            "evidence": "period/time + unresolved_requirements"
+          },
+          {
+            "requirement": "customer_population_registered_vs_buyers_unresolved",
+            "baseline": false,
+            "candidate": false,
+            "evidence": "Missing from candidate; acceptance.json requires clarification"
+          },
+          {
+            "requirement": "pharmacy_mapping_unverified",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "Analyst reading: candidate explicitly says no validated customer classification/filter"
+          },
+          {
+            "requirement": "monetary_basis_unverified",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "Analyst reading: candidate explicitly says monetary sales measure unspecified; no execution"
+          }
+        ]
+      },
+      "ABRAHAM_002": {
+        "candidate_fingerprint": "064d8d1e1525d774f85c0c386074d783584835ef73a0e88edc2d4609e13c0b3e",
+        "manual_review_applies": null,
+        "requirements": 7,
+        "baseline_preserved": 1,
+        "candidate_preserved": 7,
+        "checks": [
+          {
+            "requirement": "product_mention",
+            "baseline": true,
+            "candidate": true,
+            "evidence": "original confirmed_state.product_search_text vs candidate.relations.subject"
+          },
+          {
+            "requirement": "La_Paz_geography_not_branch",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "geographies; baseline branches misclassify geography"
+          },
+          {
+            "requirement": "Cochabamba_geography_not_branch",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "geographies; baseline branches misclassify geography"
+          },
+          {
+            "requirement": "product_La_Paz_own_distribution",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "relations; distribución/distribution is translation-only equivalence"
+          },
+          {
+            "requirement": "product_Cochabamba_LS_distribution",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "relations; exact product/distributor/geography match"
+          },
+          {
+            "requirement": "no_invented_branch_mapping",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "scope vs branches"
+          },
+          {
+            "requirement": "distribution_claims_preserved_unverified",
+            "baseline": false,
+            "candidate": true,
+            "evidence": "relations.status + exact-substring provenance validated"
+          }
+        ]
+      }
+    },
+    "relations": {
+      "baseline_preserved": 0,
+      "candidate_preserved": 2,
+      "expected": 2
+    },
+    "remaining_error": "Abraham 001 customer population ambiguity not explicitly retained (registered members vs distinct buyers)."
+  },
+  "cost_accounting_note": "Measured tokens cover checkpointed completed calls only. Initial harness aborted after 104 corpus rows: measure_context string caused AttributeError in plan guard. Corrected fail-closed guard and resumed cached rows. Tail requests in flight at abort were not checkpointed; exact billed total UNKNOWN (not zero). See execution.log, execution-resume.log and source snapshots. No corpus extraction re-run.",
+  "harness_functional_failures": {
+    "initial": 1,
+    "resolved": 1,
+    "environmental_aborts": 0
+  },
+  "recommendation_reasons": [
+    "Require canonical validated nested intent schema (including end_exclusive), grounding and explicit update semantics.",
+    "Require a proven lossless intent-to-plan coverage check before promotion; conservative V1 blocks previously allowed controls.",
+    "Do not accept Abraham improvements as general success: report full-corpus loss/regressions separately.",
+    "Need independently reviewed gold for unsupported REQUESTS rather than accepted-state-only gold, and verified USD tariff."
+  ],
+  "protected_sources_unchanged": true,
+  "host_cleanup": {
+    "host_preflight": "SAFE",
+    "resource_guard": "PASS",
+    "concurrency_used": 2,
+    "unrelated_processes_terminated": 0,
+    "environmental_aborts": 0,
+    "own_processes_left_running": 0
+  },
+  "artifact_hashes": {
+    "../../data/reports/telchi/compound_intent_v1/run01/rows.jsonl": "2859811ccdedbeabdf44373b937085ef625fde462d1b75431e09dd697a51e7a1",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/compound_intent_v1/__init__.py": "0aee5bc54d8cef6f9c7696a99da17acbc7c62f67f56e8444af5a146119bec333",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/compound_intent_v1/contract.py": "5c47136452d6eac9ce85f9b36720d4e6af27f503ece7de461122e332234d1d02",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/compound_intent_v1/evaluate.py": "8e379480cef489cac4a4582ba4caedff32783b9d2fd59aa70374b1e5abe64794",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/compound_intent_v1/run.py": "5ca57869144a3eddecf527dcd2538a60bfa69bc83d131b262e2f3fa02f2538f6",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/compound_intent_v1/test_contract.py": "062e84c1bc8f34c7540704f631d4312f762b60cc4d1122750e8253f1384eb0f7",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/compound_intent_v1/test_evaluate.py": "4d2123e50e4fe4b49177b90ebdd79fa41bf5022869caacbf02f4803c8d9573e0"
+  }
+}

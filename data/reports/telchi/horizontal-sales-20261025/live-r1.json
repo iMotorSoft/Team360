@@ -1,0 +1,1571 @@
+{
+  "timestamp": "2026-10-25T16:32:45.247635+00:00",
+  "original_trace": {
+    "event_id": "7b132911-ccb0-431d-91b8-efa29ab2305e",
+    "received_utc": "2026-10-25 16:25:41.068165+00:00",
+    "text": "cual fue la venta por canal horizontal de agosto",
+    "audit": {
+      "bmd": {
+        "category": "MAPPING_MISSING"
+      },
+      "timings": {
+        "capability_ms": 0.0,
+        "state_engine_ms": 1.0881079997488996,
+        "interpretation_ms": 4604.716659001497,
+        "response_format_ms": 0.0,
+        "total_processing_ms": 4658.721522999258
+      },
+      "decision": "DIRECT_UNAVAILABLE",
+      "committed": true,
+      "contract_error": null,
+      "previous_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": "HORIZONTAL",
+        "entity_mention": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "validated_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": "HORIZONTAL",
+        "entity_mention": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "capability_calls": 0,
+      "execution_result": null,
+      "execution_status": "not_executed",
+      "response_prepared": {
+        "text": "Entendí que pedís importe de ventas en agosto de 2026. Todavía no puedo consultar las ventas con esos filtros de sucursal, canal o producto. No es un problema con la fecha elegida. Decime qué información necesitás (producto, cliente, período o categoría) y consulto la parte que sí está acreditada.",
+        "classification": "DIRECT_UNAVAILABLE"
+      },
+      "required_permission": "telchi.sales.period_billed_amount.read.v1",
+      "interpretation_proposed": {
+        "action": "EXECUTE",
+        "intent": "REFINE",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-08-01",
+              "end_exclusive": "2026-09-01"
+            },
+            "/sales_channel": "HORIZONTAL",
+            "/entity_mention": null,
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/temporal_reference": null
+          },
+          "unset": [
+            "/comparison"
+          ]
+        },
+        "clarification": null
+      }
+    },
+    "retained_history": {
+      "9a9f0daf-016d-488d-b4de-1c3df7cb60ed": {
+        "limit": 5,
+        "metric": "sales.product_line_amount_ranking",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": "sap_product",
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.product_line_amount_ranking"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "e337fcb4-8295-47da-8143-80cd32015010": {
+        "focus": {
+          "product": "L03281",
+          "product_label": "MINOXITEL 5% LOCION - HOMBRE x 100 mL."
+        },
+        "limit": 50,
+        "metric": "sales.product_line_amount_ranking",
+        "period": {
+          "start": "2026-07-01",
+          "end_exclusive": "2026-08-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": "sap_product",
+        "reference": null,
+        "comparison": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.product_line_amount_ranking"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": "L03281"
+      },
+      "d51e28c7-d220-49ae-a1d1-a059a317551f": {
+        "focus": {
+          "product": "L03281",
+          "customer": "C000061",
+          "customer_type": "sap_billed",
+          "product_label": "MINOXITEL 5% LOCION - HOMBRE x 100 mL.",
+          "customer_label": "FARMACORP S.A."
+        },
+        "limit": 50,
+        "metric": "sales.commercial_line_amount_by",
+        "period": {
+          "start": "2026-07-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "branches": [],
+        "group_by": "card_code",
+        "reference": null,
+        "comparison": null,
+        "period_mode": "union",
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": "L03281",
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.commercial_line_amount_by"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "85558c51-18b3-4f4a-a834-030db4c9f5e8": {
+        "focus": {
+          "product": "L03281",
+          "customer": "C000061",
+          "customer_type": "sap_billed",
+          "product_label": "MINOXITEL 5% LOCION - HOMBRE x 100 mL.",
+          "customer_label": "FARMACORP S.A."
+        },
+        "limit": 50,
+        "metric": "sales.commercial_line_amount_by",
+        "period": {
+          "start": "2026-07-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "branches": [],
+        "group_by": "card_code",
+        "reference": null,
+        "comparison": null,
+        "period_mode": "union",
+        "breakdown_by": "period",
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": "L03281",
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": "C000061",
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.commercial_line_amount_by"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "07e1842f-4f38-400f-846c-aee85f5203de": {
+        "focus": {
+          "product": "L03281",
+          "customer": "C000061",
+          "customer_type": "sap_billed",
+          "product_label": "MINOXITEL 5% LOCION - HOMBRE x 100 mL.",
+          "customer_label": "FARMACORP S.A."
+        },
+        "limit": 50,
+        "metric": "sales.commercial_line_amount_by",
+        "period": {
+          "start": "2026-07-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "branches": [],
+        "group_by": "sap_product",
+        "reference": null,
+        "comparison": null,
+        "period_mode": "union",
+        "breakdown_by": "period",
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": "C000061",
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.commercial_line_amount_by"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "ce54a3ee-e560-46de-b9f6-99306b983c0d": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "dae625b2-df16-4b1f-8deb-abd7b93fb4d8": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "e3134f67-a238-46cc-b663-81a6eac990ff": {
+        "limit": 5,
+        "metric": "sales.product_line_amount_ranking",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": "sap_product",
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.product_line_amount_ranking"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "c138b1e4-5812-4ce8-ade3-d9de891d0602": {
+        "focus": {
+          "product": "L03281",
+          "product_label": "MINOXITEL 5% LOCION - HOMBRE x 100 mL."
+        },
+        "limit": 50,
+        "metric": "sales.product_line_amount_ranking",
+        "period": {
+          "start": "2026-07-01",
+          "end_exclusive": "2026-08-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": "sap_product",
+        "reference": null,
+        "comparison": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.product_line_amount_ranking"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": "L03281"
+      },
+      "3da72fe4-735c-448c-8bdb-fc7c1c16f4fe": {
+        "focus": {
+          "product": "L03281",
+          "customer": "C000061",
+          "customer_type": "sap_billed",
+          "product_label": "MINOXITEL 5% LOCION - HOMBRE x 100 mL.",
+          "customer_label": "FARMACORP S.A."
+        },
+        "limit": 10,
+        "metric": "sales.commercial_line_amount_by",
+        "period": {
+          "start": "2026-07-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "branches": [],
+        "group_by": "card_code",
+        "reference": null,
+        "comparison": null,
+        "period_mode": "union",
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": "L03281",
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.commercial_line_amount_by"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "15495db6-9d32-4f21-94ea-4c431520018f": {
+        "focus": {
+          "product": "L03281",
+          "customer": "C000061",
+          "customer_type": "sap_billed",
+          "product_label": "MINOXITEL 5% LOCION - HOMBRE x 100 mL.",
+          "customer_label": "FARMACORP S.A."
+        },
+        "limit": 10,
+        "metric": "sales.commercial_line_amount_by",
+        "period": {
+          "start": "2026-07-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "branches": [],
+        "group_by": "card_code",
+        "reference": null,
+        "comparison": null,
+        "period_mode": "union",
+        "breakdown_by": "period",
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": "L03281",
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": "C000061",
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.commercial_line_amount_by"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "56e372f2-6a98-4b01-8d41-5146e78615b9": {
+        "focus": {
+          "product": "L03281",
+          "customer": "C000061",
+          "customer_type": "sap_billed",
+          "product_label": "MINOXITEL 5% LOCION - HOMBRE x 100 mL.",
+          "customer_label": "FARMACORP S.A."
+        },
+        "limit": 10,
+        "metric": "sales.commercial_line_amount_by",
+        "period": {
+          "start": "2026-07-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "branches": [],
+        "group_by": "sap_product",
+        "reference": null,
+        "comparison": null,
+        "period_mode": "union",
+        "breakdown_by": "period",
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": "C000061",
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.commercial_line_amount_by"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "b445d116-2558-4223-97fc-c02209837b78": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "1c12dfc4-37b4-43dd-a25f-680fee285581": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "70e3dea1-3b06-40ae-9180-785352d5fb1b": {
+        "focus": {
+          "product": "L03281",
+          "customer": "C000061",
+          "customer_type": "sap_billed",
+          "product_label": "MINOXITEL 5% LOCION - HOMBRE x 100 mL.",
+          "customer_label": "FARMACORP S.A."
+        },
+        "limit": 10,
+        "metric": "sales.commercial_line_amount_by",
+        "period": {
+          "start": "2026-07-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "branches": [],
+        "group_by": "sap_product",
+        "reference": null,
+        "comparison": null,
+        "period_mode": "union",
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": "C000061",
+        "product_context": null,
+        "business_category": "LAB_FINISHED_PRODUCT",
+        "requested_metrics": [
+          "sales.commercial_line_amount_by"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "54ff3d8f-ebdf-4a9b-9cb5-8782d1caff73": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "LAB_FINISHED_PRODUCT",
+          "RAW_MATERIAL",
+          "FRACTIONATED_PRODUCT"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "52e4b122-6d45-4cac-874f-aec9c3a3c4e2": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "LAB_FINISHED_PRODUCT"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "17d76815-23cf-4f12-bc5c-5225b8d73f0c": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "MEDICATIONS"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "d9873561-66c7-4d45-83d0-eff5297a8f1c": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "MEDICATIONS"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "c7daba87-a1b0-4f2d-9517-4607e8ca9b31": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      }
+    }
+  },
+  "reference": {
+    "read_only": true,
+    "sap_accessed": false,
+    "queries": [
+      {
+        "kind": "invoices",
+        "sql": "SELECT sales_channel_code,sales_channel_semantic_status,currency,canceled,\n                COUNT(*) documents,COUNT(DISTINCT doc_entry) distinct_documents,COUNT(doc_total) amounts,\n                SUM(CAST(doc_total AS DECIMAL(38,6))) amount,MIN(doc_date) first_date,MAX(doc_date) last_date\n                FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND doc_date>=? AND doc_date<? GROUP BY ALL",
+        "parameters": [
+          "SAP_B1_HANA",
+          "2026-08-01",
+          "2026-09-01"
+        ],
+        "rows": [
+          {
+            "sales_channel_code": null,
+            "sales_channel_semantic_status": null,
+            "currency": "BS",
+            "canceled": "N",
+            "documents": 2254,
+            "distinct_documents": 2254,
+            "amounts": 2254,
+            "amount": "4549252.500000",
+            "first_date": "2026-08-01T00:00:00",
+            "last_date": "2026-08-31T00:00:00"
+          },
+          {
+            "sales_channel_code": "SALON",
+            "sales_channel_semantic_status": "SUPPORTED",
+            "currency": "BS",
+            "canceled": "N",
+            "documents": 31883,
+            "distinct_documents": 31883,
+            "amounts": 31883,
+            "amount": "4019087.350000",
+            "first_date": "2026-08-01T00:00:00",
+            "last_date": "2026-08-31T00:00:00"
+          },
+          {
+            "sales_channel_code": "HORIZONTAL",
+            "sales_channel_semantic_status": "CONFIRMED",
+            "currency": "BS",
+            "canceled": "N",
+            "documents": 2665,
+            "distinct_documents": 2665,
+            "amounts": 2665,
+            "amount": "1996773.280000",
+            "first_date": "2026-08-01T00:00:00",
+            "last_date": "2026-08-31T00:00:00"
+          }
+        ]
+      },
+      {
+        "kind": "credits",
+        "sql": "SELECT sales_channel_code,sales_channel_semantic_status,currency,canceled,\n                COUNT(*) documents,COUNT(DISTINCT doc_entry) distinct_documents,COUNT(doc_total) amounts,\n                SUM(CAST(doc_total AS DECIMAL(38,6))) amount,MIN(doc_date) first_date,MAX(doc_date) last_date\n                FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND doc_date>=? AND doc_date<? GROUP BY ALL",
+        "parameters": [
+          "SAP_B1_HANA",
+          "2026-08-01",
+          "2026-09-01"
+        ],
+        "rows": [
+          {
+            "sales_channel_code": null,
+            "sales_channel_semantic_status": null,
+            "currency": "BS",
+            "canceled": "N",
+            "documents": 50,
+            "distinct_documents": 50,
+            "amounts": 50,
+            "amount": "138652.230000",
+            "first_date": "2026-08-03T00:00:00",
+            "last_date": "2026-08-29T00:00:00"
+          },
+          {
+            "sales_channel_code": "HORIZONTAL",
+            "sales_channel_semantic_status": "CONFIRMED",
+            "currency": "BS",
+            "canceled": "N",
+            "documents": 142,
+            "distinct_documents": 142,
+            "amounts": 142,
+            "amount": "127550.360000",
+            "first_date": "2026-08-01T00:00:00",
+            "last_date": "2026-08-31T00:00:00"
+          },
+          {
+            "sales_channel_code": "SALON",
+            "sales_channel_semantic_status": "SUPPORTED",
+            "currency": "BS",
+            "canceled": "N",
+            "documents": 96,
+            "distinct_documents": 96,
+            "amounts": 96,
+            "amount": "37219.510000",
+            "first_date": "2026-08-01T00:00:00",
+            "last_date": "2026-08-31T00:00:00"
+          }
+        ]
+      }
+    ],
+    "source": {
+      "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot_id": 1408,
+      "updated_at": "2026-09-28T18:18:35.264000"
+    },
+    "invoices": "1996773.280000",
+    "credits": "127550.360000",
+    "net": "1869222.920000",
+    "publication_unchanged": true,
+    "limitations": "Materialized DMS series classification. Full DMS/U_ORIGIN census reconciliation, cross-channel credit attribution, unposted DMS returns and full historical coverage not certified. Active headers by DocDate in BS, source taxes/discounts retained; not collections."
+  },
+  "transport_calls": 0,
+  "database_writes": 0,
+  "simulated": [
+    "identity",
+    "RBAC",
+    "conversation persistence",
+    "transport"
+  ],
+  "turns": [
+    {
+      "question": "¿Cuál fue la venta por canal horizontal de agosto?",
+      "classification": "DIRECT_AVAILABLE",
+      "response": "Venta neta documental del canal horizontal / DMS (venta de calle): Bs 1.869.222,92. Del 1 de agosto de 2026 al 31 de agosto de 2026. Facturado: Bs 1.996.773,28; notas de crédito: Bs 127.550,36. Facturas y notas de crédito activas en BS, por fecha documental, con impuestos y descuentos; excluye anuladas. No son cobros. Canal según series DMS materializadas. No certifica reconciliación completa DMS/origen, créditos entre canales ni devoluciones no registradas. Cobertura histórica completa no certificada. Información actualizada al 28 de septiembre de 2026.",
+      "interpretation": {
+        "intent": "REFINE",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-08-01",
+              "end_exclusive": "2026-09-01"
+            },
+            "/sales_channel": "HORIZONTAL",
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": null,
+            "/temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "confirmed_state": {
+        "schema_version": 2,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "entity_mention": null,
+        "temporal_reference": null,
+        "product_search_text": null,
+        "product_context": null,
+        "selected_item_codes": [],
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": "HORIZONTAL",
+        "product_target": null,
+        "ranking_detail": null,
+        "customer_target": null,
+        "business_category": null,
+        "analysis_categories": null,
+        "ranking_target_item_code": null
+      },
+      "capability_calls": 1,
+      "execution_result": {
+        "capability": "sales.period_billed_amount.v1",
+        "rows": [
+          {
+            "invoice_count": 2665,
+            "unique_invoices": 2665,
+            "billed_amount": "1996773.280000",
+            "credit_count": 142,
+            "unique_credits": 142,
+            "credit_amount": "127550.360000",
+            "net_amount": "1869222.920000",
+            "invoice_amount_count": 2665,
+            "credit_amount_count": 142
+          }
+        ],
+        "period": {
+          "date_from": "2026-08-01",
+          "date_to_exclusive": "2026-09-01",
+          "currency": "BS",
+          "sales_channel": "HORIZONTAL"
+        },
+        "currency": "BS",
+        "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+        "source": {
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot_id": 1408,
+          "updated_at": "2026-09-28T18:18:35.264000"
+        },
+        "read_only": true,
+        "sap_accessed": false,
+        "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? AND sales_channel_code=?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? AND sales_channel_code=?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+        "sql_parameters": [
+          "SAP_B1_HANA",
+          "N",
+          "BS",
+          "2026-08-01",
+          "2026-09-01",
+          "HORIZONTAL",
+          "SAP_B1_HANA",
+          "N",
+          "BS",
+          "2026-08-01",
+          "2026-09-01",
+          "HORIZONTAL"
+        ],
+        "sql_duration_ms": 225.98079000090365,
+        "grain": "document_header",
+        "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+        "sales_channel": "HORIZONTAL",
+        "channel_semantic_status": "CONFIRMED",
+        "channel_basis": "materialized DMS numbering series; not customer or salesperson type",
+        "channel_limitations": "DMS/U_ORIGIN census reconciliation, cross-channel credit attribution and unposted DMS returns completeness not certified.",
+        "requested_metrics": [
+          "sales.net_amount"
+        ]
+      },
+      "luna_metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 4767.299,
+        "attempts": 1
+      },
+      "luna_failure": null,
+      "reference_parity": true
+    },
+    {
+      "question": "¿Cuánto vendió DMS en agosto de 2026?",
+      "classification": "DIRECT_AVAILABLE",
+      "response": "Venta neta documental del canal horizontal / DMS (venta de calle): Bs 1.869.222,92. Del 1 de agosto de 2026 al 31 de agosto de 2026. Facturado: Bs 1.996.773,28; notas de crédito: Bs 127.550,36. Facturas y notas de crédito activas en BS, por fecha documental, con impuestos y descuentos; excluye anuladas. No son cobros. Canal según series DMS materializadas. No certifica reconciliación completa DMS/origen, créditos entre canales ni devoluciones no registradas. Cobertura histórica completa no certificada. Información actualizada al 28 de septiembre de 2026.",
+      "interpretation": {
+        "intent": "REFINE",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-08-01",
+              "end_exclusive": "2026-09-01"
+            },
+            "/sales_channel": "HORIZONTAL",
+            "/limit": 10,
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": null,
+            "/temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "confirmed_state": {
+        "schema_version": 2,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "entity_mention": null,
+        "temporal_reference": null,
+        "product_search_text": null,
+        "product_context": null,
+        "selected_item_codes": [],
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": "HORIZONTAL",
+        "product_target": null,
+        "ranking_detail": null,
+        "customer_target": null,
+        "business_category": null,
+        "analysis_categories": null,
+        "ranking_target_item_code": null
+      },
+      "capability_calls": 1,
+      "execution_result": {
+        "capability": "sales.period_billed_amount.v1",
+        "rows": [
+          {
+            "invoice_count": 2665,
+            "unique_invoices": 2665,
+            "billed_amount": "1996773.280000",
+            "credit_count": 142,
+            "unique_credits": 142,
+            "credit_amount": "127550.360000",
+            "net_amount": "1869222.920000",
+            "invoice_amount_count": 2665,
+            "credit_amount_count": 142
+          }
+        ],
+        "period": {
+          "date_from": "2026-08-01",
+          "date_to_exclusive": "2026-09-01",
+          "currency": "BS",
+          "sales_channel": "HORIZONTAL"
+        },
+        "currency": "BS",
+        "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+        "source": {
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot_id": 1408,
+          "updated_at": "2026-09-28T18:18:35.264000"
+        },
+        "read_only": true,
+        "sap_accessed": false,
+        "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? AND sales_channel_code=?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? AND sales_channel_code=?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+        "sql_parameters": [
+          "SAP_B1_HANA",
+          "N",
+          "BS",
+          "2026-08-01",
+          "2026-09-01",
+          "HORIZONTAL",
+          "SAP_B1_HANA",
+          "N",
+          "BS",
+          "2026-08-01",
+          "2026-09-01",
+          "HORIZONTAL"
+        ],
+        "sql_duration_ms": 228.54051499962225,
+        "grain": "document_header",
+        "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+        "sales_channel": "HORIZONTAL",
+        "channel_semantic_status": "CONFIRMED",
+        "channel_basis": "materialized DMS numbering series; not customer or salesperson type",
+        "channel_limitations": "DMS/U_ORIGIN census reconciliation, cross-channel credit attribution and unposted DMS returns completeness not certified.",
+        "requested_metrics": [
+          "sales.net_amount"
+        ]
+      },
+      "luna_metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 5108.206,
+        "attempts": 1
+      },
+      "luna_failure": null,
+      "reference_parity": true
+    },
+    {
+      "question": "¿Cuáles fueron las ventas horizontales de agosto?",
+      "classification": "DIRECT_AVAILABLE",
+      "response": "Venta neta documental del canal horizontal / DMS (venta de calle): Bs 1.869.222,92. Del 1 de agosto de 2026 al 31 de agosto de 2026. Facturado: Bs 1.996.773,28; notas de crédito: Bs 127.550,36. Facturas y notas de crédito activas en BS, por fecha documental, con impuestos y descuentos; excluye anuladas. No son cobros. Canal según series DMS materializadas. No certifica reconciliación completa DMS/origen, créditos entre canales ni devoluciones no registradas. Cobertura histórica completa no certificada. Información actualizada al 28 de septiembre de 2026.",
+      "interpretation": {
+        "intent": "REFINE",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-08-01",
+              "end_exclusive": "2026-09-01"
+            },
+            "/sales_channel": "HORIZONTAL",
+            "/limit": 10,
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": null,
+            "/temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "confirmed_state": {
+        "schema_version": 2,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "entity_mention": null,
+        "temporal_reference": null,
+        "product_search_text": null,
+        "product_context": null,
+        "selected_item_codes": [],
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": "HORIZONTAL",
+        "product_target": null,
+        "ranking_detail": null,
+        "customer_target": null,
+        "business_category": null,
+        "analysis_categories": null,
+        "ranking_target_item_code": null
+      },
+      "capability_calls": 1,
+      "execution_result": {
+        "capability": "sales.period_billed_amount.v1",
+        "rows": [
+          {
+            "invoice_count": 2665,
+            "unique_invoices": 2665,
+            "billed_amount": "1996773.280000",
+            "credit_count": 142,
+            "unique_credits": 142,
+            "credit_amount": "127550.360000",
+            "net_amount": "1869222.920000",
+            "invoice_amount_count": 2665,
+            "credit_amount_count": 142
+          }
+        ],
+        "period": {
+          "date_from": "2026-08-01",
+          "date_to_exclusive": "2026-09-01",
+          "currency": "BS",
+          "sales_channel": "HORIZONTAL"
+        },
+        "currency": "BS",
+        "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+        "source": {
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot_id": 1408,
+          "updated_at": "2026-09-28T18:18:35.264000"
+        },
+        "read_only": true,
+        "sap_accessed": false,
+        "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? AND sales_channel_code=?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? AND sales_channel_code=?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+        "sql_parameters": [
+          "SAP_B1_HANA",
+          "N",
+          "BS",
+          "2026-08-01",
+          "2026-09-01",
+          "HORIZONTAL",
+          "SAP_B1_HANA",
+          "N",
+          "BS",
+          "2026-08-01",
+          "2026-09-01",
+          "HORIZONTAL"
+        ],
+        "sql_duration_ms": 216.57251299984637,
+        "grain": "document_header",
+        "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+        "sales_channel": "HORIZONTAL",
+        "channel_semantic_status": "CONFIRMED",
+        "channel_basis": "materialized DMS numbering series; not customer or salesperson type",
+        "channel_limitations": "DMS/U_ORIGIN census reconciliation, cross-channel credit attribution and unposted DMS returns completeness not certified.",
+        "requested_metrics": [
+          "sales.net_amount"
+        ]
+      },
+      "luna_metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 2982.854,
+        "attempts": 1
+      },
+      "luna_failure": null,
+      "reference_parity": true
+    },
+    {
+      "question": "¿Cuánto vendimos por la calle en agosto?",
+      "classification": "DIRECT_AVAILABLE",
+      "response": "Venta neta documental del canal horizontal / DMS (venta de calle): Bs 1.869.222,92. Del 1 de agosto de 2026 al 31 de agosto de 2026. Facturado: Bs 1.996.773,28; notas de crédito: Bs 127.550,36. Facturas y notas de crédito activas en BS, por fecha documental, con impuestos y descuentos; excluye anuladas. No son cobros. Canal según series DMS materializadas. No certifica reconciliación completa DMS/origen, créditos entre canales ni devoluciones no registradas. Cobertura histórica completa no certificada. Información actualizada al 28 de septiembre de 2026.",
+      "interpretation": {
+        "intent": "REFINE",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": null,
+            "/temporal_reference": null,
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-08-01",
+              "end_exclusive": "2026-09-01"
+            },
+            "/sales_channel": "HORIZONTAL",
+            "/limit": 10
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "confirmed_state": {
+        "schema_version": 2,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "entity_mention": null,
+        "temporal_reference": null,
+        "product_search_text": null,
+        "product_context": null,
+        "selected_item_codes": [],
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": "HORIZONTAL",
+        "product_target": null,
+        "ranking_detail": null,
+        "customer_target": null,
+        "business_category": null,
+        "analysis_categories": null,
+        "ranking_target_item_code": null
+      },
+      "capability_calls": 1,
+      "execution_result": {
+        "capability": "sales.period_billed_amount.v1",
+        "rows": [
+          {
+            "invoice_count": 2665,
+            "unique_invoices": 2665,
+            "billed_amount": "1996773.280000",
+            "credit_count": 142,
+            "unique_credits": 142,
+            "credit_amount": "127550.360000",
+            "net_amount": "1869222.920000",
+            "invoice_amount_count": 2665,
+            "credit_amount_count": 142
+          }
+        ],
+        "period": {
+          "date_from": "2026-08-01",
+          "date_to_exclusive": "2026-09-01",
+          "currency": "BS",
+          "sales_channel": "HORIZONTAL"
+        },
+        "currency": "BS",
+        "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+        "source": {
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot_id": 1408,
+          "updated_at": "2026-09-28T18:18:35.264000"
+        },
+        "read_only": true,
+        "sap_accessed": false,
+        "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? AND sales_channel_code=?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? AND sales_channel_code=?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+        "sql_parameters": [
+          "SAP_B1_HANA",
+          "N",
+          "BS",
+          "2026-08-01",
+          "2026-09-01",
+          "HORIZONTAL",
+          "SAP_B1_HANA",
+          "N",
+          "BS",
+          "2026-08-01",
+          "2026-09-01",
+          "HORIZONTAL"
+        ],
+        "sql_duration_ms": 211.71258599861176,
+        "grain": "document_header",
+        "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+        "sales_channel": "HORIZONTAL",
+        "channel_semantic_status": "CONFIRMED",
+        "channel_basis": "materialized DMS numbering series; not customer or salesperson type",
+        "channel_limitations": "DMS/U_ORIGIN census reconciliation, cross-channel credit attribution and unposted DMS returns completeness not certified.",
+        "requested_metrics": [
+          "sales.net_amount"
+        ]
+      },
+      "luna_metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 4906.76,
+        "attempts": 1
+      },
+      "luna_failure": null,
+      "reference_parity": true
+    }
+  ],
+  "LOCAL_BUSINESS_REGRESSION": true,
+  "WHATSAPP_E2E": "NOT_RUN",
+  "READY_FOR_HORIZONTAL_SALES_RETEST": "NO: DEV runtime admission/gates not reaccredited or reopened by this probe"
+}

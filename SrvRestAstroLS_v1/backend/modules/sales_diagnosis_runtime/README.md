@@ -1,5 +1,7 @@
 # Sales Diagnosis Runtime Module -- Fase 1.8a
 
+Este documento conserva fases históricas dev/product adapter. No describe el estado público vigente de Vera; consultar [status_actual.md](status_actual.md) y sus autoridades runtime antes de interpretar límites o comandos de aquellas fases.
+
 ## Objetivo
 
 Modulo interno skeleton para el runtime del asistente de ventas/diagnostico de Team360.
@@ -419,7 +421,7 @@ Resultado: 12 passed, 7 skipped (dependen de TEAM360_DB_URL).
 
 `POST /api/dev/sales-diagnosis-runtime/turn`
 
-Endpoint backend-only interno/dev. NO es endpoint publico final.
+Endpoint backend-only interno/dev. NO es endpoint publico final. La ruta permanece documentada en OpenAPI, pero sólo procesa requests con `TEAM360_ENV=dev|development` explícito; production, entorno ausente o valor desconocido responden 404 antes de construir providers o tocar estado.
 
 ### Request
 

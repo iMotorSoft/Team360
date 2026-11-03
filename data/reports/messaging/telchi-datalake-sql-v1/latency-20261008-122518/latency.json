@@ -1,0 +1,1228 @@
+{
+  "gate": "TEAM360_MESSAGING_TELCHI_DATALAKE_SQL_LATENCY_V1",
+  "status": "PASS",
+  "n": 10,
+  "all_metrics_ms": {
+    "pre_sql": {
+      "n": 10,
+      "min": 1803.494873046875,
+      "mean": 1840.58125,
+      "p50": 1835.3990478515625,
+      "p90": 1866.98388671875,
+      "p95": 1883.3985595703125,
+      "max": 1899.813232421875
+    },
+    "sql_datalake": {
+      "n": 10,
+      "min": 2311.30419921875,
+      "mean": 2371.1151611328123,
+      "p50": 2362.2357177734375,
+      "p90": 2433.0903076171876,
+      "p95": 2454.166369628906,
+      "max": 2475.242431640625
+    },
+    "formatting_until_send": {
+      "n": 10,
+      "min": 104.938232421875,
+      "mean": 159.0470458984375,
+      "p50": 138.912109375,
+      "p90": 220.67829589843748,
+      "p95": 228.54263916015623,
+      "max": 236.406982421875
+    },
+    "team360_until_send": {
+      "n": 10,
+      "min": 4243.883544921875,
+      "mean": 4370.74345703125,
+      "p50": 4375.9241943359375,
+      "p90": 4414.340747070312,
+      "p95": 4504.163537597656,
+      "max": 4593.986328125
+    },
+    "evolution_accept": {
+      "n": 10,
+      "min": 717.591796875,
+      "mean": 817.26962890625,
+      "p50": 801.41552734375,
+      "p90": 919.8239013671875,
+      "p95": 927.3173461914063,
+      "max": 934.810791015625
+    },
+    "total_observable": {
+      "n": 10,
+      "min": 6626.025634765625,
+      "mean": 6919.32197265625,
+      "p50": 6908.7967529296875,
+      "p90": 7217.009741210937,
+      "p95": 7338.676623535156,
+      "max": 7460.343505859375
+    }
+  },
+  "warm_n": 9,
+  "warm_metrics_ms": {
+    "pre_sql": {
+      "n": 9,
+      "min": 1803.494873046875,
+      "mean": 1843.07568359375,
+      "p50": 1837.72412109375,
+      "p90": 1870.631591796875,
+      "p95": 1885.222412109375,
+      "max": 1899.813232421875
+    },
+    "sql_datalake": {
+      "n": 9,
+      "min": 2311.30419921875,
+      "mean": 2370.781439887153,
+      "p50": 2355.982177734375,
+      "p90": 2437.773876953125,
+      "p95": 2456.508154296875,
+      "max": 2475.242431640625
+    },
+    "formatting_until_send": {
+      "n": 9,
+      "min": 104.938232421875,
+      "mean": 155.38720703125,
+      "p50": 138.019775390625,
+      "p90": 222.425927734375,
+      "p95": 229.41645507812498,
+      "max": 236.406982421875
+    },
+    "team360_until_send": {
+      "n": 9,
+      "min": 4243.883544921875,
+      "mean": 4369.244330512152,
+      "p50": 4371.069091796875,
+      "p90": 4434.3013671875,
+      "p95": 4514.14384765625,
+      "max": 4593.986328125
+    },
+    "evolution_accept": {
+      "n": 9,
+      "min": 717.591796875,
+      "mean": 806.0597330729166,
+      "p50": 776.1484375,
+      "p90": 920.418408203125,
+      "p95": 927.614599609375,
+      "max": 934.810791015625
+    },
+    "total_observable": {
+      "n": 9,
+      "min": 6626.025634765625,
+      "mean": 6859.208468967014,
+      "p50": 6829.6357421875,
+      "p90": 7116.0107421875,
+      "p95": 7152.99169921875,
+      "max": 7189.97265625
+    }
+  },
+  "samples": [
+    {
+      "inbound_id_hash": "e02aeb17f8affe9860ec4da6a865efb9562b6317517278b7ca54eff4264845fc",
+      "outbound_id_hash": "618c33a3e489afc297221c288c3645d7699eca09e4f1a21a2a0ab7ba24c00ac9",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "c45cb6c719aa29d9917d9fa66202deb12bc36df3ed1db054f5a40e7a120de0c8",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462555180.8926,
+        "t1_ms": 1791462555213.694,
+        "t2_ms": 1791462556999.024,
+        "t3_ms": 1791462559373.1426,
+        "t4_ms": 1791462559459.2773,
+        "t5_ms": 1791462559565.1282,
+        "t6_ms": 1791462560483.2869,
+        "t7_ms": 1791462562641.236
+      },
+      "durations_ms": {
+        "pre_sql": 1818.13134765625,
+        "sql_datalake": 2374.11865234375,
+        "formatting_until_send": 191.985595703125,
+        "team360_until_send": 4384.235595703125,
+        "evolution_accept": 918.15869140625,
+        "total_observable": 7460.343505859375
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462556999.024,
+        "sql_duration_ms": 2374.114873000508,
+        "sql_finished_ms": 1791462559373.1426,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1426.897,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462555238.3225
+    },
+    {
+      "inbound_id_hash": "29a50a9dea7101dd5facea48660b8d3b0b5e9d3d086150153f35a41dc9372f72",
+      "outbound_id_hash": "33eb0d8d0def6d1cc7641c1dca715b4e436d9f87b933bbf47f80ea845d9988ee",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "feaef8276849438343e31563dbe31ca4d6706f3993338fc707864e598e9c5578",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462578880.7292,
+        "t1_ms": 1791462578931.5752,
+        "t2_ms": 1791462580713.8032,
+        "t3_ms": 1791462583045.3774,
+        "t4_ms": 1791462583129.6187,
+        "t5_ms": 1791462583183.3972,
+        "t6_ms": 1791462584100.2175,
+        "t7_ms": 1791462585868.687
+      },
+      "durations_ms": {
+        "pre_sql": 1833.073974609375,
+        "sql_datalake": 2331.57421875,
+        "formatting_until_send": 138.019775390625,
+        "team360_until_send": 4302.66796875,
+        "evolution_accept": 916.8203125,
+        "total_observable": 6987.957763671875
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462580713.8032,
+        "sql_duration_ms": 2331.5698919996066,
+        "sql_finished_ms": 1791462583045.3774,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1418.01,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462578954.2578
+    },
+    {
+      "inbound_id_hash": "e0c9ca2965e80d8cfd98bc46746a554712553f22fb2102b3841352841a9f9df1",
+      "outbound_id_hash": "34c06b5841b79984cedc9032dc0ecfaeb23ab41128b8bfe667d6a030a462d43e",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "1401cb740dd6f9211f3a3e6a9129d8bd37554f11c6bbca49f6956f25bab83ba5",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462601285.7812,
+        "t1_ms": 1791462601331.6953,
+        "t2_ms": 1791462603089.2761,
+        "t3_ms": 1791462605400.646,
+        "t4_ms": 1791462605485.726,
+        "t5_ms": 1791462605529.6648,
+        "t6_ms": 1791462606464.4756,
+        "t7_ms": 1791462608115.417
+      },
+      "durations_ms": {
+        "pre_sql": 1803.494873046875,
+        "sql_datalake": 2311.369873046875,
+        "formatting_until_send": 129.018798828125,
+        "team360_until_send": 4243.883544921875,
+        "evolution_accept": 934.810791015625,
+        "total_observable": 6829.6357421875
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462603089.2761,
+        "sql_duration_ms": 2311.36581499959,
+        "sql_finished_ms": 1791462605400.646,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1428.685,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462601343.0571
+    },
+    {
+      "inbound_id_hash": "4d20cf7484844047b210dd2ae162c90a7dbd653f5c73aaf56c5215bd85b023a0",
+      "outbound_id_hash": "7ecaade277ba95b8c555a83defb8c21dc8c1e2c7426dca15ed049388b531ce43",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "95285f58bb08f0f766e01afd0eefa6d02c055cba0169a7ca0511dd50cecbe200",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462611255.1558,
+        "t1_ms": 1791462611283.136,
+        "t2_ms": 1791462613118.492,
+        "t3_ms": 1791462615474.474,
+        "t4_ms": 1791462615562.4824,
+        "t5_ms": 1791462615635.935,
+        "t6_ms": 1791462616353.5269,
+        "t7_ms": 1791462618352.676
+      },
+      "durations_ms": {
+        "pre_sql": 1863.336181640625,
+        "sql_datalake": 2355.982177734375,
+        "formatting_until_send": 161.4609375,
+        "team360_until_send": 4380.779296875,
+        "evolution_accept": 717.591796875,
+        "total_observable": 7097.520263671875
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462613118.492,
+        "sql_duration_ms": 2355.978256999151,
+        "sql_finished_ms": 1791462615474.474,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1453.539,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462611294.2063
+    },
+    {
+      "inbound_id_hash": "02dae3fabbbd646556e2c3dcc89af35d0684bc6e8df0222b65466c8009940c75",
+      "outbound_id_hash": "37fea1a5282375cf147b91aa0a76921fbd174b0cabb5ce3ca4d12921e2bbe65c",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "7128c383c754f3c26ee2e4babd7bea054841a405c1d2ba1f6312a3f4cbf28658",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462623482.0122,
+        "t1_ms": 1791462623517.8345,
+        "t2_ms": 1791462625323.62,
+        "t3_ms": 1791462627634.9243,
+        "t4_ms": 1791462627722.3074,
+        "t5_ms": 1791462627771.2827,
+        "t6_ms": 1791462628611.9146,
+        "t7_ms": 1791462630108.0378
+      },
+      "durations_ms": {
+        "pre_sql": 1841.60791015625,
+        "sql_datalake": 2311.30419921875,
+        "formatting_until_send": 136.3583984375,
+        "team360_until_send": 4289.2705078125,
+        "evolution_accept": 840.6318359375,
+        "total_observable": 6626.025634765625
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462625323.62,
+        "sql_duration_ms": 2311.30012200083,
+        "sql_finished_ms": 1791462627634.9243,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1437.332,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462623540.4995
+    },
+    {
+      "inbound_id_hash": "d84062b9d182a01fb2f75a7b8851fbdb3d84862aded504e0c65fd3dd4ca9a9b8",
+      "outbound_id_hash": "11a9026eef088528a6e8819e2517faa674107e96b0f963298c3d172245302a5f",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "6f1ddea661e2ade00c17e773fe7557af0e4cbe70238af89b119171efd1a5ad6c",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462634085.1162,
+        "t1_ms": 1791462634117.9705,
+        "t2_ms": 1791462635913.0715,
+        "t3_ms": 1791462638332.5925,
+        "t4_ms": 1791462638422.324,
+        "t5_ms": 1791462638466.1392,
+        "t6_ms": 1791462639292.8218,
+        "t7_ms": 1791462641086.968
+      },
+      "durations_ms": {
+        "pre_sql": 1827.955322265625,
+        "sql_datalake": 2419.52099609375,
+        "formatting_until_send": 133.546630859375,
+        "team360_until_send": 4381.02294921875,
+        "evolution_accept": 826.6826171875,
+        "total_observable": 7001.851806640625
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462635913.0715,
+        "sql_duration_ms": 2419.516587999169,
+        "sql_finished_ms": 1791462638332.5925,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1435.468,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462634140.255
+    },
+    {
+      "inbound_id_hash": "14d47b8ce5d08baeb7f2062b9533101b902b657572e601e52e6c7bf7aba372a5",
+      "outbound_id_hash": "4521cd1a960374c14ba944443b9955faf89606e347962af8a6c4e8a66610c010",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "873d4e6f263837e1181bca62f194d6aadb65a7cd0e650205a8cb4f8c1b345fc3",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462644648.6682,
+        "t1_ms": 1791462644692.1514,
+        "t2_ms": 1791462646548.4814,
+        "t3_ms": 1791462649023.7239,
+        "t4_ms": 1791462649106.6362,
+        "t5_ms": 1791462649242.6545,
+        "t6_ms": 1791462649993.4338,
+        "t7_ms": 1791462651838.6409
+      },
+      "durations_ms": {
+        "pre_sql": 1899.813232421875,
+        "sql_datalake": 2475.242431640625,
+        "formatting_until_send": 218.9306640625,
+        "team360_until_send": 4593.986328125,
+        "evolution_accept": 750.779296875,
+        "total_observable": 7189.97265625
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462646548.4814,
+        "sql_duration_ms": 2475.238001001344,
+        "sql_finished_ms": 1791462649023.7239,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1496.949,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462644702.9165
+    },
+    {
+      "inbound_id_hash": "efbf2a966635fb11783a0b8892c2737333d0b9fe3a91b252720ec0b5785d4dad",
+      "outbound_id_hash": "cafdeb048dda48126a1a0c820ef89a00903bdb20bff60bf16ac0f1143283955b",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "f84fed1485e68dd1f8c84f215a5b6e6606f321738c96a87cc1a6b1248b8119b0",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462655302.455,
+        "t1_ms": 1791462655321.4602,
+        "t2_ms": 1791462657160.3005,
+        "t3_ms": 1791462659528.7898,
+        "t4_ms": 1791462659614.571,
+        "t5_ms": 1791462659668.5942,
+        "t6_ms": 1791462660444.7427,
+        "t7_ms": 1791462661973.521
+      },
+      "durations_ms": {
+        "pre_sql": 1857.845458984375,
+        "sql_datalake": 2368.4892578125,
+        "formatting_until_send": 139.804443359375,
+        "team360_until_send": 4366.13916015625,
+        "evolution_accept": 776.1484375,
+        "total_observable": 6671.06591796875
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462657160.3005,
+        "sql_duration_ms": 2368.4850549998373,
+        "sql_finished_ms": 1791462659528.7898,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1445.425,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462655347.445
+    },
+    {
+      "inbound_id_hash": "37f8ed967adc0f95b089121ecc48b2d3f592a4a346f8351d9baca9713480e6d0",
+      "outbound_id_hash": "34f63bdab501282a1313e1d682a48cb43043f23ec3ad5d9d5ff5de9b9d403f9a",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "627ecb06c256384bd359a52437b8546a94dc9af1f690100e4ed587a7ec2c30f0",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462689320.9053,
+        "t1_ms": 1791462689367.3555,
+        "t2_ms": 1791462691158.6294,
+        "t3_ms": 1791462693587.0361,
+        "t4_ms": 1791462693670.0588,
+        "t5_ms": 1791462693691.9744,
+        "t6_ms": 1791462694431.0037,
+        "t7_ms": 1791462695968.444
+      },
+      "durations_ms": {
+        "pre_sql": 1837.72412109375,
+        "sql_datalake": 2428.40673828125,
+        "formatting_until_send": 104.938232421875,
+        "team360_until_send": 4371.069091796875,
+        "evolution_accept": 739.029296875,
+        "total_observable": 6647.538818359375
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462691158.6294,
+        "sql_duration_ms": 2428.402472000016,
+        "sql_finished_ms": 1791462693587.0361,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1436.413,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462689379.991
+    },
+    {
+      "inbound_id_hash": "6a75aa4b1d5ae10db4fa787a52a9c6863310ab305a178e9b41c712e238566adb",
+      "outbound_id_hash": "867295458fe686700e7ad0b095615d5fdaa9b0491326baac99eebceb86e4e9e1",
+      "thread_id_hash": "7f9ffda6c2c97735320d28e79898f09f54ffd0a11f179da13da42c3c81576323",
+      "provider_message_id_hash": "85ebd858193f253d847eafc4f012fe121159eefefb9364263d51def4694ff855",
+      "tenant": "telchi",
+      "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+      "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+      "timings": {
+        "t0_ms": 1791462700588.8555,
+        "t1_ms": 1791462700614.709,
+        "t2_ms": 1791462702411.6855,
+        "t3_ms": 1791462704746.8286,
+        "t4_ms": 1791462704831.0564,
+        "t5_ms": 1791462704983.2356,
+        "t6_ms": 1791462705735.2788,
+        "t7_ms": 1791462707270.163
+      },
+      "durations_ms": {
+        "pre_sql": 1822.830078125,
+        "sql_datalake": 2335.14306640625,
+        "formatting_until_send": 236.406982421875,
+        "team360_until_send": 4394.380126953125,
+        "evolution_accept": 752.043212890625,
+        "total_observable": 6681.3076171875
+      },
+      "transport_status": "read",
+      "result": {
+        "rows": [
+          {
+            "lines": 11782,
+            "quantity": "557199.0000000000",
+            "item_code": "L00505",
+            "line_total": "759383.9500000000"
+          },
+          {
+            "lines": 2,
+            "quantity": "200000.0000000000",
+            "item_code": "L02467",
+            "line_total": "18280.0000000000"
+          },
+          {
+            "lines": 928,
+            "quantity": "133931.0000000000",
+            "item_code": "M05970",
+            "line_total": "37813.6100000000"
+          },
+          {
+            "lines": 3354,
+            "quantity": "116567.0000000000",
+            "item_code": "L01698",
+            "line_total": "290330.7200000000"
+          },
+          {
+            "lines": 2324,
+            "quantity": "115269.0000000000",
+            "item_code": "L01003",
+            "line_total": "351977.4200000000"
+          },
+          {
+            "lines": 5808,
+            "quantity": "108791.0000000000",
+            "item_code": "L01613",
+            "line_total": "1142555.8000000000"
+          },
+          {
+            "lines": 5244,
+            "quantity": "101919.0000000000",
+            "item_code": "L02837",
+            "line_total": "378595.4600000000"
+          },
+          {
+            "lines": 2373,
+            "quantity": "98511.0000000000",
+            "item_code": "L00003",
+            "line_total": "214459.6200000000"
+          },
+          {
+            "lines": 715,
+            "quantity": "94065.0000000000",
+            "item_code": "M05239",
+            "line_total": "17451.0600000000"
+          },
+          {
+            "lines": 340,
+            "quantity": "93144.0000000000",
+            "item_code": "M05486",
+            "line_total": "20928.7800000000"
+          }
+        ],
+        "read_only": true,
+        "row_count": 10,
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+        "period_from": "2026-01-01",
+        "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+        "sap_accessed": false,
+        "sql_started_ms": 1791462702411.6855,
+        "sql_duration_ms": 2335.1391599990166,
+        "sql_finished_ms": 1791462704746.8286,
+        "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+        "period_to_exclusive": "2026-09-16",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+        "foundation_resolution_ms": 1437.635,
+        "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+      "capability_started_ms": 1791462700625.853
+    }
+  ],
+  "percentiles": "linear interpolation (N-1)*p",
+  "limitations": [
+    "Preflight executed fixed SQL before message 1: not a pure cold Data Lake/cache sample.",
+    "New subprocess and read-only DuckLake attachment on every call: module load/SQL connection initialization recur.",
+    "T7 is local delivered callback, not handset timestamp.",
+    "Pre-SQL cannot be split into imports, attachment and Foundation resolution with current timestamps.",
+    "Shared host load not controlled; small N does not prove capacity or production readiness."
+  ]
+}

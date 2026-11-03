@@ -1,0 +1,14 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "Investigate and validate safe isolated authorization without changing operational grants",
+  "probe_command": "cd SrvRestAstroLS_v1/backend && .venv/bin/python ../../data/reports/telchi/safe-continuity-v2-reaccreditation/probe.py",
+  "probe_result": "Isolated real Console SQL authorization PASS; complete accreditation ENVIRONMENT_BLOCKED",
+  "tests_command": "cd SrvRestAstroLS_v1/backend && uv run pytest modules/telchi/assistant/tests/test_commercial_continuity_v2.py modules/telchi/assistant/tests/test_dev_gate_policy.py modules/telchi/assistant/tests/test_pilot_access.py -q",
+  "tests_result": "58 passed in 2.59s",
+  "git_diff_check": "PASS",
+  "review": "Reviewed new runner and generated report. All fixture DML explicitly targets pg_temp, with a new synthetic identity, forced rollback, verified temporary-table removal and connection closure. Operational effective permissions, runtime control and gate manifest unchanged. Existing worktree preserved.",
+  "development_attempts": "Initial invocation had an incorrect relative path, then fixture policy validation rejected the missing approval callback before authorization. Corrected evidence runner only; prior fixture transactions rolled back and pools closed. No operational grant mutation or manifest publication.",
+  "impact": "New evidence files only; no business, category, RBAC implementation, transport or infrastructure changes.",
+  "limitations": "58 local contracts are not six operational gates. Real isolated authorization is not a real-user revocation rehearsal. Evolution connectivity prevents current webhook verification; lifecycle READY is not safe STOPPED. No inference of WhatsApp readiness.",
+  "next_step": "Owner-authorized lifecycle/webhook reconciliation, then repeat preflight and six-gate accreditation without operational grant changes. No automatic service start or webhook restore."
+}

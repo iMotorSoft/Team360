@@ -1,0 +1,897 @@
+{
+  "host": {
+    "status": "SAFE",
+    "load_1m": 1.61669921875,
+    "available_mb": 7325,
+    "swap_used_mb": 2281,
+    "concurrency": 1,
+    "unrelated_processes_terminated": 0
+  },
+  "entrypoint": "ls_iMotorSoft_Srv05:app",
+  "timestamp": "2026-10-09T18:22:54.642495+00:00",
+  "tests": {
+    "Srv05": {
+      "status": "PASS",
+      "command": [
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=no",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_srv05_compatibility.py",
+        "tests/test_srv05_architecture.py",
+        "tests/test_srv05_runtime.py",
+        "tests/test_srv05_launchers.py"
+      ],
+      "summary": [
+        "93 passed in 9.19s"
+      ],
+      "returncode": 0
+    },
+    "Core": {
+      "status": "PASS",
+      "command": [
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=no",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_module_registry.py",
+        "tests/test_db_module.py"
+      ],
+      "summary": [
+        "=============================== warnings summary ===============================",
+        "27 passed, 1 warning in 1.16s"
+      ],
+      "returncode": 0
+    },
+    "Flow": {
+      "status": "PASS",
+      "command": [
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=no",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_flow_routes.py",
+        "tests/test_flow_configuration_routes.py",
+        "tests/test_flow_scheduler.py",
+        "tests/test_flow_director_authorization.py",
+        "tests/test_flow_access_mode.py",
+        "tests/test_flow_configuration_service.py",
+        "tests/test_flow_service.py",
+        "tests/test_flow_lamuni_demo.py"
+      ],
+      "summary": [
+        "=============================== warnings summary ===============================",
+        "242 passed, 2 skipped, 1 warning in 7.39s"
+      ],
+      "returncode": 0
+    },
+    "Diagnosis": {
+      "status": "PASS",
+      "command": [
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=no",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_diagnosis_public_router.py",
+        "tests/test_embed_clients_contract.py",
+        "tests/test_knowledge_scope_resolver.py",
+        "tests/test_sales_diagnosis_active_context.py",
+        "tests/test_sales_diagnosis_milvus_provider.py",
+        "tests/test_sales_diagnosis_runtime_contracts.py",
+        "tests/test_sales_diagnosis_runtime_route.py",
+        "tests/test_sales_diagnosis_runtime_dev_route.py",
+        "tests/test_sales_diagnosis_feasibility_scope.py",
+        "tests/test_sales_diagnosis_post_close.py"
+      ],
+      "summary": [
+        "=============================== warnings summary ===============================",
+        "367 passed, 1 skipped, 1 warning in 14.45s"
+      ],
+      "returncode": 0
+    },
+    "Console": {
+      "status": "PASS",
+      "command": [
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=no",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_console_auth.py",
+        "tests/test_console_bootstrap_service.py",
+        "tests/test_console_me_route.py",
+        "tests/test_console_repositories_sql_safety.py",
+        "tests/test_paseto_tokens.py"
+      ],
+      "summary": [
+        "=============================== warnings summary ===============================",
+        "51 passed, 1 warning in 1.47s"
+      ],
+      "returncode": 0
+    },
+    "Messaging": {
+      "status": "PASS",
+      "command": [
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=no",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_messaging_evolution.py",
+        "tests/test_messaging_gupshup_client.py",
+        "tests/test_messaging_gupshup_config.py",
+        "tests/test_messaging_gupshup_mapper.py",
+        "tests/test_messaging_gupshup_sender.py",
+        "tests/test_messaging_gupshup_webhook.py",
+        "tests/test_messaging_whatsapp_idempotency.py",
+        "tests/test_messaging_whatsapp_ports.py",
+        "tests/test_messaging_meta_config.py",
+        "tests/test_messaging_benchmark.py"
+      ],
+      "summary": [
+        "=============================== warnings summary ===============================",
+        "170 passed, 1 warning in 2.47s"
+      ],
+      "returncode": 0
+    },
+    "Harness": {
+      "status": "PASS",
+      "command": [
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=no",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_team360_full_gate.py"
+      ],
+      "summary": [
+        "11 passed in 0.42s"
+      ],
+      "returncode": 0
+    }
+  },
+  "processes": [
+    {
+      "pid": 144136,
+      "kind": "structural",
+      "returncode": 0,
+      "session_cleanup_verified": true
+    },
+    {
+      "pid": 144140,
+      "kind": "operational",
+      "returncode": 0,
+      "session_cleanup_verified": true
+    },
+    {
+      "pid": 144308,
+      "kind": "pytest Srv05",
+      "returncode": 0,
+      "session_cleanup_verified": true
+    },
+    {
+      "pid": 144405,
+      "kind": "pytest Core",
+      "returncode": 0,
+      "session_cleanup_verified": true
+    },
+    {
+      "pid": 144420,
+      "kind": "pytest Flow",
+      "returncode": 0,
+      "session_cleanup_verified": true
+    },
+    {
+      "pid": 144888,
+      "kind": "pytest Diagnosis",
+      "returncode": 0,
+      "session_cleanup_verified": true
+    },
+    {
+      "pid": 145381,
+      "kind": "pytest Console",
+      "returncode": 0,
+      "session_cleanup_verified": true
+    },
+    {
+      "pid": 145413,
+      "kind": "pytest Messaging",
+      "returncode": 0,
+      "session_cleanup_verified": true
+    },
+    {
+      "pid": 145476,
+      "kind": "pytest Harness",
+      "returncode": 0,
+      "session_cleanup_verified": true
+    }
+  ],
+  "frontend": "NOT_TESTED",
+  "browser": "NOT_TESTED",
+  "structural": {
+    "status": "PASS",
+    "routes": [
+      {
+        "path": "/api/automation-diagnosis/session/start",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.automation_diagnosis.start_session"
+      },
+      {
+        "path": "/api/automation-diagnosis/session/{session_id:str}/answer",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.automation_diagnosis.save_answer"
+      },
+      {
+        "path": "/api/automation-diagnosis/session/{session_id:str}/classify",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.automation_diagnosis.classify"
+      },
+      {
+        "path": "/api/console/bootstrap",
+        "method": "POST",
+        "owner": "Console",
+        "handler": "routes.console_bootstrap.console_bootstrap"
+      },
+      {
+        "path": "/api/console/me",
+        "method": "GET",
+        "owner": "Console",
+        "handler": "routes.console_me.console_me"
+      },
+      {
+        "path": "/api/dev/sales-diagnosis-runtime/turn",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.sales_diagnosis_runtime_dev.dev_sales_diagnosis_turn"
+      },
+      {
+        "path": "/api/diagnosis/embed/auth",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.diagnosis.public_embed_auth"
+      },
+      {
+        "path": "/api/diagnosis/lead",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.diagnosis.public_lead"
+      },
+      {
+        "path": "/api/diagnosis/message",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.diagnosis.public_message"
+      },
+      {
+        "path": "/api/diagnosis/session/{session_id:str}",
+        "method": "GET",
+        "owner": "Diagnosis",
+        "handler": "routes.diagnosis.public_get_session"
+      },
+      {
+        "path": "/api/diagnosis/start",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.diagnosis.public_start"
+      },
+      {
+        "path": "/api/diagnosis/submit-checklist",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.diagnosis.public_submit_checklist"
+      },
+      {
+        "path": "/api/diagnosis/turn",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.diagnosis.public_turn"
+      },
+      {
+        "path": "/api/health",
+        "method": "GET",
+        "owner": "Core",
+        "handler": "ls_iMotorSoft_Srv01.health"
+      },
+      {
+        "path": "/api/sales-diagnosis-runtime/turn",
+        "method": "POST",
+        "owner": "Diagnosis",
+        "handler": "routes.sales_diagnosis_runtime.sales_diagnosis_turn"
+      },
+      {
+        "path": "/api/team360-flow/cases/clear",
+        "method": "POST",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.flow_cases_clear"
+      },
+      {
+        "path": "/api/team360-flow/configuration",
+        "method": "GET",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.flow_configuration_list"
+      },
+      {
+        "path": "/api/team360-flow/configuration/{sector_id:str}",
+        "method": "GET",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.flow_configuration_get"
+      },
+      {
+        "path": "/api/team360-flow/configuration/{sector_id:str}",
+        "method": "PATCH",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.flow_configuration_update"
+      },
+      {
+        "path": "/api/team360-flow/executive",
+        "method": "GET",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.executive_case_list"
+      },
+      {
+        "path": "/api/team360-flow/executive/{request_id:str}",
+        "method": "GET",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.executive_audit_query"
+      },
+      {
+        "path": "/api/team360-flow/executive/{request_id:str}/resend-approval",
+        "method": "POST",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.flow_resend_approval"
+      },
+      {
+        "path": "/api/team360-flow/operational-settings",
+        "method": "GET",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.flow_operational_settings_get"
+      },
+      {
+        "path": "/api/team360-flow/operational-settings",
+        "method": "PATCH",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.flow_operational_settings_update"
+      },
+      {
+        "path": "/api/team360-flow/scheduler/status",
+        "method": "GET",
+        "owner": "Flow",
+        "handler": "modules.flow.routes.flow_scheduler_status"
+      },
+      {
+        "path": "/health",
+        "method": "GET",
+        "owner": "Core",
+        "handler": "ls_iMotorSoft_Srv01.health_root"
+      },
+      {
+        "path": "/webhooks/messaging/evolution/whatsapp",
+        "method": "POST",
+        "owner": "Messaging",
+        "handler": "modules.messaging.webhooks.evolution_whatsapp.EvolutionWhatsAppWebhookController.receive"
+      },
+      {
+        "path": "/webhooks/messaging/gupshup/whatsapp",
+        "method": "POST",
+        "owner": "Messaging",
+        "handler": "modules.messaging.webhooks.gupshup_whatsapp.GupshupWhatsAppWebhookController.receive_webhook"
+      }
+    ],
+    "modules": {
+      "Flow": "MOUNTED",
+      "Diagnosis": "MOUNTED",
+      "Console": "MOUNTED",
+      "Messaging/Gupshup": "MOUNTED",
+      "Messaging/Evolution": "MOUNTED (consumer disabled by default)",
+      "Diagnosis product adapter": "REGISTERED_BUT_DISABLED (default)",
+      "Diagnosis dev adapter": "DEV_ONLY (physically mounted)",
+      "Telchi": "NOT_IN_GLOBAL_SERVER"
+    },
+    "lifecycle_hooks": "pool \u2192 scheduler; scheduler \u2192 pool"
+  },
+  "operational": {
+    "status": "DEGRADED",
+    "services": {
+      "PostgreSQL": {
+        "status": "READY",
+        "database": "team360",
+        "version": "18.4 (Debian 18.4-1.pgdg13+1)",
+        "read_only": "on",
+        "tables_present": [
+          "flow_requests",
+          "flow_operational_settings",
+          "flow_scheduler_state",
+          "sales_diagnosis_conversation_states",
+          "embed_clients",
+          "core_permissions",
+          "message_threads",
+          "message_events"
+        ],
+        "automation_enabled": true
+      },
+      "Milvus": {
+        "status": "READY",
+        "collection": "team360_sales_diagnosis_knowledge_v1",
+        "scopes_with_version_verified": 1,
+        "dimension": 1536
+      },
+      "LiteLLM": {
+        "status": "READY",
+        "alias": "openai_gpt-5.4-nano",
+        "observed_model": "openai_gpt-5.4-nano",
+        "latency_ms": 2362,
+        "fallback": "no client fallback; proxy internal routing NOT_TESTED"
+      },
+      "Evolution": {
+        "status": "NOT_REQUIRED",
+        "reason": "DEV consumer conditional; Flow/Diagnosis do not consume it",
+        "health": "NOT_TESTED"
+      },
+      "Gmail": {
+        "status": "CONDITIONAL",
+        "probe": "NOT_TESTED",
+        "reason": "no delegated test account selected; no mail sent/read"
+      },
+      "Gupshup": {
+        "status": "CONDITIONAL",
+        "probe": "NOT_TESTED",
+        "reason": "no outbound traffic authorized"
+      }
+    },
+    "checks": {
+      "Lifecycle": {
+        "status": "NOT_TESTED",
+        "reason": "real Flow automation enabled; starting scheduler could send mail",
+        "mode": "HTTP probes without lifespan; manually opened read-only probe pool"
+      },
+      "Flow access policy": {
+        "mode": "default_admin",
+        "warning": "default_admin includes Directorio; README/global status claiming unconditional PASETO differ from runtime"
+      },
+      "Diagnosis context": {
+        "status": "PASS",
+        "public_scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+        "wrong_tenant_denied": true
+      },
+      "Mamamia360 binding": {
+        "status": "PASS",
+        "client_id": "mamamia360",
+        "previous_probe_id_present": false,
+        "client_present": true,
+        "active": true,
+        "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+        "reason": "local DEV database only; no production binding altered"
+      },
+      "HTTP": [
+        {
+          "path": "/health",
+          "status_code": 200,
+          "status": "PASS"
+        },
+        {
+          "path": "/api/health",
+          "status_code": 200,
+          "status": "PASS"
+        },
+        {
+          "path": "/api/team360-flow/configuration",
+          "status_code": 200,
+          "status": "PASS"
+        },
+        {
+          "path": "/api/team360-flow/operational-settings",
+          "status_code": 200,
+          "status": "PASS"
+        },
+        {
+          "path": "/api/console/me",
+          "status_code": 401,
+          "status": "PASS"
+        },
+        {
+          "path": "/api/team360-flow/executive?page_size=1",
+          "status_code": 200,
+          "status": "PASS"
+        },
+        {
+          "path": "/api/diagnosis/turn",
+          "status_code": 403,
+          "status": "PASS"
+        },
+        {
+          "path": "/webhooks/messaging/evolution/whatsapp",
+          "status_code": 503,
+          "status": "PASS"
+        },
+        {
+          "path": "/webhooks/messaging/gupshup/whatsapp",
+          "status_code": 503,
+          "status": "PASS"
+        }
+      ],
+      "HTTP aggregate": "PASS",
+      "Cleanup": {
+        "status": "PASS",
+        "pool_closed": true,
+        "scheduler_remaining": false
+      },
+      "Diagnosis embedding/search": {
+        "status": "PASS",
+        "dimension": 1536,
+        "results": 1,
+        "scope_verified": true
+      },
+      "Controlled operational": {
+        "status": "DEGRADED",
+        "fixture": "scheduler disabled projection over real PG reads",
+        "scheduler": {
+          "forbidden_cycle_attempts": 0,
+          "reads": 10,
+          "database_automation_enabled": true
+        },
+        "egress": {
+          "blocked_connections": 0
+        },
+        "conversation": [
+          {
+            "http_status": 201,
+            "latency_ms": 4052,
+            "post_close_state": {
+              "human_approval": null,
+              "diagnosis_status": "gathering"
+            },
+            "response": "Perfecto: quer\u00e9s automatizar las consultas que llegan por **email** sobre **stock (en el sistema)** y **precios (en una planilla)**, con **20 consultas por d\u00eda**, y hoy **una persona aprueba/valida toda respuesta**.\n\nPara armar el flujo real: **cuando llega el email, la persona qu\u00e9 hace exactamente antes de responder (solo confirma stock/precio y responde, o tambi\u00e9n revisa disponibilidad/condiciones y luego redacta)?**",
+            "turn_count": 1,
+            "decision": {
+              "action": "reflect_and_ask",
+              "retrieval_query": "Caso sint\u00e9tico de prueba. Tenemos una tienda y queremos automatizar consultas de stock y precios recibidas por email. Stock en sistema y precios en planilla. Son 20 consultas diarias y una persona aprueba toda respuesta. No ejecutes acciones. Caso sint\u00e9tico de prueba. Tenemos una tienda y queremos automatizar consultas de stock y precios recibidas por email. Stock en sistema y precios en planilla. Son 20 consultas diarias y una persona aprueba toda respuesta. No ejecutes acciones.",
+              "diagnosis_status": "gathering",
+              "readiness_reason": "ai_classifier",
+              "intent": "provide_information",
+              "intent_scope": "global",
+              "intent_confidence": 0.86,
+              "intent_source": "ai_classifier",
+              "matched_rule": null,
+              "classifier_called": true,
+              "generation": {
+                "status": "success",
+                "model": "openai_gpt-5.4-nano",
+                "fallback_used": false,
+                "fallback_reason": null,
+                "provider_called": true,
+                "provider_fallback_used": false,
+                "response_source": "llm",
+                "recovery_used": false
+              },
+              "diagnosis_built": false
+            },
+            "diagnosis_present": false,
+            "persisted": true,
+            "scope": "ks_team360_sales_diagnosis",
+            "retrieval": [
+              {
+                "chunk_id": "7269d495-4cd3-4dcf-b8cf-592c5298d1b1",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5800045132637024
+              },
+              {
+                "chunk_id": "a7ac5840-b2a4-40de-98c4-13a00dbaf16a",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5589783787727356
+              },
+              {
+                "chunk_id": "13ef40c8-5095-42ac-ab88-fae10aa342fd",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5553616285324097
+              },
+              {
+                "chunk_id": "a9dfea0e-3821-44ba-b47c-e3654a20b25d",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5489721894264221
+              },
+              {
+                "chunk_id": "d47ff5cf-5265-4eaf-bf06-87aed7613ed9",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5342337489128113
+              }
+            ]
+          },
+          {
+            "http_status": 201,
+            "latency_ms": 5489,
+            "post_close_state": {
+              "human_approval": "required",
+              "diagnosis_status": "completed"
+            },
+            "response": "## Diagn\u00f3stico preliminar de factibilidad (con lo que contaste)\n\n### HECHOS confirmados\n- **Canal:** email\n- **Objetivo:** reducir trabajo manual en consultas de ventas\n- **Datos/sistemas:** **Planilla / Excel** (precios y stock)\n- **Aprobaci\u00f3n humana:** obligatoria (human-in-the-loop)\n\n### SUPUESTOS (para que funcione)\n- El **stock** y los **precios** del Excel est\u00e1n **actualizados** y son accesibles para consultar.\n- La planilla se mantiene con una **responsabilidad clara** (qui\u00e9n la actualiza y con qu\u00e9 frecuencia).\n\n### PUNTOS A VALIDAR (para implementaci\u00f3n)\n- C\u00f3mo se va a **consultar el Excel** para obtener precios y stock (m\u00e9todo de acceso/actualizaci\u00f3n).\n- Qu\u00e9 casos van a requerir **aprobaci\u00f3n** (por ejemplo, faltantes, inconsistencias o excepciones).\n\n### Factibilidad\n- **Alta (high)**, porque el flujo es principalmente: leer email \u2192 buscar datos en Excel \u2192 armar respuesta \u2192 **una persona aprueba**.\n\n### Modo recomendado\n- **Human_in_the_loop:** el sistema prepara la respuesta con precios/stock y la persona aprueba lo que corresponda (especialmente excepciones).\n\n### Riesgos principales\n- **Datos desactualizados** (precio/stock viejo en la planilla).\n- **Acceso/forma de conexi\u00f3n al Excel** no resuelta (depende de c\u00f3mo hoy se consulta/actualiza).\n\n### Pr\u00f3ximo paso sugerido\n- Definir el **flujo de aprobaci\u00f3n** (qu\u00e9 se aprueba y qu\u00e9 no) y validar el **acceso/actualizaci\u00f3n** de la planilla para precios y stock.",
+            "turn_count": 2,
+            "decision": {
+              "action": "diagnose",
+              "retrieval_query": "El objetivo es reducir trabajo manual en consultas de ventas. Usamos email y Excel. La aprobaci\u00f3n humana es obligatoria. Con estos datos cerr\u00e1 un diagn\u00f3stico de factibilidad; no env\u00edes comunicaciones ni pidas credenciales. Caso sint\u00e9tico de prueba. Tenemos una tienda y queremos automatizar consultas de stock y precios recibidas por email. Stock en sistema y precios en planilla. Son 20 consultas diarias y una persona aprueba toda respuesta. No ejecutes acciones. Luego se el objetivo es reducir tr",
+              "diagnosis_status": "completed",
+              "readiness_reason": "request_diagnosis_with_coverage",
+              "intent": "request_diagnosis",
+              "intent_scope": "global",
+              "intent_confidence": 0.9,
+              "intent_source": "ai_classifier",
+              "matched_rule": null,
+              "classifier_called": true,
+              "generation": {
+                "status": "success",
+                "model": "openai_gpt-5.4-nano",
+                "fallback_used": false,
+                "fallback_reason": null,
+                "provider_called": true,
+                "provider_fallback_used": false,
+                "response_source": "llm",
+                "recovery_used": false
+              },
+              "diagnosis_built": true
+            },
+            "diagnosis_present": true,
+            "persisted": true,
+            "scope": "ks_team360_sales_diagnosis",
+            "retrieval": [
+              {
+                "chunk_id": "a7bb9f6e-0fb1-49aa-a755-f3a828b6ef1a",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5985931158065796
+              },
+              {
+                "chunk_id": "7269d495-4cd3-4dcf-b8cf-592c5298d1b1",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5979748964309692
+              },
+              {
+                "chunk_id": "d47ff5cf-5265-4eaf-bf06-87aed7613ed9",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5931630730628967
+              },
+              {
+                "chunk_id": "13ef40c8-5095-42ac-ab88-fae10aa342fd",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5909956097602844
+              },
+              {
+                "chunk_id": "b4f8303b-6817-4753-88d9-ae2d51602e1d",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5781547427177429
+              }
+            ]
+          },
+          {
+            "http_status": 201,
+            "latency_ms": 5267,
+            "post_close_state": {
+              "human_approval": "required",
+              "diagnosis_status": "completed"
+            },
+            "response": "## Diagn\u00f3stico final de factibilidad (preliminar, con lo que contaste)\n\n### HECHOS confirmados\n- **Canal:** email  \n- **Objetivo:** reducir trabajo manual en consultas de ventas\n- **Fuentes de datos:** **Planilla / Excel** (precios y stock)\n- **Aprobaci\u00f3n humana:** **obligatoria** (human-in-the-loop)\n\n### SUPUESTOS (para que funcione)\n- La planilla con **precios** y la de **stock** est\u00e1n **actualizadas** y se pueden **consultar/exportar**.\n- Hay una **responsabilidad clara** para mantener la planilla al d\u00eda.\n\n### PUNTOS A VALIDAR (para implementaci\u00f3n)\n- **C\u00f3mo** se va a acceder/consultar la planilla para obtener **precios**.\n- **C\u00f3mo** se va a acceder/consultar la planilla para obtener **stock**.\n- **Qu\u00e9 casos** requieren aprobaci\u00f3n (por ejemplo, faltantes, inconsistencias o excepciones).\n\n### Factibilidad\n- **Alta (high)**: el flujo es principalmente **email \u2192 buscar precios/stock en Excel \u2192 redactar respuesta \u2192 aprobaci\u00f3n humana**.\n- **Modo recomendado:** **human-in-the-loop** (el sistema prepara; una persona aprueba lo sensible/excepcional).\n\n### Riesgos principales\n- **Datos desactualizados** (precio/stock viejo en la planilla).\n- **Acceso/integraci\u00f3n a la planilla no resuelta** (depende del m\u00e9todo real con el que hoy se consulta/actualiza).\n\n---\n\n## Pr\u00f3ximo paso concreto (sin implementar)\n**Definir y documentar el \u201cflujo de aprobaci\u00f3n\u201d**: qu\u00e9 respuestas pueden salir con datos est\u00e1ndar y **cu\u00e1les siempre van a revisi\u00f3n humana**, junto con el **m\u00e9todo real** con el que hoy se consulta/actualiza la **Planilla / Excel** (para precios y para stock).",
+            "turn_count": 3,
+            "decision": {
+              "action": "diagnose",
+              "retrieval_query": "Dame ahora el diagn\u00f3stico final de factibilidad y un pr\u00f3ximo paso concreto, sin implementar ni enviar nada. Caso sint\u00e9tico de prueba. Tenemos una tienda y queremos automatizar consultas de stock y precios recibidas por email. Stock en sistema y precios en planilla. Son 20 consultas diarias y una persona aprueba toda respuesta. No ejecutes acciones. Luego se el objetivo es reducir trabajo manual en consultas de ventas. usamos email y excel. la aprobaci\u00f3n humana es obligatoria. con estos datos cer",
+              "diagnosis_status": "completed",
+              "readiness_reason": "request_diagnosis_with_coverage",
+              "intent": "request_diagnosis",
+              "intent_scope": "global",
+              "intent_confidence": 0.93,
+              "intent_source": "ai_classifier",
+              "matched_rule": null,
+              "classifier_called": true,
+              "generation": {
+                "status": "success",
+                "model": "openai_gpt-5.4-nano",
+                "fallback_used": false,
+                "fallback_reason": null,
+                "provider_called": true,
+                "provider_fallback_used": false,
+                "response_source": "llm",
+                "recovery_used": false
+              },
+              "diagnosis_built": true
+            },
+            "diagnosis_present": true,
+            "persisted": true,
+            "scope": "ks_team360_sales_diagnosis",
+            "retrieval": [
+              {
+                "chunk_id": "7269d495-4cd3-4dcf-b8cf-592c5298d1b1",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5785980820655823
+              },
+              {
+                "chunk_id": "13ef40c8-5095-42ac-ab88-fae10aa342fd",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5783291459083557
+              },
+              {
+                "chunk_id": "a7bb9f6e-0fb1-49aa-a755-f3a828b6ef1a",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5764285922050476
+              },
+              {
+                "chunk_id": "a7ac5840-b2a4-40de-98c4-13a00dbaf16a",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.5763831734657288
+              },
+              {
+                "chunk_id": "28c3e497-674b-426b-83cc-2c2c1da819fd",
+                "scope": "8b071443-5bd6-4fe4-bbc3-fc2dca179a5b",
+                "score": 0.576140284538269
+              }
+            ]
+          }
+        ],
+        "llm_calls": [
+          {
+            "model": "openai_gpt-5.4-nano",
+            "provider": "litellm",
+            "latency_ms": 1343,
+            "nonempty": true
+          },
+          {
+            "model": "openai_gpt-5.4-nano",
+            "provider": "litellm",
+            "latency_ms": 1489,
+            "nonempty": true
+          },
+          {
+            "model": "openai_gpt-5.4-nano",
+            "provider": "litellm",
+            "latency_ms": 1045,
+            "nonempty": true
+          },
+          {
+            "model": "openai_gpt-5.4-nano",
+            "provider": "litellm",
+            "latency_ms": 3344,
+            "nonempty": true
+          },
+          {
+            "model": "openai_gpt-5.4-nano",
+            "provider": "litellm",
+            "latency_ms": 890,
+            "nonempty": true
+          },
+          {
+            "model": "openai_gpt-5.4-nano",
+            "provider": "litellm",
+            "latency_ms": 3419,
+            "nonempty": true
+          },
+          {
+            "model": "openai_gpt-5.4-nano",
+            "provider": "litellm",
+            "latency_ms": 1186,
+            "nonempty": true
+          },
+          {
+            "model": "openai_gpt-5.4-nano",
+            "provider": "litellm",
+            "latency_ms": 1682,
+            "nonempty": true
+          }
+        ],
+        "pool_fixture": "fresh standard pool after prior read-only probe pool closed",
+        "scheduler_tasks_in_lifespan_loop": 1,
+        "startup": "PASS",
+        "double_initialization": "ABSENT",
+        "pool_read_only": "on",
+        "Console fixture": {
+          "status": "PASS",
+          "bootstrap": 201,
+          "valid_token": 200,
+          "tampered_token": 401,
+          "missing_token": 401,
+          "permissions": [
+            "package.view"
+          ],
+          "workspace": "workspace-1",
+          "entitlements": {
+            "plan_code": "operational",
+            "plan_display_name": "Operational",
+            "features": [
+              "events.basic"
+            ]
+          },
+          "worker_access": "DENIED by bootstrap capability",
+          "scope": "official repository fakes + fresh Ed25519 keys; NOT real DB identity/RBAC"
+        },
+        "Mamamia authorization": {
+          "status": "PASS",
+          "client_id": "mamamia360",
+          "allow_origin": 200,
+          "deny_origin": 403,
+          "unsigned_turn": 403,
+          "context": {
+            "assistant_instance_code": "team360_sales_diagnosis",
+            "organization_code": "team360_live",
+            "workspace_code": "team360_public_site",
+            "package_code": "pkg_sales_diagnosis",
+            "knowledge_scope_code": "ks_team360_sales_diagnosis"
+          },
+          "distributor_model": "embed binding to canonical public context, not independent customer DB",
+          "scope_cross_tenant": true
+        },
+        "Embed auth": {
+          "status": "PASS",
+          "client_id": "mamamia360",
+          "allow": 200,
+          "deny_origin": 403,
+          "request_bound_tamper": 403,
+          "context_fields_not_leaked": true
+        },
+        "Diagnosis post-close": {
+          "status": "PASS",
+          "action": "diagnose",
+          "reload": true,
+          "human_approval": "required",
+          "diagnosis_status": "completed",
+          "implicit_reopen": false,
+          "approval_event_created": false
+        },
+        "Diagnosis conversation": {
+          "status": "PASS",
+          "sessions": [
+            "full_gate_2a3a0ff491fc4b19842974adda5810fe"
+          ],
+          "state_provider": "postgres",
+          "retrieval_provider": "milvus",
+          "generation_provider": "litellm",
+          "proxy_upstream_fallback_audit": "NOT_TESTED"
+        },
+        "Embed conversation": {
+          "status": "PASS",
+          "http_status": 201,
+          "persisted": true,
+          "scope": "ks_team360_sales_diagnosis",
+          "package": "pkg_sales_diagnosis",
+          "body_context_override_ignored": true,
+          "browser_assets": "NOT_TESTED"
+        },
+        "cleanup": {
+          "status": "PASS",
+          "deleted": 2,
+          "remaining": 0,
+          "sessions": [
+            "full_gate_2a3a0ff491fc4b19842974adda5810fe",
+            "full_gate_3e7235b7470e4fde92c5813a302f0892"
+          ]
+        },
+        "shutdown": "PASS",
+        "remaining_scheduler_tasks": 0,
+        "lifecycle_status": "PASS_CONTROLLED_FIXTURE"
+      }
+    },
+    "not_tested": [
+      "browser E2E",
+      "frontend build/static",
+      "Gupshup outbound",
+      "Evolution send/delivery (no test binding enabled)",
+      "Telchi (no global routes)",
+      "Flow automatic cycle (no external writes)",
+      "LiteLLM proxy internal fallback audit",
+      "Unmodified DB-enabled Flow automatic startup/delivery",
+      "Console real DB identity/permission boundary",
+      "Embed browser loader/manifest/assets"
+    ]
+  },
+  "structural_gate": "PASS",
+  "operational_gate": "DEGRADED",
+  "full_gate": "DEGRADED"
+}

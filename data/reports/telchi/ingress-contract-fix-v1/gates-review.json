@@ -1,0 +1,46 @@
+{
+  "checked_at": "2026-10-18T15:06:37.829294+00:00",
+  "source_matches": false,
+  "approval_matches": false,
+  "expires_at": "2026-10-16T17:09:43.922863+00:00",
+  "gates": {
+    "assistant_foundation": {
+      "integrity": true,
+      "scope": "One real approved fixed Foundation read via current Messaging/identity/handler; read-only attachment verified in reader; no SAP or publication changes",
+      "artifact_source_matches": false,
+      "artifact_approval_matches": false
+    },
+    "business_authorization": {
+      "integrity": true,
+      "scope": "Current effective Console grant positive; empty cache negative; forged/stale cache for real revoked fixture denied by live Console lookup; no grant changes",
+      "artifact_source_matches": false,
+      "artifact_approval_matches": false
+    },
+    "durable_idempotency": {
+      "integrity": true,
+      "scope": "Real PG concurrent claims plus sequential retry, one handler/model/capability/intent; overlapping retry safely execution_uncertain; no handler replay. Recording egress only.",
+      "artifact_source_matches": false,
+      "artifact_approval_matches": false
+    },
+    "http_auth": {
+      "integrity": true,
+      "scope": "Reused focused inert HTTP ingress and container auth/reachability, identical source fingerprint, no WhatsApp",
+      "artifact_source_matches": false,
+      "artifact_approval_matches": false
+    },
+    "identity_tenant_isolation": {
+      "integrity": true,
+      "scope": "Real approved PG phone resolution; foreign tenant lookup absent; wrong channel scope denied; existing revoked/inactive fixture rejected. No cross-tenant fixture reactivation.",
+      "artifact_source_matches": false,
+      "artifact_approval_matches": false
+    },
+    "model_no_fallback": {
+      "integrity": true,
+      "scope": "One direct live OpenAI request through current Luna adapter; model/effort/completion verified; fresh provider-failure/no-fallback tests PASS",
+      "artifact_source_matches": false,
+      "artifact_approval_matches": false
+    }
+  },
+  "validation": "BLOCKED",
+  "reason": "gate_scope_mismatch"
+}

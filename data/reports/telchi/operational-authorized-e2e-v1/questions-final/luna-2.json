@@ -1,0 +1,222 @@
+{
+  "timestamp": "2026-11-02T17:14:18.129931+00:00",
+  "source_sha256": "906c5e42a81a1c257799ee450ff9e9cf074778cfa986ba7120e3a8173a09da37",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "preparation_ms": 0.11763600014091935,
+    "response_bytes": 6361,
+    "duration_ms": 5351.604,
+    "attempts": 1
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/schema_version": 2,
+        "/metric": "sales.net_amount",
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿Qué período querés consultar?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuántas líneas de consumo de producción registramos en octubre de 2026?",
+      "text": "No hay un resultado Foundation verificable. Intentá nuevamente.",
+      "classification": "ERROR",
+      "event_id": "4e2ce417-ebbe-4c44-9ee9-cea58c48c437",
+      "thread_id": "04d8da47-cd2b-4dfd-af9b-027cd85823e5",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 67134.01094599976,
+          "state_engine_ms": 1.028378001137753,
+          "interpretation_ms": 7984.72881500129,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 75148.31334499831
+        },
+        "decision": "ERROR",
+        "committed": true,
+        "contract_error": null,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "validated_state": {
+          "limit": 10,
+          "metric": "production.consumption",
+          "period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-11-01"
+          },
+          "pending": null,
+          "branches": [],
+          "group_by": null,
+          "reference": null,
+          "comparison": null,
+          "period_mode": null,
+          "breakdown_by": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "physical_focus": null,
+          "product_target": null,
+          "ranking_detail": null,
+          "schema_version": 2,
+          "customer_target": null,
+          "product_context": null,
+          "business_category": null,
+          "requested_metrics": [
+            "production.consumption"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "ranking_target_item_code": null
+        },
+        "capability_calls": 1,
+        "execution_result": null,
+        "execution_status": "failed",
+        "response_prepared": {
+          "text": "No hay un resultado Foundation verificable. Intentá nuevamente.",
+          "classification": "ERROR"
+        },
+        "required_permission": "telchi.production.consumption.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "production.consumption",
+              "/period": {
+                "start": "2026-10-01",
+                "end_exclusive": "2026-11-01"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "production.consumption"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference",
+              "/product_search_text",
+              "/selected_item_codes",
+              "/product_target",
+              "/customer_target",
+              "/business_category",
+              "/group_by",
+              "/physical_focus",
+              "/breakdown_by",
+              "/periods",
+              "/period_mode",
+              "/ranking_target_item_code",
+              "/ranking_detail",
+              "/limit"
+            ]
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.19207799959986005,
+        "response_bytes": 8394,
+        "duration_ms": 7983.803,
+        "attempts": 1
+      },
+      "elapsed_ms": 75429.16204500034,
+      "request_trace": {
+        "schema": "telchi-pre-sql-profile-v1",
+        "clock": "perf_counter_ns",
+        "spans": [
+          {
+            "label": "authorization_initial",
+            "start_ms": 166.576002,
+            "end_ms": 168.053836,
+            "duration_ms": 1.477834
+          },
+          {
+            "label": "authorization_transaction_revalidation",
+            "start_ms": 176.368809,
+            "end_ms": 190.395428,
+            "duration_ms": 14.026619
+          },
+          {
+            "label": "model_inference_response",
+            "start_ms": 242.501299,
+            "end_ms": 8173.741934,
+            "duration_ms": 7931.240635
+          },
+          {
+            "label": "interpretation_result_parse",
+            "start_ms": 8174.44424,
+            "end_ms": 8174.541558,
+            "duration_ms": 0.097318
+          },
+          {
+            "label": "conversation_audit_save",
+            "start_ms": 75338.745362,
+            "end_ms": 75416.277247,
+            "duration_ms": 77.531885
+          }
+        ],
+        "total_ms": 75463.287702
+      }
+    }
+  ],
+  "budgets": {
+    "worker_seconds": 180,
+    "turn_seconds": 240,
+    "model_seconds": 20,
+    "model_attempts": 1,
+    "production_changed": false
+  }
+}

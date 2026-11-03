@@ -1,0 +1,194 @@
+TELCHIAI — ABRAHAM 002: CITRATO / LA PAZ / COCHABAMBA / L&S
+Rama: feature/console-backend-core. HEAD inspeccionado: 09d2ec7.
+Contexto: TELCHI → VENTAS (+ CLIENTES, STOCK como verificación) → INVESTIGATION.
+Fuentes: Foundation pinned, maestros raw SAP locales, legacy DS/DS0 read-only; HANA bloqueada.
+Estado investigativo: DONE_WITH_CONCERNS. Resolución de negocio: BLOCKED, NO PASS.
+No implementación, promoción, cambio de permisos, deploy, activación WhatsApp ni modificación de CURRENT.
+
+1. RESPUESTA ESPONTÁNEA EXACTA
+Pregunta enviada literalmente, sin agregar año, métricas, instrucciones ni contexto del caso 001:
+"Venta de Citrato de magnesio en la paz y cochabamba, en la paz distribucion propia y en conchabamba lo hace L&S"
+Respuesta:
+"Entendí que pedís líneas de ventas por producto. La búsqueda de productos necesita texto y no admite esos filtros."
+
+Ejecución: 2026-10-15T14:13:07Z; HTTP 200 en 11.667,25 ms, DIRECT_UNAVAILABLE.
+conversation_key: abraham002-7c9026614e581854
+correlation_id: 9646f268-17d2-4a12-a5c9-a821d4de92dc
+Evidencia íntegra: spontaneous.json, con auditoría y hashes de fuentes assistant antes/después idénticos.
+Modelo: gpt-5.6-luna / medium / OpenAI Responses directo; eco de razonamiento verificado.
+Preflight PG SELECT 1 y llamada mínima real al intérprete en contexto aislado correctos.
+Milvus/LiteLLM NOT_APPLICABLE a este pipeline directo; sin retrieval ni proxy/fallback configurado.
+Mismo adapter DEV existente → MessageDispatcher → TelchiHandler → State Engine → catálogo.
+Identidad/grants desde binding piloto existente PG; no se inyectaron permisos desde el texto.
+Ingresó por endpoint local tokenizado POST /api/telchi/assistant/dev/turn. Sin salida WhatsApp.
+Se creó sólo el thread/auditoría DEV de esta prueba, no datos comerciales ni grants.
+
+Estado propuesto y confirmado:
+- metric y requested_metrics: sales.by_products / [sales.by_products].
+- product_search_text: Citrato de magnesio; selected_item_codes=[]; product_context=null.
+- branches=[La Paz,Cochabamba]; no mapping ciudad/sucursal acreditado.
+- period=null; temporal_reference=null; comparison=null; sales_channel=null; entity_mention=null.
+- L&S y las relaciones distribución propia/tercerizada NO aparecen.
+- No distinción sell-in/sell-out, granularidad mensual ni selección monetaria/física.
+- committed=true; capability_calls=0; capability_ms=0; execution_status=not_executed; execution_result=null.
+No se buscó ningún producto ni se ejecutó consulta analítica. committed es validación estructural, no ejecución.
+La búsqueda de producto fue una ruta candidata de catálogo, NO una capability ejecutada.
+
+Importante: la pregunta original no explicita año, mes ni importe/cantidad. 2026, desglose mensual y ambas métricas provienen del protocolo de evaluación. No se etiqueta su ausencia como pérdida de slots explícitos del mensaje literal. Sí se perdieron relaciones explícitas: distribución propia y L&S.
+
+2. PRODUCTO — RESOLUCIÓN INDEPENDIENTE, NO MAPPING INVENTADO
+Fuente actual inspeccionada: Reference products SAP_HANA + OITM raw septiembre; no se suman namespaces legacy.
+Candidatos directos separados:
+Código   Descripción SAP                                        UoM catálogo    SellItem
+L03332   CITRATO DE MAGNESIO USP x Kg                            KG              Y
+L03432   CITRATO DE MAGNESIO x 1 Kg.                             BOLSA           Y
+L03612   CITRATO DE MAGNESIO 400 mg x 100 capsulas                FCO             Y
+M07010   CITRATO DE MAGNESIO 500mg x 100 caps. #MAINES             FCO             Y
+No son una sola presentación. El texto x 1 Kg no convierte automáticamente bolsas a KG.
+FCO es metadata de maestro: no acredita UoM/factor físico de cada línea INV1/RIN1.
+No convertir 400 mg a 500 mg, cápsulas a tabletas, ni frascos a KG.
+
+Otros códigos localizados, separados de los candidatos directos:
+- L03618 y L03653: etiquetas; no producto final para sumar ventas.
+- L03651: estearato de magnesio para materia prima; NO citrato como producto vendido.
+- L03652: celulosa microcristalina para esa producción; NO citrato.
+- L03659: citrato granel; L03756: citrato x Kg NUTRALIM; ambos SellItem=N en maestro inspeccionado. No descartarlos universalmente por flag actual ni agregarlos automáticamente a venta terminada.
+- M07871: MAGNESIUM CITRATE COMPLEX 1400 mg x 60 caps. #A3TEK: candidato relacionado inglés/complex, revisión comercial pendiente.
+- M08237: melatonina + citrato; M08239: citrato + potasio; M08657: citrato con vitamina C x 25 sobres. Mezclas distintas, excluidas de la comparación principal automática.
+- LEGACY_DS0/5933005: calcio/citrato/magnesio/zinc/vitamina D #KIRKLAND; no homologado al producto consultado.
+Otros productos de magnesio detectados en discovery_corrected.json no fueron añadidos.
+
+Fabricantes: MAINES/NUTRALIM/A3TEK/NATUVIT/TERBOL son textos de descripción, no fabricantes verificados por OMRC. El maestro Foundation no publica manufacturer y los OITM raw inspeccionados no traen FirmCode. Legacy productSB1 trae FirmCode=215/Linea=LITEL para L03332 y FirmCode=-1/Linea=ALCOS para M07010; no certifican fabricante actual. Legacy M07010 dice tabletas; SAP actual dice cápsulas: diferencia explícita, sin conversión.
+La búsqueda fue acotada por nombres citrat/magnes en el catálogo local: no demuestra ausencia de sinónimos desconocidos ni exhaustividad del maestro vivo HANA.
+
+3. L&S — IDENTIDAD Y RELACIÓN TERRITORIAL
+Reference SAP_HANA tiene C010264 / L&S S.R.L. / CardType=C / activo / grupo104.
+No confundir con C008108 / FCIA FARMADOSIS L&S. Legacy DS0 usa además código10952 para L & S Srl: no se unió automáticamente con SAP.
+Legacy DS/clientSB1 y DS0/clientSB1: C010264 / LYS / ClientCity=Cochabamba / propiedad7 Distribuidoras.
+Los dos archivos tienen hash idéntico: copias de una fuente histórica, no dos corroboraciones independientes.
+PriceListName=La Paz Horizontal para ese mismo cliente: contraejemplo directo a usar lista de precios como geografía.
+Esto apoya identidad y relación histórica de distribuidora en Cochabamba, NO exclusividad territorial vigente ni destino de cada compra.
+No se inspeccionó contrato territorial actual ni maestro de clientes finales de L&S.
+
+Sell-in documental observado para C010264:
+Mes 2026  SKU      Quantity fuente  LineTotal BS fuente  NC objetivo observada
+Febrero   L03612   25               1.794,38             sin filas
+Marzo     L03612   100              9.091,51             sin filas
+Ventana consultada: [2026-01-01,2027-01-01), limitada por cobertura del snapshot.
+Los otros meses no devolvieron líneas objetivo a esa cuenta; eso no certifica cero venta comercial ni cero sell-out.
+Estos importes SON observaciones de LineTotal, NO facturación neta final homologada por presentación.
+Los dos registros son ventas Telchi → cuenta L&S, no ventas L&S → farmacias/consumidores.
+Hay un comprador SAP en cada mes con esas líneas: el distribuidor. No es conteo de farmacias atendidas.
+Todas las facturas activas a L&S, de cualquier producto: 52 documentos, 20/01–22/09. No atribuirlas todas a Citrato ni al mercado Cochabamba.
+No hubo NC activas objetivo a C010264 dentro del snapshot. No prueba ausencia de devoluciones físicas, pendientes, no integradas o posteriores.
+No se localizó ledger real de sell-out, inventario ni devoluciones posteriores de L&S en los datasets Foundation/maestros inspeccionados.
+
+4. LA PAZ — QUÉ PUEDE Y QUÉ NO PUEDE ATRIBUIRSE
+Foundation sales_document no publica ciudad de destino, dirección de entrega, ruta ni sucursal del documento.
+Customers: los 12.979 registros SAP_HANA tienen branch_id=NULL; raw OCRD local tampoco contiene ciudad/destino/ruta.
+Legacy histórico: 11.512 códigos únicos, 10.322 ClientCity=NULL y 28 vacíos. Sólo seis registros dicen La Paz/LA PAZ; ninguno aparece entre las líneas objetivo 2026 inspeccionadas.
+No usar ese resultado para afirmar que no hubo ventas en La Paz: el maestro es antiguo e incompleto.
+Warehouse reference sí identifica LPZ-D1/LPZ-D2 móviles, branch office02, y LPZ-T1; hay líneas objetivo desde ellos.
+Esto es coherente con infraestructura propia en La Paz, no prueba destino comercial final ni padrón de distribución propia.
+CBBA-DT1 se llama distribución Cochabamba-Terbol: tampoco equivale automáticamente a L&S o a todo Citrato vendido en Cochabamba.
+
+EVIDENCIA OPERATIVA SOLAMENTE — NO COMPARACIÓN DE DESTINOS:
+Agrupación de líneas desde depósitos LPZ-* por SKU y mes; Quantity documental y neteo aritmético de LineTotal OINV menos ORIN, BS.
+Mes       L03432 cantidad OINV   L03432 neto líneas   L03612 cantidad OINV / NC  L03612 neto líneas
+Enero     2                    261,00               —                          —
+Febrero   7                    863,89               —                          —
+Marzo     1                    122,24               50 / 3                     4.344,83
+Abril     3                    391,50               52 / sin NC                4.727,61
+Mayo      6                    733,41               21 / sin NC                1.909,20
+Junio     4                    505,47               41 / sin NC                3.727,56
+Julio     —                    —                    71 / 1                     6.364,12
+Agosto    7                    863,91               69 / 6                     5.503,71
+Sept.     —                    —                    19 / sin NC                1.704,18
+— = no filas de este SKU/filtro en el snapshot; NO venta ciudad certificada cero.
+L03332 y M07010: sin filas en esos depósitos/ventana; no exclusión universal del negocio.
+Septiembre LPZ objetivo alcanza 22/09. No tratar como mes completo ni calcular ranking/demanda de ciudades con esta tabla.
+Compradores distintos por SKU/mes/depósito están en geography.json; no sumar distintos entre depósitos, productos o meses.
+No se certifica aquí un total único de clientes finales de La Paz. No confundir compradores SAP con consumidores.
+
+5. SEMÁNTICA FINANCIERA, CANTIDADES Y COBERTURA
+LineTotal se mantiene separado de DocTotal. No se distribuyeron cabeceras globales entre productos.
+El neteo operacional resta líneas ORIN activas por el mes de su DocDate, no reclasifica retrospectivamente la factura original.
+No está cerrada la reconciliación de impuestos, descuentos globales, fletes/gastos/redondeos, factura base y NC posteriores para neto comercial por SKU. Por eso NO se entrega como facturación neta en bolivianos certificada.
+Cantidad documental no equivale a cantidad física certificada: faltan unidad/factor en INV1/RIN1 publicadas. Catálogo actual no sustituye metadata de la línea histórica.
+No se suman unidades entre presentaciones ni se mezclan ventas SAP, DMS y legacy para inflar ventas.
+Verificación de integridad para códigos objetivo: sin duplicados de cabecera o línea y sin huérfanos OINV/ORIN en las consultas guardadas.
+Decimales DECIMAL(38,6), no float; moneda cabecera/línea BS en los agregados observados. Canceled=N; Y/C excluidas.
+Hay NC objetivo globales, aunque no para L&S. No confundir falta de NC del distribuidor con falta global.
+
+Foundation: foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot1408.
+Reference: v2_reference_closure_2088d5885204313a; source_as_of 24/09.
+Foundation data_as_of: 28/09/2026 18:18:35.264; NO fecha de cierre de ventas.
+OINV activas generales llegan al24/09; ORIN activas al23/09. Objetivos generales llegan al23/09.
+Consulta todo2026 no crea cobertura octubre–diciembre ni certifica meses anteriores completos.
+CURRENT se resolvió al inicio/final de cada sesión sin cambio. No se consultó latest/candidate.
+SAP HANA actual: ConnectionRefusedError en preflight TCP acotado; sin consulta empresarial viva. Bloqueo ambiental, no fallo del asistente ni prueba de ausencia SAP.
+DMS: no dataset externo en el root físico inspeccionado; antecedente read-only telchi_order_delivery_source_discovery_v1_report.md también declara sólo marcas DMS sincronizadas SAP en su alcance. No es un censo universal de sistemas privados ni prueba de inexistencia de export L&S fuera de lo inspeccionado.
+No se amplió discovery de secretos ni se intentó inventar un conector DMS.
+
+6. EVALUACIÓN Y CAUSA
+INTENT_PRESERVATION=FAIL: producto/ciudades sí; relaciones comerciales explícitas no.
+PRODUCT_RESOLUTION=PARTIAL_NOT_EXECUTED: texto sí; códigos, presentaciones y lookup no.
+GEOGRAPHIC_ATTRIBUTION=PARTIAL_BLOCKED: nombres como branches sin destino acreditado.
+DISTRIBUTION_MODEL=FAIL: pierde operador por territorio y omite distinción sell-in/sell-out.
+DATA_READINESS=PARTIAL_OBSERVED_RECONCILIATION_BLOCKED.
+ANSWER_CORRECTNESS=FAIL_AS_BUSINESS_ANSWER: rechazo seguro pero incompleto, sin resolución útil.
+EXECUTION_SAFETY=PASS en la corrida observada: cero consultas y cero números inventados. No convierte comprensión/negocio en PASS.
+
+Hipótesis confirmada por replay offline:
+1. La salida interpretation_proposed ya perdió L&S y distribución propia. No es pérdida ocasionada por SQL.
+2. Normalizadores documentary_request_contract/fixed_ranking_request_contract no alteran esa propuesta en este caso.
+3. State Engine reproduce validated_state exactamente, committed=true; no borra relaciones recibidas: nunca las recibió.
+4. Contrato editable actual no admite relaciones territorio-operador/distribution/sales-level/time-grain. Existe semantic_references application-owned, pero no fue poblado y no es un path libre del LLM. No afirmar que no existe ninguna infraestructura semántica.
+5. Bloqueo inmediato: SalesCapabilities.availability para productos rechaza branches no vacío antes de lookup. El texto de producto SÍ está presente. Un contrafactual offline sin branches da available=true, SIN ejecutar ni recomendar quitar las ciudades.
+6. Mensaje combinado «necesita texto y no admite esos filtros» oculta la condición real y no conserva el contexto del ejecutivo.
+No se aisló defecto intrínseco de Luna frente a contrato adecuado: una ejecución, sin comparar modelos ni reintentar hasta obtener respuesta mejor.
+
+Comparación con001 (evidencia previa reutilizada, NO nueva ejecución de001):
+Común: compresión de intención a vocabulario del catálogo, contrato estructural estrecho y respuesta de indisponibilidad que omite necesidad de negocio. committed no valida comprensión.
+Distinto:001 pierde conteo de clientes/foco farmacia/mes y tiene gaps DMS/canal/NC;002 retiene producto y ciudades pero pierde relación territorial/operador y nivel de venta, con blocker inmediato en búsqueda de producto filtrada. No atribuir ambos a idéntico bug SQL o sólo falta de datos.
+
+7. CORRECCIONES MÍNIMAS PROPUESTAS, NO IMPLEMENTADAS
+- Extender de forma versionada intención en el MISMO State Engine/intérprete existente: territorios no confundidos con sucursales, operador y modelo por territorio, nivel sell-in/sell-out y granularidad. No router, motor paralelo ni catálogo por frases de Abraham.
+- Mantener contexto aportado por usuario separado de mapping confirmado por datos y vigencia.
+- Evaluar disponibilidad por requisito; preservar dimensiones bloqueadas. Un resultado parcial de sell-in no sustituye la comparación de mercado ni exige descartar la ciudad.
+- Resolver producto con búsqueda existente separada de filtros de ventas, sin borrar la intención; validar presentaciones/códigos antes de agregar.
+- Redactar necesidad completa y blocker preciso: texto válido pero filtros/geografía no acreditados. No forzar «unidades o bolivianos» ni pedir fecha como solución a un mapping ausente.
+- Habilitar importes físicos/netos o nuevas capabilities sólo tras sus gates específicos, fuera de esta investigación.
+Candidato permanente en investigation/.../abraham_citrate_distribution_v1/acceptance.json: pregunta literal, contexto relacional, métricas analíticas, período explícitamente no inferido y seguimientos no ejecutados. NO gold aprobado por Abraham ni aceptación runtime activada.
+
+8. ARTEFACTOS, COMANDOS Y VALIDACIÓN
+Sólo paths nuevos de este caso:
+SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/abraham_citrate_distribution_v1/
+  spontaneous_probe.py, independent_probe.py, verify_data.py, geography_probe.py,
+  acceptance.json, test_diagnosis.py.
+data/reports/telchi/abraham_citrate_distribution_v1/run01/
+  spontaneous.json, dev-server.log, discovery.json, discovery_corrected.json,
+  verification.json, verification_corrected.json, geography.json, evaluation.json, report.txt.
+Los intentos discovery.json/verification.json conservan errores originales del runner nuevo. Los archivos *_corrected.json y geography.json no tienen queries con error.
+Errores propios corregidos sólo en investigación: nombre product_name asumido inicialmente como name; materialización de timestamps TZ sin pytz evitada seleccionando campos necesarios; alias SQL month reservado; root del test un nivel demasiado alto.
+Primer pytest:4 fallos por root del test/24 pass; corregido a parents[7], no cambio de runtime.
+No instalar dependencias para ocultar esos errores ni alterar datos.
+
+Desde backend, reproducción sobre outputs NUEVOS (no sobrescribe evidencia):
+uv run python -m modules.telchi.investigation.validation.abraham_citrate_distribution_v1.spontaneous_probe --output <nuevo-directorio>
+uv run python -m modules.telchi.investigation.validation.abraham_citrate_distribution_v1.independent_probe --output <nuevo-json>
+uv run python -m modules.telchi.investigation.validation.abraham_citrate_distribution_v1.verify_data --output <nuevo-json>
+uv run python -m modules.telchi.investigation.validation.abraham_citrate_distribution_v1.geography_probe --output <nuevo-json>
+uv run pytest -q modules/telchi/investigation/validation/abraham_citrate_distribution_v1/test_diagnosis.py modules/telchi/assistant/tests/test_product_sales.py modules/telchi/assistant/tests/test_rejected_execution_guard.py
+Resultado final:28 passed en0,35s. Incluye replay/contrafactual offline, integridad de evidencia y guards existentes. NO demuestra que el asistente haya corregido su comprensión ni promueve el caso a PASS comercial.
+Sin Markdown nuevo/modificado: gates LAT de Markdown no aplicables. git diff --check ejecutado sin errores. Revisión final de archivos nuevos: JSON parseables, scripts con sintaxis válida, hashes assistant aún idénticos y PID propio ausente. git diff --stat no enumera estos archivos porque son nuevos/untracked; se revisaron explícitamente, no se adoptó ningún diff preexistente.
+Warning uv preexistente: tool.uv.dev-dependencies deprecado; no se cambió pyproject/lockfile.
+
+HOST_PREFLIGHT=SAFE; RESOURCE_GUARD=PASS; CONCURRENCY_USED=1 proceso secuencial / DuckDB2 threads / límite512–768MB.
+Load1,42–2,22 sobre8 CPUs; MemAvailable5,2–6,1GB; swap8MB estable; vmstat sin si/so, idle83–89%.
+UNRELATED_PROCESSES_TERMINATED=0; ENVIRONMENTAL_ABORTS=0; OWN_PROCESSES_LEFT_RUNNING=0.
+Servidor propio PID86299 detenido y reaped por harness; no servicio/browser ajeno reiniciado ni terminado.
+
+Impacto transversal: ninguno funcional. Se preservaron caso001, assistant, Messaging, Srv05, estado GLOBAL, Foundation y trabajo preexistente. Sin commit ni operaciones Git mutadoras.
+Riesgos: snapshot parcial, maestros históricos incompletos, fabricante/UoM física no certificados, relación territorial actual y sell-out no acreditados.
+Próximo paso: obtener destino comercial/master vigente y acuerdo/padrón territorial, UoM/factor por línea y export autorizado de sell-out/inventario/devoluciones L&S; validar neto SKU. En paralelo, autorización Development separada para preservación relacional de intención y renderer preciso, antes de ampliar capacidades.

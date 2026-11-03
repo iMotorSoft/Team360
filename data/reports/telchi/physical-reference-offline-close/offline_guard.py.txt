@@ -1,0 +1,19 @@
+"""Run-local hard guard: no native HANA driver or network connections."""
+import socket
+import sys
+from types import ModuleType
+import pytest
+
+def forbidden(*args, **kwargs):
+    raise AssertionError('OFFLINE_GUARD: network/HANA access forbidden')
+
+def pytest_sessionstart(session):
+    socket.socket.connect = forbidden
+    socket.socket.connect_ex = forbidden
+    socket.create_connection = forbidden
+    driver = ModuleType('hdbcli')
+    api = ModuleType('hdbcli.dbapi')
+    api.connect = forbidden
+    driver.dbapi = api
+    sys.modules['hdbcli'] = driver
+    sys.modules['hdbcli.dbapi'] = api

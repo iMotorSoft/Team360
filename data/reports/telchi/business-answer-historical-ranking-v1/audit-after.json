@@ -1,0 +1,6608 @@
+{
+  "read_only": true,
+  "sap_accessed": false,
+  "queries": [
+    {
+      "name": "documents_schema",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))",
+      "parameters": [],
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_due_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "tax_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_foreign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "series",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "user_sign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_semantic_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "lines_schema",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408))",
+      "parameters": [],
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "whs_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "price",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "attributed_slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "crosswalk_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet')",
+      "parameters": [],
+      "rows": [
+        {
+          "column_name": "canonical_product_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ItemCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "product_business_type_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "product_business_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_rule_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_basis",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_evidence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "products_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet')",
+      "parameters": [],
+      "rows": [
+        {
+          "column_name": "canonical_product_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canonical_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "product_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "inventory_uom_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sales_uom_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "purchase_uom_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_item_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_valid_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_frozen_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_invnt_item",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_sell_item",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_prchse_item",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_itms_grp_cod",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_update_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "L01412_classification",
+      "sql": "SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') WHERE \"ItemCode\"='L01412' ",
+      "parameters": [],
+      "rows": [
+        {
+          "canonical_product_id": "product_b9b7829f664a6773f532cad3",
+          "ItemCode": "L01412",
+          "product_business_type_id": "product_business_type_5147408ae89ee48029b729cd",
+          "product_business_type": "RAW_MATERIAL",
+          "valid_from": null,
+          "valid_to": null,
+          "source": "TELCHI_PRODUCT_BUSINESS_CLASSIFICATION_V1",
+          "confidence": "0.95",
+          "status": "VALIDATED",
+          "classification_rule_id": "PBT-006",
+          "classification_basis": "COMBINED",
+          "classification_source": "TELCHI_PRODUCT_BUSINESS_CLASSIFICATION_V1",
+          "classification_evidence": "BOM component and input/bulk group 129: INSUMO",
+          "source_as_of": "2026-09-24 10:53:07.952772-03"
+        }
+      ]
+    },
+    {
+      "name": "L01412_catalog",
+      "sql": "SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet') WHERE item_code='L01412'",
+      "parameters": [],
+      "rows": [
+        {
+          "canonical_product_id": "product_4a3df86b4d44c25518faf25f",
+          "source_system": "LEGACY_DS",
+          "source_native_id": "L01412",
+          "item_code": "L01412",
+          "canonical_name": "SABORIZANTE VAINILLA EXTRA x kg.",
+          "product_name": "SABORIZANTE VAINILLA EXTRA x kg.",
+          "inventory_uom_id": "unit_of_measure_f88d46cef688251debf034c6",
+          "sales_uom_id": null,
+          "purchase_uom_id": null,
+          "active": true,
+          "valid_from": null,
+          "valid_to": null,
+          "status": "ACTIVE",
+          "_source_system": "LEGACY_DS",
+          "_source_dataset": "productSB1",
+          "_source_native_key": "L01412",
+          "_source_file": "raw/legacy/parquet/productSB1.parq",
+          "_source_snapshot_at": null,
+          "_source_extracted_at": "2026-09-16 09:27:57.830446-03",
+          "_ingested_at": "2026-09-16 09:27:57.830446-03",
+          "_transformation_version": "reference-v2-rebuild-v1",
+          "_semantic_version": "2.0.0",
+          "_lineage_quality": "PARTIAL_TRACE",
+          "sap_item_name": null,
+          "sap_valid_for": null,
+          "sap_frozen_for": null,
+          "sap_invnt_item": null,
+          "sap_sell_item": null,
+          "sap_prchse_item": null,
+          "sap_itms_grp_cod": null,
+          "sap_update_date": null
+        },
+        {
+          "canonical_product_id": "product_b9b7829f664a6773f532cad3",
+          "source_system": "SAP_HANA",
+          "source_native_id": "L01412",
+          "item_code": "L01412",
+          "canonical_name": "SABORIZANTE VAINILLA EXTRA x kg.",
+          "product_name": "SABORIZANTE VAINILLA EXTRA x kg.",
+          "inventory_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "sales_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "purchase_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "active": true,
+          "valid_from": null,
+          "valid_to": null,
+          "status": "ACTIVE",
+          "_source_system": "SAP_HANA",
+          "_source_dataset": "OITM",
+          "_source_native_key": "L01412",
+          "_source_file": null,
+          "_source_snapshot_at": null,
+          "_source_extracted_at": "2026-09-24 09:03:11.919356-03",
+          "_ingested_at": "2026-09-24 09:03:11.919356-03",
+          "_transformation_version": "TELCHI_DATALAKE_REFERENCE_V2_SAP_MASTER_INGESTION_V1",
+          "_semantic_version": "2.0.0",
+          "_lineage_quality": "FULL_DOCUMENT_TRACE",
+          "sap_item_name": "SABORIZANTE VAINILLA EXTRA x kg.",
+          "sap_valid_for": "Y",
+          "sap_frozen_for": "N",
+          "sap_invnt_item": "Y",
+          "sap_sell_item": "N",
+          "sap_prchse_item": "Y",
+          "sap_itms_grp_cod": "129",
+          "sap_update_date": "2026-09-04T00:00:00"
+        }
+      ]
+    },
+    {
+      "name": "L01412_august_original",
+      "sql": "SELECT d AS header,l AS line FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l\n          ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n          WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n          AND d.canceled='N' AND d.doc_date>='2026-08-01' AND d.doc_date<'2026-09-01'\n          AND l.item_code='L01412' ",
+      "parameters": [],
+      "rows": [
+        {
+          "header": {
+            "atomic_id": "sales_document_742a453b90cc9d95c30a118082725073",
+            "source_system": "SAP_B1_HANA",
+            "source_table": "OINV",
+            "doc_entry": "11507272",
+            "doc_num": "260102290",
+            "doc_date": "2026-08-26T00:00:00",
+            "doc_due_date": "2026-12-24T00:00:00",
+            "tax_date": "2026-08-26T00:00:00",
+            "doc_status": "O",
+            "canceled": "N",
+            "currency": "BS",
+            "doc_total": "698.25",
+            "card_code": "S0003",
+            "source_as_of": "2026-09-24T12:59:42.721586+00:00",
+            "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+            "reference_version": "REFERENCE_V2",
+            "reference_manifest_hash": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_b19ceecf40d3ba09",
+            "transformation_version": "create-initial-v1.0.0",
+            "schema_version": "1.0.0",
+            "doc_total_system": "60.35",
+            "doc_total_foreign": "0",
+            "slp_code": "13",
+            "series": "1248",
+            "user_sign": "204",
+            "sales_channel_code": null,
+            "sales_channel_name": null,
+            "sales_channel_semantic_status": null
+          },
+          "line": {
+            "atomic_id": "sales_line_dd81db6643dd51ed8d1cb7839b0b0fc8",
+            "source_system": "SAP_B1_HANA",
+            "source_table": "INV1",
+            "doc_entry": "11507272",
+            "line_num": "0",
+            "item_code": "L01412",
+            "whs_code": "LAB-M1",
+            "quantity": "1.072",
+            "currency": "USD",
+            "line_total": "698.25",
+            "price": "56.2951",
+            "line_status": "O",
+            "source_as_of": "2026-09-24T12:59:42.721586+00:00",
+            "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+            "reference_version": "REFERENCE_V2",
+            "reference_manifest_hash": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_b19ceecf40d3ba09",
+            "transformation_version": "create-initial-v1.0.0",
+            "schema_version": "1.0.0",
+            "slp_code": "13",
+            "attributed_slp_code": "13"
+          }
+        }
+      ]
+    },
+    {
+      "name": "document_duplicates",
+      "sql": "SELECT source_system,source_table,doc_entry,COUNT(*) n\n          FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) GROUP BY ALL HAVING COUNT(*)>1",
+      "parameters": [],
+      "rows": []
+    },
+    {
+      "name": "line_duplicates",
+      "sql": "SELECT source_system,source_table,doc_entry,line_num,COUNT(*) n\n          FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) GROUP BY ALL HAVING COUNT(*)>1",
+      "parameters": [],
+      "rows": []
+    },
+    {
+      "name": "crosswalk_duplicates",
+      "sql": "SELECT \"ItemCode\",COUNT(*) n FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') GROUP BY ALL HAVING COUNT(*)>1",
+      "parameters": [],
+      "rows": []
+    },
+    {
+      "name": "07_currency_universe",
+      "sql": "SELECT x.product_business_type,x.status,d.currency header_currency,\n              l.currency line_currency,COUNT(*) line_count,COUNT(DISTINCT l.item_code) product_count,\n              SUM(CAST(l.line_total AS DECIMAL(38,6))) original_amount FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<? GROUP BY ALL ORDER BY 1,2,3,4",
+      "parameters": [
+        "2026-07-01",
+        "2026-08-01"
+      ],
+      "rows": [
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 138,
+          "product_count": 2,
+          "original_amount": "8646.200000"
+        },
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 28735,
+          "product_count": 223,
+          "original_amount": "2827044.230000"
+        },
+        {
+          "product_business_type": "LAB_FINISHED_PRODUCT",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 24265,
+          "product_count": 283,
+          "original_amount": "3273893.070000"
+        },
+        {
+          "product_business_type": "OTHER_INPUT",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 450,
+          "product_count": 64,
+          "original_amount": "27026.520000"
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "PROVISIONAL",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 1806,
+          "product_count": 248,
+          "original_amount": "176739.040000"
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 144,
+          "product_count": 5,
+          "original_amount": "3187.310000"
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 108,
+          "product_count": 15,
+          "original_amount": "14630.180000"
+        },
+        {
+          "product_business_type": "RAW_MATERIAL",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 565,
+          "product_count": 36,
+          "original_amount": "759227.580000"
+        },
+        {
+          "product_business_type": "SERVICE",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 263,
+          "product_count": 6,
+          "original_amount": "9680.550000"
+        },
+        {
+          "product_business_type": "TRADED_PRODUCT",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 28296,
+          "product_count": 3457,
+          "original_amount": "2223916.100000"
+        },
+        {
+          "product_business_type": "UNKNOWN",
+          "status": "UNKNOWN",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 9,
+          "product_count": 3,
+          "original_amount": "394.190000"
+        }
+      ]
+    },
+    {
+      "name": "07_independent_full_ranking",
+      "sql": "SELECT l.item_code,\n              SUM(CAST(l.line_total AS DECIMAL(38,6))) amount,COUNT(*) line_count,\n              COUNT(DISTINCT d.doc_entry) document_count FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<?\n              AND x.product_business_type='LAB_FINISHED_PRODUCT'\n              GROUP BY l.item_code ORDER BY amount DESC,l.item_code ASC",
+      "parameters": [
+        "2026-07-01",
+        "2026-08-01"
+      ],
+      "rows": [
+        {
+          "item_code": "L01612",
+          "amount": "324555.030000",
+          "line_count": 178,
+          "document_count": 178
+        },
+        {
+          "item_code": "L03281",
+          "amount": "271255.490000",
+          "line_count": 959,
+          "document_count": 959
+        },
+        {
+          "item_code": "L03402",
+          "amount": "176961.870000",
+          "line_count": 611,
+          "document_count": 611
+        },
+        {
+          "item_code": "L01613",
+          "amount": "117648.080000",
+          "line_count": 665,
+          "document_count": 665
+        },
+        {
+          "item_code": "L01001",
+          "amount": "111777.950000",
+          "line_count": 626,
+          "document_count": 626
+        },
+        {
+          "item_code": "L03612",
+          "amount": "97731.580000",
+          "line_count": 751,
+          "document_count": 751
+        },
+        {
+          "item_code": "L00059",
+          "amount": "83382.060000",
+          "line_count": 80,
+          "document_count": 80
+        },
+        {
+          "item_code": "L02823",
+          "amount": "79807.930000",
+          "line_count": 517,
+          "document_count": 517
+        },
+        {
+          "item_code": "L01967",
+          "amount": "73891.390000",
+          "line_count": 323,
+          "document_count": 323
+        },
+        {
+          "item_code": "L02822",
+          "amount": "70722.780000",
+          "line_count": 534,
+          "document_count": 534
+        },
+        {
+          "item_code": "L01969",
+          "amount": "58398.200000",
+          "line_count": 251,
+          "document_count": 251
+        },
+        {
+          "item_code": "L01060",
+          "amount": "57155.990000",
+          "line_count": 268,
+          "document_count": 268
+        },
+        {
+          "item_code": "L03658",
+          "amount": "52138.730000",
+          "line_count": 532,
+          "document_count": 532
+        },
+        {
+          "item_code": "L01044",
+          "amount": "51183.320000",
+          "line_count": 219,
+          "document_count": 219
+        },
+        {
+          "item_code": "L01643",
+          "amount": "50632.290000",
+          "line_count": 394,
+          "document_count": 394
+        },
+        {
+          "item_code": "L01622",
+          "amount": "47097.080000",
+          "line_count": 44,
+          "document_count": 44
+        },
+        {
+          "item_code": "L03283",
+          "amount": "45141.590000",
+          "line_count": 336,
+          "document_count": 336
+        },
+        {
+          "item_code": "L00426",
+          "amount": "44372.840000",
+          "line_count": 181,
+          "document_count": 181
+        },
+        {
+          "item_code": "L03518",
+          "amount": "41763.810000",
+          "line_count": 46,
+          "document_count": 46
+        },
+        {
+          "item_code": "L00056",
+          "amount": "41735.450000",
+          "line_count": 1048,
+          "document_count": 1048
+        },
+        {
+          "item_code": "L02837",
+          "amount": "39328.860000",
+          "line_count": 602,
+          "document_count": 602
+        },
+        {
+          "item_code": "L01445",
+          "amount": "39214.910000",
+          "line_count": 117,
+          "document_count": 117
+        },
+        {
+          "item_code": "L01117",
+          "amount": "39199.490000",
+          "line_count": 393,
+          "document_count": 393
+        },
+        {
+          "item_code": "L00069",
+          "amount": "33431.760000",
+          "line_count": 172,
+          "document_count": 172
+        },
+        {
+          "item_code": "L03023",
+          "amount": "31123.420000",
+          "line_count": 225,
+          "document_count": 225
+        },
+        {
+          "item_code": "L01343",
+          "amount": "30784.640000",
+          "line_count": 696,
+          "document_count": 696
+        },
+        {
+          "item_code": "L01003",
+          "amount": "30703.900000",
+          "line_count": 257,
+          "document_count": 257
+        },
+        {
+          "item_code": "L03399",
+          "amount": "28583.660000",
+          "line_count": 431,
+          "document_count": 431
+        },
+        {
+          "item_code": "L02958",
+          "amount": "28087.950000",
+          "line_count": 436,
+          "document_count": 436
+        },
+        {
+          "item_code": "L02944",
+          "amount": "27797.910000",
+          "line_count": 185,
+          "document_count": 185
+        },
+        {
+          "item_code": "L00068",
+          "amount": "27698.280000",
+          "line_count": 386,
+          "document_count": 386
+        },
+        {
+          "item_code": "L02024",
+          "amount": "22644.460000",
+          "line_count": 444,
+          "document_count": 444
+        },
+        {
+          "item_code": "L02549",
+          "amount": "22085.600000",
+          "line_count": 71,
+          "document_count": 71
+        },
+        {
+          "item_code": "L03649",
+          "amount": "21369.940000",
+          "line_count": 395,
+          "document_count": 395
+        },
+        {
+          "item_code": "L01651",
+          "amount": "20896.310000",
+          "line_count": 637,
+          "document_count": 637
+        },
+        {
+          "item_code": "L03600",
+          "amount": "20493.890000",
+          "line_count": 202,
+          "document_count": 202
+        },
+        {
+          "item_code": "L01064",
+          "amount": "19970.700000",
+          "line_count": 15,
+          "document_count": 15
+        },
+        {
+          "item_code": "L01598",
+          "amount": "19751.360000",
+          "line_count": 51,
+          "document_count": 51
+        },
+        {
+          "item_code": "L01004",
+          "amount": "18507.980000",
+          "line_count": 70,
+          "document_count": 70
+        },
+        {
+          "item_code": "L01652",
+          "amount": "18436.020000",
+          "line_count": 175,
+          "document_count": 175
+        },
+        {
+          "item_code": "L03506",
+          "amount": "18343.810000",
+          "line_count": 56,
+          "document_count": 56
+        },
+        {
+          "item_code": "L01062",
+          "amount": "18160.280000",
+          "line_count": 163,
+          "document_count": 163
+        },
+        {
+          "item_code": "L01258",
+          "amount": "18094.570000",
+          "line_count": 31,
+          "document_count": 31
+        },
+        {
+          "item_code": "L02938",
+          "amount": "16191.620000",
+          "line_count": 85,
+          "document_count": 85
+        },
+        {
+          "item_code": "L01624",
+          "amount": "15523.970000",
+          "line_count": 48,
+          "document_count": 48
+        },
+        {
+          "item_code": "L03258",
+          "amount": "15496.670000",
+          "line_count": 138,
+          "document_count": 138
+        },
+        {
+          "item_code": "L01600",
+          "amount": "15394.300000",
+          "line_count": 187,
+          "document_count": 187
+        },
+        {
+          "item_code": "L02941",
+          "amount": "15335.940000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00066",
+          "amount": "15280.790000",
+          "line_count": 220,
+          "document_count": 220
+        },
+        {
+          "item_code": "L01648",
+          "amount": "14371.650000",
+          "line_count": 130,
+          "document_count": 130
+        },
+        {
+          "item_code": "L01130",
+          "amount": "13405.280000",
+          "line_count": 140,
+          "document_count": 140
+        },
+        {
+          "item_code": "L00427",
+          "amount": "12598.240000",
+          "line_count": 233,
+          "document_count": 233
+        },
+        {
+          "item_code": "L02945",
+          "amount": "12261.770000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L02018",
+          "amount": "11913.520000",
+          "line_count": 223,
+          "document_count": 223
+        },
+        {
+          "item_code": "L00061",
+          "amount": "11795.960000",
+          "line_count": 142,
+          "document_count": 142
+        },
+        {
+          "item_code": "L02888",
+          "amount": "11790.890000",
+          "line_count": 81,
+          "document_count": 81
+        },
+        {
+          "item_code": "L01623",
+          "amount": "11781.410000",
+          "line_count": 28,
+          "document_count": 28
+        },
+        {
+          "item_code": "L01885",
+          "amount": "11383.130000",
+          "line_count": 182,
+          "document_count": 182
+        },
+        {
+          "item_code": "L00369",
+          "amount": "11233.290000",
+          "line_count": 78,
+          "document_count": 78
+        },
+        {
+          "item_code": "L00057",
+          "amount": "11090.520000",
+          "line_count": 143,
+          "document_count": 143
+        },
+        {
+          "item_code": "L00065",
+          "amount": "10876.660000",
+          "line_count": 112,
+          "document_count": 112
+        },
+        {
+          "item_code": "L00060",
+          "amount": "10857.840000",
+          "line_count": 185,
+          "document_count": 185
+        },
+        {
+          "item_code": "L03504",
+          "amount": "10661.410000",
+          "line_count": 121,
+          "document_count": 121
+        },
+        {
+          "item_code": "L00305",
+          "amount": "10059.390000",
+          "line_count": 72,
+          "document_count": 72
+        },
+        {
+          "item_code": "L03024",
+          "amount": "10054.210000",
+          "line_count": 504,
+          "document_count": 504
+        },
+        {
+          "item_code": "L01859",
+          "amount": "9703.970000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L01868",
+          "amount": "9660.710000",
+          "line_count": 128,
+          "document_count": 128
+        },
+        {
+          "item_code": "L01040",
+          "amount": "9478.430000",
+          "line_count": 32,
+          "document_count": 32
+        },
+        {
+          "item_code": "L03124",
+          "amount": "9395.820000",
+          "line_count": 72,
+          "document_count": 72
+        },
+        {
+          "item_code": "L03125",
+          "amount": "9355.660000",
+          "line_count": 98,
+          "document_count": 98
+        },
+        {
+          "item_code": "L03594",
+          "amount": "9195.130000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L02059",
+          "amount": "8909.110000",
+          "line_count": 149,
+          "document_count": 149
+        },
+        {
+          "item_code": "L03255",
+          "amount": "8614.040000",
+          "line_count": 77,
+          "document_count": 77
+        },
+        {
+          "item_code": "L02873",
+          "amount": "8556.770000",
+          "line_count": 124,
+          "document_count": 124
+        },
+        {
+          "item_code": "L03257",
+          "amount": "7903.580000",
+          "line_count": 90,
+          "document_count": 90
+        },
+        {
+          "item_code": "L01079",
+          "amount": "7761.250000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01063",
+          "amount": "7627.930000",
+          "line_count": 28,
+          "document_count": 28
+        },
+        {
+          "item_code": "L00306",
+          "amount": "7596.920000",
+          "line_count": 168,
+          "document_count": 168
+        },
+        {
+          "item_code": "L03321",
+          "amount": "7493.970000",
+          "line_count": 114,
+          "document_count": 114
+        },
+        {
+          "item_code": "L00448",
+          "amount": "7447.300000",
+          "line_count": 25,
+          "document_count": 25
+        },
+        {
+          "item_code": "L01653",
+          "amount": "7447.010000",
+          "line_count": 98,
+          "document_count": 98
+        },
+        {
+          "item_code": "L00001",
+          "amount": "7282.780000",
+          "line_count": 50,
+          "document_count": 50
+        },
+        {
+          "item_code": "L00064",
+          "amount": "7080.760000",
+          "line_count": 120,
+          "document_count": 120
+        },
+        {
+          "item_code": "L03015",
+          "amount": "7056.480000",
+          "line_count": 57,
+          "document_count": 57
+        },
+        {
+          "item_code": "L03030",
+          "amount": "6546.270000",
+          "line_count": 60,
+          "document_count": 60
+        },
+        {
+          "item_code": "L00320",
+          "amount": "6410.980000",
+          "line_count": 155,
+          "document_count": 155
+        },
+        {
+          "item_code": "L00058",
+          "amount": "6352.740000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L00067",
+          "amount": "6307.450000",
+          "line_count": 33,
+          "document_count": 33
+        },
+        {
+          "item_code": "L01095",
+          "amount": "6225.410000",
+          "line_count": 52,
+          "document_count": 52
+        },
+        {
+          "item_code": "L01891",
+          "amount": "6162.890000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L00319",
+          "amount": "6006.670000",
+          "line_count": 52,
+          "document_count": 52
+        },
+        {
+          "item_code": "L03576",
+          "amount": "5794.730000",
+          "line_count": 68,
+          "document_count": 68
+        },
+        {
+          "item_code": "L00444",
+          "amount": "5730.470000",
+          "line_count": 171,
+          "document_count": 171
+        },
+        {
+          "item_code": "L03184",
+          "amount": "5726.710000",
+          "line_count": 89,
+          "document_count": 89
+        },
+        {
+          "item_code": "L00070",
+          "amount": "5708.120000",
+          "line_count": 97,
+          "document_count": 97
+        },
+        {
+          "item_code": "L03583",
+          "amount": "5511.120000",
+          "line_count": 83,
+          "document_count": 83
+        },
+        {
+          "item_code": "L00353",
+          "amount": "5374.400000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L03172",
+          "amount": "5313.090000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L01038",
+          "amount": "5218.570000",
+          "line_count": 177,
+          "document_count": 177
+        },
+        {
+          "item_code": "L03599",
+          "amount": "5217.000000",
+          "line_count": 37,
+          "document_count": 37
+        },
+        {
+          "item_code": "L00481",
+          "amount": "5199.170000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L01639",
+          "amount": "5125.090000",
+          "line_count": 157,
+          "document_count": 157
+        },
+        {
+          "item_code": "L02548",
+          "amount": "4921.420000",
+          "line_count": 46,
+          "document_count": 46
+        },
+        {
+          "item_code": "L00340",
+          "amount": "4910.130000",
+          "line_count": 30,
+          "document_count": 30
+        },
+        {
+          "item_code": "L03022",
+          "amount": "4839.330000",
+          "line_count": 151,
+          "document_count": 151
+        },
+        {
+          "item_code": "L00451",
+          "amount": "4729.970000",
+          "line_count": 91,
+          "document_count": 91
+        },
+        {
+          "item_code": "L00301",
+          "amount": "4503.610000",
+          "line_count": 45,
+          "document_count": 45
+        },
+        {
+          "item_code": "L00813",
+          "amount": "4488.070000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L00038",
+          "amount": "4344.180000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L02553",
+          "amount": "4330.700000",
+          "line_count": 17,
+          "document_count": 17
+        },
+        {
+          "item_code": "L02930",
+          "amount": "4316.800000",
+          "line_count": 109,
+          "document_count": 109
+        },
+        {
+          "item_code": "L00322",
+          "amount": "4311.130000",
+          "line_count": 30,
+          "document_count": 30
+        },
+        {
+          "item_code": "L00063",
+          "amount": "4249.950000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L02973",
+          "amount": "4193.040000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00302",
+          "amount": "4106.200000",
+          "line_count": 70,
+          "document_count": 70
+        },
+        {
+          "item_code": "L03241",
+          "amount": "4073.150000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00443",
+          "amount": "3968.040000",
+          "line_count": 51,
+          "document_count": 51
+        },
+        {
+          "item_code": "L00461",
+          "amount": "3951.020000",
+          "line_count": 68,
+          "document_count": 68
+        },
+        {
+          "item_code": "L02082",
+          "amount": "3781.920000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L02897",
+          "amount": "3763.460000",
+          "line_count": 105,
+          "document_count": 105
+        },
+        {
+          "item_code": "L01628",
+          "amount": "3715.510000",
+          "line_count": 26,
+          "document_count": 26
+        },
+        {
+          "item_code": "L03577",
+          "amount": "3672.300000",
+          "line_count": 103,
+          "document_count": 103
+        },
+        {
+          "item_code": "L01252",
+          "amount": "3647.880000",
+          "line_count": 50,
+          "document_count": 50
+        },
+        {
+          "item_code": "L00450",
+          "amount": "3573.360000",
+          "line_count": 34,
+          "document_count": 34
+        },
+        {
+          "item_code": "L00370",
+          "amount": "3550.000000",
+          "line_count": 116,
+          "document_count": 116
+        },
+        {
+          "item_code": "L02464",
+          "amount": "3470.040000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L01605",
+          "amount": "3433.410000",
+          "line_count": 77,
+          "document_count": 77
+        },
+        {
+          "item_code": "L01099",
+          "amount": "3288.590000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L02880",
+          "amount": "3229.920000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L01193",
+          "amount": "3227.770000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00483",
+          "amount": "3189.200000",
+          "line_count": 63,
+          "document_count": 63
+        },
+        {
+          "item_code": "L01636",
+          "amount": "3133.030000",
+          "line_count": 53,
+          "document_count": 53
+        },
+        {
+          "item_code": "L01640",
+          "amount": "3098.730000",
+          "line_count": 99,
+          "document_count": 99
+        },
+        {
+          "item_code": "L03256",
+          "amount": "3082.060000",
+          "line_count": 51,
+          "document_count": 51
+        },
+        {
+          "item_code": "L01209",
+          "amount": "3015.420000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03168",
+          "amount": "2927.520000",
+          "line_count": 17,
+          "document_count": 17
+        },
+        {
+          "item_code": "L03053",
+          "amount": "2762.600000",
+          "line_count": 64,
+          "document_count": 64
+        },
+        {
+          "item_code": "L01195",
+          "amount": "2654.900000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L01609",
+          "amount": "2620.030000",
+          "line_count": 27,
+          "document_count": 27
+        },
+        {
+          "item_code": "L03055",
+          "amount": "2506.890000",
+          "line_count": 27,
+          "document_count": 27
+        },
+        {
+          "item_code": "L00335",
+          "amount": "2494.350000",
+          "line_count": 28,
+          "document_count": 28
+        },
+        {
+          "item_code": "L00323",
+          "amount": "2353.310000",
+          "line_count": 80,
+          "document_count": 80
+        },
+        {
+          "item_code": "L00480",
+          "amount": "2346.390000",
+          "line_count": 66,
+          "document_count": 66
+        },
+        {
+          "item_code": "L00434",
+          "amount": "2165.830000",
+          "line_count": 33,
+          "document_count": 33
+        },
+        {
+          "item_code": "L00477",
+          "amount": "2144.710000",
+          "line_count": 59,
+          "document_count": 59
+        },
+        {
+          "item_code": "L03148",
+          "amount": "2113.660000",
+          "line_count": 37,
+          "document_count": 37
+        },
+        {
+          "item_code": "L01633",
+          "amount": "2046.780000",
+          "line_count": 61,
+          "document_count": 61
+        },
+        {
+          "item_code": "L03116",
+          "amount": "2019.600000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L02361",
+          "amount": "1969.440000",
+          "line_count": 17,
+          "document_count": 17
+        },
+        {
+          "item_code": "L00482",
+          "amount": "1849.880000",
+          "line_count": 18,
+          "document_count": 18
+        },
+        {
+          "item_code": "L01645",
+          "amount": "1839.760000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00449",
+          "amount": "1801.300000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L01998",
+          "amount": "1762.190000",
+          "line_count": 15,
+          "document_count": 15
+        },
+        {
+          "item_code": "L02547",
+          "amount": "1709.350000",
+          "line_count": 39,
+          "document_count": 39
+        },
+        {
+          "item_code": "L03093",
+          "amount": "1657.210000",
+          "line_count": 34,
+          "document_count": 34
+        },
+        {
+          "item_code": "L03446",
+          "amount": "1627.070000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01206",
+          "amount": "1588.270000",
+          "line_count": 38,
+          "document_count": 38
+        },
+        {
+          "item_code": "L00337",
+          "amount": "1559.880000",
+          "line_count": 36,
+          "document_count": 36
+        },
+        {
+          "item_code": "L03028",
+          "amount": "1559.300000",
+          "line_count": 63,
+          "document_count": 63
+        },
+        {
+          "item_code": "L00032",
+          "amount": "1551.150000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L02128",
+          "amount": "1539.900000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L03027",
+          "amount": "1436.400000",
+          "line_count": 49,
+          "document_count": 49
+        },
+        {
+          "item_code": "L00486",
+          "amount": "1414.270000",
+          "line_count": 44,
+          "document_count": 44
+        },
+        {
+          "item_code": "L03114",
+          "amount": "1357.510000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L01198",
+          "amount": "1350.540000",
+          "line_count": 29,
+          "document_count": 29
+        },
+        {
+          "item_code": "L00479",
+          "amount": "1349.200000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L00309",
+          "amount": "1346.340000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L01974",
+          "amount": "1288.500000",
+          "line_count": 29,
+          "document_count": 29
+        },
+        {
+          "item_code": "L00356",
+          "amount": "1281.220000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L02896",
+          "amount": "1273.380000",
+          "line_count": 22,
+          "document_count": 22
+        },
+        {
+          "item_code": "L00459",
+          "amount": "1270.830000",
+          "line_count": 32,
+          "document_count": 32
+        },
+        {
+          "item_code": "L00329",
+          "amount": "1234.800000",
+          "line_count": 27,
+          "document_count": 27
+        },
+        {
+          "item_code": "L03054",
+          "amount": "1176.490000",
+          "line_count": 25,
+          "document_count": 25
+        },
+        {
+          "item_code": "L00341",
+          "amount": "1145.380000",
+          "line_count": 42,
+          "document_count": 42
+        },
+        {
+          "item_code": "L00453",
+          "amount": "1117.930000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L00476",
+          "amount": "1097.070000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L01100",
+          "amount": "1095.300000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00465",
+          "amount": "1095.080000",
+          "line_count": 28,
+          "document_count": 28
+        },
+        {
+          "item_code": "L00454",
+          "amount": "1073.680000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L00455",
+          "amount": "1058.350000",
+          "line_count": 37,
+          "document_count": 37
+        },
+        {
+          "item_code": "L03129",
+          "amount": "1024.860000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L00311",
+          "amount": "1007.590000",
+          "line_count": 36,
+          "document_count": 36
+        },
+        {
+          "item_code": "L01997",
+          "amount": "1004.850000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00475",
+          "amount": "990.940000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L01647",
+          "amount": "972.980000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00328",
+          "amount": "928.910000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L01632",
+          "amount": "913.810000",
+          "line_count": 36,
+          "document_count": 36
+        },
+        {
+          "item_code": "L02972",
+          "amount": "889.580000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L02463",
+          "amount": "882.020000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L03744",
+          "amount": "876.960000",
+          "line_count": 17,
+          "document_count": 17
+        },
+        {
+          "item_code": "L03117",
+          "amount": "873.330000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L00463",
+          "amount": "866.380000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00325",
+          "amount": "848.250000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L00485",
+          "amount": "836.940000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L01596",
+          "amount": "834.050000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L01608",
+          "amount": "832.820000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L03115",
+          "amount": "802.900000",
+          "line_count": 20,
+          "document_count": 20
+        },
+        {
+          "item_code": "L03183",
+          "amount": "791.710000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L01976",
+          "amount": "762.490000",
+          "line_count": 25,
+          "document_count": 25
+        },
+        {
+          "item_code": "L01869",
+          "amount": "736.890000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L00357",
+          "amount": "722.100000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L01952",
+          "amount": "722.050000",
+          "line_count": 15,
+          "document_count": 15
+        },
+        {
+          "item_code": "L03227",
+          "amount": "644.000000",
+          "line_count": 20,
+          "document_count": 20
+        },
+        {
+          "item_code": "L01646",
+          "amount": "558.130000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L02021",
+          "amount": "545.920000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00464",
+          "amount": "542.890000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00361",
+          "amount": "535.920000",
+          "line_count": 15,
+          "document_count": 15
+        },
+        {
+          "item_code": "L01261",
+          "amount": "529.680000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L03326",
+          "amount": "515.370000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L00291",
+          "amount": "510.720000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L02551",
+          "amount": "502.860000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L00326",
+          "amount": "487.680000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L00314",
+          "amount": "486.790000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L02465",
+          "amount": "447.180000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00484",
+          "amount": "411.660000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00457",
+          "amount": "395.310000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00414",
+          "amount": "391.740000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L00315",
+          "amount": "390.190000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L00286",
+          "amount": "371.760000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L00299",
+          "amount": "356.770000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L01602",
+          "amount": "355.520000",
+          "line_count": 21,
+          "document_count": 21
+        },
+        {
+          "item_code": "L02552",
+          "amount": "339.620000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L01604",
+          "amount": "339.240000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L01597",
+          "amount": "332.150000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L00458",
+          "amount": "299.280000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00440",
+          "amount": "293.110000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L00478",
+          "amount": "289.710000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01207",
+          "amount": "282.310000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L02914",
+          "amount": "264.480000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L03231",
+          "amount": "243.600000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00029",
+          "amount": "233.550000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02866",
+          "amount": "231.760000",
+          "line_count": 23,
+          "document_count": 23
+        },
+        {
+          "item_code": "L00289",
+          "amount": "219.040000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L01610",
+          "amount": "218.170000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L01975",
+          "amount": "218.090000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L00411",
+          "amount": "213.150000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00439",
+          "amount": "208.800000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L01212",
+          "amount": "206.710000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00415",
+          "amount": "206.630000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L01592",
+          "amount": "181.600000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L03325",
+          "amount": "180.690000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L01836",
+          "amount": "172.270000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L02546",
+          "amount": "171.290000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L01202",
+          "amount": "158.480000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00333",
+          "amount": "134.250000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00037",
+          "amount": "133.110000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01886",
+          "amount": "130.500000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00292",
+          "amount": "123.580000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00332",
+          "amount": "122.630000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L03235",
+          "amount": "121.800000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L02963",
+          "amount": "110.490000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00487",
+          "amount": "109.710000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00298",
+          "amount": "107.870000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01590",
+          "amount": "97.900000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L01027",
+          "amount": "97.010000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02962",
+          "amount": "97.010000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03624",
+          "amount": "93.900000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00336",
+          "amount": "85.250000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L02917",
+          "amount": "82.650000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00416",
+          "amount": "77.860000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L01591",
+          "amount": "75.810000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00354",
+          "amount": "73.980000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L00348",
+          "amount": "73.080000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00529",
+          "amount": "71.340000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L02915",
+          "amount": "66.120000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L01593",
+          "amount": "50.000000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00363",
+          "amount": "45.820000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01595",
+          "amount": "41.640000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L01603",
+          "amount": "39.710000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00365",
+          "amount": "37.410000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01611",
+          "amount": "36.840000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L02916",
+          "amount": "36.300000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L03234",
+          "amount": "35.000000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03232",
+          "amount": "30.450000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03233",
+          "amount": "30.450000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02550",
+          "amount": "29.920000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00351",
+          "amount": "26.970000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02362",
+          "amount": "25.270000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00324",
+          "amount": "24.660000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00330",
+          "amount": "16.830000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00347",
+          "amount": "15.660000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00317",
+          "amount": "8.100000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00358",
+          "amount": "6.960000",
+          "line_count": 1,
+          "document_count": 1
+        }
+      ]
+    },
+    {
+      "name": "07_independent_category_total",
+      "sql": "SELECT SUM(CAST(l.line_total AS DECIMAL(38,6))) amount,\n              COUNT(*) line_count,COUNT(DISTINCT l.item_code) product_count FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<?\n              AND x.product_business_type='LAB_FINISHED_PRODUCT' ",
+      "parameters": [
+        "2026-07-01",
+        "2026-08-01"
+      ],
+      "rows": [
+        {
+          "amount": "3273893.070000",
+          "line_count": 24265,
+          "product_count": 283
+        }
+      ]
+    },
+    {
+      "name": "07_lineage_bad",
+      "sql": "SELECT COUNT(*) n FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<? AND x.product_business_type='LAB_FINISHED_PRODUCT'\n              AND (d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n                OR d.source_as_of IS DISTINCT FROM l.source_as_of OR d.raw_extraction_id IS NULL\n                OR d.source_as_of IS NULL OR l.line_num IS NULL OR x.status NOT IN ('VALIDATED','SUPPORTED'))",
+      "parameters": [
+        "2026-07-01",
+        "2026-08-01"
+      ],
+      "rows": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "name": "08_currency_universe",
+      "sql": "SELECT x.product_business_type,x.status,d.currency header_currency,\n              l.currency line_currency,COUNT(*) line_count,COUNT(DISTINCT l.item_code) product_count,\n              SUM(CAST(l.line_total AS DECIMAL(38,6))) original_amount FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<? GROUP BY ALL ORDER BY 1,2,3,4",
+      "parameters": [
+        "2026-08-01",
+        "2026-09-01"
+      ],
+      "rows": [
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 100,
+          "product_count": 4,
+          "original_amount": "7048.540000"
+        },
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 25645,
+          "product_count": 222,
+          "original_amount": "2786518.800000"
+        },
+        {
+          "product_business_type": "LAB_FINISHED_PRODUCT",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 23885,
+          "product_count": 289,
+          "original_amount": "3480448.890000"
+        },
+        {
+          "product_business_type": "OTHER_INPUT",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 654,
+          "product_count": 77,
+          "original_amount": "33382.790000"
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "PROVISIONAL",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 1661,
+          "product_count": 232,
+          "original_amount": "189080.470000"
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 138,
+          "product_count": 5,
+          "original_amount": "1038.760000"
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 103,
+          "product_count": 14,
+          "original_amount": "16012.590000"
+        },
+        {
+          "product_business_type": "RAW_MATERIAL",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 501,
+          "product_count": 37,
+          "original_amount": "853568.450000"
+        },
+        {
+          "product_business_type": "RAW_MATERIAL",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "USD",
+          "line_count": 1,
+          "product_count": 1,
+          "original_amount": "698.250000"
+        },
+        {
+          "product_business_type": "SERVICE",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 234,
+          "product_count": 7,
+          "original_amount": "25989.860000"
+        },
+        {
+          "product_business_type": "TRADED_PRODUCT",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 26610,
+          "product_count": 3502,
+          "original_amount": "2112118.260000"
+        },
+        {
+          "product_business_type": "UNKNOWN",
+          "status": "UNKNOWN",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 3,
+          "product_count": 1,
+          "original_amount": "63.270000"
+        }
+      ]
+    },
+    {
+      "name": "08_independent_full_ranking",
+      "sql": "SELECT l.item_code,\n              SUM(CAST(l.line_total AS DECIMAL(38,6))) amount,COUNT(*) line_count,\n              COUNT(DISTINCT d.doc_entry) document_count FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<?\n              AND x.product_business_type='LAB_FINISHED_PRODUCT'\n              GROUP BY l.item_code ORDER BY amount DESC,l.item_code ASC",
+      "parameters": [
+        "2026-08-01",
+        "2026-09-01"
+      ],
+      "rows": [
+        {
+          "item_code": "L03281",
+          "amount": "314971.570000",
+          "line_count": 1055,
+          "document_count": 1053
+        },
+        {
+          "item_code": "L03612",
+          "amount": "198872.750000",
+          "line_count": 1185,
+          "document_count": 1184
+        },
+        {
+          "item_code": "L01064",
+          "amount": "198649.980000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L01969",
+          "amount": "186797.820000",
+          "line_count": 704,
+          "document_count": 704
+        },
+        {
+          "item_code": "L01612",
+          "amount": "169704.970000",
+          "line_count": 217,
+          "document_count": 217
+        },
+        {
+          "item_code": "L03402",
+          "amount": "150379.170000",
+          "line_count": 425,
+          "document_count": 425
+        },
+        {
+          "item_code": "L01613",
+          "amount": "131869.980000",
+          "line_count": 627,
+          "document_count": 627
+        },
+        {
+          "item_code": "L01001",
+          "amount": "95567.990000",
+          "line_count": 654,
+          "document_count": 654
+        },
+        {
+          "item_code": "L01967",
+          "amount": "84712.820000",
+          "line_count": 408,
+          "document_count": 408
+        },
+        {
+          "item_code": "L03283",
+          "amount": "67729.850000",
+          "line_count": 352,
+          "document_count": 352
+        },
+        {
+          "item_code": "L02822",
+          "amount": "59456.050000",
+          "line_count": 444,
+          "document_count": 444
+        },
+        {
+          "item_code": "L02823",
+          "amount": "53094.780000",
+          "line_count": 360,
+          "document_count": 360
+        },
+        {
+          "item_code": "L03658",
+          "amount": "53091.040000",
+          "line_count": 406,
+          "document_count": 406
+        },
+        {
+          "item_code": "L01445",
+          "amount": "52866.270000",
+          "line_count": 151,
+          "document_count": 151
+        },
+        {
+          "item_code": "L01060",
+          "amount": "52801.060000",
+          "line_count": 254,
+          "document_count": 254
+        },
+        {
+          "item_code": "L00069",
+          "amount": "52581.730000",
+          "line_count": 159,
+          "document_count": 159
+        },
+        {
+          "item_code": "L01622",
+          "amount": "47198.220000",
+          "line_count": 58,
+          "document_count": 58
+        },
+        {
+          "item_code": "L01643",
+          "amount": "47033.470000",
+          "line_count": 440,
+          "document_count": 440
+        },
+        {
+          "item_code": "L00059",
+          "amount": "46684.960000",
+          "line_count": 95,
+          "document_count": 95
+        },
+        {
+          "item_code": "L02837",
+          "amount": "43981.040000",
+          "line_count": 619,
+          "document_count": 619
+        },
+        {
+          "item_code": "L01044",
+          "amount": "40586.370000",
+          "line_count": 175,
+          "document_count": 175
+        },
+        {
+          "item_code": "L00056",
+          "amount": "40462.600000",
+          "line_count": 700,
+          "document_count": 700
+        },
+        {
+          "item_code": "L00426",
+          "amount": "38175.560000",
+          "line_count": 164,
+          "document_count": 164
+        },
+        {
+          "item_code": "L01003",
+          "amount": "36689.010000",
+          "line_count": 208,
+          "document_count": 208
+        },
+        {
+          "item_code": "L03258",
+          "amount": "32558.530000",
+          "line_count": 378,
+          "document_count": 378
+        },
+        {
+          "item_code": "L01117",
+          "amount": "32382.310000",
+          "line_count": 320,
+          "document_count": 320
+        },
+        {
+          "item_code": "L02958",
+          "amount": "29087.510000",
+          "line_count": 466,
+          "document_count": 466
+        },
+        {
+          "item_code": "L02024",
+          "amount": "28568.110000",
+          "line_count": 489,
+          "document_count": 489
+        },
+        {
+          "item_code": "L00061",
+          "amount": "28349.720000",
+          "line_count": 138,
+          "document_count": 138
+        },
+        {
+          "item_code": "L03399",
+          "amount": "26944.520000",
+          "line_count": 385,
+          "document_count": 385
+        },
+        {
+          "item_code": "L01004",
+          "amount": "24805.440000",
+          "line_count": 74,
+          "document_count": 74
+        },
+        {
+          "item_code": "L03023",
+          "amount": "24526.190000",
+          "line_count": 194,
+          "document_count": 194
+        },
+        {
+          "item_code": "L03257",
+          "amount": "23744.610000",
+          "line_count": 316,
+          "document_count": 316
+        },
+        {
+          "item_code": "L00068",
+          "amount": "22050.720000",
+          "line_count": 277,
+          "document_count": 277
+        },
+        {
+          "item_code": "L01062",
+          "amount": "22029.500000",
+          "line_count": 149,
+          "document_count": 149
+        },
+        {
+          "item_code": "L01343",
+          "amount": "21971.900000",
+          "line_count": 436,
+          "document_count": 436
+        },
+        {
+          "item_code": "L01079",
+          "amount": "20851.250000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L03518",
+          "amount": "20429.160000",
+          "line_count": 51,
+          "document_count": 51
+        },
+        {
+          "item_code": "L01651",
+          "amount": "20313.810000",
+          "line_count": 411,
+          "document_count": 411
+        },
+        {
+          "item_code": "L01652",
+          "amount": "20122.990000",
+          "line_count": 216,
+          "document_count": 216
+        },
+        {
+          "item_code": "L03600",
+          "amount": "19736.880000",
+          "line_count": 185,
+          "document_count": 185
+        },
+        {
+          "item_code": "L00060",
+          "amount": "17646.530000",
+          "line_count": 229,
+          "document_count": 229
+        },
+        {
+          "item_code": "L01598",
+          "amount": "17257.800000",
+          "line_count": 45,
+          "document_count": 45
+        },
+        {
+          "item_code": "L03124",
+          "amount": "16387.180000",
+          "line_count": 120,
+          "document_count": 120
+        },
+        {
+          "item_code": "L02018",
+          "amount": "16221.500000",
+          "line_count": 222,
+          "document_count": 222
+        },
+        {
+          "item_code": "L03255",
+          "amount": "16160.810000",
+          "line_count": 84,
+          "document_count": 84
+        },
+        {
+          "item_code": "L01130",
+          "amount": "15858.000000",
+          "line_count": 132,
+          "document_count": 132
+        },
+        {
+          "item_code": "L00427",
+          "amount": "15427.250000",
+          "line_count": 220,
+          "document_count": 220
+        },
+        {
+          "item_code": "L02549",
+          "amount": "15355.340000",
+          "line_count": 66,
+          "document_count": 66
+        },
+        {
+          "item_code": "L03649",
+          "amount": "14758.940000",
+          "line_count": 324,
+          "document_count": 324
+        },
+        {
+          "item_code": "L03506",
+          "amount": "14591.180000",
+          "line_count": 51,
+          "document_count": 51
+        },
+        {
+          "item_code": "L02059",
+          "amount": "14414.200000",
+          "line_count": 218,
+          "document_count": 218
+        },
+        {
+          "item_code": "L01600",
+          "amount": "13851.990000",
+          "line_count": 178,
+          "document_count": 178
+        },
+        {
+          "item_code": "L02888",
+          "amount": "13339.680000",
+          "line_count": 104,
+          "document_count": 104
+        },
+        {
+          "item_code": "L01624",
+          "amount": "13192.760000",
+          "line_count": 48,
+          "document_count": 48
+        },
+        {
+          "item_code": "L03321",
+          "amount": "13018.110000",
+          "line_count": 161,
+          "document_count": 161
+        },
+        {
+          "item_code": "L03125",
+          "amount": "12919.110000",
+          "line_count": 141,
+          "document_count": 141
+        },
+        {
+          "item_code": "L01455",
+          "amount": "12832.500000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00070",
+          "amount": "12527.050000",
+          "line_count": 124,
+          "document_count": 124
+        },
+        {
+          "item_code": "L01885",
+          "amount": "12110.220000",
+          "line_count": 162,
+          "document_count": 162
+        },
+        {
+          "item_code": "L02938",
+          "amount": "11777.180000",
+          "line_count": 73,
+          "document_count": 73
+        },
+        {
+          "item_code": "L03030",
+          "amount": "11548.410000",
+          "line_count": 78,
+          "document_count": 78
+        },
+        {
+          "item_code": "L03024",
+          "amount": "11223.130000",
+          "line_count": 489,
+          "document_count": 489
+        },
+        {
+          "item_code": "L01623",
+          "amount": "10506.860000",
+          "line_count": 26,
+          "document_count": 26
+        },
+        {
+          "item_code": "L00305",
+          "amount": "10360.420000",
+          "line_count": 75,
+          "document_count": 75
+        },
+        {
+          "item_code": "L03504",
+          "amount": "10348.620000",
+          "line_count": 112,
+          "document_count": 112
+        },
+        {
+          "item_code": "L00064",
+          "amount": "10283.400000",
+          "line_count": 127,
+          "document_count": 127
+        },
+        {
+          "item_code": "L03594",
+          "amount": "10095.290000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L01258",
+          "amount": "9783.150000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L01040",
+          "amount": "9756.640000",
+          "line_count": 40,
+          "document_count": 40
+        },
+        {
+          "item_code": "L01653",
+          "amount": "9670.900000",
+          "line_count": 132,
+          "document_count": 132
+        },
+        {
+          "item_code": "L00057",
+          "amount": "8833.230000",
+          "line_count": 124,
+          "document_count": 124
+        },
+        {
+          "item_code": "L00066",
+          "amount": "8801.720000",
+          "line_count": 190,
+          "document_count": 190
+        },
+        {
+          "item_code": "L00369",
+          "amount": "8762.250000",
+          "line_count": 62,
+          "document_count": 62
+        },
+        {
+          "item_code": "L03256",
+          "amount": "8738.440000",
+          "line_count": 57,
+          "document_count": 57
+        },
+        {
+          "item_code": "L01063",
+          "amount": "8327.220000",
+          "line_count": 25,
+          "document_count": 25
+        },
+        {
+          "item_code": "L01639",
+          "amount": "8193.100000",
+          "line_count": 197,
+          "document_count": 197
+        },
+        {
+          "item_code": "L03168",
+          "amount": "7874.560000",
+          "line_count": 24,
+          "document_count": 24
+        },
+        {
+          "item_code": "L00065",
+          "amount": "7773.560000",
+          "line_count": 105,
+          "document_count": 105
+        },
+        {
+          "item_code": "L02873",
+          "amount": "7570.990000",
+          "line_count": 111,
+          "document_count": 111
+        },
+        {
+          "item_code": "L00306",
+          "amount": "7188.450000",
+          "line_count": 177,
+          "document_count": 177
+        },
+        {
+          "item_code": "L02944",
+          "amount": "6928.530000",
+          "line_count": 162,
+          "document_count": 162
+        },
+        {
+          "item_code": "L00320",
+          "amount": "6500.530000",
+          "line_count": 181,
+          "document_count": 181
+        },
+        {
+          "item_code": "L01095",
+          "amount": "6394.540000",
+          "line_count": 55,
+          "document_count": 55
+        },
+        {
+          "item_code": "L03015",
+          "amount": "6251.810000",
+          "line_count": 58,
+          "document_count": 58
+        },
+        {
+          "item_code": "L03576",
+          "amount": "6154.870000",
+          "line_count": 83,
+          "document_count": 83
+        },
+        {
+          "item_code": "L03744",
+          "amount": "6120.450000",
+          "line_count": 89,
+          "document_count": 89
+        },
+        {
+          "item_code": "L00448",
+          "amount": "6028.230000",
+          "line_count": 15,
+          "document_count": 15
+        },
+        {
+          "item_code": "L01193",
+          "amount": "5660.460000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00319",
+          "amount": "5310.000000",
+          "line_count": 59,
+          "document_count": 59
+        },
+        {
+          "item_code": "L00063",
+          "amount": "5269.620000",
+          "line_count": 18,
+          "document_count": 18
+        },
+        {
+          "item_code": "L00444",
+          "amount": "5100.770000",
+          "line_count": 181,
+          "document_count": 181
+        },
+        {
+          "item_code": "L00370",
+          "amount": "5074.930000",
+          "line_count": 107,
+          "document_count": 107
+        },
+        {
+          "item_code": "L00340",
+          "amount": "4918.090000",
+          "line_count": 30,
+          "document_count": 30
+        },
+        {
+          "item_code": "L00353",
+          "amount": "4882.210000",
+          "line_count": 18,
+          "document_count": 18
+        },
+        {
+          "item_code": "L01859",
+          "amount": "4873.760000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L02553",
+          "amount": "4861.560000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00301",
+          "amount": "4775.930000",
+          "line_count": 39,
+          "document_count": 39
+        },
+        {
+          "item_code": "L03583",
+          "amount": "4765.480000",
+          "line_count": 71,
+          "document_count": 71
+        },
+        {
+          "item_code": "L00481",
+          "amount": "4730.340000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L03241",
+          "amount": "4725.410000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L00001",
+          "amount": "4706.020000",
+          "line_count": 41,
+          "document_count": 41
+        },
+        {
+          "item_code": "L01038",
+          "amount": "4583.390000",
+          "line_count": 137,
+          "document_count": 137
+        },
+        {
+          "item_code": "L00451",
+          "amount": "4541.320000",
+          "line_count": 97,
+          "document_count": 97
+        },
+        {
+          "item_code": "L01891",
+          "amount": "4321.440000",
+          "line_count": 15,
+          "document_count": 15
+        },
+        {
+          "item_code": "L00322",
+          "amount": "4277.350000",
+          "line_count": 33,
+          "document_count": 33
+        },
+        {
+          "item_code": "P00098",
+          "amount": "4210.790000",
+          "line_count": 36,
+          "document_count": 36
+        },
+        {
+          "item_code": "L00038",
+          "amount": "3978.950000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L00067",
+          "amount": "3927.250000",
+          "line_count": 26,
+          "document_count": 26
+        },
+        {
+          "item_code": "L01099",
+          "amount": "3879.330000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L03599",
+          "amount": "3854.620000",
+          "line_count": 42,
+          "document_count": 42
+        },
+        {
+          "item_code": "L03022",
+          "amount": "3700.460000",
+          "line_count": 127,
+          "document_count": 127
+        },
+        {
+          "item_code": "L02897",
+          "amount": "3679.740000",
+          "line_count": 89,
+          "document_count": 89
+        },
+        {
+          "item_code": "L00323",
+          "amount": "3672.300000",
+          "line_count": 105,
+          "document_count": 105
+        },
+        {
+          "item_code": "L02548",
+          "amount": "3658.640000",
+          "line_count": 30,
+          "document_count": 30
+        },
+        {
+          "item_code": "L00335",
+          "amount": "3538.710000",
+          "line_count": 37,
+          "document_count": 37
+        },
+        {
+          "item_code": "L00450",
+          "amount": "3490.970000",
+          "line_count": 32,
+          "document_count": 32
+        },
+        {
+          "item_code": "L02880",
+          "amount": "3445.230000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L01252",
+          "amount": "3426.070000",
+          "line_count": 40,
+          "document_count": 40
+        },
+        {
+          "item_code": "L00302",
+          "amount": "3297.320000",
+          "line_count": 71,
+          "document_count": 71
+        },
+        {
+          "item_code": "L00480",
+          "amount": "3230.840000",
+          "line_count": 92,
+          "document_count": 92
+        },
+        {
+          "item_code": "L00443",
+          "amount": "3229.910000",
+          "line_count": 32,
+          "document_count": 32
+        },
+        {
+          "item_code": "L03184",
+          "amount": "3201.860000",
+          "line_count": 94,
+          "document_count": 94
+        },
+        {
+          "item_code": "L03577",
+          "amount": "3122.340000",
+          "line_count": 90,
+          "document_count": 90
+        },
+        {
+          "item_code": "L00434",
+          "amount": "3045.040000",
+          "line_count": 38,
+          "document_count": 38
+        },
+        {
+          "item_code": "L00483",
+          "amount": "2890.530000",
+          "line_count": 61,
+          "document_count": 61
+        },
+        {
+          "item_code": "L02930",
+          "amount": "2783.790000",
+          "line_count": 77,
+          "document_count": 77
+        },
+        {
+          "item_code": "L02945",
+          "amount": "2761.380000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00337",
+          "amount": "2755.570000",
+          "line_count": 82,
+          "document_count": 82
+        },
+        {
+          "item_code": "L03093",
+          "amount": "2743.470000",
+          "line_count": 38,
+          "document_count": 38
+        },
+        {
+          "item_code": "L01640",
+          "amount": "2716.940000",
+          "line_count": 89,
+          "document_count": 89
+        },
+        {
+          "item_code": "L00461",
+          "amount": "2601.910000",
+          "line_count": 69,
+          "document_count": 69
+        },
+        {
+          "item_code": "L00058",
+          "amount": "2596.080000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L03053",
+          "amount": "2588.440000",
+          "line_count": 54,
+          "document_count": 54
+        },
+        {
+          "item_code": "L01195",
+          "amount": "2425.210000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L01484",
+          "amount": "2414.250000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00309",
+          "amount": "2090.410000",
+          "line_count": 25,
+          "document_count": 25
+        },
+        {
+          "item_code": "L01648",
+          "amount": "2087.600000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L01998",
+          "amount": "1932.710000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L00477",
+          "amount": "1915.580000",
+          "line_count": 55,
+          "document_count": 55
+        },
+        {
+          "item_code": "L00328",
+          "amount": "1874.080000",
+          "line_count": 15,
+          "document_count": 15
+        },
+        {
+          "item_code": "L03330",
+          "amount": "1857.450000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01206",
+          "amount": "1825.980000",
+          "line_count": 27,
+          "document_count": 27
+        },
+        {
+          "item_code": "L01454",
+          "amount": "1804.430000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00329",
+          "amount": "1802.670000",
+          "line_count": 48,
+          "document_count": 48
+        },
+        {
+          "item_code": "L02128",
+          "amount": "1796.550000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00449",
+          "amount": "1767.040000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L00341",
+          "amount": "1753.660000",
+          "line_count": 57,
+          "document_count": 57
+        },
+        {
+          "item_code": "L00361",
+          "amount": "1639.080000",
+          "line_count": 22,
+          "document_count": 22
+        },
+        {
+          "item_code": "L00482",
+          "amount": "1618.480000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L03055",
+          "amount": "1577.670000",
+          "line_count": 18,
+          "document_count": 18
+        },
+        {
+          "item_code": "L03129",
+          "amount": "1571.700000",
+          "line_count": 17,
+          "document_count": 17
+        },
+        {
+          "item_code": "L03114",
+          "amount": "1468.020000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L02941",
+          "amount": "1442.030000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03027",
+          "amount": "1401.630000",
+          "line_count": 35,
+          "document_count": 35
+        },
+        {
+          "item_code": "L00455",
+          "amount": "1368.970000",
+          "line_count": 48,
+          "document_count": 48
+        },
+        {
+          "item_code": "L01868",
+          "amount": "1356.550000",
+          "line_count": 17,
+          "document_count": 17
+        },
+        {
+          "item_code": "L03054",
+          "amount": "1354.500000",
+          "line_count": 29,
+          "document_count": 29
+        },
+        {
+          "item_code": "L00465",
+          "amount": "1351.780000",
+          "line_count": 29,
+          "document_count": 29
+        },
+        {
+          "item_code": "L01605",
+          "amount": "1324.230000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L02973",
+          "amount": "1320.580000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00486",
+          "amount": "1256.190000",
+          "line_count": 58,
+          "document_count": 58
+        },
+        {
+          "item_code": "L02896",
+          "amount": "1242.420000",
+          "line_count": 35,
+          "document_count": 35
+        },
+        {
+          "item_code": "L01633",
+          "amount": "1217.100000",
+          "line_count": 35,
+          "document_count": 35
+        },
+        {
+          "item_code": "L02361",
+          "amount": "1205.880000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L02082",
+          "amount": "1184.940000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L03172",
+          "amount": "1175.370000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L02547",
+          "amount": "1128.630000",
+          "line_count": 34,
+          "document_count": 34
+        },
+        {
+          "item_code": "L01100",
+          "amount": "1096.200000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L03117",
+          "amount": "1095.190000",
+          "line_count": 23,
+          "document_count": 23
+        },
+        {
+          "item_code": "L00453",
+          "amount": "1085.350000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00357",
+          "amount": "1057.460000",
+          "line_count": 33,
+          "document_count": 33
+        },
+        {
+          "item_code": "L00311",
+          "amount": "1045.310000",
+          "line_count": 31,
+          "document_count": 31
+        },
+        {
+          "item_code": "L01628",
+          "amount": "1009.800000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00037",
+          "amount": "1002.240000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00479",
+          "amount": "996.160000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L03148",
+          "amount": "983.460000",
+          "line_count": 20,
+          "document_count": 20
+        },
+        {
+          "item_code": "L00414",
+          "amount": "972.490000",
+          "line_count": 41,
+          "document_count": 41
+        },
+        {
+          "item_code": "L00484",
+          "amount": "952.200000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L02464",
+          "amount": "931.780000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00459",
+          "amount": "927.900000",
+          "line_count": 32,
+          "document_count": 32
+        },
+        {
+          "item_code": "L01485",
+          "amount": "910.630000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01636",
+          "amount": "890.060000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L00314",
+          "amount": "871.770000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L03115",
+          "amount": "867.090000",
+          "line_count": 22,
+          "document_count": 22
+        },
+        {
+          "item_code": "L03116",
+          "amount": "855.270000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L03028",
+          "amount": "822.080000",
+          "line_count": 52,
+          "document_count": 52
+        },
+        {
+          "item_code": "L00478",
+          "amount": "734.260000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00286",
+          "amount": "727.860000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L03183",
+          "amount": "715.580000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00476",
+          "amount": "710.780000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L03233",
+          "amount": "700.350000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00475",
+          "amount": "696.900000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00439",
+          "amount": "696.010000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L01952",
+          "amount": "685.150000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L00454",
+          "amount": "671.660000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00813",
+          "amount": "666.860000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L01632",
+          "amount": "661.060000",
+          "line_count": 25,
+          "document_count": 25
+        },
+        {
+          "item_code": "L00325",
+          "amount": "621.180000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L02552",
+          "amount": "612.480000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00529",
+          "amount": "606.400000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L00326",
+          "amount": "596.820000",
+          "line_count": 23,
+          "document_count": 23
+        },
+        {
+          "item_code": "L02866",
+          "amount": "570.720000",
+          "line_count": 51,
+          "document_count": 51
+        },
+        {
+          "item_code": "L01198",
+          "amount": "566.410000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L00029",
+          "amount": "539.760000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L02972",
+          "amount": "533.760000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L03445",
+          "amount": "452.400000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L02463",
+          "amount": "441.000000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00289",
+          "amount": "438.880000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L01997",
+          "amount": "433.150000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L01974",
+          "amount": "431.020000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00356",
+          "amount": "430.640000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00411",
+          "amount": "426.300000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00415",
+          "amount": "373.670000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L03227",
+          "amount": "363.880000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L01202",
+          "amount": "356.580000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00349",
+          "amount": "338.880000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00464",
+          "amount": "336.690000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L02021",
+          "amount": "334.950000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00315",
+          "amount": "327.990000",
+          "line_count": 15,
+          "document_count": 15
+        },
+        {
+          "item_code": "L00032",
+          "amount": "321.300000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L03284",
+          "amount": "318.420000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03326",
+          "amount": "318.420000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L00332",
+          "amount": "307.500000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L01209",
+          "amount": "301.540000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00292",
+          "amount": "288.410000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L03323",
+          "amount": "260.990000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01602",
+          "amount": "251.460000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L02546",
+          "amount": "245.680000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L00463",
+          "amount": "243.600000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L03231",
+          "amount": "243.600000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00416",
+          "amount": "242.730000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L01212",
+          "amount": "229.680000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01647",
+          "amount": "223.940000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L02465",
+          "amount": "223.590000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00458",
+          "amount": "215.760000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L03230",
+          "amount": "192.300000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01608",
+          "amount": "190.900000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00457",
+          "amount": "190.530000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00291",
+          "amount": "172.800000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L01596",
+          "amount": "167.490000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L01976",
+          "amount": "166.240000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00363",
+          "amount": "149.210000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L02362",
+          "amount": "146.160000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L00487",
+          "amount": "139.600000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L00027",
+          "amount": "133.980000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01869",
+          "amount": "133.980000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00485",
+          "amount": "131.370000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L02914",
+          "amount": "129.200000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L01592",
+          "amount": "124.400000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L03624",
+          "amount": "118.320000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00299",
+          "amount": "117.480000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L01836",
+          "amount": "116.820000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01609",
+          "amount": "93.020000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01597",
+          "amount": "91.780000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L02551",
+          "amount": "88.740000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00333",
+          "amount": "87.030000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00440",
+          "amount": "80.060000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00348",
+          "amount": "73.080000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01645",
+          "amount": "69.960000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L02915",
+          "amount": "63.070000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L03232",
+          "amount": "60.900000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01975",
+          "amount": "60.290000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L02918",
+          "amount": "60.040000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L01590",
+          "amount": "58.740000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L01593",
+          "amount": "48.780000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L01591",
+          "amount": "48.720000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L03446",
+          "amount": "43.070000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03226",
+          "amount": "43.000000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00336",
+          "amount": "42.640000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01603",
+          "amount": "38.280000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00408",
+          "amount": "35.670000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02916",
+          "amount": "30.590000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L03235",
+          "amount": "30.450000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02917",
+          "amount": "30.010000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00351",
+          "amount": "26.970000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00347",
+          "amount": "23.490000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L01604",
+          "amount": "19.140000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01261",
+          "amount": "17.230000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00354",
+          "amount": "15.660000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01595",
+          "amount": "13.870000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01611",
+          "amount": "10.900000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01610",
+          "amount": "9.090000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00409",
+          "amount": "8.050000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00317",
+          "amount": "7.830000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00324",
+          "amount": "7.830000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00330",
+          "amount": "7.830000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02550",
+          "amount": "7.480000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00358",
+          "amount": "6.960000",
+          "line_count": 1,
+          "document_count": 1
+        }
+      ]
+    },
+    {
+      "name": "08_independent_category_total",
+      "sql": "SELECT SUM(CAST(l.line_total AS DECIMAL(38,6))) amount,\n              COUNT(*) line_count,COUNT(DISTINCT l.item_code) product_count FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<?\n              AND x.product_business_type='LAB_FINISHED_PRODUCT' ",
+      "parameters": [
+        "2026-08-01",
+        "2026-09-01"
+      ],
+      "rows": [
+        {
+          "amount": "3480448.890000",
+          "line_count": 23885,
+          "product_count": 289
+        }
+      ]
+    },
+    {
+      "name": "08_lineage_bad",
+      "sql": "SELECT COUNT(*) n FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<? AND x.product_business_type='LAB_FINISHED_PRODUCT'\n              AND (d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n                OR d.source_as_of IS DISTINCT FROM l.source_as_of OR d.raw_extraction_id IS NULL\n                OR d.source_as_of IS NULL OR l.line_num IS NULL OR x.status NOT IN ('VALIDATED','SUPPORTED'))",
+      "parameters": [
+        "2026-08-01",
+        "2026-09-01"
+      ],
+      "rows": [
+        {
+          "n": 0
+        }
+      ]
+    },
+    {
+      "name": "09_currency_universe",
+      "sql": "SELECT x.product_business_type,x.status,d.currency header_currency,\n              l.currency line_currency,COUNT(*) line_count,COUNT(DISTINCT l.item_code) product_count,\n              SUM(CAST(l.line_total AS DECIMAL(38,6))) original_amount FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<? GROUP BY ALL ORDER BY 1,2,3,4",
+      "parameters": [
+        "2026-09-01",
+        "2026-10-01"
+      ],
+      "rows": [
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 121,
+          "product_count": 3,
+          "original_amount": "12561.660000"
+        },
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 20968,
+          "product_count": 214,
+          "original_amount": "2502055.480000"
+        },
+        {
+          "product_business_type": "LAB_FINISHED_PRODUCT",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 18541,
+          "product_count": 278,
+          "original_amount": "2679208.660000"
+        },
+        {
+          "product_business_type": "OTHER_INPUT",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 581,
+          "product_count": 65,
+          "original_amount": "31278.870000"
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "PROVISIONAL",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 1535,
+          "product_count": 227,
+          "original_amount": "167796.820000"
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 234,
+          "product_count": 7,
+          "original_amount": "24790.610000"
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 104,
+          "product_count": 16,
+          "original_amount": "21122.980000"
+        },
+        {
+          "product_business_type": "RAW_MATERIAL",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 526,
+          "product_count": 34,
+          "original_amount": "839582.630000"
+        },
+        {
+          "product_business_type": "SERVICE",
+          "status": "VALIDATED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 189,
+          "product_count": 7,
+          "original_amount": "46099.380000"
+        },
+        {
+          "product_business_type": "TRADED_PRODUCT",
+          "status": "SUPPORTED",
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "line_count": 22364,
+          "product_count": 3317,
+          "original_amount": "1724194.490000"
+        }
+      ]
+    },
+    {
+      "name": "09_independent_full_ranking",
+      "sql": "SELECT l.item_code,\n              SUM(CAST(l.line_total AS DECIMAL(38,6))) amount,COUNT(*) line_count,\n              COUNT(DISTINCT d.doc_entry) document_count FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<?\n              AND x.product_business_type='LAB_FINISHED_PRODUCT'\n              GROUP BY l.item_code ORDER BY amount DESC,l.item_code ASC",
+      "parameters": [
+        "2026-09-01",
+        "2026-10-01"
+      ],
+      "rows": [
+        {
+          "item_code": "L03281",
+          "amount": "259922.610000",
+          "line_count": 768,
+          "document_count": 768
+        },
+        {
+          "item_code": "L03402",
+          "amount": "193755.330000",
+          "line_count": 626,
+          "document_count": 626
+        },
+        {
+          "item_code": "L01612",
+          "amount": "127578.780000",
+          "line_count": 134,
+          "document_count": 134
+        },
+        {
+          "item_code": "L01613",
+          "amount": "102772.040000",
+          "line_count": 537,
+          "document_count": 537
+        },
+        {
+          "item_code": "L01001",
+          "amount": "100764.020000",
+          "line_count": 533,
+          "document_count": 533
+        },
+        {
+          "item_code": "L02888",
+          "amount": "63987.640000",
+          "line_count": 81,
+          "document_count": 81
+        },
+        {
+          "item_code": "L03612",
+          "amount": "61695.320000",
+          "line_count": 504,
+          "document_count": 504
+        },
+        {
+          "item_code": "L02822",
+          "amount": "53394.230000",
+          "line_count": 504,
+          "document_count": 504
+        },
+        {
+          "item_code": "L00056",
+          "amount": "50130.510000",
+          "line_count": 562,
+          "document_count": 562
+        },
+        {
+          "item_code": "L01643",
+          "amount": "48834.500000",
+          "line_count": 342,
+          "document_count": 342
+        },
+        {
+          "item_code": "L01060",
+          "amount": "46030.660000",
+          "line_count": 202,
+          "document_count": 202
+        },
+        {
+          "item_code": "L01003",
+          "amount": "45459.490000",
+          "line_count": 162,
+          "document_count": 162
+        },
+        {
+          "item_code": "L01967",
+          "amount": "44871.070000",
+          "line_count": 160,
+          "document_count": 160
+        },
+        {
+          "item_code": "L01079",
+          "amount": "42934.500000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L02837",
+          "amount": "39107.020000",
+          "line_count": 516,
+          "document_count": 516
+        },
+        {
+          "item_code": "L01044",
+          "amount": "38868.310000",
+          "line_count": 166,
+          "document_count": 166
+        },
+        {
+          "item_code": "L03283",
+          "amount": "37073.170000",
+          "line_count": 170,
+          "document_count": 170
+        },
+        {
+          "item_code": "L03399",
+          "amount": "33801.470000",
+          "line_count": 460,
+          "document_count": 460
+        },
+        {
+          "item_code": "L01969",
+          "amount": "31847.460000",
+          "line_count": 120,
+          "document_count": 120
+        },
+        {
+          "item_code": "L03658",
+          "amount": "31466.520000",
+          "line_count": 252,
+          "document_count": 252
+        },
+        {
+          "item_code": "L01652",
+          "amount": "31442.760000",
+          "line_count": 275,
+          "document_count": 275
+        },
+        {
+          "item_code": "L01117",
+          "amount": "28335.890000",
+          "line_count": 277,
+          "document_count": 277
+        },
+        {
+          "item_code": "L01622",
+          "amount": "27995.400000",
+          "line_count": 37,
+          "document_count": 37
+        },
+        {
+          "item_code": "L01859",
+          "amount": "27994.870000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00069",
+          "amount": "27375.690000",
+          "line_count": 108,
+          "document_count": 108
+        },
+        {
+          "item_code": "L01343",
+          "amount": "27288.440000",
+          "line_count": 358,
+          "document_count": 358
+        },
+        {
+          "item_code": "L00068",
+          "amount": "27052.000000",
+          "line_count": 227,
+          "document_count": 227
+        },
+        {
+          "item_code": "L01064",
+          "amount": "26817.840000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L02958",
+          "amount": "26519.090000",
+          "line_count": 370,
+          "document_count": 370
+        },
+        {
+          "item_code": "L00059",
+          "amount": "26515.780000",
+          "line_count": 63,
+          "document_count": 63
+        },
+        {
+          "item_code": "L00426",
+          "amount": "26181.770000",
+          "line_count": 127,
+          "document_count": 127
+        },
+        {
+          "item_code": "L02024",
+          "amount": "26131.080000",
+          "line_count": 364,
+          "document_count": 364
+        },
+        {
+          "item_code": "L03125",
+          "amount": "23170.470000",
+          "line_count": 175,
+          "document_count": 175
+        },
+        {
+          "item_code": "L03023",
+          "amount": "21904.330000",
+          "line_count": 179,
+          "document_count": 179
+        },
+        {
+          "item_code": "L01062",
+          "amount": "21392.800000",
+          "line_count": 146,
+          "document_count": 146
+        },
+        {
+          "item_code": "L01445",
+          "amount": "20730.300000",
+          "line_count": 103,
+          "document_count": 103
+        },
+        {
+          "item_code": "L02018",
+          "amount": "19806.420000",
+          "line_count": 163,
+          "document_count": 163
+        },
+        {
+          "item_code": "L01598",
+          "amount": "18716.960000",
+          "line_count": 39,
+          "document_count": 39
+        },
+        {
+          "item_code": "L02059",
+          "amount": "18403.860000",
+          "line_count": 235,
+          "document_count": 235
+        },
+        {
+          "item_code": "L03506",
+          "amount": "17532.860000",
+          "line_count": 50,
+          "document_count": 50
+        },
+        {
+          "item_code": "L03600",
+          "amount": "17222.800000",
+          "line_count": 175,
+          "document_count": 175
+        },
+        {
+          "item_code": "L02549",
+          "amount": "17014.740000",
+          "line_count": 50,
+          "document_count": 50
+        },
+        {
+          "item_code": "L00060",
+          "amount": "16742.610000",
+          "line_count": 168,
+          "document_count": 168
+        },
+        {
+          "item_code": "L02823",
+          "amount": "16312.230000",
+          "line_count": 320,
+          "document_count": 320
+        },
+        {
+          "item_code": "L03518",
+          "amount": "15756.580000",
+          "line_count": 35,
+          "document_count": 35
+        },
+        {
+          "item_code": "L01130",
+          "amount": "14749.790000",
+          "line_count": 109,
+          "document_count": 109
+        },
+        {
+          "item_code": "L00061",
+          "amount": "14418.130000",
+          "line_count": 109,
+          "document_count": 109
+        },
+        {
+          "item_code": "L01651",
+          "amount": "14279.700000",
+          "line_count": 318,
+          "document_count": 318
+        },
+        {
+          "item_code": "L03258",
+          "amount": "14254.900000",
+          "line_count": 131,
+          "document_count": 131
+        },
+        {
+          "item_code": "L01004",
+          "amount": "13650.870000",
+          "line_count": 45,
+          "document_count": 45
+        },
+        {
+          "item_code": "L02938",
+          "amount": "13370.880000",
+          "line_count": 80,
+          "document_count": 80
+        },
+        {
+          "item_code": "L03124",
+          "amount": "12994.270000",
+          "line_count": 94,
+          "document_count": 94
+        },
+        {
+          "item_code": "L00057",
+          "amount": "12934.860000",
+          "line_count": 141,
+          "document_count": 141
+        },
+        {
+          "item_code": "L01624",
+          "amount": "12744.060000",
+          "line_count": 39,
+          "document_count": 39
+        },
+        {
+          "item_code": "L01653",
+          "amount": "12103.400000",
+          "line_count": 125,
+          "document_count": 125
+        },
+        {
+          "item_code": "L02944",
+          "amount": "11220.620000",
+          "line_count": 164,
+          "document_count": 164
+        },
+        {
+          "item_code": "L01258",
+          "amount": "11008.980000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L03649",
+          "amount": "10537.230000",
+          "line_count": 245,
+          "document_count": 245
+        },
+        {
+          "item_code": "L00070",
+          "amount": "10386.720000",
+          "line_count": 93,
+          "document_count": 93
+        },
+        {
+          "item_code": "L00066",
+          "amount": "10338.170000",
+          "line_count": 143,
+          "document_count": 143
+        },
+        {
+          "item_code": "L03024",
+          "amount": "10315.720000",
+          "line_count": 374,
+          "document_count": 374
+        },
+        {
+          "item_code": "L01600",
+          "amount": "10207.790000",
+          "line_count": 117,
+          "document_count": 117
+        },
+        {
+          "item_code": "L01639",
+          "amount": "10162.260000",
+          "line_count": 165,
+          "document_count": 165
+        },
+        {
+          "item_code": "L01885",
+          "amount": "9905.560000",
+          "line_count": 153,
+          "document_count": 153
+        },
+        {
+          "item_code": "L01623",
+          "amount": "9902.170000",
+          "line_count": 19,
+          "document_count": 19
+        },
+        {
+          "item_code": "L02941",
+          "amount": "9834.490000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L03255",
+          "amount": "9373.220000",
+          "line_count": 83,
+          "document_count": 83
+        },
+        {
+          "item_code": "L01040",
+          "amount": "9133.300000",
+          "line_count": 26,
+          "document_count": 26
+        },
+        {
+          "item_code": "L00064",
+          "amount": "9095.580000",
+          "line_count": 110,
+          "document_count": 110
+        },
+        {
+          "item_code": "L00001",
+          "amount": "9084.960000",
+          "line_count": 48,
+          "document_count": 48
+        },
+        {
+          "item_code": "L03744",
+          "amount": "8782.390000",
+          "line_count": 91,
+          "document_count": 91
+        },
+        {
+          "item_code": "L00305",
+          "amount": "8565.000000",
+          "line_count": 65,
+          "document_count": 65
+        },
+        {
+          "item_code": "L03504",
+          "amount": "7698.290000",
+          "line_count": 84,
+          "document_count": 84
+        },
+        {
+          "item_code": "L01891",
+          "amount": "7522.860000",
+          "line_count": 18,
+          "document_count": 18
+        },
+        {
+          "item_code": "L03184",
+          "amount": "7452.440000",
+          "line_count": 65,
+          "document_count": 65
+        },
+        {
+          "item_code": "L00427",
+          "amount": "7401.970000",
+          "line_count": 160,
+          "document_count": 160
+        },
+        {
+          "item_code": "L02873",
+          "amount": "7311.870000",
+          "line_count": 91,
+          "document_count": 91
+        },
+        {
+          "item_code": "L00369",
+          "amount": "7187.210000",
+          "line_count": 70,
+          "document_count": 70
+        },
+        {
+          "item_code": "L03321",
+          "amount": "6730.740000",
+          "line_count": 101,
+          "document_count": 101
+        },
+        {
+          "item_code": "L03583",
+          "amount": "6702.490000",
+          "line_count": 64,
+          "document_count": 64
+        },
+        {
+          "item_code": "L01063",
+          "amount": "6345.310000",
+          "line_count": 18,
+          "document_count": 18
+        },
+        {
+          "item_code": "L00065",
+          "amount": "6261.880000",
+          "line_count": 88,
+          "document_count": 88
+        },
+        {
+          "item_code": "L03594",
+          "amount": "6035.190000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00448",
+          "amount": "6006.480000",
+          "line_count": 20,
+          "document_count": 20
+        },
+        {
+          "item_code": "L00306",
+          "amount": "5713.220000",
+          "line_count": 151,
+          "document_count": 151
+        },
+        {
+          "item_code": "L01095",
+          "amount": "4994.260000",
+          "line_count": 44,
+          "document_count": 44
+        },
+        {
+          "item_code": "L03257",
+          "amount": "4733.830000",
+          "line_count": 58,
+          "document_count": 58
+        },
+        {
+          "item_code": "L03015",
+          "amount": "4692.480000",
+          "line_count": 45,
+          "document_count": 45
+        },
+        {
+          "item_code": "L00322",
+          "amount": "4661.460000",
+          "line_count": 36,
+          "document_count": 36
+        },
+        {
+          "item_code": "L03256",
+          "amount": "4478.540000",
+          "line_count": 48,
+          "document_count": 48
+        },
+        {
+          "item_code": "L00353",
+          "amount": "4468.300000",
+          "line_count": 17,
+          "document_count": 17
+        },
+        {
+          "item_code": "L02897",
+          "amount": "4467.100000",
+          "line_count": 78,
+          "document_count": 78
+        },
+        {
+          "item_code": "L00444",
+          "amount": "4415.960000",
+          "line_count": 141,
+          "document_count": 141
+        },
+        {
+          "item_code": "L00320",
+          "amount": "4330.100000",
+          "line_count": 137,
+          "document_count": 137
+        },
+        {
+          "item_code": "L02945",
+          "amount": "4196.880000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00038",
+          "amount": "4130.480000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L01038",
+          "amount": "4011.780000",
+          "line_count": 123,
+          "document_count": 123
+        },
+        {
+          "item_code": "L03576",
+          "amount": "3973.280000",
+          "line_count": 59,
+          "document_count": 59
+        },
+        {
+          "item_code": "L03022",
+          "amount": "3955.580000",
+          "line_count": 121,
+          "document_count": 121
+        },
+        {
+          "item_code": "L01648",
+          "amount": "3881.500000",
+          "line_count": 12,
+          "document_count": 12
+        },
+        {
+          "item_code": "L00813",
+          "amount": "3787.990000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L03241",
+          "amount": "3676.190000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L03030",
+          "amount": "3585.650000",
+          "line_count": 56,
+          "document_count": 56
+        },
+        {
+          "item_code": "L00461",
+          "amount": "3512.010000",
+          "line_count": 55,
+          "document_count": 55
+        },
+        {
+          "item_code": "L01252",
+          "amount": "3467.580000",
+          "line_count": 48,
+          "document_count": 48
+        },
+        {
+          "item_code": "L00319",
+          "amount": "3460.300000",
+          "line_count": 47,
+          "document_count": 47
+        },
+        {
+          "item_code": "L02128",
+          "amount": "3336.450000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L02930",
+          "amount": "3336.270000",
+          "line_count": 74,
+          "document_count": 74
+        },
+        {
+          "item_code": "L00058",
+          "amount": "3285.990000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L03599",
+          "amount": "3226.880000",
+          "line_count": 23,
+          "document_count": 23
+        },
+        {
+          "item_code": "L01640",
+          "amount": "3211.870000",
+          "line_count": 84,
+          "document_count": 84
+        },
+        {
+          "item_code": "L03053",
+          "amount": "3198.620000",
+          "line_count": 64,
+          "document_count": 64
+        },
+        {
+          "item_code": "L00370",
+          "amount": "3168.850000",
+          "line_count": 73,
+          "document_count": 73
+        },
+        {
+          "item_code": "L00340",
+          "amount": "2907.770000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L03267",
+          "amount": "2905.800000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L03097",
+          "amount": "2871.000000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03096",
+          "amount": "2842.290000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03323",
+          "amount": "2817.880000",
+          "line_count": 18,
+          "document_count": 18
+        },
+        {
+          "item_code": "L02880",
+          "amount": "2799.240000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00450",
+          "amount": "2785.770000",
+          "line_count": 22,
+          "document_count": 22
+        },
+        {
+          "item_code": "L01193",
+          "amount": "2729.360000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00451",
+          "amount": "2722.400000",
+          "line_count": 65,
+          "document_count": 65
+        },
+        {
+          "item_code": "L00027",
+          "amount": "2679.600000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00480",
+          "amount": "2662.710000",
+          "line_count": 95,
+          "document_count": 95
+        },
+        {
+          "item_code": "L00323",
+          "amount": "2636.830000",
+          "line_count": 85,
+          "document_count": 85
+        },
+        {
+          "item_code": "L00302",
+          "amount": "2633.540000",
+          "line_count": 54,
+          "document_count": 54
+        },
+        {
+          "item_code": "L03577",
+          "amount": "2581.030000",
+          "line_count": 73,
+          "document_count": 73
+        },
+        {
+          "item_code": "L00037",
+          "amount": "2505.600000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00335",
+          "amount": "2469.950000",
+          "line_count": 27,
+          "document_count": 27
+        },
+        {
+          "item_code": "L01195",
+          "amount": "2418.040000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L02553",
+          "amount": "2402.840000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L00301",
+          "amount": "2319.000000",
+          "line_count": 27,
+          "document_count": 27
+        },
+        {
+          "item_code": "L02548",
+          "amount": "2281.590000",
+          "line_count": 28,
+          "document_count": 28
+        },
+        {
+          "item_code": "L00483",
+          "amount": "2278.050000",
+          "line_count": 48,
+          "document_count": 48
+        },
+        {
+          "item_code": "L00063",
+          "amount": "2201.550000",
+          "line_count": 15,
+          "document_count": 15
+        },
+        {
+          "item_code": "L00481",
+          "amount": "2200.230000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00337",
+          "amount": "2091.570000",
+          "line_count": 56,
+          "document_count": 56
+        },
+        {
+          "item_code": "L01206",
+          "amount": "2021.870000",
+          "line_count": 35,
+          "document_count": 35
+        },
+        {
+          "item_code": "L00477",
+          "amount": "1953.850000",
+          "line_count": 37,
+          "document_count": 37
+        },
+        {
+          "item_code": "L00443",
+          "amount": "1942.870000",
+          "line_count": 27,
+          "document_count": 27
+        },
+        {
+          "item_code": "L03055",
+          "amount": "1764.720000",
+          "line_count": 23,
+          "document_count": 23
+        },
+        {
+          "item_code": "L03172",
+          "amount": "1746.960000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00482",
+          "amount": "1742.620000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L02082",
+          "amount": "1714.700000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L01099",
+          "amount": "1705.200000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L01605",
+          "amount": "1698.500000",
+          "line_count": 20,
+          "document_count": 20
+        },
+        {
+          "item_code": "L00329",
+          "amount": "1672.600000",
+          "line_count": 30,
+          "document_count": 30
+        },
+        {
+          "item_code": "L00067",
+          "amount": "1653.030000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L03054",
+          "amount": "1624.110000",
+          "line_count": 30,
+          "document_count": 30
+        },
+        {
+          "item_code": "L00486",
+          "amount": "1597.750000",
+          "line_count": 60,
+          "document_count": 60
+        },
+        {
+          "item_code": "L00356",
+          "amount": "1524.240000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L01628",
+          "amount": "1514.700000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L03028",
+          "amount": "1513.150000",
+          "line_count": 46,
+          "document_count": 46
+        },
+        {
+          "item_code": "L01868",
+          "amount": "1507.300000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L00434",
+          "amount": "1474.670000",
+          "line_count": 34,
+          "document_count": 34
+        },
+        {
+          "item_code": "L02973",
+          "amount": "1472.050000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L03093",
+          "amount": "1462.850000",
+          "line_count": 23,
+          "document_count": 23
+        },
+        {
+          "item_code": "L00459",
+          "amount": "1449.050000",
+          "line_count": 31,
+          "document_count": 31
+        },
+        {
+          "item_code": "L03168",
+          "amount": "1428.420000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L00455",
+          "amount": "1398.650000",
+          "line_count": 37,
+          "document_count": 37
+        },
+        {
+          "item_code": "L02464",
+          "amount": "1397.660000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L02463",
+          "amount": "1323.000000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00453",
+          "amount": "1317.640000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L02896",
+          "amount": "1262.560000",
+          "line_count": 35,
+          "document_count": 35
+        },
+        {
+          "item_code": "L03148",
+          "amount": "1259.580000",
+          "line_count": 22,
+          "document_count": 22
+        },
+        {
+          "item_code": "L02547",
+          "amount": "1253.730000",
+          "line_count": 31,
+          "document_count": 31
+        },
+        {
+          "item_code": "L00475",
+          "amount": "1168.840000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L03027",
+          "amount": "1158.250000",
+          "line_count": 34,
+          "document_count": 34
+        },
+        {
+          "item_code": "L01952",
+          "amount": "1087.960000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L00484",
+          "amount": "1064.880000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00309",
+          "amount": "1044.450000",
+          "line_count": 18,
+          "document_count": 18
+        },
+        {
+          "item_code": "L02972",
+          "amount": "1035.750000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L01998",
+          "amount": "1000.510000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00311",
+          "amount": "985.250000",
+          "line_count": 24,
+          "document_count": 24
+        },
+        {
+          "item_code": "L00341",
+          "amount": "955.950000",
+          "line_count": 37,
+          "document_count": 37
+        },
+        {
+          "item_code": "L00414",
+          "amount": "921.590000",
+          "line_count": 25,
+          "document_count": 25
+        },
+        {
+          "item_code": "L00449",
+          "amount": "902.650000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L00326",
+          "amount": "887.400000",
+          "line_count": 18,
+          "document_count": 18
+        },
+        {
+          "item_code": "L00465",
+          "amount": "843.350000",
+          "line_count": 24,
+          "document_count": 24
+        },
+        {
+          "item_code": "L00476",
+          "amount": "842.160000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L03114",
+          "amount": "838.500000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L00349",
+          "amount": "797.370000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00411",
+          "amount": "792.830000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L00485",
+          "amount": "790.690000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L01636",
+          "amount": "777.100000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L00464",
+          "amount": "775.170000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L01596",
+          "amount": "733.550000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00361",
+          "amount": "730.800000",
+          "line_count": 20,
+          "document_count": 20
+        },
+        {
+          "item_code": "L00357",
+          "amount": "719.490000",
+          "line_count": 20,
+          "document_count": 20
+        },
+        {
+          "item_code": "L02866",
+          "amount": "709.910000",
+          "line_count": 48,
+          "document_count": 48
+        },
+        {
+          "item_code": "L02361",
+          "amount": "703.430000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L03129",
+          "amount": "701.220000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L01632",
+          "amount": "658.860000",
+          "line_count": 26,
+          "document_count": 26
+        },
+        {
+          "item_code": "L03115",
+          "amount": "644.700000",
+          "line_count": 16,
+          "document_count": 16
+        },
+        {
+          "item_code": "L00415",
+          "amount": "634.240000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L03116",
+          "amount": "585.990000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00479",
+          "amount": "577.680000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L01974",
+          "amount": "569.000000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00454",
+          "amount": "559.000000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00032",
+          "amount": "524.790000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01100",
+          "amount": "518.090000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L03446",
+          "amount": "505.890000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00458",
+          "amount": "502.850000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L03227",
+          "amount": "487.190000",
+          "line_count": 14,
+          "document_count": 14
+        },
+        {
+          "item_code": "L00328",
+          "amount": "465.740000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L03117",
+          "amount": "457.950000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00478",
+          "amount": "434.570000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00363",
+          "amount": "431.960000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L01198",
+          "amount": "404.560000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00299",
+          "amount": "395.820000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L03234",
+          "amount": "371.710000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00292",
+          "amount": "367.570000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00315",
+          "amount": "364.970000",
+          "line_count": 20,
+          "document_count": 20
+        },
+        {
+          "item_code": "P00096",
+          "amount": "348.000000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L00416",
+          "amount": "344.520000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L01647",
+          "amount": "301.160000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L01597",
+          "amount": "296.100000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L01997",
+          "amount": "287.110000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L03326",
+          "amount": "287.100000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L00333",
+          "amount": "285.110000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L00289",
+          "amount": "284.360000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00291",
+          "amount": "284.160000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L02552",
+          "amount": "278.400000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00286",
+          "amount": "263.600000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L00487",
+          "amount": "246.690000",
+          "line_count": 11,
+          "document_count": 11
+        },
+        {
+          "item_code": "L03231",
+          "amount": "243.600000",
+          "line_count": 7,
+          "document_count": 7
+        },
+        {
+          "item_code": "L00314",
+          "amount": "241.870000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L01633",
+          "amount": "239.270000",
+          "line_count": 10,
+          "document_count": 10
+        },
+        {
+          "item_code": "L03183",
+          "amount": "228.380000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01207",
+          "amount": "227.800000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00325",
+          "amount": "219.240000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L01592",
+          "amount": "199.900000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L02917",
+          "amount": "197.330000",
+          "line_count": 8,
+          "document_count": 8
+        },
+        {
+          "item_code": "L01976",
+          "amount": "193.350000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L00336",
+          "amount": "183.560000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L03235",
+          "amount": "182.700000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L00529",
+          "amount": "178.350000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L02546",
+          "amount": "167.160000",
+          "line_count": 13,
+          "document_count": 13
+        },
+        {
+          "item_code": "L02362",
+          "amount": "146.160000",
+          "line_count": 24,
+          "document_count": 24
+        },
+        {
+          "item_code": "L00408",
+          "amount": "142.680000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00463",
+          "amount": "121.800000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00439",
+          "amount": "104.400000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L03327",
+          "amount": "104.390000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02914",
+          "amount": "99.180000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L00457",
+          "amount": "95.270000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01609",
+          "amount": "93.020000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "P00102",
+          "amount": "91.350000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01261",
+          "amount": "91.280000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L02550",
+          "amount": "89.000000",
+          "line_count": 6,
+          "document_count": 6
+        },
+        {
+          "item_code": "L02551",
+          "amount": "88.740000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L03226",
+          "amount": "86.000000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01209",
+          "amount": "83.740000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01593",
+          "amount": "81.330000",
+          "line_count": 9,
+          "document_count": 9
+        },
+        {
+          "item_code": "L03325",
+          "amount": "69.600000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L01869",
+          "amount": "66.990000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02915",
+          "amount": "66.120000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00332",
+          "amount": "65.250000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03232",
+          "amount": "65.250000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01590",
+          "amount": "58.730000",
+          "line_count": 3,
+          "document_count": 3
+        },
+        {
+          "item_code": "L00351",
+          "amount": "52.200000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01608",
+          "amount": "49.760000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01591",
+          "amount": "48.720000",
+          "line_count": 5,
+          "document_count": 5
+        },
+        {
+          "item_code": "L01603",
+          "amount": "47.850000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01610",
+          "amount": "36.360000",
+          "line_count": 4,
+          "document_count": 4
+        },
+        {
+          "item_code": "L02918",
+          "amount": "33.060000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L03233",
+          "amount": "30.450000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L03624",
+          "amount": "30.450000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00298",
+          "amount": "30.020000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01975",
+          "amount": "20.100000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01611",
+          "amount": "18.150000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01203",
+          "amount": "17.700000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L02916",
+          "amount": "16.530000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00354",
+          "amount": "15.660000",
+          "line_count": 2,
+          "document_count": 2
+        },
+        {
+          "item_code": "L01595",
+          "amount": "13.880000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01604",
+          "amount": "9.570000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00330",
+          "amount": "7.830000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L00347",
+          "amount": "7.830000",
+          "line_count": 1,
+          "document_count": 1
+        },
+        {
+          "item_code": "L01645",
+          "amount": "6.220000",
+          "line_count": 1,
+          "document_count": 1
+        }
+      ]
+    },
+    {
+      "name": "09_independent_category_total",
+      "sql": "SELECT SUM(CAST(l.line_total AS DECIMAL(38,6))) amount,\n              COUNT(*) line_count,COUNT(DISTINCT l.item_code) product_count FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<?\n              AND x.product_business_type='LAB_FINISHED_PRODUCT' ",
+      "parameters": [
+        "2026-09-01",
+        "2026-10-01"
+      ],
+      "rows": [
+        {
+          "amount": "2679208.660000",
+          "line_count": 18541,
+          "product_count": 278
+        }
+      ]
+    },
+    {
+      "name": "09_lineage_bad",
+      "sql": "SELECT COUNT(*) n FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON d.doc_entry=l.doc_entry AND d.source_system=l.source_system\n              LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\n              WHERE d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND l.source_table='INV1'\n              AND d.canceled='N' AND d.doc_date>=? AND d.doc_date<? AND x.product_business_type='LAB_FINISHED_PRODUCT'\n              AND (d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n                OR d.source_as_of IS DISTINCT FROM l.source_as_of OR d.raw_extraction_id IS NULL\n                OR d.source_as_of IS NULL OR l.line_num IS NULL OR x.status NOT IN ('VALIDATED','SUPPORTED'))",
+      "parameters": [
+        "2026-09-01",
+        "2026-10-01"
+      ],
+      "rows": [
+        {
+          "n": 0
+        }
+      ]
+    }
+  ],
+  "months": {
+    "07": {
+      "target": [
+        {
+          "item_code": "L03281",
+          "amount": "271255.490000",
+          "line_count": 959,
+          "document_count": 959,
+          "position": 2
+        }
+      ],
+      "comparable_products": 283,
+      "total": {
+        "amount": "3273893.070000",
+        "line_count": 24265,
+        "product_count": 283
+      },
+      "worker": {
+        "status": "PASS",
+        "reconciliation": {
+          "product_amount": "3273893.070000",
+          "category_amount": "3273893.070000",
+          "difference": "0.000000",
+          "tolerance": "0",
+          "product_count": 283,
+          "line_count": 24265,
+          "breakdown_sha256": "7ca902e1ef328f2de0c314d1be07f0da3b0a21706fbe8761af6753fe52c18772"
+        }
+      }
+    },
+    "08": {
+      "target": [
+        {
+          "item_code": "L03281",
+          "amount": "314971.570000",
+          "line_count": 1055,
+          "document_count": 1053,
+          "position": 1
+        }
+      ],
+      "comparable_products": 289,
+      "total": {
+        "amount": "3480448.890000",
+        "line_count": 23885,
+        "product_count": 289
+      },
+      "worker": {
+        "status": "PASS",
+        "reconciliation": {
+          "product_amount": "3480448.890000",
+          "category_amount": "3480448.890000",
+          "difference": "0.000000",
+          "tolerance": "0",
+          "product_count": 289,
+          "line_count": 23885,
+          "breakdown_sha256": "39019624fdc3ed0af5a86b681ef9f691f79eb89f420e3cb5c8c6f24f9cb5195c"
+        }
+      }
+    },
+    "09": {
+      "target": [
+        {
+          "item_code": "L03281",
+          "amount": "259922.610000",
+          "line_count": 768,
+          "document_count": 768,
+          "position": 1
+        }
+      ],
+      "comparable_products": 278,
+      "total": {
+        "amount": "2679208.660000",
+        "line_count": 18541,
+        "product_count": 278
+      },
+      "worker": {
+        "status": "PASS",
+        "reconciliation": {
+          "product_amount": "2679208.660000",
+          "category_amount": "2679208.660000",
+          "difference": "0.000000",
+          "tolerance": "0",
+          "product_count": 278,
+          "line_count": 18541,
+          "breakdown_sha256": "077975fab58572d1c8237932c103fd700a0b37750b56ceb32b960f9af8c1a53a"
+        }
+      }
+    }
+  },
+  "source": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 1520.121,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "crosswalk_sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10"
+}

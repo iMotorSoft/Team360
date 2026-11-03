@@ -1,0 +1,3159 @@
+{
+  "atomic_receivable_status": "INVESTIGATION_LINEAGE_ONLY_NOT_CANONICAL_READER_CAPABILITY",
+  "receivable_schema": {
+    "sql": "DESCRIBE SELECT * FROM (SELECT * FROM telchi.atomic.receivable_document AT (VERSION=>1322))",
+    "params": [],
+    "result": [
+      {
+        "column_name": "atomic_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "row_hash",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_table",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_object_type",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_row_identity",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_run_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_as_of",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "ingested_at",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "built_at",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "transformation_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "schema_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_doc_entry",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_doc_num",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "customer_code",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "document_type",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "document_date",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "posting_date",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "tax_date",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "due_date",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "currency",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "document_rate",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "system_rate",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "document_total",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "document_total_foreign",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "document_total_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "paid_to_date",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "paid_foreign",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "paid_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_open_amount",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_open_amount_foreign",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_open_amount_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "cancelled",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "cancel_date",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "source_document_status",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "payment_term_code",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "transaction_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "salesperson_code",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "branch_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "installment_count",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      },
+      {
+        "column_name": "installments_json",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": "NULL",
+        "extra": null
+      }
+    ]
+  },
+  "receivable_keys": {
+    "sql": "SELECT source_system,source_table, count(*) AS rows,\n        count(transaction_id) AS trans_id_nonnull, count(DISTINCT source_doc_entry) AS doc_entries,\n        count(branch_id) AS branch_nonnull, count(DISTINCT branch_id) AS branch_values,\n        min(document_date) AS first_date,max(document_date) AS last_date\n        FROM (SELECT * FROM telchi.atomic.receivable_document AT (VERSION=>1322)) GROUP BY 1,2",
+    "params": [],
+    "result": [
+      {
+        "source_system": "SAP_B1_HANA",
+        "source_table": "OINV+INV6",
+        "rows": 1859136,
+        "trans_id_nonnull": 1859136,
+        "doc_entries": 1859136,
+        "branch_nonnull": 0,
+        "branch_values": 0,
+        "first_date": "2022-03-31T00:00:00",
+        "last_date": "2026-09-28T00:00:00"
+      }
+    ]
+  },
+  "receivable_branch_distribution": {
+    "sql": "SELECT branch_id,count(*) AS rows FROM (SELECT * FROM telchi.atomic.receivable_document AT (VERSION=>1322)) GROUP BY 1 ORDER BY 1",
+    "params": [],
+    "result": [
+      {
+        "branch_id": null,
+        "rows": 1859136
+      }
+    ]
+  },
+  "invoice_number_12345": {
+    "sql": "SELECT source_system,doc_entry,doc_num,series,doc_date,canceled,currency,doc_total FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_num=?",
+    "params": [
+      "12345"
+    ],
+    "result": []
+  },
+  "sales_2026_months": {
+    "sql": "SELECT substr(doc_date,1,7) AS month,canceled,currency,count(*) AS documents,\n        sum(try_cast(doc_total AS DECIMAL(38,6))) AS document_total FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\n        WHERE doc_date>='2026-01-01' AND doc_date<'2027-01-01' GROUP BY 1,2,3 ORDER BY 1,2,3",
+    "params": [],
+    "result": [
+      {
+        "month": "2026-01",
+        "canceled": "C",
+        "currency": "BS",
+        "documents": 2,
+        "document_total": "137.000000"
+      },
+      {
+        "month": "2026-01",
+        "canceled": "N",
+        "currency": "BS",
+        "documents": 39368,
+        "document_total": "11410419.290000"
+      },
+      {
+        "month": "2026-01",
+        "canceled": "Y",
+        "currency": "BS",
+        "documents": 2,
+        "document_total": "137.000000"
+      },
+      {
+        "month": "2026-02",
+        "canceled": "N",
+        "currency": "BS",
+        "documents": 34321,
+        "document_total": "9007877.330000"
+      },
+      {
+        "month": "2026-03",
+        "canceled": "N",
+        "currency": "BS",
+        "documents": 40683,
+        "document_total": "10280358.980000"
+      },
+      {
+        "month": "2026-04",
+        "canceled": "N",
+        "currency": "BS",
+        "documents": 38917,
+        "document_total": "9737328.020000"
+      },
+      {
+        "month": "2026-05",
+        "canceled": "C",
+        "currency": "BS",
+        "documents": 2,
+        "document_total": "740.220000"
+      },
+      {
+        "month": "2026-05",
+        "canceled": "N",
+        "currency": "BS",
+        "documents": 36242,
+        "document_total": "8761459.220000"
+      },
+      {
+        "month": "2026-05",
+        "canceled": "Y",
+        "currency": "BS",
+        "documents": 2,
+        "document_total": "740.220000"
+      },
+      {
+        "month": "2026-06",
+        "canceled": "C",
+        "currency": "BS",
+        "documents": 1,
+        "document_total": "231.450000"
+      },
+      {
+        "month": "2026-06",
+        "canceled": "N",
+        "currency": "BS",
+        "documents": 35360,
+        "document_total": "10033501.020000"
+      },
+      {
+        "month": "2026-06",
+        "canceled": "Y",
+        "currency": "BS",
+        "documents": 1,
+        "document_total": "231.450000"
+      },
+      {
+        "month": "2026-07",
+        "canceled": "C",
+        "currency": "BS",
+        "documents": 1,
+        "document_total": "2786.400000"
+      },
+      {
+        "month": "2026-07",
+        "canceled": "N",
+        "currency": "BS",
+        "documents": 38434,
+        "document_total": "10343999.570000"
+      },
+      {
+        "month": "2026-07",
+        "canceled": "Y",
+        "currency": "BS",
+        "documents": 1,
+        "document_total": "2786.400000"
+      },
+      {
+        "month": "2026-08",
+        "canceled": "N",
+        "currency": "BS",
+        "documents": 36802,
+        "document_total": "10565113.130000"
+      },
+      {
+        "month": "2026-09",
+        "canceled": "C",
+        "currency": "BS",
+        "documents": 1,
+        "document_total": "87.500000"
+      },
+      {
+        "month": "2026-09",
+        "canceled": "N",
+        "currency": "BS",
+        "documents": 30301,
+        "document_total": "8891439.790000"
+      },
+      {
+        "month": "2026-09",
+        "canceled": "Y",
+        "currency": "BS",
+        "documents": 1,
+        "document_total": "87.500000"
+      }
+    ]
+  },
+  "sales_identity_duplicates": {
+    "sql": "SELECT count(*) AS duplicate_keys FROM (SELECT source_system,source_table,doc_entry FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) GROUP BY 1,2,3 HAVING count(*)>1)",
+    "params": [],
+    "result": [
+      {
+        "duplicate_keys": 0
+      }
+    ]
+  },
+  "line_identity_duplicates": {
+    "sql": "SELECT count(*) AS duplicate_keys FROM (SELECT source_system,source_table,doc_entry,line_num FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) GROUP BY 1,2,3,4 HAVING count(*)>1)",
+    "params": [],
+    "result": [
+      {
+        "duplicate_keys": 0
+      }
+    ]
+  },
+  "invoice_to_receivable_key_coverage": {
+    "sql": "SELECT count(*) AS sales_documents,\n        count(r.source_doc_entry) AS matched_receivable_rows,\n        count(r.transaction_id) AS transaction_ids_available,\n        count(CASE WHEN trim(coalesce(r.transaction_id,'')) NOT IN ('','0','-1') THEN 1 END) AS non_sentinel_transaction_ids,\n        count(CASE WHEN trim(coalesce(r.branch_id,'')) NOT IN ('','0','-1') THEN 1 END) AS non_sentinel_documentary_branch\n        FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) s LEFT JOIN (SELECT * FROM telchi.atomic.receivable_document AT (VERSION=>1322)) r ON s.source_system=r.source_system AND s.doc_entry=r.source_doc_entry AND r.source_table='OINV+INV6' ",
+    "params": [],
+    "result": [
+      {
+        "sales_documents": 330443,
+        "matched_receivable_rows": 330443,
+        "transaction_ids_available": 330443,
+        "non_sentinel_transaction_ids": 330443,
+        "non_sentinel_documentary_branch": 0
+      }
+    ]
+  },
+  "branches_schema": {
+    "sql": "DESCRIBE SELECT * FROM read_parquet(?)",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/branches/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "column_name": "source_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "source_native_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "branch_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "code",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "name",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "valid_from",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "valid_to",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "status",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_dataset",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_native_key",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_file",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_snapshot_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_extracted_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_ingested_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_transformation_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_semantic_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_lineage_quality",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ]
+  },
+  "branches": {
+    "sql": "SELECT COLUMNS(*)::VARCHAR FROM read_parquet(?)",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/branches/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "source_system": "REFERENCE_FILE",
+        "source_native_id": "4",
+        "branch_id": "branch_1ff5c1e81100db5a93ff4390",
+        "code": "4",
+        "name": "Sucursal 2do. Anillo",
+        "valid_from": null,
+        "valid_to": null,
+        "status": "ACTIVE",
+        "_source_system": "REFERENCE_FILE",
+        "_source_dataset": "almacenOficina.xlsx",
+        "_source_native_key": "4",
+        "_source_file": "raw/legacy/reference_sources/almacenOficina.xlsx",
+        "_source_snapshot_at": null,
+        "_source_extracted_at": "2026-09-16 09:27:57.830446-03",
+        "_ingested_at": "2026-09-16 09:27:57.830446-03",
+        "_transformation_version": "reference-crosswalk-v1",
+        "_semantic_version": "1.0.0",
+        "_lineage_quality": "FULL_DOCUMENT_TRACE"
+      },
+      {
+        "source_system": "REFERENCE_FILE",
+        "source_native_id": "5",
+        "branch_id": "branch_0df8d32ff6388a3dd395eda0",
+        "code": "5",
+        "name": "Saavedra",
+        "valid_from": null,
+        "valid_to": null,
+        "status": "ACTIVE",
+        "_source_system": "REFERENCE_FILE",
+        "_source_dataset": "almacenOficina.xlsx",
+        "_source_native_key": "5",
+        "_source_file": "raw/legacy/reference_sources/almacenOficina.xlsx",
+        "_source_snapshot_at": null,
+        "_source_extracted_at": "2026-09-16 09:27:57.830446-03",
+        "_ingested_at": "2026-09-16 09:27:57.830446-03",
+        "_transformation_version": "reference-crosswalk-v1",
+        "_semantic_version": "1.0.0",
+        "_lineage_quality": "FULL_DOCUMENT_TRACE"
+      },
+      {
+        "source_system": "REFERENCE_FILE",
+        "source_native_id": "8",
+        "branch_id": "branch_5eff53c8e5429f11a3de25b1",
+        "code": "8",
+        "name": "Urubo",
+        "valid_from": null,
+        "valid_to": null,
+        "status": "ACTIVE",
+        "_source_system": "REFERENCE_FILE",
+        "_source_dataset": "almacenOficina.xlsx",
+        "_source_native_key": "8",
+        "_source_file": "raw/legacy/reference_sources/almacenOficina.xlsx",
+        "_source_snapshot_at": null,
+        "_source_extracted_at": "2026-09-16 09:27:57.830446-03",
+        "_ingested_at": "2026-09-16 09:27:57.830446-03",
+        "_transformation_version": "reference-crosswalk-v1",
+        "_semantic_version": "1.0.0",
+        "_lineage_quality": "FULL_DOCUMENT_TRACE"
+      },
+      {
+        "source_system": "REFERENCE_FILE",
+        "source_native_id": "2",
+        "branch_id": "branch_743bb6f6a11c9023b881f53a",
+        "code": "2",
+        "name": "Laboratorio",
+        "valid_from": null,
+        "valid_to": null,
+        "status": "ACTIVE",
+        "_source_system": "REFERENCE_FILE",
+        "_source_dataset": "almacenOficina.xlsx",
+        "_source_native_key": "2",
+        "_source_file": "raw/legacy/reference_sources/almacenOficina.xlsx",
+        "_source_snapshot_at": null,
+        "_source_extracted_at": "2026-09-16 09:27:57.830446-03",
+        "_ingested_at": "2026-09-16 09:27:57.830446-03",
+        "_transformation_version": "reference-crosswalk-v1",
+        "_semantic_version": "1.0.0",
+        "_lineage_quality": "FULL_DOCUMENT_TRACE"
+      },
+      {
+        "source_system": "REFERENCE_FILE",
+        "source_native_id": "3",
+        "branch_id": "branch_9dd0b20885d6dc2b1606f779",
+        "code": "3",
+        "name": "FERIA EXPOSICION",
+        "valid_from": null,
+        "valid_to": null,
+        "status": "ACTIVE",
+        "_source_system": "REFERENCE_FILE",
+        "_source_dataset": "almacenOficina.xlsx",
+        "_source_native_key": "3",
+        "_source_file": "raw/legacy/reference_sources/almacenOficina.xlsx",
+        "_source_snapshot_at": null,
+        "_source_extracted_at": "2026-09-16 09:27:57.830446-03",
+        "_ingested_at": "2026-09-16 09:27:57.830446-03",
+        "_transformation_version": "reference-crosswalk-v1",
+        "_semantic_version": "1.0.0",
+        "_lineage_quality": "FULL_DOCUMENT_TRACE"
+      },
+      {
+        "source_system": "REFERENCE_FILE",
+        "source_native_id": "1",
+        "branch_id": "branch_b1f11fe4c7aeac3baf73a33e",
+        "code": "1",
+        "name": "Casa Matriz",
+        "valid_from": null,
+        "valid_to": null,
+        "status": "ACTIVE",
+        "_source_system": "REFERENCE_FILE",
+        "_source_dataset": "almacenOficina.xlsx",
+        "_source_native_key": "1",
+        "_source_file": "raw/legacy/reference_sources/almacenOficina.xlsx",
+        "_source_snapshot_at": null,
+        "_source_extracted_at": "2026-09-16 09:27:57.830446-03",
+        "_ingested_at": "2026-09-16 09:27:57.830446-03",
+        "_transformation_version": "reference-crosswalk-v1",
+        "_semantic_version": "1.0.0",
+        "_lineage_quality": "FULL_DOCUMENT_TRACE"
+      },
+      {
+        "source_system": "REFERENCE_FILE",
+        "source_native_id": "7",
+        "branch_id": "branch_772e702a03d0d11e235be1e9",
+        "code": "7",
+        "name": "Villa",
+        "valid_from": null,
+        "valid_to": null,
+        "status": "ACTIVE",
+        "_source_system": "REFERENCE_FILE",
+        "_source_dataset": "almacenOficina.xlsx",
+        "_source_native_key": "7",
+        "_source_file": "raw/legacy/reference_sources/almacenOficina.xlsx",
+        "_source_snapshot_at": null,
+        "_source_extracted_at": "2026-09-16 09:27:57.830446-03",
+        "_ingested_at": "2026-09-16 09:27:57.830446-03",
+        "_transformation_version": "reference-crosswalk-v1",
+        "_semantic_version": "1.0.0",
+        "_lineage_quality": "FULL_DOCUMENT_TRACE"
+      }
+    ]
+  },
+  "business_locations_schema": {
+    "sql": "DESCRIBE SELECT * FROM read_parquet(?)",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/business_locations/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "column_name": "business_location_code",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "business_location_name",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "status",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "mapping_source",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "source_as_of",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ]
+  },
+  "business_locations": {
+    "sql": "SELECT COLUMNS(*)::VARCHAR FROM read_parquet(?)",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/business_locations/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "business_location_code": "SEGUNDO_ANILLO",
+        "business_location_name": "Segundo Anillo",
+        "status": "VALIDATED",
+        "mapping_source": "BUSINESS_CONFIRMED",
+        "source_as_of": "2026-09-24 09:03:11.919356-03"
+      },
+      {
+        "business_location_code": "UNKNOWN",
+        "business_location_name": "Unknown",
+        "status": "UNKNOWN",
+        "mapping_source": "NO_EXPLICIT_EVIDENCE",
+        "source_as_of": "2026-09-24 09:03:11.919356-03"
+      }
+    ]
+  },
+  "products_schema": {
+    "sql": "DESCRIBE SELECT * FROM read_parquet(?)",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "column_name": "canonical_product_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "source_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "source_native_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "item_code",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "canonical_name",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "product_name",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "inventory_uom_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sales_uom_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "purchase_uom_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "active",
+        "column_type": "BOOLEAN",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "valid_from",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "valid_to",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "status",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_dataset",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_native_key",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_file",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_snapshot_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_extracted_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_ingested_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_transformation_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_semantic_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_lineage_quality",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_item_name",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_valid_for",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_frozen_for",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_invnt_item",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_sell_item",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_prchse_item",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_itms_grp_cod",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_update_date",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ]
+  },
+  "warehouses_schema": {
+    "sql": "DESCRIBE SELECT * FROM read_parquet(?)",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/warehouses/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "column_name": "source_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "source_native_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "warehouse_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "code",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "name",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "valid_from",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "valid_to",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "status",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "warehouse_role_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_dataset",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_native_key",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_file",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_snapshot_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_extracted_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_ingested_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_transformation_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_semantic_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_lineage_quality",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_locked",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_inactive",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_branch_office_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_type",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_warehouse_dms",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_update_date",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ]
+  },
+  "candidate_product_schema": {
+    "sql": "DESCRIBE SELECT * FROM read_parquet(?)",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-reference-offline-63c915b39dceeac998547e93-r2/candidate/reference/_versions/v2_aabf716d342de26794c09797/products/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "column_name": "canonical_product_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "source_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "source_native_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "item_code",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "canonical_name",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "product_name",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "inventory_uom_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sales_uom_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "purchase_uom_id",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "active",
+        "column_type": "BOOLEAN",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "valid_from",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "valid_to",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "status",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_system",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_dataset",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_native_key",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_file",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_snapshot_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_source_extracted_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_ingested_at",
+        "column_type": "TIMESTAMP WITH TIME ZONE",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_transformation_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_semantic_version",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "_lineage_quality",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_item_name",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_valid_for",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_frozen_for",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_invnt_item",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_sell_item",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_prchse_item",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_itms_grp_cod",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_update_date",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "sap_forma_farmac_code",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "physical_classification_label",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "physical_state",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "physical_classification_status",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "physical_classification_source",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "column_name": "physical_classification_observed_at",
+        "column_type": "VARCHAR",
+        "null": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ]
+  },
+  "candidate_physical_classification_label": {
+    "sql": "SELECT \"physical_classification_label\", count(*) AS rows FROM read_parquet(?) GROUP BY 1 ORDER BY 1",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-reference-offline-63c915b39dceeac998547e93-r2/candidate/reference/_versions/v2_aabf716d342de26794c09797/products/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "physical_classification_label": "LIQUIDO",
+        "rows": 695
+      },
+      {
+        "physical_classification_label": "MEDICAMENTO",
+        "rows": 37
+      },
+      {
+        "physical_classification_label": "NINGUNA",
+        "rows": 6642
+      },
+      {
+        "physical_classification_label": "NO CORRESPONDE",
+        "rows": 1
+      },
+      {
+        "physical_classification_label": "SEMI-SOLIDO",
+        "rows": 93
+      },
+      {
+        "physical_classification_label": "SOLIDO",
+        "rows": 490
+      },
+      {
+        "physical_classification_label": null,
+        "rows": 45434
+      }
+    ]
+  },
+  "candidate_physical_classification_observed_at": {
+    "sql": "SELECT \"physical_classification_observed_at\", count(*) AS rows FROM read_parquet(?) GROUP BY 1 ORDER BY 1",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-reference-offline-63c915b39dceeac998547e93-r2/candidate/reference/_versions/v2_aabf716d342de26794c09797/products/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:08.037140+00:00",
+        "rows": 32
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:12.059219+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:15.894067+00:00",
+        "rows": 11
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:19.478272+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:25.088345+00:00",
+        "rows": 61
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:29.381319+00:00",
+        "rows": 76
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:33.600928+00:00",
+        "rows": 63
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:38.446898+00:00",
+        "rows": 99
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:41.854858+00:00",
+        "rows": 74
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:45.199216+00:00",
+        "rows": 77
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:48.612622+00:00",
+        "rows": 87
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:52.083798+00:00",
+        "rows": 81
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:55.581591+00:00",
+        "rows": 67
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:48:59.704491+00:00",
+        "rows": 58
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:04.144507+00:00",
+        "rows": 76
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:08.119860+00:00",
+        "rows": 83
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:11.984589+00:00",
+        "rows": 67
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:15.724578+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:20.534792+00:00",
+        "rows": 22
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:24.996468+00:00",
+        "rows": 61
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:28.624796+00:00",
+        "rows": 81
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:32.020684+00:00",
+        "rows": 76
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:35.615202+00:00",
+        "rows": 79
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:39.457821+00:00",
+        "rows": 51
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:43.422398+00:00",
+        "rows": 48
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:47.011107+00:00",
+        "rows": 48
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:50.424303+00:00",
+        "rows": 51
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:54.635909+00:00",
+        "rows": 42
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:49:58.430309+00:00",
+        "rows": 43
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:02.125413+00:00",
+        "rows": 44
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:05.720433+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:13.322344+00:00",
+        "rows": 24
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:17.313596+00:00",
+        "rows": 69
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:22.972107+00:00",
+        "rows": 53
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:26.942483+00:00",
+        "rows": 67
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:31.553997+00:00",
+        "rows": 75
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:35.416158+00:00",
+        "rows": 69
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:38.872564+00:00",
+        "rows": 52
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:42.333126+00:00",
+        "rows": 58
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:45.759868+00:00",
+        "rows": 60
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:49.642750+00:00",
+        "rows": 36
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T17:50:56.363377+00:00",
+        "rows": 9
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T23:22:35.659084+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T23:24:24.715110+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T23:39:08.038129+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-28T23:52:17.991939+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:10:56.264618+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:13:47.799545+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:14:20.521840+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:45:00.962964+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:45:16.737726+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:47:46.859546+00:00",
+        "rows": 1
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:48:02.549738+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:48:18.443790+00:00",
+        "rows": 22
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:48:35.885435+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:48:51.479725+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:51:22.570481+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:51:38.606653+00:00",
+        "rows": 9
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:51:54.131999+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:52:09.704478+00:00",
+        "rows": 11
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:52:25.259982+00:00",
+        "rows": 11
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:54:59.088021+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:55:14.997560+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:55:32.085797+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:55:48.151721+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:56:04.709024+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:58:54.812071+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:59:10.685256+00:00",
+        "rows": 23
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:59:27.765502+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:59:43.834729+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T00:59:59.735745+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:07:25.357146+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:07:41.500666+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:07:57.056717+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:08:12.502536+00:00",
+        "rows": 21
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:08:28.634251+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:11:14.161926+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:11:30.166395+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:11:45.822279+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:12:02.575016+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:12:19.011997+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:15:13.680419+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:15:30.741760+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:15:46.638632+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:16:04.178402+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:16:20.023999+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:19:19.529692+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:19:38.200609+00:00",
+        "rows": 21
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:19:54.091177+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:20:10.050626+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:20:26.003152+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:23:54.065193+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:24:09.567699+00:00",
+        "rows": 6
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:24:25.130657+00:00",
+        "rows": 10
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:24:41.746014+00:00",
+        "rows": 9
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:24:57.249540+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:28:04.474196+00:00",
+        "rows": 4
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:28:20.715630+00:00",
+        "rows": 22
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:28:37.148495+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:28:52.346458+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:29:08.471070+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:32:26.109915+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:32:42.009050+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:32:58.105648+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:33:14.073312+00:00",
+        "rows": 10
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:33:31.026530+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:36:54.876130+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:37:10.868339+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:37:26.397784+00:00",
+        "rows": 11
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:37:42.392432+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:37:58.131407+00:00",
+        "rows": 23
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:41:53.160861+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:42:09.188004+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:42:24.679253+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:42:40.744046+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:42:56.525057+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:46:24.341073+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:46:39.882555+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:46:55.916763+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:47:11.999208+00:00",
+        "rows": 22
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:47:28.145471+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:50:54.013928+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:51:09.685418+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:51:26.329577+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:51:42.298171+00:00",
+        "rows": 8
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:51:58.770389+00:00",
+        "rows": 4
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:55:29.406269+00:00",
+        "rows": 5
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:55:44.507983+00:00",
+        "rows": 9
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:56:00.677261+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:56:16.829824+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T01:56:35.100980+00:00",
+        "rows": 8
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:30:42.108069+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:30:54.640167+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:31:07.064463+00:00",
+        "rows": 11
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:31:19.483890+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:31:31.989503+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:32:13.335455+00:00",
+        "rows": 11
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:32:25.793243+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:32:38.237399+00:00",
+        "rows": 21
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:32:50.681472+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:33:03.113666+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:33:45.061249+00:00",
+        "rows": 8
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:33:57.579830+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:34:10.040497+00:00",
+        "rows": 11
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:34:22.559321+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:34:34.974099+00:00",
+        "rows": 10
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:35:16.576441+00:00",
+        "rows": 9
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:35:29.059976+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:35:41.526427+00:00",
+        "rows": 9
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:35:54.006779+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:36:06.513611+00:00",
+        "rows": 10
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:36:56.269374+00:00",
+        "rows": 8
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:37:08.708133+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:37:21.151982+00:00",
+        "rows": 9
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:37:33.987447+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:37:46.479373+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:38:28.460594+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:38:40.953377+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:38:53.413233+00:00",
+        "rows": 23
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:39:05.846592+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:39:18.269453+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:40:00.571478+00:00",
+        "rows": 8
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:40:12.982818+00:00",
+        "rows": 2
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:40:25.474899+00:00",
+        "rows": 3
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:40:37.898285+00:00",
+        "rows": 10
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:40:50.395028+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:41:32.752602+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:41:45.273907+00:00",
+        "rows": 22
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:41:57.937034+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:42:10.365883+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:42:22.847312+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:43:12.147196+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:43:24.641077+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:43:37.267364+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:43:49.733424+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:44:02.165435+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:44:45.174300+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:44:57.655562+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:45:10.197642+00:00",
+        "rows": 22
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:45:22.642130+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:45:35.171056+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:46:17.965627+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:46:30.430755+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:46:42.891564+00:00",
+        "rows": 13
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:46:55.376649+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:47:07.974532+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:47:51.256765+00:00",
+        "rows": 23
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:48:03.685498+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:48:16.053579+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:48:28.445552+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:48:41.163669+00:00",
+        "rows": 23
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:49:30.365534+00:00",
+        "rows": 22
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:49:42.750419+00:00",
+        "rows": 18
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:49:55.199260+00:00",
+        "rows": 22
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:50:07.571758+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:50:19.993413+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:51:03.166849+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:51:15.921306+00:00",
+        "rows": 21
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:51:28.325974+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:51:41.457169+00:00",
+        "rows": 16
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:51:54.748829+00:00",
+        "rows": 24
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:52:38.796292+00:00",
+        "rows": 14
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:52:51.309655+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:53:04.283367+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:53:16.770182+00:00",
+        "rows": 21
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:53:29.194143+00:00",
+        "rows": 21
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:54:12.776380+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:54:25.199148+00:00",
+        "rows": 22
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:54:37.624935+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:54:50.119235+00:00",
+        "rows": 19
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T10:55:02.909757+00:00",
+        "rows": 20
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:15:28.082131+00:00",
+        "rows": 15
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:15:40.739624+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:15:53.432307+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:16:06.335408+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:16:18.966831+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:39:55.448955+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:40:08.025384+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:40:20.606944+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:40:33.285117+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:40:45.987374+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:41:26.049210+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:41:39.101257+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:41:51.782532+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:42:04.409323+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:42:16.986414+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:42:57.160104+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:43:09.744026+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:43:22.396556+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:43:34.994950+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:43:47.591149+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:44:27.937041+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:44:40.607321+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:44:53.217181+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:45:05.883171+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:45:18.445328+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:46:15.406039+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:46:28.051025+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:46:40.831452+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:46:53.504376+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:47:06.111228+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:47:46.800955+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:47:59.447066+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:48:12.063914+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:48:24.674606+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:48:37.356234+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:49:18.143198+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:49:30.768034+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:49:43.406923+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:49:56.021638+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:50:08.984940+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:50:50.232340+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:51:02.866320+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:51:15.471110+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:51:28.112630+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:51:40.712371+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:52:35.201644+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:52:47.912807+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:53:00.540578+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:53:13.223208+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:53:25.930980+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:54:07.217945+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:54:19.899052+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:54:32.561567+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:54:45.270068+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:54:57.906270+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:55:39.320620+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:55:51.964273+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:56:04.903010+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:56:17.624133+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:56:30.252070+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:57:11.869979+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:57:24.772664+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:57:37.381691+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:57:49.965952+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:58:02.604408+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:58:56.088995+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:59:09.032604+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:59:21.664636+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:59:34.310164+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T16:59:46.908851+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:00:29.006887+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:00:41.666201+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:00:54.401832+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:01:07.058856+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:01:19.791002+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:02:02.211608+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:02:14.931954+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:02:27.999952+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:02:40.574546+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:02:53.290965+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:03:36.182158+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:03:48.886138+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:04:01.967608+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:04:14.757994+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:04:27.429025+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:05:24.612115+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:05:37.368868+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:05:50.031189+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:06:02.680114+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:06:15.309444+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:06:58.524953+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:07:11.226915+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:07:23.859203+00:00",
+        "rows": 5
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:07:36.480954+00:00",
+        "rows": 12
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:07:49.108376+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:08:32.145876+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:08:44.826906+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:08:57.495989+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:09:10.123087+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:09:22.779759+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:10:06.297971+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:10:19.098050+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:10:31.863887+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:10:44.630249+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:10:57.380152+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:11:53.846196+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:12:06.630517+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:12:19.405130+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:12:32.094240+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:12:44.784332+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:13:28.273087+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:13:41.008541+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:13:53.709839+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:14:06.667121+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:14:19.308837+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:15:03.160021+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:15:16.014807+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:15:29.183751+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:15:41.927839+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:15:56.235938+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:41:16.531826+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:41:30.027991+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T17:41:44.585627+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T18:05:43.556442+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T18:05:56.392399+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T18:06:40.897106+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T18:06:53.736747+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T18:07:06.702830+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T18:07:19.480309+00:00",
+        "rows": 25
+      },
+      {
+        "physical_classification_observed_at": "2026-10-29T18:07:32.299961+00:00",
+        "rows": 17
+      },
+      {
+        "physical_classification_observed_at": null,
+        "rows": 45434
+      }
+    ]
+  },
+  "candidate_physical_classification_source": {
+    "sql": "SELECT \"physical_classification_source\", count(*) AS rows FROM read_parquet(?) GROUP BY 1 ORDER BY 1",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-reference-offline-63c915b39dceeac998547e93-r2/candidate/reference/_versions/v2_aabf716d342de26794c09797/products/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "physical_classification_source": "SAP_HANA.OITM.U_FormaFarmac",
+        "rows": 7958
+      },
+      {
+        "physical_classification_source": null,
+        "rows": 45434
+      }
+    ]
+  },
+  "candidate_physical_classification_status": {
+    "sql": "SELECT \"physical_classification_status\", count(*) AS rows FROM read_parquet(?) GROUP BY 1 ORDER BY 1",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-reference-offline-63c915b39dceeac998547e93-r2/candidate/reference/_versions/v2_aabf716d342de26794c09797/products/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "physical_classification_status": "CLASSIFIED",
+        "rows": 1278
+      },
+      {
+        "physical_classification_status": "NOT_APPLICABLE",
+        "rows": 1
+      },
+      {
+        "physical_classification_status": "NOT_PHYSICAL",
+        "rows": 37
+      },
+      {
+        "physical_classification_status": "UNCLASSIFIED",
+        "rows": 6642
+      },
+      {
+        "physical_classification_status": null,
+        "rows": 45434
+      }
+    ]
+  },
+  "candidate_physical_state": {
+    "sql": "SELECT \"physical_state\", count(*) AS rows FROM read_parquet(?) GROUP BY 1 ORDER BY 1",
+    "params": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-reference-offline-63c915b39dceeac998547e93-r2/candidate/reference/_versions/v2_aabf716d342de26794c09797/products/part-00000.parquet"
+    ],
+    "result": [
+      {
+        "physical_state": "LIQUID",
+        "rows": 695
+      },
+      {
+        "physical_state": "SEMISOLID",
+        "rows": 93
+      },
+      {
+        "physical_state": "SOLID",
+        "rows": 490
+      },
+      {
+        "physical_state": null,
+        "rows": 52114
+      }
+    ]
+  }
+}

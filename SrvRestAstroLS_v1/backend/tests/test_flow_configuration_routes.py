@@ -18,9 +18,7 @@ _ONE_PATH = "/api/team360-flow/configuration/alumbrado"
 
 @pytest.fixture(autouse=True)
 def _authenticated_flow_mode(monkeypatch):
-    # Default for the MVP is default_admin (no token). These tests verify the
-    # authenticated guard is preserved for the future; default_admin behavior
-    # is covered in the "default_admin" tests below.
+    # Authenticated is the safe default; explicit DEV demo is tested below.
     monkeypatch.setenv("TEAM360_FLOW_ACCESS_MODE", "authenticated")
 
 
@@ -366,9 +364,10 @@ def test_patch_missing_required_fields_422(monkeypatch):
 # ------------------------------------------------------------ default_admin ---
 
 def _default_admin(monkeypatch) -> None:
-    # Switch back to the MVP default (default_admin) after the autouse
+    # Explicitly select the DEV demo policy after the autouse
     # authenticated fixture; no token is required in this mode.
-    monkeypatch.delenv("TEAM360_FLOW_ACCESS_MODE", raising=False)
+    monkeypatch.setenv("TEAM360_FLOW_ACCESS_MODE", "default_admin")
+    monkeypatch.setenv("TEAM360_ENV", "development")
 
 
 def test_default_admin_list_no_token_200(monkeypatch):

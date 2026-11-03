@@ -1,0 +1,62 @@
+{
+  "recorded_at_utc": "2026-10-28T17:33:51Z",
+  "branch": "feature/console-backend-core",
+  "context": {"entity": "TELCHI", "domain": "PRODUCCIÓN / clasificación física de productos", "stage": "INVESTIGATION", "source": "SAP_HANA", "policy": "READ_ONLY"},
+  "overall": "PARTIAL",
+  "classification": "ENVIRONMENT_BLOCKED_BEFORE_SQL",
+  "preflight": {
+    "result": "FAIL",
+    "branch_expected": true,
+    "existing_worktree_changes": "PRESERVED; no existing file edited",
+    "hdbcli_available": true,
+    "configuration_present": true,
+    "configured_schema_is_TELCHI": true,
+    "authentication": "NOT_TESTED",
+    "tcp_probe": "PASS; one socket connection with 3 second connection timeout, closed by context manager; no SQL",
+    "route": "loopback",
+    "rootless_podman_ps": "exit 0; no running containers visible",
+    "forwarding_processes": "socat and conmon visible by process name; command/configuration inspection unavailable without additional privileges",
+    "vpn_path_verified": false,
+    "producer_observation": "No matching producer found in readable non-shell command lines; cannot exclude producers behind the unverified forwarding/container path",
+    "existing_target_tcp_connections_before_probe": 0,
+    "exclusive_access_guarantee": "NOT_ESTABLISHED",
+    "disk_available_gib_approx": 415,
+    "host": {
+      "assessment": "BUSY_BUT_SAFE_FOR_SMALL_PREFLIGHT_ONLY; no scans or extraction started",
+      "logical_cpus": 8,
+      "load_average_first_observation": [4.47, 2.99, 2.30],
+      "memory_available_mib_first_observation": 7788,
+      "swap_io_observed": "si=0, so=0; vmstat swpd=524 KiB",
+      "io_wait_percent_observed": "49-69; sustained across two short observations"
+    },
+    "connection_lifecycle_code_review": "Existing HanaReadOnlySource._execute closes cursor, then rolls back and closes connection in finally. Cursor-close failure can bypass subsequent connection cleanup. No explicit connect/statement timeout or cancellation token; no automatic retry.",
+    "physical_contract": "Offline contract reviewed: raw nullable code retained; 1=LIQUID, 2=SEMISOLID, 3=SOLID; 0,4,5 do not imply physical state",
+    "isolated_capture_destination": "NOT_CREATED: blocked before SQL; operational rows must be stored outside repository and shared Data Root in a fresh restricted directory",
+    "stop_reason": "User requires stopping when concurrency on the same data resource cannot be excluded. Effective forwarding/VPN path and producers behind it could not be verified with current permissions. No privilege escalation attempted."
+  },
+  "results": {
+    "preflight": "FAIL",
+    "pilot_oitm": "SKIP (preflight blocked; not a demonstrated SQL failure)",
+    "classification_capture": "SKIP",
+    "article_integrity": "SKIP",
+    "historical_comparison": "SKIP",
+    "reference_compatibility": "SKIP (offline contract reviewed, no actual candidate)",
+    "foundation_real_unchanged": "PASS for this operation's non-mutation scope only; no catalog connection, no pointer write, no shared Data Root write; not an independent before/after catalog audit"
+  },
+  "sap_sql_executed": [],
+  "sap_write_count": 0,
+  "articles_captured": 0,
+  "physical_distribution": {"solid": null, "semisolid": null, "liquid": null, "reason": "NOT_OBSERVED"},
+  "current_global_coverage": "NOT_ESTABLISHED",
+  "historically_classified_articles": {"count": 1865, "source": "user-provided historical baseline; not revalidated"},
+  "phase_durations": {"preflight": "NOT_INSTRUMENTED end-to-end; individual command timings only", "pilot": "NOT_RUN", "capture": "NOT_RUN", "local_validation": "NOT_RUN", "reference_candidate": "NOT_RUN"},
+  "architecture_review": {
+    "reference_cli": "No capture-only or OITM-only mode; existing extraction performs five SELECTs and normal builder activates a Reference pointer. Not invoked.",
+    "controlled_capture": "No verified OITM two-column key-segmented, durable-checkpoint capture path identified. Existing fetchmany(1000) batches transfer but accumulates the full query result; it is not key pagination.",
+    "minimal_followup": "Establish effective VPN/forwarder and producer exclusivity via existing owner visibility. Separately prepare and offline-test an isolated OITM-only wrapper using the existing read-only adapter with durable per-batch output/checkpoints, approved keyset strategy and cost evidence, small bounded batches, pauses, query/time budgets and safe lifecycle handling. Do not change production adapter ad hoc. Pilot remains unexecuted and must precede any capture."
+  },
+  "pending_static_gate": {"result": "FAIL", "source": "previous offline evidence/user context", "scope": "exploratory_sql reader static scanner", "rerun": false, "suppressed": false, "reason_not_run": "No related implementation changed; preflight blocked before SQL"},
+  "validation": {"git_diff_check": "PASS", "production_adapter_diff": "EMPTY", "tests": "NOT_RUN: operational preflight only; no implementation changed", "new_report_review": "Reviewed for absence of credentials, endpoints, article codes and commercial rows"},
+  "safety": {"service_restarts": 0, "podman_start": 0, "credential_changes": 0, "shared_data_writes": 0, "foundation_publications": 0, "reference_current_changes": 0, "commits": 0, "unrelated_processes_terminated": 0, "own_processes_left_running": 0, "own_socket": "closed; no SAP connection opened"},
+  "ready_for_later_reference_incorporation": false
+}

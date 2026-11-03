@@ -1,0 +1,189 @@
+{
+  "timestamp": "2026-10-30T12:20:06.566236+00:00",
+  "source_sha256": "42c375cc6f991d952053c7ce74b69e95d1102bd2725900ea3d4d15f74e4a8d83",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "preparation_ms": 0.09082800534088165,
+    "response_bytes": 7003,
+    "duration_ms": 4762.216,
+    "attempts": 1
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿Qué período querés consultar?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuánto vendimos en septiembre de 2026?",
+      "text": "No pude interpretar la consulta. No se ejecutó ninguna consulta.",
+      "classification": "ERROR",
+      "event_id": "834f192b-4ef9-407e-ae8a-0874fc3a9cf5",
+      "thread_id": "0a060806-eb44-4f99-87b9-46a6bd6adb02",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.8643250039312989,
+          "interpretation_ms": 5281.713756005047,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5282.648341002641
+        },
+        "decision": "EXECUTION_FORBIDDEN",
+        "committed": false,
+        "contract_error": "CONTRACT_ERROR_NO_COMMIT",
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "validated_state": null,
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "No pude interpretar la consulta. No se ejecutó ninguna consulta.",
+          "classification": "ERROR"
+        },
+        "required_permission": null,
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/limit": null,
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/periods": [],
+              "/branches": [],
+              "/group_by": null,
+              "/reference": null,
+              "/comparison": null,
+              "/period_mode": null,
+              "/breakdown_by": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/product_target": null,
+              "/schema_version": 2,
+              "/customer_target": null,
+              "/business_category": null,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null,
+              "/product_search_text": null,
+              "/selected_item_codes": []
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.09108700032811612,
+        "response_bytes": 6969,
+        "duration_ms": 5272.126,
+        "attempts": 1
+      },
+      "elapsed_ms": 5605.002361990046,
+      "request_trace": {
+        "schema": "telchi-pre-sql-profile-v1",
+        "clock": "perf_counter_ns",
+        "spans": [
+          {
+            "label": "authorization_initial",
+            "start_ms": 215.301661,
+            "end_ms": 215.772662,
+            "duration_ms": 0.471001
+          },
+          {
+            "label": "authorization_transaction_revalidation",
+            "start_ms": 218.15495,
+            "end_ms": 222.288255,
+            "duration_ms": 4.133305
+          },
+          {
+            "label": "model_inference_response",
+            "start_ms": 257.316206,
+            "end_ms": 5494.067619,
+            "duration_ms": 5236.751413
+          },
+          {
+            "label": "interpretation_result_parse",
+            "start_ms": 5494.767375,
+            "end_ms": 5494.90101,
+            "duration_ms": 0.133635
+          },
+          {
+            "label": "conversation_audit_save",
+            "start_ms": 5504.982027,
+            "end_ms": 5593.926482,
+            "duration_ms": 88.944455
+          }
+        ],
+        "total_ms": 5648.849416
+      }
+    }
+  ],
+  "diagnostic_budget": {
+    "environment": "DEV",
+    "turn_seconds": 120,
+    "worker_seconds": 90,
+    "model_seconds": 20,
+    "model_attempts": 1,
+    "production_changed": false
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "identifier": "TELCHIAI_EXPLORATORY_FOUNDATION_READONLY_V1",
+  "timestamp": "2026-10-27T14:57:04.227918+00:00",
+  "code_digest": "a0e26a76fa1548e4b5309df16bfecb8f38b770ca7a93f8e9d52924b121bb02ae",
+  "question": "¿Cuánto vendimos de Calenta en agosto de 2026?",
+  "scope": "Four reference SKUs, commercial lines, August 2026; local control only",
+  "sql_author": "controller, NOT Luna",
+  "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "snapshot": "1408",
+  "catalog": {
+    "dataset": "telchi_foundation_supervised_dev_v1",
+    "organization": "TELCHI",
+    "workspace": "foundation_supervised_dev",
+    "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot": "1408",
+    "tables": [
+      {
+        "name": "sales_document",
+        "columns": [
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "series",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_semantic_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "raw_extraction_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [
+          "doc_entry"
+        ],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "SAP_B1_HANA/OINV, active August 2026 invoices only; header grain, no header money exposed.",
+          "Only documents containing one of the four reference SKUs; classification is current, not historical."
+        ]
+      },
+      {
+        "name": "sales_line",
+        "columns": [
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "raw_extraction_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [
+          "doc_entry",
+          "line_num"
+        ],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Commercial line amount before credit memos and global header adjustments, not collections or net billing.",
+          "Four explicit reference SKUs, not an accredited universal brand definition.",
+          "Currency and lineage must be verified, not assumed from successful SQL.",
+          "Conservative join-pair budget may reject joins; no automatic budget elevation."
+        ]
+      }
+    ],
+    "known_relations": [
+      {
+        "left_table": "sales_document",
+        "left_column": "doc_entry",
+        "right_table": "sales_line",
+        "right_column": "doc_entry",
+        "rationale": ""
+      }
+    ],
+    "synthetic_only": false
+  },
+  "queries": [
+    {
+      "proposal": {
+        "sql": "SELECT sum(line_total) AS amount FROM sales_line",
+        "objective": "independent_control",
+        "justification": "bounded independent row reference",
+        "requested_sources": [
+          "sales_line"
+        ],
+        "expected_grain": "total",
+        "expected_result": "control",
+        "candidate_relations": [],
+        "requested_budget": {
+          "query_seconds": 2.0,
+          "total_seconds": 10.0,
+          "cpu_seconds": 1,
+          "process_memory_bytes": 536870912,
+          "threads": 1,
+          "result_rows": 100,
+          "result_bytes": 65536,
+          "source_bytes": 65536,
+          "queries": 5,
+          "concurrency": 1,
+          "max_join_pairs": 10000
+        },
+        "parameters": [],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "validated": {
+        "admitted_tree_json": "{\"error\":false,\"statements\":[{\"named_param_map\":[],\"node\":{\"aggregate_handling\":\"STANDARD_HANDLING\",\"cte_map\":{\"map\":[]},\"from_table\":{\"alias\":\"\",\"at_clause\":null,\"catalog_name\":\"\",\"column_name_alias\":[],\"query_location\":38,\"sample\":null,\"schema_name\":\"\",\"table_name\":\"sales_line\",\"type\":\"BASE_TABLE\"},\"group_expressions\":[],\"group_sets\":[],\"having\":null,\"modifiers\":[],\"qualify\":null,\"sample\":null,\"select_list\":[{\"alias\":\"amount\",\"catalog\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"line_total\"],\"query_location\":11,\"type\":\"COLUMN_REF\"}],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"sum\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":7,\"schema\":\"\",\"type\":\"FUNCTION\"}],\"type\":\"SELECT_NODE\",\"where_clause\":null}}]}",
+        "generated_sql": "SELECT SUM(\"sales_line\".\"line_total\") AS \"amount\" FROM \"sales_line\" AS \"sales_line\"",
+        "sources": [
+          "sales_line"
+        ],
+        "columns": [
+          [
+            "sales_line",
+            "line_total"
+          ]
+        ],
+        "functions": [
+          "sum"
+        ],
+        "relations": [],
+        "parameters": [],
+        "limits": {
+          "query_seconds": 2.0,
+          "total_seconds": 10.0,
+          "cpu_seconds": 1,
+          "process_memory_bytes": 536870912,
+          "threads": 1,
+          "result_rows": 100,
+          "result_bytes": 65536,
+          "source_bytes": 65536,
+          "queries": 5,
+          "concurrency": 1,
+          "max_join_pairs": 10000
+        },
+        "required_permissions": [
+          "telchi.exploratory.foundation.supervised_dev.read.v1"
+        ],
+        "query_id": "7a91c20fa1af8a17c485fdbeb6e0dbc349e848d8e1050a50f8e9b93b3ec60f7d",
+        "context_digest": "426f72eb03daed8d0f77c52f3211a876b4a73e3f8493a39feeb7002126dad6ec",
+        "declared_grain": "total",
+        "mandatory_checks": [
+          "integrity",
+          "provenance",
+          "grain",
+          "counts",
+          "sums",
+          "percentages",
+          "duplicates",
+          "cardinality",
+          "partitions"
+        ],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "decision": {
+        "decision": "RESOURCE_BLOCKED",
+        "reason": "host_io_or_memory_pressure",
+        "query_id": null,
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "result": {
+        "query_id": "7a91c20fa1af8a17c485fdbeb6e0dbc349e848d8e1050a50f8e9b93b3ec60f7d",
+        "schema": [],
+        "declared_grain": "",
+        "rows": [],
+        "aggregates": [],
+        "returned_count": 0,
+        "total_count": null,
+        "truncated": false,
+        "elapsed_seconds": 0.0,
+        "cpu_seconds": null,
+        "peak_memory_bytes": null,
+        "bytes_read": null,
+        "source": "telchi_foundation_supervised_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "evidence": [],
+        "status": "NOT_EXECUTED",
+        "limitations": [
+          "BLOCKED_HOST"
+        ],
+        "version": "telchiai.exploratory_sql.v1"
+      }
+    }
+  ],
+  "business_data_sent_to_model": false,
+  "egress": {
+    "status": "BLOCKED",
+    "endpoint": "https://api.openai.com/v1/responses",
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "store": false,
+    "project_organization": "Not explicitly selected by existing adapter; key-bound destination unaccredited",
+    "policy": "No applicable enterprise data treatment attestation located; store=false is not an attestation",
+    "existing_approval": "DEV commercial capability approval does not attest provider destination or exploratory observation egress"
+  },
+  "states": {
+    "FOUNDATION_BINDING": "PARTIAL",
+    "READONLY_EXECUTION": "BLOCKED",
+    "OPENAI_DATA_EGRESS": "BLOCKED",
+    "LUNA_REAL_RESEARCH": "BLOCKED",
+    "CALENTA_RECONCILIATION": "NOT_RUN",
+    "INDEPENDENT_VERIFICATION": "NOT_RUN",
+    "SECURITY_REGRESSION": "NOT_RUN",
+    "TELCHI_V1_REGRESSION": "NOT_RUN",
+    "WHATSAPP_E2E": "NOT_RUN",
+    "READY_FOR_SHARED_SERVICE": "BLOCKED"
+  },
+  "host_preflight": {
+    "safe": false,
+    "io_wait_fraction": 0.46439666744235275,
+    "io_wait_samples": [
+      0.467005076142132,
+      0.46153846153846156,
+      0.46464646464646464
+    ],
+    "available_bytes": 6204956672,
+    "load_average": [
+      0.98046875,
+      0.845703125,
+      0.97314453125
+    ],
+    "cpu_count": 8
+  },
+  "blocked_reason": "host_io_or_memory_pressure",
+  "resources": {
+    "elapsed_seconds": 1.0887174020008388,
+    "peak_process_rss_kib": 115360,
+    "duckdb_threads": 1,
+    "duckdb_memory_limit_bytes": 536870912,
+    "sql_seconds": 0,
+    "queries_attempted": 1,
+    "queries_completed": 0,
+    "model_calls": 0,
+    "retries": 0,
+    "os_isolation_accredited": false,
+    "connection_setup_deadline_enforced": false,
+    "process_memory_cpu_scan_bytes_enforced": false
+  }
+}

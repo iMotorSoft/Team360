@@ -1153,6 +1153,40 @@ def _component_reference(domain: str, applied: dict[str, Any]) -> ComponentRefer
     )
 
 
+def reference_requires_publication(store: FoundationPublicationStore, reference: dict[str, Any]) -> bool:
+    previous = store.current_publication()
+    return previous is not None and previous.reference_version != reference.get("reference_version")
+
+
+def publish_reference_only(*, connector: Any, foundation_store: FoundationPublicationStore,
+                           reference: dict[str, Any], fault_point: str | None = None,
+                           base_data_snapshot_id: int | None = None,
+                           prepare_only: bool = False) -> dict[str, Any]:
+    """Existing publication boundary without fact extraction or SAP access.
+
+    Explicit caller only. The master builder does not automatically publish a
+    Foundation, and no scheduler or conversational capability calls this path.
+    """
+    previous = foundation_store.current_publication()
+    if previous is None:
+        raise UpdateAbort("Reference-only publication requires an existing Foundation")
+    if not reference.get("reference_version") or not Path(reference.get("reference_path", "")).is_dir():
+        raise UpdateAbort("Reference-only publication requires an immutable Reference directory")
+    if not reference_requires_publication(foundation_store, reference):
+        return {"status": "NOOP", "foundation_publication_id": previous.foundation_publication_id}
+    run_id = "reference-only-" + digest({
+        "base": previous.foundation_publication_id, "reference": reference["reference_version"], "attempt": _now(),
+    })[:24]
+    candidate = prepare_candidate(foundation_store, update_run_id=run_id, reference_version=reference["reference_version"])
+    return commit_foundation(
+        connector=connector, foundation_store=foundation_store, candidate=candidate,
+        applied={}, reference=reference, source_as_of=previous.source_as_of,
+        precommit_validation={"status": "PASS", "mode": "REFERENCE_ONLY_COMPATIBILITY"},
+        run_id=run_id, fault_point=fault_point, base_data_snapshot_id=base_data_snapshot_id,
+        prepare_only=prepare_only,
+    )
+
+
 def commit_foundation(
     *,
     connector: DuckLakeConnector,
@@ -1164,6 +1198,8 @@ def commit_foundation(
     precommit_validation: dict[str, Any],
     run_id: str,
     fault_point: str | None = None,
+    base_data_snapshot_id: int | None = None,
+    prepare_only: bool = False,
 ) -> dict[str, Any]:
     """Record component membership, validate, then perform the logical commit.
 
@@ -1209,6 +1245,80 @@ def commit_foundation(
         "oitw_dataset_publication_id": (components.get("oitw") or ComponentReference("oitw", None)).publication_id,
     }
     try:
+        from copy import deepcopy
+        from .foundation_manifest import validate_manifest
+        from .reference_compatibility import KIND as REFRESH_KIND, reference_projection
+        previous = foundation_store.current_publication()
+        previous_manifest = previous.manifest if previous else {}
+        extras = set(previous_manifest.get("components", {})) - set(COMPONENT_NAMES)
+        reference_only = not applied
+        if extras or reference_only:
+            # Existing derived contracts bind exact facts/snapshots. A facts delta
+            # needs a component-specific rebuild, not an unproven manifest copy.
+            validate_manifest(foundation_store, previous)
+            unsupported = extras - {"material_supply", "receivables_collections", "purchasing"}
+            if unsupported:
+                raise UpdateAbort("REFERENCE_COMPATIBILITY_ADAPTER_REQUIRED: " + ",".join(sorted(unsupported)))
+            if "material_supply" in extras:
+                from .material_supply_candidate import resolve_current_material_supply
+                resolve_current_material_supply(foundation_store)
+            if "receivables_collections" in extras:
+                from .receivables_collections_foundation import resolve_current
+                resolve_current(foundation_store)
+            if "purchasing" in extras:
+                from .purchasing import ATOMIC, DERIVED, VERSION
+                purchasing = previous_manifest["components"]["purchasing"]
+                if (set(purchasing["datasets"]) != set(ATOMIC + DERIVED)
+                        or purchasing["stable_contract"].get("lineage_algorithm_version") != VERSION):
+                    raise UpdateAbort("Purchasing dataset/algorithm contract incompatible")
+            if applied:
+                raise UpdateAbort("SEALED_COMPONENT_REVALIDATION_REQUIRED: facts changed with " + ",".join(sorted(extras)))
+            old_root = DATA_ROOT / "reference" / "_versions" / previous.reference_version
+            new_root = Path(reference["reference_path"]).resolve()
+            expected_root = (DATA_ROOT / "reference" / "_versions" / reference["reference_version"]).resolve()
+            if new_root != expected_root:
+                raise UpdateAbort("Reference immutable path/version binding mismatch")
+            proof = reference_projection(old_root, new_root)
+            # The derivation base is NOT the prior reader's commit snapshot.
+            # Metadata-only refreshes must preserve the exact visible facts.
+            if previous_manifest.get('candidate_kind') == REFRESH_KIND:
+                pinned_snapshot = previous_manifest['reference_data_snapshot_id']
+                if base_data_snapshot_id is not None and base_data_snapshot_id != pinned_snapshot:
+                    raise UpdateAbort('Reference refresh data snapshot changed')
+            elif connector is not None:
+                from .foundation_reader import FoundationReader
+                with connector.session(read_only=True) as connection:
+                    access = FoundationReader(connector).resolve_on(connection)
+                if access.foundation_publication_id != previous.foundation_publication_id:
+                    raise UpdateAbort('CURRENT changed while pinning Reference data snapshot')
+                pinned_snapshot = access.ducklake_snapshot_id
+                if base_data_snapshot_id is not None and base_data_snapshot_id != pinned_snapshot:
+                    raise UpdateAbort('Reference refresh data snapshot mismatch')
+            else:
+                # Offline stores have no DuckLake history; require accredited input.
+                pinned_snapshot = base_data_snapshot_id
+            if type(pinned_snapshot) is not int or pinned_snapshot < previous_manifest['base_snapshot_id']:
+                raise UpdateAbort('Reference refresh requires an accredited data snapshot')
+            manifest = deepcopy(previous_manifest)
+            # The proof below is physical-only, not the ancestor's append proof.
+            manifest.pop('reference_compatibility_adapter', None)
+            manifest.update(
+                foundation_publication_id=candidate.foundation_publication_id,
+                update_run_id=run_id, candidate_kind=REFRESH_KIND,
+                manifest_schema_version="1.0.0",
+                base_foundation_publication_id=previous.foundation_publication_id,
+                reference_version=reference["reference_version"],
+                reference_compatibility=proof,
+                reference_data_snapshot_id=pinned_snapshot,
+                precommit_validation=precommit_validation,
+            )
+            manifest["components"]["reference"] = components["reference"].as_dict()
+        elif connector is not None:
+            with connector.session(read_only=True) as connection:
+                snapshot = connection.execute("SELECT max(snapshot_id) FROM ducklake_snapshots('telchi')").fetchone()[0]
+            manifest["base_snapshot_id"] = int(snapshot)
+        elif "base_snapshot_id" in previous_manifest:
+            manifest["base_snapshot_id"] = previous_manifest["base_snapshot_id"]
         foundation_store.update_components(
             candidate.foundation_publication_id,
             components,
@@ -1216,6 +1326,8 @@ def commit_foundation(
             validation_status=precommit_validation.get("status", "UNKNOWN"),
             manifest=manifest,
         )
+        if extras or reference_only:
+            validate_manifest(foundation_store, foundation_store.get(candidate.foundation_publication_id))
         foundation_store.set_status(candidate.foundation_publication_id, VALIDATING)
         foundation_store.inject(CommitFaultPoint.DURING_VALIDATION)
         if precommit_validation.get("status") != "PASS":
@@ -1225,6 +1337,8 @@ def commit_foundation(
             candidate.foundation_publication_id, READY_TO_COMMIT, validated_at=_now()
         )
         foundation_store.inject(CommitFaultPoint.BEFORE_LOGICAL_COMMIT)
+        if prepare_only:
+            return {"status": "PREPARED", "foundation_publication_id": candidate.foundation_publication_id}
         commit_result = foundation_store.logical_commit(candidate.foundation_publication_id)
         if commit_result.get("status") == "ALREADY_CURRENT":
             return {"status": "ALREADY_CURRENT", "logical_commit": commit_result}
@@ -1711,6 +1825,9 @@ def run_update(
         # proliferate a snapshot or attempt a logical commit with absent new
         # component publications. Current A remains visible and is reverified.
         commit_started = time.perf_counter()
+        if pub_result["status"] == "NOOP" and reference_requires_publication(foundation_store, reference):
+            pub_result["status"] = "PUBLISHED"
+            pub_result["reference_only"] = True
         if pub_result["status"] == "NOOP":
             foundation_store.set_status(
                 candidate.foundation_publication_id, SUPERSEDED,

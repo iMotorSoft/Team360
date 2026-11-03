@@ -1,0 +1,2412 @@
+{
+  "run_id": "20261012T225749Z",
+  "base_url": "http://127.0.0.1:50663",
+  "endpoint": "/api/telchi/assistant/dev/turn",
+  "transport": "curl",
+  "pipeline": "MessageDispatcher -> TelchiHandler -> StateEngine -> capabilities",
+  "whatsapp_e2e": false,
+  "scenarios": [
+    {
+      "id": "B01",
+      "conversation": "b01:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Últimas facturas activas por fecha documental (no instante de ingreso):\n2026-09-24 · OINV DocEntry 11532517 · DocNum 260192728 · N\n2026-09-24 · OINV DocEntry 11532516 · DocNum 260192727 · N\n2026-09-24 · OINV DocEntry 11532515 · DocNum 260192726 · N\n2026-09-24 · OINV DocEntry 11532514 · DocNum 260192725 · N\n2026-09-24 · OINV DocEntry 11532513 · DocNum 260739131 · N\n2026-09-24 · OINV DocEntry 11532512 · DocNum 260192724 · N\n2026-09-24 · OINV DocEntry 11532511 · DocNum 260192723 · N\n2026-09-24 · OINV DocEntry 11532510 · DocNum 260192722 · N\n2026-09-24 · OINV DocEntry 11532509 · DocNum 260192721 · N\n2026-09-24 · OINV DocEntry 11532508 · DocNum 260739130 · N\nOrden: DocDate descendente, DocEntry descendente. Excluye anuladas y notas de crédito. No es venta neta.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "user_text": "Dame las últimas 10 facturas de venta registradas",
+          "elapsed_ms": 5239.23,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"b01:20261012T225749Z\"}"
+          ],
+          "conversation_id": "2e9ad976-6a18-452a-aa8a-a7b4569c604e",
+          "correlation_id": "64050615-b5e3-4229-a1f0-8132df91bc19",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 2345.2247599925613,
+              "state_engine_ms": 0.6137719974503852,
+              "interpretation_ms": 2720.09485399758,
+              "response_format_ms": 0.017497004591859877,
+              "total_processing_ms": 5082.014908999554
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 1,
+            "execution_result": {
+              "sql": "SELECT source_system,doc_entry,doc_num,doc_date,canceled\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\nWHERE source_system=? AND canceled=? AND doc_date IS NOT NULL\nORDER BY doc_date DESC,CAST(doc_entry AS BIGINT) DESC,doc_entry DESC LIMIT ?",
+              "rows": [
+                {
+                  "doc_num": "260192728",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532517",
+                  "source_system": "SAP_B1_HANA"
+                },
+                {
+                  "doc_num": "260192727",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532516",
+                  "source_system": "SAP_B1_HANA"
+                },
+                {
+                  "doc_num": "260192726",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532515",
+                  "source_system": "SAP_B1_HANA"
+                },
+                {
+                  "doc_num": "260192725",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532514",
+                  "source_system": "SAP_B1_HANA"
+                },
+                {
+                  "doc_num": "260739131",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532513",
+                  "source_system": "SAP_B1_HANA"
+                },
+                {
+                  "doc_num": "260192724",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532512",
+                  "source_system": "SAP_B1_HANA"
+                },
+                {
+                  "doc_num": "260192723",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532511",
+                  "source_system": "SAP_B1_HANA"
+                },
+                {
+                  "doc_num": "260192722",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532510",
+                  "source_system": "SAP_B1_HANA"
+                },
+                {
+                  "doc_num": "260192721",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532509",
+                  "source_system": "SAP_B1_HANA"
+                },
+                {
+                  "doc_num": "260739130",
+                  "canceled": "N",
+                  "doc_date": "2026-09-24T00:00:00",
+                  "doc_entry": "11532508",
+                  "source_system": "SAP_B1_HANA"
+                }
+              ],
+              "grain": "invoice_header",
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "read_only": true,
+              "capability": "sales.latest_documents.v1",
+              "limitations": "Active invoices (N), by DocDate, not entry timestamp; excludes credit memos. Not net sales. Completeness not certified.",
+              "sap_accessed": false,
+              "document_type": "OINV",
+              "sql_parameters": [
+                "SAP_B1_HANA",
+                "N",
+                10
+              ],
+              "sql_duration_ms": 354.4073200027924
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Últimas facturas activas por fecha documental (no instante de ingreso):\n2026-09-24 · OINV DocEntry 11532517 · DocNum 260192728 · N\n2026-09-24 · OINV DocEntry 11532516 · DocNum 260192727 · N\n2026-09-24 · OINV DocEntry 11532515 · DocNum 260192726 · N\n2026-09-24 · OINV DocEntry 11532514 · DocNum 260192725 · N\n2026-09-24 · OINV DocEntry 11532513 · DocNum 260739131 · N\n2026-09-24 · OINV DocEntry 11532512 · DocNum 260192724 · N\n2026-09-24 · OINV DocEntry 11532511 · DocNum 260192723 · N\n2026-09-24 · OINV DocEntry 11532510 · DocNum 260192722 · N\n2026-09-24 · OINV DocEntry 11532509 · DocNum 260192721 · N\n2026-09-24 · OINV DocEntry 11532508 · DocNum 260739130 · N\nOrden: DocDate descendente, DocEntry descendente. Excluye anuladas y notas de crédito. No es venta neta.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "required_permission": "telchi.sales.latest_documents.read.v1",
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "conversation": "m01:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.net_amount"
+          ],
+          "metric": "sales.net_amount",
+          "entity": null,
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "response_text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "user_text": "Ventas de mayo de 2026",
+          "elapsed_ms": 6852.52,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m01:20261012T225749Z\"}"
+          ],
+          "conversation_id": "b8696612-6586-4d2b-8333-9670e7640f38",
+          "correlation_id": "7b5fb81c-0c2a-4179-9b51-b519f399a529",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 2212.9611860000296,
+              "state_engine_ms": 0.5722079949919134,
+              "interpretation_ms": 4463.508654996986,
+              "response_format_ms": 0.017812999431043863,
+              "total_processing_ms": 6693.036144999496
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 1,
+            "execution_result": {
+              "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount FROM invoices i CROSS JOIN credits c",
+              "rows": [
+                {
+                  "net_amount": "8552079.190000",
+                  "credit_count": 245,
+                  "billed_amount": "8761459.220000",
+                  "credit_amount": "209380.030000",
+                  "invoice_count": 36242,
+                  "unique_credits": 245,
+                  "unique_invoices": 36242
+                }
+              ],
+              "grain": "document_header",
+              "period": {
+                "currency": "BS",
+                "date_from": "2026-05-01",
+                "date_to_exclusive": "2026-06-01"
+              },
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "currency": "BS",
+              "read_only": true,
+              "capability": "sales.period_billed_amount.v1",
+              "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+              "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+              "sap_accessed": false,
+              "sql_parameters": [
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-05-01",
+                "2026-06-01",
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-05-01",
+                "2026-06-01"
+              ],
+              "sql_duration_ms": 281.83584500220604,
+              "requested_metrics": [
+                "sales.net_amount"
+              ]
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "required_permission": "telchi.sales.period_billed_amount.read.v1",
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": {
+                    "start": "2026-05-01",
+                    "end_exclusive": "2026-06-01"
+                  },
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M02",
+      "conversation": "m02:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.net_amount"
+          ],
+          "metric": "sales.net_amount",
+          "entity": null,
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-06-01",
+            "end_exclusive": "2026-07-01"
+          },
+          "response_text": "Ventas netas documentales: Bs 9,763,493.67. Facturación válida: Bs 10,033,501.02; notas de crédito: Bs 270,007.35. Período [2026-06-01, 2026-07-01). 35360 facturas y 261 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "user_text": "Ventas de junio de 2026",
+          "elapsed_ms": 4805.23,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m02:20261012T225749Z\"}"
+          ],
+          "conversation_id": "eb7dc591-ff82-48b8-93b8-3baeb5902041",
+          "correlation_id": "c62cc8e5-f87c-433e-86e2-35a54e2fed1a",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 2219.1203459951794,
+              "state_engine_ms": 0.5137699990882538,
+              "interpretation_ms": 2449.7306809935253,
+              "response_format_ms": 0.01685900497250259,
+              "total_processing_ms": 4681.722542001808
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-06-01",
+                "end_exclusive": "2026-07-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-06-01",
+                "end_exclusive": "2026-07-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 1,
+            "execution_result": {
+              "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount FROM invoices i CROSS JOIN credits c",
+              "rows": [
+                {
+                  "net_amount": "9763493.670000",
+                  "credit_count": 261,
+                  "billed_amount": "10033501.020000",
+                  "credit_amount": "270007.350000",
+                  "invoice_count": 35360,
+                  "unique_credits": 261,
+                  "unique_invoices": 35360
+                }
+              ],
+              "grain": "document_header",
+              "period": {
+                "currency": "BS",
+                "date_from": "2026-06-01",
+                "date_to_exclusive": "2026-07-01"
+              },
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "currency": "BS",
+              "read_only": true,
+              "capability": "sales.period_billed_amount.v1",
+              "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+              "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+              "sap_accessed": false,
+              "sql_parameters": [
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-06-01",
+                "2026-07-01",
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-06-01",
+                "2026-07-01"
+              ],
+              "sql_duration_ms": 277.36481700412696,
+              "requested_metrics": [
+                "sales.net_amount"
+              ]
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Ventas netas documentales: Bs 9,763,493.67. Facturación válida: Bs 10,033,501.02; notas de crédito: Bs 270,007.35. Período [2026-06-01, 2026-07-01). 35360 facturas y 261 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "required_permission": "telchi.sales.period_billed_amount.read.v1",
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": {
+                    "start": "2026-06-01",
+                    "end_exclusive": "2026-07-01"
+                  },
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": [
+                  "/branches",
+                  "/sales_channel",
+                  "/comparison",
+                  "/reference"
+                ]
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M03",
+      "conversation": "m03:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.coverage"
+          ],
+          "metric": "sales.coverage",
+          "entity": null,
+          "temporal_reference": "latest_available_month",
+          "period": null,
+          "response_text": "Último mes con facturas activas registradas por fecha documental: 2026-09. Última fecha: 2026-09-24T00:00:00. Documentos: 330429. No certifica último mes completo ni cobertura de ventas netas.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "user_text": "¿Cuál es el último mes con ventas?",
+          "elapsed_ms": 6341.97,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m03:20261012T225749Z\"}"
+          ],
+          "conversation_id": "6ea0d26a-d9ea-47a2-8fc3-3a73c5ad8397",
+          "correlation_id": "fb436b06-bea6-4c99-898a-13da0dc1df75",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 2016.7068160008057,
+              "state_engine_ms": 0.5632649990729988,
+              "interpretation_ms": 4185.347976999765,
+              "response_format_ms": 0.0071879985625855625,
+              "total_processing_ms": 6208.49313600047
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": "sales.coverage",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.coverage"
+              ],
+              "temporal_reference": "latest_available_month"
+            },
+            "validated_state": {
+              "metric": "sales.coverage",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.coverage"
+              ],
+              "temporal_reference": "latest_available_month"
+            },
+            "capability_calls": 1,
+            "execution_result": {
+              "sql": "SELECT MIN(doc_date) AS first_date,MAX(doc_date) AS last_date,COUNT(*) AS documents\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND doc_date IS NOT NULL",
+              "rows": [
+                {
+                  "documents": 330429,
+                  "last_date": "2026-09-24T00:00:00",
+                  "first_date": "2022-03-31T00:00:00",
+                  "latest_month_with_rows": "2026-09",
+                  "complete_month_certified": false
+                }
+              ],
+              "grain": "invoice_header",
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "read_only": true,
+              "capability": "sales.coverage.v1",
+              "limitations": "Active invoices (N), by DocDate, not entry timestamp; excludes credit memos. Not net sales. Completeness not certified.",
+              "sap_accessed": false,
+              "document_type": "OINV",
+              "sql_parameters": [
+                "SAP_B1_HANA",
+                "N"
+              ],
+              "sql_duration_ms": 65.32236999919405
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Último mes con facturas activas registradas por fecha documental: 2026-09. Última fecha: 2026-09-24T00:00:00. Documentos: 330429. No certifica último mes completo ni cobertura de ventas netas.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "required_permission": "telchi.sales.coverage.read.v1",
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.coverage",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.coverage"
+                  ],
+                  "/temporal_reference": "latest_available_month"
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M04",
+      "conversation": "m04:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís últimas facturas por fecha documental para «Calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+          "user_text": "Dame las últimas ventas de Calenta",
+          "elapsed_ms": 2736.08,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m04:20261012T225749Z\"}"
+          ],
+          "conversation_id": "10d3a5de-ff8e-43bf-8808-2942da1f5cc3",
+          "correlation_id": "97c58a09-1893-4a50-9df4-42d5382c8858",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.29093500052113086,
+              "interpretation_ms": 2562.3903880041325,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 2562.8133169957437
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís últimas facturas por fecha documental para «Calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "required_permission": null,
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M05",
+      "conversation": "m05:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.net_amount"
+          ],
+          "metric": "sales.net_amount",
+          "entity": null,
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "response_text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "user_text": "Ventas de mayo de 2026",
+          "elapsed_ms": 6172.46,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m05:20261012T225749Z\"}"
+          ],
+          "conversation_id": "7d06e626-3cee-4849-9d00-cda31cf664c3",
+          "correlation_id": "08420da6-eb58-4d81-a193-53c10c52bd9b",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 2332.5341400050092,
+              "state_engine_ms": 0.49598500481806695,
+              "interpretation_ms": 3703.9691400059382,
+              "response_format_ms": 0.016677993698976934,
+              "total_processing_ms": 6041.413394006668
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 1,
+            "execution_result": {
+              "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount FROM invoices i CROSS JOIN credits c",
+              "rows": [
+                {
+                  "net_amount": "8552079.190000",
+                  "credit_count": 245,
+                  "billed_amount": "8761459.220000",
+                  "credit_amount": "209380.030000",
+                  "invoice_count": 36242,
+                  "unique_credits": 245,
+                  "unique_invoices": 36242
+                }
+              ],
+              "grain": "document_header",
+              "period": {
+                "currency": "BS",
+                "date_from": "2026-05-01",
+                "date_to_exclusive": "2026-06-01"
+              },
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "currency": "BS",
+              "read_only": true,
+              "capability": "sales.period_billed_amount.v1",
+              "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+              "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+              "sap_accessed": false,
+              "sql_parameters": [
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-05-01",
+                "2026-06-01",
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-05-01",
+                "2026-06-01"
+              ],
+              "sql_duration_ms": 280.77011900313664,
+              "requested_metrics": [
+                "sales.net_amount"
+              ]
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "required_permission": "telchi.sales.period_billed_amount.read.v1",
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": {
+                    "start": "2026-05-01",
+                    "end_exclusive": "2026-06-01"
+                  },
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": [
+                  "/branches",
+                  "/sales_channel",
+                  "/comparison",
+                  "/reference"
+                ]
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": null,
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "response_text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Conservo la solicitud de cantidades: el ranking fijo no admite este período; no sumo unidades incompatibles ni sustituyo cantidades físicas por el conteo de documentos. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "user_text": "Quiero importe y cantidades",
+          "elapsed_ms": 5826.7,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m05:20261012T225749Z\"}"
+          ],
+          "conversation_id": "7d06e626-3cee-4849-9d00-cda31cf664c3",
+          "correlation_id": "26039e61-bb3a-4b20-9d07-bc9bc5617493",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 2199.376195007062,
+              "state_engine_ms": 0.49078599840868264,
+              "interpretation_ms": 3489.0945739971357,
+              "response_format_ms": 0.01672299549682066,
+              "total_processing_ms": 5693.075308998232
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 1,
+            "execution_result": {
+              "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount FROM invoices i CROSS JOIN credits c",
+              "rows": [
+                {
+                  "net_amount": "8552079.190000",
+                  "credit_count": 245,
+                  "billed_amount": "8761459.220000",
+                  "credit_amount": "209380.030000",
+                  "invoice_count": 36242,
+                  "unique_credits": 245,
+                  "unique_invoices": 36242
+                }
+              ],
+              "grain": "document_header",
+              "period": {
+                "currency": "BS",
+                "date_from": "2026-05-01",
+                "date_to_exclusive": "2026-06-01"
+              },
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "currency": "BS",
+              "read_only": true,
+              "capability": "sales.period_billed_amount.v1",
+              "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+              "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+              "sap_accessed": false,
+              "sql_parameters": [
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-05-01",
+                "2026-06-01",
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-05-01",
+                "2026-06-01"
+              ],
+              "sql_duration_ms": 282.53971499361796,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ]
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Conservo la solicitud de cantidades: el ranking fijo no admite este período; no sumo unidades incompatibles ni sustituyo cantidades físicas por el conteo de documentos. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "required_permission": "telchi.sales.period_billed_amount.read.v1",
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/period": {
+                    "start": "2026-05-01",
+                    "end_exclusive": "2026-06-01"
+                  },
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M06",
+      "conversation": "m06:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.net_amount"
+          ],
+          "metric": "sales.net_amount",
+          "entity": null,
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-06-01",
+            "end_exclusive": "2026-07-01"
+          },
+          "response_text": "Ventas netas documentales: Bs 9,763,493.67. Facturación válida: Bs 10,033,501.02; notas de crédito: Bs 270,007.35. Período [2026-06-01, 2026-07-01). 35360 facturas y 261 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "user_text": "Ventas de junio de 2026",
+          "elapsed_ms": 5061.0,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m06:20261012T225749Z\"}"
+          ],
+          "conversation_id": "dfd2409d-643c-4d48-86d5-298032589cc1",
+          "correlation_id": "ef0dda3e-83ed-49b4-b0ca-5acbfc8cbc0a",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 2238.5887150012422,
+              "state_engine_ms": 0.192170002264902,
+              "interpretation_ms": 2730.447889000061,
+              "response_format_ms": 0.014197998098097742,
+              "total_processing_ms": 4970.999413002573
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-06-01",
+                "end_exclusive": "2026-07-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-06-01",
+                "end_exclusive": "2026-07-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 1,
+            "execution_result": {
+              "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount FROM invoices i CROSS JOIN credits c",
+              "rows": [
+                {
+                  "net_amount": "9763493.670000",
+                  "credit_count": 261,
+                  "billed_amount": "10033501.020000",
+                  "credit_amount": "270007.350000",
+                  "invoice_count": 35360,
+                  "unique_credits": 261,
+                  "unique_invoices": 35360
+                }
+              ],
+              "grain": "document_header",
+              "period": {
+                "currency": "BS",
+                "date_from": "2026-06-01",
+                "date_to_exclusive": "2026-07-01"
+              },
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "currency": "BS",
+              "read_only": true,
+              "capability": "sales.period_billed_amount.v1",
+              "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+              "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+              "sap_accessed": false,
+              "sql_parameters": [
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-06-01",
+                "2026-07-01",
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-06-01",
+                "2026-07-01"
+              ],
+              "sql_duration_ms": 296.8027169990819,
+              "requested_metrics": [
+                "sales.net_amount"
+              ]
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Ventas netas documentales: Bs 9,763,493.67. Facturación válida: Bs 10,033,501.02; notas de crédito: Bs 270,007.35. Período [2026-06-01, 2026-07-01). 35360 facturas y 261 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "required_permission": "telchi.sales.period_billed_amount.read.v1",
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": {
+                    "start": "2026-06-01",
+                    "end_exclusive": "2026-07-01"
+                  },
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.net_amount"
+          ],
+          "metric": "sales.net_amount",
+          "entity": null,
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "response_text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "user_text": "¿Y el mes anterior?",
+          "elapsed_ms": 5327.1,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m06:20261012T225749Z\"}"
+          ],
+          "conversation_id": "dfd2409d-643c-4d48-86d5-298032589cc1",
+          "correlation_id": "f5f52316-9878-4630-b9ba-e979d713ddcd",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 2258.155481002177,
+              "state_engine_ms": 0.10158700024476275,
+              "interpretation_ms": 2952.4158040003385,
+              "response_format_ms": 0.015937999705784023,
+              "total_processing_ms": 5211.903524002992
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-06-01",
+                "end_exclusive": "2026-07-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 1,
+            "execution_result": {
+              "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount FROM invoices i CROSS JOIN credits c",
+              "rows": [
+                {
+                  "net_amount": "8552079.190000",
+                  "credit_count": 245,
+                  "billed_amount": "8761459.220000",
+                  "credit_amount": "209380.030000",
+                  "invoice_count": 36242,
+                  "unique_credits": 245,
+                  "unique_invoices": 36242
+                }
+              ],
+              "grain": "document_header",
+              "period": {
+                "currency": "BS",
+                "date_from": "2026-05-01",
+                "date_to_exclusive": "2026-06-01"
+              },
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "currency": "BS",
+              "read_only": true,
+              "capability": "sales.period_billed_amount.v1",
+              "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+              "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+              "sap_accessed": false,
+              "sql_parameters": [
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-05-01",
+                "2026-06-01",
+                "SAP_B1_HANA",
+                "N",
+                "BS",
+                "2026-05-01",
+                "2026-06-01"
+              ],
+              "sql_duration_ms": 288.7349049997283,
+              "requested_metrics": [
+                "sales.net_amount"
+              ]
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "required_permission": "telchi.sales.period_billed_amount.read.v1",
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/period": {
+                    "start": "2026-05-01",
+                    "end_exclusive": "2026-06-01"
+                  }
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M07",
+      "conversation": "m07:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "NEEDS_CLARIFICATION",
+          "committed": true,
+          "decision": "ASK",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.source_top_items"
+          ],
+          "metric": "sales.source_top_items",
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "¿Para qué período querés consultar los productos más vendidos?",
+          "user_text": "¿Cuáles son los productos más vendidos?",
+          "elapsed_ms": 5069.61,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m07:20261012T225749Z\"}"
+          ],
+          "conversation_id": "dba8a480-2490-4a99-9918-982a4105b5e8",
+          "correlation_id": "3a16eafe-46ff-40be-b86e-a29e239a14d1",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.8864230039762333,
+              "interpretation_ms": 4975.124960998073,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4976.485386003333
+            },
+            "decision": "ASK",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿Para qué período querés consultar los productos más vendidos?"
+                },
+                "proposed": {
+                  "metric": "sales.source_top_items",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "temporal_reference": null
+                },
+                "source_turn_id": "3a16eafe-46ff-40be-b86e-a29e239a14d1",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿Para qué período querés consultar los productos más vendidos?"
+                },
+                "proposed": {
+                  "metric": "sales.source_top_items",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "temporal_reference": null
+                },
+                "source_turn_id": "3a16eafe-46ff-40be-b86e-a29e239a14d1",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "¿Para qué período querés consultar los productos más vendidos?",
+              "classification": "NEEDS_CLARIFICATION"
+            },
+            "required_permission": null,
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.source_top_items",
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": [
+                  "/period",
+                  "/branches",
+                  "/sales_channel",
+                  "/comparison",
+                  "/reference"
+                ]
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿Para qué período querés consultar los productos más vendidos?"
+              }
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.source_top_items"
+          ],
+          "metric": "sales.source_top_items",
+          "entity": null,
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "response_text": "Top 10 por cantidad documental, 01/01–15/09/2026:\nL00505: 557199.0000000000\nL02467: 200000.0000000000\nM05970: 133931.0000000000\nL01698: 116567.0000000000\nL01003: 115269.0000000000\nL01613: 108791.0000000000\nL02837: 101919.0000000000\nL00003: 98511.0000000000\nM05239: 94065.0000000000\nM05486: 93144.0000000000\nUnidades originales por producto, no comparables entre productos. Sin descontar notas de crédito ni anulaciones; no es facturación ni venta neta. Cobertura histórica completa no certificada. Actualización: 2026-09-28T18:18:35.264000. Fuente: Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9.",
+          "user_text": "Top 10 por cantidad documental del 1 de enero al 15 de septiembre de 2026, sin filtros",
+          "elapsed_ms": 8142.74,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m07:20261012T225749Z\"}"
+          ],
+          "conversation_id": "dba8a480-2490-4a99-9918-982a4105b5e8",
+          "correlation_id": "82def67a-1229-46aa-ab17-ae7739ac35a5",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 4258.18209299905,
+              "state_engine_ms": 0.7348270009970292,
+              "interpretation_ms": 3831.2845940017723,
+              "response_format_ms": 0.011693002306856215,
+              "total_processing_ms": 8092.544922998059
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿Para qué período querés consultar los productos más vendidos?"
+                },
+                "proposed": {
+                  "metric": "sales.source_top_items",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "temporal_reference": null
+                },
+                "source_turn_id": "3a16eafe-46ff-40be-b86e-a29e239a14d1",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 1,
+            "execution_result": {
+              "rows": [
+                {
+                  "quantity": "557199.0000000000",
+                  "item_code": "L00505"
+                },
+                {
+                  "quantity": "200000.0000000000",
+                  "item_code": "L02467"
+                },
+                {
+                  "quantity": "133931.0000000000",
+                  "item_code": "M05970"
+                },
+                {
+                  "quantity": "116567.0000000000",
+                  "item_code": "L01698"
+                },
+                {
+                  "quantity": "115269.0000000000",
+                  "item_code": "L01003"
+                },
+                {
+                  "quantity": "108791.0000000000",
+                  "item_code": "L01613"
+                },
+                {
+                  "quantity": "101919.0000000000",
+                  "item_code": "L02837"
+                },
+                {
+                  "quantity": "98511.0000000000",
+                  "item_code": "L00003"
+                },
+                {
+                  "quantity": "94065.0000000000",
+                  "item_code": "M05239"
+                },
+                {
+                  "quantity": "93144.0000000000",
+                  "item_code": "M05486"
+                }
+              ],
+              "units": "source_document_units_per_item; not comparable across items",
+              "metric": "source_document_quantity_by_item",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "coverage": "fixed_query_window; historical completeness not certified",
+              "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+              "parameters": {
+                "limit": 10,
+                "metric": "sales.source_top_items",
+                "period": {
+                  "start": "2026-01-01",
+                  "end_exclusive": "2026-09-16"
+                },
+                "pending": null,
+                "branches": [],
+                "reference": null,
+                "comparison": null,
+                "sales_channel": null,
+                "entity_mention": null,
+                "schema_version": 2,
+                "requested_metrics": [
+                  "sales.source_top_items"
+                ],
+                "temporal_reference": null
+              },
+              "limitations": "Invoices only, no cancellation filter or credit subtraction; not net sales or revenue."
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Top 10 por cantidad documental, 01/01–15/09/2026:\nL00505: 557199.0000000000\nL02467: 200000.0000000000\nM05970: 133931.0000000000\nL01698: 116567.0000000000\nL01003: 115269.0000000000\nL01613: 108791.0000000000\nL02837: 101919.0000000000\nL00003: 98511.0000000000\nM05239: 94065.0000000000\nM05486: 93144.0000000000\nUnidades originales por producto, no comparables entre productos. Sin descontar notas de crédito ni anulaciones; no es facturación ni venta neta. Cobertura histórica completa no certificada. Actualización: 2026-09-28T18:18:35.264000. Fuente: Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "required_permission": "telchi.sales.source_quantity.read.v1",
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "ANSWER_CLARIFICATION",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.source_top_items",
+                  "/period": {
+                    "start": "2026-01-01",
+                    "end_exclusive": "2026-09-16"
+                  },
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M10",
+      "conversation": "m10:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "NET_PRODUCT_AMOUNT_UNRESOLVED",
+          "metrics": [
+            "sales.net_amount"
+          ],
+          "metric": "sales.net_amount",
+          "entity": null,
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "response_text": "El importe neto por producto no está acreditado: falta la asignación de descuentos e impuestos de cabecera y notas de crédito al producto. No ejecuté un total global como sustituto ni consulté Foundation.",
+          "user_text": "Dame el importe neto por producto de mayo de 2026",
+          "elapsed_ms": 3166.63,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m10:20261012T225749Z\"}"
+          ],
+          "conversation_id": "d5a57210-e484-4787-8926-bdb74db88e63",
+          "correlation_id": "a9707291-08f9-4438-bc57-aa6f099fd352",
+          "audit": {
+            "bmd": {
+              "category": "NET_PRODUCT_AMOUNT_UNRESOLVED"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.17360600031679496,
+              "interpretation_ms": 3051.0122129999218,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 3051.33702600142
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "El importe neto por producto no está acreditado: falta la asignación de descuentos e impuestos de cabecera y notas de crédito al producto. No ejecuté un total global como sustituto ni consulté Foundation.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "required_permission": null,
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": {
+                    "start": "2026-05-01",
+                    "end_exclusive": "2026-06-01"
+                  },
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M11",
+      "conversation": "m11:20261012T225749Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": "Calenta y Calenta Forte",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís últimas facturas por fecha documental para «Calenta y Calenta Forte» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+          "user_text": "Dame las últimas ventas de Calenta y Calenta Forte como una sola marca",
+          "elapsed_ms": 4672.2,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:50663/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"m11:20261012T225749Z\"}"
+          ],
+          "conversation_id": "096d1479-5a2f-46dc-823b-8f22c320cc24",
+          "correlation_id": "b3c7a749-2e28-4f01-9890-b62aac517c4c",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.49813499936135486,
+              "interpretation_ms": 4559.344202003558,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4560.086533005233
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta y Calenta Forte",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta y Calenta Forte",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís últimas facturas por fecha documental para «Calenta y Calenta Forte» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "required_permission": null,
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/period": null,
+                  "/comparison": null,
+                  "/entity_mention": {
+                    "text": "Calenta y Calenta Forte",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": [
+                  "/branches",
+                  "/sales_channel",
+                  "/reference"
+                ]
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "server": {
+    "pid_reaped": true,
+    "log": "../../data/reports/telchi/sales_monetary_entity_resolution_v1/business_http_final/dev-server.log"
+  }
+}

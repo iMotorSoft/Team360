@@ -1,0 +1,74 @@
+{
+  "branch": "feature/console-backend-core",
+  "context": "TELCHI / PRODUCCION: physical article classification / INVESTIGATION / SAP_HANA READ_ONLY",
+  "status": "RESOURCE_BLOCKED",
+  "stop_reason": "destination_commit_latency_exceeded",
+  "previous_block_explanation": "Existing capture.py had no generic iowait veto. Earlier suspension was an operational host-preflight decision, not a demonstrated HANA overload. No external preflight threshold was changed or bypassed.",
+  "changes": [
+    "capture.py: destination checks before preparation and after prefix validation; durable roundtrip before connection; target checks between queries; commit readback and latency stop; explicit short-write detection",
+    "persistence.py: read-only device binding, capacity/inodes/read-only checks, two device-pressure intervals including flush counters, bounded one-transaction probe",
+    "test_capture.py and test_persistence.py: synthetic continuation, corruption, write/fsync errors, interruptions, recovery, locking, pressure, latency and cleanup coverage"
+  ],
+  "policy": {
+    "device_pressure": "Both one-second samples must exceed await 250 ms, or busy >=80% with average queue >=4 or inflight >=8; unknown device/metrics fail closed",
+    "capacity": "At least 64 MiB available and 128 inodes",
+    "probe_and_commit_limit_ms": 1500,
+    "commit_measurement": "Durable journal, batch, checkpoint, journal removal, directory fsync and full checkpoint/batch readback; not a pure disk-write measurement",
+    "small_write_is_not_sole_evidence": true,
+    "no_claim_of_power_loss_hardware_certification": true
+  },
+  "offline_validation": {
+    "command": "cd SrvRestAstroLS_v1/backend && UV_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 uv run --no-sync pytest --import-mode=importlib -q modules/telchi/investigation/validation/controlled_physical_capture_v1/test_capture.py modules/telchi/investigation/validation/controlled_physical_capture_v1/test_persistence.py",
+    "result": "67 passed in 1.57s",
+    "physical_fsync_in_unit_tests": "Mocked; atomic protocol, error propagation and ordering tested, not physical power loss",
+    "real_destination_validation": "Private prefix copied with fsync and per-file hash equality; actual device metrics and capacity accepted before SAP; real durable probe 75.815 ms",
+    "git_diff_check": "PASS",
+    "final_code_review": "Completed; changes limited to assigned capturer, tests and new JSON evidence"
+  },
+  "execution": {
+    "blocks_started": 1,
+    "blocks_completed": 0,
+    "sap_queries": 2,
+    "sap_writes": 0,
+    "query_latencies_ms": [143.67481200315524, 146.7696860054275],
+    "query_latency_mean_ms": 145.22224900429137,
+    "commit_and_verification_ms": [213.82763300061924, 3232.6427480002167],
+    "new_articles": 50,
+    "total_articles": 4825,
+    "concurrency": 1,
+    "retries": 0,
+    "connection_attempts": 1,
+    "connection_closed": true,
+    "cursors_opened": 2,
+    "cursors_closed": 2,
+    "further_queries_after_block": 0
+  },
+  "final_integrity": {
+    "result": "PASS for retained data, not authorization to continue",
+    "unique_keys": 4825,
+    "batches": 61,
+    "prefix_batches_unchanged": 59,
+    "source_inventory_unchanged": true,
+    "pending_journal": false,
+    "temporary_files": 0,
+    "untracked_batches": 0,
+    "checkpoint": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-capture-20261028T233238Z-3659bb90-block1/checkpoint.json",
+    "checkpoint_sha256": "612cd3a8dae71552fa57a27b76cc5aecd462781ad5e85eac80a5989875d64bc4",
+    "original_checkpoint_sha256": "d54d235fe072985ff917240fe792aa9a4438610f8b2091b6174f38e06c762046",
+    "target_inventory_sha256": "b0b2aa640cc44d6b88e01cef2c474ecfc02011da39c438641b23a37aab2ce6bf"
+  },
+  "safety": {
+    "host_preflight": "BUSY_BUT_SAFE for bounded serial work at start; runtime persistence guard then BLOCKED",
+    "initial_host_observation": "8 cores; MemAvailable 6619 MiB; swap 4 MiB with no sampled swap I/O; CPU iowait 53-57%, used as host context, not HANA health",
+    "resource_guard": "BLOCKED at second committed batch",
+    "reference_changes": 0,
+    "foundation_changes": 0,
+    "current_changes": 0,
+    "general_updates": 0,
+    "commits": 0,
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0
+  },
+  "residual_risk": "Destination responsiveness varied despite acceptable initial device samples and probe. The second batch is fully retained and verified, but continued persistence performance is not accredited. No retry, resumed block, device reconfiguration or service restart attempted.",
+  "next_step": "Stop. A future capture needs a new authorized operational assessment of destination persistence, preserving this checkpoint and using a new destination."
+}

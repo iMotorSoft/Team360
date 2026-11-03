@@ -1,0 +1,87 @@
+{
+  "scope": "TELCHI / conversational DEV lifecycle / DEVELOPMENT",
+  "implementation_validation": "OFFLINE_ONLY",
+  "historical_manifest": {
+    "state": "INVALIDATED_BY_SOURCE_CHANGE",
+    "source_digest_modified": false,
+    "historical_artifacts_modified": false,
+    "manifest_regenerated": false,
+    "new_six_gate_PASS_claimed": false,
+    "reason": "source_digest includes all assistant Python, including the modified launcher, new helper and tests. Previous attestations do not authorize this source tree."
+  },
+  "configuration": {
+    "default_private_file": "PRIVATE_ROOT/whatsapp-dev-control.json",
+    "format": "JSON data, never executable shell; owner-only regular file, exact mode 0600; no symlinks",
+    "preparation_result": "BLOCKED: private env prepared and configuration() validated offline; explicit authorized container-reachable IPv4 host is not recoverable from retained backup. Do not invent it. Existing evolution-api container inspected read-only is not running. No service started.",
+    "schema": {
+      "env": "Exact allowlist CONFIG_ENV in whatsapp_dev_lifecycle.py, including AUTOMATION_DIAGNOSIS_REPOSITORY=postgres and existing Luna credential OpenAI_Key_JAI_query. Explicit TEAM360_DB_URL, no inherited libpq/fallback credentials. All caller environment is removed; only deterministic PATH/LANG/UID-derived HOME plus explicit JSON env remain. Shell also sanitizes before Python imports. Unknown keys and non-postgres repository are rejected atomically. No secrets in repository or CLI arguments.",
+      "host": "Required explicit container-reachable IPv4 address, not 0.0.0.0 or 127.0.0.1",
+      "port": "Optional integer; default 18181",
+      "duration": "Optional integer from 60 to 1800 seconds; default 600. Session remains bounded by approval/gates expiry.",
+      "container": "Optional existing Evolution container name; default evolution-api. Used by the existing ingress probe, never started/stopped.",
+      "approval": "Optional existing private approval path; default PRIVATE_ROOT/whatsapp-dev-session-approval.json"
+    },
+    "private_root": "As defined by modules/telchi/CONTEXT.md; do not create a second private root.",
+    "services": "Existing backend virtualenv required. No uv sync, dependency startup, tunnels or shared service changes.",
+    "compatibility": "Existing whatsapp_dev.py commands and arguments remain supported. Direct start participates in the same ownership lock."
+  },
+  "operational_contract": {
+    "state_file": "PRIVATE_ROOT/whatsapp-dev-control/current.json",
+    "archive": "PRIVATE_ROOT/whatsapp-dev-control/SESSION_ID.json",
+    "lock": "PRIVATE_ROOT/whatsapp-dev-control/owner.lock; Linux flock held by launcher for session lifetime",
+    "identity": "PID + boot ID + process start ticks + UID + executable + command digest; pidfd pins the process before stop identity recheck",
+    "listener": "Explicit host/port plus SHA256 of the random health nonce; never store the nonce itself",
+    "start": "Detached bounded launcher, private log, at most 90 seconds waiting for READY. Failure or duplicate never takes ownership of an existing session. No automatic recovery/retry.",
+    "status": "Read-only state/identity/nonce checks, approval and gate integrity/expiry checks, read-only PostgreSQL binding check, Evolution connection and webhook GETs. Approval/gates are reported separately; an invalid approval leaves PostgreSQL NOT_CHECKED, not falsely reported down. DEGRADED distinguishes an owned live session with unavailable dependencies/health or invalid attestation. Uncertain ownership/restoration is REVIEW_REQUIRED. No session gives STOPPED with external checks NOT_CHECKED, not a webhook restoration claim.",
+    "stop": "SIGTERM only to verified launcher via pidfd. Wait at most 125 seconds, then check persisted closure, identities and actual webhook. No controller SIGKILL or port lookup. Existing launcher remains authority for child cleanup.",
+    "preflight_failure": "A session that never reached child creation or webhook mutation closes with webhook_untouched=true, not a restoration claim. Actual inactive webhook still checked by status.",
+    "uncertainty": "Orphan, changed identity, failed restore or foreign webhook remains REVIEW_REQUIRED with concrete review_reasons. Runtime incidents are preserved separately and do not invalidate verified cleanup. CLOSED requires full canonical webhook equality against backup and exact child exit; controller state is STOPPED. Backups and logs retained. Existing explicit restore command is the manual recovery primitive; no automatic repair or state deletion is introduced. A reviewed orphan record requires explicit operator reconciliation before another start.",
+    "not_e2e": "READY means ready for an operator-controlled test, never WhatsApp E2E PASS. PostgreSQL conversation persistence is unchanged."
+  },
+  "gate_impact_matrix": [
+    {
+      "gate": "http_auth",
+      "impact": "AFFECTED_OPERATIONAL_PATH",
+      "unchanged": "PilotBoundary token validation and Srv05 routes",
+      "minimum_proposal": "After approval, validate owned health identity, Evolution-container reachability and invalid/valid-token non-message connection event on the new controlled runtime. Verify zero conversation/provider effects. No WhatsApp messages."
+    },
+    {
+      "gate": "identity_tenant_isolation",
+      "impact": "LAUNCH_CONFIGURATION_AND_PERSISTED_SESSION_IDENTITY",
+      "unchanged": "Identity resolution, tenant checks, PostgreSQL binding repository",
+      "minimum_proposal": "Read-only preflight against the approved DEV binding; review configuration/approval parity and exact unchanged runtime dependencies. If historical evidence cannot be explicitly inherited, require a narrowly authorized positive/negative isolation probe, not the full business suite."
+    },
+    {
+      "gate": "business_authorization",
+      "impact": "NO_POLICY_CHANGE; LAUNCH_ENTRYPOINT_CHANGED",
+      "unchanged": "BusinessPolicy, permission, tenant/workspace/user approval and evidence verification",
+      "minimum_proposal": "Review unchanged policy code and historical artifacts; verify approval expiry/integrity and permission with read-only preflight. No new business permission, query or commercial benchmark."
+    },
+    {
+      "gate": "durable_idempotency",
+      "impact": "NO_STORAGE_OR_DISPATCH_CHANGE",
+      "unchanged": "PostgreSQL durable inbox/outbox, conversation repository and deduplication",
+      "minimum_proposal": "Propose explicit inheritance only if source/config/schema parity and historical artifact integrity are demonstrated. If restart behavior is judged affected, approve a single bounded dedicated restart/duplicate probe with authorized fixtures; no blanket battery."
+    },
+    {
+      "gate": "assistant_foundation",
+      "impact": "NO_ASSISTANT_OR_FOUNDATION_LOGIC_CHANGE",
+      "unchanged": "Assistant handlers, Foundation readers, business semantics and publication",
+      "minimum_proposal": "Verify scoped source/config/publication parity and artifact integrity for explicit historical evidence reuse; do not rerun Foundation or commercial batteries automatically."
+    },
+    {
+      "gate": "model_no_fallback",
+      "impact": "NO_MODEL_ALIAS_OR_ADAPTER_CHANGE",
+      "unchanged": "Provider adapter, model, fallback policy and request path",
+      "minimum_proposal": "Verify adapter/config parity and historical real evidence provenance. Any necessary live check must be separately approved and narrowly scoped; no Luna/LlmFit benchmark."
+    }
+  ],
+  "pending_approval_plan": [
+    "Freeze and review the exact final source/config set, including concurrent worktree changes; compute the current fingerprint only as an identifier, not as proof.",
+    "Approve which historical guarantees may be inherited with explicit provenance and which need a fresh focal probe. No automatic six-PASS conversion.",
+    "Approve a controlled non-ingress validation route for guarantees requiring the new runtime. The existing gate guard blocks normal start with the old manifest; do not bypass or fabricate a manifest to bootstrap revalidation.",
+    "Run only the approved read-only preflights and focused new lifecycle/ingress checks under a separate real-service window; preserve historical artifacts unchanged.",
+    "Only after reviewed evidence and operator approval issue a new manifest. This implementation does not implement renewal or change the gate verifier.",
+    "Perform one bounded operator session plus stop/status restoration readback after renewal. A real conversational/E2E test remains a separate approval."
+  ]
+}

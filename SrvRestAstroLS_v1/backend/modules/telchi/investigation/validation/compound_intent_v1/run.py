@@ -1,0 +1,249 @@
+"""Reproducible offline A/B; only live dependency is existing Luna provider.
+
+From backend: uv run python -m modules.telchi.investigation.validation.compound_intent_v1.run
+  --llmfit /path/to/LlmFit --output /path/to/new/report
+No DB, SQL, Foundation read, server, WhatsApp or runtime mutation. Resume uses frozen rows.
+"""
+import argparse
+import asyncio
+from copy import deepcopy
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import statistics
+import time
+import httpx
+from modules.telchi.assistant.luna import LunaInterpreter, MODEL, SYSTEM
+from modules.telchi.assistant.state_engine import EMPTY
+from modules.telchi.assistant.tests.runtime_http.run_battery import _load_env_file
+from .contract import PROMPT, accept_sidecar, atoms, plan_current
+
+BACKEND = Path(__file__).resolve().parents[5]
+CALLS_FILE = None
+ABRAHAM = [
+ ('ABRAHAM_001', '¿Cuántos clientes tenemos en horizontal, principalmente las farmacias, y cuánto se les vende por mes?',
+  dict(metrics=['customer_count', 'sales.unspecified'], dimensions=['customer'], segments=['farmacias'],
+       granularities=['month'], filters=[[dict(field='sales_channel_id', op='eq', values=['HORIZONTAL'])]]),
+  'abraham_horizontal_pharmacies_v1/first_run/spontaneous.json'),
+ ('ABRAHAM_002', 'Venta de Citrato de magnesio en la paz y cochabamba, en la paz distribucion propia y en conchabamba lo hace L&S',
+  dict(metrics=['sales.unspecified'], geographies=['La Paz', 'Cochabamba'],
+       relations=[dict(subject='Citrato de magnesio', predicate='distribution', object='propia', geography='La Paz'),
+                  dict(subject='Citrato de magnesio', predicate='distribution', object='L&S', geography='Cochabamba')]),
+  'abraham_citrate_distribution_v1/run01/spontaneous.json')]
+SIMPLE = [('S01', ['Ventas de mayo de 2026']),
+          ('S02', ['Dame las últimas 10 ventas registradas']),
+          ('S03', ['¿Cuál es el último mes con ventas registradas?']),
+          ('S04', ['Buscá Citrato de magnesio']),
+          ('S05', ['Ventas de mayo de 2026', '¿Y el mes anterior?']),
+          ('S06', ['Quiero importes y cantidades', 'mayo de 2026'])]
+
+
+class Capture(httpx.AsyncBaseTransport):
+    def __init__(self, system=None):
+        self.inner = httpx.AsyncHTTPTransport(retries=0)
+        self.system = system
+        self.usage = None
+        self.request_hash = None
+
+    async def handle_async_request(self, request):
+        body = json.loads(request.content)
+        if self.system:
+            body['input'][0]['content'] = self.system
+        self.request_hash = hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()
+        new = httpx.Request(request.method, request.url, headers=request.headers,
+                            content=json.dumps(body).encode())
+        # Rebuild content-length after replacing prompt, without recording credentials.
+        new.headers['content-length'] = str(len(new.content))
+        response = await self.inner.handle_async_request(new)
+        await response.aread()
+        self.usage = response.json().get('usage')
+        return response
+
+    async def aclose(self):
+        await self.inner.aclose()
+
+
+async def call(text, state, history, tid, system=None):
+    transport = Capture(system)
+    luna = LunaInterpreter(timeout_seconds=90, transport=transport)
+    start = time.perf_counter()
+    def checkpoint(result):
+        if CALLS_FILE is not None:
+            with CALLS_FILE.open('a') as f:
+                f.write(json.dumps(dict(turn_id=tid, sidecar=bool(system), result=result), ensure_ascii=False)+'\n')
+        return result
+    try:
+        value = await luna.interpret(text=text, state=state, history=history, turn_id=tid)
+        return checkpoint(dict(value=value, metadata=luna.last_metadata, usage=transport.usage,
+                    latency_ms=(time.perf_counter()-start)*1000, request_hash=transport.request_hash, error=None))
+    except Exception as exc:
+        return checkpoint(dict(value=None, error=type(exc).__name__ + ':' + str(exc), usage=transport.usage,
+                    latency_ms=(time.perf_counter()-start)*1000, request_hash=transport.request_hash))
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def projection(s):
+    """Map only equivalent current-runtime fields, never invent missing requirements."""
+    if 'metrics' in s:
+        return s
+    return dict(metrics=s.get('requested_metrics') or ([s['metric']] if s.get('metric') else []),
+                time=dict(kind='PERIOD', as_of=None, periods=[s['period']]) if s.get('period') else None,
+                filters=[[dict(field='sales_channel_id', op='eq', values=[s['sales_channel']])]] if s.get('sales_channel') else [],
+                scope=dict(branch_ids=s.get('branches', []), warehouse_ids=[]))
+
+
+def summarize(rows):
+    report = {}
+    for group in ('abraham', 'llmfit', 'simple'):
+        subset = [r for r in rows if r['group'] == group]
+        entry = dict(turns=len(subset), errors=sum(bool(r['candidate_call']['error'] or r['sidecar_error']) for r in subset))
+        for arm in ('baseline', 'candidate'):
+            tp = expected = predicted = 0
+            exact = 0
+            for r in subset:
+                gold = atoms(r['gold'])
+                # Score only gold's field family; additional requested facets are separately auditable.
+                predicted_atoms = atoms(r[arm + '_intent'])
+                roots = {p.split('/')[1] for p, _ in gold}
+                predicted_atoms = {(p,v) for p,v in predicted_atoms if p.split('/')[1] in roots}
+                tp += len(gold & predicted_atoms); expected += len(gold); predicted += len(predicted_atoms)
+                exact += gold == predicted_atoms
+            entry[arm] = dict(preserved=tp, requirements=expected, predicted=predicted,
+                              recall=tp/expected if expected else None, precision=tp/predicted if predicted else None,
+                              exact_turns=exact)
+        entry['previously_correct_turn_regressions'] = [r['id'] for r in subset
+            if atoms(r['gold']) == atoms({k:v for k,v in r['baseline_intent'].items() if k in r['gold']})
+            and atoms(r['gold']) != atoms({k:v for k,v in r['candidate_intent'].items() if k in r['gold']})]
+        entry['baseline_allowed'] = sum(bool(r['baseline_allowed']) for r in subset)
+        entry['candidate_allowed'] = sum(bool(r['candidate_allowed']) for r in subset)
+        entry['new_authorizations'] = sum(bool(r['candidate_allowed'] and not r['baseline_allowed']) for r in subset)
+        entry['blocked_previously_allowed'] = [r['id'] for r in subset if r['baseline_allowed'] and not r['candidate_allowed']]
+        lat = [r['candidate_call']['latency_ms'] for r in subset]
+        entry['additional_call_latency_ms'] = dict(p50=statistics.median(lat), p95=sorted(lat)[max(0, math.ceil(len(lat)*.95)-1)]) if lat else {}
+        usage = [r['candidate_call'].get('usage') or {} for r in subset]
+        entry['additional_llm_calls'] = len(subset)
+        entry['additional_tokens'] = {k:sum(u.get(k,0) for u in usage) for k in ('input_tokens','output_tokens','total_tokens')}
+        report[group] = entry
+    report['recommendation'] = 'REVISE'
+    report['cost_usd'] = None
+    report['cost_limitation'] = 'Direct Responses usage has tokens but no billed USD. No verified price for gpt-5.6-luna; do not invent pricing.'
+    report['limitations'] = [
+        'LlmFit frozen baseline uses its generic experimental contract/catalog, not current Telchi capabilities. Replay has no new LlmFit baseline LLM calls.',
+        'Gold expected_state_after describes accepted intent, not all unsupported requests. Request preservation on blocked/ASK turns is not fully measured by this gold.',
+        'Gold is assistant-authored and not independently reviewed. Structural atoms flatten list membership; relational exact matching reported separately.',
+        'One sample per turn, no statistical significance; live sidecar call with fixed-input frozen LlmFit baseline, sequential sidecar rollout within each conversation.',
+        'Current runtime executable plan tested only on Abraham and simple controls; LlmFit executable plans remain frozen and candidate cannot authorize or execute them.',
+        'Sidecar overhead is additive to baseline latency; no HTTP/SQL/end-to-end or production costs claimed.']
+    ab = [r for r in rows if r['group']=='abraham']
+    report['abraham_relations'] = {arm: dict(preserved=sum(sum(all(actual.get(k)==v for k,v in relation.items()) for actual in r[arm+'_intent'].get('relations',[])) for r in ab for relation in r['gold'].get('relations',[])), expected=2) for arm in ('baseline','candidate')}
+    return report
+
+
+async def main(args):
+    global CALLS_FILE
+    out = Path(args.output).resolve(); out.mkdir(parents=True, exist_ok=True)
+    CALLS_FILE = out/'calls-resume.jsonl'
+    root = Path(args.llmfit).resolve()/'benchmarks/telchi/conversation_state_v1'
+    dataset = json.loads((root/'dataset.json').read_text())
+    frozen_file = root/'hybrid_router_validation/LUNA_ONLY/turns.jsonl'
+    frozen = {r['turn_id']:r for r in map(json.loads, frozen_file.read_text().splitlines())}
+    catalog = json.loads((root/'domain/catalog.json').read_text())
+    source_files = [root/'dataset.json', frozen_file, root/'domain/catalog.json']
+    protected = sorted((BACKEND/'modules/telchi/assistant').glob('*.py'))
+    protected += sorted((BACKEND/'modules/telchi/datalake').glob('*.py'))
+    before = {str(p):digest(p) for p in protected}
+    manifest = dict(model=MODEL, reasoning='medium', corpus_conversations=len(dataset['conversations']),
+                    corpus_turns=sum(len(c['turns']) for c in dataset['conversations']),
+                    inputs={str(p):digest(p) for p in source_files}, system_hash=hashlib.sha256((PROMPT+json.dumps(catalog)).encode()).hexdigest(),
+                    runtime_hashes_before=before, host_preflight='SAFE: 8 CPUs, load ~3, available RAM ~5.8GB, swap stable ~19MB, CPU idle >80%',
+                    concurrency=2, database_accessed=False, sql_executed=False, whatsapp_sent=False,
+                    fallback=False, retries=0, baseline_contract_note='LlmFit frozen generic vs current Telchi controls separated')
+    (out/'manifest.json').write_text(json.dumps(manifest,indent=2))
+    os.environ.update(_load_env_file())
+    # Actual provider/auth/model/completion probe, no DB/Milvus/LiteLLM in this flow.
+    if not (out/'preflight.json').exists():
+        probe = await call('¿Cuánto vendimos?', EMPTY, [], 'provider-preflight')
+        (out/'preflight.json').write_text(json.dumps(probe,indent=2))
+        if probe['error']:
+            raise RuntimeError('PROVIDER_PREFLIGHT_BLOCKED; evidence saved')
+    rows_file=out/'rows.jsonl'
+    cached={r['id']:r for r in map(json.loads, rows_file.read_text().splitlines())} if rows_file.exists() else {}
+    semaphore=asyncio.Semaphore(2)
+    async def conversation(cid, turns, group):
+        async with semaphore:
+            intent=None; messages={}; history=[]; runtime=deepcopy(EMPTY); runtime_history={}
+            for turn in turns:
+                tid=turn['id']; text=turn['text']; messages[tid]=text
+                if tid in cached:
+                    r=cached[tid]
+                else:
+                    extraction=await call(text, dict(previous_requested_business_intent=intent, catalog=catalog), history, tid, PROMPT)
+                    intent_after,error=accept_sidecar(intent,extraction['value'], messages)
+                    if group=='llmfit':
+                        base=frozen[tid]
+                        baseline_intent=base['state_after']
+                        baseline_allowed=bool(base['committed'] and base['output']['action']=='EXECUTE')
+                        candidate_allowed=False  # Generic lab contract has no authority in current runtime.
+                        baseline_call=None; candidate_plan=None
+                    else:
+                        if 'frozen' in turn:
+                            original=json.loads(Path(turn['frozen']).read_text())
+                            audit=original['turn']['response']['audit']
+                            proposal=audit['interpretation_proposed']
+                            baseline_call=dict(value=proposal, source=turn['frozen'])
+                        else:
+                            baseline_call=await call(text,runtime,list(runtime_history),tid)
+                            proposal=baseline_call['value']
+                        proposal=proposal or {}
+                        baseline_plan=plan_current(runtime,proposal,runtime_history,tid)
+                        candidate_plan=plan_current(runtime,proposal,runtime_history,tid,intent_after,error)
+                        runtime=baseline_plan['state_engine']['state_after']
+                        runtime_history[tid]=deepcopy(runtime)
+                        baseline_intent=projection(runtime.get('pending',{}).get('proposed',runtime) if runtime.get('pending') else runtime)
+                        baseline_allowed=baseline_plan['executable_capability_plan']['allowed']
+                        candidate_allowed=candidate_plan['executable_capability_plan']['allowed']
+                    r=dict(id=tid, group=group, text=text, gold=turn['gold'], baseline_intent=baseline_intent,
+                           candidate_intent=intent_after or {}, baseline_allowed=baseline_allowed,
+                           candidate_allowed=candidate_allowed, candidate_call=extraction, baseline_call=baseline_call,
+                           candidate_plan=candidate_plan, sidecar_error=error)
+                    with rows_file.open('a') as f: f.write(json.dumps(r,ensure_ascii=False)+'\n')
+                    cached[tid]=r
+                    print(tid, 'done', 'error='+str(error), flush=True)
+                intent=r['candidate_intent']
+                if r.get('candidate_plan'):
+                    runtime=r['candidate_plan']['state_engine']['state_after']; runtime_history[tid]=deepcopy(runtime)
+                history.append(dict(turn_id=tid,user_message=text,requested_business_intent=intent))
+    jobs=[]
+    for c in dataset['conversations']:
+        jobs.append(conversation(c['conversation_id'],[dict(id=t['turn_id'],text=t['user_message'],gold={k:v for k,v in t['expected_state_after'].items() if k not in {'intent','pending_clarification'}}) for t in c['turns']], 'llmfit'))
+    reports=BACKEND.parents[1]/'data/reports/telchi'
+    for tid,text,gold,path in ABRAHAM:
+        jobs.append(conversation(tid,[dict(id=tid,text=text,gold=gold,frozen=str(reports/path))],'abraham'))
+    # Simple expected intent is manually defined, never supplied to extraction.
+    for cid, texts in SIMPLE:
+        turns=[]
+        for n,text in enumerate(texts):
+            metric={'S01':'sales.net_amount','S02':'sales.latest_documents','S03':'sales.coverage','S04':'products.search','S05':'sales.net_amount','S06':'sales.net_amount'}[cid]
+            gold=dict(metrics=[metric])
+            if cid in {'S01','S05'} or (cid=='S06' and n==1):
+                month='04' if cid=='S05' and n else '05'; end='05' if month=='04' else '06'
+                gold['time']=dict(kind='PERIOD',as_of=None,periods=[dict(start=f'2026-{month}-01',end_exclusive=f'2026-{end}-01')])
+            if cid=='S06': gold['metrics'].append('sales.source_top_items')
+            turns.append(dict(id=f'{cid}_{n+1}',text=text,gold=gold))
+        jobs.append(conversation(cid,turns,'simple'))
+    await asyncio.gather(*jobs)
+    rows=list(cached.values())
+    result=summarize(rows)
+    result['protected_sources_unchanged'] = before=={str(p):digest(p) for p in protected}
+    result['own_processes_left_running']=0  # No subprocesses/servers created; clients scoped and closed.
+    (out/'results.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n')
+    print(json.dumps(result,indent=2,ensure_ascii=False))
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(); parser.add_argument('--llmfit',required=True); parser.add_argument('--output',required=True)
+    asyncio.run(main(parser.parse_args()))

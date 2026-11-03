@@ -1,0 +1,62 @@
+{
+  "identifier": "TELCHIAI_EXPLORATORY_SQL_DIRECT_READONLY_V1",
+  "timestamp": "2026-10-27T14:21:44.275291+00:00",
+  "environment": "DEV",
+  "scope": "synthetic",
+  "question": "Investiga las facturas sintéticas sin canal, vendedores y movimientos. Cuantifica importes a grano documental y comprueba si los movimientos multiplican la facturación. Separa cabeceras de líneas, hechos e hipótesis. Incluye al finalizar el total global de cabeceras como claim invoice_header_total_bs.",
+  "turns": [],
+  "status": "BLOCKED",
+  "foundation": {
+    "status": "BLOCKED",
+    "reasons": [
+      "enterprise_openai_destination_scope_not_accredited",
+      "foundation_authorized_catalog_binding_not_implemented",
+      "host_io_pressure_requires_new_preflight"
+    ],
+    "foundation_opened": false,
+    "business_data_sent_to_model": false
+  },
+  "whatsapp_e2e": "NOT_RUN",
+  "os_isolation": "F1_EXECUTION_ISOLATION_FAIL preserved",
+  "ready_for_channel_integration": false,
+  "blocked_reason": "model_invalid_json",
+  "elapsed_seconds": 7.126692001000265,
+  "model_calls": [
+    {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "fallback": false,
+      "elapsed_seconds": 7.126239657000042,
+      "usage": {
+        "input_tokens": 1253,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1250
+        },
+        "output_tokens": 711,
+        "output_tokens_details": {
+          "reasoning_tokens": 140
+        },
+        "total_tokens": 1964
+      },
+      "output_text": "{\"action\":\"query\",\"sql\":\"SELECT i.channel_id, c.name, i.seller_id, s.name, count(*), sum(i.amount) FROM invoices i LEFT JOIN channels c ON i.channel_id = c.id INNER JOIN sellers s ON i.seller_id = s.id GROUP BY i.channel_id, c.name, i.seller_id, s.name ORDER BY i.channel_id, i.seller_id LIMIT 100\",\"objective\":\"Cuantificar las cabeceras por presencia de canal y vendedor, manteniendo el grano documental de factura.\",\"justification\":\"La pregunta pide facturas sin canal y vendedores; el catálogo confirma que invoices es grano id y que channel_id puede ser nulo, mientras seller_id es obligatorio.\",\"requested_sources\":[\"invoices\",\"channels\",\"sellers\"],\"expected_grain\":\"una fila por combinación de canal y vendedor\",\"expected_result\":\"conteo de facturas y suma de amount de cabecera por grupo\",\"candidate_relations\":[{\"left_table\":\"invoices\",\"left_column\":\"channel_id\",\"right_table\":\"channels\",\"right_column\":\"id\",\"rationale\":\"relación declarada para etiquetar canales, preservando facturas sin canal mediante LEFT JOIN\"},{\"left_table\":\"invoices\",\"left_column\":\"seller_id\",\"right_table\":\"sellers\",\"right_column\":\"id\",\"rationale\":\"relación declarada para identificar el vendedor\"}]}{\"action\":\"query\",\"sql\":\"SELECT i.channel_id, c.name, i.seller_id, s.name, count(*), sum(i.amount) FROM invoices i LEFT JOIN channels c ON i.channel_id = c.id INNER JOIN sellers s ON i.seller_id = s.id GROUP BY i.channel_id, c.name, i.seller_id, s.name ORDER BY i.channel_id, i.seller_id LIMIT 100\",\"objective\":\"Cuantificar las cabeceras por presencia de canal y vendedor, manteniendo el grano documental de factura.\",\"justification\":\"La pregunta pide facturas sin canal y vendedores; el catálogo confirma que invoices es grano id y que channel_id puede ser nulo, mientras seller_id es obligatorio.\",\"requested_sources\":[\"invoices\",\"channels\",\"sellers\"],\"expected_grain\":\"una fila por combinación de canal y vendedor\",\"expected_result\":\"conteo de facturas y suma de amount de cabecera por grupo\",\"candidate_relations\":[{\"left_table\":\"invoices\",\"left_column\":\"channel_id\",\"right_table\":\"channels\",\"right_column\":\"id\",\"rationale\":\"relación declarada para etiquetar canales, preservando facturas sin canal mediante LEFT JOIN\"},{\"left_table\":\"invoices\",\"left_column\":\"seller_id\",\"right_table\":\"sellers\",\"right_column\":\"id\",\"rationale\":\"relación declarada para identificar el vendedor\"}]}",
+      "output_types": [
+        "reasoning",
+        "message",
+        "reasoning",
+        "message"
+      ]
+    }
+  ],
+  "resources": {
+    "peak_process_rss_kib": 40712,
+    "duckdb_threads": 1,
+    "concurrency": 1,
+    "observation_bytes_limit": 32768,
+    "wall_budget_seconds": 180,
+    "own_processes_left_running": 0
+  },
+  "code_digest": "e3cde74d3d71877bc6e4e18b6e1df7ad807c3c3d879105c63c7501e64f75ed8c"
+}

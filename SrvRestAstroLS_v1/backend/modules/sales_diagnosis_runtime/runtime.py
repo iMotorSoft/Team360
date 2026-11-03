@@ -309,6 +309,8 @@ class AssistantConversationRuntime:
 
         # 5. Decide action based on intent + coverage + safety
         should_diagnose = self._decide_turn(intent, state)
+        # Per-turn rendering instruction, not a reopening of the persisted case.
+        state.semantic_memory["_runtime_diagnose"] = should_diagnose
 
         # 5.2 Decide if proactive pause should be offered (independent of diagnosis)
         should_pause = self._should_offer_pause(state, input)
@@ -1178,8 +1180,14 @@ class AssistantConversationRuntime:
     def _decide_turn(self, intent: IntentClassification, state: ConversationState) -> bool:
         mem = state.semantic_memory or {}
         status = mem.get("diagnosis_status", "gathering")
-        if status in ("completed",):
-            return False
+        if status == "completed":
+            # An explicit global request may render the diagnosis again without
+            # reopening the interview or discarding the confirmed review policy.
+            return (
+                intent.intent in (IntentType.REQUEST_DIAGNOSIS, IntentType.STOP_INTERVIEW)
+                and intent.scope == IntentScope.GLOBAL
+                and intent.confidence >= CLASSIFIER_CONFIDENCE_MODERATE
+            )
 
         # Feasibility scope guard: if a previous turn already determined that
         # enough data exists for a feasibility diagnosis, close the interview
@@ -2008,6 +2016,7 @@ class AssistantConversationRuntime:
         return state
 
     def _save_state(self, state: ConversationState) -> None:
+        state.semantic_memory.pop("_runtime_diagnose", None)
         if self._state_repo:
             try:
                 self._state_repo.save(state)

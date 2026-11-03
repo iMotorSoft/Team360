@@ -1,0 +1,430 @@
+{
+  "status": "PARTIAL_PUBLISHED",
+  "objective_completed": false,
+  "reported_at": "2026-11-01T20:43:13.478852+00:00",
+  "branch": "feature/console-backend-core",
+  "reason": "Only append-only Reference was integrated and published. Independent inventory/production/purchasing/collections facts successor and Material Supply rederivation are NOT implemented by this task. This is not FULL_UNIVERSE_PUBLISHED_PASS.",
+  "foundation": {
+    "before": "foundation_5a76699adba7eb2ab388167244e7869b",
+    "after": "foundation_9cd0d1a146308f555733d58fb3fda1ff",
+    "commit_snapshot_before": 1485,
+    "commit_snapshot_after": 1492,
+    "data_snapshot": 1408,
+    "derivation_snapshot": 1322,
+    "eight_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "catalog_component_count": 5,
+    "all_seven_nonreference_components_exactly_preserved": true
+  },
+  "reference": {
+    "before": "v2_sales_3b5cfb885a90e82fcf905d2b",
+    "after": "v2_sales_448ae93a960bf7342564a2d0",
+    "new_identities": {
+      "products": 140,
+      "customers": 29,
+      "suppliers": 59,
+      "total": 228
+    },
+    "changed_datasets": [
+      "products",
+      "customers",
+      "suppliers",
+      "product_crosswalk",
+      "customer_crosswalk",
+      "supplier_crosswalk"
+    ],
+    "source_as_of_by_entity": {
+      "customer": "2026-11-01T17:50:16.749000+00:00",
+      "product": "2026-11-01T17:50:07.336000+00:00",
+      "supplier": "2026-11-01T17:50:16.749000+00:00"
+    },
+    "existing_rows": "All previous rows, attributes, canonical IDs, physical/commercial classifications and crosswalks retained exactly; other files byte-identical",
+    "new_attributes": "Native captured evidence only; secondary missing relationships remain unknown; no physical inference",
+    "suppliers": "59 additions; existing suppliers preserved; payment terms resolved only to existing targets or unknown",
+    "salespersons": "Not appended or refreshed; numeric native identifiers in raw OSLP require normalization before judging missing identities; no duplicate salesperson additions"
+  },
+  "captured_datasets_verified": 23,
+  "captured_rows_verified": 2192262,
+  "unique_source_master_rows_used": 31326,
+  "source_master_datasets_used": [
+    "oitm",
+    "ocrd"
+  ],
+  "rows_published_as_new_reference_entities": 228,
+  "facts_datasets_newly_published": 0,
+  "full_capture_artifacts_preserved": true,
+  "coverage_by_domain": [
+    {
+      "domain": "Ventas",
+      "previous_coverage": "Documentos hasta 01/11; corte publicado 2026-11-01T13:55:47.173006+00:00; ledger [2026-09-01,2026-11-02)",
+      "new_coverage": "Sin recaptura en este ciclo",
+      "status": "PREVIOUS_PUBLISHED_NOT_REFRESHED_THIS_CYCLE",
+      "publication": "sales_6daf72e9a14c5852e35c465f",
+      "reader": "CURRENT canonical pinned reader verified; 377816 headers",
+      "luna": "Sales capabilities previously demonstrated on same CURRENT; no live Luna re-test this cycle; no WhatsApp readiness claim",
+      "status_this_execution": "PRIOR_PUBLICATION_RETAINED_NOT_REFRESHED"
+    },
+    {
+      "domain": "Inventario",
+      "previous_coverage": "Movimientos 2022-03-31 a 2026-09-24; stock publicado 24/09; component metadata and actual row extraction timestamps differ (live-reader.json)",
+      "new_coverage": "Stock observado 2026-11-01 17:43:38–17:46:05 UTC, 1385179 rows; movements [2026-09-17,2026-11-02), 257632 rows, native prefix <=20962453 only",
+      "status": "CAPTURED_NOT_PUBLISHED; MOVEMENTS_PREFIX_NOT_CLOSED",
+      "publication": "update_publication_b567d267b6340baf3939083e4c4cea27",
+      "reader": "Old CURRENT stock/movement relations read and counted; no candidate binding",
+      "luna": "NOT_ACCREDITED_FOR_LUNA",
+      "status_this_execution": "PRIOR_PUBLICATION_RETAINED_NOT_REFRESHED"
+    },
+    {
+      "domain": "Producción",
+      "previous_coverage": "Derived Material Supply component cutoff 2026-09-24; not a standalone order/receipt publication",
+      "new_coverage": "2026 orders/issues observed 01/11; document max 31/10; BOM snapshot 1061 headers/8038 lines; 4521 orders/41808 issue lines",
+      "status": "CAPTURED_NOT_PUBLISHED; BUSINESS_DERIVATION_PENDING",
+      "publication": "material_supply_137a23480171bda867ff8b12",
+      "reader": "Old Material Supply CURRENT resolver verified; new production source facts not bound",
+      "luna": "NOT_ACCREDITED_FOR_LUNA",
+      "status_this_execution": "PRIOR_PUBLICATION_RETAINED_NOT_REFRESHED"
+    },
+    {
+      "domain": "Compras",
+      "previous_coverage": "2026-01-01 to 2026-09-23 documentary source availability",
+      "new_coverage": "2026 bounded document-state capture; PO document max 30/10, receipt/AP max 31/10; observed 01/11 17:46:55–17:48:07 UTC",
+      "status": "CAPTURED_NOT_PUBLISHED; LINEAGE_PENDING",
+      "publication": "purchasing_4ab178d62c5f5ba27d7180a8",
+      "reader": "CURRENT read_component verified 8 datasets and exact hashes/row fingerprints (purchasing-reader-r2.json)",
+      "luna": "NOT_ACCREDITED_FOR_LUNA",
+      "status_this_execution": "PRIOR_PUBLICATION_RETAINED_NOT_REFRESHED"
+    },
+    {
+      "domain": "Cobranzas / CxC",
+      "previous_coverage": "Source cutoff stored 2026-09-28T18:18:35.264000; historical business tables retain derivation snapshot 1322",
+      "new_coverage": "Overlap [2026-09-21,2026-11-02); 7 families; invoice prefix <=11582386, 51582 rows; all older mutable balances NOT refreshed",
+      "status": "PARTIAL_CAPTURE_NOT_PUBLISHED; HISTORICAL_BALANCES_PENDING",
+      "publication": "receivables_collections_633d1fbbfdd87e6665b1aad3",
+      "reader": "CURRENT three business datasets verified at exact derivation; 3708581 rows, old cutoff",
+      "luna": "NOT_ACCREDITED_FOR_LUNA; NO_CURRENT_AGING_CLAIM",
+      "status_this_execution": "PRIOR_PUBLICATION_RETAINED_NOT_REFRESHED"
+    },
+    {
+      "domain": "Reference",
+      "previous_coverage": "v2_sales_3b5cfb885a90e82fcf905d2b; source_as_of 2026-11-01T13:59:40.724221+00:00",
+      "new_coverage": "140 new products, 29 new customers, 59 new suppliers from captured OITM/OCRD observations; existing attributes and other datasets retain exact prior values and dates",
+      "status": "APPEND_ONLY_PUBLISHED",
+      "publication": "v2_sales_448ae93a960bf7342564a2d0",
+      "reader": "Canonical CURRENT verified; append rederived from byte/hash-verified source receipts",
+      "luna": "No new conversational adapter; sales uses new Reference in actual diagnostic"
+    },
+    {
+      "domain": "Precios",
+      "previous_coverage": "No accredited published price-list component found",
+      "new_coverage": "No ITM1/OPLN extraction; OITM AvgPrice/LastPurPrc are not price lists",
+      "status": "PENDING_FUNCTIONAL_CONTRACT",
+      "publication": null,
+      "reader": "NOT_ACCREDITED",
+      "luna": "NOT_ACCREDITED_FOR_LUNA",
+      "status_this_execution": "PRIOR_PUBLICATION_RETAINED_NOT_REFRESHED"
+    },
+    {
+      "domain": "Material Supply",
+      "previous_coverage": "Historical derivation 2026-06-26 to 2026-09-24, component as_of 2026-09-24T13:53:07.952772+00:00",
+      "new_coverage": "No new derivation; dependency captures available but not integrated",
+      "status": "OLD_PUBLISHED_RETAINED_NOT_REFRESHED",
+      "publication": "material_supply_137a23480171bda867ff8b12",
+      "reader": "PRODUCTIVE_CURRENT resolver verified; existing sealed datasets preserved",
+      "luna": "NOT_ACCREDITED_FOR_LUNA",
+      "status_this_execution": "PRIOR_PUBLICATION_RETAINED_NOT_REFRESHED"
+    },
+    {
+      "domain": "Contabilidad",
+      "previous_coverage": "No published OJDT/JDT1/OACT journal or ledger contract",
+      "new_coverage": "Exact 10 existing invoice–TransId pairs and finite extraction proposal prepared offline; zero SAP accounting queries",
+      "status": "FUNCTIONAL_EXTENSION_PENDING",
+      "publication": null,
+      "reader": "NO_JOURNAL_LEDGER_READER",
+      "luna": "NOT_ACCREDITED_FOR_LUNA",
+      "status_this_execution": "PRIOR_PUBLICATION_RETAINED_NOT_REFRESHED"
+    }
+  ],
+  "coverage_dataset_evidence": "capture-integrity.json; complete receipts and frozen-prefix receipts retain their original source observation intervals and limits",
+  "watermarks": {
+    "facts_advanced": false,
+    "reference_observations": "Per-entity source_before.utc from exact captured receipts, not Foundation-wide time",
+    "global_CDC_claim": false
+  },
+  "reconciliations": {
+    "source_relationships": {
+      "stock_products": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "stock_warehouses": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "production_products": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "production_issue_products": {
+        "unmatched_rows": 13503,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "bom_header_for_lines": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "production_issue_orders": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "purchase_supplier": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "purchase_order_orphan_lines": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "purchase_receipt_orphan_lines": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "ap_invoice_orphan_lines": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "allocation_payment": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      },
+      "reconciliation_event_for_participant": {
+        "unmatched_rows": 0,
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist"
+      }
+    },
+    "purchasing": "purchasing-reconciliation.json: exact native-key normalized documentary diff; 442 previous PO line keys absent; no silent deletion or lineage inference",
+    "inventory": "Prior stock diff reused because inventory component and snapshot remain exact: 13554 new positions, 17915 quantity-modified positions, 0 missing old keys; not published",
+    "production": "13472 unmatched OITM issue lines have BOM Type 290; 31 further lines unresolved; no finished-product receipts inferred",
+    "collections": "Overlap only, frozen document prefix; all pre-overlap mutable balances not refreshed; historical/current aging not newly accredited"
+  },
+  "material_supply": {
+    "recalculated": false,
+    "publication": "material_supply_137a23480171bda867ff8b12",
+    "reason": "No source facts changed in published Foundation; original dependency contracts retained. Rederivation on captured new sources remains pending, not silently relabeled as refreshed."
+  },
+  "snapshots_preserved": [
+    1322,
+    1408,
+    1485,
+    1492
+  ],
+  "canonical_readers": {
+    "foundation": "foundation_9cd0d1a146308f555733d58fb3fda1ff",
+    "reference": "v2_sales_448ae93a960bf7342564a2d0",
+    "observed_at": "2026-11-01T20:40:57.205796+00:00",
+    "commit_snapshot": 1492,
+    "data_snapshot": 1408,
+    "derivation_snapshot": 1322,
+    "components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "domains": {
+      "oitw": {
+        "rows": 1371625,
+        "refreshed": false,
+        "source_as_of": "2026-09-24T14:07:04.221589+00:00"
+      },
+      "oinm": {
+        "rows": 1576871,
+        "refreshed": false,
+        "source_as_of": "2026-09-24T13:53:46.471312+00:00"
+      },
+      "material_supply": {
+        "mode": "PRODUCTIVE_CURRENT",
+        "refreshed": false
+      },
+      "receivables_collections": {
+        "mode": "PRODUCTIVE_CURRENT",
+        "refreshed": false
+      },
+      "purchasing": {
+        "rows": {
+          "purchase_order": 3337,
+          "purchase_order_line": 18584,
+          "purchase_receipt": 3471,
+          "purchase_receipt_line": 16921,
+          "ap_invoice": 6169,
+          "ap_invoice_line": 21679,
+          "purchasing_document_lineage": 38600,
+          "purchase_inventory_receipt": 17196
+        },
+        "refreshed": false
+      }
+    },
+    "reference_append": {
+      "customer": 29,
+      "product": 140,
+      "supplier": 59
+    },
+    "status": "CURRENT_READERS_PASS_NOT_FRESHNESS_PASS"
+  },
+  "luna": {
+    "observations": "luna-dispatch.json",
+    "non_sales_domains": "Four requested questions returned DIRECT_UNAVAILABLE; no adapters created",
+    "sales": {
+      "status": "BUDGETED_DIAGNOSTIC_PASS",
+      "evidence": "luna-sales-budgeted.json",
+      "independently_reconciled": true,
+      "billed_BS": "11982896.13",
+      "credit_BS": "479145.78",
+      "net_BS": "11503750.35",
+      "invoice_count": 41078,
+      "credit_count": 280,
+      "diagnostic_turn_budget_seconds": 180,
+      "worker_budget_seconds": 60,
+      "elapsed_ms": 117283.23882400218
+    },
+    "default_80_second_turn": "NOT_PASS; observed timeout preserved in luna-sales-r2.json; no runtime budget changed",
+    "http_composition": "NOT_PASS: inherited Srv05 Evolution configuration requires V1 transport document; not modified; canonical dispatcher verified directly instead",
+    "model_preflight": "Real OpenAI direct gpt-5.6-luna / medium verified; exact model and reasoning echo; no fallback",
+    "whatsapp_sent": 0,
+    "channel_readiness": "NOT_REACCREDITED"
+  },
+  "tests": {
+    "datalake": "717 passed in 149.87s; pytest-datalake-final.xml",
+    "assistant_focused": "75 passed in 111.92s; pytest-assistant-focused.xml",
+    "assistant_full": "ENVIRONMENTAL_ABORT at external 240-second command budget; no full-suite PASS, no complete XML",
+    "succession_recovery_rollback": "Included in 717-test Data Lake suite; earlier focused 92 passed",
+    "reference_append_and_cache": "Focused negative tests for byte/hash corruption, schema, duplicate identity, old-row changes, proof, permission and snapshot mutations; canonical serialization parity",
+    "LAT": "md/index/sections/code-refs/full PASS; existing init/semantic-search warnings",
+    "diff_check": "PASS"
+  },
+  "publication": {
+    "promoted": true,
+    "mechanism": "Existing sales_foundation_promotion.Promotion + FoundationPublicationStore; no second publisher or manual CURRENT write",
+    "cas": "Existing exact-base logical_commit; base matched live CURRENT",
+    "journal": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/full-foundation-integration-v1/reference-journal-v2",
+    "journal_events": {
+      "activated.json": "ab4388c618af4bafcf425dc0d9f9cb0a55cefbd6d698d63a22492a7b960462b1",
+      "commit-intent.json": "f1e661d1d623950c435012dd52dc609ab571bcf261dd1b5c07f73d626c861234",
+      "committed.json": "187c309ddb23029155a549df447f576876cc0dfd966dba7697c5a97edf5df0b5",
+      "plan.json": "9436918944b728d33b0e2a5005fc96116a0d953f16e92953ab523b4cfc79bd37",
+      "rollback-inputs.json": "d4b3a784c6ae8c578c4675ed207b8699fe24425ee3eb64420b0c489096958823",
+      "verified.json": "69082f07b509b069fd97a06d542e0b1038e77d698c1e110b499485cef3e954a0"
+    },
+    "recovery": "Actual repeated promote on same journal returned same CURRENT/Reference and reader result; no second commit",
+    "rollback": "Retained input trees verified against durable rollback-inputs; isolated recovery/rollback tests PASS; no live rollback performed",
+    "concurrent_promotion": "Existing global run lock COMPLETED before and after; canonical Reference flock and Foundation run lock used",
+    "unpublished_draft": "reference-append-v1/reference-journal-v1 retained as earlier product/customer-only draft; never promoted; superseded by v2 with suppliers"
+  },
+  "resources": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS_FOR_COMPLETED_OPERATIONS",
+    "pytest_workers": 1,
+    "duckdb_threads": 2,
+    "duckdb_memory_MB": 512,
+    "sustained_swap_growth_observed_during_preflight": false,
+    "pressure": "High global I/O wait did not stop independent work; memory remained about 6.5GB available, no service restart or unrelated termination",
+    "cleanup": {
+      "bytes_removed": 96964512,
+      "files_removed": 134629,
+      "own_test_root": "/dev/shm/telchi-integration-tests-kLAI1V",
+      "own_test_root_exists": false,
+      "unrelated_processes_terminated": 0
+    },
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "environmental_aborts": 1,
+    "peak_memory_and_total_CPU_seconds": "NOT_MEASURED; samples and cProfile evidence retained"
+  },
+  "performance": {
+    "root_cause": "Repeated whole-row JSON hashes, typed projections and full semantic reserialization during ancestry validation; cProfile captured 146M calls, not merely global disk pressure",
+    "fix": "Exact-row equality fast path; SHA-verified operation-local deterministic projection reuse; streaming semantic JSON fingerprint identical to original digest. Every file rehashed on cache hit; scope discarded after validation; no persistent self-attested cache",
+    "evidence": [
+      "validation-profile.log",
+      "sales-independent.json",
+      "sales-worker-final.json"
+    ],
+    "result": "Observed canonical validation reduced from about 66.7s to 51.7s; parent independently validates too, total query about 107s. Default handler 80s still insufficient; no latency/readiness PASS claimed"
+  },
+  "files_modified": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/full_refresh_reference.py": "f49b9ac87e0e3e052fbe74de7d8bb4bf622e2fb670ac7a7594cf536f6f263a06",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/verification_cache.py": "7e12f9ca85f28d92a2a3d86366428efd32b86712ea60e9c59e4969cb8b02297b",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/foundation_manifest.py": "cabfe1ab5b4c940c2811254de115e0499a7b204386a9277fe7f8a3797c636117",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_reference_release.py": "20da3c4ed4f8f2b3d5fe3f6111a1bfb85c0fbb1e822a7958f31a4f9fdd6d6518",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_succession.py": "f6bc2610aa4b98c34207b72d137078ad1399b7aeff136098a4bd7e38e2248f50",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_facts_transition.py": "fafb503ffec80a89e92084cc413017edb65504e8532d3c293685162ca884f8b1",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/reference_compatibility.py": "2585042f7107815300a07a6addfffe94c52b4293bd3569bacb563fd6a3811e3a",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/reference_update.py": "b9004927dea6cc7e587360653bcf02edc206eea1c13d01eaa064effe347e0b30",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/update.py": "880b6991fa245a7c47a3e7b2ca952034bfe4057445cdb1dd13c3e0c0c6546a91",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/full_refresh_contracts.json": "77d2e5be67f57f3fb2f3474e338435026fdbce1f695ad330084ea44826121aa5",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_full_refresh_reference.py": "8da6f82fa12a686bf4dbc6928f782f388b60dc9e4e3b85a1e56b46abb94d08d2",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_verification_cache.py": "3a8e658cf8c9bc639d7f37c5eb122a067702b8baeada7964ff6bb232a38e2372",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_sales_reference_release.py": "af5b22bf2d782e98e675dfcd018d27f016adead0a4239b47e0c4e12e90f5791f",
+    "SrvRestAstroLS_v1/backend/modules/telchi/status_actual.md": "852598ad20919dd5ecb4b93cd3947d2a4385672d57d449dff933ad08a0e20123"
+  },
+  "transversal_impact": "Only Telchi module, its tests/local status and new evidence changed. Existing diffs preserved. No GLOBAL, messaging, assistant implementation, grants, credentials, shared Atomic, runtime services, frontend or scheduler changed. Telchi source digest changes do not automatically renew channel readiness.",
+  "limitations": [
+    "Multidomain independent facts succession remains unimplemented; the added adapter authorizes only captured Reference append",
+    "Inventory, production, purchasing, collections and Material Supply retain old published cutoffs",
+    "No integral facts candidate was built; raw captures and purchasing diff are not publication",
+    "All historical receivable balances cannot be reaccredited from the overlap-only capture",
+    "Default conversational deadline remains insufficient; only explicit-budget diagnostic passed",
+    "Full assistant suite interrupted; not a PASS",
+    "GLOBAL status not edited: this task held only Telchi-local scope; local status is authoritative for this publication"
+  ],
+  "next_action_exact": "Continue from CURRENT foundation_9cd0d1a146308f555733d58fb3fda1ff and Reference v2_sales_448ae93a960bf7342564a2d0. Implement the independent-facts successor in the existing foundation_manifest/reader/sales_succession/Promotion chain with concrete domain replay validators. Integrate OITW separately from the bounded OINM prefix, reconcile whole-document purchasing including 442 absent prior PO line keys, separate material/resource production lines, and recompute the five Material Supply datasets using compatible captured facts and explicit cuts. Retain receivables historical balances unless fully accredited; publish only coherent approved components. Reuse every verified capture and the already-published master append; do not redo SAP, sales or Reference.",
+  "restrictions": {
+    "sap_queries": 0,
+    "sap_writes": 0,
+    "captures_overwritten": 0,
+    "scheduler_enabled": false,
+    "shared_atomic_modified": false,
+    "grants_modified": false,
+    "services_started_or_stopped": 0,
+    "commits": 0,
+    "pushes": 0
+  },
+  "interruptions": [
+    {
+      "classification": "ENVIRONMENTAL_ABORT",
+      "scope": "full assistant suite",
+      "budget_seconds": 240
+    },
+    {
+      "classification": "FUNCTIONAL_PERFORMANCE_LIMITATION",
+      "scope": "default worker/handler deadlines",
+      "evidence": [
+        "luna-dispatch.json",
+        "luna-sales-r2.json",
+        "sales-worker.log"
+      ]
+    },
+    {
+      "classification": "DIAGNOSTIC_CONFIGURATION_LIMIT",
+      "scope": "Srv05 HTTP composition; existing V1 transport config missing; dispatcher-only follow-up"
+    },
+    {
+      "classification": "FUNCTIONAL_FAILURE_CORRECTED",
+      "scope": "First streaming fingerprint prototype used wrong JSON separators/Unicode settings; 13 tests failed; corrected to exact legacy settings; final 717-test run passes"
+    },
+    {
+      "classification": "DIAGNOSTIC_MISUSE_CORRECTED",
+      "scope": "Wrong monetary argument names, nonexistent helper import and wrong stock relation name; corrected probes retained separately"
+    }
+  ]
+}

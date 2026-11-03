@@ -1,0 +1,244 @@
+{
+  "all_optimizers": 0.0055081470000000006,
+  "cumulative_optimizer_timing": 0.005507637,
+  "physical_planner": 0.00018640699999999998,
+  "physical_planner_column_binding": 6.716e-06,
+  "physical_planner_create_plan": 0.000171553,
+  "physical_planner_resolve_types": 1.216e-06,
+  "planner": 0.003250972,
+  "planner_binding": 0.003244178,
+  "optimizer_common_subplan": 5.7109e-05,
+  "optimizer_join_elimination": 2.0146e-05,
+  "total_bytes_written": 0,
+  "total_bytes_read": 41468,
+  "system_peak_temp_dir_size": 0,
+  "system_peak_buffer_memory": 81331974,
+  "rows_returned": 0,
+  "wal_replay_entry_count": 0,
+  "optimizer_common_subexpressions": 1.4778e-05,
+  "result_set_size": 0,
+  "optimizer_window_self_join": 1.08e-06,
+  "query_name": "EXPLAIN (ANALYZE, FORMAT JSON) SELECT l.item_code,COUNT(*) AS lines,COALESCE(SUM(CAST(l.quantity AS DECIMAL(38,10))),0) AS quantity,COALESCE(SUM(CAST(l.line_total AS DECIMAL(38,10))),0) AS line_total FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) h JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON l.doc_entry=h.doc_entry WHERE h.\"doc_date\" >= ? AND h.\"doc_date\" < ? GROUP BY l.item_code ORDER BY quantity DESC,l.item_code LIMIT 10",
+  "waiting_to_attach_latency": 0.0,
+  "optimizer_statistics_propagation": 7.8514e-05,
+  "attach_load_storage_latency": 0.0,
+  "optimizer_join_order": 0.005023502,
+  "blocked_thread_time": 0.0,
+  "cpu_time": 4.456621952000001,
+  "extra_info": {},
+  "total_memory_allocated": 17301504,
+  "optimizer_in_clause": 2.308e-06,
+  "cumulative_cardinality": 2414816,
+  "checkpoint_latency": 0.0,
+  "optimizer_unnest_rewriter": 9.57e-07,
+  "cumulative_rows_scanned": 4191806,
+  "write_to_wal_latency": 0.0,
+  "optimizer_common_aggregate": 3.424e-06,
+  "latency": 2.455720653,
+  "attach_replay_wal_latency": 0.0,
+  "optimizer_deliminator": 7.35e-07,
+  "commit_local_storage_latency": 0.0,
+  "optimizer_unused_columns": 4.1268e-05,
+  "optimizer_top_n_window_elimination": 3.738e-06,
+  "optimizer_regex_range": 8.04e-07,
+  "optimizer_cte_filter_pusher": 1.325e-06,
+  "optimizer_empty_result_pullup": 1.039e-06,
+  "optimizer_filter_pushdown": 9.8106e-05,
+  "optimizer_filter_pullup": 2.636e-06,
+  "optimizer_expression_rewriter": 8.31e-05,
+  "optimizer_column_lifetime": 1.4746e-05,
+  "optimizer_build_side_probe_side": 1.0931e-05,
+  "optimizer_limit_pushdown": 8.15e-07,
+  "optimizer_top_n": 3.563e-06,
+  "optimizer_compressed_materialization": 0.0,
+  "optimizer_duplicate_groups": 6.859e-06,
+  "optimizer_reorder_filter": 1.598e-06,
+  "optimizer_sampling_pushdown": 5.25e-07,
+  "optimizer_join_filter_pushdown": 1.6641e-05,
+  "optimizer_extension": 9.25e-07,
+  "optimizer_materialized_cte": 0.0,
+  "optimizer_sum_rewriter": 7.634e-06,
+  "optimizer_late_materialization": 5.365e-06,
+  "optimizer_cte_inlining": 1.421e-06,
+  "optimizer_row_group_pruner": 2.045e-06,
+  "children": [
+    {
+      "system_peak_temp_dir_size": 0,
+      "system_peak_buffer_memory": 0,
+      "result_set_size": 0,
+      "operator_timing": 2.28e-07,
+      "operator_type": "EXPLAIN_ANALYZE",
+      "cpu_time": 4.456621952000001,
+      "extra_info": {},
+      "cumulative_cardinality": 2414816,
+      "cumulative_rows_scanned": 4191806,
+      "operator_cardinality": 0,
+      "operator_name": "EXPLAIN_ANALYZE",
+      "operator_rows_scanned": 0,
+      "children": [
+        {
+          "system_peak_temp_dir_size": 0,
+          "system_peak_buffer_memory": 0,
+          "result_set_size": 560,
+          "operator_timing": 0.000292289,
+          "operator_type": "TOP_N",
+          "cpu_time": 4.456621724000001,
+          "extra_info": {
+            "Top": "10",
+            "Order By": [
+              "COALESCE(sum(CAST(l.quantity AS DECIMAL(38, 10))), 0) DESC",
+              "l.item_code ASC"
+            ]
+          },
+          "cumulative_cardinality": 2414816,
+          "cumulative_rows_scanned": 4191806,
+          "operator_cardinality": 10,
+          "operator_name": "TOP_N",
+          "operator_rows_scanned": 0,
+          "children": [
+            {
+              "system_peak_temp_dir_size": 0,
+              "system_peak_buffer_memory": 0,
+              "result_set_size": 366128,
+              "operator_timing": 8.3595e-05,
+              "operator_type": "PROJECTION",
+              "cpu_time": 4.456329435000001,
+              "extra_info": {
+                "Projections": [
+                  "item_code",
+                  "lines",
+                  "quantity",
+                  "line_total"
+                ],
+                "Estimated Cardinality": "232709"
+              },
+              "cumulative_cardinality": 2414806,
+              "cumulative_rows_scanned": 4191806,
+              "operator_cardinality": 6538,
+              "operator_name": "PROJECTION",
+              "operator_rows_scanned": 0,
+              "children": [
+                {
+                  "system_peak_temp_dir_size": 0,
+                  "system_peak_buffer_memory": 0,
+                  "result_set_size": 366128,
+                  "operator_timing": 0.028520379000000012,
+                  "operator_type": "HASH_GROUP_BY",
+                  "cpu_time": 4.45624584,
+                  "extra_info": {
+                    "Groups": "#0",
+                    "Aggregates": [
+                      "count_star()",
+                      "sum(#1)",
+                      "sum(#2)"
+                    ],
+                    "Estimated Cardinality": "232709"
+                  },
+                  "cumulative_cardinality": 2408268,
+                  "cumulative_rows_scanned": 4191806,
+                  "operator_cardinality": 6538,
+                  "operator_name": "HASH_GROUP_BY",
+                  "operator_rows_scanned": 0,
+                  "children": [
+                    {
+                      "system_peak_temp_dir_size": 0,
+                      "system_peak_buffer_memory": 0,
+                      "result_set_size": 33298128,
+                      "operator_timing": 4.295718765,
+                      "operator_type": "PROJECTION",
+                      "cpu_time": 4.4277254610000005,
+                      "extra_info": {
+                        "Projections": [
+                          "item_code",
+                          "CAST(quantity AS DECIMAL(38,10))",
+                          "CAST(line_total AS DECIMAL(38,10))"
+                        ],
+                        "Estimated Cardinality": "286678"
+                      },
+                      "cumulative_cardinality": 2401730,
+                      "cumulative_rows_scanned": 4191806,
+                      "operator_cardinality": 693711,
+                      "operator_name": "PROJECTION",
+                      "operator_rows_scanned": 0,
+                      "children": [
+                        {
+                          "system_peak_temp_dir_size": 0,
+                          "system_peak_buffer_memory": 0,
+                          "result_set_size": 44397504,
+                          "operator_timing": 0.06516119599999999,
+                          "operator_type": "HASH_JOIN",
+                          "cpu_time": 0.132006696,
+                          "extra_info": {
+                            "Join Type": "INNER",
+                            "Conditions": "doc_entry = doc_entry",
+                            "Estimated Cardinality": "286678"
+                          },
+                          "cumulative_cardinality": 1708019,
+                          "cumulative_rows_scanned": 4191806,
+                          "operator_cardinality": 693711,
+                          "operator_name": "HASH_JOIN",
+                          "operator_rows_scanned": 0,
+                          "children": [
+                            {
+                              "system_peak_temp_dir_size": 0,
+                              "system_peak_buffer_memory": 0,
+                              "result_set_size": 44410240,
+                              "operator_timing": 0.05453520100000002,
+                              "operator_type": "TABLE_SCAN",
+                              "cpu_time": 0.05453520100000002,
+                              "extra_info": {
+                                "Table": "sales_line",
+                                "Projections": [
+                                  "doc_entry",
+                                  "item_code",
+                                  "quantity",
+                                  "line_total"
+                                ],
+                                "Estimated Cardinality": "1433400",
+                                "Dynamic Filters": "optional: doc_entry>='11012999' AND optional: doc_entry<='11530661' AND optional: doc_entry IN BF(doc_entry)",
+                                "Total Files Read": "1",
+                                "Filename(s)": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/ducklake/data/atomic/sales_line/ducklake-01a0d38b-6b4c-7c63-a890-ad4139730350.parquet"
+                              },
+                              "cumulative_cardinality": 693910,
+                              "cumulative_rows_scanned": 2866800,
+                              "operator_cardinality": 693910,
+                              "operator_name": "DUCKLAKE_SCAN",
+                              "operator_rows_scanned": 2866800,
+                              "children": []
+                            },
+                            {
+                              "system_peak_temp_dir_size": 0,
+                              "system_peak_buffer_memory": 0,
+                              "result_set_size": 5126368,
+                              "operator_timing": 0.012310299000000005,
+                              "operator_type": "TABLE_SCAN",
+                              "cpu_time": 0.012310299000000005,
+                              "extra_info": {
+                                "Table": "sales_document",
+                                "Projections": "doc_entry",
+                                "Filters": "doc_date>='2026-01-01' AND doc_date<'2026-09-16'",
+                                "Estimated Cardinality": "132500",
+                                "Total Files Read": "1",
+                                "Filename(s)": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/ducklake/data/atomic/sales_document/ducklake-01a0d38b-67a5-7896-9753-52c972d3e158.parquet"
+                              },
+                              "cumulative_cardinality": 320398,
+                              "cumulative_rows_scanned": 1325006,
+                              "operator_cardinality": 320398,
+                              "operator_name": "DUCKLAKE_SCAN",
+                              "operator_rows_scanned": 1325006,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

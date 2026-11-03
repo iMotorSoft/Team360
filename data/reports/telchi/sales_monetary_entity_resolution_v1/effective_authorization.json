@@ -1,0 +1,168 @@
+{
+  "effective": [
+    "telchi.sales.coverage.read.v1",
+    "telchi.sales.latest_documents.read.v1",
+    "telchi.sales.period_billed_amount.read.v1",
+    "telchi.sales.source_quantity.read.v1"
+  ],
+  "positive_authorization": true,
+  "actual_existing_identity_negatives": {
+    "admin": {
+      "allowed": false,
+      "existing_identity": true
+    },
+    "global": {
+      "allowed": false,
+      "existing_identity": true
+    }
+  },
+  "wrong_workspace_effective": [],
+  "events": [
+    {
+      "id": "6e8b988a-99b8-4adf-bba8-e584151a2129",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "actor_user_id": "67a1b108-7c65-4c80-bbca-ffc42891949c",
+      "event_name": "telchi.admin.monetary-authorize",
+      "entity_type": "telchi_admin",
+      "entity_id": null,
+      "correlation_id": "b5fe46f0-5503-4dfe-91ce-aeb2e33998fb",
+      "payload_jsonb": {
+        "after": {
+          "limits": {
+            "roles": [
+              "telchi_sales_period_billed_amount_reader_v1"
+            ],
+            "metrics": [
+              "SALES_VALID_GROSS",
+              "SALES_CREDIT_NOTES",
+              "SALES_NET"
+            ],
+            "modules": [
+              "telchi"
+            ],
+            "currency": "BS",
+            "free_sql": false,
+            "environment": "dev",
+            "permissions": [
+              "telchi.sales.period_billed_amount.read.v1"
+            ],
+            "capabilities": [
+              "sales.period_billed_amount.v1"
+            ],
+            "entity_filters": false,
+            "whole_workspace": true,
+            "credential_enrollment": false
+          },
+          "admin_id": "73d09264-8be2-4402-8023-0142a5f26730"
+        },
+        "before": null,
+        "result": "approved",
+        "created": [
+          {
+            "row": {
+              "id": "3baceafc-745c-4fce-b565-9aacdf2f9ac4",
+              "category": "business",
+              "description": "Foundation CURRENT 1408; BS active OINV and ORIN DocTotal by bounded DocDate period; gross billing, credit amount and historical SALES_NET; no cash, SAP, entity filters or product allocation.",
+              "display_name": "Telchi period documentary billing read V1",
+              "created_at_utc": "2026-10-12 22:54:07.070788+00:00",
+              "permission_code": "telchi.sales.period_billed_amount.read.v1"
+            },
+            "table": "core_permissions"
+          },
+          {
+            "row": {
+              "id": "5841e6e4-5b45-434b-8e94-d76937680b66",
+              "status": "active",
+              "role_code": "telchi_sales_period_billed_amount_reader_v1",
+              "description": null,
+              "display_name": "Telchi period documentary billing reader V1",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "created_at_utc": "2026-10-12 22:54:07.070788+00:00",
+              "is_system_role": false,
+              "updated_at_utc": "2026-10-12 22:54:07.070788+00:00"
+            },
+            "table": "core_roles"
+          },
+          {
+            "row": {
+              "id": "6d7c987c-c1ca-4dc9-8320-364c806c309e",
+              "role_id": "5841e6e4-5b45-434b-8e94-d76937680b66",
+              "permission_id": "3baceafc-745c-4fce-b565-9aacdf2f9ac4",
+              "created_at_utc": "2026-10-12 22:54:07.070788+00:00"
+            },
+            "table": "core_role_permissions"
+          }
+        ],
+        "actor_kind": "explicit_local_owner_dev_procedure",
+        "authorization": "TEAM360 / TELCHIAI \u2014 SALES MONETARY & ENTITY RESOLUTION V1",
+        "backup_sha256": "b98c6c85c2f8dedccc03eda998cce2ed585269d26d3c707ae3797463a461600f"
+      },
+      "occurred_at_utc": "2026-10-12 22:54:07.070788+00:00",
+      "created_at_utc": "2026-10-12 22:54:07.070788+00:00"
+    },
+    {
+      "id": "7129a652-4861-4362-9d1e-e034d7e38937",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "actor_user_id": "73d09264-8be2-4402-8023-0142a5f26730",
+      "event_name": "telchi.admin.monetary-grant",
+      "entity_type": "telchi_admin",
+      "entity_id": null,
+      "correlation_id": "09bffe46-d2e8-44ef-95b1-8f0ef442d33e",
+      "payload_jsonb": {
+        "after": [
+          "telchi.sales.coverage.read.v1",
+          "telchi.sales.latest_documents.read.v1",
+          "telchi.sales.period_billed_amount.read.v1",
+          "telchi.sales.source_quantity.read.v1"
+        ],
+        "before": [
+          "telchi.sales.coverage.read.v1",
+          "telchi.sales.latest_documents.read.v1",
+          "telchi.sales.source_quantity.read.v1"
+        ],
+        "result": "granted",
+        "created": [
+          {
+            "row": {
+              "id": "a00c8255-6354-40c1-a05c-1ed458813048",
+              "role_id": "5841e6e4-5b45-434b-8e94-d76937680b66",
+              "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+              "created_at_utc": "2026-10-12 22:54:07.070788+00:00"
+            },
+            "table": "core_user_roles"
+          }
+        ],
+        "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+        "actor_kind": "explicit_local_owner_dev_procedure",
+        "permissions": [
+          "telchi.sales.period_billed_amount.read.v1"
+        ],
+        "backup_sha256": "b98c6c85c2f8dedccc03eda998cce2ed585269d26d3c707ae3797463a461600f"
+      },
+      "occurred_at_utc": "2026-10-12 22:54:07.070788+00:00",
+      "created_at_utc": "2026-10-12 22:54:07.070788+00:00"
+    }
+  ],
+  "no_full_access": true,
+  "identities": {
+    "global": {
+      "id": "67a1b108-7c65-4c80-bbca-ffc42891949c",
+      "workspace_id": "d848e051-3dfc-408b-ad5a-94f2ba85ee23",
+      "status": "active"
+    },
+    "admin": {
+      "id": "73d09264-8be2-4402-8023-0142a5f26730",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "status": "active"
+    },
+    "pilot": {
+      "id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "status": "active"
+    },
+    "workspace": {
+      "id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "organization_id": "44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99"
+    }
+  }
+}

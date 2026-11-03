@@ -1,0 +1,94 @@
+{
+  "A_initial_state": {
+    "branch": "feature/console-backend-core",
+    "HEAD": "09d2ec715a31bb88574d734eacb9f437f008624e",
+    "worktree": "Extensive preexisting tracked/untracked changes preserved; no Git mutations",
+    "continuity": "Continues existing dispatcher, registry, identity adapter and recovery; prior 346 PASS are not current evidence",
+    "Srv05": "Evolution opt-in, DEV-only, baseline delegated to unchanged Srv01"
+  },
+  "B_composition": {
+    "changed_paths": [
+      "SrvRestAstroLS_v1/backend/ls_iMotorSoft_Srv05.py",
+      "SrvRestAstroLS_v1/backend/modules/messaging/identity.py",
+      "SrvRestAstroLS_v1/backend/db/migrations/027_team360_messaging_phone_bindings.sql",
+      "SrvRestAstroLS_v1/backend/tests/test_srv05_horizontal_composition.py",
+      "SrvRestAstroLS_v1/backend/tests/test_messaging_phone_binding_isolated.py",
+      "data/reports/messaging/horizontal-v1-srv05-identity/operational-read.json",
+      "data/reports/messaging/horizontal-v1-srv05-identity/report.json"
+    ],
+    "registry": "Existing HandlerRegistration / MessageDispatcher. create_app(messaging_handlers={module_name: HandlerRegistration(...)}) copies and freezes trusted registrations. No payload imports or module-specific routing conditions",
+    "activation": "TEAM360_SRV05_EVOLUTION_ENABLED=1 plus existing explicit DEV configuration and TEAM360_MESSAGING_DISPATCH_MODE=horizontal_v1; trusted channel dispatcher must agree",
+    "startup": "Existing pool lifecycle retained. Transport schema, dispatcher mode, receiver binding, identity columns and actual horizontal builder checked before scheduler starts. Empty registry remains importable for deployment factories, but cannot start horizontal runtime. Invalid registrations fail composition; missing handler/permission/schema fails startup with no legacy fallback",
+    "baseline": "Srv01 untouched; Srv05 OFF preserves schema/lifecycle; legacy Evolution ON preserved. Horizontal ON reaches real builder and dispatcher in HTTP tests with inert DB/provider ports",
+    "scope": "Only Srv05 composition GLOBAL plus explicitly authorized new migration; no settings/capability inventory refactor needed"
+  },
+  "C_identity_PG18": {
+    "existing_schema": "core_users.workspace_id references core_workspaces; no core tenant FK. whatsapp_numbers identifies receiver assets, not verified sender users; no equivalent sender binding found in migrations or operational schema",
+    "migration": "027 materializes the prior report's proposed messaging_phone_bindings relation, not a parallel identity system. Prepared and applied ONLY in disposable PostgreSQL 18",
+    "constraints": "Stable UUID; dev/pro environment vocabulary; provider FK; normalized numeric direct sender identity; user/workspace/actor FKs; scoped uniqueness including revoked tombstones; verification proof/time mandatory; revoked timestamp consistency; immutable identity scope; user/workspace check on non-revoked mutation",
+    "revocation": "Update verification_status=revoked with revoked_at_utc; deletion rejected. Runtime rejects revoked/pending/inactive/mismatched/ambiguous rows. User workspace changes are rechecked at resolution rather than adding triggers to core_users",
+    "audit": "Database trigger updates modified timestamp and emits core_events containing binding ID, actor, environment, provider and status, without telephone/proof payload. PUBLIC has no table privileges. Database owner/admin authority and approved grants remain operator responsibilities",
+    "verification_procedure": [
+      "Authorized identity administrator selects approved workspace, trusted channel tenant scope, environment/provider and existing active Team360 user",
+      "Verify control through an approved external procedure; no enrollment from incoming chat, display name, allowlist or unverified core_users metadata",
+      "Persist pending identity with attributable administrative actor; mark verified only with UTC proof timestamp and opaque verification_ref from approved evidence",
+      "Use audited revocation, not deletion; new enrollment or re-verification requires separate approved evidence"
+    ],
+    "normalization": "Existing Evolution mapper accepts direct numeric s.whatsapp.net identities. Group/LID/ambiguous alternate IDs remain rejected; no E.164 identity is invented from alternate payload fields",
+    "rollback": "DROP TABLE and DROP FUNCTION in isolated transaction tested, missing schema fails closed, reapplication tested",
+    "operational": "Read-only PG18 probe confirms messaging_phone_bindings absent. No migration, enrollment, permission mutation or real-number association performed"
+  },
+  "D_permissions": {
+    "repository": "Existing PermissionConsoleRepository.list_effective_permissions reused unchanged",
+    "calculation": "Existing Console RBAC SQL unions role and profile grants, filtering active/testing user and role/profile workspace scope. No effective permissions stored in binding",
+    "context": "PostgresPhoneIdentityResolver returns existing SenderIdentity with scoped effective permissions; dispatcher checks environment/tenant/workspace and registration required_permissions before passing MessageContext to handler. Handler retains per-operation permission responsibility",
+    "public": "Only confirmed absent binding can use explicit public_capabilities. Telchi fixture declares none; Flow fixture declares public information. No real Flow capability or business permission was invented",
+    "fail_closed": "Revoked/ambiguous/invalid identity denies; DB errors return ERROR, never anonymous. Missing schema prevents horizontal startup",
+    "real_evidence": "Disposable PG18 resolves bound user and effective role grant; role removal immediately changes permissions. Operational PG18 executes repository on one existing user in BEGIN READ ONLY, publishes only permission count, never impersonates or binds user"
+  },
+  "E_messaging": {
+    "routing_dispatch": "Srv05 authenticated Evolution webhook -> existing MessagingService -> actual horizontal builder/dispatcher -> declarative handler. Telchi/Flow test handlers use identical contract",
+    "isolation": "Existing trusted dev channel metadata and receiver, dispatcher identity checks, environment-scoped storage_instance for persistence/dedup/audit/delivery retained. No PROD channel/credentials/handler activated; payload cannot select environment",
+    "persistence_recovery": "Existing claim and dedup fences, atomic response/intent persistence, no handler replay for persisted result, controlled pending-intent and known-failure recovery retained. Claim-without-result and sending/unknown states require reconciliation; no blind resend, broker or exactly-once claim",
+    "delivery": "Provider acceptance is distinct from delivered/read callbacks. Existing callback merge/dedup tests rerun",
+    "limits": "No scheduled recovery worker or automatic replay of execution-uncertain side effects. Current horizontal persistence/recovery evidence remains doubles/SQL contracts, not an end-to-end live transport guarantee"
+  },
+  "F_validation": {
+    "regression_command": "cd SrvRestAstroLS_v1/backend && uv run pytest -q tests/test_messaging_*.py tests/test_srv05_horizontal_composition.py tests/test_srv05_evolution_isolation.py tests/test_srv05_runtime.py tests/test_srv05_compatibility.py tests/test_console_auth.py tests/test_console_repositories_sql_safety.py --ignore=tests/test_messaging_evolution_postgres.py --ignore=tests/test_messaging_telchi_sql_postgres.py",
+    "final_regression": {"passed": 356, "skipped": 5, "failed": 0},
+    "isolated_command": "TEAM360_MESSAGING_ISOLATED_TEST_DSN=postgresql://postgres@127.0.0.1:<owned-container-port>/messaging_disposable uv run pytest -q tests/test_messaging_phone_binding_isolated.py",
+    "isolated_result": {"passed": 1, "skipped": 0, "failed": 0},
+    "isolated_coverage": "Real migrations 001/002/027; verified identity; existing role RBAC; permission removal; unknown identity; DEV/PRO scope separation; tenant/workspace scope separation; uniqueness; FK; invalid proof; immutable scope; revocation; delete denial; PII-free audit; rollback/missing-table/reapply",
+    "container": "Owned postgres:18.1-alpine3.22 container only, no preexisting mounts, tmpfs data, loopback random port, 0.75 CPU/256 MB cap. Stopped and removed after tests",
+    "operational_reads": "See operational-read.json: server_version_num=180004; binding_schema=false; permission repository PASS with one effective permission. Explicit READ ONLY transaction and 5s statement timeout; no identifiers, emails or phones published",
+    "non_final_failure": "Two new HTTP composition tests initially failed because their transaction/get_pool doubles did not cover the real builder's imported ports; corrected test wiring without runtime workaround and final suite passed",
+    "external_not_executed": "Live WhatsApp ingress/send, production channels, identity enrollment, operational DDL, LLM/State Engine/Foundation queries, browser/deploy. Existing operational-writing integration suites explicitly excluded",
+    "skips": "Four existing optional cases plus new disposable-PG test skipped in unconfigured regression process; disposable-PG test executed separately with explicit DSN",
+    "whitespace": "git diff --check PASS; explicit untracked-file whitespace checks performed",
+    "warnings": "Existing uv dev-dependencies deprecation and Diagnosis in-memory default warning",
+    "resources": "Cheap preflight first; sequential tests and capped disposable PG. No unrelated process killed or service restarted. Owned container removed; no test servers/workers remain"
+  },
+  "G_blockers": {
+    "operational_migration": "027 must be separately authorized and applied by operator; currently absent on operational PG18",
+    "binding": "Approved proof-of-control procedure and real DEV identity enrollment pending; no productive binding simulated",
+    "permissions": "Existing resolution demonstrated; actual Telchi business permission and approved user grants must be selected before real handler registration",
+    "configuration": "Operator-approved horizontal channel metadata/receiver and deployment factory supplying real handler registry pending. Empty global app cannot silently serve horizontal traffic",
+    "Telchi": "Actual handler remains intentionally unimplemented. Preserve direct OpenAI gpt-5.6-luna medium / OpenAI_Key_JAI_query, LlmFit State Engine committed-is-True guard, Foundation-only capabilities. No LlmFit reopening or model benchmark",
+    "Foundation": "No data access performed. Existing quantity capability is not net invoicing; any requested business capability must be validated against Foundation. ACG/APD/BMD remain future; no fictitious deferred work",
+    "WhatsApp": "Live approved DEV ingress/outbound and callback validation pending; no external subscription/credential/PROD changes",
+    "recovery": "Execution-uncertain claims/sends still need controlled reconciliation; horizontal live PostgreSQL transport recovery not certified by this run"
+  },
+  "H_final_states": {
+    "TEAM360_MESSAGING_HORIZONTAL_V1": "PARTIAL",
+    "SRV05_HORIZONTAL_COMPOSITION": "PASS",
+    "PHONE_BINDING_SCHEMA_TESTED": "PASS",
+    "PHONE_BINDING_OPERATIONAL": "BLOCKED",
+    "TEAM360_PERMISSION_RESOLUTION": "PASS",
+    "DEV_PROD_CHANNEL_ISOLATION": "PASS",
+    "MESSAGING_RUNTIME_DISPATCH": "PASS",
+    "MESSAGING_RECOVERY": "PARTIAL",
+    "TEAM360_TELCHI_WHATSAPP_ASSISTANT_V1": "BLOCKED"
+  },
+  "interpretation": "Composition/isolation/dispatch PASS denotes structural and controlled local contracts, not operational WhatsApp readiness. Schema PASS is real disposable PG18. Permission PASS includes real operational read-only repository execution and disposable binding/RBAC chain; no real enrolled user's WhatsApp authorization is claimed. Overall remains PARTIAL until authorized operational setup, actual handler and DEV channel validation",
+  "preservation": "No changes to Srv01, Flow, Diagnosis, Telchi, credentials, settings, dependencies, lockfiles or global status. No commit/push/deploy/operational DDL. Existing precommit work retained"
+}

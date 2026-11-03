@@ -1,0 +1,358 @@
+{
+  "mode": "APPLIED",
+  "backup": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/operational-registration-20261102T165833291113Z/before.json",
+  "backup_sha256": "f5c81daf58be67f0f2c81b60a78d26dbbad7cd75fd4f1a688c094440dd47bbe3",
+  "idempotent": true,
+  "changed": true,
+  "run_id": "fc15b40e-dd96-43d8-9dce-c7b3d6128a12",
+  "created": [
+    {
+      "table": "core_roles",
+      "row": {
+        "id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "role_code": "telchi_operational_observations_reader_v1",
+        "display_name": "Telchi operational observations reader V1",
+        "description": null,
+        "is_system_role": false,
+        "status": "active",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00",
+        "updated_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "1a041ad8-4504-449f-97d9-5cc96520c6bd",
+        "permission_code": "telchi.inventory.stock_by_warehouse.read.v1",
+        "display_name": "Telchi inventory.stock_by_warehouse read V1",
+        "description": "Read-only bounded published operational observations: inventory.stock_by_warehouse. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "4e9a9291-c5e5-418e-b9e2-afc36aadca60",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "1a041ad8-4504-449f-97d9-5cc96520c6bd",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "inventory.stock_by_warehouse.v1",
+        "permission_id": "1a041ad8-4504-449f-97d9-5cc96520c6bd",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "661e2a9b-19e7-4894-b5f3-ca809a03ee02",
+        "permission_code": "telchi.production.consumption.read.v1",
+        "display_name": "Telchi production.consumption read V1",
+        "description": "Read-only bounded published operational observations: production.consumption. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "09d627e3-690d-42a8-8183-5ad323731016",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "661e2a9b-19e7-4894-b5f3-ca809a03ee02",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "production.consumption.v1",
+        "permission_id": "661e2a9b-19e7-4894-b5f3-ca809a03ee02",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "bd43e98e-5ea5-4c93-9de2-311726e3f848",
+        "permission_code": "telchi.production.orders.read.v1",
+        "display_name": "Telchi production.orders read V1",
+        "description": "Read-only bounded published operational observations: production.orders. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "4276eee0-050d-47c5-9b28-6a77dda75610",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "bd43e98e-5ea5-4c93-9de2-311726e3f848",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "production.orders.v1",
+        "permission_id": "bd43e98e-5ea5-4c93-9de2-311726e3f848",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "55e19b57-2063-4130-a770-6bc60f9a9dbf",
+        "permission_code": "telchi.production.bom.read.v1",
+        "display_name": "Telchi production.bom read V1",
+        "description": "Read-only bounded published operational observations: production.bom. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "12ee67d5-dbfe-4676-b9b5-aafbf4710b22",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "55e19b57-2063-4130-a770-6bc60f9a9dbf",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "production.bom.v1",
+        "permission_id": "55e19b57-2063-4130-a770-6bc60f9a9dbf",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "45c8a855-7272-4004-966a-eac830711d84",
+        "permission_code": "telchi.purchasing.invoiced_amount.read.v1",
+        "display_name": "Telchi purchasing.invoiced_amount read V1",
+        "description": "Read-only bounded published operational observations: purchasing.invoiced_amount. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "50d01fe8-bf7d-469b-9e52-2fe8ff1d011b",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "45c8a855-7272-4004-966a-eac830711d84",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "purchasing.invoiced_amount.v1",
+        "permission_id": "45c8a855-7272-4004-966a-eac830711d84",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "105dfdf9-c2b1-4d0f-956c-4ff8afb3fca2",
+        "permission_code": "telchi.purchasing.ordered_amount.read.v1",
+        "display_name": "Telchi purchasing.ordered_amount read V1",
+        "description": "Read-only bounded published operational observations: purchasing.ordered_amount. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "e66d39fd-3318-4a29-8467-62f63f84094d",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "105dfdf9-c2b1-4d0f-956c-4ff8afb3fca2",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "purchasing.ordered_amount.v1",
+        "permission_id": "105dfdf9-c2b1-4d0f-956c-4ff8afb3fca2",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "03454cc5-12b4-42f4-a294-957ad11b49d6",
+        "permission_code": "telchi.purchasing.received_amount.read.v1",
+        "display_name": "Telchi purchasing.received_amount read V1",
+        "description": "Read-only bounded published operational observations: purchasing.received_amount. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "106d1757-82c3-4d1b-8e52-bbbd84b8d229",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "03454cc5-12b4-42f4-a294-957ad11b49d6",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "purchasing.received_amount.v1",
+        "permission_id": "03454cc5-12b4-42f4-a294-957ad11b49d6",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "dd4a28e1-6b0b-4c36-9ac9-77d2cbaeee28",
+        "permission_code": "telchi.collections.received_amount.read.v1",
+        "display_name": "Telchi collections.received_amount read V1",
+        "description": "Read-only bounded published operational observations: collections.received_amount. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "99e8eac1-70ad-4154-a82b-c073c805534a",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "dd4a28e1-6b0b-4c36-9ac9-77d2cbaeee28",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "collections.received_amount.v1",
+        "permission_id": "dd4a28e1-6b0b-4c36-9ac9-77d2cbaeee28",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "fc0cc78b-10f3-4bf8-87b5-8fbfefd30680",
+        "permission_code": "telchi.collections.unallocated.read.v1",
+        "display_name": "Telchi collections.unallocated read V1",
+        "description": "Read-only bounded published operational observations: collections.unallocated. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "c03744c7-2a29-409d-a78d-a522d93fa175",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "fc0cc78b-10f3-4bf8-87b5-8fbfefd30680",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "collections.unallocated.v1",
+        "permission_id": "fc0cc78b-10f3-4bf8-87b5-8fbfefd30680",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "f6f3d787-1d00-49c7-a401-efa68c408d4b",
+        "permission_code": "telchi.material_supply.consumption.read.v1",
+        "display_name": "Telchi material_supply.consumption read V1",
+        "description": "Read-only bounded published operational observations: material_supply.consumption. Whole Telchi DEV workspace; native units and coverage retained. No SAP, writes, administration or complete historical balance.",
+        "category": "business",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_role_permissions",
+      "row": {
+        "id": "71be1563-97ad-4210-88eb-4f1fed57e24d",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "permission_id": "f6f3d787-1d00-49c7-a401-efa68c408d4b",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "material_supply.consumption.v1",
+        "permission_id": "f6f3d787-1d00-49c7-a401-efa68c408d4b",
+        "enabled": true
+      }
+    },
+    {
+      "table": "core_user_roles",
+      "row": {
+        "id": "97c0541b-cdae-45e6-b2d3-f148aea58a1d",
+        "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+        "role_id": "8b29eaa5-7f9e-459b-902c-d4eda7d850a3",
+        "created_at_utc": "2026-11-02 16:58:33.219586+00:00"
+      }
+    }
+  ],
+  "role": "telchi_operational_observations_reader_v1",
+  "effective": [
+    "telchi.collections.received_amount.read.v1",
+    "telchi.collections.unallocated.read.v1",
+    "telchi.inventory.stock_by_warehouse.read.v1",
+    "telchi.material_supply.consumption.read.v1",
+    "telchi.production.bom.read.v1",
+    "telchi.production.consumption.read.v1",
+    "telchi.production.orders.read.v1",
+    "telchi.products.search.read.v1",
+    "telchi.purchasing.invoiced_amount.read.v1",
+    "telchi.purchasing.ordered_amount.read.v1",
+    "telchi.purchasing.received_amount.read.v1",
+    "telchi.sales.by_products.read.v1",
+    "telchi.sales.category_line_amount.read.v1",
+    "telchi.sales.commercial_line_amount_by.read.v1",
+    "telchi.sales.coverage.read.v1",
+    "telchi.sales.invoice_amount.read.v1",
+    "telchi.sales.invoice_lines.read.v1",
+    "telchi.sales.latest_documents.read.v1",
+    "telchi.sales.period_billed_amount.read.v1",
+    "telchi.sales.product_line_amount_ranking.read.v1",
+    "telchi.sales.source_quantity.read.v1"
+  ],
+  "full_access_changed": false
+}

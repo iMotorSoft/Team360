@@ -24,6 +24,16 @@ ALLOWLIST: tuple[dict[str, str], ...] = (
         "reason": "isolated contract fixtures",
     },
     {
+        "path": "assistant/tests/**",
+        "classification": "TEST_ONLY",
+        "reason": "isolated contract fixtures and runtime HTTP probes; never a Foundation consumer",
+    },
+    {
+        "path": "exploratory_sql/test_foundation.py",
+        "classification": "TEST_ONLY",
+        "reason": "isolated negative authorization fixture asserts physical Atomic SQL is denied before opening a reader",
+    },
+    {
         "path": "datalake/comparison.py",
         "classification": "VALIDATION_ONLY",
         "reason": "bounded SAP-vs-DuckLake comparison helper",

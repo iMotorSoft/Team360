@@ -1,0 +1,45 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "Focused ingress accreditation only",
+  "INGRESS_REAL_LISTENER": "BLOCKED",
+  "PILOT_ACCESS": "VALID",
+  "RBAC_PER_CAPABILITY": "PASS",
+  "REVOCATION": "PASS",
+  "TENANT_ISOLATION": "PASS",
+  "SIX_GATES": "BLOCKED",
+  "TELCHIAI": "STOPPED",
+  "READY_FOR_MANUAL_START": "NO",
+  "qualification": "RBAC, revocation and isolation PASS are scoped to 24 offline contracts; real HTTP admission was NOT_TESTED because unmodified production app construction failed. Read-only PostgreSQL pilot/tenant/workspace session validation passed. No end-to-end ingress PASS claimed.",
+  "classification": "FUNCTIONAL_FAILURE",
+  "blocker": "Srv05 create_app rejects Telchi HandlerRegistration.required_permissions=frozenset() before listener construction: Approved DEV horizontal handler registry required",
+  "affected_gate": "http_auth positive messages.upsert admission",
+  "related_static_blocker": "evolution_whatsapp.build_service also rejects an empty required_permissions set; this second blocker is source-inspected, not executed",
+  "paths_requiring_coordination": [
+    "SrvRestAstroLS_v1/backend/ls_iMotorSoft_Srv05.py:58 (GLOBAL)",
+    "SrvRestAstroLS_v1/backend/modules/messaging/webhooks/evolution_whatsapp.py:43 (SHARED)"
+  ],
+  "historical_evidence": "All six referenced artifacts retain matching SHA256; old manifest source and approval fingerprints do not match current values. Historical artifacts preserved, not promoted to current PASS.",
+  "tests": {
+    "command": "cd SrvRestAstroLS_v1/backend && uv run pytest modules/telchi/assistant/tests/test_pilot_access.py -q",
+    "result": "24 passed in 0.77s",
+    "log": "focused-tests.txt",
+    "diff_check": "git diff --check: PASS"
+  },
+  "execution": {
+    "command": "SrvRestAstroLS_v1/backend/.venv/bin/python data/reports/telchi/ingress-operational-v1/probe.py",
+    "result": "BLOCKED before listener; see result.json for private artifact SHA256, code/config fingerprints and historical integrity",
+    "initial_harness_timeout": "ENVIRONMENTAL_ABORT; not evidence of runtime failure. Process absence verified. Final bounded probe reproduced construction error without allocating listener or pool."
+  },
+  "files_created": ["probe.py", "result.json", "focused-tests.txt", "closure.json"],
+  "runtime_changes": 0,
+  "manifest_published": false,
+  "approval_grant_or_capability_changes": 0,
+  "whatsapp_sends": 0,
+  "webhook_mutations": 0,
+  "model_calls": 0,
+  "foundation_queries": 0,
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "cross_module_impact": "None applied. Future correction requires explicitly coordinated GLOBAL/SHARED scope; preserve capability-level RBAC and existing consumers.",
+  "next_step": "Authorize a minimal coordinated correction of the two legacy ingress registration guards, without introducing base permissions, then rerun the focused real-listener probe. Do not manually start TelchiAI yet."
+}

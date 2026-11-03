@@ -1,0 +1,55 @@
+{
+  "contract": "telchi-sales-refresh-operation-proposal-v1",
+  "enabled": false,
+  "installed": false,
+  "schedule": null,
+  "entity": "TELCHI",
+  "domains": ["sales", "credit_memo"],
+  "capture_engine": "modules.telchi.datalake.sales_continuity",
+  "cycle_adapter": "modules.telchi.datalake.sales_refresh_cycle",
+  "promotion_wrapper": "modules.telchi.datalake.sales_foundation_promotion",
+  "runbook": "SALES_FOUNDATION_PROMOTION_V1.md",
+  "publication_engine": "modules.telchi.datalake.foundation_publication.FoundationPublicationStore",
+  "execution_status": "DISABLED_OPERATIONAL_SOURCE_AND_SCHEDULE_AUTHORIZATION_REQUIRED",
+  "strategy": "BOUNDED_DAILY_WHOLE_DOCUMENT_REPLACEMENT_WITH_OVERLAP",
+  "watermarks": {
+    "published_through_inclusive": null,
+    "candidate_through_inclusive": "2026-10-29",
+    "global_modification_watermark": null,
+    "advance_only_after": ["atomic_commit", "resolve_live_current", "canonical_reader_acceptance", "permission_acceptance"],
+    "capture_checkpoint_is_not_published_watermark": true,
+    "immutable_plan_resume": true,
+    "fresh_cycle_resets_native_pagination": true
+  },
+  "proposed_policy_not_extraction_entitlement": {
+    "overlap_days": 7,
+    "max_cycle_days": 31,
+    "max_selects": 12000,
+    "max_window_selects": 512,
+    "header_documents": 100,
+    "line_rows": 250,
+    "concurrency": 1,
+    "retries": 0,
+    "statement_seconds": 5,
+    "operation_seconds": 30,
+    "total_seconds": 14400
+  },
+  "late_changes": {
+    "within_overlap": "replace_complete_document_headers_and_lines_including_cancellation_state",
+    "outside_overlap": "explicit_bounded_reconciliation_required",
+    "cdc_claim": false,
+    "physical_deletions": "not_certified",
+    "source_timezone": "must_be_verified_before_activation"
+  },
+  "locks": ["existing_nonblocking_sales_extraction_lock", "FoundationPublicationStore.acquire_run_lock", "logical_commit_expected_current_CAS"],
+  "alerts": ["uncertain_request_no_retry", "incomplete_checkpoint", "hash_mismatch", "reference_identity_missing", "source_not_returned", "reconciliation_mismatch", "resource_blocked", "current_changed", "publication_failed", "postpublication_reader_failed", "published_coverage_stale"],
+  "activation_procedure": [
+    "Keep enabled=false until operational schedule and future date/query envelope are explicitly authorized.",
+    "Use sales_refresh_cycle.make_plan with exact CURRENT, accredited published coverage, bounded overlap and explicit evidenced late_dates; capture requires separate source authorization.",
+    "Use sales_refresh_cycle.prepare_candidate to reconcile whole documents and retain previous daily coverage; unresolved Reference identities remain fail-closed, never trigger master queries automatically.",
+    "Use sales_foundation_promotion prepare/promote with exact-candidate authorization, durable journal, Reference CAS and canonical Foundation logical commit; never edit pointers manually.",
+    "Verify source timezone, authorized identity and effective permissions, current Foundation and historical cutoffs, resource guard and exclusive operational ownership.",
+    "Dry-run one bounded cycle offline with crash/recovery, cancellation, late-edit, NOOP and rollback tests; do not repeat the recovered September/October extraction.",
+    "Only after those gates and schedule-specific authorization, install one singleton scheduler; advance published watermark only after live reader and permission verification."
+  ]
+}

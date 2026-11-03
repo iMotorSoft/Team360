@@ -1,0 +1,29 @@
+........................................................................ [  9%]
+........................................................................ [ 19%]
+............s.................s......................................... [ 28%]
+...............................................s........................ [ 38%]
+........................................................................ [ 47%]
+..................................................................s..... [ 57%]
+........................................................................ [ 66%]
+........................................................................ [ 76%]
+...............................................F........................ [ 85%]
+........................................................................ [ 95%]
+.....................................                                    [100%]
+=================================== FAILURES ===================================
+________________ test_insecure_state_directory_is_not_repaired _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-issajar/pytest-55/test_insecure_state_directory_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7041a8de9ca0>
+
+    def test_insecure_state_directory_is_not_repaired(tmp_path, monkeypatch):
+        monkeypatch.setattr(dev, 'PRIVATE_ROOT', tmp_path)
+        control.root().mkdir(mode=0o755)
+        with pytest.raises(ValueError, match='private_directory'):
+            with control.owned_session(SimpleNamespace(output=tmp_path / 'session', approval=tmp_path / 'approval')):
+>               pytest.fail('public directory accepted')
+E               Failed: public directory accepted
+
+modules/telchi/assistant/tests/test_whatsapp_dev_lifecycle_extra.py:86: Failed
+=========================== short test summary info ============================
+FAILED modules/telchi/assistant/tests/test_whatsapp_dev_lifecycle_extra.py::test_insecure_state_directory_is_not_repaired
+1 failed, 752 passed, 4 skipped in 41.60s

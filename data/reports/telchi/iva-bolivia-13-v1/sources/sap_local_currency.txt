@@ -1,0 +1,122 @@
+ 
+ 
+ 
+     
+     
+     GetAdminInfo Method - SAP B1 SDK Help 
+     
+     
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+ 
+     
+     
+         
+             📚 SAP Business One SDK Help 
+             
+                 
+                  
+             
+         
+     
+
+     
+     
+         
+             Home  ›  GetAdminInfo Method 
+         
+     
+
+     
+     
+         
+             
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                        GetAdminInfo Method
+                     
+ 
+ 
+ 
+ 
+ See Also  
+                     Example 
+ 
+ 
+ 
+ 
+ 
+  
+ 
+  
+  Description   Returns the  AdminInfo  data structure.  
+  Syntax       Visual Basic     Public Function GetAdminInfo() As  AdminInfo       
+  Example    The following is a VB.NET sample that retrieves the administration information.   GetAdminInfo (Visual Basic)    Copy Code           Dim  oCompanyService  As  SAPbobsCOM.CompanyService 
+ Dim  oCompanyAdminInfo  As  AdminInfo 
+ Dim  sAddress  As   String  
+ 
+ 'get company service  
+oCompanyService = oCompany.GetCompanyService 
+ 
+ 'get admin info  
+oCompanyAdminInfo = oCompanyService.GetAdminInfo 
+ 
+ 'set company name  
+oCompanyAdminInfo.CompanyName = "My Company"  
+ 
+ 'set Company color  
+ 'Sets the number of the background color for active windows  
+ '(e.g Red=8,Orange=7)  
+oCompanyAdminInfo.CompanyColor = 8 
+ 
+ 'set phone number  
+oCompanyAdminInfo.PhoneNumber1 = "6666666"  
+ 
+ 'set email  
+oCompanyAdminInfo.EMail = "MyMail@mail.com"  
+ 
+ 'update the admin info  
+oCompanyService.UpdateAdminInfo(oCompanyAdminInfo) 
+         
+ 
+  
+  See Also     CompanyService Object 
+ 
+ 
+ 
+ 
+    © Copyright 2026 SAP SE or an SAP affiliate company. All rights reserved.   
+ 
+ 
+  
+         
+     
+
+    
+    
+    
+ 
+ 

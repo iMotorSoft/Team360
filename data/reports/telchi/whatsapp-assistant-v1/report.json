@@ -1,0 +1,133 @@
+{
+  "branch": "feature/console-backend-core",
+  "head": "09d2ec715a31bb88574d734eacb9f437f008624e",
+  "statuses": {
+    "TELCHI_CONVERSATION_HANDLER": "PARTIAL",
+    "TELCHI_LUNA_INTEGRATION": "PASS",
+    "TELCHI_STATE_ENGINE": "PASS",
+    "TELCHI_EXECUTION_GUARD": "PASS",
+    "TELCHI_SALES_CAPABILITY": "PARTIAL",
+    "TELCHI_FOUNDATION_READ_ONLY": "PASS",
+    "TELCHI_BUSINESS_AUTHORIZATION": "PARTIAL",
+    "TELCHI_CONVERSATION_PERSISTENCE": "PARTIAL",
+    "TELCHI_MESSAGING_INTEGRATION": "PARTIAL",
+    "TEAM360_TELCHI_WHATSAPP_ASSISTANT_V1": "PARTIAL"
+  },
+  "tests": {
+    "passed": 900,
+    "skipped": 5,
+    "failed": 0,
+    "own_and_composition": 72,
+    "command": "regression-pool-final.txt"
+  },
+  "documentation_gates": "PASS",
+  "manual_documentation_checks": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md",
+    "data/reports/telchi/whatsapp-assistant-v1/report.md"
+  ],
+  "own_untracked_diff_check": "PASS",
+  "created_source_files": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/__init__.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/capabilities.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/composition.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/state_engine.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/__init__.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_probe.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_assistant.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_repository.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_safety.py",
+    "SrvRestAstroLS_v1/backend/tests/test_telchi_assistant_srv05.py"
+  ],
+  "source_sha256": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md": "65718aa417b920436e95b27a866b1b98584bd4991a6176a871a2d2daa69a426f",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/__init__.py": "5e077f893f781a8f0265be4655c1af245513755552ffe4e72d87fea64129b386",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/capabilities.py": "8eac9785aa82213edd34369c3d66efd722e773cdcbeccdb8cd78ae99eb39ead2",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/composition.py": "e4dd104d9ad89f1628484d33d07b6d197a30d83b50ddaaacb8716abc3f339198",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py": "88b5f6541705f0856a64f48bdabd729063864933859922a1d9741f659f9335f3",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py": "16888d0529c0963c71e8eaa7e8b680a63b8e4884f08ddb7ff89b591ec75cd00f",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py": "4fad294a5966c977624afbef0010c82d390ad182dd9919c57e9e2f6280013a30",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/state_engine.py": "8440aaee61e16704345378af21e839226b5a07b8d3a22ef1397f93f7d2cb25a5",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/__init__.py": "5a09da8c7f90657c4096177a508bb7d29f386e33b05700dacc66936b7add40bc",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_probe.py": "63eed7b6079dc233e3d903759b177288cb7938b85848870378c263a5aa31e6c7",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_assistant.py": "de522065fd6212a55456f619f6dd8c489c55c55da029b79b21102af2aa7add65",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_repository.py": "75d9500a71b136a1cb9cac2f698d2889f97ba1128c754db1c4c925097f43be03",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_safety.py": "9f4054566ebc484b5bd979b2c77ac65fa926d284e07be81b6deb43affeeb31c4",
+    "SrvRestAstroLS_v1/backend/tests/test_telchi_assistant_srv05.py": "3079c5a616a6176af0cea63bcb0ccff8b441f8043e13223ca7085b5e4caa194f"
+  },
+  "reused_boundary_sha256_final": {
+    "SrvRestAstroLS_v1/backend/ls_iMotorSoft_Srv05.py": "504f06d096272cbcaaeaeb1294937564625d6298fbe4359adc3c3c363c186543",
+    "SrvRestAstroLS_v1/backend/modules/messaging/handlers.py": "7fea28a5974a5d3025c17730d6dade85616050060da5904d911b22f800908dcd",
+    "SrvRestAstroLS_v1/backend/modules/messaging/service.py": "85d6d56e45c1cd9dbbcb890c2a3daa165da079bf5da0b204e0c51def25ac338a",
+    "SrvRestAstroLS_v1/backend/modules/messaging/identity.py": "485f41da43601cd6a1fc26b7adf22e579f94d4d9ae8f049aac4dcc52eb1da572",
+    "SrvRestAstroLS_v1/backend/modules/messaging/repository.py": "fdc122579c5a7947feec623919e1b0faafd078144891cabd138dd0830044c3bd",
+    "SrvRestAstroLS_v1/backend/modules/console/repositories.py": "48a4f5a6cc55e29d65e9be793a0dc0d55665b7f91c8799c4cfaa1e3a0d041d13",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/foundation_reader.py": "9f68b985ce73c4cd8bcbd502c9471e5b1284c946aefa63ec9078bb7af94cedb4",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/messaging_sales_query.py": "f90d46678389d0d23a5d20879a8f058f875c95ec9c1bb34676639aa3cf084898",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/executive_sales.py": "e097b8913ce19997c00a2a4928aef33ad0f15e517d90968eb9ddd13ad092def8"
+  },
+  "foundation": {
+    "status": "PASS",
+    "via": "TelchiHandler with simulated PG/auth",
+    "source": {
+      "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot_id": 1408,
+      "updated_at": "2026-09-28T18:18:35.264000"
+    },
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "period": {
+      "start": "2026-01-01",
+      "end_exclusive": "2026-09-16"
+    },
+    "units": "source_document_units_per_item; not comparable across items",
+    "coverage": "fixed_query_window; historical completeness not certified",
+    "limitations": "Invoices only, no cancellation filter or credit subtraction; not net sales or revenue.",
+    "row_count": 10,
+    "result_hash": "cba2bd24f0fa00573343eebf3f31d3376a85a63f0a89da05fb82573adf8ea706",
+    "elapsed_ms": 4703.677345998585,
+    "sap_accessed": false,
+    "read_only": true
+  },
+  "luna_final_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  },
+  "operational": {
+    "phone_binding": "BLOCKED",
+    "business_permission": "NOT_SELECTED",
+    "whole_workspace_scope": "NOT_ATTESTED",
+    "postgres_state_writes": "NOT_TESTED",
+    "whatsapp_delivery": "NOT_TESTED",
+    "migrations_applied": 0,
+    "ddl": 0,
+    "deploys": 0,
+    "sap_access": 0,
+    "commits": 0,
+    "pushes": 0
+  },
+  "product": {
+    "ACG": "BASIC",
+    "APD": "FUTURE",
+    "BMD": "MINIMAL"
+  },
+  "resource": {
+    "host_preflight": "BUSY_BUT_SAFE",
+    "concurrency_workers": 1,
+    "duckdb_threads": 2,
+    "unrelated_processes_terminated": 0,
+    "environmental_aborts": 0,
+    "own_processes_left_running": 0
+  },
+  "limitations": [
+    "Handler PG commit and horizontal outbound intent are separate transactions",
+    "Whole-workspace access requires evidence; constrained scopes are blocked",
+    "Documentary quantities are not net sales/revenue or normalized units",
+    "Engine guarantees contract, not perfect interpretation",
+    "Total processing timings exclude PG lock/commit and transport"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-10-11T17:16:03.115156+00:00",
+  "commands": [
+    {
+      "command": "lat check md",
+      "exit_code": 0,
+      "output": "recovery-lat-md.txt"
+    },
+    {
+      "command": "lat check index",
+      "exit_code": 0,
+      "output": "recovery-lat-index.txt"
+    },
+    {
+      "command": "lat check sections",
+      "exit_code": 0,
+      "output": "recovery-lat-sections.txt"
+    },
+    {
+      "command": "lat check code-refs",
+      "exit_code": 0,
+      "output": "recovery-lat-code-refs.txt"
+    },
+    {
+      "command": "lat check",
+      "exit_code": 0,
+      "output": "recovery-lat-all.txt"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "output": "recovery-lat-diff-check.txt"
+    }
+  ],
+  "script_syntax": "PASS",
+  "secret_scan": {
+    "result": "PASS",
+    "affected_files": []
+  }
+}

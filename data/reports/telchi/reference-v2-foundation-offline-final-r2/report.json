@@ -1,0 +1,130 @@
+{
+  "branch": "feature/console-backend-core",
+  "candidate": {
+    "activated": false,
+    "content_fingerprint": "aabf716d342de26794c09797c1e1fe6ff305c267982467242830059641076cc8",
+    "crosswalk_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-reference-offline-63c915b39dceeac998547e93-r2/candidate/crosswalk/_versions/v2_aabf716d342de26794c09797",
+    "enriched_rows": 7958,
+    "matched_observations": 7958,
+    "pending_structural_identities": [],
+    "preserved_rows": 45434,
+    "product_rows": 53392,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-reference-offline-63c915b39dceeac998547e93-r2/candidate/reference/_versions/v2_aabf716d342de26794c09797",
+    "reference_version": "v2_aabf716d342de26794c09797",
+    "status": "PREPARED"
+  },
+  "consolidated": {
+    "captured_outside_universe": 5241,
+    "content_sha256": "63c915b39dceeac998547e933e2da9aa362fe0331c7f8e27da251ee65e293cb3",
+    "file_sha256": "819e0b6ca19e34a53e8db967f78d5770ab6554aba067482a44eb104ffa0598f2",
+    "found": 7958,
+    "not_returned": 43,
+    "operational_universe": 8001,
+    "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-reference-offline-63c915b39dceeac998547e93-r2/consolidated.json",
+    "pending_capture": 0
+  },
+  "distribution": {
+    "0": 6642,
+    "1": 695,
+    "2": 93,
+    "3": 490,
+    "4": 37,
+    "5": 1
+  },
+  "entity": "TELCHI",
+  "explicit_physical": 1278,
+  "foundation": {
+    "base_snapshot": 1322,
+    "compatibility": "PASS_ON_REAL_CANDIDATE_AND_FROZEN_MANIFEST",
+    "components": {
+      "credit_memo": {
+        "publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+        "status": "PRESERVED_EXACT"
+      },
+      "material_supply": {
+        "publication_id": "material_supply_2ee04203964a197ab627f839",
+        "status": "PRESERVED_EXACT"
+      },
+      "oinm": {
+        "publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+        "status": "PRESERVED_EXACT"
+      },
+      "oitw": {
+        "publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+        "status": "PRESERVED_EXACT"
+      },
+      "purchasing": {
+        "publication_id": "purchasing_4ab178d62c5f5ba27d7180a8",
+        "status": "PRESERVED_EXACT"
+      },
+      "receivables_collections": {
+        "publication_id": "receivables_collections_633d1fbbfdd87e6665b1aad3",
+        "status": "PRESERVED_EXACT"
+      },
+      "reference": {
+        "publication_id": "v2_aabf716d342de26794c09797",
+        "status": "COMPATIBLE_PHYSICAL_ONLY"
+      },
+      "sales": {
+        "publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+        "status": "PRESERVED_EXACT"
+      }
+    },
+    "data_snapshot": 1408,
+    "id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "live_catalog_accessed": false,
+    "sealed_dataset_files_verified": 13,
+    "simulation": {
+      "FAIL_AFTER_REFERENCE_SELECTION": "PASS_OLD_CURRENT_INTACT",
+      "FAIL_BEFORE_LOGICAL_COMMIT": "PASS_OLD_CURRENT_INTACT",
+      "FAIL_DURING_LOGICAL_COMMIT": "PASS_OLD_CURRENT_INTACT",
+      "FAIL_DURING_VALIDATION": "PASS_OLD_CURRENT_INTACT",
+      "derivation_snapshot": 1322,
+      "noop": "PASS",
+      "publication": "PASS",
+      "reader_mode": "REAL_REFERENCE_AND_MANIFEST; FACT_VERIFIER_INJECTED_OFFLINE",
+      "reader_snapshot": 1408,
+      "recovery": "PASS",
+      "rollback": "PASS"
+    }
+  },
+  "limitations": [
+    "Frozen Foundation identity/manifest from accredited operational-universe report; live CURRENT not queried.",
+    "No offline DuckLake catalog export: physical fact and Receivables fingerprints are not recomputed; exact dependencies and snapshot IDs preserved.",
+    "43 missing Reference identities equal NOT_RETURNED only after independent key comparison; no deletion/creation inferred.",
+    "Historical reference_current pointer differs from Foundation; future controlled publication must reconcile under exclusive lock."
+  ],
+  "reason": "Offline candidate complete and validated against real frozen Foundation contracts; quality gates passed. No shared activation or external connections.",
+  "quality_gates": {"status": "PASS", "details": "gates.json", "pending": [], "unique_offline_tests_passed": 546},
+  "publication_readiness": "READY_FOR_EVALUATION_NOT_AUTHORIZED",
+  "blocked_found_identities": 0,
+  "historical_identity_decisions_pending": 43,
+  "final_preservation_evidence": "final-preservation.json",
+  "additional_real_candidate_evidence": "real-candidate-additional-validation.json",
+  "reconciliation_counts": {
+    "absent_reference_intersection_not_returned": 43,
+    "absent_reference_only": 0,
+    "existing_reference": 7958,
+    "not_returned": 43,
+    "not_returned_only": 0,
+    "observed_absent_reference": 43,
+    "pending": 43,
+    "reference_outside_operational": 8976,
+    "sap_found_absent_reference": 0
+  },
+  "safety": {
+    "capture_roots_unchanged": 28,
+    "commits": 0,
+    "hana_connections": 0,
+    "network_connections": 0,
+    "original_reference_hash": "02e635f28ff91d42b7faadfe517d9c4f4d8c12fe41e6766f3f5d334346ee3c16",
+    "publication_real": false,
+    "reference_pointer_diverges_from_foundation": true,
+    "shared_file_inventory_unchanged": true,
+    "shared_files": 52744,
+    "shared_writes": 0
+  },
+  "stage": "DEVELOPMENT",
+  "verdict": "PASS",
+  "verdict_scope": "OFFLINE_ONLY_NOT_PRODUCTION_OR_PUBLICATION"
+}

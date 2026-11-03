@@ -1,0 +1,333 @@
+{
+  "timestamp": "2026-10-11T23:22:28.819333+00:00",
+  "checksum": "9ff78e59b5276e0158a774aaef70162770bc907fbe71cf81159a73ec036f1694",
+  "target": "localhost:5432/team360",
+  "backup": {
+    "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/backups/binding-027-20261011T232228Z/team360.dump",
+    "bytes": 3143971,
+    "sha256": "9be210ce43496e4bd95ebe3545574b57c31cbf978c6a46043eeced9bf6d6444f",
+    "toc_sql_extraction": "PASS",
+    "restore_rehearsal": "NOT_EXECUTED"
+  },
+  "rehearsal": {
+    "constraints": [
+      {
+        "conname": "messaging_phone_bindings_actor_user_id_fkey",
+        "contype": "f",
+        "convalidated": true,
+        "definition": "FOREIGN KEY (actor_user_id) REFERENCES core_users(id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_actor_user_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL actor_user_id"
+      },
+      {
+        "conname": "messaging_phone_bindings_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK (((verification_status <> 'verified'::text) OR ((verified_at_utc IS NOT NULL) AND (revoked_at_utc IS NULL) AND (verification_ref IS NOT NULL) AND (length(TRIM(BOTH FROM verification_ref)) > 0))))"
+      },
+      {
+        "conname": "messaging_phone_bindings_check1",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK (((verification_status = 'revoked'::text) = (revoked_at_utc IS NOT NULL)))"
+      },
+      {
+        "conname": "messaging_phone_bindings_created_at_utc_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL created_at_utc"
+      },
+      {
+        "conname": "messaging_phone_bindings_environment_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK ((environment = ANY (ARRAY['dev'::text, 'pro'::text])))"
+      },
+      {
+        "conname": "messaging_phone_bindings_environment_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL environment"
+      },
+      {
+        "conname": "messaging_phone_bindings_environment_provider_sender_identi_key",
+        "contype": "u",
+        "convalidated": true,
+        "definition": "UNIQUE (environment, provider, sender_identity, tenant_id, workspace_id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL id"
+      },
+      {
+        "conname": "messaging_phone_bindings_pkey",
+        "contype": "p",
+        "convalidated": true,
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_provider_fkey",
+        "contype": "f",
+        "convalidated": true,
+        "definition": "FOREIGN KEY (provider) REFERENCES communication_providers(code)"
+      },
+      {
+        "conname": "messaging_phone_bindings_provider_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL provider"
+      },
+      {
+        "conname": "messaging_phone_bindings_sender_identity_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK ((sender_identity ~ '^[1-9][0-9]{6,14}$'::text))"
+      },
+      {
+        "conname": "messaging_phone_bindings_sender_identity_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL sender_identity"
+      },
+      {
+        "conname": "messaging_phone_bindings_tenant_id_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK ((length(TRIM(BOTH FROM tenant_id)) > 0))"
+      },
+      {
+        "conname": "messaging_phone_bindings_tenant_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL tenant_id"
+      },
+      {
+        "conname": "messaging_phone_bindings_updated_at_utc_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL updated_at_utc"
+      },
+      {
+        "conname": "messaging_phone_bindings_user_id_fkey",
+        "contype": "f",
+        "convalidated": true,
+        "definition": "FOREIGN KEY (user_id) REFERENCES core_users(id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_user_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL user_id"
+      },
+      {
+        "conname": "messaging_phone_bindings_verification_status_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK ((verification_status = ANY (ARRAY['pending'::text, 'verified'::text, 'revoked'::text])))"
+      },
+      {
+        "conname": "messaging_phone_bindings_verification_status_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL verification_status"
+      },
+      {
+        "conname": "messaging_phone_bindings_workspace_id_fkey",
+        "contype": "f",
+        "convalidated": true,
+        "definition": "FOREIGN KEY (workspace_id) REFERENCES core_workspaces(id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_workspace_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL workspace_id"
+      }
+    ],
+    "triggers": [
+      {
+        "tgname": "messaging_phone_binding_audit",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER messaging_phone_binding_audit BEFORE INSERT OR DELETE OR UPDATE ON public.messaging_phone_bindings FOR EACH ROW EXECUTE FUNCTION messaging_phone_binding_audit()"
+      }
+    ],
+    "indexes": [
+      {
+        "indexname": "messaging_phone_bindings_pkey",
+        "indexdef": "CREATE UNIQUE INDEX messaging_phone_bindings_pkey ON public.messaging_phone_bindings USING btree (id)"
+      },
+      {
+        "indexname": "messaging_phone_bindings_environment_provider_sender_identi_key",
+        "indexdef": "CREATE UNIQUE INDEX messaging_phone_bindings_environment_provider_sender_identi_key ON public.messaging_phone_bindings USING btree (environment, provider, sender_identity, tenant_id, workspace_id)"
+      }
+    ]
+  },
+  "transactional_rollback": "PASS",
+  "applied_schema": {
+    "constraints": [
+      {
+        "conname": "messaging_phone_bindings_actor_user_id_fkey",
+        "contype": "f",
+        "convalidated": true,
+        "definition": "FOREIGN KEY (actor_user_id) REFERENCES core_users(id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_actor_user_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL actor_user_id"
+      },
+      {
+        "conname": "messaging_phone_bindings_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK (((verification_status <> 'verified'::text) OR ((verified_at_utc IS NOT NULL) AND (revoked_at_utc IS NULL) AND (verification_ref IS NOT NULL) AND (length(TRIM(BOTH FROM verification_ref)) > 0))))"
+      },
+      {
+        "conname": "messaging_phone_bindings_check1",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK (((verification_status = 'revoked'::text) = (revoked_at_utc IS NOT NULL)))"
+      },
+      {
+        "conname": "messaging_phone_bindings_created_at_utc_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL created_at_utc"
+      },
+      {
+        "conname": "messaging_phone_bindings_environment_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK ((environment = ANY (ARRAY['dev'::text, 'pro'::text])))"
+      },
+      {
+        "conname": "messaging_phone_bindings_environment_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL environment"
+      },
+      {
+        "conname": "messaging_phone_bindings_environment_provider_sender_identi_key",
+        "contype": "u",
+        "convalidated": true,
+        "definition": "UNIQUE (environment, provider, sender_identity, tenant_id, workspace_id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL id"
+      },
+      {
+        "conname": "messaging_phone_bindings_pkey",
+        "contype": "p",
+        "convalidated": true,
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_provider_fkey",
+        "contype": "f",
+        "convalidated": true,
+        "definition": "FOREIGN KEY (provider) REFERENCES communication_providers(code)"
+      },
+      {
+        "conname": "messaging_phone_bindings_provider_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL provider"
+      },
+      {
+        "conname": "messaging_phone_bindings_sender_identity_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK ((sender_identity ~ '^[1-9][0-9]{6,14}$'::text))"
+      },
+      {
+        "conname": "messaging_phone_bindings_sender_identity_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL sender_identity"
+      },
+      {
+        "conname": "messaging_phone_bindings_tenant_id_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK ((length(TRIM(BOTH FROM tenant_id)) > 0))"
+      },
+      {
+        "conname": "messaging_phone_bindings_tenant_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL tenant_id"
+      },
+      {
+        "conname": "messaging_phone_bindings_updated_at_utc_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL updated_at_utc"
+      },
+      {
+        "conname": "messaging_phone_bindings_user_id_fkey",
+        "contype": "f",
+        "convalidated": true,
+        "definition": "FOREIGN KEY (user_id) REFERENCES core_users(id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_user_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL user_id"
+      },
+      {
+        "conname": "messaging_phone_bindings_verification_status_check",
+        "contype": "c",
+        "convalidated": true,
+        "definition": "CHECK ((verification_status = ANY (ARRAY['pending'::text, 'verified'::text, 'revoked'::text])))"
+      },
+      {
+        "conname": "messaging_phone_bindings_verification_status_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL verification_status"
+      },
+      {
+        "conname": "messaging_phone_bindings_workspace_id_fkey",
+        "contype": "f",
+        "convalidated": true,
+        "definition": "FOREIGN KEY (workspace_id) REFERENCES core_workspaces(id)"
+      },
+      {
+        "conname": "messaging_phone_bindings_workspace_id_not_null",
+        "contype": "n",
+        "convalidated": true,
+        "definition": "NOT NULL workspace_id"
+      }
+    ],
+    "triggers": [
+      {
+        "tgname": "messaging_phone_binding_audit",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER messaging_phone_binding_audit BEFORE INSERT OR DELETE OR UPDATE ON public.messaging_phone_bindings FOR EACH ROW EXECUTE FUNCTION messaging_phone_binding_audit()"
+      }
+    ],
+    "indexes": [
+      {
+        "indexname": "messaging_phone_bindings_pkey",
+        "indexdef": "CREATE UNIQUE INDEX messaging_phone_bindings_pkey ON public.messaging_phone_bindings USING btree (id)"
+      },
+      {
+        "indexname": "messaging_phone_bindings_environment_provider_sender_identi_key",
+        "indexdef": "CREATE UNIQUE INDEX messaging_phone_bindings_environment_provider_sender_identi_key ON public.messaging_phone_bindings USING btree (environment, provider, sender_identity, tenant_id, workspace_id)"
+      }
+    ]
+  },
+  "applied": "PASS",
+  "completed_at": "2026-10-11T23:22:33.692306+00:00"
+}

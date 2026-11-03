@@ -1,0 +1,57 @@
+{
+  "branch": "feature/console-backend-core",
+  "scope": "TELCHI / assistant lifecycle / DEVELOPMENT; offline preparation only",
+  "configuration": {
+    "result": "BLOCKED",
+    "file": "PRIVATE_ROOT/whatsapp-dev-control.json",
+    "mode": "0600",
+    "environment_validation": "PASS: explicit existing credentials, approved sender hash, local DSN, current approval integrity/expiry and configuration() checked without network",
+    "sources": ["existing .env.backend-dev.local transport values", "existing approved private webhook token", "existing process Luna credential and receiver", "existing database settings resolver", "existing WHATSAPP_DEV profile constants and approval"],
+    "unknown_values_not_replaced": ["authorized container-reachable explicit IPv4 host"],
+    "blockers": ["host deliberately omitted rather than invented; launch refuses before creating state/process", "read-only podman inspection found evolution-api in created state and no running podman containers; availability must be supplied by operator, not repaired here"],
+    "caller_environment": "env -i before Python import; deterministic PATH/LANG and UID-derived HOME in loader; exact CONFIG_ENV allowlist; no terminal profiles, libpq options, provider credentials, Python injection or proxies inherited",
+    "no_credentials_created_or_renewed": true
+  },
+  "closure": {
+    "implementation": "PASS_OFFLINE",
+    "definition_CLOSED": "restore() verifies equality of enabled, url, events, headers, byEvents and base64 against backup; stop_owned() verifies exact child exited. Controller persists STOPPED plus closure=CLOSED.",
+    "definition_REVIEW_REQUIRED": "Restoration or child exit unverified, changed ownership, foreign webhook, unavailable backup/readback. Persist concrete review_reasons; retain all backups and incident evidence.",
+    "runtime_incident": "Separate sanitized exception class, never exception text or credentials. A runtime error is not itself proof of failed cleanup.",
+    "historical_sessions": ["whatsapp-dev-session-20261015T235915Z", "whatsapp-dev-session-20261016T002629Z"],
+    "historical_findings": "Both closure files assert webhook_restored=true and backend_stopped=true, but emitted hardcoded CLOSED_REVIEW_REQUIRED. Both backups contain all six canonical fields, original enabled=false and matching previous/temporary URL. Equality in restore() covers the other fields too.",
+    "historical_reclassification": "BLOCKED for an independent present-time full readback: retained backup plus closure flags are not a new real observation. Historical files untouched; no retroactive CLOSED/PASS fabricated. User-supplied URL/enabled/listener observations alone do not certify every field. Recheck all six fields in authorized window."
+  },
+  "inheritance_policy": "Historical artifact integrity was checked for all six gates. Artifact integrity and unchanged code in this task justify reuse candidates, not automatic new PASS. Old source digest mismatch remains enforced. Historical artifacts have aggregate digests, not a complete per-file/config baseline proving cross-version parity. Review provenance and authorized configuration before attesting inheritance; do not rerun business/model suites by default.",
+  "gate_matrix": [
+    {"gate": "http_auth", "decision": "NEW_FOCAL_EVIDENCE_REQUIRED", "reason": "PilotBoundary token checks unchanged; sanitized environment and managed launcher entry/ownership are new.", "minimum": "One isolated ingress probe on frozen runtime: bad token -> 401 before effects; authenticated non-message connection.update -> ignored; reject non-pilot input before execution. Verify own health nonce, container reachability and zero handler/model/capability/outbound effects. Then ordinary start's existing container_probe repeats only non-message reachability/auth."},
+    {"gate": "identity_tenant_isolation", "decision": "INHERIT_AFTER_PARITY_REVIEW", "reason": "No identity resolver, persistence scope or tenant policy edit; process session identity is separate from business identity.", "minimum": "Review historical real isolation negatives, artifact integrity and unchanged scoped code; read-only binding/workspace/user/receiver check with exact approved config. No new identity/tenant fixtures or full suite."},
+    {"gate": "business_authorization", "decision": "INHERIT_AFTER_VALIDITY_REVIEW", "reason": "BusinessPolicy, permission and approval verifier unchanged; current approval integrity/expiry validated offline.", "minimum": "Read-only effective permission and approved whole-workspace binding check, approval/evidence integrity and expiry recheck immediately before renewal/start. No grants or commercial queries."},
+    {"gate": "durable_idempotency", "decision": "INHERIT_AFTER_PARITY_REVIEW", "reason": "No storage, repository, schema, dispatch or recovery implementation edited. Durable historical artifact intact.", "minimum": "Review storage/dispatch/schema/config parity and recorded real sequential/concurrent/recovery invariants. Lifecycle stop verifies owned child exit; do not rerun duplicate business messages or PG benchmarks."},
+    {"gate": "assistant_foundation", "decision": "INHERIT_AFTER_PARITY_REVIEW", "reason": "No assistant handler, capability, Foundation reader or publication edited. Real artifact intact.", "minimum": "Confirm recorded publication/snapshot/period and effective policy/config still apply using existing metadata read-only. No Foundation query rerun or business dialogue test."},
+    {"gate": "model_no_fallback", "decision": "INHERIT_AFTER_PARITY_REVIEW", "reason": "Luna adapter/model/effort/request path unchanged; existing authorized credential preserved; real artifact intact.", "minimum": "Review recorded actual model/effort/no-fallback evidence and adapter/config parity. No generation, Luna re-test or LlmFit benchmark."}
+  ],
+  "renewal_order": [
+    "Resolve authorized host and external-service availability without changing infrastructure in this task. Reserve exclusive webhook and port ownership; confirm host resources and baseline external identities/configuration read-only.",
+    "Review frozen inventory, historical artifacts and inheritance decisions. Old manifest must remain byte-identical. If parity is insufficient, identify the exact missing observation rather than rerunning six gates.",
+    "Approve a bounded isolated ingress certification harness before executing it: existing create_telchi_app composition wrapped by unchanged PilotBoundary, existing approved BusinessPolicy, Flow scheduler suppressed, explicit owned non-public listener, no webhook mutation, no messages/model/outbound, no auto-launch dependencies. Harness is an explicit test entrypoint, not a bypass flag in normal start/create_session_app/gate_evidence. Its exact runner still needs review before the real-service window; this stage does not implement or execute it. It must shut down its owned child before ordinary start.",
+    "Preserve ingress result and inheritance review in new private artifacts. Issue a NEW manifest only from reviewed evidence, with current source/approval digests, authorized scope and bounded expiry. Never replace old source hash or relabel an old artifact as a fresh run. If approval must be renewed, obtain authorization rather than renewing credentials/approval here.",
+    "Run the one normal lifecycle sequence below with unchanged mandatory gate verifier. No WhatsApp question or commercial execution required to certify lifecycle."
+  ],
+  "single_operational_window": [
+    "Read-only baseline: external Cloudflare/Evolution/Flow/Astro process identities and relevant health/config; exact canonical webhook backup, port availability, approval and gate validity, PG binding. Do not discover ownership from ports alone.",
+    "start with explicit private config: record session_id, verified launcher/backend identities and listener nonce digest; READY only after authentic owned health, container auth/reachability, temporary webhook readback and required evidence checks.",
+    "status from independent terminal using same private JSON: same session_id/identities, READY with separate approval/gates/PostgreSQL/Evolution fields.",
+    "second start: refusal, no changed session_id/owner/backup/webhook and no surviving duplicate launcher/backend.",
+    "stop: only verified launcher receives SIGTERM; exact backend exits; compare ALL SIX canonical webhook fields with the private backup. No public dump of headers/tokens. Persist CLOSED only with both checks.",
+    "second stop and status: stable STOPPED/same session_id, no new signals, same fully restored webhook and no own live processes.",
+    "Read-only after/before comparison confirms Cloudflare/Evolution/Flow/Astro unaffected except explicitly restored temporary webhook; retain backups, closures and sanitized baseline/comparison. Any uncertainty -> REVIEW_REQUIRED with reasons; no infrastructure repair or silent retry."
+  ],
+  "ready_for_normal_start": false,
+  "next_action": "Operator supplies authorized host and external availability; approves isolated ingress evidence/explicit inheritance and new manifest. Then authorize one bounded lifecycle window. No additional commercial tests.",
+  "services_started": 0,
+  "whatsapp_sessions_started": 0,
+  "shared_infrastructure_modified": false,
+  "historical_evidence_modified": false,
+  "commit_or_push": false,
+  "host_budget": "BUSY_BUT_SAFE; 8 CPUs, load ~3.4, ~6 GiB MemAvailable; focused sequential pytest only, no browser/scans/DB/model workloads; no unrelated processes terminated"
+}

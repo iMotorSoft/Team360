@@ -1,0 +1,49 @@
+{
+  "head": "09d2ec715a31bb88574d734eacb9f437f008624e",
+  "branch": "feature/console-backend-core",
+  "baseline_scanner_same_exploratory_findings": true,
+  "exploratory_findings": [
+    {
+      "path": "exploratory_sql/foundation.py",
+      "line": 151,
+      "pattern": "TELCHI_ATOMIC",
+      "classification": "UNKNOWN",
+      "allowlisted": false,
+      "reason": "unclassified Telchi path",
+      "excerpt": "# telchi.atomic or a caller-selected search path."
+    },
+    {
+      "path": "exploratory_sql/test_foundation.py",
+      "line": 67,
+      "pattern": "TELCHI_ATOMIC",
+      "classification": "UNKNOWN",
+      "allowlisted": false,
+      "reason": "unclassified Telchi path",
+      "excerpt": "'SELECT doc_entry FROM telchi.atomic.sales_document',"
+    }
+  ],
+  "exploratory_sources": {
+    "exploratory_sql/foundation.py": {
+      "tracked_at_HEAD": false,
+      "sha256": "525d8452318f36b9d85db6aecc4977e846e0aae607750327d120b59e9e97077d"
+    },
+    "exploratory_sql/test_foundation.py": {
+      "tracked_at_HEAD": false,
+      "sha256": "f3a3b59bb8754fa5f5c99cce5d879cda55df569d008b88a458c9911148c6ce86"
+    }
+  },
+  "scanner_current_counters": {
+    "DIRECT_READ_PATTERNS_FOUND": 381,
+    "DIRECT_READ_PATTERNS_PRODUCTIVE": 0,
+    "DIRECT_READ_PATTERNS_ALLOWLISTED": 379,
+    "UNCLASSIFIED_DIRECT_READS": 2,
+    "PRODUCTIVE_DIRECT_ATOMIC_READERS": 0,
+    "SHARED_LIBRARY_DIRECT_ATOMIC_READERS": 0
+  },
+  "prepared_capture_syntax": "PASS_NOT_EXECUTED",
+  "new_files_sha256": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_physical_reference_end_to_end.py": "33461e56c43d6ccd258cc3f05d843b394bd4231d8125ecdfa631ca08f7d8ef64",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/PHYSICAL_REFERENCE_SAP_RUNBOOK.md": "12ba4a380efa350d287400dff7f8004dafc3c194e397c635c736f69a28639071"
+  },
+  "guard_sha256": "e8e0530da8301a0ee2cafa586711f075f8417e02b1495e2a7db29b4e9eb20cfa"
+}

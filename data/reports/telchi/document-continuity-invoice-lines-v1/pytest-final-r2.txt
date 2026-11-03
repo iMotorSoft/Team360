@@ -1,0 +1,251 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+.................................................FF..................... [ 16%]
+........................................F............................... [ 33%]
+..................................................................FF.... [ 50%]
+........................................................................ [ 67%]
+........................................................................ [ 84%]
+.......................s.....................s..................         [100%]
+=================================== FAILURES ===================================
+_ test_authorized_context_reaches_interpreter_without_text_derived_tenant[Mostrame las \xfaltimas 5 facturas de venta de Telchi.] _
+
+text = 'Mostrame las últimas 5 facturas de venta de Telchi.'
+
+    @pytest.mark.parametrize('text', [ORIGINAL, 'Mostrame las últimas 5 facturas de venta.'])
+    def test_authorized_context_reaches_interpreter_without_text_derived_tenant(text):
+        async def run():
+            handler, store, calls, c = setup([documents()])
+            result = await handler.handle(event(text), c)
+            supplied = handler.interpreter.calls[0]['enterprise_context']
+            assert supplied == {'source': 'authenticated_team360_workspace', 'tenant_id': 'telchi',
+                                'workspace_id': 'workspace', 'own_company': {'name': 'Telchi', 'aliases': []}}
+            assert result.classification == 'DIRECT_AVAILABLE'
+            assert calls == ['sales.latest_documents']  # Query double, never Foundation.
+            audit = latest(store)
+            assert audit['required_permission'] == 'telchi.sales.latest_documents.read.v1'
+            assert audit['interpretation_proposed'] == documents()  # no post-hoc entity removal
+            assert audit['committed']
+>       asyncio.run(run())
+
+modules/telchi/assistant/tests/test_enterprise_context.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def run():
+        handler, store, calls, c = setup([documents()])
+        result = await handler.handle(event(text), c)
+        supplied = handler.interpreter.calls[0]['enterprise_context']
+        assert supplied == {'source': 'authenticated_team360_workspace', 'tenant_id': 'telchi',
+                            'workspace_id': 'workspace', 'own_company': {'name': 'Telchi', 'aliases': []}}
+>       assert result.classification == 'DIRECT_AVAILABLE'
+E       AssertionError: assert 'ERROR' == 'DIRECT_AVAILABLE'
+E         
+E         - DIRECT_AVAILABLE
+E         + ERROR
+
+modules/telchi/assistant/tests/test_enterprise_context.py:34: AssertionError
+_ test_authorized_context_reaches_interpreter_without_text_derived_tenant[Mostrame las \xfaltimas 5 facturas de venta.] _
+
+text = 'Mostrame las últimas 5 facturas de venta.'
+
+    @pytest.mark.parametrize('text', [ORIGINAL, 'Mostrame las últimas 5 facturas de venta.'])
+    def test_authorized_context_reaches_interpreter_without_text_derived_tenant(text):
+        async def run():
+            handler, store, calls, c = setup([documents()])
+            result = await handler.handle(event(text), c)
+            supplied = handler.interpreter.calls[0]['enterprise_context']
+            assert supplied == {'source': 'authenticated_team360_workspace', 'tenant_id': 'telchi',
+                                'workspace_id': 'workspace', 'own_company': {'name': 'Telchi', 'aliases': []}}
+            assert result.classification == 'DIRECT_AVAILABLE'
+            assert calls == ['sales.latest_documents']  # Query double, never Foundation.
+            audit = latest(store)
+            assert audit['required_permission'] == 'telchi.sales.latest_documents.read.v1'
+            assert audit['interpretation_proposed'] == documents()  # no post-hoc entity removal
+            assert audit['committed']
+>       asyncio.run(run())
+
+modules/telchi/assistant/tests/test_enterprise_context.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def run():
+        handler, store, calls, c = setup([documents()])
+        result = await handler.handle(event(text), c)
+        supplied = handler.interpreter.calls[0]['enterprise_context']
+        assert supplied == {'source': 'authenticated_team360_workspace', 'tenant_id': 'telchi',
+                            'workspace_id': 'workspace', 'own_company': {'name': 'Telchi', 'aliases': []}}
+>       assert result.classification == 'DIRECT_AVAILABLE'
+E       AssertionError: assert 'ERROR' == 'DIRECT_AVAILABLE'
+E         
+E         - DIRECT_AVAILABLE
+E         + ERROR
+
+modules/telchi/assistant/tests/test_enterprise_context.py:34: AssertionError
+________ test_latest_executes_without_source_quantity_and_audits_access ________
+
+    def test_latest_executes_without_source_quantity_and_audits_access():
+        async def run():
+            handler, store, calls, c = setup([documentary_proposal()])
+            handler.authorization = BusinessAuthorization(policy())
+            c = replace(c, sender_identity=replace(c.sender_identity,
+                permissions=frozenset({'telchi.sales.latest_documents.read.v1'})))
+            assert not registration(handler).required_permissions
+            result = await handler.handle(event('Mostrame las últimas 5 facturas de venta de Telchi.'), c)
+            assert result.classification == 'DIRECT_AVAILABLE' and calls == ['sales.latest_documents']
+            audit = latest(store)
+            assert audit['required_permission'] == 'telchi.sales.latest_documents.read.v1'
+            assert audit['business_rbac_verified'] is True
+            assert audit['pilot_approval_sha256'] == 'fixture-digest'
+>       asyncio.run(run())
+
+modules/telchi/assistant/tests/test_pilot_access.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def run():
+        handler, store, calls, c = setup([documentary_proposal()])
+        handler.authorization = BusinessAuthorization(policy())
+        c = replace(c, sender_identity=replace(c.sender_identity,
+            permissions=frozenset({'telchi.sales.latest_documents.read.v1'})))
+        assert not registration(handler).required_permissions
+        result = await handler.handle(event('Mostrame las últimas 5 facturas de venta de Telchi.'), c)
+>       assert result.classification == 'DIRECT_AVAILABLE' and calls == ['sales.latest_documents']
+E       AssertionError: assert ('ERROR' == 'DIRECT_AVAILABLE'
+E         
+E         - DIRECT_AVAILABLE
+E         + ERROR)
+
+modules/telchi/assistant/tests/test_pilot_access.py:109: AssertionError
+________ test_previous_documents_preserve_context_no_second_query[ASK] _________
+
+action = 'ASK'
+
+    @pytest.mark.parametrize('action', ['ASK', 'EXECUTE'])
+    def test_previous_documents_preserve_context_no_second_query(action):
+        async def run():
+            ask = (proposal({}, intent='REFERENCE', action='ASK',
+                clarification={'slot': 'reference', 'question': '¿A qué consulta anterior te referís?'})
+                if action == 'ASK' else proposal({}, action='EXECUTE'))
+            handler, store, calls, c = setup([documentary_proposal(), ask])
+            await handler.handle(event('Dame las últimas 10 facturas'), c)
+            result = await handler.handle(event('¿Y las anteriores?'), replace(c, correlation_id='second'))
+            assert result.classification == 'DIRECT_UNAVAILABLE'
+            assert 'no admite paginación' in result.text
+            assert calls == ['sales.latest_documents']
+            assert latest(store)['confirmed_state']['metric'] == 'sales.latest_documents'
+            assert latest(store)['execution_status'] == 'not_executed'
+>       asyncio.run(run())
+
+modules/telchi/assistant/tests/test_sales_business_contract.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def run():
+        ask = (proposal({}, intent='REFERENCE', action='ASK',
+            clarification={'slot': 'reference', 'question': '¿A qué consulta anterior te referís?'})
+            if action == 'ASK' else proposal({}, action='EXECUTE'))
+        handler, store, calls, c = setup([documentary_proposal(), ask])
+        await handler.handle(event('Dame las últimas 10 facturas'), c)
+        result = await handler.handle(event('¿Y las anteriores?'), replace(c, correlation_id='second'))
+>       assert result.classification == 'DIRECT_UNAVAILABLE'
+E       AssertionError: assert 'NEEDS_CLARIFICATION' == 'DIRECT_UNAVAILABLE'
+E         
+E         - DIRECT_UNAVAILABLE
+E         + NEEDS_CLARIFICATION
+
+modules/telchi/assistant/tests/test_sales_business_contract.py:62: AssertionError
+______ test_previous_documents_preserve_context_no_second_query[EXECUTE] _______
+
+action = 'EXECUTE'
+
+    @pytest.mark.parametrize('action', ['ASK', 'EXECUTE'])
+    def test_previous_documents_preserve_context_no_second_query(action):
+        async def run():
+            ask = (proposal({}, intent='REFERENCE', action='ASK',
+                clarification={'slot': 'reference', 'question': '¿A qué consulta anterior te referís?'})
+                if action == 'ASK' else proposal({}, action='EXECUTE'))
+            handler, store, calls, c = setup([documentary_proposal(), ask])
+            await handler.handle(event('Dame las últimas 10 facturas'), c)
+            result = await handler.handle(event('¿Y las anteriores?'), replace(c, correlation_id='second'))
+            assert result.classification == 'DIRECT_UNAVAILABLE'
+            assert 'no admite paginación' in result.text
+            assert calls == ['sales.latest_documents']
+            assert latest(store)['confirmed_state']['metric'] == 'sales.latest_documents'
+            assert latest(store)['execution_status'] == 'not_executed'
+>       asyncio.run(run())
+
+modules/telchi/assistant/tests/test_sales_business_contract.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def run():
+        ask = (proposal({}, intent='REFERENCE', action='ASK',
+            clarification={'slot': 'reference', 'question': '¿A qué consulta anterior te referís?'})
+            if action == 'ASK' else proposal({}, action='EXECUTE'))
+        handler, store, calls, c = setup([documentary_proposal(), ask])
+        await handler.handle(event('Dame las últimas 10 facturas'), c)
+        result = await handler.handle(event('¿Y las anteriores?'), replace(c, correlation_id='second'))
+>       assert result.classification == 'DIRECT_UNAVAILABLE'
+E       AssertionError: assert 'ERROR' == 'DIRECT_UNAVAILABLE'
+E         
+E         - DIRECT_UNAVAILABLE
+E         + ERROR
+
+modules/telchi/assistant/tests/test_sales_business_contract.py:62: AssertionError
+=============================== warnings summary ===============================
+tests/test_telchi_assistant_srv05.py::test_telchi_handler_registered_using_existing_srv05_port
+  /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/routes/diagnosis.py:140: UserWarning: AUTOMATION_DIAGNOSIS_REPOSITORY not set, defaulting to in-memory. Set AUTOMATION_DIAGNOSIS_REPOSITORY=postgres for persistence.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED modules/telchi/assistant/tests/test_enterprise_context.py::test_authorized_context_reaches_interpreter_without_text_derived_tenant[Mostrame las \xfaltimas 5 facturas de venta de Telchi.]
+FAILED modules/telchi/assistant/tests/test_enterprise_context.py::test_authorized_context_reaches_interpreter_without_text_derived_tenant[Mostrame las \xfaltimas 5 facturas de venta.]
+FAILED modules/telchi/assistant/tests/test_pilot_access.py::test_latest_executes_without_source_quantity_and_audits_access
+FAILED modules/telchi/assistant/tests/test_sales_business_contract.py::test_previous_documents_preserve_context_no_second_query[ASK]
+FAILED modules/telchi/assistant/tests/test_sales_business_contract.py::test_previous_documents_preserve_context_no_second_query[EXECUTE]
+5 failed, 417 passed, 2 skipped, 1 warning in 12.85s

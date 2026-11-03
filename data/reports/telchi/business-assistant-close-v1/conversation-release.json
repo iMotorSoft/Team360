@@ -1,0 +1,1072 @@
+{
+  "timestamp": "2026-10-19T17:00:23.407453+00:00",
+  "source_sha256": "c0c7ea3bebb75dc51cdfc0a9af843a19938182c26ce3661fafaf48d5b6b28832",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿De qué período querés consultar la facturación?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuánto facturamos en septiembre de 2026?",
+      "text": "Facturación registrada: Bs 8.891.439,79 (BS, bolivianos), del 1 de septiembre de 2026 al 30 de septiembre de 2026. Incluye 30301 facturas activas por fecha de factura, con sus impuestos y descuentos documentales. Notas de crédito activas: Bs 328.670,24; neto documental: Bs 8.562.769,55. Excluye facturas anuladas y otras monedas; no equivale a cobros ni a saldo pendiente. No certifica ventas físicas ni cobertura histórica completa. El período solicitado termina después de la actualización disponible: no es un cierre mensual completo. Información actualizada al 28 de septiembre de 2026.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "a9113afb-6c8b-46cc-8051-6447811cd2b0",
+      "thread_id": "f887bfad-d78a-4914-9786-f17f0940469f",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 2243.11075300011,
+          "state_engine_ms": 0.7703320006839931,
+          "interpretation_ms": 4561.235936999765,
+          "response_format_ms": 0.054770999668107834,
+          "total_processing_ms": 6829.864635000376
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+          "rows": [
+            {
+              "net_amount": "8562769.550000",
+              "credit_count": 224,
+              "billed_amount": "8891439.790000",
+              "credit_amount": "328670.240000",
+              "invoice_count": 30301,
+              "unique_credits": 224,
+              "unique_invoices": 30301,
+              "credit_amount_count": 224,
+              "invoice_amount_count": 30301
+            }
+          ],
+          "grain": "document_header",
+          "period": {
+            "currency": "BS",
+            "date_from": "2026-09-01",
+            "date_to_exclusive": "2026-10-01"
+          },
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "currency": "BS",
+          "read_only": true,
+          "capability": "sales.period_billed_amount.v1",
+          "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+          "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+          "sap_accessed": false,
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-09-01",
+            "2026-10-01",
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-09-01",
+            "2026-10-01"
+          ],
+          "sql_duration_ms": 325.02062100047624,
+          "requested_metrics": [
+            "sales.net_amount"
+          ]
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Facturación registrada: Bs 8.891.439,79 (BS, bolivianos), del 1 de septiembre de 2026 al 30 de septiembre de 2026. Incluye 30301 facturas activas por fecha de factura, con sus impuestos y descuentos documentales. Notas de crédito activas: Bs 328.670,24; neto documental: Bs 8.562.769,55. Excluye facturas anuladas y otras monedas; no equivale a cobros ni a saldo pendiente. No certifica ventas físicas ni cobertura histórica completa. El período solicitado termina después de la actualización disponible: no es un cierre mensual completo. Información actualizada al 28 de septiembre de 2026.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null,
+              "/product_search_text": null,
+              "/selected_item_codes": []
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "elapsed_ms": 7006.998441000178
+    },
+    {
+      "question": "¿Y en agosto?",
+      "text": "Facturación registrada: Bs 10.565.113,13 (BS, bolivianos), del 1 de agosto de 2026 al 31 de agosto de 2026. Incluye 36802 facturas activas por fecha de factura, con sus impuestos y descuentos documentales. Notas de crédito activas: Bs 303.422,10; neto documental: Bs 10.261.691,03. Excluye facturas anuladas y otras monedas; no equivale a cobros ni a saldo pendiente. No certifica ventas físicas ni cobertura histórica completa. Información actualizada al 28 de septiembre de 2026.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "f97dae3b-f1cd-467b-b6c5-d7ecfdb0ab94",
+      "thread_id": "f887bfad-d78a-4914-9786-f17f0940469f",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 2291.554158001418,
+          "state_engine_ms": 0.6857589996798197,
+          "interpretation_ms": 4002.165689999856,
+          "response_format_ms": 0.06026599930919474,
+          "total_processing_ms": 6320.8225990001665
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "previous_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+          "rows": [
+            {
+              "net_amount": "10261691.030000",
+              "credit_count": 288,
+              "billed_amount": "10565113.130000",
+              "credit_amount": "303422.100000",
+              "invoice_count": 36802,
+              "unique_credits": 288,
+              "unique_invoices": 36802,
+              "credit_amount_count": 288,
+              "invoice_amount_count": 36802
+            }
+          ],
+          "grain": "document_header",
+          "period": {
+            "currency": "BS",
+            "date_from": "2026-08-01",
+            "date_to_exclusive": "2026-09-01"
+          },
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "currency": "BS",
+          "read_only": true,
+          "capability": "sales.period_billed_amount.v1",
+          "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+          "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+          "sap_accessed": false,
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-08-01",
+            "2026-09-01",
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-08-01",
+            "2026-09-01"
+          ],
+          "sql_duration_ms": 297.5968599994303,
+          "requested_metrics": [
+            "sales.net_amount"
+          ]
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Facturación registrada: Bs 10.565.113,13 (BS, bolivianos), del 1 de agosto de 2026 al 31 de agosto de 2026. Incluye 36802 facturas activas por fecha de factura, con sus impuestos y descuentos documentales. Notas de crédito activas: Bs 303.422,10; neto documental: Bs 10.261.691,03. Excluye facturas anuladas y otras monedas; no equivale a cobros ni a saldo pendiente. No certifica ventas físicas ni cobertura histórica completa. Información actualizada al 28 de septiembre de 2026.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "REFINE",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-08-01",
+                "end_exclusive": "2026-09-01"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "elapsed_ms": 6407.520761999876
+    },
+    {
+      "question": "¿Cuál fue la diferencia?",
+      "text": "Todavía no puedo calcular automáticamente la diferencia de facturación entre períodos. Puedo consultar cada período por separado, pero no voy a inventar una comparación.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "event_id": "4d69211a-ee4e-449a-a1c7-dfcc9406bb39",
+      "thread_id": "f887bfad-d78a-4914-9786-f17f0940469f",
+      "audit": {
+        "bmd": {
+          "category": "COMPARISON_UNSUPPORTED"
+        },
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.8993350002128864,
+          "interpretation_ms": 4175.436638999599,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4177.097508999395
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          },
+          "pending": {
+            "spec": {
+              "slot": "comparison",
+              "question": "¿Con qué período querés comparar agosto de 2026?"
+            },
+            "proposed": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-08-01",
+                "end_exclusive": "2026-09-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "source_turn_id": "4d69211a-ee4e-449a-a1c7-dfcc9406bb39",
+            "base_state_hash": "ccb36a1e35b0433afdf01d1d32181efe093ce5022936c20980c21b6a125cd67d"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          },
+          "pending": {
+            "spec": {
+              "slot": "comparison",
+              "question": "¿Con qué período querés comparar agosto de 2026?"
+            },
+            "proposed": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-08-01",
+                "end_exclusive": "2026-09-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "source_turn_id": "4d69211a-ee4e-449a-a1c7-dfcc9406bb39",
+            "base_state_hash": "ccb36a1e35b0433afdf01d1d32181efe093ce5022936c20980c21b6a125cd67d"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Todavía no puedo calcular automáticamente la diferencia de facturación entre períodos. Puedo consultar cada período por separado, pero no voy a inventar una comparación.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "required_permission": null,
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "interpretation_proposed": {
+          "action": "ASK",
+          "intent": "COMPARE",
+          "state_delta": {
+            "set": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-08-01",
+                "end_exclusive": "2026-09-01"
+              },
+              "branches": [],
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": {
+            "slot": "comparison",
+            "question": "¿Con qué período querés comparar agosto de 2026?"
+          }
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "elapsed_ms": 4320.855085999938
+    },
+    {
+      "question": "Mostrame las últimas cinco facturas.",
+      "text": "Últimas facturas activas por fecha documental (no instante de ingreso):\n1. Factura N.º 260192728 · fecha 2026-09-24\n2. Factura N.º 260192727 · fecha 2026-09-24\n3. Factura N.º 260192726 · fecha 2026-09-24\n4. Factura N.º 260192725 · fecha 2026-09-24\n5. Factura N.º 260739131 · fecha 2026-09-24\nOrdenadas de más reciente a más antigua. Excluye anuladas y notas de crédito. No es venta neta.\nInformación actualizada al 28 de septiembre de 2026; puede no reflejar cambios posteriores.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "3b4d97ec-168d-4f52-9903-691735acc3ef",
+      "thread_id": "f887bfad-d78a-4914-9786-f17f0940469f",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 2153.157007000118,
+          "state_engine_ms": 0.7674819999010651,
+          "interpretation_ms": 5897.847363999972,
+          "response_format_ms": 0.024156000108632725,
+          "total_processing_ms": 8059.786762999465
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "previous_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          },
+          "pending": {
+            "spec": {
+              "slot": "comparison",
+              "question": "¿Con qué período querés comparar agosto de 2026?"
+            },
+            "proposed": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-08-01",
+                "end_exclusive": "2026-09-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "source_turn_id": "4d69211a-ee4e-449a-a1c7-dfcc9406bb39",
+            "base_state_hash": "ccb36a1e35b0433afdf01d1d32181efe093ce5022936c20980c21b6a125cd67d"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "confirmed_state": {
+          "limit": 5,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "limit": 5,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "SELECT source_system,doc_entry,doc_num,doc_date,canceled\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\nWHERE source_system=? AND canceled=? AND doc_date IS NOT NULL\nORDER BY doc_date DESC,CAST(doc_entry AS BIGINT) DESC,doc_entry DESC LIMIT ?",
+          "rows": [
+            {
+              "doc_num": "260192728",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532517",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192727",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532516",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192726",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532515",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192725",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532514",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260739131",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532513",
+              "source_system": "SAP_B1_HANA"
+            }
+          ],
+          "grain": "invoice_header",
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "read_only": true,
+          "capability": "sales.latest_documents.v1",
+          "limitations": "Active invoices (N), by DocDate, not entry timestamp; excludes credit memos. Not net sales. Completeness not certified.",
+          "sap_accessed": false,
+          "document_type": "OINV",
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N",
+            5
+          ],
+          "sql_duration_ms": 134.540009000375
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Últimas facturas activas por fecha documental (no instante de ingreso):\n1. Factura N.º 260192728 · fecha 2026-09-24\n2. Factura N.º 260192727 · fecha 2026-09-24\n3. Factura N.º 260192726 · fecha 2026-09-24\n4. Factura N.º 260192725 · fecha 2026-09-24\n5. Factura N.º 260739131 · fecha 2026-09-24\nOrdenadas de más reciente a más antigua. Excluye anuladas y notas de crédito. No es venta neta.\nInformación actualizada al 28 de septiembre de 2026; puede no reflejar cambios posteriores.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.sales.latest_documents.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/limit": 5,
+              "/metric": "sales.latest_documents",
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "/temporal_reference": null,
+              "/product_search_text": null,
+              "/selected_item_codes": []
+            },
+            "unset": [
+              "/period",
+              "/branches",
+              "/comparison",
+              "/sales_channel",
+              "/reference"
+            ]
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "elapsed_ms": 8180.810152999584
+    },
+    {
+      "question": "¿Qué productos tiene la primera?",
+      "text": "Factura N.º 260192728\n\nProductos:\n1. AGUA DESIONIZADA GRANEL x L. (L00003) — cantidad documental 10.\nLa unidad nativa de cada línea no está publicada; no infiero unidades del nombre. Las descripciones corresponden al catálogo publicado, no al texto histórico de la factura. Información actualizada al 28 de septiembre de 2026; puede no reflejar cambios posteriores.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "e45c1f62-1ee3-49d8-9835-1b978d7e7ad6",
+      "thread_id": "f887bfad-d78a-4914-9786-f17f0940469f",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 2125.0824049993753,
+          "state_engine_ms": 0.0,
+          "interpretation_ms": 2599.944654000865,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4736.026420000599
+        },
+        "decision": "READ_LINES",
+        "committed": false,
+        "previous_state": {
+          "limit": 5,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "confirmed_state": {
+          "limit": 5,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "reference_focus": "result",
+        "validated_state": null,
+        "capability_calls": 1,
+        "execution_result": {
+          "rows": [
+            {
+              "unit": null,
+              "line_num": 0,
+              "quantity": "10",
+              "item_code": "L00003",
+              "description": "AGUA DESIONIZADA GRANEL x L.",
+              "source_as_of": "2026-09-24T13:53:07.952772+00:00",
+              "description_source": "Foundation reference.products SAP_HANA"
+            }
+          ],
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "document": {
+            "doc_num": "260192728",
+            "doc_date": "2026-09-24T00:00:00",
+            "doc_entry": "11532517",
+            "document_type": "OINV",
+            "source_system": "SAP_B1_HANA"
+          },
+          "read_only": true,
+          "capability": "sales.invoice_lines.v1",
+          "parameters": {
+            "doc_num": "260192728",
+            "doc_date": "2026-09-24T00:00:00",
+            "doc_entry": "11532517",
+            "snapshot_id": 1408,
+            "document_type": "OINV",
+            "source_system": "SAP_B1_HANA",
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "limitations": "Active OINV only, INV1 in original order. Catalog description, not historical invoice wording. Native line UoM is not published. Documentary quantities only, no conversions, totals or amounts.",
+          "sap_accessed": false
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Factura N.º 260192728\n\nProductos:\n1. AGUA DESIONIZADA GRANEL x L. (L00003) — cantidad documental 10.\nLa unidad nativa de cada línea no está publicada; no infiero unidades del nombre. Las descripciones corresponden al catálogo publicado, no al texto histórico de la factura. Información actualizada al 28 de septiembre de 2026; puede no reflejar cambios posteriores.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "result_provenance": {
+          "updated_at": "2026-09-28T18:18:35.264000",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+        },
+        "selected_document": {
+          "doc_num": "260192728",
+          "doc_entry": "11532517",
+          "document_type": "OINV",
+          "source_system": "SAP_B1_HANA"
+        },
+        "document_reference": {
+          "result_id": "3b4d97ec-168d-4f52-9903-691735acc3ef",
+          "selected_ordinal": 1
+        },
+        "required_permission": "telchi.sales.invoice_lines.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "READ_LINES",
+          "intent": "DOCUMENT_REFERENCE",
+          "clarification": null,
+          "result_reference": {
+            "field": null,
+            "ordinal": 1,
+            "result_id": "3b4d97ec-168d-4f52-9903-691735acc3ef"
+          }
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "elapsed_ms": 4895.8417690000715
+    },
+    {
+      "question": "¿Cuánto vale esa factura?",
+      "text": "La factura N.º 260192728 tiene un total documental de BS 25,00. Es el importe de la factura, no lo cobrado ni el saldo pendiente. Información actualizada al 28 de septiembre de 2026.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "66e8b068-ddf5-42f8-a326-ef8f696cf05a",
+      "thread_id": "f887bfad-d78a-4914-9786-f17f0940469f",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 1970.313960000567,
+          "state_engine_ms": 0.0,
+          "interpretation_ms": 2265.7419299994217,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4247.387522000281
+        },
+        "decision": "READ_AMOUNT",
+        "committed": false,
+        "previous_state": {
+          "limit": 5,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "confirmed_state": {
+          "limit": 5,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "reference_focus": "document",
+        "validated_state": null,
+        "capability_calls": 1,
+        "execution_result": {
+          "rows": [
+            {
+              "amount": "25",
+              "currency": "BS"
+            }
+          ],
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "document": {
+            "doc_num": "260192728",
+            "doc_date": "2026-09-24T00:00:00",
+            "doc_entry": "11532517",
+            "document_type": "OINV",
+            "source_system": "SAP_B1_HANA"
+          },
+          "read_only": true,
+          "capability": "sales.invoice_amount.v1",
+          "parameters": {
+            "doc_num": "260192728",
+            "doc_date": "2026-09-24T00:00:00",
+            "doc_entry": "11532517",
+            "snapshot_id": 1408,
+            "document_type": "OINV",
+            "source_system": "SAP_B1_HANA",
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "limitations": "Published active invoice header total in its native currency. Not collections or outstanding balance. No inferred tax breakdown or line reconstruction.",
+          "sap_accessed": false,
+          "source_as_of": "2026-09-24T13:53:07.952772+00:00",
+          "amount_source": "OINV.DocTotal",
+          "raw_extraction_id": "manual-update-20260924T132754050866Z_changed"
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "La factura N.º 260192728 tiene un total documental de BS 25,00. Es el importe de la factura, no lo cobrado ni el saldo pendiente. Información actualizada al 28 de septiembre de 2026.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "result_provenance": {
+          "updated_at": "2026-09-28T18:18:35.264000",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+        },
+        "selected_document": {
+          "doc_num": "260192728",
+          "doc_entry": "11532517",
+          "document_type": "OINV",
+          "source_system": "SAP_B1_HANA"
+        },
+        "document_reference": {
+          "result_id": "3b4d97ec-168d-4f52-9903-691735acc3ef",
+          "selected_ordinal": 1
+        },
+        "required_permission": "telchi.sales.invoice_amount.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "SELECT_DOCUMENT",
+          "intent": "DOCUMENT_REFERENCE",
+          "clarification": null,
+          "result_reference": {
+            "field": "amount",
+            "ordinal": null,
+            "result_id": "3b4d97ec-168d-4f52-9903-691735acc3ef"
+          }
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "elapsed_ms": 4360.193900000013
+    }
+  ]
+}

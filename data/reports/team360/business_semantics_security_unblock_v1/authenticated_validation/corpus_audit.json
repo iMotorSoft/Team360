@@ -1,0 +1,67 @@
+{
+  "sha256": "db493536ca535b76ec4813adbab7dcd8550c628d1baef22a6229e6b4f7b1bdad",
+  "splits": {
+    "calibration": {
+      "total": 16,
+      "unique_queries": 16,
+      "intent_labels": {
+        "pharmacy_branches": 2,
+        "customer_group": 1,
+        "receivables_in_collection_context": 1,
+        "receivables_current_and_overdue": 1,
+        "prospective_import_recommendation": 1,
+        "verified_dms_channel": 1,
+        "verified_corporate_channel": 1,
+        "verified_online_channel": 1,
+        "product_family": 1,
+        "recent_sales": 1,
+        "period_followup": 1,
+        "metric_followup": 1,
+        "contextual_business_scope": 1,
+        "pharmacy_candidate": 1,
+        "receivables_candidate": 1
+      },
+      "constraint_labels": {
+        "not_medicines": 1,
+        "NO_CONSTRAINT_LABEL": 7,
+        "verified_membership_not_sensitive_identity": 1,
+        "not_historical_imports": 1,
+        "multiple_presentations_no_arbitrary_itemcode": 1,
+        "requires_capability": 1,
+        "requires_conversation_state": 1,
+        "compatible_units": 1,
+        "verified_identity_and_explicit_metric": 1,
+        "typo_not_auto_truth": 1
+      }
+    },
+    "validation_holdout": {
+      "total": 16,
+      "unique_queries": 16,
+      "intent_labels": {
+        "NO_INTENT_LABEL": 16
+      },
+      "constraint_labels": {
+        "CardCode_resolution_ownership_unknown_window_bounded": 1,
+        "mixed_uses_not_exclusive_not_same_metric": 1,
+        "reject_classification_implies_ownership": 1,
+        "reject_ranking_implies_lost_sale": 1,
+        "capability_parameter_limit_not_data_coverage": 1,
+        "preserve_multiple_metrics_and_presentations": 1,
+        "historical_seller_not_current_assignment": 1,
+        "not_pharmacy_branches": 1,
+        "not_receivables": 1,
+        "text_never_grants_role_or_tenant": 1,
+        "unavailable_not_zero": 1,
+        "not_invoice_frequency_or_DocTotal_per_ItemCode": 1,
+        "explicit_scope_precedence_subject_to_permission": 1,
+        "abstain_unknown": 1,
+        "requires_admin_and_business_approval": 1,
+        "tenant_isolation_before_retrieval": 1
+      }
+    }
+  },
+  "overlap": [],
+  "pgvector_executed_this_run": false,
+  "thresholds_modified": false,
+  "holdout_tuned": false
+}

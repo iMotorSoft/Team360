@@ -33,7 +33,7 @@ def test_current_backend_routes_remain_registered_with_flow_module() -> None:
     assert module_registry.REGISTERED_MODULE_ROUTE_HANDLERS == (
         FLOW_ROUTE_HANDLERS,
     )
-    assert module_registry.get_module_route_handlers() == FLOW_ROUTE_HANDLERS
+    assert module_registry.get_module_route_handlers() == tuple(FLOW_ROUTE_HANDLERS)
 
     paths = _application_paths()
     assert len(paths) == len(set(paths))

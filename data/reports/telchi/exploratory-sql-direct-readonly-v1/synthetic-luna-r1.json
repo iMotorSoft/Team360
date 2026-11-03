@@ -1,0 +1,55 @@
+{
+  "identifier": "TELCHIAI_EXPLORATORY_SQL_DIRECT_READONLY_V1",
+  "timestamp": "2026-10-27T14:21:19.210231+00:00",
+  "environment": "DEV",
+  "scope": "synthetic",
+  "question": "Investiga las facturas sintéticas sin canal, vendedores y movimientos. Cuantifica importes a grano documental y comprueba si los movimientos multiplican la facturación. Separa cabeceras de líneas, hechos e hipótesis. Incluye al finalizar el total global de cabeceras como claim invoice_header_total_bs.",
+  "turns": [],
+  "status": "BLOCKED",
+  "foundation": {
+    "status": "BLOCKED",
+    "reasons": [
+      "enterprise_openai_destination_scope_not_accredited",
+      "foundation_authorized_catalog_binding_not_implemented",
+      "host_io_pressure_requires_new_preflight"
+    ],
+    "foundation_opened": false,
+    "business_data_sent_to_model": false
+  },
+  "whatsapp_e2e": "NOT_RUN",
+  "os_isolation": "F1_EXECUTION_ISOLATION_FAIL preserved",
+  "ready_for_channel_integration": false,
+  "blocked_reason": "model_invalid_json",
+  "elapsed_seconds": 8.384499810000307,
+  "model_calls": [
+    {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "fallback": false,
+      "elapsed_seconds": 8.383905421000236,
+      "usage": {
+        "input_tokens": 1253,
+        "input_tokens_details": {
+          "cache_write_tokens": 1250,
+          "cached_tokens": 0
+        },
+        "output_tokens": 732,
+        "output_tokens_details": {
+          "reasoning_tokens": 109
+        },
+        "total_tokens": 1985
+      }
+    }
+  ],
+  "resources": {
+    "peak_process_rss_kib": 40192,
+    "duckdb_threads": 1,
+    "concurrency": 1,
+    "observation_bytes_limit": 32768,
+    "wall_budget_seconds": 180,
+    "own_processes_left_running": 0
+  },
+  "code_digest": "decf1121ed91345c418c594a3cc149e85fdad0becc66156a51448be498149022"
+}

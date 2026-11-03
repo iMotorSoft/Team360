@@ -1,0 +1,99 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+...............EEE...................................................... [ 71%]
+.............................                                            [100%]
+==================================== ERRORS ====================================
+___ ERROR at setup of test_on_webhook_security_frozen_binding_and_lifecycle ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7c6575351640>
+
+    @pytest.fixture
+    def composition(monkeypatch):
+        # Import with OFF, then compose ON with explicit validated synthetic config.
+        monkeypatch.setenv('TEAM360_SRV05_EVOLUTION_ENABLED', '0')
+>       import ls_iMotorSoft_Srv05 as srv
+
+tests/test_srv05_evolution_isolation.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ls_iMotorSoft_Srv05.py:45: in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def create_app() -> Litestar:
+        settings = Srv05Settings.from_env()
+        handlers = ()
+        if settings.evolution_enabled:
+            from modules.messaging.routes import ROUTE_HANDLERS
+            handlers = ROUTE_HANDLERS
+>       application = create_legacy_app(extra_route_handlers=handlers)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: create_app() got an unexpected keyword argument 'extra_route_handlers'
+
+ls_iMotorSoft_Srv05.py:38: TypeError
+_ ERROR at setup of test_missing_binding_aborts_and_closes_pool_before_scheduler _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7c6575cf0ec0>
+
+    @pytest.fixture
+    def composition(monkeypatch):
+        # Import with OFF, then compose ON with explicit validated synthetic config.
+        monkeypatch.setenv('TEAM360_SRV05_EVOLUTION_ENABLED', '0')
+>       import ls_iMotorSoft_Srv05 as srv
+
+tests/test_srv05_evolution_isolation.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ls_iMotorSoft_Srv05.py:45: in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def create_app() -> Litestar:
+        settings = Srv05Settings.from_env()
+        handlers = ()
+        if settings.evolution_enabled:
+            from modules.messaging.routes import ROUTE_HANDLERS
+            handlers = ROUTE_HANDLERS
+>       application = create_legacy_app(extra_route_handlers=handlers)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: create_app() got an unexpected keyword argument 'extra_route_handlers'
+
+ls_iMotorSoft_Srv05.py:38: TypeError
+_ ERROR at setup of test_safe_simultaneous_apps_have_no_cross_activation_or_real_scheduler _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7c6575350cb0>
+
+    @pytest.fixture
+    def composition(monkeypatch):
+        # Import with OFF, then compose ON with explicit validated synthetic config.
+        monkeypatch.setenv('TEAM360_SRV05_EVOLUTION_ENABLED', '0')
+>       import ls_iMotorSoft_Srv05 as srv
+
+tests/test_srv05_evolution_isolation.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ls_iMotorSoft_Srv05.py:45: in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def create_app() -> Litestar:
+        settings = Srv05Settings.from_env()
+        handlers = ()
+        if settings.evolution_enabled:
+            from modules.messaging.routes import ROUTE_HANDLERS
+            handlers = ROUTE_HANDLERS
+>       application = create_legacy_app(extra_route_handlers=handlers)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: create_app() got an unexpected keyword argument 'extra_route_handlers'
+
+ls_iMotorSoft_Srv05.py:38: TypeError
+=============================== warnings summary ===============================
+routes/diagnosis.py:130
+  /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/routes/diagnosis.py:130: UserWarning: AUTOMATION_DIAGNOSIS_REPOSITORY=memory: conversation state will not survive backend restart.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_srv05_evolution_isolation.py::test_on_webhook_security_frozen_binding_and_lifecycle
+ERROR tests/test_srv05_evolution_isolation.py::test_missing_binding_aborts_and_closes_pool_before_scheduler
+ERROR tests/test_srv05_evolution_isolation.py::test_safe_simultaneous_apps_have_no_cross_activation_or_real_scheduler
+98 passed, 1 warning, 3 errors in 27.36s

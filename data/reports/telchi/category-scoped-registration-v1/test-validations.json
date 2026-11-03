@@ -1,0 +1,56 @@
+{
+  "results": [
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run pytest modules/telchi/provisioning/tests/test_category_registration.py modules/telchi/assistant/tests/test_dev_gate_policy.py -q",
+      "cwd": "SrvRestAstroLS_v1/backend",
+      "exit_code": 0,
+      "output": "34 passed in 5.29s"
+    },
+    {
+      "command": "compile() five new Python files",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "source_hashes": {
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/provisioning/category_repository.py": "81a846a1a977bdcbb85d383915b05e8f418493ddef282a933e9268d309bba931",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/provisioning/category_cli.py": "313f0b7d7450ca90a502b971a97dec7e24d880ceac5c560a9e6d3498a1f3dc3d",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/provisioning/tests/test_category_registration.py": "ec4ae89d26d0727813e0c4679445b6ba2153e5c67145980b0e19fd9d11304e73",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/provisioning/tests/live_category_registration.py": "04f2567790f945f1034386b5189654d1e9449134c4b8b0e0a68036f30b0cf6f9",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/provisioning/tests/publish_category_gates.py": "949238230a0e75c108af3e5a741c94596e0d0821e4b5f429fe0d5e179771d534"
+  },
+  "reuse": {
+    "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-sales-monetary-v1/validations-final.json",
+    "sha256": "6a53e07779a6957549fbbaa11bf7ea3086d592087436cc6e30f99844a4d56ae5",
+    "source_hash_matches": {
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/category_line_amount_query.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_category_line_amount_query.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/CATEGORY_LINE_AMOUNT_V1.md": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/capabilities.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/business_categories.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/monetary_comparison.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_category_line_amount.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_category_line_amount.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_business_categories.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/status_actual.md": true
+    },
+    "prior_tests": "256 PASS / 1 SKIP; not rerun",
+    "prior_postgresql_opt_in": "34 PASS; not rerun",
+    "reason": "All recorded implementation/test/contract hashes identical; only additive provisioning code and DEV registry changed."
+  },
+  "resource_guard": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE for completed sequential probe; later UNSAFE for new scans due growing swap",
+    "CONCURRENCY_USED": "PG max 1, DuckDB capability 2 threads / 512MB, numerical libraries 1; no browser or listener",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0
+  }
+}

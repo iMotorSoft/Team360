@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "scope": "OFFLINE_ONLY",
+  "branch": "feature/console-backend-core",
+  "offline_regressions": {
+    "passed": 545,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 63.73,
+    "junit": "offline-regressions.xml",
+    "command": "cd SrvRestAstroLS_v1/backend && TEAM360_TELCHI_DATA_ROOT=/tmp/telchi-reference-v2-gates-isolated TELCHI_DUCKDB_TEMP_DIRECTORY=/tmp/telchi-reference-v2-duckdb-temp TELCHI_DUCKDB_THREADS=2 PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run --no-sync pytest -q -p no:cacheprovider -p modules.telchi.investigation.validation.physical_reference_candidate_v2.offline_guard modules/telchi/datalake/tests modules/telchi/exploratory_sql/test_foundation.py --junitxml=../../data/reports/telchi/reference-v2-foundation-offline-final-r2/offline-regressions.xml"
+  },
+  "static_scope": {"passed": 2, "failed": 0, "seconds": 1.03, "junit": "static-scope.xml", "new_unique_tests": 1},
+  "final_focused": {"passed": 8, "failed": 0, "seconds": 3.65, "junit": "final-focused.xml", "scope": "snapshot distinction plus static gate and exact test-only exception"},
+  "unique_tests_passed": 546,
+  "historical_static_gate": {"test": "test_productive_and_shared_static_scan_are_clean", "status": "PASS", "allowlist_change": "One exact negative-fixture file only; executor and siblings remain scanned"},
+  "real_candidate": {
+    "preparation": "PASS",
+    "reference_projection": "PASS",
+    "foundation_manifest_and_ancestry": "PASS",
+    "derived_resolvers": "PASS",
+    "sealed_dataset_file_hashes": 13,
+    "simulation": "PASS",
+    "data_snapshot": 1408,
+    "derivation_snapshot": 1322,
+    "compare_and_swap": "PASS",
+    "unknown_component_rejection": "PASS",
+    "incomplete_registry_rejection": "PASS",
+    "pinned_readers": "PASS",
+    "rollback_recovery": "PASS",
+    "final_code_noop": "PASS",
+    "fact_verifier": "INJECTED_OFFLINE_NOT_A_LIVE_CATALOG_VERIFICATION",
+    "commands": [
+      "cd SrvRestAstroLS_v1/backend && PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run --no-sync python -m modules.telchi.investigation.validation.physical_reference_candidate_v2.run --attempt=-r2",
+      "cd SrvRestAstroLS_v1/backend && PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run --no-sync python -m modules.telchi.investigation.validation.physical_reference_candidate_v2.verify_real",
+      "cd SrvRestAstroLS_v1/backend && PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run --no-sync python -m modules.telchi.investigation.validation.physical_reference_candidate_v2.verify_real --preservation-only"
+    ],
+    "rerun_policy": "Commands create new isolated artifacts and fail closed on existing destinations. Preserve prior attempts and use new evidence/destination identities rather than overwrite."
+  },
+  "snapshot_regression_baseline_mutation": {
+    "status": "EXPECTED_FAILURE_CONFIRMED",
+    "assertion": "84 != 1408 when old base_snapshot_id selection is reinstated only in the test process",
+    "junit": "snapshot-baseline-mutation-expected-failure.xml",
+    "source_files_modified_by_mutation": false,
+    "initial_harness_error_preserved": "snapshot-mutation-harness-root-failure.xml"
+  },
+  "LAT": {
+    "lat check md": "PASS",
+    "lat check index": "PASS",
+    "lat check sections": "PASS",
+    "lat check code-refs": "PASS",
+    "lat check": "PASS",
+    "warnings": ["No init version recorded", "No LLM key configured for semantic search; does not affect these gates"]
+  },
+  "git_diff_check": "PASS",
+  "diff_review": "PASS; preexisting worktree changes preserved, no commits or index operations",
+  "final_preservation": "PASS; see final-preservation.json",
+  "incidents": [
+    {"classification": "ENVIRONMENTAL_ABORT", "count": 1, "reason": "First real runner exceeded local harness timeout of 240 seconds; process exited, artifacts preserved. Second attempt completed."},
+    {"classification": "OFFLINE_ISOLATION_GUARD_BLOCK", "tests_failed": 12, "tests_passed": 533, "actual_shared_writes": 0, "evidence": "offline-regressions-initial-blocked.xml", "resolution": "Configure existing runtime temp-directory env override to isolated /tmp root."},
+    {"classification": "TEST_ISOLATION_DEFECT", "tests_failed": 1, "tests_passed": 544, "actual_shared_writes": 0, "evidence": "offline-regressions-temp-profile-blocked.xml", "resolution": "Fixture-only monkeypatch isolates explicit product-commercial-semantics DuckDB temp profile. No commercial runtime change or guard weakening."}
+  ],
+  "resources": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS_ON_COMPLETED_RUNS",
+    "CONCURRENCY_USED": "One runner/pytest; two DuckDB threads; one numerical-library thread; no xdist or browsers",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 1,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "observations": "8 cores; load about 0.5-1.3; available memory about 6.1-6.5 GB; sustained high iowait; swap increased early then stable near 62 MB; conservative sequential work retained"
+  },
+  "pending_offline_gates": [],
+  "future_authorization_requirements": ["Shared publication window", "Live CURRENT/snapshot revalidation", "Durable installation and Reference pointer reconciliation wrapper"],
+  "publication_real": false,
+  "HANA_connections": 0,
+  "shared_writes": 0,
+  "commits": 0
+}

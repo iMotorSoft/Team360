@@ -1,0 +1,22 @@
+Repository: /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360
+Branch: feature/console-backend-core
+Preflight: git branch --show-current; git status --short; git diff --check; uptime; free -m; ps -eo pid,pcpu,pmem,comm --sort=-pcpu
+
+From backend:
+uv sync --locked
+uv run --locked python scripts/validate_srv05_source_isolation.py --output ../../data/reports/team360-srv05-evolution-isolation/20261011T133928Z/source-uv
+uv run python scripts/validate_srv05_source_isolation.py --output ../../data/reports/team360-srv05-evolution-isolation/20261011T133928Z/source-uv-r2
+AUTOMATION_DIAGNOSIS_REPOSITORY=memory TEAM360_AI_PROVIDER=mock TEAM360_SRV05_EVOLUTION_ENABLED=0 uv run pytest -q tests/test_srv05_evolution_isolation.py tests/test_srv05_compatibility.py tests/test_module_registry.py tests/test_messaging_evolution.py tests/test_team360_full_gate.py
+AUTOMATION_DIAGNOSIS_REPOSITORY=memory TEAM360_AI_PROVIDER=mock TEAM360_SRV05_EVOLUTION_ENABLED=0 uv run pytest -q tests/test_srv05_evolution_isolation.py
+AUTOMATION_DIAGNOSIS_REPOSITORY=memory TEAM360_AI_PROVIDER=mock TEAM360_SRV05_EVOLUTION_ENABLED=0 uv run pytest -q tests/test_messaging_dev_profile.py tests/test_srv05_e2e_launcher.py tests/test_srv05_packaging_harness.py tests/test_messaging_evolution_postgres.py
+TEAM360_ENV=development TEAM360_SRV05_EVOLUTION_ENABLED=0 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run python scripts/validate_team360_full_stack.py --output ../../data/reports/team360-srv05-evolution-isolation/20261011T133928Z/full-gate-r2
+
+From repository:
+lat check md
+lat check index
+lat check sections
+lat check code-refs
+lat check
+git diff --check
+
+Reports distinguish reruns and overlapping test counts. No external Messaging test switches enabled. No private env files loaded by this task. Runtime child argv and owned PID/group cleanup are in source-uv-r2/report.json. Full Gate workers use read-only operational probes, not --safe-operational conversation writes.

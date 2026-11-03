@@ -1,7 +1,7 @@
 """Console bootstrap endpoint (/api/console/bootstrap).
 
-Experimental: returns ConsoleBootstrap + PASETO access_token when
-TEAM360_PASETO_ENABLED=true.
+Experimental DEV-only: returns ConsoleBootstrap + PASETO access_token when
+TEAM360_ENV is explicitly dev/development and TEAM360_PASETO_ENABLED=true.
 
 Preserves full compatibility: existing fields unchanged, token fields
 (access_token, token_type, expires_in) returned only when PASETO is enabled.
@@ -13,7 +13,7 @@ from typing import Any
 
 from litestar import post
 from litestar.exceptions import HTTPException
-from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
+from litestar.status_codes import HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
 from modules.console.service import ConsoleBootstrapService
 from modules.console.errors import (
@@ -21,6 +21,7 @@ from modules.console.errors import (
 )
 from modules.db.errors import DatabasePoolNotInitializedError
 from modules.db.pool import get_pool
+from modules.security.environment import is_explicit_development_environment
 from modules.security.paseto_tokens import paseto_console_settings_from_env
 
 _SERVICE = ConsoleBootstrapService()
@@ -30,6 +31,12 @@ _SERVICE = ConsoleBootstrapService()
 async def console_bootstrap(
     data: dict[str, Any],
 ) -> dict[str, Any]:
+    # This experimental endpoint accepts caller-selected identity and has no
+    # preceding session boundary. Keep it DEV-only until the documented
+    # authenticated workspace bootstrap contract is implemented.
+    if not is_explicit_development_environment():
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found")
+
     workspace_id = data.get("workspace_id", "")
     user_id = data.get("user_id", "")
 

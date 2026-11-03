@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-10-18T14:55:30.202116+00:00",
+  "branch": "feature/console-backend-core",
+  "source_sha256": "e809a3ec18709f71a9cc43b66b4886d38d3464d2ae4cebf5b14b971c6ec19055",
+  "approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+  "runner_sha256": "b90897106858e839007063dab8dd27eaa083024c612c251f147e9d99673cc9fd",
+  "configuration_sha256": "3f69ac997b76af9549a2588edd018bac160bc06ee571d4dba8b0df254f9e359c",
+  "observations": [],
+  "host_preflight": "BUSY_BUT_SAFE: 8 CPUs, load 2.45/1.84/1.65, MemAvailable 6080 MiB, swap 5 MiB, vmstat 88% idle and no swap IO; one listener, requests sequential, PG pool max 2",
+  "scope": "Production Srv05 composition + PilotBoundary over real loopback HTTP. Lifespan disabled; owned PG pool only. No normal TelchiAI launch, model, Foundation, Meta, Evolution or Cloudflare calls.",
+  "affected_gate": "http_auth: positive messages.upsert admission invalidated by removal of base pilot permission",
+  "gates_published": false,
+  "unrelated_processes_terminated": 0,
+  "historical_evidence": {
+    "assistant_foundation": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "business_authorization": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "durable_idempotency": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "http_auth": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "38fd6b6b5890a302137b27bacd9fbc968a0725735e7fc7c704b80473fac445b8",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "identity_tenant_isolation": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "model_no_fallback": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    }
+  },
+  "manifest_source_matches": false,
+  "manifest_approval_matches": false,
+  "previous_attempts": [
+    "First harness timed out (ENVIRONMENTAL_ABORT, no conclusion); process absence checked",
+    "Second harness exposed construction ValueError before listener; process exited; final harness moves composition before resource allocation"
+  ],
+  "session_before": "STOPPED",
+  "database_scope": {
+    "status": "PASS",
+    "tenant_matches": true,
+    "workspace_matches": true
+  },
+  "own_processes_left_running": 0,
+  "error_class": "ValueError",
+  "blocker": "Approved DEV horizontal handler registry required",
+  "classification": "FUNCTIONAL_FAILURE: production Srv05 refuses permissionless pilot registration before listener construction; no guard bypass authorized",
+  "session_after": "STOPPED",
+  "source_unchanged": true,
+  "private_inputs_unchanged": true,
+  "status": "BLOCKED",
+  "private_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/ingress-operational-20261018T145530202008Z/result.json",
+  "private_artifact_sha256": "36d02cf34f81095666bb1b88562a5f6e47bf588d3d16f6871dce16392d09ad91"
+}

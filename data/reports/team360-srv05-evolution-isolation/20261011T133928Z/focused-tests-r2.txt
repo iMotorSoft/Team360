@@ -1,0 +1,124 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+   Building team360-backend @ file:///media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+      Built team360-backend @ file:///media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend
+Uninstalled 1 package in 62ms
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 1 package in 3ms
+...............EEE...................................................... [ 71%]
+.............................                                            [100%]
+==================================== ERRORS ====================================
+___ ERROR at setup of test_on_webhook_security_frozen_binding_and_lifecycle ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78544dc58b30>
+
+    @pytest.fixture
+    def composition(monkeypatch):
+        # Import with OFF, then compose ON with explicit validated synthetic config.
+        monkeypatch.setenv('TEAM360_SRV05_EVOLUTION_ENABLED', '0')
+        import ls_iMotorSoft_Srv05 as srv
+        import ls_iMotorSoft_Srv01 as old
+        import modules.db.pool as pool
+        import modules.db.transaction as transaction_module
+        from modules.messaging.repository import MessagingRepository
+        events = []
+        async def opened(): events.append('open')
+        async def closed(): events.append('close')
+        async def started(): events.append('start')
+        async def stopped(): events.append('stop')
+        async def binding(*args, **kwargs):
+            events.append('binding')
+            assert kwargs == {'workspace_slug': 'test-workspace', 'channel_alias': 'test-channel',
+                              'provider': 'evolution', 'instance': 'test-instance'}
+        async def schema(*args): events.append('schema')
+        @asynccontextmanager
+        async def tx(_): yield object()
+        monkeypatch.setattr(old, '_open_db_pool', opened)
+        monkeypatch.setattr(old, '_close_db_pool', closed)
+        monkeypatch.setattr(old, '_start_flow_scheduler', started)
+        monkeypatch.setattr(old, '_stop_flow_scheduler', stopped)
+        monkeypatch.setattr(pool, 'get_pool', lambda: object())
+>       monkeypatch.setattr(transaction_module, 'transaction', tx)
+E       AttributeError: <function transaction at 0x7854513db880> has no attribute 'transaction'
+
+tests/test_srv05_evolution_isolation.py:126: AttributeError
+_ ERROR at setup of test_missing_binding_aborts_and_closes_pool_before_scheduler _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78544e5e7fe0>
+
+    @pytest.fixture
+    def composition(monkeypatch):
+        # Import with OFF, then compose ON with explicit validated synthetic config.
+        monkeypatch.setenv('TEAM360_SRV05_EVOLUTION_ENABLED', '0')
+        import ls_iMotorSoft_Srv05 as srv
+        import ls_iMotorSoft_Srv01 as old
+        import modules.db.pool as pool
+        import modules.db.transaction as transaction_module
+        from modules.messaging.repository import MessagingRepository
+        events = []
+        async def opened(): events.append('open')
+        async def closed(): events.append('close')
+        async def started(): events.append('start')
+        async def stopped(): events.append('stop')
+        async def binding(*args, **kwargs):
+            events.append('binding')
+            assert kwargs == {'workspace_slug': 'test-workspace', 'channel_alias': 'test-channel',
+                              'provider': 'evolution', 'instance': 'test-instance'}
+        async def schema(*args): events.append('schema')
+        @asynccontextmanager
+        async def tx(_): yield object()
+        monkeypatch.setattr(old, '_open_db_pool', opened)
+        monkeypatch.setattr(old, '_close_db_pool', closed)
+        monkeypatch.setattr(old, '_start_flow_scheduler', started)
+        monkeypatch.setattr(old, '_stop_flow_scheduler', stopped)
+        monkeypatch.setattr(pool, 'get_pool', lambda: object())
+>       monkeypatch.setattr(transaction_module, 'transaction', tx)
+E       AttributeError: <function transaction at 0x7854513db880> has no attribute 'transaction'
+
+tests/test_srv05_evolution_isolation.py:126: AttributeError
+_ ERROR at setup of test_safe_simultaneous_apps_have_no_cross_activation_or_real_scheduler _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x78544db5b080>
+
+    @pytest.fixture
+    def composition(monkeypatch):
+        # Import with OFF, then compose ON with explicit validated synthetic config.
+        monkeypatch.setenv('TEAM360_SRV05_EVOLUTION_ENABLED', '0')
+        import ls_iMotorSoft_Srv05 as srv
+        import ls_iMotorSoft_Srv01 as old
+        import modules.db.pool as pool
+        import modules.db.transaction as transaction_module
+        from modules.messaging.repository import MessagingRepository
+        events = []
+        async def opened(): events.append('open')
+        async def closed(): events.append('close')
+        async def started(): events.append('start')
+        async def stopped(): events.append('stop')
+        async def binding(*args, **kwargs):
+            events.append('binding')
+            assert kwargs == {'workspace_slug': 'test-workspace', 'channel_alias': 'test-channel',
+                              'provider': 'evolution', 'instance': 'test-instance'}
+        async def schema(*args): events.append('schema')
+        @asynccontextmanager
+        async def tx(_): yield object()
+        monkeypatch.setattr(old, '_open_db_pool', opened)
+        monkeypatch.setattr(old, '_close_db_pool', closed)
+        monkeypatch.setattr(old, '_start_flow_scheduler', started)
+        monkeypatch.setattr(old, '_stop_flow_scheduler', stopped)
+        monkeypatch.setattr(pool, 'get_pool', lambda: object())
+>       monkeypatch.setattr(transaction_module, 'transaction', tx)
+E       AttributeError: <function transaction at 0x7854513db880> has no attribute 'transaction'
+
+tests/test_srv05_evolution_isolation.py:126: AttributeError
+=============================== warnings summary ===============================
+routes/diagnosis.py:130
+  /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/routes/diagnosis.py:130: UserWarning: AUTOMATION_DIAGNOSIS_REPOSITORY=memory: conversation state will not survive backend restart.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_srv05_evolution_isolation.py::test_on_webhook_security_frozen_binding_and_lifecycle
+ERROR tests/test_srv05_evolution_isolation.py::test_missing_binding_aborts_and_closes_pool_before_scheduler
+ERROR tests/test_srv05_evolution_isolation.py::test_safe_simultaneous_apps_have_no_cross_activation_or_real_scheduler
+98 passed, 1 warning, 3 errors in 24.80s

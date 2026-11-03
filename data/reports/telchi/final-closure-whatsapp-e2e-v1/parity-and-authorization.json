@@ -1,0 +1,98 @@
+{
+  "status": "PASS",
+  "baseline": "data/reports/telchi/operational-authorized-e2e-v1/report.json",
+  "baseline_sha256": "fa83580fc9ffd6319aa01143628cade9221cb3ff67793dcf4ee7bf199e5d836d",
+  "basis": "fresh canonical physical/replay integrity plus exact comparison to existing independent business controls; no recapture",
+  "checks": [
+    {
+      "operation": "inventory.stock_by_warehouse",
+      "required_permission": "telchi.inventory.stock_by_warehouse.read.v1",
+      "parity": "EXACT",
+      "checks": {
+        "summary": true,
+        "controls": true,
+        "total_rows": true,
+        "omitted_rows": true,
+        "coverage": true,
+        "source": true,
+        "presented_rows": true
+      },
+      "elapsed_seconds": 62.878788854999584,
+      "analytical_calls": 1,
+      "duplicate_replays": 2,
+      "outbound_attempts": 1
+    },
+    {
+      "operation": "production.consumption",
+      "required_permission": "telchi.production.consumption.read.v1",
+      "parity": "EXACT",
+      "checks": {
+        "summary": true,
+        "controls": true,
+        "total_rows": true,
+        "omitted_rows": true,
+        "coverage": true,
+        "source": true,
+        "presented_rows": true
+      },
+      "elapsed_seconds": 64.74866623700109,
+      "analytical_calls": 1,
+      "duplicate_replays": 2,
+      "outbound_attempts": 1
+    },
+    {
+      "operation": "purchasing.invoiced_amount",
+      "required_permission": "telchi.purchasing.invoiced_amount.read.v1",
+      "parity": "EXACT",
+      "checks": {
+        "summary": true,
+        "controls": true,
+        "total_rows": true,
+        "omitted_rows": true,
+        "coverage": true,
+        "source": true,
+        "presented_rows": true
+      },
+      "elapsed_seconds": 68.5154487259988,
+      "analytical_calls": 1,
+      "duplicate_replays": 2,
+      "outbound_attempts": 1
+    },
+    {
+      "operation": "collections.received_amount",
+      "required_permission": "telchi.collections.received_amount.read.v1",
+      "parity": "EXACT",
+      "checks": {
+        "summary": true,
+        "controls": true,
+        "total_rows": true,
+        "omitted_rows": true,
+        "coverage": true,
+        "source": true,
+        "presented_rows": true
+      },
+      "elapsed_seconds": 65.89234896599919,
+      "analytical_calls": 1,
+      "duplicate_replays": 2,
+      "outbound_attempts": 1
+    },
+    {
+      "operation": "material_supply.consumption",
+      "required_permission": "telchi.material_supply.consumption.read.v1",
+      "parity": "EXACT",
+      "checks": {
+        "summary": true,
+        "controls": true,
+        "total_rows": true,
+        "omitted_rows": true,
+        "coverage": true,
+        "source": true,
+        "presented_rows": true
+      },
+      "elapsed_seconds": 66.40541185199982,
+      "analytical_calls": 1,
+      "duplicate_replays": 2,
+      "outbound_attempts": 2
+    }
+  ]
+}

@@ -1,0 +1,486 @@
+{
+  "preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  },
+  "scope": "Real interpreter, State Engine, catalog and Foundation. No identity/RBAC claim.",
+  "services_started": 0,
+  "whatsapp_sent": 0,
+  "turns": [
+    {
+      "name": "raw",
+      "question": "¿Cuánto vendimos de materia prima en septiembre?",
+      "result": {
+        "capability": "sales.category_line_amount.v1",
+        "parameters": {
+          "category": "RAW_MATERIAL",
+          "currency": "BS",
+          "date_from": "2026-09-01",
+          "date_to_exclusive": "2026-10-01"
+        },
+        "definition": "commercial_active_invoice_line_amount_excluding_line_tax_v1",
+        "currency": "BS",
+        "rows": [
+          {
+            "amount": "839582.630000",
+            "product_count": 34,
+            "line_count": 526,
+            "document_count": 495,
+            "first_date": "2026-09-01T00:00:00",
+            "last_date": "2026-09-24T00:00:00"
+          }
+        ],
+        "coverage": {
+          "first_date": "2026-09-01T00:00:00",
+          "last_date": "2026-09-24T00:00:00",
+          "complete": false
+        },
+        "classification": {
+          "version": "v2_product_business_type_f9c1130d852ccb61",
+          "sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10",
+          "reference": "v2_reference_closure_2088d5885204313a",
+          "quality_lines": {
+            "VALIDATED": 526
+          }
+        },
+        "source": {
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot_id": 1408,
+          "updated_at": "2026-09-28T18:18:35.264000"
+        },
+        "limitations": [
+          "Sin IVA de línea; descuentos propios ya reflejados en el importe.",
+          "No descuenta notas de crédito ni incorpora ajustes globales u otros componentes de cabecera.",
+          "Clasificación actual, no histórica. Cobertura completa del período no certificada.",
+          "No es facturación documental neta ni monto cobrado. Las diferencias con cabeceras no son íntegramente IVA."
+        ],
+        "read_only": true,
+        "sap_accessed": false
+      },
+      "response": "Registramos Bs 839.582,63 en importe registrado en líneas comerciales de materia prima, septiembre de 2026. Corresponde a 34 productos, 526 líneas y 495 facturas. La cobertura documental observada va del 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica el período completo. No incluye IVA de línea ni descuenta notas de crédito. Los descuentos propios ya están reflejados; no incorpora ajustes globales ni otros componentes de cabecera. Clasificación actual, no histórica.",
+      "raw": {
+        "intent": "NEW_QUERY",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": {
+              "text": "RAW_MATERIAL",
+              "type": null
+            },
+            "/temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "NEW_QUERY",
+          "action": "EXECUTE",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/entity_mention": {
+                "text": "RAW_MATERIAL",
+                "type": null
+              },
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "entity_mention": {
+            "text": "RAW_MATERIAL",
+            "type": null
+          },
+          "temporal_reference": null,
+          "product_search_text": null,
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "period": true,
+        "execute": true,
+        "amount": true,
+        "counts": true
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS"
+    },
+    {
+      "name": "finished",
+      "question": "¿Y de productos terminados?",
+      "result": {
+        "capability": "sales.category_line_amount.v1",
+        "parameters": {
+          "category": "LAB_FINISHED_PRODUCT",
+          "currency": "BS",
+          "date_from": "2026-09-01",
+          "date_to_exclusive": "2026-10-01"
+        },
+        "definition": "commercial_active_invoice_line_amount_excluding_line_tax_v1",
+        "currency": "BS",
+        "rows": [
+          {
+            "amount": "2679208.660000",
+            "product_count": 278,
+            "line_count": 18541,
+            "document_count": 10694,
+            "first_date": "2026-09-01T00:00:00",
+            "last_date": "2026-09-24T00:00:00"
+          }
+        ],
+        "coverage": {
+          "first_date": "2026-09-01T00:00:00",
+          "last_date": "2026-09-24T00:00:00",
+          "complete": false
+        },
+        "classification": {
+          "version": "v2_product_business_type_f9c1130d852ccb61",
+          "sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10",
+          "reference": "v2_reference_closure_2088d5885204313a",
+          "quality_lines": {
+            "VALIDATED": 18541
+          }
+        },
+        "source": {
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot_id": 1408,
+          "updated_at": "2026-09-28T18:18:35.264000"
+        },
+        "limitations": [
+          "Sin IVA de línea; descuentos propios ya reflejados en el importe.",
+          "No descuenta notas de crédito ni incorpora ajustes globales u otros componentes de cabecera.",
+          "Clasificación actual, no histórica. Cobertura completa del período no certificada.",
+          "No es facturación documental neta ni monto cobrado. Las diferencias con cabeceras no son íntegramente IVA."
+        ],
+        "read_only": true,
+        "sap_accessed": false
+      },
+      "response": "Registramos Bs 2.679.208,66 en importe registrado en líneas comerciales de producto terminado de laboratorio, septiembre de 2026. Corresponde a 278 productos, 18541 líneas y 10694 facturas. La cobertura documental observada va del 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica el período completo. No incluye IVA de línea ni descuenta notas de crédito. Los descuentos propios ya están reflejados; no incorpora ajustes globales ni otros componentes de cabecera. Clasificación actual, no histórica.",
+      "raw": {
+        "intent": "REFINE",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": {
+              "text": "LAB_FINISHED_PRODUCT",
+              "type": null
+            },
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "/temporal_reference": null
+          },
+          "unset": [
+            "/product_search_text",
+            "/selected_item_codes"
+          ]
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "REFINE",
+          "action": "EXECUTE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/entity_mention": {
+                "text": "LAB_FINISHED_PRODUCT",
+                "type": null
+              },
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/product_search_text",
+              "/selected_item_codes"
+            ]
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "entity_mention": {
+            "text": "LAB_FINISHED_PRODUCT",
+            "type": null
+          },
+          "temporal_reference": null,
+          "product_search_text": null,
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "period": true,
+        "execute": true
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS"
+    },
+    {
+      "name": "august",
+      "question": "¿Y en agosto?",
+      "status": "FAIL",
+      "error_class": "TelchiQueryError"
+    },
+    {
+      "name": "production",
+      "question": "¿Cuánta materia prima consumimos en producción?",
+      "raw": {
+        "intent": "NEW_QUERY",
+        "action": "DIRECT_UNAVAILABLE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/requested_metrics": [],
+            "/entity_mention": {
+              "text": "RAW_MATERIAL",
+              "type": null
+            },
+            "/metric": null,
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "/temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "NEW_QUERY",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/entity_mention": {
+                "text": "RAW_MATERIAL",
+                "type": null
+              },
+              "/metric": null,
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [],
+          "entity_mention": {
+            "text": "RAW_MATERIAL",
+            "type": null
+          },
+          "temporal_reference": null,
+          "product_search_text": null,
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": null,
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "not_executed": true
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS"
+    },
+    {
+      "name": "search",
+      "question": "Buscá productos que digan materia prima",
+      "raw": {
+        "intent": "NEW_QUERY",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "products.search"
+            ],
+            "/entity_mention": null,
+            "/temporal_reference": null,
+            "/metric": "products.search",
+            "/period": null,
+            "/branches": [],
+            "/sales_channel": null,
+            "/comparison": null,
+            "/reference": null,
+            "/product_search_text": "materia prima",
+            "/selected_item_codes": []
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "NEW_QUERY",
+          "action": "EXECUTE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "products.search"
+              ],
+              "/entity_mention": null,
+              "/temporal_reference": null,
+              "/metric": "products.search",
+              "/period": null,
+              "/branches": [],
+              "/sales_channel": null,
+              "/comparison": null,
+              "/reference": null,
+              "/product_search_text": "materia prima",
+              "/selected_item_codes": []
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "products.search"
+          ],
+          "entity_mention": null,
+          "temporal_reference": null,
+          "product_search_text": "materia prima",
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": "products.search",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "search_text": true
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS"
+    }
+  ],
+  "status": "FAIL"
+}

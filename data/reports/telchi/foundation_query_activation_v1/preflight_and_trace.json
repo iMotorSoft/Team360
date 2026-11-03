@@ -1,0 +1,31 @@
+{
+  "read_only": true,
+  "database": [
+    {
+      "version": "18.4 (Debian 18.4-1.pgdg13+1)",
+      "readonly": "on"
+    }
+  ],
+  "permissions": [
+    {
+      "permission_code": "telchi.sales.source_quantity.read.v1",
+      "description": "Only telchi.sales_top_items.source_quantity.20260101_20260915.v1; whole Telchi workspace; Foundation only; source invoice quantities, no revenue, SAP, branches, channels or other capabilities."
+    }
+  ],
+  "pilot_effective_grants": [
+    {
+      "permissions": [
+        "telchi.sales.source_quantity.read.v1"
+      ],
+      "required_new_grants": {
+        "sales.latest_documents": "telchi.sales.latest_documents.read.v1",
+        "sales.coverage": "telchi.sales.coverage.read.v1"
+      },
+      "missing": [
+        "telchi.sales.coverage.read.v1",
+        "telchi.sales.latest_documents.read.v1"
+      ]
+    }
+  ],
+  "incident_events": []
+}

@@ -1,0 +1,205 @@
+{
+  "source": "Audited WhatsApp turn 2026-10-20 11:20:57 ART; identity, event IDs and user text omitted.",
+  "previous_state": {
+    "limit": 10,
+    "metric": "sales.by_products",
+    "period": {
+      "start": "2026-09-01",
+      "end_exclusive": "2026-10-01"
+    },
+    "pending": null,
+    "branches": [],
+    "reference": null,
+    "comparison": null,
+    "sales_channel": null,
+    "entity_mention": null,
+    "schema_version": 2,
+    "product_context": {
+      "sql": "WITH catalog AS (\nSELECT source_system AS namespace,item_code,canonical_product_id,\ncoalesce(sap_item_name,product_name,canonical_name) AS description,\nsales_uom_id AS catalog_sales_uom_id,inventory_uom_id AS catalog_inventory_uom_id,\nactive,status,sap_sell_item AS sell_item,\nlower(regexp_replace(strip_accents(coalesce(sap_item_name,product_name,canonical_name)), '\\s+', ' ', 'g')) AS search_name\nFROM read_parquet(?) WHERE source_system='SAP_HANA'\n), ranked AS (\nSELECT *,CASE WHEN lower(item_code)=? THEN 0\nWHEN contains(' ' || search_name || ' ', ' ' || ? || ' ') THEN 1 ELSE 2 END AS match_rank\nFROM catalog WHERE contains(search_name,?) OR contains(lower(item_code),?)\n) SELECT * EXCLUDE(search_name) FROM ranked ORDER BY match_rank,item_code LIMIT ?",
+      "rows": [
+        {
+          "active": true,
+          "status": "ACTIVE",
+          "item_code": "L00205",
+          "namespace": "SAP_HANA",
+          "sell_item": "N",
+          "match_rank": 1,
+          "description": "ETIQUETA PARA MATERIA PRIMA",
+          "canonical_product_id": "product_a2c47ed40538381a37bc26e7",
+          "catalog_sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "catalog_inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537"
+        },
+        {
+          "active": true,
+          "status": "ACTIVE",
+          "item_code": "L01128",
+          "namespace": "SAP_HANA",
+          "sell_item": "N",
+          "match_rank": 1,
+          "description": "CREOLINA EXTRACTO x 200kg. MATERIA PRIMA",
+          "canonical_product_id": "product_8893e1793f65d79b4cb2599a",
+          "catalog_sales_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "catalog_inventory_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb"
+        },
+        {
+          "active": true,
+          "status": "ACTIVE",
+          "item_code": "L01942",
+          "namespace": "SAP_HANA",
+          "sell_item": "N",
+          "match_rank": 1,
+          "description": "CREOLINA **ECO** TURRIL x 200 Kg. MATERIA PRIMA",
+          "canonical_product_id": "product_11ad3fcb4d4c65e04ca84608",
+          "catalog_sales_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "catalog_inventory_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb"
+        }
+      ],
+      "grain": "catalog_product",
+      "source": {
+        "updated_at": "2026-09-28T18:18:35.264000",
+        "snapshot_id": 1408,
+        "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "read_only": true,
+      "truncated": false,
+      "capability": "products.search.v1",
+      "parameters": {
+        "text": "materia prima",
+        "limit": 20
+      },
+      "limitations": "Active OINV only; no credit subtraction. Quantity is source documentary quantity per line; physical line UoM/factor not published. Catalog UoM is metadata, not line UoM. No physical totals or approved line amounts. Empty results do not certify zero sales outside this publication.",
+      "sap_accessed": false,
+      "sql_parameters": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet",
+        "materia prima",
+        "materia prima",
+        "materia prima",
+        "materia prima",
+        21
+      ],
+      "product_summary": []
+    },
+    "requested_metrics": [
+      "sales.by_products"
+    ],
+    "temporal_reference": null,
+    "product_search_text": "materia prima",
+    "selected_item_codes": []
+  },
+  "proposal": {
+    "action": "EXECUTE",
+    "intent": "REFINE",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "/entity_mention": {
+          "text": "RAW_MATERIAL",
+          "type": null
+        },
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/temporal_reference": null
+      },
+      "unset": [
+        "/product_search_text",
+        "/selected_item_codes"
+      ]
+    },
+    "clarification": null
+  },
+  "obsolete_state": {
+    "limit": 10,
+    "metric": "sales.net_amount",
+    "period": {
+      "start": "2026-09-01",
+      "end_exclusive": "2026-10-01"
+    },
+    "pending": null,
+    "branches": [],
+    "reference": null,
+    "comparison": null,
+    "sales_channel": null,
+    "entity_mention": {
+      "text": "RAW_MATERIAL",
+      "type": null
+    },
+    "schema_version": 2,
+    "product_context": {
+      "sql": "WITH catalog AS (\nSELECT source_system AS namespace,item_code,canonical_product_id,\ncoalesce(sap_item_name,product_name,canonical_name) AS description,\nsales_uom_id AS catalog_sales_uom_id,inventory_uom_id AS catalog_inventory_uom_id,\nactive,status,sap_sell_item AS sell_item,\nlower(regexp_replace(strip_accents(coalesce(sap_item_name,product_name,canonical_name)), '\\s+', ' ', 'g')) AS search_name\nFROM read_parquet(?) WHERE source_system='SAP_HANA'\n), ranked AS (\nSELECT *,CASE WHEN lower(item_code)=? THEN 0\nWHEN contains(' ' || search_name || ' ', ' ' || ? || ' ') THEN 1 ELSE 2 END AS match_rank\nFROM catalog WHERE contains(search_name,?) OR contains(lower(item_code),?)\n) SELECT * EXCLUDE(search_name) FROM ranked ORDER BY match_rank,item_code LIMIT ?",
+      "rows": [
+        {
+          "active": true,
+          "status": "ACTIVE",
+          "item_code": "L00205",
+          "namespace": "SAP_HANA",
+          "sell_item": "N",
+          "match_rank": 1,
+          "description": "ETIQUETA PARA MATERIA PRIMA",
+          "canonical_product_id": "product_a2c47ed40538381a37bc26e7",
+          "catalog_sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "catalog_inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537"
+        },
+        {
+          "active": true,
+          "status": "ACTIVE",
+          "item_code": "L01128",
+          "namespace": "SAP_HANA",
+          "sell_item": "N",
+          "match_rank": 1,
+          "description": "CREOLINA EXTRACTO x 200kg. MATERIA PRIMA",
+          "canonical_product_id": "product_8893e1793f65d79b4cb2599a",
+          "catalog_sales_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "catalog_inventory_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb"
+        },
+        {
+          "active": true,
+          "status": "ACTIVE",
+          "item_code": "L01942",
+          "namespace": "SAP_HANA",
+          "sell_item": "N",
+          "match_rank": 1,
+          "description": "CREOLINA **ECO** TURRIL x 200 Kg. MATERIA PRIMA",
+          "canonical_product_id": "product_11ad3fcb4d4c65e04ca84608",
+          "catalog_sales_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "catalog_inventory_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb"
+        }
+      ],
+      "grain": "catalog_product",
+      "source": {
+        "updated_at": "2026-09-28T18:18:35.264000",
+        "snapshot_id": 1408,
+        "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+      },
+      "read_only": true,
+      "truncated": false,
+      "capability": "products.search.v1",
+      "parameters": {
+        "text": "materia prima",
+        "limit": 20
+      },
+      "limitations": "Active OINV only; no credit subtraction. Quantity is source documentary quantity per line; physical line UoM/factor not published. Catalog UoM is metadata, not line UoM. No physical totals or approved line amounts. Empty results do not certify zero sales outside this publication.",
+      "sap_accessed": false,
+      "sql_parameters": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet",
+        "materia prima",
+        "materia prima",
+        "materia prima",
+        "materia prima",
+        21
+      ],
+      "product_summary": []
+    },
+    "requested_metrics": [
+      "sales.net_amount"
+    ],
+    "temporal_reference": null,
+    "product_search_text": null,
+    "selected_item_codes": []
+  }
+}

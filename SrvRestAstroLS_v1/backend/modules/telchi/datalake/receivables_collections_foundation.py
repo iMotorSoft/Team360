@@ -16,6 +16,8 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Mapping
 
+from .foundation_manifest import validate_manifest
+
 from .foundation_publication import (
     CURRENT,
     FAILED,
@@ -378,13 +380,14 @@ class PinnedReceivablesCandidate:
         }
 
 
-def _resolve(publication: FoundationPublication, *, reader_mode: str) -> PinnedReceivablesCandidate:
+def _resolve(publication: FoundationPublication, *, reader_mode: str, store: FoundationPublicationStore) -> PinnedReceivablesCandidate:
     manifest = publication.manifest
-    if not isinstance(manifest, dict) or manifest.get("candidate_kind") != COMPONENT_KIND:
-        raise ReceivablesComponentError("Receivables Foundation manifest kind is missing or wrong")
-    components = manifest.get("components")
-    if not isinstance(components, dict) or set(components) != set(LOGICAL_COMPONENT_NAMES):
-        raise ReceivablesComponentError("Receivables Foundation logical component set is not exact")
+    try:
+        components = validate_manifest(store, publication)
+    except FoundationReaderError as exc:
+        raise ReceivablesComponentError(str(exc)) from exc
+    if not set(LOGICAL_COMPONENT_NAMES).issubset(components):
+        raise ReceivablesComponentError("Receivables required component set is incomplete")
     snapshot = manifest.get("base_snapshot_id")
     if not isinstance(snapshot, int):
         raise ReceivablesComponentError("Receivables Foundation base snapshot is missing")
@@ -405,19 +408,37 @@ def _resolve(publication: FoundationPublication, *, reader_mode: str) -> PinnedR
             raise ReceivablesComponentError(f"component {name} row/manifest mismatch")
         versions[name] = declared
     component = components[COMPONENT_NAME]
-    if set(component.get("datasets", {})) != set(DATASET_NAMES):
+    if component.get("derivation_version") not in {"1.0.0", "receivables-collections-business-v1.0.0"}:
+        raise ReceivablesComponentError("Receivables derivation version incompatible")
+    datasets = component.get("datasets")
+    if not isinstance(datasets, dict) or set(datasets) != set(DATASET_NAMES):
         raise ReceivablesComponentError("Receivables datasets are incomplete")
+    for name, metadata in datasets.items():
+        if (not isinstance(metadata, dict)
+                or metadata.get("dataset_id") != f"{component.get('derivation_id')}:{name}"
+                or type(metadata.get("row_count")) is not int or metadata["row_count"] < 0
+                or not isinstance(metadata.get("logical_fingerprint"), str) or not metadata["logical_fingerprint"]
+                or metadata.get("fingerprint_method") != "sealed_business_reproducibility_v1"
+                or metadata.get("ducklake_schema") != "business" or metadata.get("ducklake_table") != name):
+            raise ReceivablesComponentError("Receivables dataset contract is malformed: " + name)
+    stable_fields = (
+        "component_name", "atomic_derivation_id", "atomic_discovery_fingerprint",
+        "derivation_id", "derivation_version", "aging_config_version", "source_as_of",
+        "currency_reporting_basis", "historical_asof_grain", "intraday_asof",
+        "qr_source_status", "final_contado_business_rule_defined", "datasets",
+    )
+    if any(key not in component for key in stable_fields):
+        raise ReceivablesComponentError("Receivables stable contract is incomplete")
     stable = {
         key: component[key]
-        for key in (
-            "component_name", "atomic_derivation_id", "atomic_discovery_fingerprint",
-            "derivation_id", "derivation_version", "aging_config_version", "source_as_of",
-            "currency_reporting_basis", "historical_asof_grain", "intraday_asof",
-            "qr_source_status", "final_contado_business_rule_defined", "datasets",
-        )
+        for key in stable_fields
     }
     if canonical_hash(stable) != component.get("component_fingerprint"):
         raise ReceivablesComponentError("Receivables component fingerprint mismatch")
+    fingerprint = component["component_fingerprint"]
+    if (component["publication_id"] != "receivables_collections_" + fingerprint[:24]
+            or component.get("content_identity") != fingerprint):
+        raise ReceivablesComponentError("Receivables publication identity/fingerprint mismatch")
     return PinnedReceivablesCandidate(
         publication.foundation_publication_id,
         publication.status,
@@ -434,7 +455,7 @@ def validate_pinned_candidate(store: FoundationPublicationStore, candidate_id: s
         raise ReceivablesComponentError("exact candidate does not exist")
     if publication.status in (CURRENT, FAILED, SUPERSEDED) or publication.status not in VALIDATABLE_STATES:
         raise ReceivablesComponentError(f"candidate status {publication.status} is not validatable")
-    return _resolve(publication, reader_mode="EXPLICIT_PINNED_VALIDATION")
+    return _resolve(publication, reader_mode="EXPLICIT_PINNED_VALIDATION", store=store)
 
 
 def resolve_current(store: FoundationPublicationStore) -> PinnedReceivablesCandidate:
@@ -444,7 +465,7 @@ def resolve_current(store: FoundationPublicationStore) -> PinnedReceivablesCandi
     publication = store.get(foundation_id)
     if publication is None or publication.status != CURRENT:
         raise ReceivablesComponentError("CURRENT Receivables Foundation is unresolved")
-    return _resolve(publication, reader_mode="PRODUCTIVE_CURRENT")
+    return _resolve(publication, reader_mode="PRODUCTIVE_CURRENT", store=store)
 
 
 def validate_component_data(connection: Any, pinned: PinnedReceivablesCandidate) -> dict[str, Any]:

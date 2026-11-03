@@ -1,0 +1,388 @@
+{
+  "code_digest": "5d5873c40a735493b8aaa2a39c4d539511022eab46da28248efb1ec3647c304c",
+  "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "snapshot": "1408",
+  "catalog": {
+    "dataset": "telchi_foundation_direct_ask_dev_v1",
+    "organization": "TELCHI",
+    "workspace": "foundation_supervised_dev",
+    "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot": "1408",
+    "tables": [
+      {
+        "name": "sales_document",
+        "columns": [
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "series",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_semantic_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "raw_extraction_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "user_sign",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [
+          "doc_entry"
+        ],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+          "Current classification, not historical or certified complete calendar coverage.",
+          "Line money before credit memos/global adjustments; not net billing or collections.",
+          "Seller category, warehouse, series and creator are not operation channel."
+        ]
+      },
+      {
+        "name": "sales_line",
+        "columns": [
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "raw_extraction_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "whs_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [
+          "doc_entry",
+          "line_num"
+        ],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+          "Current classification, not historical or certified complete calendar coverage.",
+          "Line money before credit memos/global adjustments; not net billing or collections.",
+          "Seller category, warehouse, series and creator are not operation channel."
+        ]
+      },
+      {
+        "name": "document_metadata",
+        "columns": [
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "user_sign",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [
+          "doc_entry"
+        ],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+          "Current classification, not historical or certified complete calendar coverage.",
+          "Line money before credit memos/global adjustments; not net billing or collections.",
+          "Seller category, warehouse, series and creator are not operation channel."
+        ]
+      },
+      {
+        "name": "line_metadata",
+        "columns": [
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "whs_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [
+          "doc_entry",
+          "line_num"
+        ],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+          "Current classification, not historical or certified complete calendar coverage.",
+          "Line money before credit memos/global adjustments; not net billing or collections.",
+          "Seller category, warehouse, series and creator are not operation channel."
+        ]
+      },
+      {
+        "name": "sales_operation",
+        "columns": [
+          {
+            "name": "doc_entry",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_total",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          },
+          {
+            "name": "currency",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_num",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "doc_date",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "series",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "user_sign",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "whs_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "sales_channel_semantic_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "raw_extraction_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "source_as_of",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [
+          "doc_entry",
+          "line_num"
+        ],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+          "Current classification, not historical or certified complete calendar coverage.",
+          "Line money before credit memos/global adjustments; not net billing or collections.",
+          "Seller category, warehouse, series and creator are not operation channel."
+        ]
+      },
+      {
+        "name": "salesperson",
+        "columns": [
+          {
+            "name": "slp_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "salesperson_category_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "salesperson_category_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [
+          "slp_code"
+        ],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+          "Current classification, not historical or certified complete calendar coverage.",
+          "Line money before credit memos/global adjustments; not net billing or collections.",
+          "Seller category, warehouse, series and creator are not operation channel."
+        ]
+      },
+      {
+        "name": "product",
+        "columns": [
+          {
+            "name": "item_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "item_name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "inventory_uom_id",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          }
+        ],
+        "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+        "grain": [
+          "item_code"
+        ],
+        "max_rows": 1000000,
+        "semantic_constraints": [
+          "Published SAP product reference. Names are discovery evidence, not accredited brand membership.",
+          "Inventory UoM identifier does not establish physical conversion factors."
+        ]
+      }
+    ],
+    "known_relations": [
+      {
+        "left_table": "sales_document",
+        "left_column": "doc_entry",
+        "right_table": "sales_line",
+        "right_column": "doc_entry",
+        "rationale": ""
+      }
+    ],
+    "synthetic_only": false
+  },
+  "conversation": [
+    {
+      "role": "user",
+      "content": "¿Cuánto suman los importes de líneas comerciales en BS de los SKU L02822, L02823, L03658 y L03649 en agosto de 2026? No pido ventas netas ni cobros. Indicá las limitaciones del período publicado."
+    },
+    {
+      "role": "assistant",
+      "content": "No pude acreditar cifras suficientes para responder esta pregunta.\nCifras anteriores: verificadas con limitaciones, no una certificación de la interpretación empresarial.\nAlcance: filas publicadas; cobertura del período no certificada. Importes antes de notas de crédito y ajustes; no ventas netas ni cobros. Clasificación actual, no histórica. Causas y conversiones físicas no acreditadas.\nInvestigación adicional: precisar productos/período o contrastar la interpretación con fuentes acreditadas.",
+      "state": "PARTIAL"
+    },
+    {
+      "role": "user",
+      "content": "Ahora solo L02822, manteniendo el mismo período y medida. ¿Cuánto representa en importe y documentos únicos?"
+    },
+    {
+      "role": "assistant",
+      "content": "No pude acreditar cifras suficientes para responder esta pregunta.\nCifras anteriores: verificadas con limitaciones, no una certificación de la interpretación empresarial.\nAlcance: filas publicadas; cobertura del período no certificada. Importes antes de notas de crédito y ajustes; no ventas netas ni cobros. Clasificación actual, no histórica. Causas y conversiones físicas no acreditadas.\nInvestigación adicional: precisar productos/período o contrastar la interpretación con fuentes acreditadas.",
+      "state": "PARTIAL"
+    }
+  ],
+  "production_authorized": false
+}

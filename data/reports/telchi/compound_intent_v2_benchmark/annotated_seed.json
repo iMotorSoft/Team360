@@ -1,0 +1,838 @@
+{
+  "benchmark_version": "compound_intent_v2_benchmark/1",
+  "cases": [
+    {
+      "turn_id": "S01_1",
+      "group": "simple",
+      "conversation_id": "S01",
+      "turn_index": 1,
+      "user_message": "Ventas de mayo de 2026",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [
+          "sales.net_amount"
+        ],
+        "dimensions": [],
+        "filters": [],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": {
+          "kind": "PERIOD",
+          "as_of": null,
+          "periods": [
+            {
+              "start": "2026-05-01",
+              "end_exclusive": "2026-06-01"
+            }
+          ]
+        },
+        "comparison": null,
+        "reference": null,
+        "limit": null,
+        "sort": [],
+        "measure_context": null,
+        "segments": [],
+        "granularities": [],
+        "geographies": [],
+        "relations": [],
+        "claims": [],
+        "unresolved_requirements": []
+      },
+      "expected_action": "EXECUTE",
+      "requirements": [
+        {
+          "req_id": "S01_1.metric",
+          "category": "metric",
+          "field": "metrics",
+          "value": "sales.net_amount",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "Ventas",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "S01_1.time",
+          "category": "temporal_periodicity",
+          "field": "time",
+          "value": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "mayo de 2026",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": ""
+    },
+    {
+      "turn_id": "S02_1",
+      "group": "simple",
+      "conversation_id": "S02",
+      "turn_index": 1,
+      "user_message": "Dame las últimas 10 ventas registradas",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [
+          "sales.latest_documents"
+        ],
+        "dimensions": [],
+        "filters": [],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": null,
+        "comparison": null,
+        "reference": null,
+        "limit": 10,
+        "sort": [],
+        "measure_context": null,
+        "segments": [],
+        "granularities": [],
+        "geographies": [],
+        "relations": [],
+        "claims": [],
+        "unresolved_requirements": []
+      },
+      "expected_action": "EXECUTE",
+      "requirements": [
+        {
+          "req_id": "S02_1.metric",
+          "category": "metric",
+          "field": "metrics",
+          "value": "sales.latest_documents",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "últimas 10 ventas",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "S02_1.limit",
+          "category": "metric",
+          "field": "limit",
+          "value": 10,
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "10",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": ""
+    },
+    {
+      "turn_id": "S03_1",
+      "group": "simple",
+      "conversation_id": "S03",
+      "turn_index": 1,
+      "user_message": "¿Cuál es el último mes con ventas registradas?",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [
+          "sales.coverage"
+        ],
+        "dimensions": [],
+        "filters": [],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": null,
+        "comparison": null,
+        "reference": null,
+        "limit": null,
+        "sort": [],
+        "measure_context": null,
+        "segments": [],
+        "granularities": [
+          "month"
+        ],
+        "geographies": [],
+        "relations": [],
+        "claims": [],
+        "unresolved_requirements": [
+          "Mes más reciente con datos disponibles"
+        ]
+      },
+      "expected_action": "EXECUTE",
+      "requirements": [
+        {
+          "req_id": "S03_1.metric",
+          "category": "metric",
+          "field": "metrics",
+          "value": "sales.coverage",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "ventas registradas",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "S03_1.gran",
+          "category": "temporal_periodicity",
+          "field": "granularities",
+          "value": "month",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "último mes",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "S03_1.ref",
+          "category": "reference",
+          "field": "unresolved_requirements",
+          "value": "Mes más reciente con datos disponibles",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "último mes",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": ""
+    },
+    {
+      "turn_id": "S04_1",
+      "group": "simple",
+      "conversation_id": "S04",
+      "turn_index": 1,
+      "user_message": "Buscá Citrato de magnesio",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [
+          "products.search"
+        ],
+        "dimensions": [],
+        "filters": [],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": null,
+        "comparison": null,
+        "reference": null,
+        "limit": null,
+        "sort": [],
+        "measure_context": null,
+        "segments": [],
+        "granularities": [],
+        "geographies": [],
+        "relations": [],
+        "claims": [],
+        "unresolved_requirements": [
+          "Producto buscado: Citrato de magnesio"
+        ]
+      },
+      "expected_action": "EXECUTE",
+      "requirements": [
+        {
+          "req_id": "S04_1.metric",
+          "category": "metric",
+          "field": "metrics",
+          "value": "products.search",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "Buscá",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "S04_1.product",
+          "category": "entity_product",
+          "field": "unresolved_requirements",
+          "value": "Producto buscado: Citrato de magnesio",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "Citrato de magnesio",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": ""
+    },
+    {
+      "turn_id": "S05_1",
+      "group": "simple",
+      "conversation_id": "S05",
+      "turn_index": 1,
+      "user_message": "Ventas de mayo de 2026",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [
+          "sales.net_amount"
+        ],
+        "dimensions": [],
+        "filters": [],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": {
+          "kind": "PERIOD",
+          "as_of": null,
+          "periods": [
+            {
+              "start": "2026-05-01",
+              "end_exclusive": "2026-06-01"
+            }
+          ]
+        },
+        "comparison": null,
+        "reference": null,
+        "limit": null,
+        "sort": [],
+        "measure_context": null,
+        "segments": [],
+        "granularities": [],
+        "geographies": [],
+        "relations": [],
+        "claims": [],
+        "unresolved_requirements": []
+      },
+      "expected_action": "EXECUTE",
+      "requirements": [
+        {
+          "req_id": "S05_1.metric",
+          "category": "metric",
+          "field": "metrics",
+          "value": "sales.net_amount",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "Ventas",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "S05_1.time",
+          "category": "temporal_periodicity",
+          "field": "time",
+          "value": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "mayo de 2026",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": ""
+    },
+    {
+      "turn_id": "S05_2",
+      "group": "simple",
+      "conversation_id": "S05",
+      "turn_index": 2,
+      "user_message": "¿Y el mes anterior?",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [],
+        "dimensions": [],
+        "filters": [],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": {
+          "kind": "PERIOD",
+          "as_of": null,
+          "periods": [
+            {
+              "start": "2026-04-01",
+              "end_exclusive": "2026-05-01"
+            }
+          ]
+        },
+        "comparison": null,
+        "reference": null,
+        "limit": null,
+        "sort": [],
+        "measure_context": null,
+        "segments": [],
+        "granularities": [],
+        "geographies": [],
+        "relations": [],
+        "claims": [],
+        "unresolved_requirements": []
+      },
+      "expected_action": "EXECUTE",
+      "requirements": [
+        {
+          "req_id": "S05_2.time",
+          "category": "temporal_periodicity",
+          "field": "time",
+          "value": {
+            "start": "2026-04-01",
+            "end_exclusive": "2026-05-01"
+          },
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "el mes anterior",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": "Desplazamiento relativo de mes; conserva la métrica del turno previo."
+    },
+    {
+      "turn_id": "S06_1",
+      "group": "simple",
+      "conversation_id": "S06",
+      "turn_index": 1,
+      "user_message": "Quiero importes y cantidades",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [
+          "sales.net_amount",
+          "sales.source_top_items"
+        ],
+        "dimensions": [],
+        "filters": [],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": null,
+        "comparison": null,
+        "reference": null,
+        "limit": null,
+        "sort": [],
+        "measure_context": null,
+        "segments": [],
+        "granularities": [],
+        "geographies": [],
+        "relations": [],
+        "claims": [],
+        "unresolved_requirements": []
+      },
+      "expected_action": "ASK",
+      "requirements": [
+        {
+          "req_id": "S06_1.importes",
+          "category": "metric",
+          "field": "metrics",
+          "value": "sales.net_amount",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "importes",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "S06_1.cantidades",
+          "category": "metric",
+          "field": "metrics",
+          "value": "sales.source_top_items",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "cantidades",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": "Sin período todavía; no bloquea, pide el dato faltante."
+    },
+    {
+      "turn_id": "S06_2",
+      "group": "simple",
+      "conversation_id": "S06",
+      "turn_index": 2,
+      "user_message": "mayo de 2026",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [
+          "sales.net_amount",
+          "sales.source_top_items"
+        ],
+        "dimensions": [],
+        "filters": [],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": {
+          "kind": "PERIOD",
+          "as_of": null,
+          "periods": [
+            {
+              "start": "2026-05-01",
+              "end_exclusive": "2026-06-01"
+            }
+          ]
+        },
+        "comparison": null,
+        "reference": null,
+        "limit": null,
+        "sort": [],
+        "measure_context": null,
+        "segments": [],
+        "granularities": [],
+        "geographies": [],
+        "relations": [],
+        "claims": [],
+        "unresolved_requirements": []
+      },
+      "expected_action": "EXECUTE",
+      "requirements": [
+        {
+          "req_id": "S06_2.time",
+          "category": "temporal_periodicity",
+          "field": "time",
+          "value": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "mayo de 2026",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "S06_2.inherited",
+          "category": "metric",
+          "field": "metrics",
+          "value": "sales.net_amount",
+          "provenance": "INHERITED_CONTEXT",
+          "evidence": "importes",
+          "status": "PROVISIONAL",
+          "source_turn_id": "S06_1",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": "Completa el período pendiente conservando importes/cantidades."
+    },
+    {
+      "turn_id": "ABRAHAM_001",
+      "group": "abraham",
+      "conversation_id": "ABRAHAM_001",
+      "turn_index": 1,
+      "user_message": "¿Cuántos clientes tenemos en horizontal, principalmente las farmacias, y cuánto se les vende por mes?",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [
+          "customer_count",
+          "sales.unspecified"
+        ],
+        "dimensions": [],
+        "filters": [
+          [
+            {
+              "field": "sales_channel_id",
+              "op": "eq",
+              "values": [
+                "HORIZONTAL"
+              ]
+            }
+          ]
+        ],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": null,
+        "comparison": null,
+        "reference": null,
+        "limit": null,
+        "sort": [],
+        "measure_context": null,
+        "segments": [
+          "farmacias"
+        ],
+        "granularities": [
+          "month"
+        ],
+        "geographies": [],
+        "relations": [],
+        "claims": [],
+        "unresolved_requirements": [
+          "Población: clientes registrados vs compradores del período"
+        ]
+      },
+      "expected_action": "ASK",
+      "requirements": [
+        {
+          "req_id": "ABRAHAM_001.customers",
+          "category": "metric",
+          "field": "metrics",
+          "value": "customer_count",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "Cuántos clientes",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "ABRAHAM_001.sales",
+          "category": "metric",
+          "field": "metrics",
+          "value": "sales.unspecified",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "cuánto se les vende",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "ABRAHAM_001.channel",
+          "category": "segment_geography",
+          "field": "filters",
+          "value": "HORIZONTAL",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "horizontal",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "ABRAHAM_001.pharmacies",
+          "category": "segment_geography",
+          "field": "segments",
+          "value": "farmacias",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "farmacias",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "ABRAHAM_001.monthly",
+          "category": "temporal_periodicity",
+          "field": "granularities",
+          "value": "month",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "por mes",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "ABRAHAM_001.ambiguity",
+          "category": "ambiguity",
+          "field": "unresolved_requirements",
+          "value": "Población: clientes registrados vs compradores del período",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "Cuántos clientes",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": "Ambigüedad de población; el canal horizontal es explícito."
+    },
+    {
+      "turn_id": "ABRAHAM_002",
+      "group": "abraham",
+      "conversation_id": "ABRAHAM_002",
+      "turn_index": 1,
+      "user_message": "Venta de Citrato de magnesio en la paz y cochabamba, en la paz distribucion propia y en conchabamba lo hace L&S",
+      "independence": {
+        "level": "MODEL_ASSISTED_PROVISIONAL",
+        "method": "benchmark-author annotation, no candidate output inspected",
+        "human_reviewer": false,
+        "reviewer": null
+      },
+      "request_intent": {
+        "business_domain": null,
+        "metrics": [],
+        "dimensions": [],
+        "filters": [],
+        "scope": {
+          "branch_ids": [],
+          "warehouse_ids": []
+        },
+        "time": null,
+        "comparison": null,
+        "reference": null,
+        "limit": null,
+        "sort": [],
+        "measure_context": null,
+        "segments": [],
+        "granularities": [],
+        "geographies": [
+          "La Paz",
+          "Cochabamba"
+        ],
+        "relations": [
+          {
+            "subject": "Citrato de magnesio",
+            "predicate": "distribution",
+            "object": "propia",
+            "geography": "La Paz",
+            "evidence": "en la paz distribucion propia",
+            "source_turn_id": "ABRAHAM_002",
+            "status": "USER_ASSERTED_UNVERIFIED"
+          },
+          {
+            "subject": "Citrato de magnesio",
+            "predicate": "distribution",
+            "object": "L&S",
+            "geography": "Cochabamba",
+            "evidence": "en conchabamba lo hace L&S",
+            "source_turn_id": "ABRAHAM_002",
+            "status": "USER_ASSERTED_UNVERIFIED"
+          }
+        ],
+        "claims": [],
+        "unresolved_requirements": []
+      },
+      "expected_action": "ASK",
+      "requirements": [
+        {
+          "req_id": "ABRAHAM_002.geo_lp",
+          "category": "segment_geography",
+          "field": "geographies",
+          "value": "La Paz",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "la paz",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "ABRAHAM_002.geo_cbba",
+          "category": "segment_geography",
+          "field": "geographies",
+          "value": "Cochabamba",
+          "provenance": "CURRENT_REQUEST",
+          "evidence": "cochabamba",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "ABRAHAM_002.rel_lp",
+          "category": "relation",
+          "field": "relations",
+          "value": {
+            "subject": "Citrato de magnesio",
+            "predicate": "distribution",
+            "object": "propia",
+            "geography": "La Paz",
+            "evidence": "en la paz distribucion propia",
+            "source_turn_id": "ABRAHAM_002",
+            "status": "USER_ASSERTED_UNVERIFIED"
+          },
+          "provenance": "USER_ASSERTED_UNVERIFIED",
+          "evidence": "en la paz distribucion propia",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        },
+        {
+          "req_id": "ABRAHAM_002.rel_cbba",
+          "category": "relation",
+          "field": "relations",
+          "value": {
+            "subject": "Citrato de magnesio",
+            "predicate": "distribution",
+            "object": "L&S",
+            "geography": "Cochabamba",
+            "evidence": "en conchabamba lo hace L&S",
+            "source_turn_id": "ABRAHAM_002",
+            "status": "USER_ASSERTED_UNVERIFIED"
+          },
+          "provenance": "USER_ASSERTED_UNVERIFIED",
+          "evidence": "en conchabamba lo hace L&S",
+          "status": "PROVISIONAL",
+          "source_turn_id": "",
+          "note": ""
+        }
+      ],
+      "verified_evidence": [],
+      "ambiguities": [],
+      "non_executable": [],
+      "notes": "Tuplas (producto, distribuidor, geografía) afirmadas por el usuario; nunca certificadas."
+    }
+  ]
+}

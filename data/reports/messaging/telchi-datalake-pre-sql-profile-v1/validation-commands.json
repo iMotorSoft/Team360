@@ -1,0 +1,21 @@
+{
+  "cwd": "SrvRestAstroLS_v1/backend",
+  "commands": [
+    "uv run --no-sync pytest -q modules/telchi/datalake/tests/test_messaging_sales_query.py modules/telchi/datalake/tests/test_foundation_reader.py tests/test_messaging_pre_sql_profile.py tests/test_messaging_telchi_sql.py tests/test_messaging_telchi_sql_benchmark.py tests/test_messaging_telchi_sql_session.py tests/test_messaging_evolution.py tests/test_messaging_dev_profile.py",
+    "dotenv load ../.env.backend-dev.local; TEAM360_MESSAGING_POSTGRES_TEST=1 TEAM360_MESSAGING_TELCHI_SQL_TEST=1 TEAM360_TELCHI_PRE_SQL_PROFILE=1; pytest -q tests/test_messaging_telchi_sql_postgres.py tests/test_messaging_evolution_postgres.py",
+    "uv run --no-sync pytest -q tests/test_messaging_pre_sql_profile.py modules/telchi/datalake/tests/test_messaging_sales_query.py tests/test_messaging_telchi_sql_session.py tests/test_messaging_telchi_sql_benchmark.py",
+    "uv run --no-sync python -m modules.messaging.pre_sql_profile_session --check",
+    "uv run --no-sync python -m modules.telchi.investigation.validation.pre_sql_profile_v1.run_profile",
+    "uv run --no-sync python -m modules.telchi.investigation.validation.pre_sql_profile_v1.summarize",
+    "uv run --no-sync python -m modules.telchi.investigation.validation.pre_sql_profile_v1.validate_evidence"
+  ],
+  "root_commands": [
+    "lat check md",
+    "lat check index",
+    "lat check sections",
+    "lat check code-refs",
+    "lat check",
+    "git diff --check",
+    "git status"
+  ]
+}

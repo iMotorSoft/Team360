@@ -1,0 +1,26 @@
+Branch feature/console-backend-core; HEAD 09d2ec715a31bb88574d734eacb9f437f008624e.
+Technical preparation only; no business question or analysis executed.
+
+TEAM360_ENV=development uv run --no-sync python ../../data/reports/telchi/blind-benchmark-v1/20261028T101941Z/prepare.py
+Result: startup EOF clean; final model preflight ready=true, gpt-5.6-luna medium fallback=false; Foundation blocked by DuckLake PostgreSQL connection refused localhost:5432.
+Preparation-only initial failures preserved: missing sqlglot package metadata handled as NOT_INSTALLED (no install); first own API probe lacked literal JSON, corrected in preparation script only. No investigator changes or masked defects.
+
+uv run --no-sync pytest modules/telchi/exploratory_sql/test_ask.py -q -rs --junitxml=../../data/reports/telchi/blind-benchmark-v1/20261028T101941Z/tests.xml
+Result: 19 passed, 37.02s. Tests include read-only/context denial, date normalization, verifier limitations and cancellation. No full suite rerun.
+
+pi --version -> 1.4.0
+pi --help -> pi-help.txt; supports recorded launch flags.
+pi auth check --provider openai-codex --json --no-refresh -> ready, oauth; no credentials emitted/refreshed.
+PI_* effective model recorded: openai-codex/gpt-6.1-sol, medium. No new Pi research session launched.
+
+python3 verify_freeze.py --create -> 890 files; inventory digest 957044842db688fb14f16e15f881cc648feb702c3dee88a72943bc10b715777b.
+python3 verify_freeze.py -> unchanged=true, no changed/added/deleted scope files.
+sha256sum -c SHA256SUMS -> all 10 files OK.
+freeze.json SHA256: 16f157abbc00086806b8d67bcd2e8c83e10abb5f045c6ba24ef9fd2a41406d65.
+
+git diff --check -> exit 0.
+Final diff/stat/status reviewed; outside benchmark and empty runner startup-session evidence, worktree status additions/removals = []. Existing changes preserved, no Git write operations. Only this new report directory plus two EOF startup session.json files under direct-ask-v1 were created by preparation. No Markdown files created/edited, LAT Markdown-change gates not applicable; no LAT files changed.
+
+Host: 8 CPU, available memory approx 8.8 GiB, swap 0, low load, sustained I/O wait 36-45%; BUSY_BUT_SAFE for focused sequential preparation. No scans, broad suites or browsers. Probe/test processes completed; only current harness command found as child during final check. No own persistent servers/workers. No unrelated process terminated; no services started/restarted. Foundation failure = environmental availability blocker, not demonstrated runner defect.
+
+Freeze complete for code/rules only. Common Foundation manifest, snapshot availability, file inventory and reference hashes remain BLOCKED. Do not send the question until both data and Pi egress authorization are accredited; do not declare BENCHMARK_PASS.

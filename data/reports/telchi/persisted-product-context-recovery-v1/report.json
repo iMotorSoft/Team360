@@ -1,0 +1,100 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "PERSISTED PRODUCT CONTEXT RECOVERY V1",
+  "SECOND_INCIDENT_REPRODUCED": "PASS",
+  "PERSISTED_STATE_RECOVERY": "PASS",
+  "UNSET_NOT_REQUIRED": "PASS",
+  "LEGITIMATE_CONTEXT_PRESERVED": "PASS",
+  "AUTHENTICATED_PERSISTED_E2E": "PASS",
+  "CATEGORY_EXECUTION": "PASS",
+  "RAW_MATERIAL_AMOUNT": "Bs 839.582,63",
+  "STATE_PERSISTENCE": "PASS",
+  "RBAC_ISOLATION": "PASS",
+  "SIX_GATES": "VALID",
+  "RUNTIME_CHANGE_REQUIRED": "YES",
+  "READY_FOR_MANUAL_WHATSAPP": "NO",
+  "status": "DONE_WITH_CONCERNS: backend recovery validated; owner must manually reload runtime, then accept original persisted conversation over WhatsApp",
+  "modified_files": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/state_engine.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_persisted_product_context_recovery.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/fixtures/persisted_product_context_recovery.json",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_persisted_product_context_recovery.py",
+    "data/reports/telchi/persisted-product-context-recovery-v1/report.json"
+  ],
+  "root_cause": "Previous invalidation required a product_search_text operation in the current delta. The second incident started with null text and empty selection already persisted, so unset=[] preserved incompatible search candidates.",
+  "exact_incident_verification": {
+    "original_event_utc": "2026-10-20 14:58:40.847464+00:00",
+    "original_event_local": "11:58:40 ART",
+    "method": "Bounded read-only PostgreSQL query of original conversation; no mutation. Fixture previous state and entire proposal compare equal to audited previous_state and interpretation_proposed.",
+    "exact_state": true,
+    "exact_proposal": true,
+    "unset": []
+  },
+  "normalization": "After applying the full delta and validating it: a single sales.net_amount metric plus accredited category, null search text, empty selected codes and validated products.search.v1 context removes only product_context. No text parsing, category-specific alias, permission bypass or catalog relaxation. No delta operation required; idempotent. Other state, references and history preserved.",
+  "tests": [
+    {
+      "command": "uv run pytest modules/telchi/assistant/tests/test_persisted_product_context_recovery.py -q (before fix)",
+      "result": "7 failed / 9 passed: exact incident, three category variants and two handler cases demonstrate residual context. One additional failure was an overly broad test availability assertion for selected products without active text; corrected to validate preservation without changing catalog."
+    },
+    {
+      "command": "uv run pytest modules/telchi/assistant/tests/test_persisted_product_context_recovery.py modules/telchi/assistant/tests/test_product_context_invalidation.py modules/telchi/assistant/tests/test_category_line_amount.py modules/telchi/assistant/tests/test_product_sales.py -q",
+      "result": "66 passed; before adding explicit recovered-category comparison test"
+    },
+    {
+      "command": "uv run pytest modules/telchi/assistant/tests tests/test_telchi_assistant_srv05.py modules/telchi/provisioning/tests/test_category_registration.py -q",
+      "result": "563 passed / 3 skipped / 1 warning, 41.46s. Opt-in PG skips; real PG tested by separate live probe. Srv05 fixture warns default in-memory repository; live probe uses PostgreSQL."
+    },
+    {
+      "command": "uv run python -m modules.telchi.assistant.tests.live_persisted_product_context_recovery --output NEW_PRIVATE_JSON",
+      "result": "PASS at final fingerprint: authenticated ASGI, actual phone binding, Console FULL_ACCESS, PostgreSQL, dispatcher, State Engine, catalog, Foundation, formatter. Isolated thread seeded with exact contaminated historical state; unset=[] recovery and fresh-store follow-up; direct PostgreSQL readback."
+    },
+    {
+      "command": "uv run python - < PRIVATE_ROOT/persisted-product-context-recovery-gates-v1/probe.py",
+      "result": "PASS: all six existing DEV guarantees freshly reaccredited; previous manifest backed up, atomic publication, gate_evidence accepts current fingerprint. No reused guarantees or new gates."
+    },
+    {
+      "command": "Read-only artifact assertions: BS currency, partial coverage date, one category capability per recovery turn, persisted clean context, final source digest and gate_evidence",
+      "result": "PASS. Initial exact-string date assertion corrected in the verification command to account for ISO timestamp; result date was always 2026-09-24T00:00:00. No code change."
+    },
+    {
+      "command": "git diff --check; review changed source and new files",
+      "result": "PASS; module is preexisting untracked work, so tracked git diff alone does not display these source changes"
+    }
+  ],
+  "conservation_cases": [
+    "legitimate selected IDs and trusted context retained",
+    "period refinement retains selected product",
+    "active textual search retained",
+    "other accredited commercial categories recover deterministically",
+    "difference and percentage between recovered categories preserve accredited comparison contract",
+    "return to textual product search or trusted selection remains valid",
+    "missing period, invented selection, forbidden path and malformed context fail closed",
+    "unauthorized identity denied; no Foundation execution",
+    "compatible documentary reference and other state fields preserved"
+  ],
+  "authenticated_scope": "Token-authenticated DEV HTTP via in-process ASGI, actual approved DB identity/binding and live Console authorization. No human login, listener, service lifecycle or WhatsApp delivery. Seed search creates only an isolated test thread; recovery executes from contaminated PostgreSQL state, not EMPTY. One category capability call per recovery turn; follow-up intentionally makes a second authorized category execution. No substitute search/global sales operation during recovery.",
+  "money_semantics": "BS active commercial invoice line amount, own line discounts included, without line VAT, before credit notes and global/header adjustments. September 2026 partial coverage through 24/09/2026; current classification. Computed by existing Foundation operation, no runtime hardcoded amount.",
+  "artifacts": {
+    "live": "PRIVATE_ROOT/persisted-product-context-recovery-live-r2.json",
+    "live_sha256": "3ba02850cdf9ec820c7caaad2460269e4738528cbcd022bd5516284dbe85df9a",
+    "gates": "PRIVATE_ROOT/persisted-product-context-recovery-gates-v1/report.json",
+    "gates_sha256": "aca596e6b7fb85b3aa50220b5beb31a24c31ba8285970cc59e808da72fc8d2d8",
+    "manifest_sha256": "3ca02ab18a48d4452f1a7d3541910278b483e98958d03c387d43e5a596b0a83b",
+    "source_sha256": "746864aac65822cb8db1d126f7d84d26c82c6e00e6550f2c2c3085ddf2d3d442"
+  },
+  "gates_scope": "Existing six real DEV guarantees; no claim of human WhatsApp acceptance or that the running interpreter has loaded new source. Startup-only preflight requires disabled webhook and was deliberately not invoked against active runtime. Probe separately verified read-only configuration, approved sender, DB binding, Evolution open, unchanged webhook and gate integrity; did not weaken startup preflight.",
+  "host": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": "One runner at a time, PG pool max_size=1, existing bounded Foundation worker; two concurrent duplicate claims tested through same bounded pool; no browser/listener",
+    "observations": "8 CPUs, load about 2.7-4.1, MemAvailable about 4.4-4.8 GiB; sampled swap-in/out zero before probes; sequential bounded workloads",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0
+  },
+  "transversal_impact": "State normalization only; no Foundation, SAP, capability catalog, monetary semantics, RBAC, FULL_ACCESS, Presidencia, infrastructure or historical conversation changes. Existing worktree preserved; private DEV gate manifest renewed with backup.",
+  "services_started_or_stopped": 0,
+  "whatsapp_sent": 0,
+  "commits": 0,
+  "next_step": "Owner performs one manual stop/start to load code. Keep original conversation/history intact and manually send category question there. Inspect correlated event and confirm visible WhatsApp response. Final functional acceptance remains pending."
+}

@@ -1,0 +1,154 @@
+{
+  "status": "FOUNDATION_PUBLISHED_TELCHIAI_PENDING",
+  "timestamp": "2026-10-30T11:47:48.941695+00:00",
+  "branch": "feature/console-backend-core",
+  "authorization": {
+    "authorized_by": "Mario Rojas",
+    "private_file": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/authorizations/sales-foundation-20261030-mario-rojas/authorization.json",
+    "reference": "file:///home/issajar/.pi/agent/sessions/--media-issajar-DEVELOP-Projects-iMotorSoft-ai-dev-Team360--/2026-10-30T11-37-33-547Z_01a18c99-d26a-74c3-85eb-873737a06231.jsonl#message=2a103495&line=5",
+    "registered_at": "2026-10-30T11:38:29.912310+00:00",
+    "source_evidence_sha256": "00bfd9fd5eb764d99afa3f0d757ca6b1e1d9cb58d181e6bb5905af4d663f7f34"
+  },
+  "regression": {
+    "prepromotion": "321 PASS, regression.xml; previous timeout not counted as PASS",
+    "post_binding": "196 PASS, binding-after-r2.xml",
+    "before_fix": "3 FAIL / 1 PASS proving stale binding, binding-before.xml",
+    "invalid_test_invocation": "binding-after.xml: nonexistent test path; no tests ran, corrected invocation passed"
+  },
+  "current_before": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "current_after": "foundation_38680850adc058b1bb11887632b7b681",
+  "reference_before": {
+    "pinned": "v2_reference_closure_2088d5885204313a",
+    "independent_pointer": "v2_b19ceecf40d3ba09"
+  },
+  "reference_after": "v2_sales_e02883116f4b4991c396010a",
+  "snapshot_before": 1408,
+  "snapshot_after": 1408,
+  "cas": "Canonical logical_commit completed with expected previous Foundation; independent Reference CAS activation completed",
+  "journal": [
+    "activated.json",
+    "authorization.json",
+    "commit-intent.json",
+    "committed.json",
+    "plan.json",
+    "rollback-inputs.json",
+    "verified.json"
+  ],
+  "components": [
+    "credit_memo",
+    "material_supply",
+    "oinm",
+    "oitw",
+    "purchasing",
+    "receivables_collections",
+    "reference",
+    "sales"
+  ],
+  "commercial_reconciliation": {
+    "status": "PASS_ZERO_TOLERANCE_FROM_EFFECTIVE_CURRENT",
+    "money": [
+      {
+        "month": "2026-09",
+        "currency": "BS",
+        "invoice_doc_total": "11079079.770000",
+        "credit_doc_total": "488033.530000",
+        "net_documentary_billing": "10591046.240000"
+      },
+      {
+        "month": "2026-10",
+        "currency": "BS",
+        "invoice_doc_total": "11269116.220000",
+        "credit_doc_total": "457793.300000",
+        "net_documentary_billing": "10811322.920000"
+      }
+    ],
+    "evidence": "postpublication.json",
+    "raw_reconciliation": {
+      "groups": 8,
+      "zero_tolerance": true
+    }
+  },
+  "reader": "PASS live FoundationReader without injected snapshot; canonical manifest, sealed files, Material Supply and rollback inputs revalidated",
+  "telchiai": {
+    "status": "PENDING",
+    "probe": "Existing live_business_close pipeline, real approved DEV binding + Console + PostgreSQL + Luna + Foundation; no listener/outbound",
+    "first_attempt": "September capability timed out at 30.116 seconds",
+    "after_binding": "September capability timed out at 30.141 seconds",
+    "october": "NOT_RUN in conversational probe: existing runner stops after ERROR; reader monetary query PASS",
+    "model": "OpenAI direct gpt-5.6-luna medium; actual preflight and interpretation succeeded; no LiteLLM/Milvus in this pipeline",
+    "functional_defect": "sales_query.PUBLICATION still pinned previous Foundation; reproduced with 3 failing tests; exact pin updated, not relaxed",
+    "unresolved": "Worker capability deadline exceeded; precise timing bottleneck not established; no timeout increase, bypass, or environmental PASS",
+    "source_fix_deployed_to_running_service": false
+  },
+  "permissions": {
+    "authorized_actor": "Existing owner-approved DEV phone binding and Console resolver; monetary permission accepted and capability dispatched",
+    "negative_roles": "Offline permission rejection regressions PASS; no additional real actor impersonated",
+    "grants_changed": false,
+    "credentials_changed": false
+  },
+  "rollback": {
+    "available": true,
+    "inputs": "Hash-revalidated retained base and old Reference roots; authorization journaled; isolated rollback/recovery regression PASS",
+    "journal": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-foundation-final-promotion-v1/journal",
+    "command": "uv run python -m modules.telchi.datalake.sales_foundation_promotion rollback --journal /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-foundation-final-promotion-v1/journal --reason \"<audited operational reason>\"",
+    "executed": false
+  },
+  "files_modified": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_query.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_sales_promoted_binding.py"
+  ],
+  "source_sha256": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_query.py": "037c3435bb70754fe36a20bf242a38bbe78397ccfdc31b5990a704c89c759888",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_sales_promoted_binding.py": "ef5f82c1774de3fe69e2ad8bca879c32053e3547c1a71c276a5acce895d51b09"
+  },
+  "impact": "Only Telchi sales adapter exact pin and its imported consumers; no shared module changes. Other independently pinned analytical families are not accredited for new Foundation.",
+  "restrictions": {
+    "sap_queries": 0,
+    "recapture": false,
+    "shared_atomic_modified": false,
+    "physical_reference_v2": false,
+    "accounting": false,
+    "scheduler_activated": false,
+    "commits": 0,
+    "pushes": 0,
+    "services_restarted": 0,
+    "whatsapp_sent": 0
+  },
+  "host": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE initially; sustained I/O wait and rising swap at close: further heavy work deferred",
+    "RESOURCE_GUARD": "PASS publication preflight; no further heavy workload started after final pressure observation",
+    "CONCURRENCY_USED": {
+      "pytest_workers": 1,
+      "validation_threads": 1,
+      "sales_query_threads": 2,
+      "browsers": 0
+    },
+    "swap_mb_initial": 1486,
+    "swap_mb_final_observed": 2507,
+    "mem_available_mb_final_observed": 6358,
+    "io_wait_percent_observed": "51–77",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "environmental_aborts_detail": "No promotion or regression environmental abort; two capability deadlines retained as unresolved failures, not attributed automatically to resources.",
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "tmpfs_cleanup": [
+      "/dev/shm/telchi-nominal-promotion-20261030",
+      "/dev/shm/telchi-nominal-binding-after-r2"
+    ],
+    "CAPABILITY_TIMEOUTS": 2
+  },
+  "risks": [
+    "Conversational consumption remains unaccredited; not PUBLISHED_PASS",
+    "Published sales coverage October ends 2026-10-29; no global CDC guarantee",
+    "Other components retain authorized historical cutoffs",
+    "Binding code changes may invalidate DEV change-based channel admission evidence; no channel started",
+    "Canonical validation may exceed existing worker deadline on this I/O-busy host; requires attribution before any performance change"
+  ],
+  "next_action": "When host pressure subsides, profile the existing bounded sales worker against CURRENT to attribute its 30-second deadline, preserve all validation/security gates, then re-run both September and October through existing approved-actor pipeline; do not repromote or recapture.",
+  "validation": {
+    "git_diff_check": "PASS",
+    "final_diff_review": "Only exact PUBLICATION pin changed in existing source; new four-case regression inspected; preexisting work preserved",
+    "final_current": "Confirmed again after all tests and probes; final-current.json",
+    "markdown_gates": "NOT_REQUIRED: no Markdown created or modified"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "case_id": "ABRAHAM_HORIZONTAL_PHARMACIES_COMPOUND_V1",
+  "status": "INVESTIGATION_CANDIDATE_REQUIRES_BUSINESS_REVIEW",
+  "question": "¿Cuántos clientes tenemos en horizontal, principalmente las farmacias, y cuánto se les vende por mes?",
+  "candidate_query": {
+    "intent": "QUERY",
+    "business_domain": "SALES",
+    "metrics": ["customers.distinct_buyers", "sales.net_document_total"],
+    "dimensions": ["calendar.month", "customer.business_type"],
+    "filters": [[{"field": "sales.channel", "op": "eq", "values": ["HORIZONTAL"]}]],
+    "time": null,
+    "comparison": null,
+    "scope": {"branch_ids": [], "warehouse_ids": []},
+    "measure_context": {"requested_unit": null, "currency": null, "tax_basis": null, "valuation_basis": null},
+    "sort": [],
+    "limit": null,
+    "reference": null,
+    "pending_clarification": null
+  },
+  "unresolved_requirements": {
+    "entity": {"kind": "customer", "identity": "SAP CardCode is only a candidate account grain; not legal entity or DMS reconciliation"},
+    "customer_population": {"alternatives": ["registered_channel_members", "distinct_period_buyers", "distinct_monthly_buyers"], "confirmed": null},
+    "segmentation": {"mention": "principalmente las farmacias", "focus": "PHARMACY", "mode": "focus_breakdown_not_exclusive_filter", "mapping": null},
+    "time": {"grain": "month", "period": null, "coverage": "unresolved"},
+    "amount": {"candidate_basis": "active invoice DocTotal minus active credit memo DocTotal, by DocDate", "confirmed": false},
+    "channel": {"mention": "horizontal", "candidate_source": "DMS series proxy", "reconciled": false}
+  },
+  "execution_authority": false,
+  "expected_current_runtime": "DIRECT_UNAVAILABLE_WITH_ALL_REQUIREMENTS_RETAINED",
+  "required_followups": [
+    "Mayo a agosto de 2026: set period only; retain channel, customer population ambiguity, pharmacy focus, both metrics and month grain",
+    "Primero cuánto se vende: reorder metrics, do not remove customer count",
+    "Solo farmacias: explicitly narrow focus to exclusive segment, keep unknown mapping",
+    "Sin desglose de farmacias: explicit removal is allowed; do not remove channel or metrics",
+    "Nueva consulta: cuánto vendimos en mayo de 2026: clear prior compound requirements"
+  ],
+  "acceptance_limits": [
+    "This fixture is a proposed interpretation, not a model output or enabled capability",
+    "Do not guess year, period, tax basis, currency or pharmacy membership",
+    "Unknown pharmacy counts and amounts are not zero",
+    "Monthly distinct buyers cannot be summed into period distinct buyers",
+    "No global monetary execution may substitute for the compound request"
+  ]
+}

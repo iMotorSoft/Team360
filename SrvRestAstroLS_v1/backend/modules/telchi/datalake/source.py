@@ -6,6 +6,7 @@ import os
 import shlex
 import time
 from datetime import date
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -77,11 +78,30 @@ def _rows(cursor: Any, batch_size: int = 1000) -> list[dict[str, Any]]:
         result.extend({column: _canonical(value) for column, value in zip(columns, row)} for row in batch)
 
 
+@dataclass(frozen=True)
+class HanaTransportLimits:
+    """Opt-in driver limits; milliseconds for connection/network, seconds for SQL.
+
+    communicationTimeout bounds driver network waits (including fetch), not an
+    end-to-end wall clock guarantee. No worker is abandoned on timeout.
+    """
+    connect_ms: int = 8000
+    communication_ms: int = 15000
+    query_seconds: int = 5
+    operation_seconds: int = 30
+    max_rows: int = 1000
+
+    def __post_init__(self) -> None:
+        if any(type(v) is not int or v <= 0 for v in vars(self).values()):
+            raise ValueError("positive integer transport limits required")
+
+
 class HanaReadOnlySource:
     """One explicit hdbcli connection per bounded operation, never a pool."""
 
-    def __init__(self, *, connect_factory: Any | None = None) -> None:
+    def __init__(self, *, connect_factory: Any | None = None, limits: HanaTransportLimits | None = None) -> None:
         self._connect_factory = connect_factory
+        self.limits = limits
         self.query_log: list[dict[str, Any]] = []
         self.sap_write_count = 0
         self.oinm_schema: dict[str, Any] | None = None
@@ -91,11 +111,19 @@ class HanaReadOnlySource:
             return self._connect_factory()
         from hdbcli import dbapi
         config = hana_config()
+        options = {} if self.limits is None else {
+            "connectTimeout": self.limits.connect_ms,
+            "communicationTimeout": self.limits.communication_ms,
+        }
         connection = dbapi.connect(
             address=config["host"], port=int(config["port"]), user=config["user"],
-            password=config["password"], currentSchema=config["schema"], encrypt="false",
+            password=config["password"], currentSchema=config["schema"], encrypt="false", **options,
         )
-        return connection, connection.cursor()
+        try:
+            return connection, connection.cursor()
+        except BaseException:
+            connection.close()
+            raise
 
     def query_read_only(self, query_id: str, sql: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
         """Public, explicitly read-only bounded query entry point.
@@ -111,24 +139,119 @@ class HanaReadOnlySource:
         assert_read_only_select(sql)
         started = time.perf_counter()
         connection = cursor = None
+        audit = {
+            "query_id": query_id, "query_hash": hashlib.sha256(sql.encode()).hexdigest(),
+            "sap_access_mode": "READ_ONLY", "sap_write_count": 0,
+            "cursor_closed": False, "connection_closed": False, "retries": 0,
+        }
         try:
             connection, cursor = self._connect()
+            if self.limits is not None:
+                cursor.setquerytimeout(self.limits.query_seconds)
             cursor.execute(sql, params)
-            rows = _rows(cursor)
-            self.query_log.append({
-                "query_id": query_id, "query_hash": hashlib.sha256(sql.encode()).hexdigest(),
-                "duration_ms": round((time.perf_counter() - started) * 1000, 3),
-                "rows_returned": len(rows), "sap_access_mode": "READ_ONLY", "sap_write_count": 0,
-            })
+            if self.limits is None:
+                rows = _rows(cursor)
+            else:
+                columns = [str(item[0]) for item in cursor.description or ()]
+                rows = []
+                while True:
+                    if time.perf_counter() - started >= self.limits.operation_seconds:
+                        raise TimeoutError("HANA_OPERATION_BUDGET_EXCEEDED")
+                    batch = cursor.fetchmany(min(100, self.limits.max_rows + 1 - len(rows)))
+                    if time.perf_counter() - started >= self.limits.operation_seconds:
+                        raise TimeoutError("HANA_OPERATION_BUDGET_EXCEEDED")
+                    if not batch:
+                        break
+                    rows.extend({k: _canonical(v) for k, v in zip(columns, row)} for row in batch)
+                    if len(rows) > self.limits.max_rows:
+                        raise RuntimeError("HANA_ROW_BUDGET_EXCEEDED")
+            audit.update(rows_returned=len(rows), status="FETCHED")
             return rows
+        except BaseException as exc:
+            audit.update(status="FAILED", error_type=type(exc).__name__)
+            if connection is not None and self.limits is not None:
+                try:
+                    connection.cancel()
+                    audit["cancel_requested"] = True
+                except BaseException as cancel_error:
+                    audit["cancel_error_type"] = type(cancel_error).__name__
+            raise
         finally:
-            if cursor is not None:
-                cursor.close()
+            # A cursor/rollback failure must never prevent connection closure.
+            try:
+                if cursor is not None:
+                    cursor.close()
+                    audit["cursor_closed"] = True
+            finally:
+                try:
+                    if connection is not None:
+                        try:
+                            connection.rollback()
+                        finally:
+                            connection.close()
+                            audit["connection_closed"] = True
+                finally:
+                    audit["duration_ms"] = round((time.perf_counter() - started) * 1000, 3)
+                    self.query_log.append(audit)
+
+    def stream_read_only(self, query_id: str, sql: str, params: tuple[Any, ...] = (), *, batch_size: int = 2000):
+        """One bounded server cursor, not repeated OFFSET queries.
+
+        Callers must close the generator (contextlib.closing) on early exit.
+        The wall budget includes caller persistence between fetches. A partial
+        stream is never FETCHED and must not become a trusted snapshot.
+        """
+        assert_read_only_select(sql)
+        if self.limits is None or type(batch_size) is not int or not 1 <= batch_size <= 10000:
+            raise ValueError("stream requires explicit transport limits and bounded batches")
+        started = time.perf_counter()
+        connection = cursor = None
+        audit = dict(query_id=query_id, query_hash=hashlib.sha256(sql.encode()).hexdigest(),
+                     sap_access_mode="READ_ONLY", sap_write_count=0, retries=0,
+                     cursor_closed=False, connection_closed=False, rows_returned=0, status="INCOMPLETE")
+        try:
+            connection, cursor = self._connect()
+            cursor.setquerytimeout(self.limits.query_seconds)
+            cursor.execute(sql, params)
+            columns = [str(item[0]) for item in cursor.description or ()]
+            while True:
+                if time.perf_counter() - started >= self.limits.operation_seconds:
+                    raise TimeoutError("HANA_OPERATION_BUDGET_EXCEEDED")
+                batch = cursor.fetchmany(min(batch_size, self.limits.max_rows + 1 - audit["rows_returned"]))
+                if time.perf_counter() - started >= self.limits.operation_seconds:
+                    raise TimeoutError("HANA_OPERATION_BUDGET_EXCEEDED")
+                if not batch:
+                    audit["status"] = "FETCHED"
+                    break
+                audit["rows_returned"] += len(batch)
+                if audit["rows_returned"] > self.limits.max_rows:
+                    raise RuntimeError("HANA_ROW_BUDGET_EXCEEDED")
+                yield [{k: _canonical(v) for k, v in zip(columns, row)} for row in batch]
+        except BaseException as exc:
+            audit.update(status="FAILED", error_type=type(exc).__name__)
             if connection is not None:
                 try:
-                    connection.rollback()
+                    connection.cancel()
+                    audit["cancel_requested"] = True
+                except BaseException as cancel_error:
+                    audit["cancel_error_type"] = type(cancel_error).__name__
+            raise
+        finally:
+            try:
+                if cursor is not None:
+                    cursor.close()
+                    audit["cursor_closed"] = True
+            finally:
+                try:
+                    if connection is not None:
+                        try:
+                            connection.rollback()
+                        finally:
+                            connection.close()
+                            audit["connection_closed"] = True
                 finally:
-                    connection.close()
+                    audit["duration_ms"] = round((time.perf_counter() - started) * 1000, 3)
+                    self.query_log.append(audit)
 
     def plan(self, start: date, end: date, *, max_rows: int, max_segments: int | None = None) -> list[SegmentSpec]:
         from .planner import month_ranges

@@ -1,0 +1,88 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "Owner-authorized sales.category_line_amount.v1 registration in Telchi DEV only",
+  "CATEGORY_REGISTRATION": "PASS",
+  "SCOPED_REGISTRATION": "PASS",
+  "FULL_ACCESS_REAL_POSTGRESQL": "PASS",
+  "NON_PRIVILEGED_DENIAL": "PASS",
+  "TENANT_WORKSPACE_ISOLATION": "PASS",
+  "REVOCATION": "PASS",
+  "CATEGORY_CAPABILITY": "READY",
+  "RAW_MATERIAL_SEPTEMBER": "BS 839582.63; 34 products / 526 lines / 495 invoices",
+  "SECOND_CATEGORY": "LAB_FINISHED_PRODUCT: BS 2679208.66",
+  "AUTHENTICATED_END_TO_END": "PASS",
+  "SIX_GATES": "VALID",
+  "READY_FOR_MANUAL_WHATSAPP": "YES",
+  "TESTS": "34 new focused PASS; 256 PASS / 1 SKIP and 34 PG opt-in PASS retained as dated evidence after recorded source-hash verification, not rerun",
+  "scope": {
+    "tenant": "telchi",
+    "organization_id": "44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99",
+    "workspace_slug": "telchi_dev",
+    "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+    "module": "telchi",
+    "database": "local team360 DEV; server identity pinned by existing provisioning procedure",
+    "pilot_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+    "capability": "sales.category_line_amount.v1",
+    "permission": "telchi.sales.category_line_amount.read.v1"
+  },
+  "registration": {
+    "new_records": ["one core_permissions definition", "one enabled core_workspace_capabilities link in telchi_dev/telchi", "one telchi.admin.category-register audit event"],
+    "existing_records_changed": 0,
+    "roles_created": 0,
+    "individual_assignments_created": 0,
+    "full_access_assignments_changed": 0,
+    "shared_resolver_changed": false,
+    "idempotent": true,
+    "audit_correlation_id": "b6ddfa1f-4a92-4639-adde-f5a0e6961743",
+    "evidence": "registration.json",
+    "before_after": "Private recoverable snapshot and administrative audit contain full security records. Public registration.json contains inserted rows and effective pilot permissions before/after. All existing users' effective permissions checked; only pilot gains the category permission. All grants, profiles, roles and foreign registrations remain equal."
+  },
+  "real_verification": {
+    "evidence": "real-verification-r3.json",
+    "authentication": "Existing token-gated DEV HTTP backend route through in-process ASGI, real approved phone binding, Console resolver, committed PostgreSQL conversations, Luna Medium and read-only pinned Foundation. No identity/permission fixture ports.",
+    "not_claimed": "Human Console password login, live network listener, WhatsApp ingress/delivery, production readiness or all possible natural-language formulations",
+    "revocation": "Category registry disabled inside rollback; live permission disappears and stale identity denied; prior invoice operation remains allowed; rollback restores catalog. Existing FULL_ACCESS record never modified.",
+    "ordinary_identity": "Actual active Telchi administrator has no commercial permissions or FULL_ACCESS and is denied; no extra identity created.",
+    "foreign_identity": "Actual platform administrator lacks category permission; foreign workspace and tenant contexts are denied; phone binding cannot resolve across those boundaries.",
+    "unrelated_capabilities": "All users' effective permission sets remain identical except the single approved category increment for the pilot; latest invoice listing also executes successfully through authenticated backend.",
+    "contextual_followup": "Finished-product category inherits September 2026; subsequent comparison returns BS 1839626.03 difference with partial coverage and monetary semantics preserved."
+  },
+  "money_semantics": {
+    "currency": "BS",
+    "meaning": "Commercial active invoice line amounts, excluding line VAT, own line discounts included; before credit notes and global/header adjustments; not net documentary billing or collections",
+    "coverage": "Partial: 2026-09-01 through 2026-09-24",
+    "foundation": "foundation_afd08d9eca6a725be53cdc3f9d5709c9 / snapshot 1408; unchanged",
+    "independent_parity": "Existing ../category-sales-monetary-v1/parity-r1.json retained; live authenticated category values and counts agree exactly. Monetary implementation and recorded source hashes unchanged."
+  },
+  "gates": {
+    "evidence": "gates.json",
+    "policy": "change_based_v1, no artificial four-hour expiration",
+    "renewed": ["HTTP token boundary", "actual phone/tenant/workspace identity isolation", "actual category business authorization and revocation", "authenticated category execution and contextual response", "direct OpenAI Luna Medium reasoning echo/no fallback"],
+    "durable_evidence_reused": "Dated real claim/fence/intent evidence retained because persistence and Messaging unchanged; supplemented with actual new category committed result/cache replay and stale-identity reauthorization.",
+    "admission": "Existing gate_evidence() and full read-only DEV preflight both accept the published manifest. Runtime remains STOPPED."
+  },
+  "attempts": {
+    "r1_r2": "HTTP probe harness failed before business execution: legacy composition import installed an unopened global pool; trace confirmed PoolClosed in _run_turn. Failed artifacts retained as IN_PROGRESS, not PASS.",
+    "fix": "Runner-only: bind its opened native process-local pool after composition and assert pool identity/open state. No runtime, resolver or policy code modified.",
+    "r3": "Four authenticated business turns PASS; cached first response replay PASS; pool closed."
+  },
+  "files_created": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/provisioning/category_repository.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/provisioning/category_cli.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/provisioning/tests/test_category_registration.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/provisioning/tests/live_category_registration.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/provisioning/tests/publish_category_gates.py",
+    "data/reports/telchi/category-scoped-registration-v1/"
+  ],
+  "files_modified": ["SrvRestAstroLS_v1/backend/modules/telchi/status_actual.md"],
+  "presidencia": "Not implemented or modified. When integrated from Console, the owner and Abraham must be able to read this information with identical enterprise read scope, without technical administration privileges.",
+  "host": {
+    "completed_probe_budget": "Sequential process; one PG connection at a time, runtime capability DuckDB 2 threads / 512MB, numerical libraries 1 thread; no browser/listener",
+    "observations": "8 CPUs, load about 9-10; available memory 3.2-4.2 GiB; growing swap and I/O pressure observed later. No additional scans or broad suites launched under that pressure.",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0
+  },
+  "restrictions_preserved": ["Foundation and SAP unchanged", "classifications unchanged", "FULL_ACCESS and resolver unchanged", "no individual grants", "no Presidencia implementation", "no infrastructure writes or service restarts", "no Evolution/Meta/Cloudflare changes", "no WhatsApp sends or queued outbound intents", "no commit or push", "preexisting local changes preserved"],
+  "next_step": "Owner's manual WhatsApp test using the existing launcher and approved pilot. No automatic send or service start performed."
+}

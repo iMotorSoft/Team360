@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-10-19T00:16:35.005506+00:00",
+  "RBAC": "PASS",
+  "identity_workspace_unchanged": true,
+  "preserved_permissions": [
+    "telchi.products.search.read.v1",
+    "telchi.sales.by_products.read.v1",
+    "telchi.sales.coverage.read.v1",
+    "telchi.sales.latest_documents.read.v1",
+    "telchi.sales.period_billed_amount.read.v1",
+    "telchi.sales.source_quantity.read.v1"
+  ],
+  "effective": [
+    "telchi.products.search.read.v1",
+    "telchi.sales.by_products.read.v1",
+    "telchi.sales.coverage.read.v1",
+    "telchi.sales.invoice_lines.read.v1",
+    "telchi.sales.latest_documents.read.v1",
+    "telchi.sales.period_billed_amount.read.v1",
+    "telchi.sales.source_quantity.read.v1"
+  ],
+  "increment": [
+    "telchi.sales.invoice_lines.read.v1"
+  ],
+  "idempotent_reapply": "PASS",
+  "events": [
+    {
+      "id": "5c4ef8dd-8bc5-48a0-936e-a39bccd737da",
+      "event_name": "telchi.admin.invoice-authorize"
+    },
+    {
+      "id": "f8e0ea10-aedd-4278-8eb0-ea79a09219c3",
+      "event_name": "telchi.admin.invoice-grant"
+    }
+  ],
+  "private_backup_sha256": "d1db60b3b51408ce1849a1e986c685cb34826d03b36eefeab487834e247bea21",
+  "backup_restore_rehearsal": "PASS before application; report-path write failed only after rollback equality assertions",
+  "snapshot_delta": {
+    "permissions": 1,
+    "roles": 1,
+    "role_permissions": 1,
+    "user_roles": 1,
+    "user_profiles": 0,
+    "admin_events": 2
+  },
+  "runtime_restart": false,
+  "whatsapp_approval_modified": false
+}

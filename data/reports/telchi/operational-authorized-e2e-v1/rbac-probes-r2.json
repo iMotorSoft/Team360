@@ -1,0 +1,158 @@
+{
+  "scope": "real PostgreSQL authorization port, no model/readers",
+  "operations": [
+    {
+      "metric": "inventory.stock_by_warehouse",
+      "permission": "telchi.inventory.stock_by_warehouse.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    },
+    {
+      "metric": "production.consumption",
+      "permission": "telchi.production.consumption.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    },
+    {
+      "metric": "production.orders",
+      "permission": "telchi.production.orders.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    },
+    {
+      "metric": "production.bom",
+      "permission": "telchi.production.bom.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    },
+    {
+      "metric": "purchasing.invoiced_amount",
+      "permission": "telchi.purchasing.invoiced_amount.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    },
+    {
+      "metric": "purchasing.ordered_amount",
+      "permission": "telchi.purchasing.ordered_amount.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    },
+    {
+      "metric": "purchasing.received_amount",
+      "permission": "telchi.purchasing.received_amount.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    },
+    {
+      "metric": "collections.received_amount",
+      "permission": "telchi.collections.received_amount.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    },
+    {
+      "metric": "collections.unallocated",
+      "permission": "telchi.collections.unallocated.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    },
+    {
+      "metric": "material_supply.consumption",
+      "permission": "telchi.material_supply.consumption.read.v1",
+      "checks": {
+        "authorized": true,
+        "no_permission": true,
+        "foreign_workspace": true,
+        "invalid_identity": true,
+        "disabled_capability": true,
+        "unregistered_capability": true,
+        "revoked_stale_identity": true,
+        "revoked_fresh_identity": true,
+        "recovery": true
+      }
+    }
+  ],
+  "rollback": true,
+  "explicit_business_role_without_full_access": true,
+  "restored_effective": true
+}

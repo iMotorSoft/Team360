@@ -1,0 +1,187 @@
+TEAM360 / TELCHIAI — PERMISOS DE LECTURA SAP HANA
+Rama: feature/console-backend-core. Resultado PARCIAL / ENVIRONMENTAL_ABORT.
+No se modificó código, SAP, credenciales, servicios ni Foundation. Sin commits.
+Una sola conexión HANA; consultas estrictamente secuenciales; paralelismo=0; pausa de 1 s.
+Primer bloque: 10 PASS (80,833–133,981 ms). Segundo bloque: OINM PASS en 4.073,836 ms.
+Detención inmediata tras OINM por superar 2.000 ms. No demuestra caída global de SAP.
+Sin consultas adicionales, diagnósticos, reintentos ni reconexiones. Cursor y conexión cerrados.
+
+Identificados: 148 (143 negocio + 5 vistas SYS de metadatos).
+Inventario base: 79; referencias adicionales de negocio: 64; metadatos: 5.
+La revisión estática final añadió OHTR/OUDP y las hipótesis históricas OMTC/OPQT; no se consultaron.
+11 objetos consultados en esta corrida; 3 PASS HISTÓRICOS aportados por el usuario.
+PASS nuevos: 11; PASS VACÍO: 0; PASS HISTÓRICO: 3; DENIED: 0; NOT FOUND: 0; ERROR: 0; SKIP: 134.
+Lectura acreditada total: 14/148 = 9,46 %; negocio: 14/143 = 9,79 %.
+Duración nueva acumulada: 4.963,144 ms; histórica: 254,494 ms; combinada: 5.217,638 ms (sin pausas/conexión).
+
+DICTAMEN
+1. Podemos acreditar lectura básica del 9,46 % del inventario identificado, incluyendo evidencia histórica.
+2. No hay denegaciones demostradas. OINM es legible pero presentó latencia anormal; no es un fallo de permisos.
+3. Pendiente acreditar ventas/cobranzas restantes, inventarios, compras, proveedores, tesorería, producción, precios, sucursales, RRHH, autorizaciones, UDT y metadatos. SKIP no prueba afectación funcional ni denegación.
+4. No corresponde solicitar GRANT específicos todavía. Sólo ante DENIED futuro, solicitar SELECT sobre el objeto exacto al usuario/rol actual. NOT FOUND exigiría confirmar nombre/schema/visibilidad con el administrador, no asumir inexistencia ni pedir permisos generales.
+5. Todos los objetos con SKIP en la matriz permanecen sin verificar. Se conservaron sin abrir otra sesión.
+
+ALCANCE Y EVIDENCIA
+Point-in-time dependency inventory from current module code, Foundation contracts and historical investigations; not the full SAP catalog. Historical hypotheses retained as INVESTIGACIÓN, not asserted to exist.
+ACTUAL means reference in functional module Python/SQL or user-accredited accounting baseline, not a production-promotion claim. PREVISTO means explicit non-investigation contract only. Remaining historical-only references are INVESTIGACIÓN.
+OJDT/JDT1/OACT results supplied by user as passed with current credentials; not independently reexecuted.
+Se corrigieron claves candidatas inexactas del inventario usando columnas físicas offline (p.ej. ODSC.BankCode, PCH6.DocEntry, OBNK.IdNumber). Sin corregir código fuente.
+Para UDT sin schema offline, el plan usa Code convencional; sigue siendo candidato, no columna acreditada. No se alcanzó ninguna UDT.
+El acceso TOP 1 acredita esa proyección: no demuestra permisos de todas las columnas ni viabilidad de consultas de negocio.
+SYS legible tampoco acreditaría visibilidad completa del catálogo.
+Comandos: .venv/bin/python /tmp/telchi_hana_permission_probe.py con PYTHONPATH del backend; liberación manual del bloque 2 tras revisar el bloque 1.
+No se ejecutó Data Lake, pytest ni LAT: no se modificó software ni documentación Markdown. Invariantes offline PASS; git diff --check PASS.
+HOST_PREFLIGHT=BUSY_BUT_SAFE; swap=0; ~7,7 GB disponibles al inicio; concurrencia SAP=1 (paralelismo=0).
+UNRELATED_PROCESSES_TERMINATED=0; OWN_PROCESSES_LEFT_RUNNING=0. Auditoría de /proc confirma runner terminado.
+Próximo paso: revisar lentitud con el owner de SAP y autorizar/reanudar otra ventana sólo sobre SKIP, sin repetir PASS.
+
+MATRIZ CONSOLIDADA (duraciones en ms; coma decimal)
+Área | Schema | Tabla/Vista | Uso | Estado | Duración ms
+Metadatos y borradores | TELCHI | CUFD | ACTUAL | PASS | 81,206
+PRODUCCIÓN | TELCHI | IGE1 | ACTUAL | PASS | 88,963
+VENTAS | TELCHI | INV1 | ACTUAL | PASS | 133,981
+CRÉDITO_Y_DEUDORES | TELCHI | INV6 | ACTUAL | PASS | 86,512
+RECONCILIACIONES | TELCHI | ITR1 | ACTUAL | PASS | 83,213
+BOM_PRODUCCIÓN | TELCHI | ITT1 | ACTUAL | PASS | 80,946
+CONTABILIDAD | TELCHI | JDT1 | ACTUAL | PASS HISTÓRICO | 86,291
+Ventas y devoluciones | TELCHI | NNM1 | ACTUAL | PASS | 88,922
+CONTABILIDAD | TELCHI | OACT | ACTUAL | PASS HISTÓRICO | 76,344
+CLIENTES_PROVEEDORES | TELCHI | OCRD | ACTUAL | PASS | 81,607
+CRÉDITO_Y_DEUDORES | TELCHI | OCTG | ACTUAL | PASS | 83,125
+PRODUCCIÓN | TELCHI | OIGE | ACTUAL | PASS | 80,833
+MOVIMIENTOS_DE_INVENTARIO | TELCHI | OINM | ACTUAL | PASS | 4073,836
+VENTAS | TELCHI | OINV | ACTUAL | SKIP | —
+PRODUCTOS | TELCHI | OITM | ACTUAL | SKIP | —
+RECONCILIACIONES | TELCHI | OITR | ACTUAL | SKIP | —
+BOM_PRODUCCIÓN | TELCHI | OITT | ACTUAL | SKIP | —
+STOCK_E_INVENTARIOS | TELCHI | OITW | ACTUAL | SKIP | —
+CONTABILIDAD | TELCHI | OJDT | ACTUAL | PASS HISTÓRICO | 91,859
+FACTURAS_DE_PROVEEDOR | TELCHI | OPCH | ACTUAL | SKIP | —
+RECEPCIONES | TELCHI | OPDN | ACTUAL | SKIP | —
+COMPRAS_Y_ABASTECIMIENTO | TELCHI | OPOR | ACTUAL | SKIP | —
+COBRANZAS | TELCHI | ORCT | ACTUAL | SKIP | —
+NOTAS_DE_CREDITO | TELCHI | ORIN | ACTUAL | SKIP | —
+VENDEDORES | TELCHI | OSLP | ACTUAL | SKIP | —
+USUARIOS_ROLES_Y_PERMISOS | TELCHI | OUSR | ACTUAL | SKIP | —
+ALMACENES | TELCHI | OWHS | ACTUAL | SKIP | —
+PRODUCCIÓN | TELCHI | OWOR | ACTUAL | SKIP | —
+FACTURAS_DE_PROVEEDOR | TELCHI | PCH1 | ACTUAL | SKIP | —
+RECEPCIONES | TELCHI | PDN1 | ACTUAL | SKIP | —
+COMPRAS_Y_ABASTECIMIENTO | TELCHI | POR1 | ACTUAL | SKIP | —
+Tesorería y bancos | TELCHI | RCT1 | ACTUAL | SKIP | —
+COBRANZAS | TELCHI | RCT2 | ACTUAL | SKIP | —
+Tesorería y bancos | TELCHI | RCT3 | ACTUAL | SKIP | —
+NOTAS_DE_CREDITO | TELCHI | RIN1 | ACTUAL | SKIP | —
+Metadatos y borradores | TELCHI | UFD1 | ACTUAL | SKIP | —
+Metadatos SAP | SYS | TABLE_COLUMNS | ACTUAL | SKIP | —
+CONFIGURACIÓN_SAP | TELCHI | OADM | PREVISTO | SKIP | —
+Retail y consignación | TELCHI | @ASO1_01SUCURSAL | INVESTIGACIÓN | SKIP | —
+Objetivos de venta | TELCHI | @OBJ_VENTAS_C | INVESTIGACIÓN | SKIP | —
+Objetivos de venta | TELCHI | @OBJ_VENTAS_L | INVESTIGACIÓN | SKIP | —
+Retail y consignación | TELCHI | @SO1_01CLIENTEALTER | INVESTIGACIÓN | SKIP | —
+COMPRAS_Y_ABASTECIMIENTO | TELCHI | @SO1_01COMPRA | INVESTIGACIÓN | SKIP | —
+COMPRAS_Y_ABASTECIMIENTO | TELCHI | @SO1_01COMPRADETALLE | INVESTIGACIÓN | SKIP | —
+COMPRAS_Y_ABASTECIMIENTO | TELCHI | @SO1_01COMPRAWEB | INVESTIGACIÓN | SKIP | —
+Retail y consignación | TELCHI | @SO1_01CONFIGURACION | INVESTIGACIÓN | SKIP | —
+COMPRAS_Y_ABASTECIMIENTO | TELCHI | @SO1_01DEVOLCOMPRA | INVESTIGACIÓN | SKIP | —
+COMPRAS_Y_ABASTECIMIENTO | TELCHI | @SO1_01FAVPROVEEDOR | INVESTIGACIÓN | SKIP | —
+USUARIOS_ROLES_Y_PERMISOS | TELCHI | @SO1_01LOGAUTORIZA | INVESTIGACIÓN | SKIP | —
+COMPRAS_Y_ABASTECIMIENTO | TELCHI | @SO1_01SUGERENCOMPRA | INVESTIGACIÓN | SKIP | —
+CRÉDITO_Y_DEUDORES | TELCHI | @SO1_01VENCREVENC | INVESTIGACIÓN | SKIP | —
+Retail y consignación | TELCHI | @SO1_01VENTA | INVESTIGACIÓN | SKIP | —
+Retail y consignación | TELCHI | @SO1_01VENTADETALLE | INVESTIGACIÓN | SKIP | —
+Retail y consignación | TELCHI | @UT_ERP_MESSAGE | INVESTIGACIÓN | SKIP | —
+Clientes y proveedores | TELCHI | ACRD | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | AWHT | INVESTIGACIÓN | SKIP | —
+Clientes y proveedores | TELCHI | CRD1 | INVESTIGACIÓN | SKIP | —
+VENTAS | TELCHI | DLN1 | INVESTIGACIÓN | SKIP | —
+Ventas y devoluciones | TELCHI | DPI1 | INVESTIGACIÓN | SKIP | —
+Compras y cuentas por pagar | TELCHI | DPO1 | INVESTIGACIÓN | SKIP | —
+Tesorería y bancos | TELCHI | DPS1 | INVESTIGACIÓN | SKIP | —
+CAJA_BANCOS | TELCHI | DSC1 | INVESTIGACIÓN | SKIP | —
+FORECAST_Y_ESTACIONALIDAD | TELCHI | FCT1 | INVESTIGACIÓN | SKIP | —
+Usuarios y sucursales | TELCHI | HEM6 | INVESTIGACIÓN | SKIP | —
+LOTES_SERIES | TELCHI | IBT1 | INVESTIGACIÓN | SKIP | —
+PRODUCCIÓN | TELCHI | IGN1 | INVESTIGACIÓN | SKIP | —
+CAJA_BANCOS | TELCHI | OBNK | INVESTIGACIÓN | SKIP | —
+Tesorería y bancos | TELCHI | OBOE | INVESTIGACIÓN | SKIP | —
+Usuarios y sucursales | TELCHI | OBPL | INVESTIGACIÓN | SKIP | —
+Tesorería y bancos | TELCHI | OBTF | INVESTIGACIÓN | SKIP | —
+LOTES_SERIES | TELCHI | OBTN | INVESTIGACIÓN | SKIP | —
+CAJA_BANCOS | TELCHI | OCHH | INVESTIGACIÓN | SKIP | —
+CAJA_BANCOS | TELCHI | OCHO | INVESTIGACIÓN | SKIP | —
+Clientes y proveedores | TELCHI | OCPR | INVESTIGACIÓN | SKIP | —
+Clientes y proveedores | TELCHI | OCQG | INVESTIGACIÓN | SKIP | —
+Tesorería y bancos | TELCHI | OCRB | INVESTIGACIÓN | SKIP | —
+CLIENTES_PROVEEDORES | TELCHI | OCRG | INVESTIGACIÓN | SKIP | —
+Investigación SAP | TELCHI | OCRN | INVESTIGACIÓN | SKIP | —
+VENTAS | TELCHI | ODLN | INVESTIGACIÓN | SKIP | —
+Ventas y devoluciones | TELCHI | ODPI | INVESTIGACIÓN | SKIP | —
+Compras y cuentas por pagar | TELCHI | ODPO | INVESTIGACIÓN | SKIP | —
+CAJA_BANCOS | TELCHI | ODPS | INVESTIGACIÓN | SKIP | —
+Metadatos y borradores | TELCHI | ODRF | INVESTIGACIÓN | SKIP | —
+CAJA_BANCOS | TELCHI | ODSC | INVESTIGACIÓN | SKIP | —
+FORECAST_Y_ESTACIONALIDAD | TELCHI | OFCT | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | OFPR | INVESTIGACIÓN | SKIP | —
+RRHH | TELCHI | OHEM | INVESTIGACIÓN | SKIP | —
+Usuarios y sucursales | TELCHI | OHPS | INVESTIGACIÓN | SKIP | —
+PRODUCCIÓN | TELCHI | OIGN | INVESTIGACIÓN | SKIP | —
+Compras y cuentas por pagar | TELCHI | OIPF | INVESTIGACIÓN | SKIP | —
+PRODUCTOS | TELCHI | OITB | INVESTIGACIÓN | SKIP | —
+Precios y productos | TELCHI | OITG | INVESTIGACIÓN | SKIP | —
+Precios y productos | TELCHI | OMRC | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | OMRV | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | OOCR | INVESTIGACIÓN | SKIP | —
+Precios y productos | TELCHI | OPLN | INVESTIGACIÓN | SKIP | —
+SOLICITUDES_DE_COMPRA | TELCHI | OPRQ | INVESTIGACIÓN | SKIP | —
+COTIZACIONES_PROFORMAS | TELCHI | OQUT | INVESTIGACIÓN | SKIP | —
+Ventas y devoluciones | TELCHI | ORDN | INVESTIGACIÓN | SKIP | —
+VENTAS | TELCHI | ORDR | INVESTIGACIÓN | SKIP | —
+Compras y cuentas por pagar | TELCHI | ORPC | INVESTIGACIÓN | SKIP | —
+DEVOLUCIONES | TELCHI | ORPD | INVESTIGACIÓN | SKIP | —
+Precios y productos | TELCHI | OSPP | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | OTAX | INVESTIGACIÓN | SKIP | —
+Usuarios y sucursales | TELCHI | OUBR | INVESTIGACIÓN | SKIP | —
+Metadatos y borradores | TELCHI | OUDO | INVESTIGACIÓN | SKIP | —
+USUARIOS_ROLES_Y_PERMISOS | TELCHI | OUGR | INVESTIGACIÓN | SKIP | —
+USUARIOS_ROLES_Y_PERMISOS | TELCHI | OUPT | INVESTIGACIÓN | SKIP | —
+CAJA_BANCOS | TELCHI | OVPM | INVESTIGACIÓN | SKIP | —
+RETENCIONES | TELCHI | OWHT | INVESTIGACIÓN | SKIP | —
+Transferencias y reposición | TELCHI | OWTQ | INVESTIGACIÓN | SKIP | —
+TRANSFERENCIAS_Y_DEPÓSITOS | TELCHI | OWTR | INVESTIGACIÓN | SKIP | —
+RETENCIONES | TELCHI | PCH5 | INVESTIGACIÓN | SKIP | —
+RETENCIONES | TELCHI | PCH6 | INVESTIGACIÓN | SKIP | —
+SOLICITUDES_DE_COMPRA | TELCHI | PRQ1 | INVESTIGACIÓN | SKIP | —
+COTIZACIONES_PROFORMAS | TELCHI | QUT1 | INVESTIGACIÓN | SKIP | —
+Tesorería y bancos | TELCHI | RCT4 | INVESTIGACIÓN | SKIP | —
+Ventas y devoluciones | TELCHI | RDN1 | INVESTIGACIÓN | SKIP | —
+VENTAS | TELCHI | RDR1 | INVESTIGACIÓN | SKIP | —
+Compras y cuentas por pagar | TELCHI | RPC1 | INVESTIGACIÓN | SKIP | —
+DEVOLUCIONES | TELCHI | RPD1 | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | TAX1 | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | TAX2 | INVESTIGACIÓN | SKIP | —
+Metadatos y borradores | TELCHI | UDO1 | INVESTIGACIÓN | SKIP | —
+USUARIOS_ROLES_Y_PERMISOS | TELCHI | UGR1 | INVESTIGACIÓN | SKIP | —
+USUARIOS_ROLES_Y_PERMISOS | TELCHI | USR3 | INVESTIGACIÓN | SKIP | —
+ACTIVIDAD_DE_USUARIOS | TELCHI | USR5 | INVESTIGACIÓN | SKIP | —
+Usuarios y sucursales | TELCHI | USR7 | INVESTIGACIÓN | SKIP | —
+Tesorería y bancos | TELCHI | VPM1 | INVESTIGACIÓN | SKIP | —
+CAJA_BANCOS | TELCHI | VPM2 | INVESTIGACIÓN | SKIP | —
+Tesorería y bancos | TELCHI | VPM3 | INVESTIGACIÓN | SKIP | —
+Tesorería y bancos | TELCHI | VPM4 | INVESTIGACIÓN | SKIP | —
+Tesorería y bancos | TELCHI | VPM5 | INVESTIGACIÓN | SKIP | —
+RETENCIONES | TELCHI | VPM6 | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | WHT1 | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | WHT2 | INVESTIGACIÓN | SKIP | —
+Contabilidad e impuestos | TELCHI | WHT3 | INVESTIGACIÓN | SKIP | —
+PRODUCCIÓN | TELCHI | WOR1 | INVESTIGACIÓN | SKIP | —
+Transferencias y reposición | TELCHI | WTQ1 | INVESTIGACIÓN | SKIP | —
+TRANSFERENCIAS_Y_DEPÓSITOS | TELCHI | WTR1 | INVESTIGACIÓN | SKIP | —
+Metadatos SAP | SYS | OBJECT_DEPENDENCIES | INVESTIGACIÓN | SKIP | —
+Metadatos SAP | SYS | PROCEDURES | INVESTIGACIÓN | SKIP | —
+Metadatos SAP | SYS | TABLES | INVESTIGACIÓN | SKIP | —
+Metadatos SAP | SYS | VIEWS | INVESTIGACIÓN | SKIP | —
+RRHH | TELCHI | OHTR | INVESTIGACIÓN | SKIP | —
+RRHH | TELCHI | OUDP | INVESTIGACIÓN | SKIP | —
+Trazabilidad investigativa (hipótesis histórica) | TELCHI | OMTC | INVESTIGACIÓN | SKIP | —
+Compras (hipótesis histórica) | TELCHI | OPQT | INVESTIGACIÓN | SKIP | —

@@ -1,0 +1,588 @@
+{
+  "timestamp": "2026-11-02T17:20:12.965787+00:00",
+  "source_sha256": "00486915a1e05ae4015b076ae428f937dc9ceafb88ec4f5f4690f4ba3335cafb",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "preparation_ms": 0.08890400022210088,
+    "response_bytes": 6597,
+    "duration_ms": 5154.539,
+    "attempts": 1
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿Qué período querés consultar?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuántas líneas de consumo de producción registramos en octubre de 2026?",
+      "text": "Consumo registrado para producción:\n3.974 líneas de consumo de producción.\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:46:37.892000 a 2026-11-01T17:46:53.281000.\nControles: period_source_lines=4814, included_issue_lines=3974, unknown_native_identity_lines_affected=0\nMostradas 10 de 556 filas; 546 omitidas del mensaje. No es un ranking global entre unidades.\nEmisiones activas BaseType 202; identidad no equivale a materia prima clasificada. Incluye identidades de recursos/desconocidas separadas, sin inferir su naturaleza.\n31 líneas fuente desconocidas se conservan; no hay recepción de producto terminado ni vigencia histórica de BOM.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "9ab26f4e-c2b3-4d72-b362-348f65ad15e3",
+      "thread_id": "55145303-679f-4a8e-ab23-488e32a74f9a",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 79916.2996569994,
+          "state_engine_ms": 0.5114989999128738,
+          "interpretation_ms": 8445.693047999157,
+          "response_format_ms": 0.04461599928617943,
+          "total_processing_ms": 88388.48892100032
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "business_scope": {
+          "domain": "production",
+          "metric": "production.consumption",
+          "coverage": {
+            "kind": "BOUNDED_OBSERVATION",
+            "dataset_rows": 41808,
+            "source_scope": {
+              "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+              "start": "2026-01-01",
+              "limitation": "No claim of modifications outside this business-date scope; no CDC",
+              "end_exclusive": "2026-11-02",
+              "absent_optional_fields": []
+            },
+            "declared_start": "2026-01-01",
+            "absence_is_zero": false,
+            "requested_period": {
+              "date_from": "2026-10-01",
+              "date_to_exclusive": "2026-11-01"
+            },
+            "last_observed_date": "2026-10-31 00:00:00",
+            "first_observed_date": "2026-01-05 00:00:00",
+            "declared_end_exclusive": "2026-11-02",
+            "observation_started_at": "2026-11-01T17:46:37.892000",
+            "observation_finished_at": "2026-11-01T17:46:53.281000",
+            "complete_business_history": false,
+            "requested_outside_capture": false
+          },
+          "datasets": [
+            "production_issue",
+            "observed_material_actual_consumption",
+            "production_order"
+          ],
+          "universe": "CAPTURED_NATIVE_OBSERVATIONS"
+        },
+        "contract_error": null,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "limit": 10,
+          "metric": "production.consumption",
+          "period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-11-01"
+          },
+          "pending": null,
+          "branches": [],
+          "group_by": null,
+          "reference": null,
+          "comparison": null,
+          "period_mode": null,
+          "breakdown_by": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "physical_focus": null,
+          "product_target": null,
+          "schema_version": 2,
+          "customer_target": null,
+          "product_context": null,
+          "business_category": null,
+          "requested_metrics": [
+            "production.consumption"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "limit": 10,
+          "metric": "production.consumption",
+          "period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-11-01"
+          },
+          "pending": null,
+          "branches": [],
+          "group_by": null,
+          "reference": null,
+          "comparison": null,
+          "period_mode": null,
+          "breakdown_by": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "physical_focus": null,
+          "product_target": null,
+          "schema_version": 2,
+          "customer_target": null,
+          "product_context": null,
+          "business_category": null,
+          "requested_metrics": [
+            "production.consumption"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "rows": [
+            {
+              "unit": "BOLSA",
+              "quantity": "641.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L01685",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "BOLSA",
+              "quantity": "30.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M02927",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CAPS",
+              "quantity": "100.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M05939",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CJA",
+              "quantity": "10.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L02331",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CJA",
+              "quantity": "5.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L02322",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CJA",
+              "quantity": "3.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L02157",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CJA",
+              "quantity": "3.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L02227",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "COMP",
+              "quantity": "100.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M02605",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "COMP",
+              "quantity": "100.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M05375",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "COMP",
+              "quantity": "100.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M05847",
+              "issue_lines": 1,
+              "native_factor": "1"
+            }
+          ],
+          "label": "Consumo registrado para producción",
+          "metric": "production.consumption",
+          "source": {
+            "datasets": {
+              "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+              "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7",
+              "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33"
+            },
+            "updated_at": "2026-11-01T17:50:16.749000+00:00",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+            "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+          },
+          "summary": null,
+          "timings": {
+            "serialization_ms": 0.1862030003394466,
+            "planning_and_sql_ms": 92.62474000024667,
+            "foundation_resolution_ms": 79179.276
+          },
+          "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+          "controls": {
+            "period_source_lines": 4814,
+            "included_issue_lines": 3974,
+            "unknown_native_identity_lines_affected": 0
+          },
+          "coverage": {
+            "kind": "BOUNDED_OBSERVATION",
+            "dataset_rows": 41808,
+            "source_scope": {
+              "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+              "start": "2026-01-01",
+              "limitation": "No claim of modifications outside this business-date scope; no CDC",
+              "end_exclusive": "2026-11-02",
+              "absent_optional_fields": []
+            },
+            "declared_start": "2026-01-01",
+            "absence_is_zero": false,
+            "requested_period": {
+              "date_from": "2026-10-01",
+              "date_to_exclusive": "2026-11-01"
+            },
+            "last_observed_date": "2026-10-31 00:00:00",
+            "first_observed_date": "2026-01-05 00:00:00",
+            "declared_end_exclusive": "2026-11-02",
+            "observation_started_at": "2026-11-01T17:46:37.892000",
+            "observation_finished_at": "2026-11-01T17:46:53.281000",
+            "complete_business_history": false,
+            "requested_outside_capture": false
+          },
+          "read_only": true,
+          "capability": "production.consumption.v1",
+          "parameters": {
+            "limit": 10,
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "total_rows": 556,
+          "limitations": [
+            "Emisiones activas BaseType 202; identidad no equivale a materia prima clasificada. Incluye identidades de recursos/desconocidas separadas, sin inferir su naturaleza.",
+            "31 líneas fuente desconocidas se conservan; no hay recepción de producto terminado ni vigencia histórica de BOM.",
+            "Cantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles."
+          ],
+          "omitted_rows": 546,
+          "sap_accessed": false,
+          "sql_evidence": [
+            {
+              "sql": "CREATE OR REPLACE TEMP VIEW op_source AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/production_issue.parquet'))",
+              "parameters": []
+            },
+            {
+              "sql": "SELECT min(\"DocDate\") AS first_observed_date,max(\"DocDate\") AS last_observed_date,count(*) AS dataset_rows FROM op_source",
+              "parameters": []
+            },
+            {
+              "sql": "CREATE OR REPLACE TEMP TABLE op_period AS SELECT * FROM op_source WHERE \"DocDate\">=? AND \"DocDate\"<?",
+              "parameters": [
+                "2026-10-01",
+                "2026-11-01"
+              ]
+            },
+            {
+              "sql": "CREATE OR REPLACE TEMP VIEW op_eligible_groups AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/observed_material_actual_consumption.parquet'))",
+              "parameters": []
+            },
+            {
+              "sql": "CREATE OR REPLACE TEMP VIEW op_orders AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/production_order.parquet'))",
+              "parameters": []
+            },
+            {
+              "sql": "CREATE OR REPLACE TEMP TABLE op_consumption AS SELECT I.* FROM op_period I\n                    WHERE I.\"CANCELED\"='N' AND cast(I.\"BaseType\" AS DECIMAL(18,6))=202 ",
+              "parameters": []
+            },
+            {
+              "sql": "SELECT \"ItemCode\" AS item_code,\"unitMsr\" AS unit,\"UomCode\" AS uom_code,\n                    \"NumPerMsr\" AS native_factor,count(*) AS issue_lines,\n                    sum(cast(\"Quantity\" AS DECIMAL(38,12))) AS quantity\n                    FROM op_consumption GROUP BY ALL ORDER BY unit NULLS LAST,uom_code NULLS LAST,native_factor NULLS LAST,quantity DESC,item_code",
+              "parameters": []
+            },
+            {
+              "sql": "SELECT (SELECT count(*) FROM op_period) AS period_source_lines,\n                    count(*) AS included_issue_lines FROM op_consumption",
+              "parameters": []
+            },
+            {
+              "sql": "CREATE OR REPLACE TEMP TABLE op_unknown(doc_entry BIGINT,line_num BIGINT)",
+              "parameters": []
+            },
+            {
+              "sql": "INSERT INTO op_unknown VALUES (?,?)",
+              "batch": true,
+              "parameters": [
+                [
+                  54328,
+                  1
+                ],
+                [
+                  54406,
+                  1
+                ],
+                [
+                  54485,
+                  1
+                ],
+                [
+                  54678,
+                  1
+                ],
+                [
+                  54777,
+                  1
+                ],
+                [
+                  54896,
+                  1
+                ],
+                [
+                  54956,
+                  1
+                ],
+                [
+                  55152,
+                  1
+                ],
+                [
+                  55162,
+                  1
+                ],
+                [
+                  55178,
+                  1
+                ],
+                [
+                  55327,
+                  1
+                ],
+                [
+                  55329,
+                  1
+                ],
+                [
+                  55363,
+                  1
+                ],
+                [
+                  55565,
+                  1
+                ],
+                [
+                  55700,
+                  1
+                ],
+                [
+                  55708,
+                  1
+                ],
+                [
+                  55820,
+                  1
+                ],
+                [
+                  55885,
+                  1
+                ],
+                [
+                  56055,
+                  1
+                ],
+                [
+                  56191,
+                  1
+                ],
+                [
+                  56273,
+                  1
+                ],
+                [
+                  56571,
+                  1
+                ],
+                [
+                  56608,
+                  1
+                ],
+                [
+                  56935,
+                  1
+                ],
+                [
+                  57154,
+                  1
+                ],
+                [
+                  57206,
+                  1
+                ],
+                [
+                  57683,
+                  1
+                ],
+                [
+                  57732,
+                  1
+                ],
+                [
+                  58052,
+                  1
+                ],
+                [
+                  58437,
+                  1
+                ],
+                [
+                  63017,
+                  1
+                ]
+              ]
+            },
+            {
+              "sql": "SELECT count(*) FROM op_consumption I\n                    JOIN op_unknown U ON I.\"DocEntry\"=U.doc_entry AND I.\"LineNum\"=U.line_num",
+              "parameters": []
+            }
+          ]
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Consumo registrado para producción:\n3.974 líneas de consumo de producción.\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:46:37.892000 a 2026-11-01T17:46:53.281000.\nControles: period_source_lines=4814, included_issue_lines=3974, unknown_native_identity_lines_affected=0\nMostradas 10 de 556 filas; 546 omitidas del mensaje. No es un ranking global entre unidades.\nEmisiones activas BaseType 202; identidad no equivale a materia prima clasificada. Incluye identidades de recursos/desconocidas separadas, sin inferir su naturaleza.\n31 líneas fuente desconocidas se conservan; no hay recepción de producto terminado ni vigencia histórica de BOM.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.production.consumption.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "production.consumption",
+              "/period": {
+                "start": "2026-10-01",
+                "end_exclusive": "2026-11-01"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "production.consumption"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference",
+              "/product_search_text",
+              "/selected_item_codes",
+              "/business_category",
+              "/product_target",
+              "/customer_target",
+              "/group_by",
+              "/physical_focus",
+              "/breakdown_by",
+              "/periods",
+              "/period_mode",
+              "/limit"
+            ]
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.1949539982888382,
+        "response_bytes": 8984,
+        "duration_ms": 8442.379,
+        "attempts": 1
+      },
+      "elapsed_ms": 88679.39853600001,
+      "request_trace": {
+        "schema": "telchi-pre-sql-profile-v1",
+        "clock": "perf_counter_ns",
+        "spans": [
+          {
+            "label": "authorization_initial",
+            "start_ms": 237.663042,
+            "end_ms": 239.330655,
+            "duration_ms": 1.667613
+          },
+          {
+            "label": "authorization_transaction_revalidation",
+            "start_ms": 247.921163,
+            "end_ms": 262.408068,
+            "duration_ms": 14.486905
+          },
+          {
+            "label": "model_inference_response",
+            "start_ms": 312.26847,
+            "end_ms": 8705.427048,
+            "duration_ms": 8393.158578
+          },
+          {
+            "label": "interpretation_result_parse",
+            "start_ms": 8705.847535,
+            "end_ms": 8705.886221,
+            "duration_ms": 0.038686
+          },
+          {
+            "label": "conversation_audit_save",
+            "start_ms": 88650.932876,
+            "end_ms": 88654.335208,
+            "duration_ms": 3.402332
+          }
+        ],
+        "total_ms": 88714.165817
+      }
+    }
+  ]
+}

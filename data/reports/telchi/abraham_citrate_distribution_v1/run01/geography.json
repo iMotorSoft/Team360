@@ -1,0 +1,616 @@
+{
+  "timestamp": "2026-10-15T14:17:30.895647+00:00",
+  "read_only": true,
+  "queries": [
+    {
+      "name": "historical_city_labels",
+      "sql": "SELECT ClientCity,COUNT(*) customers FROM read_parquet('/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS/clientSB1.parq') GROUP BY 1 ORDER BY customers DESC LIMIT 40",
+      "rows": [
+        {
+          "ClientCity": null,
+          "customers": 10322
+        },
+        {
+          "ClientCity": "Santa Cruz",
+          "customers": 748
+        },
+        {
+          "ClientCity": "SANTA CRUZ",
+          "customers": 119
+        },
+        {
+          "ClientCity": "Montero",
+          "customers": 94
+        },
+        {
+          "ClientCity": "Yapacani",
+          "customers": 31
+        },
+        {
+          "ClientCity": "",
+          "customers": 28
+        },
+        {
+          "ClientCity": "Warnes",
+          "customers": 19
+        },
+        {
+          "ClientCity": "La Guardia",
+          "customers": 19
+        },
+        {
+          "ClientCity": "Cotoca",
+          "customers": 14
+        },
+        {
+          "ClientCity": "San Julian",
+          "customers": 13
+        },
+        {
+          "ClientCity": "Portachuelo",
+          "customers": 11
+        },
+        {
+          "ClientCity": "El Torno",
+          "customers": 11
+        },
+        {
+          "ClientCity": "4 Cañadas",
+          "customers": 7
+        },
+        {
+          "ClientCity": "COCHABAMBA",
+          "customers": 7
+        },
+        {
+          "ClientCity": "Minero",
+          "customers": 7
+        },
+        {
+          "ClientCity": "Valle Grande",
+          "customers": 6
+        },
+        {
+          "ClientCity": "Santa Fe (Yapacani)",
+          "customers": 5
+        },
+        {
+          "ClientCity": "Pailon",
+          "customers": 5
+        },
+        {
+          "ClientCity": "LA PAZ",
+          "customers": 4
+        },
+        {
+          "ClientCity": "Sucre",
+          "customers": 3
+        },
+        {
+          "ClientCity": "Yacuiba",
+          "customers": 3
+        },
+        {
+          "ClientCity": "BRASIL",
+          "customers": 3
+        },
+        {
+          "ClientCity": "Cochabamba",
+          "customers": 3
+        },
+        {
+          "ClientCity": "Mairana",
+          "customers": 3
+        },
+        {
+          "ClientCity": "Av. 2 De Agosto N 34 Zona: B/ San Silvestre\"",
+          "customers": 2
+        },
+        {
+          "ClientCity": "Potosi",
+          "customers": 2
+        },
+        {
+          "ClientCity": "Jorochito",
+          "customers": 2
+        },
+        {
+          "ClientCity": "SCZ",
+          "customers": 2
+        },
+        {
+          "ClientCity": "La Paz",
+          "customers": 2
+        },
+        {
+          "ClientCity": "SANTIAGO",
+          "customers": 2
+        },
+        {
+          "ClientCity": "ROTTERDAM",
+          "customers": 1
+        },
+        {
+          "ClientCity": "Tarija",
+          "customers": 1
+        },
+        {
+          "ClientCity": "Camiri",
+          "customers": 1
+        },
+        {
+          "ClientCity": "COLOMBIA",
+          "customers": 1
+        },
+        {
+          "ClientCity": "Villa Montes",
+          "customers": 1
+        },
+        {
+          "ClientCity": "YACUIBA",
+          "customers": 1
+        },
+        {
+          "ClientCity": "PARAGUAY",
+          "customers": 1
+        },
+        {
+          "ClientCity": "Saavedra",
+          "customers": 1
+        },
+        {
+          "ClientCity": "Buena Vista (Yapacani)",
+          "customers": 1
+        },
+        {
+          "ClientCity": "Trinidad",
+          "customers": 1
+        }
+      ]
+    },
+    {
+      "name": "historical_la_paz_spelling_candidates",
+      "sql": "SELECT ClientCity,COUNT(*) customers FROM read_parquet('/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS/clientSB1.parq') WHERE contains(lower(strip_accents(ClientCity)), 'paz') GROUP BY 1",
+      "rows": [
+        {
+          "ClientCity": "La Paz",
+          "customers": 2
+        },
+        {
+          "ClientCity": "LA PAZ",
+          "customers": 4
+        }
+      ]
+    },
+    {
+      "name": "sales_LPZ_WAREHOUSE_monthly_NOT_DESTINATION",
+      "sql": "SELECT\n                SUBSTR(d.doc_date,1,7) period_month,l.item_code,l.whs_code,\n                COUNT(*) lines,COUNT(DISTINCT d.card_code) buyer_codes,\n                MAX(d.doc_date) latest_date,d.currency document_currency,l.currency line_currency,\n                SUM(TRY_CAST(l.quantity AS DECIMAL(38,6))) documentary_quantity,\n                SUM(TRY_CAST(l.line_total AS DECIMAL(38,6))) raw_line_total\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d\n                ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\n                WHERE d.canceled='N' AND l.item_code IN ('L03332','L03432','L03612','M07010') AND l.whs_code LIKE 'LPZ-%'\n                AND d.doc_date>='2026-01-01' AND d.doc_date<'2027-01-01'\n                GROUP BY ALL ORDER BY period_month,l.item_code,l.whs_code",
+      "rows": [
+        {
+          "period_month": "2026-01",
+          "item_code": "L03432",
+          "whs_code": "LPZ-D2",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-01-12T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "1.000000",
+          "raw_line_total": "130.500000"
+        },
+        {
+          "period_month": "2026-01",
+          "item_code": "L03432",
+          "whs_code": "LPZ-T1",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-01-27T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "1.000000",
+          "raw_line_total": "130.500000"
+        },
+        {
+          "period_month": "2026-02",
+          "item_code": "L03432",
+          "whs_code": "LPZ-D2",
+          "lines": 5,
+          "buyer_codes": 5,
+          "latest_date": "2026-02-19T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "7.000000",
+          "raw_line_total": "863.890000"
+        },
+        {
+          "period_month": "2026-03",
+          "item_code": "L03432",
+          "whs_code": "LPZ-D1",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-03-14T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "1.000000",
+          "raw_line_total": "122.240000"
+        },
+        {
+          "period_month": "2026-03",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D1",
+          "lines": 14,
+          "buyer_codes": 14,
+          "latest_date": "2026-03-31T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "16.000000",
+          "raw_line_total": "1454.680000"
+        },
+        {
+          "period_month": "2026-03",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 20,
+          "buyer_codes": 20,
+          "latest_date": "2026-03-28T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "33.000000",
+          "raw_line_total": "3048.050000"
+        },
+        {
+          "period_month": "2026-03",
+          "item_code": "L03612",
+          "whs_code": "LPZ-T1",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-03-11T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "1.000000",
+          "raw_line_total": "114.840000"
+        },
+        {
+          "period_month": "2026-04",
+          "item_code": "L03432",
+          "whs_code": "LPZ-D2",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-04-13T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "1.000000",
+          "raw_line_total": "130.500000"
+        },
+        {
+          "period_month": "2026-04",
+          "item_code": "L03432",
+          "whs_code": "LPZ-T1",
+          "lines": 2,
+          "buyer_codes": 1,
+          "latest_date": "2026-04-18T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "2.000000",
+          "raw_line_total": "261.000000"
+        },
+        {
+          "period_month": "2026-04",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D1",
+          "lines": 12,
+          "buyer_codes": 12,
+          "latest_date": "2026-04-16T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "20.000000",
+          "raw_line_total": "1818.320000"
+        },
+        {
+          "period_month": "2026-04",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 11,
+          "buyer_codes": 9,
+          "latest_date": "2026-04-28T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "27.000000",
+          "raw_line_total": "2454.710000"
+        },
+        {
+          "period_month": "2026-04",
+          "item_code": "L03612",
+          "whs_code": "LPZ-T1",
+          "lines": 3,
+          "buyer_codes": 3,
+          "latest_date": "2026-04-17T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "5.000000",
+          "raw_line_total": "454.580000"
+        },
+        {
+          "period_month": "2026-05",
+          "item_code": "L03432",
+          "whs_code": "LPZ-D1",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-05-09T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "1.000000",
+          "raw_line_total": "122.230000"
+        },
+        {
+          "period_month": "2026-05",
+          "item_code": "L03432",
+          "whs_code": "LPZ-D2",
+          "lines": 2,
+          "buyer_codes": 2,
+          "latest_date": "2026-05-14T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "5.000000",
+          "raw_line_total": "611.180000"
+        },
+        {
+          "period_month": "2026-05",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D1",
+          "lines": 8,
+          "buyer_codes": 2,
+          "latest_date": "2026-05-23T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "8.000000",
+          "raw_line_total": "727.310000"
+        },
+        {
+          "period_month": "2026-05",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 8,
+          "buyer_codes": 8,
+          "latest_date": "2026-05-25T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "13.000000",
+          "raw_line_total": "1181.890000"
+        },
+        {
+          "period_month": "2026-06",
+          "item_code": "L03432",
+          "whs_code": "LPZ-D2",
+          "lines": 2,
+          "buyer_codes": 2,
+          "latest_date": "2026-06-25T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "4.000000",
+          "raw_line_total": "505.470000"
+        },
+        {
+          "period_month": "2026-06",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D1",
+          "lines": 2,
+          "buyer_codes": 2,
+          "latest_date": "2026-06-13T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "3.000000",
+          "raw_line_total": "272.750000"
+        },
+        {
+          "period_month": "2026-06",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 25,
+          "buyer_codes": 13,
+          "latest_date": "2026-06-30T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "38.000000",
+          "raw_line_total": "3454.810000"
+        },
+        {
+          "period_month": "2026-07",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D1",
+          "lines": 9,
+          "buyer_codes": 5,
+          "latest_date": "2026-07-30T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "17.000000",
+          "raw_line_total": "1545.590000"
+        },
+        {
+          "period_month": "2026-07",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 20,
+          "buyer_codes": 12,
+          "latest_date": "2026-07-31T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "51.000000",
+          "raw_line_total": "4636.700000"
+        },
+        {
+          "period_month": "2026-07",
+          "item_code": "L03612",
+          "whs_code": "LPZ-T1",
+          "lines": 2,
+          "buyer_codes": 2,
+          "latest_date": "2026-07-22T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "3.000000",
+          "raw_line_total": "272.750000"
+        },
+        {
+          "period_month": "2026-08",
+          "item_code": "L03432",
+          "whs_code": "LPZ-D2",
+          "lines": 3,
+          "buyer_codes": 3,
+          "latest_date": "2026-08-26T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "6.000000",
+          "raw_line_total": "733.410000"
+        },
+        {
+          "period_month": "2026-08",
+          "item_code": "L03432",
+          "whs_code": "LPZ-T1",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-08-31T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "1.000000",
+          "raw_line_total": "130.500000"
+        },
+        {
+          "period_month": "2026-08",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D1",
+          "lines": 12,
+          "buyer_codes": 11,
+          "latest_date": "2026-08-28T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "17.000000",
+          "raw_line_total": "1497.710000"
+        },
+        {
+          "period_month": "2026-08",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 18,
+          "buyer_codes": 16,
+          "latest_date": "2026-08-31T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "48.000000",
+          "raw_line_total": "4178.270000"
+        },
+        {
+          "period_month": "2026-08",
+          "item_code": "L03612",
+          "whs_code": "LPZ-T1",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-08-28T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "4.000000",
+          "raw_line_total": "344.520000"
+        },
+        {
+          "period_month": "2026-09",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D1",
+          "lines": 9,
+          "buyer_codes": 8,
+          "latest_date": "2026-09-22T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "15.000000",
+          "raw_line_total": "1340.520000"
+        },
+        {
+          "period_month": "2026-09",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 4,
+          "buyer_codes": 4,
+          "latest_date": "2026-09-21T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "4.000000",
+          "raw_line_total": "363.660000"
+        }
+      ]
+    },
+    {
+      "name": "credit_memo_LPZ_WAREHOUSE_monthly_NOT_DESTINATION",
+      "sql": "SELECT\n                SUBSTR(d.doc_date,1,7) period_month,l.item_code,l.whs_code,\n                COUNT(*) lines,COUNT(DISTINCT d.card_code) buyer_codes,\n                MAX(d.doc_date) latest_date,d.currency document_currency,l.currency line_currency,\n                SUM(TRY_CAST(l.quantity AS DECIMAL(38,6))) documentary_quantity,\n                SUM(TRY_CAST(l.line_total AS DECIMAL(38,6))) raw_line_total\n                FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) d\n                ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\n                WHERE d.canceled='N' AND l.item_code IN ('L03332','L03432','L03612','M07010') AND l.whs_code LIKE 'LPZ-%'\n                AND d.doc_date>='2026-01-01' AND d.doc_date<'2027-01-01'\n                GROUP BY ALL ORDER BY period_month,l.item_code,l.whs_code",
+      "rows": [
+        {
+          "period_month": "2026-03",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-03-19T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "3.000000",
+          "raw_line_total": "272.740000"
+        },
+        {
+          "period_month": "2026-07",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-07-08T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "1.000000",
+          "raw_line_total": "90.920000"
+        },
+        {
+          "period_month": "2026-08",
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 1,
+          "buyer_codes": 1,
+          "latest_date": "2026-08-18T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "6.000000",
+          "raw_line_total": "516.790000"
+        }
+      ]
+    }
+  ],
+  "foundation": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 1468.106,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "publication_unchanged": true
+}

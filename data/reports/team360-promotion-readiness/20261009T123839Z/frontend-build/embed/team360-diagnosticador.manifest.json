@@ -1,0 +1,23 @@
+{
+  "name": "team360-diagnosticador",
+  "version": "0.9.0-experimental",
+  "channel": "experimental",
+  "asset": "/embed/team360-diagnosticador.js",
+  "entry": "/embed/team360-diagnosticador.js",
+  "entrySha256": "9d2763155df47bf72c2bc41e08f49f880f528d5ad27ad88db6e725b5ae274917",
+  "entryIntegrity": "sha256-nSdjFV30e/csK8QeCPSfiA9SjVrSetiNtuclta4nSRc=",
+  "loader": "/embed/team360-diagnosticador-loader.js",
+  "loaderSha256": "8ee2b72bf74bfcef38da97cac3bb928947a7dde7a01ef3fb892ceff3257e064c",
+  "loaderIntegrity": "sha256-juK3K/dL/O842pfKw7uSiUen3eegHvP7iSzv8yV+Bkw=",
+  "format": "browser-global",
+  "global": "Team360Diagnosticador",
+  "api": {
+    "mount": "window.Team360Diagnosticador.mount",
+    "auth": "POST /api/diagnosis/embed/auth",
+    "turn": "POST /api/diagnosis/turn"
+  },
+  "requires": {
+    "moduleScript": true,
+    "api": "diagnosis-embed-auth-v1"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-10-22T17:32:51.073472+00:00",
+  "branch": "feature/console-backend-core",
+  "source_sha256": "caf32f38568f89969f9fe2c785fb976bbd8feced701ea5277e5440403f8f59e3",
+  "six_gates": "VALID",
+  "gate_policy": "change_based_v1",
+  "gates": {
+    "assistant_foundation": "PASS",
+    "business_authorization": "PASS",
+    "durable_idempotency": "PASS",
+    "http_auth": "PASS",
+    "identity_tenant_isolation": "PASS",
+    "model_no_fallback": "PASS"
+  },
+  "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/six-gates-20261022T173049568448Z/final-accreditation.json",
+  "artifact_sha256": "20ec84f712bb7e6c389327621b266091afa77f2d6e2b4e573da4fd73743d55b8",
+  "manifest_sha256": "68ff2a2c1dc6a20ed07c60ea173f048658c98763752003bc5e2c11ce949159fe",
+  "artifact_hashes_verified": true,
+  "source_unchanged": true,
+  "official_status": {
+    "state": "STOPPED",
+    "session_id": "e8e5b2cba309b4a0c30ef3f097afaa92",
+    "launcher": "ABSENT_OR_CHANGED",
+    "backend": "ABSENT_OR_CHANGED",
+    "webhook": "INTERNAL",
+    "evolution": "READY",
+    "postgresql": "READY",
+    "approval": "VALID",
+    "gates": "VALID",
+    "review_reasons": []
+  },
+  "normal_launcher_preflight": "PREFLIGHT_PASS",
+  "dev_session_policy": {
+    "status": "READY",
+    "idle_timeout": 900,
+    "max_duration": 14400
+  },
+  "model": "gpt-5.6-luna",
+  "provider": "OpenAI direct",
+  "reasoning": "medium",
+  "focused_tests": {
+    "command": "pytest modules/telchi/assistant/tests tests/test_messaging_evolution.py tests/test_messaging_horizontal_runtime.py tests/test_messaging_handlers.py -q",
+    "result": "769 passed, 4 skipped in 42.68s",
+    "exit_code": 0,
+    "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/six-gates-20261022T173049568448Z/focused-tests.txt",
+    "sha256": "b065811ff7914248456ababa672b37f029a88642883b2ca9820d0683f842a5a4"
+  },
+  "preliminary_contracts": "58 passed in 2.18s",
+  "git_diff_check": "PASS",
+  "final_diff_review": "Reviewed runner delta against previous accredited runner; only isolated authorization and stricter integrity/session checks added.",
+  "host_preflight": "BUSY_BUT_SAFE",
+  "resource_guard": "PASS",
+  "host_after": {
+    "load": "3.76/3.08/1.88",
+    "available_mib": 5949,
+    "swap_mib": 350,
+    "swap_io_last_samples": 0
+  },
+  "concurrency": "One sequential runner; PG max 3; two claims of one event; one model request; no browser.",
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "environmental_aborts": 0,
+  "grants_modified": "NO",
+  "runtime_state": "STOPPED",
+  "webhook_state": "INTERNAL",
+  "ready_for_manual_start": "YES",
+  "whatsapp_e2e": "NOT_RUN",
+  "modified_paths": [
+    "data/reports/telchi/commercial-continuity-v2-final-reaccreditation/",
+    "PRIVATE_ROOT gates manifest and new private evidence directory"
+  ],
+  "impact": "No enterprise/runtime code, Foundation, SAP/HANA, classifications, operational grants, credentials or shared services modified. DEV event/audit/intent rows created by the real Messaging probe remain auditable.",
+  "limitations": [
+    "4 tests skipped; not counted as passes.",
+    "Recording sender proves one logical outbound intent, not WhatsApp delivery.",
+    "No live provider outage induced; no-fallback failure contracts supplement real model success.",
+    "Readiness remains conditional on unchanged code/configuration/approval/evidence and service availability."
+  ]
+}

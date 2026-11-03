@@ -1,0 +1,39 @@
+{
+  "endpoint": "/api/telchi/assistant/dev/turn",
+  "transport": "curl",
+  "checks": {
+    "missing_token": "401",
+    "wrong_token": "401",
+    "invalid_json": "400",
+    "missing_text": "400",
+    "forbidden_field_user_id": "400",
+    "forbidden_field_phone": "400",
+    "unknown_route": "404",
+    "webhook_blocked": "404",
+    "health": "200",
+    "token_absent_from_log": true,
+    "phone_absent_from_log": true
+  },
+  "session_isolation": {
+    "a_conversation": "b5ce9740-85f3-46bd-903b-368548b82e9c",
+    "b_conversation": "4c6072a2-d801-4563-a299-c6009bd89869",
+    "distinct": true,
+    "a_entity": {
+      "text": "calenta",
+      "type": null
+    },
+    "b_entity": null
+  },
+  "concurrency": {
+    "statuses": [
+      true,
+      true
+    ],
+    "conversations": [
+      "08bfdf97-88ef-4dd7-8b30-abe7942fee4c",
+      "a03963cf-eab2-478c-b0fd-78e837ea22b6"
+    ],
+    "distinct": true
+  },
+  "passed": true
+}

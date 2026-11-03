@@ -48,13 +48,15 @@ Do not add a concept to `lat.md/lat.md` before creating its document.
 
 ## Status files rule
 
-Status documents must separate current architectural state from daily implementation evidence and frozen history.
+El único estado técnico GLOBAL vigente es [SrvRestAstroLS_v1/docs/status_actual.md](../SrvRestAstroLS_v1/docs/status_actual.md). Debe ser compacto: estado vigente + decisión + límite + enlace a evidencia, sin copiar resultados completos de tests o fases.
 
-`lat.md/status_actual.md` must stay compact.
+La jerarquía es AGENTS (cómo trabajar y coordinar ownership) → LAT (invariantes y reglas GLOBAL) → tablero técnico GLOBAL → estado o autoridad local → contratos, runbooks, reports y fases. El tablero enlaza LAT y las autoridades locales para navegación práctica.
 
-Daily evidence, historical logs, and long validation reports belong in `SrvRestAstroLS_v1/docs/`.
+El nombre canónico de estados nuevos es `status_actual.md`, en minúsculas. Autoridades locales existentes pueden conservar su nombre: Telchi mantiene `CONTEXT.md` para arquitectura, roots y etapas; un estado local nunca lo sustituye.
 
-When LAT changes, update `lat.md/status_actual.md`.
+`lat.md/status_actual.md` registra mantenimiento de arquitectura e índice LAT, no otro estado técnico GLOBAL. Cuando LAT cambia, actualizarlo sin duplicar evidencia operacional.
+
+Los cierres históricos, contratos y reportes permanecen en sus fuentes. Si un tablero acumuló historia, conservar una copia congelada íntegra antes de compactarlo; no modificar el histórico anterior ni borrar evidencia preexistente. Los resultados generados viven en `data/reports/`.
 
 ## Duplication rule
 

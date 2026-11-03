@@ -1,0 +1,92 @@
+{
+  "status": "PASS",
+  "checks": {
+    "current": {
+      "foundation": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+      "reference": "v2_sales_448ae93a960bf7342564a2d0",
+      "manifest_sha256": "5b42eb99b9088c319e10f4fee833fe7b44bad437c8f44db285ba99cdf0dd3cbc"
+    },
+    "canonical_manifest_physical_integrity": {
+      "status": "PASS",
+      "seconds": 61.34000361499966
+    },
+    "live_readers": {
+      "foundation": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+      "reference": "v2_sales_448ae93a960bf7342564a2d0",
+      "snapshot": 1408,
+      "components": [
+        "credit_memo",
+        "material_supply",
+        "oinm",
+        "oitw",
+        "purchasing",
+        "receivables_collections",
+        "reference",
+        "sales"
+      ],
+      "stock": {
+        "status": "LIVE_READER_RAW_AGGREGATES_EXACT",
+        "rows": 1385179,
+        "groups": {
+          "item_code": 17118,
+          "whs_code": 82
+        },
+        "observation_start": "2026-11-01T17:43:38.461000+00:00",
+        "observation_end": "2026-11-01T17:46:05.375000+00:00",
+        "on_hand": "12566072.730500000000",
+        "committed": "316652.428800000000",
+        "on_order": "3556027.785700000000",
+        "quantities_across_items_are_not_a_single_unit_metric": true,
+        "unknown_inventory_uom_rows": 22603,
+        "movement_refresh": false,
+        "historical_stock_claim": false
+      },
+      "operational_observations": {
+        "status": "SOURCE_OBSERVATION_READERS_EXACT",
+        "datasets": {
+          "production": {
+            "bom_header": 1061,
+            "bom_line": 8038,
+            "production_order": 4521,
+            "production_issue": 41808
+          },
+          "purchasing": {
+            "purchase_order": 3838,
+            "purchase_order_line": 20806,
+            "purchase_receipt": 3976,
+            "purchase_receipt_line": 19705,
+            "ap_invoice": 7190,
+            "ap_invoice_line": 25258
+          },
+          "collections": {
+            "receivable_document": 51582,
+            "collection_payment": 50687,
+            "collection_allocation": 50646,
+            "reconciliation_event": 57072,
+            "reconciliation_participant": 120322,
+            "payment_method_component": 51231,
+            "payment_term": 38
+          },
+          "movements": {
+            "inventory_movement": 257632
+          },
+          "material_supply": {
+            "observed_material_actual_consumption": 994
+          }
+        },
+        "limits": {
+          "production": "SOURCE_FACTS_ONLY; no finished-goods receipt capture; current BOM is not historical effectivity; non-OITM issue identities are not material consumption",
+          "purchasing": "BOUNDED_DOCUMENT_OBSERVATIONS; stages separate; no purchase requests or return document capture; no certified net purchases after returns",
+          "collections": "BOUNDED_EVENTS_AND_OBSERVATIONS; invoice prefix only; no complete current aging or historical reconstructed balances; preserve on-account payments",
+          "movements": "FROZEN_NATIVE_KEY_PREFIX_ONLY; no complete-window continuity or stock derivation",
+          "material_supply": "OBSERVED_CONSUMPTION_ONLY per item/native unit, active BaseType=202 with captured order and OITM identities; historical five business datasets retained exact and not rebound; no historical BOM effectivity or full OINM window"
+        },
+        "historical_business_metrics_refreshed": false
+      },
+      "seconds": 202.0026841630006
+    },
+    "current_unchanged": true
+  },
+  "started": 1793641899.7660787,
+  "elapsed_seconds": 263.8570432662964
+}

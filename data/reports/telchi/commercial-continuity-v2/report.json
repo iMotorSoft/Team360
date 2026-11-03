@@ -1,0 +1,129 @@
+{
+  "branch": "feature/console-backend-core",
+  "head": "09d2ec715a31bb88574d734eacb9f437f008624e",
+  "stage": "TELCHI / VENTAS-CLIENTES / DEVELOPMENT",
+  "status": "DONE_WITH_CONCERNS",
+  "source_sha256": "caf32f38568f89969f9fe2c785fb976bbd8feced701ea5277e5440403f8f59e3",
+  "incidents": {
+    "TURN7_OTHER_PRODUCTS": "PASS",
+    "TURN8_CATEGORY_PERCENTAGES": "PARTIAL",
+    "TURN9_FINISHED_PRODUCTS_SHARE": "PASS",
+    "TOPIC_SWITCH": "PASS",
+    "PRODUCT_SCOPE_TRANSFER": "PASS"
+  },
+  "business_accreditation": {
+    "PERCENTAGE_DENOMINATOR": "VERIFIED",
+    "denominator_scope": "September 2026 only: active commercial BS invoice lines, excluding line tax, before credit notes and header adjustments; no currency exclusions; observed coverage through September 24, not a certified monthly close.",
+    "denominator_bs": "8048691.580000",
+    "denominator_lines": 65163,
+    "denominator_products": 4168,
+    "denominator_reconciliation_difference": "0.000000",
+    "CATEGORY_OVERLAP": "UNRESOLVED",
+    "overlap_scope": "Published product_business_type is one current category per item. No mutually exclusive partition including medications is accredited; percentages are individual shares, not a four-category sum.",
+    "MEDICATIONS_CLASSIFICATION": "NOT_ACCREDITED",
+    "FRACTIONED_PRODUCTS_CLASSIFICATION": "ACCREDITED_WITH_SUPPORTED_LINES",
+    "fractionated_quality_lines": {"VALIDATED": 20968, "SUPPORTED": 121},
+    "BUSINESS_ANSWER_FIRST": "PASS",
+    "foundation_publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "foundation_snapshot": 1408,
+    "foundation_updated_at": "2026-09-28T18:18:35.264000",
+    "classification_version": "v2_product_business_type_f9c1130d852ccb61",
+    "classification_sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10",
+    "september": {
+      "documentary_billed_bs_not_percentage_base": "8891439.79",
+      "LAB_FINISHED_PRODUCT": {"line_amount_bs": "2679208.66", "share_percent": "33.29"},
+      "RAW_MATERIAL": {"line_amount_bs": "839582.63", "share_percent": "10.43"},
+      "FRACTIONATED_PRODUCT": {"line_amount_bs": "2514617.14", "share_percent": "31.24", "warning": "121 lines have supported, not validated, classification."}
+    },
+    "august_raw_material": {"line_amount_bs": "853568.45", "status": "PARTIAL", "excluded_currency_operations": 1, "percentage_denominator": "NOT_ACCREDITED", "percentage": null},
+    "farmacorp_july_august_additional_top5": [
+      {"code": "L01613", "description": "LOCION POVIDINE LITEL 10% x 120mL.", "amount_bs": "52200.00"},
+      {"code": "L01757", "description": "CLORURO DE MAGNESIO x 33gr.", "amount_bs": "21415.49"},
+      {"code": "L01003", "description": "ALCOHOL 70% x 120mL.", "amount_bs": "14786.52"},
+      {"code": "L01612", "description": "LOCION POVIDINE LITEL 10% x 1L.", "amount_bs": "12906.45"},
+      {"code": "L01729", "description": "VASELINA U.S.P. x 30g.", "amount_bs": "12528.00"}
+    ]
+  },
+  "first_divergences": {
+    "A": {
+      "event_id": "56e372f2-6a98-4b01-8d41-5146e78615b9",
+      "first_divergence": "Luna retained LAB_FINISHED_PRODUCT in the other-products scope; State Engine accepted the inherited category. The compositor then displayed only the reference product and replaced the actual additional products with a count and residual amount.",
+      "fix": "Separate reference exclusion from product filter; retain authenticated account and applicable periods, clear unrequested category, show five additional named products. Bounded continuation and ordinal references use the same displayed rows. No percentage is added to this list."
+    },
+    "B": {
+      "event_id": "b445d116-2558-4223-97fc-c02209837b78",
+      "first_divergence": "Luna chose NEW_QUERY / DIRECT_UNAVAILABLE, dropping the requested composition. September global scope itself was correct and had no residual customer or product filter. Handler trusted unavailable action instead of composing available accredited primitives.",
+      "fix": "Closed deterministic category-analysis contract, validated by State Engine; separately authorized category primitives and global line denominator; source, definition, currency, period, observed coverage, exclusions and exact reconciliation checked before Decimal division. Unknown medications remain unclassified."
+    },
+    "C": {
+      "event_id": "1c12dfc4-37b4-43dd-a25f-680fee285581",
+      "first_divergence": "Luna chose EXPLAIN / DIRECT_UNAVAILABLE. Handler EXPLAIN branch returned accounting prose with no amount, although September and the finished-product category were retained.",
+      "fix": "Percentage follow-up becomes an executable closed analysis preserving the previous period and replacing the category selection. Result first, compatible denominator and Decimal percentage when verified; partial accredited amount otherwise."
+    }
+  },
+  "conversation": {
+    "CONVERSATION_TURNS": 12,
+    "CORRECT_TURNS": 12,
+    "CONTEXT_LOSS": 0,
+    "UNJUSTIFIED_UNAVAILABILITY": 0,
+    "MONETARY_RECONCILIATION": "PASS: difference zero; complete global product breakdown sums exactly to its denominator, and displayed percentages recomputed independently with Decimal in evaluator.",
+    "WHATSAPP_RESPONSE_LENGTH": "PASS",
+    "response_length_min": 446,
+    "response_length_max": 1325,
+    "model": "gpt-5.6-luna / medium / OpenAI direct; returned model and effort verified; no fallback",
+    "pipeline": "Actual approved DEV identity, Console permission resolver, State Engine, capabilities, pinned read-only Foundation and committed PostgreSQL conversation; a fresh handler/interpreter per turn.",
+    "primary_evidence": "live-final-r3.json",
+    "additional_direct_topic_switch": "A separate real persisted 10-turn conversation jumps directly from FARMACORP purchases to September composition. Original real run is direct-switch-final.json. Final-code deterministic state equivalence and reformatting are recorded separately in direct-switch-final-r3-replay.json; replay makes no new model/Foundation calls.",
+    "probe_limitations": "Two supplementary direct-switch attempts aborted before conversation because the legacy helper required the missing-period preflight to return ASK/period. Their raw proposals were not retained. Subsequent captured preflight returned ASK/period with verified actual model metadata. Those aborted attempts are not counted as successful conversations or environmental failures."
+  },
+  "operation": {
+    "TESTS": "682 passed, 4 skipped, 1 warning",
+    "test_command": "cd SrvRestAstroLS_v1/backend && uv run pytest modules/telchi/assistant/tests tests/test_telchi_assistant_srv05.py modules/telchi/datalake/tests/test_commercial_line_amount_by_query.py modules/telchi/datalake/tests/test_category_line_amount_query.py -q",
+    "live_command": "cd SrvRestAstroLS_v1/backend && uv run python -m modules.telchi.assistant.tests.live_commercial_continuity_v2 --output /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/commercial-continuity-v2/live-final-r3.json",
+    "SIX_GATES": "NOT_RUN",
+    "gate_limit": "Previous manifest cannot attest the changed source digest. Existing gate_business_close includes temporary grant revocation, outside the owner's prohibition on permission changes. It was inspected, not executed; no gate registry or manifest was rewritten.",
+    "WHATSAPP_E2E": "NOT_RUN",
+    "RUNTIME_CHANGED": "YES",
+    "runtime_scope": "DEV implementation source only. No deployment, listener, service restart, session intervention, webhook activation or automatic WhatsApp message.",
+    "GIT_COMMIT": "NO",
+    "GIT_PUSH": "NO",
+    "foundation_modified": false,
+    "permissions_modified": false,
+    "shared_services_modified": false,
+    "postgres_scope": "Existing approved DEV conversation/audit rows only; no schema, shared database configuration or business-data changes.",
+    "git_diff_check": "PASS",
+    "final_review": "Reviewed local implementation sections, closed state validation, per-primitive permissions and cached-response reauthorization, Decimal compatibility guards, displayed-row/reference alignment, partial currency fallback and classification warnings. Preexisting unrelated worktree changes preserved.",
+    "HOST_PREFLIGHT": "SAFE; later BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": "One sequential runner; DuckDB uses its existing two-thread/512MB worker limits; one-connection probe pool.",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0
+  },
+  "files_modified_under_SrvRestAstroLS_v1_backend_modules_telchi_assistant": [
+    "business_scope.py",
+    "capabilities.py",
+    "commercial_answer.py",
+    "commercial_continuity.py (new)",
+    "handler.py",
+    "result_references.py",
+    "state_engine.py",
+    "tests/test_commercial_continuity_v2.py (new)",
+    "tests/live_commercial_continuity_v2.py (new)"
+  ],
+  "blast_radius": "Nine assistant-local files: closed request/state validation, existing capability authorization and composition, result presentation/reference alignment, plus tests/probe. No reader, Foundation, shared transport, RBAC, provider or infrastructure implementation changed.",
+  "remaining_business_decisions": [
+    "Accredit medication membership and its relationship to current product categories before publishing a four-category partition.",
+    "Review the 121 SUPPORTED fractionated lines if fully validated classification is required; do not silently relabel them.",
+    "Accredit currencies/exclusions before percentage claims for periods such as August; existing compatible partial amounts remain usable.",
+    "These shares describe observed active invoice lines, not complete monthly net sales, collections or documentary totals with tax."
+  ],
+  "manual_whatsapp_procedure": [
+    "Do not use the previous six-gate manifest as accreditation of this changed source. Reaccredit affected guarantees in an authorized separate window without changing permissions unless separately authorized.",
+    "Follow SrvRestAstroLS_v1/backend/modules/telchi/assistant/WHATSAPP_DEV.md: approved private environment and identity, read-only preflight, then operator-controlled manual start in an exclusive transport window. Do not interrupt an existing session.",
+    "Owner manually sends the sequence in tests/live_commercial_continuity_v2.py, one question at a time. Confirm five named additional products excluding L03281.",
+    "Repeat the stronger variant: directly after the other-products answer ask the September global category-percentage question, without an intervening global-total question. Confirm no FARMACORP/product filter, September retained, correct line denominator, three individual shares and medication/SUPPORTED warnings.",
+    "Ask 'el procentaje de venta de productos terminados'; expect September, Bs 2.679.208,66 and 33,29% on the same BS 8.048.691,58 line basis. Ask August raw-material share; expect useful partial BS amount and no unaccredited percentage.",
+    "Review actual sent/received messages, lengths, audit, duplicates and provider delivery; close only the operator-owned session using its normal lifecycle. HTTP/local dispatch evidence alone is not WhatsApp E2E."
+  ]
+}

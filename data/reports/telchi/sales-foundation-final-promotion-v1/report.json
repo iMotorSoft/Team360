@@ -1,0 +1,592 @@
+{
+  "status": "READY_FOR_PROMOTION",
+  "published": false,
+  "closed_at": "2026-10-30T10:19:14.274191+00:00",
+  "branch": "feature/console-backend-core",
+  "objective": "Finish offline preparation of September and October sales publication; stop only live promotion for missing exact operational authorization",
+  "current": {
+    "before": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "after": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "data_snapshot_before": 1408,
+    "data_snapshot_after": 1408,
+    "unchanged": true,
+    "active_promotion": false,
+    "run_lock": [
+      [
+        "temporal-purpose-final-validation-20261002T105435815511Z",
+        "COMPLETED"
+      ]
+    ]
+  },
+  "foundation": {
+    "candidate": "foundation_38680850adc058b1bb11887632b7b681",
+    "effective": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "candidate_file": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-foundation-release-20261030-v2/foundation-candidate.json",
+    "candidate_file_sha256": "9aae6aa2cee389ecc8328efbfa44bd69af9f4effde518247c6563cdba259df32",
+    "manifest_sha256": "ef5138ba9363508f997bb15d9c4746f9874862703761921bcb76f1256126318a",
+    "new_live_commit_snapshot": null
+  },
+  "reference": {
+    "candidate": "v2_sales_e02883116f4b4991c396010a",
+    "effective_foundation_reference": "v2_reference_closure_2088d5885204313a",
+    "independent_pointer_version": "v2_b19ceecf40d3ba09",
+    "independent_pointer_source_as_of": "2026-09-24T12:03:11.919356Z",
+    "pointer_snapshot": "External immutable Reference version; pointer declares no DuckLake snapshot ID",
+    "divergence": "LIVE_UNCHANGED_PENDING_AUTHORIZED_RECONCILIATION",
+    "physical_v2": "v2_aabf716d342de26794c09797 separate, not touched",
+    "historical_versions_deleted": 0
+  },
+  "reconciliation": {
+    "root_cause": "Independent master pointer publication and Foundation-pinned Reference were not activated as one journaled operation. Canonical reader pins Foundation Reference; create_initial/update consume independent master pointer.",
+    "fix": "Existing Reference producer now exposes its atomic fsync/rename publisher through shared flock and exact CAS. Durable orchestration uses canonical Foundation logical_commit/logical_rollback, not a new publication system.",
+    "visibility": "Foundation commit is atomic visibility point. A crash before independent pointer activation never makes canonical readers mix versions; journal completes activation or exact rollback.",
+    "rollback_restores": "Exact previous pair, including original independent-pointer divergence; no history removed",
+    "legacy_consumers": "Do not run create_initial, general update or historical investigation writers during activation; no legacy reader certified for mixed publication reads"
+  },
+  "eight_components": {
+    "credit_memo": {
+      "publication_id": "credit_memo_302525a291e9eedc8b4cca26",
+      "source_as_of": "2026-10-30T03:00:41.433539+00:00",
+      "unchanged_from_base": false
+    },
+    "material_supply": {
+      "publication_id": "material_supply_137a23480171bda867ff8b12",
+      "source_as_of": "2026-09-24T13:53:07.952772+00:00",
+      "unchanged_from_base": false
+    },
+    "oinm": {
+      "publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+      "source_as_of": "2026-09-24T13:53:46.471312+00:00",
+      "unchanged_from_base": true
+    },
+    "oitw": {
+      "publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+      "source_as_of": "2026-09-24T14:07:04.221589+00:00",
+      "unchanged_from_base": true
+    },
+    "purchasing": {
+      "publication_id": "purchasing_4ab178d62c5f5ba27d7180a8",
+      "source_as_of": "2026-09-23",
+      "unchanged_from_base": true
+    },
+    "receivables_collections": {
+      "publication_id": "receivables_collections_633d1fbbfdd87e6665b1aad3",
+      "source_as_of": "2026-09-28T18:18:35.264000",
+      "unchanged_from_base": true
+    },
+    "reference": {
+      "publication_id": "v2_sales_e02883116f4b4991c396010a",
+      "source_as_of": "2026-10-30T09:01:30.323257+00:00",
+      "unchanged_from_base": false
+    },
+    "sales": {
+      "publication_id": "sales_77993642d2b60fca7b687193",
+      "source_as_of": "2026-10-30T03:00:38.921605+00:00",
+      "unchanged_from_base": false
+    }
+  },
+  "sealed_components": {
+    "status": "PASS_REVALIDATED",
+    "method": "Canonical recursive validate_manifest, immutable historical snapshots and exact sealed Parquet hashes; no bypass of SEALED_COMPONENT_REVALIDATION_REQUIRED",
+    "evidence": "isolated-reader.json",
+    "historical_derivation_snapshot": 1322
+  },
+  "material_supply": {
+    "status": "PASS_RETAINED_REPLAY_BINDINGS_AND_RECHECKED_BYTES",
+    "datasets_affected": [
+      "material_equivalent_demand",
+      "material_supply_status"
+    ],
+    "provenance": {
+      "after_demand_sha256": "8eeb3d6000dd9d70504d2a7e986ab432f13056f9d181c9648bd34b4a043f0c0e",
+      "after_status_sha256": "5f9747aabad265c9e6da536bdec81742882e07b9b90e5c2b1b3eded7624178f7",
+      "before_demand_sha256": "c137d25a8477a76b5268d550b94ccfb500f1a6acbba9a7b9f39fcd142e5dd4eb",
+      "before_status_sha256": "04ed56ad206a64bf752f82a252e71729f8e38da4b4c228fb73c9797ebf97bcaa",
+      "bom_provenance": {
+        "bom_header": {
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/bom_header/full/fact-capture-2026-09-24_bom_header_full_1790295310397114261/part-00000.parquet": "0fe71f555a987added796b6df26b6e8e875d039c4e9189c7548cff47f3caa020"
+        },
+        "bom_line": {
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/bom_line/full/fact-capture-2026-09-24_bom_line_full_1790295313123924875/part-00000.parquet": "889e5a1e1b27b3d9e9ec2390842e8b5e64e7886790457bcfdd2f209fbb586353"
+        }
+      },
+      "datasets_replaced": [
+        "material_equivalent_demand",
+        "material_supply_status"
+      ],
+      "demand_window": [
+        "2026-06-26",
+        "2026-09-24"
+      ],
+      "new_component": {
+        "content_identity": "137a23480171bda867ff8b12e6bbb454979c1663826149254b114733b7bd3c4e",
+        "datasets": {
+          "material_actual_consumption": {
+            "file_hashes": [
+              "c7af6b34243abb7837462fa1f984aa3699b4344e20c7ce8e3f11a79d3adc5ff2"
+            ],
+            "file_references": [
+              "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_DERIVATION_V1/material_actual_consumption/full/material-supply-derivation-2026-09-24_material_actual_consumption_full_1790296840828337066/part-00000.parquet"
+            ],
+            "manifest_path": null,
+            "row_count": 791
+          },
+          "material_equivalent_demand": {
+            "file_hashes": [
+              "bfe00a0326ad48ffef2731ac6e6b723d2701debe9f29a6c8c0c14ef01b61b0b6"
+            ],
+            "file_references": [
+              "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_equivalent_demand/sales-facts-revalidation-v1/part-00000.parquet"
+            ],
+            "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_equivalent_demand/sales-facts-revalidation-v1/manifest.json",
+            "row_count": 1086
+          },
+          "material_lead_time_profile": {
+            "file_hashes": [
+              "0d8dc377637ce0a9b7701009de9d8f67c2bcbd350ad539fc22b5d263132fe4a6"
+            ],
+            "file_references": [
+              "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/material_lead_time_profile/full/material-supply-final-1790303719477148466_material_lead_time_profile_full/part-00000.parquet"
+            ],
+            "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/material_lead_time_profile/full/material-supply-final-1790303719477148466_material_lead_time_profile_full/manifest.json",
+            "row_count": 11445
+          },
+          "material_supply_status": {
+            "file_hashes": [
+              "e76aac762b0063de5972376da53fd00bc40ba5c75ad91ae5f2de8c5d194652f8"
+            ],
+            "file_references": [
+              "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_supply_status/sales-facts-revalidation-v1/part-00000.parquet"
+            ],
+            "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_supply_status/sales-facts-revalidation-v1/manifest.json",
+            "row_count": 1188
+          },
+          "open_purchase_pipeline": {
+            "file_hashes": [
+              "5e126a73e73392b358252589dccf78eacecb613db0733cd13392ddde13aba7d7"
+            ],
+            "file_references": [
+              "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/open_purchase_pipeline/full/material-supply-final-1790303719477148466_open_purchase_pipeline_full/part-00000.parquet"
+            ],
+            "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/open_purchase_pipeline/full/material-supply-final-1790303719477148466_open_purchase_pipeline_full/manifest.json",
+            "row_count": 18717
+          }
+        },
+        "keyset_fingerprint": null,
+        "name": "material_supply",
+        "publication_id": "material_supply_137a23480171bda867ff8b12",
+        "row_count": 33227,
+        "sales_revalidation_contract": {
+          "datasets": {
+            "material_actual_consumption": {
+              "file_hashes": [
+                "c7af6b34243abb7837462fa1f984aa3699b4344e20c7ce8e3f11a79d3adc5ff2"
+              ],
+              "file_references": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_DERIVATION_V1/material_actual_consumption/full/material-supply-derivation-2026-09-24_material_actual_consumption_full_1790296840828337066/part-00000.parquet"
+              ],
+              "manifest_path": null,
+              "row_count": 791
+            },
+            "material_equivalent_demand": {
+              "file_hashes": [
+                "bfe00a0326ad48ffef2731ac6e6b723d2701debe9f29a6c8c0c14ef01b61b0b6"
+              ],
+              "file_references": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_equivalent_demand/sales-facts-revalidation-v1/part-00000.parquet"
+              ],
+              "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_equivalent_demand/sales-facts-revalidation-v1/manifest.json",
+              "row_count": 1086
+            },
+            "material_lead_time_profile": {
+              "file_hashes": [
+                "0d8dc377637ce0a9b7701009de9d8f67c2bcbd350ad539fc22b5d263132fe4a6"
+              ],
+              "file_references": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/material_lead_time_profile/full/material-supply-final-1790303719477148466_material_lead_time_profile_full/part-00000.parquet"
+              ],
+              "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/material_lead_time_profile/full/material-supply-final-1790303719477148466_material_lead_time_profile_full/manifest.json",
+              "row_count": 11445
+            },
+            "material_supply_status": {
+              "file_hashes": [
+                "e76aac762b0063de5972376da53fd00bc40ba5c75ad91ae5f2de8c5d194652f8"
+              ],
+              "file_references": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_supply_status/sales-facts-revalidation-v1/part-00000.parquet"
+              ],
+              "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_supply_status/sales-facts-revalidation-v1/manifest.json",
+              "row_count": 1188
+            },
+            "open_purchase_pipeline": {
+              "file_hashes": [
+                "5e126a73e73392b358252589dccf78eacecb613db0733cd13392ddde13aba7d7"
+              ],
+              "file_references": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/open_purchase_pipeline/full/material-supply-final-1790303719477148466_open_purchase_pipeline_full/part-00000.parquet"
+              ],
+              "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/open_purchase_pipeline/full/material-supply-final-1790303719477148466_open_purchase_pipeline_full/manifest.json",
+              "row_count": 18717
+            }
+          },
+          "original_component": "material_supply_2ee04203964a197ab627f839",
+          "proof": {
+            "after_demand_sha256": "8eeb3d6000dd9d70504d2a7e986ab432f13056f9d181c9648bd34b4a043f0c0e",
+            "after_status_sha256": "5f9747aabad265c9e6da536bdec81742882e07b9b90e5c2b1b3eded7624178f7",
+            "before_demand_sha256": "c137d25a8477a76b5268d550b94ccfb500f1a6acbba9a7b9f39fcd142e5dd4eb",
+            "before_status_sha256": "04ed56ad206a64bf752f82a252e71729f8e38da4b4c228fb73c9797ebf97bcaa",
+            "bom_provenance": {
+              "bom_header": {
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/bom_header/full/fact-capture-2026-09-24_bom_header_full_1790295310397114261/part-00000.parquet": "0fe71f555a987added796b6df26b6e8e875d039c4e9189c7548cff47f3caa020"
+              },
+              "bom_line": {
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/bom_line/full/fact-capture-2026-09-24_bom_line_full_1790295313123924875/part-00000.parquet": "889e5a1e1b27b3d9e9ec2390842e8b5e64e7886790457bcfdd2f209fbb586353"
+              }
+            },
+            "datasets_replaced": [
+              "material_equivalent_demand",
+              "material_supply_status"
+            ],
+            "demand_window": [
+              "2026-06-26",
+              "2026-09-24"
+            ],
+            "new_component": null,
+            "old_demand_replay_matches": true,
+            "old_status_replay_matches": true,
+            "refresh_of_stock_production_purchasing": false,
+            "replay_demand_sha256": "c137d25a8477a76b5268d550b94ccfb500f1a6acbba9a7b9f39fcd142e5dd4eb",
+            "replay_status_sha256": "04ed56ad206a64bf752f82a252e71729f8e38da4b4c228fb73c9797ebf97bcaa",
+            "status": "REPLAY_PASS",
+            "stock_component": "update_publication_b567d267b6340baf3939083e4c4cea27",
+            "stock_source_as_of": "2026-09-24T13:53:07.952772"
+          }
+        },
+        "source_as_of": "2026-09-24T13:53:07.952772+00:00"
+      },
+      "old_demand_replay_matches": true,
+      "old_status_replay_matches": true,
+      "refresh_of_stock_production_purchasing": false,
+      "replay_demand_sha256": "c137d25a8477a76b5268d550b94ccfb500f1a6acbba9a7b9f39fcd142e5dd4eb",
+      "replay_status_sha256": "04ed56ad206a64bf752f82a252e71729f8e38da4b4c228fb73c9797ebf97bcaa",
+      "status": "REPLAY_PASS",
+      "stock_component": "update_publication_b567d267b6340baf3939083e4c4cea27",
+      "stock_source_as_of": "2026-09-24T13:53:07.952772"
+    },
+    "other_components_refreshed": false
+  },
+  "canonical_reader": {
+    "isolated": "PASS_REAL_FILES",
+    "counts": {
+      "credit_memo_document": 2535,
+      "credit_memo_line": 10869,
+      "sales_document": 375274,
+      "sales_line": 812390
+    },
+    "resolution": "Canonical FoundationReader on isolated in-memory metadata, explicit source-snapshot resolver. Not a real production commit.",
+    "live_base": "PASS_UNCHANGED_BASE",
+    "live_candidate": "NOT_ACTIVATED",
+    "cycle_money": "PASS_8_GROUPS_ZERO_TOLERANCE",
+    "evidence": [
+      "isolated-reader.json",
+      "cycle-money.json",
+      "live-final.json"
+    ]
+  },
+  "commercial": {
+    "september": {
+      "credit_doc_total": "488033.530000",
+      "currency": "BS",
+      "invoice_doc_total": "11079079.770000",
+      "month": "2026-09",
+      "net_documentary_billing": "10591046.240000"
+    },
+    "october": {
+      "credit_doc_total": "457793.300000",
+      "currency": "BS",
+      "invoice_doc_total": "11269116.220000",
+      "month": "2026-10",
+      "net_documentary_billing": "10811322.920000"
+    },
+    "metric": "Active invoice DocTotal minus active credit memo DocTotal: net documentary billing, not accounting revenue",
+    "capture_reused": {
+      "windows": 118,
+      "invoices": 75134,
+      "credit_memos": 544,
+      "lines": 165024
+    },
+    "source_queries_this_task": 0,
+    "raw_reconciliation": "PASS_ZERO_TOLERANCE"
+  },
+  "coverage": {
+    "september": "2026-09-01 through 2026-09-30 complete",
+    "october": "2026-10-01 through 2026-10-29 inclusive; partial calendar month",
+    "global_change_CDC": false
+  },
+  "telchiai": {
+    "isolated_business_answers": "PASS commercial monthly/daily/customer/product/evolution/equivalent-period output through real canonical candidate relations",
+    "authorization_contracts": "PASS focused assistant access and business conversation regressions",
+    "real_conversational_candidate_consumption": "NOT_RUN_NOT_PUBLISHED",
+    "effective_role_permissions_after_publication": "REQUIRES_AUTHORIZED_ACTOR_POSTACTIVATION",
+    "business_answer_first": "Existing contract preserved and regression tested",
+    "permissions_modified": false,
+    "impersonation": false,
+    "no_published_pass_claim": true
+  },
+  "incremental_adapter": {
+    "module": "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_refresh_cycle.py",
+    "status": "IMPLEMENTED_OFFLINE_TESTED",
+    "engine": "Existing sales_continuity durable bounded whole-document capture/recover",
+    "features": [
+      "immutable per-cycle plan and original resource budgets",
+      "same shared extraction flock",
+      "published coverage checkpoints, not last DocEntry",
+      "1-14 overlap days, at most 31 explicit business days",
+      "evidenced late dates outside overlap; no silent full-year rescan",
+      "active and cancelled documents and line-only changes reconciled by whole-document upsert",
+      "idempotent capture resume and published coverage checkpoint",
+      "previous daily coverage retained verbatim outside refreshed windows",
+      "raw/reader monetary reconciliation and original Foundation/Material Supply gates",
+      "canonical promotion wrapper with separate exact candidate authorization"
+    ],
+    "limits": [
+      "No global change CDC claim",
+      "Changes outside overlap require accredited late-change evidence and explicit bounded windows",
+      "No productive SAP cycle or scheduler exercised here",
+      "Missing future Reference identities remain fail-closed; no automatic master refresh"
+    ]
+  },
+  "scheduler": {
+    "config": "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_refresh_scheduler.disabled.json",
+    "enabled": false,
+    "installed": false,
+    "productive_scheduler_activated": false,
+    "schedule": null,
+    "schedule_timezone_and_entitlement": "Must be established by separate operational decision; not invented"
+  },
+  "tests": {
+    "suites": {
+      "regression-final.xml": {
+        "tests": 319,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "recovery-final.xml": {
+        "tests": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "row-contract-final.xml": {
+        "tests": 22,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "interpretation": "319-test regression passed, then final 22-test promotion/incremental matrix passed on final wrapper code. 321 distinct tests across the runs; overlapping tests are not added as unique.",
+    "faults": [
+      "before commit",
+      "canonical fault after commit",
+      "during activation",
+      "after pointer activation",
+      "interrupted rollback",
+      "reader rejection then retry",
+      "journal recovery",
+      "same-candidate duplicate/NOOP",
+      "CURRENT conflict",
+      "Reference conflict",
+      "candidate bytes corruption",
+      "Reference bytes corruption",
+      "active run lock",
+      "Reference flock conflict",
+      "exact authorization mismatch",
+      "retained concurrent reader simulation",
+      "cancellation/late window/resume",
+      "future transition coverage preservation",
+      "no premature watermark advance",
+      "Exact incremental catalog-row roundtrip preserves lossy ancestor columns without inventing fingerprints"
+    ],
+    "initial_test_failure": "One new test incorrectly expected integer 0 instead of engine empty query list; assertion corrected to existing API. Final reruns passed. No runtime gate disabled.",
+    "lat": {
+      "md": "PASS",
+      "index": "PASS",
+      "sections": "PASS",
+      "code-refs": "PASS",
+      "all": "PASS"
+    },
+    "git_diff_check": "PASS",
+    "compileall": "PASS"
+  },
+  "journal": {
+    "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-foundation-final-promotion-v1/journal",
+    "durability": "Immutable fsynced no-clobber JSON events, directory fsync, journal flock",
+    "live_events": [
+      "plan.json",
+      "rollback-inputs.json"
+    ],
+    "recovery": "Repeat exact authorized promote command. Refuse other runs, changed pointers, corrupted inputs and rolled-back journals. Same-run stale recovery requires journal and Reference flocks.",
+    "rollback_inputs": "Hash-pinned previous independent pointer roots and Foundation base Reference/crosswalk roots",
+    "activation_events_not_written": true
+  },
+  "rollback": {
+    "available": "Implemented and isolated fault/recovery tested; historical real base and Reference rollback inputs revalidated before authorization",
+    "command": "cd SrvRestAstroLS_v1/backend && uv run python -m modules.telchi.datalake.sales_foundation_promotion rollback --journal /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-foundation-final-promotion-v1/journal --reason \"Audited operational reason\"",
+    "CAS": true,
+    "requires": "Previously journaled exact promotion authorization, intact retained base and audited reason"
+  },
+  "files": {
+    "created": [
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_foundation_promotion.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_refresh_cycle.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_sales_foundation_promotion.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_sales_refresh_cycle.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/SALES_FOUNDATION_PROMOTION_V1.md"
+    ],
+    "amended_preserving_preexisting_work": [
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/reference_update.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_continuity.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_continuity_candidate.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_facts_transition.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_refresh_scheduler.disabled.json"
+    ],
+    "sha256": {
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_foundation_promotion.py": "99cc06968cc5c8cabb6f28d0b925e84223af7b7ecd1025cef19e74423b391b67",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_refresh_cycle.py": "f540cd1d5bb2a6a356d558f96cdfd8d3d97fff82ebf20d93af8cb08e4cb5c5df",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_sales_foundation_promotion.py": "4143dd492c1c8354464cf94c47dc078acb9cbfd314b7b5531c5b0da7488a8b2c",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_sales_refresh_cycle.py": "c6065a0bc3340dcde314a20bc210fa59a32f07845ca35edd72d116c8dd3355ca",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/SALES_FOUNDATION_PROMOTION_V1.md": "8f2e95eb1c4d4f3a6f246333fb721b95c532a060ce2b6a95f6593199ae1783e4",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/reference_update.py": "30a1e28770f5b6e69ce3566b262e5038c5fe139c00c895cb94da30da50f7492b",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_continuity.py": "964f5cd9c5e53741864784b006b78f85a9df5e7a2f6b82cfb93372bd74413e95",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_continuity_candidate.py": "3cc13fc019b3d9718147ec7aa8c3daaec39ef2c3abbd0bb6bef440b61fa22500",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_facts_transition.py": "9efedc4d8188776e71a556bec9718377071533626fb455dd2ed52fb3ab6caecc",
+      "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_refresh_scheduler.disabled.json": "d41f866559be824c9b173c01a737e0cf25ee83422f671aab5ebffbff4c9c805f"
+    },
+    "evidence_root": "data/reports/telchi/sales-foundation-final-promotion-v1",
+    "data_written": [
+      "staging/sales-foundation-final-promotion-v1/journal/plan.json",
+      "staging/sales-foundation-final-promotion-v1/journal/rollback-inputs.json"
+    ],
+    "global_documents_modified": false
+  },
+  "transversal_impact": {
+    "scope": "Telchi MODULE_LOCAL only",
+    "reason_more_than_five_files": "One canonical Reference publisher hardening, orchestration, incremental adapter and its existing capture/builder/validator integration, disabled scheduler configuration, local tests and runbook; no parallel engine.",
+    "consumers": "Reference producer now rejects concurrent stale pointer updates; Foundation/TelchiAI consumers retain existing pinned-reader and permission contracts",
+    "shared_atomic_changes": 0,
+    "auth_frontend_messaging_bootstrap_changes": 0,
+    "preexisting_worktree_preserved": true,
+    "commits": 0,
+    "pushes": 0
+  },
+  "host": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS_FOR_COMPLETED_SCOPE",
+    "CONCURRENCY_USED": {
+      "pytest_workers": 1,
+      "live_duckdb_threads": 1,
+      "reference_helpers_threads": 2,
+      "browsers": 0
+    },
+    "observations": "High persistent host I/O wait, low CPU load, 6.4-6.8GB available memory. Swap total rose from 1057MB to 1443MB during shared-host session; sampled interval swap-in/out remained zero. Used tmpfs for own small tests, removed all five own test roots; no additional heavy workload initiated.",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "cleanup": "All foreground runners completed, all six own tmpfs test roots removed. No server, browser or background worker created; unrelated existing uv left untouched.",
+    "tool_environment": "Initial cleanup attempt used unavailable python command; rerun with python3 succeeded."
+  },
+  "commands": [
+    {
+      "command": "git branch --show-current; git status --short",
+      "result": "Expected branch; unrelated preexisting changes preserved"
+    },
+    {
+      "command": "uptime; free -m; nproc; vmstat 1 3; ps -eo pid,ppid,comm,pcpu,pmem,rss --sort=-pcpu; df -h /dev/shm /media/issajar/DEVELOP",
+      "result": "BUSY_BUT_SAFE for bounded work; high I/O wait"
+    },
+    {
+      "command": "Initial focused uv run pytest tests/test_sales_foundation_promotion.py",
+      "result": "12 passed"
+    },
+    {
+      "command": "Intermediate promotion/refresh/transition pytest matrix",
+      "result": "29 passed, 1 test-assertion failure; corrected and rerun"
+    },
+    {
+      "command": "cd SrvRestAstroLS_v1/backend && uv run pytest -q modules/telchi/datalake/tests/test_sales_foundation_promotion.py modules/telchi/datalake/tests/test_sales_refresh_cycle.py modules/telchi/datalake/tests/test_reference_update.py modules/telchi/datalake/tests/test_foundation_publication.py modules/telchi/datalake/tests/test_foundation_reader.py modules/telchi/datalake/tests/test_sales_continuity.py modules/telchi/datalake/tests/test_sales_continuity_candidate.py modules/telchi/datalake/tests/test_sales_facts_transition.py modules/telchi/datalake/tests/test_sales_reference_release.py modules/telchi/datalake/tests/test_sales_material_revalidation.py modules/telchi/datalake/tests/test_sales_sealed_revalidation.py modules/telchi/datalake/tests/test_sales_incremental.py modules/telchi/datalake/tests/test_physical_reference_offline.py modules/telchi/datalake/tests/test_physical_reference_end_to_end.py modules/telchi/datalake/tests/test_receivables_collections_foundation.py modules/telchi/assistant/tests/test_pilot_access.py modules/telchi/assistant/tests/test_sales_monetary.py modules/telchi/assistant/tests/test_sales_business_contract.py modules/telchi/assistant/tests/test_business_conversation.py --basetemp=/dev/shm/telchi-final-promotion-regression --junitxml=../../data/reports/telchi/sales-foundation-final-promotion-v1/regression.xml",
+      "result": "317 passed"
+    },
+    {
+      "command": "cd SrvRestAstroLS_v1/backend && uv run pytest -q modules/telchi/datalake/tests/test_sales_foundation_promotion.py modules/telchi/datalake/tests/test_sales_refresh_cycle.py modules/telchi/datalake/tests/test_reference_update.py modules/telchi/datalake/tests/test_foundation_publication.py modules/telchi/datalake/tests/test_foundation_reader.py modules/telchi/datalake/tests/test_sales_continuity.py modules/telchi/datalake/tests/test_sales_continuity_candidate.py modules/telchi/datalake/tests/test_sales_facts_transition.py modules/telchi/datalake/tests/test_sales_reference_release.py modules/telchi/datalake/tests/test_sales_material_revalidation.py modules/telchi/datalake/tests/test_sales_sealed_revalidation.py modules/telchi/datalake/tests/test_sales_incremental.py modules/telchi/datalake/tests/test_physical_reference_offline.py modules/telchi/datalake/tests/test_physical_reference_end_to_end.py modules/telchi/datalake/tests/test_receivables_collections_foundation.py modules/telchi/assistant/tests/test_pilot_access.py modules/telchi/assistant/tests/test_sales_monetary.py modules/telchi/assistant/tests/test_sales_business_contract.py modules/telchi/assistant/tests/test_business_conversation.py --basetemp=/dev/shm/telchi-final-promotion-regression-r2 --junitxml=../../data/reports/telchi/sales-foundation-final-promotion-v1/regression-final.xml",
+      "result": "319 passed in 50.30s"
+    },
+    {
+      "command": "cd SrvRestAstroLS_v1/backend && uv run pytest -q modules/telchi/datalake/tests/test_sales_foundation_promotion.py modules/telchi/datalake/tests/test_sales_refresh_cycle.py --basetemp=/dev/shm/telchi-final-promotion-recovery-final --junitxml=../../data/reports/telchi/sales-foundation-final-promotion-v1/recovery-final.xml",
+      "result": "21 passed in 9.31s"
+    },
+    {
+      "command": "uv run python -m modules.telchi.datalake.sales_foundation_promotion prepare --candidate /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-foundation-release-20261030-v2/foundation-candidate.json --journal /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-foundation-final-promotion-v1/journal",
+      "result": "PASS durable plan and rollback inputs, no activation"
+    },
+    {
+      "command": "uv run python via stdin: real_promotion(journal).check(plan); isolated FoundationPublicationStore + FoundationReader; compare commercial_answers; logical_rollback in in-memory catalog",
+      "result": "PASS; isolated-reader.json"
+    },
+    {
+      "command": "uv run python via stdin: verify_cycle_money against already reader-verified candidate files",
+      "result": "PASS 8 groups zero tolerance; cycle-money.json"
+    },
+    {
+      "command": "uv run python via stdin: final real_promotion.check + live FoundationReader + run-lock and pointer inspection",
+      "result": "PASS base unchanged, no active promotion, no authorization; live-final.json"
+    },
+    {
+      "command": "uv run python -m compileall -q <six affected Python modules>",
+      "result": "PASS"
+    },
+    {
+      "command": "lat check md; lat check index; lat check sections; lat check code-refs; lat check; git diff --check",
+      "result": "All exit 0"
+    },
+    {
+      "command": "python3 own /dev/shm test-root cleanup; ps -eo pid,ppid,comm",
+      "result": "Five own roots removed, no own long-running process; unrelated process preserved"
+    },
+    {
+      "command": "uv run pytest -q modules/telchi/datalake/tests/test_sales_foundation_promotion.py modules/telchi/datalake/tests/test_sales_refresh_cycle.py --basetemp=/dev/shm/telchi-final-promotion-row-contract --junitxml=../../data/reports/telchi/sales-foundation-final-promotion-v1/row-contract-final.xml; final real_promotion.check(plan) and CURRENT inspection",
+      "result": "22 passed in 9.67s; final candidate, retained rollback inputs and unchanged CURRENT revalidated"
+    }
+  ],
+  "authorization": {
+    "effective_operational_authorization": "NOT_FOUND",
+    "request_file": "data/reports/telchi/sales-foundation-final-promotion-v1/authorization-request.json",
+    "not_inferred_from_user_objective_or_tests": true,
+    "exact_required": {
+      "request_status": "AWAITING_OWNER_DECISION_NOT_AN_AUTHORIZATION",
+      "contract": "sales-foundation-promotion-v1",
+      "action_requested": "PROMOTE",
+      "candidate": "foundation_38680850adc058b1bb11887632b7b681",
+      "base": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "manifest_sha256": "ef5138ba9363508f997bb15d9c4746f9874862703761921bcb76f1256126318a",
+      "reference": "v2_sales_e02883116f4b4991c396010a",
+      "retained_component_cutoffs": {
+        "credit_memo": "2026-10-30T03:00:41.433539+00:00",
+        "material_supply": "2026-09-24T13:53:07.952772+00:00",
+        "oinm": "2026-09-24T13:53:46.471312+00:00",
+        "oitw": "2026-09-24T14:07:04.221589+00:00",
+        "purchasing": "2026-09-23",
+        "receivables_collections": "2026-09-28T18:18:35.264000",
+        "reference": "2026-10-30T09:01:30.323257+00:00",
+        "sales": "2026-10-30T03:00:38.921605+00:00"
+      },
+      "required_decision": "Explicit current operational authorization by an identified owner for this candidate, its Reference transition and retained historical cutoffs; issue a separate private authorization document. No credential or grant changes are requested."
+    }
+  },
+  "next_action": {
+    "owner": "Issue one exact operational promotion authorization for this Foundation, Reference reconciliation and retained cutoffs",
+    "command_after_authorization": "cd SrvRestAstroLS_v1/backend && uv run python -m modules.telchi.datalake.sales_foundation_promotion promote --journal /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-foundation-final-promotion-v1/journal --authorization /ruta/privada/autorizacion-operativa.json",
+    "then": "Verify real TelchiAI seven commercial questions and effective role permissions; only after actual consumption declare PUBLISHED_PASS. Do not query SAP, modify grants or activate scheduler."
+  },
+  "runbook": "SrvRestAstroLS_v1/backend/modules/telchi/datalake/SALES_FOUNDATION_PROMOTION_V1.md"
+}

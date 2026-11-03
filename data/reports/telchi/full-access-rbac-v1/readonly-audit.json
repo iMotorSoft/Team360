@@ -1,0 +1,241 @@
+{
+  "observed_at": "2026-10-19T16:16:10.144726+00:00",
+  "database_writes": 0,
+  "branch": "feature/console-backend-core",
+  "server": [
+    {
+      "database": "team360",
+      "read_only": "on",
+      "port": 5432
+    }
+  ],
+  "pilot": [
+    {
+      "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+      "email": "devfull@telchiai.com",
+      "role": "member",
+      "status": "active",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "slug": "telchi_dev",
+      "workspace_status": "testing",
+      "organization_id": "44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99",
+      "organization_code": "telchi",
+      "organization_status": "active"
+    }
+  ],
+  "effective_permissions": [
+    "telchi.products.search.read.v1",
+    "telchi.sales.by_products.read.v1",
+    "telchi.sales.coverage.read.v1",
+    "telchi.sales.invoice_lines.read.v1",
+    "telchi.sales.latest_documents.read.v1",
+    "telchi.sales.period_billed_amount.read.v1",
+    "telchi.sales.source_quantity.read.v1"
+  ],
+  "roles": [
+    {
+      "role_id": "264fba91-fc21-401b-8297-7eb1a8003103",
+      "role_code": "telchi_products_search_reader_v1",
+      "display_name": "Telchi products.search reader V1"
+    },
+    {
+      "role_id": "11fbc3e0-4494-42b8-9d3c-ac222f2f2c02",
+      "role_code": "telchi_sales_by_products_reader_v1",
+      "display_name": "Telchi sales.by_products reader V1"
+    },
+    {
+      "role_id": "58c894fe-8e1e-4db8-b11e-9e9d5fa2b8fb",
+      "role_code": "telchi_sales_coverage_reader_v1",
+      "display_name": "Telchi active invoice coverage read V1"
+    },
+    {
+      "role_id": "dd795943-2b55-4691-82bb-e20fabd95d68",
+      "role_code": "telchi_sales_invoice_lines_reader_v1",
+      "display_name": "Telchi invoice products reader V1"
+    },
+    {
+      "role_id": "93119fd0-33ea-4620-b25a-2ccbc45abc82",
+      "role_code": "telchi_sales_latest_documents_reader_v1",
+      "display_name": "Telchi active latest invoices read V1"
+    },
+    {
+      "role_id": "5841e6e4-5b45-434b-8e94-d76937680b66",
+      "role_code": "telchi_sales_period_billed_amount_reader_v1",
+      "display_name": "Telchi period documentary billing reader V1"
+    },
+    {
+      "role_id": "b4d73cb0-6ad8-4068-a0e8-836c39cf1cff",
+      "role_code": "telchi_source_quantity_reader_v1",
+      "display_name": "Telchi source quantity reader V1"
+    }
+  ],
+  "profiles": [],
+  "full_access_permissions": [],
+  "full_access_roles": [],
+  "phone_bindings": [
+    {
+      "environment": "dev",
+      "provider": "evolution",
+      "tenant_id": "telchi",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "verification_status": "verified",
+      "has_verified_at": true,
+      "has_verification_ref": true,
+      "revoked_at_utc": null
+    }
+  ],
+  "channels": [
+    {
+      "channel_alias": "telchi_whatsapp_dev",
+      "status": "testing",
+      "provider": "evolution",
+      "environment": "dev",
+      "module": "telchi",
+      "tenant_id": "telchi",
+      "dispatcher": "horizontal_v1"
+    }
+  ],
+  "commercial_authorizations": [
+    {
+      "event_name": "telchi.admin.invoice-authorize",
+      "occurred_at_utc": "2026-10-18 16:33:19.013137+00:00",
+      "after": {
+        "limits": {
+          "roles": [
+            "telchi_sales_invoice_lines_reader_v1"
+          ],
+          "modules": [
+            "telchi"
+          ],
+          "free_sql": false,
+          "snapshot": 1408,
+          "environment": "dev",
+          "permissions": [
+            "telchi.sales.invoice_lines.read.v1"
+          ],
+          "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "capabilities": [
+            "sales.invoice_lines.v1"
+          ],
+          "line_amounts": false,
+          "document_type": "OINV",
+          "whole_workspace": true,
+          "native_line_unit": "not_published",
+          "physical_quantity_totals": false
+        },
+        "admin_id": "73d09264-8be2-4402-8023-0142a5f26730"
+      }
+    },
+    {
+      "event_name": "telchi.admin.product-authorize",
+      "occurred_at_utc": "2026-10-13 11:33:19.054003+00:00",
+      "after": {
+        "limits": {
+          "roles": [
+            "telchi_products_search_reader_v1",
+            "telchi_sales_by_products_reader_v1"
+          ],
+          "modules": [
+            "telchi"
+          ],
+          "free_sql": false,
+          "snapshot": 1408,
+          "namespace": "SAP_HANA",
+          "environment": "dev",
+          "permissions": [
+            "telchi.products.search.read.v1",
+            "telchi.sales.by_products.read.v1"
+          ],
+          "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "capabilities": [
+            "products.search.v1",
+            "sales.by_products.v1"
+          ],
+          "line_amounts": false,
+          "whole_workspace": true,
+          "credential_enrollment": false,
+          "physical_quantity_totals": false
+        },
+        "admin_id": "73d09264-8be2-4402-8023-0142a5f26730"
+      }
+    },
+    {
+      "event_name": "telchi.admin.monetary-authorize",
+      "occurred_at_utc": "2026-10-12 22:54:07.070788+00:00",
+      "after": {
+        "limits": {
+          "roles": [
+            "telchi_sales_period_billed_amount_reader_v1"
+          ],
+          "metrics": [
+            "SALES_VALID_GROSS",
+            "SALES_CREDIT_NOTES",
+            "SALES_NET"
+          ],
+          "modules": [
+            "telchi"
+          ],
+          "currency": "BS",
+          "free_sql": false,
+          "environment": "dev",
+          "permissions": [
+            "telchi.sales.period_billed_amount.read.v1"
+          ],
+          "capabilities": [
+            "sales.period_billed_amount.v1"
+          ],
+          "entity_filters": false,
+          "whole_workspace": true,
+          "credential_enrollment": false
+        },
+        "admin_id": "73d09264-8be2-4402-8023-0142a5f26730"
+      }
+    },
+    {
+      "event_name": "telchi.admin.sales-authorize",
+      "occurred_at_utc": "2026-10-12 22:20:54.275920+00:00",
+      "after": {
+        "limits": {
+          "roles": [
+            "telchi_sales_latest_documents_reader_v1",
+            "telchi_sales_coverage_reader_v1"
+          ],
+          "modules": [
+            "telchi"
+          ],
+          "free_sql": false,
+          "environment": "dev",
+          "permissions": [
+            "telchi.sales.latest_documents.read.v1",
+            "telchi.sales.coverage.read.v1"
+          ],
+          "capabilities": [
+            "sales.latest_documents.v1",
+            "sales.coverage.v1"
+          ],
+          "whole_workspace": true,
+          "credential_enrollment": false
+        },
+        "admin_id": "73d09264-8be2-4402-8023-0142a5f26730"
+      }
+    }
+  ],
+  "wrong_workspace_effective": [],
+  "pilot_admission": {
+    "environment": "dev",
+    "tenant_id": "telchi",
+    "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+    "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+    "access": "assistant",
+    "revoked": false,
+    "module_enabled": true,
+    "whole_workspace_scope_verified": true,
+    "scope_matches_database": true,
+    "sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5"
+  },
+  "limits": [
+    "No live transport or runtime availability certified.",
+    "No FULL_ACCESS role exists to revoke; specific-grant revocation tested offline.",
+    "Organization/tenant binding is separate from Console permission resolution."
+  ]
+}

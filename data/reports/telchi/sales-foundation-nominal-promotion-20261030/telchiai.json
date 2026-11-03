@@ -1,0 +1,172 @@
+{
+  "timestamp": "2026-10-30T11:43:53.480864+00:00",
+  "source_sha256": "93bffa76625f1190d5b26d9af40bd49470bb5d7af8f2feb5c5befc6e272ed0d7",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "duration_ms": 5532.91,
+    "attempts": 1
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/schema_version": 2,
+        "/metric": "sales.net_amount",
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿De qué período querés consultar la facturación?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuánto facturamos neto en septiembre de 2026?",
+      "text": "No hay un resultado Foundation verificable. Intentá nuevamente.",
+      "classification": "ERROR",
+      "event_id": "a4b845d7-94d9-4dc3-b6c0-4c6eccf68b08",
+      "thread_id": "04a72042-5550-41b6-987e-15b95b22f4b1",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 30115.962345997104,
+          "state_engine_ms": 0.6361010018736124,
+          "interpretation_ms": 8322.241847010446,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 38451.22692400764
+        },
+        "decision": "ERROR",
+        "committed": true,
+        "contract_error": null,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "validated_state": {
+          "limit": 10,
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "group_by": null,
+          "reference": null,
+          "comparison": null,
+          "period_mode": null,
+          "breakdown_by": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "product_target": null,
+          "ranking_detail": null,
+          "schema_version": 2,
+          "customer_target": null,
+          "product_context": null,
+          "business_category": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "ranking_target_item_code": null
+        },
+        "capability_calls": 1,
+        "execution_result": null,
+        "execution_status": "failed",
+        "response_prepared": {
+          "text": "No hay un resultado Foundation verificable. Intentá nuevamente.",
+          "classification": "ERROR"
+        },
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference",
+              "/product_search_text",
+              "/selected_item_codes",
+              "/business_category",
+              "/product_target",
+              "/customer_target",
+              "/group_by",
+              "/breakdown_by",
+              "/periods",
+              "/period_mode",
+              "/limit",
+              "/ranking_target_item_code",
+              "/ranking_detail"
+            ]
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 8311.301,
+        "attempts": 1
+      },
+      "elapsed_ms": 42343.82990599261
+    }
+  ]
+}

@@ -1,0 +1,596 @@
+{
+  "private_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/medications-conversation-2026-10-22T181640.942142+0000.json",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "duration_ms": 4839.015,
+    "attempts": 1
+  },
+  "turns": [
+    {
+      "question": "Mostrame la composición global de ventas de septiembre de 2026: porcentaje de productos terminados, materias primas, fraccionados y medicamentos.",
+      "text": "Composición de ventas globales — septiembre de 2026.\n\nProductos terminados de laboratorio: Bs 2.679.208,66 — 33,29 %.\n\nMaterias primas: Bs 839.582,63 — 10,43 %.\n\nMedicamentos: clasificación no acreditada; no los equiparo con productos terminados. Todavía no puedo determinar su porcentaje: falta identificar qué importe de estas ventas corresponde a medicamentos.\n\nFraccionados: Bs 2.514.617,14 — 31,24 %.\n\nIncluye 121 líneas con clasificación respaldada (SUPPORTED), no toda validada.\n\nBase: Bs 8.048.691,58 de líneas comerciales activas BS del mismo período, sin filtros de cliente o producto. No es facturación documental con impuestos.\n\nCobertura observada: 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica cierre completo.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nNo sumo las categorías como una partición: medicamentos puede superponerse con otras categorías y no tiene identificación acreditada.\n\nPuedo ampliar los importes acreditados por producto.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "c50e3e4c-561f-48d8-94f0-7f7c0260c366",
+      "thread_id": "dd79f6ba-702d-4e01-ae70-0ea2877ae76e",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 9017.046,
+        "attempts": 1
+      },
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "LAB_FINISHED_PRODUCT",
+          "RAW_MATERIAL",
+          "MEDICATIONS",
+          "FRACTIONATED_PRODUCT"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "proposal": {
+        "action": "DIRECT_UNAVAILABLE",
+        "intent": "NEW_QUERY",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "/entity_mention": null,
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/temporal_reference": null
+          },
+          "unset": [
+            "/comparison",
+            "/branches",
+            "/sales_channel",
+            "/reference",
+            "/business_category"
+          ]
+        },
+        "clarification": null
+      },
+      "contract_error": null,
+      "denominator_status": "VERIFIED"
+    },
+    {
+      "question": "y el porcentaje de productos terminados",
+      "text": "Composición de ventas globales — septiembre de 2026.\n\nProductos terminados de laboratorio: Bs 2.679.208,66 — 33,29 %.\n\nBase: Bs 8.048.691,58 de líneas comerciales activas BS del mismo período, sin filtros de cliente o producto. No es facturación documental con impuestos.\n\nCobertura observada: 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica cierre completo.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nPuedo ampliar los importes acreditados por producto.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "79c9498b-6921-4280-b941-3de42376ef8d",
+      "thread_id": "dd79f6ba-702d-4e01-ae70-0ea2877ae76e",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 15393.688,
+        "attempts": 1
+      },
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "LAB_FINISHED_PRODUCT"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "proposal": {
+        "action": "ASK",
+        "intent": "REFINE",
+        "state_delta": {
+          "set": {
+            "metric": null,
+            "period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "entity_mention": {
+              "text": "LAB_FINISHED_PRODUCT",
+              "type": null
+            },
+            "schema_version": 2,
+            "business_category": "LAB_FINISHED_PRODUCT",
+            "requested_metrics": [],
+            "temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": {
+          "slot": "metric",
+          "question": "¿Querés el porcentaje del importe vendido o el porcentaje de cantidad de productos terminados?"
+        }
+      },
+      "contract_error": null,
+      "denominator_status": "VERIFIED"
+    },
+    {
+      "question": "y el porcentaje de materias primas",
+      "text": "Composición de ventas globales — septiembre de 2026.\n\nMaterias primas: Bs 839.582,63 — 10,43 %.\n\nBase: Bs 8.048.691,58 de líneas comerciales activas BS del mismo período, sin filtros de cliente o producto. No es facturación documental con impuestos.\n\nCobertura observada: 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica cierre completo.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nPuedo ampliar los importes acreditados por producto.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "950d89a4-4f08-4c5b-8512-d002647249bf",
+      "thread_id": "dd79f6ba-702d-4e01-ae70-0ea2877ae76e",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 15056.302,
+        "attempts": 1
+      },
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "RAW_MATERIAL"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "proposal": {
+        "action": "ASK",
+        "intent": "REFINE",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "/entity_mention": {
+              "text": "RAW_MATERIAL",
+              "type": null
+            },
+            "/schema_version": 2,
+            "/business_category": "RAW_MATERIAL",
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": {
+          "slot": "metric",
+          "question": "¿Querés el porcentaje de materias primas sobre las ventas totales de septiembre de 2026?"
+        }
+      },
+      "contract_error": null,
+      "denominator_status": "VERIFIED"
+    },
+    {
+      "question": "y el porcentaje de fraccionados",
+      "text": "Composición de ventas globales — septiembre de 2026.\n\nFraccionados: Bs 2.514.617,14 — 31,24 %.\n\nIncluye 121 líneas con clasificación respaldada (SUPPORTED), no toda validada.\n\nBase: Bs 8.048.691,58 de líneas comerciales activas BS del mismo período, sin filtros de cliente o producto. No es facturación documental con impuestos.\n\nCobertura observada: 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica cierre completo.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nPuedo ampliar los importes acreditados por producto.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "b7df2ea6-2d4f-4b2c-ba9e-cecb866116ea",
+      "thread_id": "dd79f6ba-702d-4e01-ae70-0ea2877ae76e",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 6602.62,
+        "attempts": 1
+      },
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "FRACTIONATED_PRODUCT"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "proposal": {
+        "action": "ANALYSIS_UNAVAILABLE",
+        "intent": "EXPLAIN",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "/entity_mention": {
+              "text": "FRACTIONATED_PRODUCT",
+              "type": null
+            },
+            "/schema_version": 2,
+            "/business_category": "FRACTIONATED_PRODUCT",
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "contract_error": null,
+      "denominator_status": "VERIFIED"
+    },
+    {
+      "question": "entonces cuanto es el porcentaje de medicamentos vendidos",
+      "text": "Composición de ventas globales — septiembre de 2026.\n\nMedicamentos: clasificación no acreditada; no los equiparo con productos terminados. Todavía no puedo determinar su porcentaje: falta identificar qué importe de estas ventas corresponde a medicamentos.\n\nBase: Bs 8.048.691,58 de líneas comerciales activas BS del mismo período, sin filtros de cliente o producto. No es facturación documental con impuestos.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nPuedo ampliar los importes acreditados por producto.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "5b31ce40-e9c6-4b75-9e60-345068dfd6a8",
+      "thread_id": "dd79f6ba-702d-4e01-ae70-0ea2877ae76e",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 7804.705,
+        "attempts": 1
+      },
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "MEDICATIONS"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "proposal": {
+        "action": "ANALYSIS_UNAVAILABLE",
+        "intent": "EXPLAIN",
+        "state_delta": {
+          "set": {
+            "/entity_mention": null,
+            "/schema_version": 2,
+            "/requested_metrics": [],
+            "/temporal_reference": null
+          },
+          "unset": [
+            "/metric",
+            "/business_category"
+          ]
+        },
+        "clarification": null
+      },
+      "contract_error": null,
+      "denominator_status": "VERIFIED"
+    },
+    {
+      "question": "¿por qué no podés calcularlo?",
+      "text": "Composición de ventas globales — septiembre de 2026.\n\nMedicamentos: clasificación no acreditada; no los equiparo con productos terminados. Todavía no puedo determinar su porcentaje: falta identificar qué importe de estas ventas corresponde a medicamentos.\n\nBase: Bs 8.048.691,58 de líneas comerciales activas BS del mismo período, sin filtros de cliente o producto. No es facturación documental con impuestos.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nPuedo ampliar los importes acreditados por producto.\n\nReutilizo el resultado anterior autorizado; no hice una nueva consulta. Su actualización no certifica cierre completo.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "d8a8db9a-9804-459b-b5c5-c344bcdb1097",
+      "thread_id": "dd79f6ba-702d-4e01-ae70-0ea2877ae76e",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 3155.001,
+        "attempts": 1
+      },
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "MEDICATIONS"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "proposal": {
+        "action": "DIRECT_UNAVAILABLE",
+        "intent": "EXPLAIN",
+        "state_delta": {
+          "set": {},
+          "unset": []
+        },
+        "clarification": null
+      },
+      "contract_error": null,
+      "denominator_status": null
+    },
+    {
+      "question": "¿qué información sí tenemos?",
+      "text": "Composición de ventas globales — septiembre de 2026.\n\nMedicamentos: clasificación no acreditada; no los equiparo con productos terminados. Todavía no puedo determinar su porcentaje: falta identificar qué importe de estas ventas corresponde a medicamentos.\n\nBase: Bs 8.048.691,58 de líneas comerciales activas BS del mismo período, sin filtros de cliente o producto. No es facturación documental con impuestos.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nPuedo ampliar los importes acreditados por producto.\n\nReutilizo el resultado anterior autorizado; no hice una nueva consulta. Su actualización no certifica cierre completo.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "8bd7b060-65fc-4950-acdc-1c3f6e4ea920",
+      "thread_id": "dd79f6ba-702d-4e01-ae70-0ea2877ae76e",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 8091.9,
+        "attempts": 1
+      },
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "MEDICATIONS"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "proposal": {
+        "action": "DIRECT_UNAVAILABLE",
+        "intent": "EXPLAIN",
+        "state_delta": {
+          "set": {},
+          "unset": []
+        },
+        "clarification": null
+      },
+      "contract_error": null,
+      "denominator_status": null
+    },
+    {
+      "question": "volvamos al porcentaje de productos terminados",
+      "text": "Composición de ventas globales — septiembre de 2026.\n\nProductos terminados de laboratorio: Bs 2.679.208,66 — 33,29 %.\n\nBase: Bs 8.048.691,58 de líneas comerciales activas BS del mismo período, sin filtros de cliente o producto. No es facturación documental con impuestos.\n\nCobertura observada: 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica cierre completo.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nPuedo ampliar los importes acreditados por producto.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "12df8006-1d55-4ff7-9d5d-9db8bef9a09c",
+      "thread_id": "dd79f6ba-702d-4e01-ae70-0ea2877ae76e",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 9161.552,
+        "attempts": 1
+      },
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_offset": 0,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "excluded_product": null,
+        "business_category": null,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "temporal_reference": null,
+        "analysis_categories": [
+          "LAB_FINISHED_PRODUCT"
+        ],
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "proposal": {
+        "action": "ANALYSIS_UNAVAILABLE",
+        "intent": "EXPLAIN",
+        "state_delta": {
+          "set": {
+            "/metric": null,
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "/entity_mention": {
+              "text": "LAB_FINISHED_PRODUCT",
+              "type": null
+            },
+            "/schema_version": 2,
+            "/business_category": "LAB_FINISHED_PRODUCT",
+            "/requested_metrics": [],
+            "/temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "contract_error": null,
+      "denominator_status": "VERIFIED"
+    }
+  ]
+}

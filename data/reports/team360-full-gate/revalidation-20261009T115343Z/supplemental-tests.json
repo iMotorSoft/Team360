@@ -1,0 +1,86 @@
+{
+  "Post-close PG": {
+    "command": [
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=no",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_sales_diagnosis_post_close.py"
+    ],
+    "returncode": 0,
+    "pid": 32118,
+    "session_cleanup_verified": true,
+    "host": {
+      "status": "SAFE",
+      "load_1m": 3.7734375,
+      "available_mb": 5543,
+      "swap_used_mb": 515,
+      "concurrency": 1,
+      "unrelated_processes_terminated": 0
+    },
+    "summary": [
+      "12 passed in 0.73s"
+    ]
+  },
+  "Diagnosis expanded": {
+    "command": [
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=no",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_sales_diagnosis_active_context.py",
+      "tests/test_sales_diagnosis_async_state_repository.py",
+      "tests/test_sales_diagnosis_embedding_provider.py",
+      "tests/test_sales_diagnosis_feasibility_scope.py",
+      "tests/test_sales_diagnosis_headless_evaluator.py",
+      "tests/test_sales_diagnosis_intent_classifier.py",
+      "tests/test_sales_diagnosis_milvus_provider.py",
+      "tests/test_sales_diagnosis_policies.py",
+      "tests/test_sales_diagnosis_post_close.py",
+      "tests/test_sales_diagnosis_runtime_contracts.py",
+      "tests/test_sales_diagnosis_runtime_dev_route.py",
+      "tests/test_sales_diagnosis_runtime_postgres_smoke_contract.py",
+      "tests/test_sales_diagnosis_runtime_route.py",
+      "tests/test_sales_diagnosis_semantics.py",
+      "tests/test_sales_diagnosis_state_postgres_contract.py",
+      "tests/test_sales_diagnosis_state_repository.py",
+      "tests/test_diagnosis_public_router.py",
+      "tests/test_embed_clients_contract.py",
+      "tests/test_knowledge_scope_resolver.py"
+    ],
+    "returncode": 1,
+    "pid": 32151,
+    "session_cleanup_verified": true,
+    "host": {
+      "status": "SAFE",
+      "load_1m": 3.7734375,
+      "available_mb": 5615,
+      "swap_used_mb": 515,
+      "concurrency": 1,
+      "unrelated_processes_terminated": 0
+    },
+    "summary": [
+      "=============================== warnings summary ===============================",
+      "=========================== short test summary info ============================",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_with_context_smoke",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_first_message_creates_session",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_second_message_reuses_session",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_unknown_session_creates_new",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_fast_path_turn_decision",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_factual_shortcut_turn_decision",
+      "FAILED tests/test_diagnosis_public_router.py::test_generation_metadata_success",
+      "FAILED tests/test_diagnosis_public_router.py::test_generation_metadata_fallback",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_auth_error_no_placeholder",
+      "FAILED tests/test_diagnosis_public_router.py::test_retry_after_timeout_preserves_session",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_litellm_client_error_returns_503",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_litellm_http_401_returns_503",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_transient_error_falls_back_safely",
+      "FAILED tests/test_diagnosis_public_router.py::test_public_turn_successful_litellm_response",
+      "14 failed, 769 passed, 10 skipped, 1 warning in 10.99s"
+    ]
+  }
+}

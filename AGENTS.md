@@ -4,6 +4,8 @@ Este archivo es la fuente operativa canonica para Codex, OpenCode, Crush y otros
 
 ## Inicio obligatorio
 
+Comenzar por rama, worktree y [estado técnico GLOBAL](SrvRestAstroLS_v1/docs/status_actual.md); cargar después solo el contexto necesario.
+
 1. Trabajar desde `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360`.
 2. Ejecutar `git branch --show-current` y `git status --short`.
 3. Leer `SrvRestAstroLS_v1/docs/status_actual.md` para conocer el estado vigente.
@@ -13,13 +15,30 @@ Este archivo es la fuente operativa canonica para Codex, OpenCode, Crush y otros
 
 No hacer commit, push, merge, rebase, reset, clean, stash, checkout forzado ni borrar ramas salvo pedido explicito del usuario y una ventana Git exclusiva.
 
+## Shared development host
+
+La máquina comparte backend, frontend, PostgreSQL, browsers, IDE, agentes, otros proyectos y procesos de usuario. Esta política aplica aunque el prompt no mencione recursos.
+
+- `USE AVAILABLE CAPACITY, DO NOT DESTABILIZE THE HOST`; prioridad: `CORRECTNESS > HOST STABILITY > SPEED`.
+- Antes de workloads pesados, inspeccionar sin modificar el host: load, CPU aproximada, memoria disponible, swap y procesos pesados relevantes.
+- Evaluar señales conjuntamente y su evolución; un pico breve o un único umbral no decide por sí solo. Evitar presión sostenida, swap creciente, agotamiento de RAM y degradación de servicios.
+- Usar concurrencia moderada si hay capacidad; reducirla con carga, ejecutar focalizado/secuencial en host ocupado y no iniciar trabajo intensivo si es inseguro. No imponer single-thread universal.
+- No consumir todos los cores por defecto; no usar `pytest -n auto`, pools ilimitados ni suites grandes simultáneas; contar también threads internos y procesos hijos.
+- Checks baratos primero, tests focalizados y evidencia válida reutilizada; escalar carga progresivamente solo cuando agregue una garantía necesaria.
+- NO terminar procesos que la ejecución actual no haya creado: prohibidos `killall`, `pkill` genérico y matar backend/frontend, PostgreSQL, browsers, IDE u otros agentes existentes; no reiniciar servicios para liberar recursos.
+- Ante presión, no iniciar nuevas tareas pesadas, reducir concurrencia, preservar estado y detener únicamente workers propios atribuibles con seguridad; reportar `RESOURCE_BLOCKED` / `BLOCKED_HOST`, nunca forzar un PASS.
+- Al terminar, comprobar y cerrar procesos propios, incluidos hijos, browsers y servidores temporales; ante atribución dudosa, dejarlos intactos.
+- Distinguir `FUNCTIONAL_FAILURE` (fallo lógico demostrado), `RESOURCE_BLOCKED` (no es seguro ejecutar) y `ENVIRONMENTAL_ABORT` (interrupción ambiental sin defecto demostrado); no cambiar código para ocultar problemas ambientales.
+- Guard proporcional: consultas pequeñas normales, contexto rápido para un test local y guard explícito para suites grandes, browsers, scans, benchmarks y gates largos. Telchi detalla operación y promociones en `SrvRestAstroLS_v1/backend/modules/telchi/CONTEXT.md`.
+
 ## Ownership y concurrencia
 
 La politica detallada y fuente humana canonica es `lat.md/team360-global-orchestration.md`; estas son las reglas operativas inmediatas.
 
 - `MODULE_LOCAL`: el agente puede editar solo el scope existente que le fue asignado, incluidos sus tests y documentacion propios.
 - `SHARED`: antes de editar, identificar consumidores, informar el impacto y obtener asignacion o autorizacion cuando pueda afectarlos.
-- `GLOBAL`: detenerse antes del cambio, informar path, motivo, impacto y modulo solicitante, y pedir una ventana GLOBAL exclusiva. Mientras espera, puede continuar otra tarea local.
+- `GLOBAL`: todos pueden leer; un solo writer GLOBAL simultáneo, con ventana explícita y alcance delimitado. Antes de editar, informar path, motivo, impacto y módulo solicitante y coordinar ownership. Los agentes locales pueden continuar si no alteran condiciones GLOBAL.
+- Una ventana GLOBAL documental no autoriza código, infraestructura, Git ni producción. Procesos `pi`, `opencode` u otros activos no prueban ownership. Con autorización de reconciliación, inspeccionar el diff preexistente y preservarlo; nunca exigir limpiar el worktree para comenzar.
 - `PRODUCTION_PROTECTED`: detenerse y obtener autorizacion explicita; exige regresion especifica y no permite ampliar el scope. Actualmente cubre solo Diagnosticador/Vera y el componente/embed productivo.
 - Los cambios dentro del scope asignado a otro agente son `EXPECTED CONCURRENT CHANGES`: preservarlos y no revertirlos, borrarlos, formatearlos, modificarlos ni incluirlos en Git.
 - Un cambio fuera de los scopes concurrentes declarados que no pueda explicarse obliga a detenerse e informar.
@@ -84,6 +103,7 @@ El skill `.agents/skills/team360-project/SKILL.md` conserva workflows detallados
 - LiteLLM se consume mediante adapters y aliases; no hardcodear providers ni ocultar fallos con fallback silencioso.
 - Para `/t360`, `SrvRestAstroLS_v1/astro/src/components/global.js` es la unica fuente de verdad de URLs.
 - Browser MCP es diagnostico exploratorio; Playwright + Chromium es el gate E2E reproducible.
+- Autoridad operativa: la instruccion directa del responsable del proyecto autoriza la operacion dentro de su alcance y permisos efectivos. Ningun agente agrega aprobaciones, jerarquias administrativas ni bloqueos nuevos sin decision explicita; la trazabilidad se registra automaticamente, sin tramite adicional. Ver [team360-operational-authority-policy](lat.md/team360-operational-authority-policy.md).
 
 ## Validacion
 
@@ -106,7 +126,11 @@ No declarar PASS solo por HTTP 200, por Browser MCP o por una entrada previa del
 
 ## Documentacion
 
-- `SrvRestAstroLS_v1/docs/status_actual.md`: tablero tecnico vigente y compacto.
+Jerarquía: AGENTS (trabajo/ownership) → [estado GLOBAL](SrvRestAstroLS_v1/docs/status_actual.md) → [LAT](lat.md/lat.md) y autoridades locales → contratos, runbooks y evidencia.
+
+- `SrvRestAstroLS_v1/docs/status_actual.md`: único estado técnico GLOBAL vigente y compacto. El nombre canónico de estados nuevos es `status_actual.md`, en minúsculas.
+- `lat.md/status_actual.md`: mantenimiento de arquitectura LAT, no otro estado técnico GLOBAL.
+- Estado local: usar el `status_actual.md` o autoridad existente enlazado desde el tablero GLOBAL; Telchi conserva `CONTEXT.md` para arquitectura, roots y etapas.
 - `SrvRestAstroLS_v1/docs/status_historico_hasta_2026-06-28.md`: bitacora tecnica historica congelada.
 - `lat.md/`: invariantes, contratos y decisiones estables; no usar para evidencia diaria.
 - `docs/`: producto, negocio, estrategia y analisis no operativo.

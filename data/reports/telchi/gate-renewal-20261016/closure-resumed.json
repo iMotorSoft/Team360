@@ -1,0 +1,148 @@
+{
+  "generated_at": "2026-10-16T12:55:35.710306+00:00",
+  "branch": "feature/console-backend-core",
+  "objective": "Complete focused TelchiAI DEV renewal without runtime/configuration changes",
+  "result": {
+    "TELCHIAI_GATES": "BLOCKED",
+    "MANIFEST": "BLOCKED",
+    "PREFLIGHT": "BLOCKED",
+    "READY_FOR_LIFECYCLE_TEST": "NO"
+  },
+  "ingress": {
+    "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/gate-renewal-20261016T125427Z/http-auth.json",
+    "sha256": "38fd6b6b5890a302137b27bacd9fbc968a0725735e7fc7c704b80473fac445b8",
+    "http_auth_local": "PASS",
+    "container_state": "running",
+    "container_probe": "PASS: non-message connection event and invalid token only",
+    "error_class": null,
+    "fingerprints_stable": true,
+    "own_processes_left_running": 0
+  },
+  "evolution": {
+    "http_status": 200,
+    "connection": {
+      "instance": {
+        "instanceName": "team360-meta-dev",
+        "state": "open"
+      }
+    },
+    "webhook_inactive": true,
+    "webhook_restorable": true
+  },
+  "historical_review": {
+    "assistant_foundation": {
+      "original_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/whatsapp-gate-audit-foundation-20261015T2337Z.json",
+      "original_sha256": "fb152224e40aa00cc737bf80160c9a7165b4339f5c3ce4d1f182974f08f64ba4",
+      "original_integrity": true,
+      "current_scoped_hashes": {
+        "modules/telchi/assistant/capabilities.py": "08013cc0a0784ff8a0083f36c870508d0ab9b0ebbe180212564a4bc0bc3f9c0a",
+        "modules/telchi/datalake/messaging_sales_query.py": "f90d46678389d0d23a5d20879a8f058f875c95ec9c1bb34676639aa3cf084898",
+        "modules/telchi/datalake/foundation_reader.py": "9f68b985ce73c4cd8bcbd502c9471e5b1284c946aefa63ec9078bb7af94cedb4",
+        "modules/telchi/datalake/foundation_publication.py": "3d7cc3034b0524d683a9f415aadde0f34ac684d2d518621242052f6ef48a7661"
+      },
+      "scoped_files_unchanged_since_prior_review": true,
+      "historical_approval_matches": true,
+      "applicability": "HISTORICAL_EVIDENCE_INTACT; CROSS_VERSION_PARITY_NOT_PROVEN",
+      "original_scope": "Approved source_top_items fixed period on real read-only Foundation; 10 rows, publication/snapshot lineage."
+    },
+    "business_authorization": {
+      "original_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/negative-gates-20261015T235435Z/negative_gates.json",
+      "original_sha256": "1159cc5211ca06e5e5031b12cb49923a54b400c42fd5ed6121d144cfff394a58",
+      "original_integrity": true,
+      "current_scoped_hashes": {
+        "modules/telchi/assistant/handler.py": "f0d44268aa94d32298c0906b181667d42a7248c0053c3bde11d97bbbb7419d4e",
+        "modules/messaging/handlers.py": "7fea28a5974a5d3025c17730d6dade85616050060da5904d911b22f800908dcd",
+        "modules/telchi/assistant/whatsapp_dev_repository.py": "a75d351d47dc9d148fd15b334b4fe6b8280273681a006cbd18cbffcea86dfa1e"
+      },
+      "scoped_files_unchanged_since_prior_review": true,
+      "historical_approval_matches": true,
+      "applicability": "HISTORICAL_EVIDENCE_INTACT; CROSS_VERSION_PARITY_NOT_PROVEN",
+      "original_scope": "Real active Telchi DEV identity with an effective non-source_quantity permission resolves but is denied by MessageDispatcher/BusinessAuthorization; zero model/capability/Foundation execution."
+    },
+    "durable_idempotency": {
+      "original_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/durable-idempotency-v1-20261015T232924Z/durable_idempotency.json",
+      "original_sha256": "17ab1af880e1c3102117ee5d2fb6e6f8245f396c2f54061762733d7243ef9e02",
+      "original_integrity": true,
+      "current_scoped_hashes": {
+        "modules/messaging/service.py": "85d6d56e45c1cd9dbbcb890c2a3daa165da079bf5da0b204e0c51def25ac338a",
+        "modules/messaging/repository.py": "fdc122579c5a7947feec623919e1b0faafd078144891cabd138dd0830044c3bd",
+        "modules/telchi/assistant/repository.py": "4f67619b45f4920cdc2e24c79dcacc7075a9a7c618e1c130498fe21d9207a523",
+        "modules/db/transaction.py": "a19b79289aee9b1c855583840020039ec0f02666db177d9f561e033e678a0627"
+      },
+      "scoped_files_unchanged_since_prior_review": true,
+      "historical_approval_matches": true,
+      "applicability": "HISTORICAL_EVIDENCE_INTACT; CROSS_VERSION_PARITY_NOT_PROVEN",
+      "original_scope": "Real PostgreSQL Messaging fence; at-most-once handler execution; recording egress double."
+    },
+    "identity_tenant_isolation": {
+      "original_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/negative-gates-20261015T235435Z/negative_gates.json",
+      "original_sha256": "1159cc5211ca06e5e5031b12cb49923a54b400c42fd5ed6121d144cfff394a58",
+      "original_integrity": true,
+      "current_scoped_hashes": {
+        "modules/messaging/identity.py": "485f41da43601cd6a1fc26b7adf22e579f94d4d9ae8f049aac4dcc52eb1da572",
+        "modules/messaging/handlers.py": "7fea28a5974a5d3025c17730d6dade85616050060da5904d911b22f800908dcd",
+        "modules/telchi/assistant/whatsapp_dev_repository.py": "a75d351d47dc9d148fd15b334b4fe6b8280273681a006cbd18cbffcea86dfa1e"
+      },
+      "scoped_files_unchanged_since_prior_review": true,
+      "historical_approval_matches": true,
+      "applicability": "HISTORICAL_EVIDENCE_INTACT; CROSS_VERSION_PARITY_NOT_PROVEN",
+      "original_scope": "Real DEV identity in a separate synthetic tenant/workspace resolves in its own scope but is denied on the Telchi channel; cross-scope phone binding rejected by the DB trigger; no tenant/capability contamination."
+    },
+    "model_no_fallback": {
+      "original_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/durable-idempotency-v1-20261015T232924Z/durable_idempotency.json",
+      "original_sha256": "17ab1af880e1c3102117ee5d2fb6e6f8245f396c2f54061762733d7243ef9e02",
+      "original_integrity": true,
+      "current_scoped_hashes": {
+        "modules/telchi/assistant/luna.py": "e3f77ba5c3c55c9a7551325d53e4f16d5f519ef6013b1e5545b7e1567e93f9ec"
+      },
+      "scoped_files_unchanged_since_prior_review": true,
+      "historical_approval_matches": true,
+      "applicability": "HISTORICAL_EVIDENCE_INTACT; CROSS_VERSION_PARITY_NOT_PROVEN",
+      "original_scope": "Real Luna OpenAI direct credential path; gpt-5.6-luna / medium; no retry, fallback or proxy."
+    }
+  },
+  "code_review": {
+    "identity_tenant_isolation": "PhoneIdentityRepository.resolve scopes provider/environment/tenant/workspace and verifies active user/workspace; check_session independently validates approved live pilot and effective permission.",
+    "business_authorization": "BusinessAuthorization.allowed denies mismatched identity/scope, missing policy permission and absent operation-specific effective grants before capability execution.",
+    "durable_idempotency": "MessagingService commits claim fence before dispatch; duplicate recovery resumes durable delivery intent, never handler execution. Recording egress in historical gate does not certify real delivery.",
+    "assistant_foundation": "SalesCapabilities validates exact fixed period and lineage; messaging_sales_query opens read_only session. Historical publication/snapshot result not rerun or changed.",
+    "model_no_fallback": "LunaInterpreter pins direct OpenAI endpoint/model/medium effort, trust_env=False, no retry/fallback, verifies response model/effort. No provider call repeated.",
+    "limitation": "Current static invariants and unchanged hashes since the post-lifecycle inventory corroborate compatibility, but neither reconstructs the pre-lifecycle source/configuration baseline. Historical aggregate digest differs; mtimes are not historical content proof."
+  },
+  "gate_evidence": "gate_scope_mismatch",
+  "preflight_cli": {
+    "command": "python -m modules.telchi.assistant.whatsapp_dev preflight --approval PRIVATE_APPROVAL",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "BLOCKED: revisar configuraci\u00f3n/evidencia privada y restauraci\u00f3n; sin detalles sensibles."
+  },
+  "blocker": "Missing complete historical per-file/configuration baseline tied to source digest 464554e03705d9e82ed052eb62950450d07495ac3fd75a54f5c7e56cfc8d0141; cannot independently establish applicability of five historical gates to current source 454eddaebef39b836247bd2b167bc533a1bfbb7d0ca62761a2b75a61aa7d352f. Existing manifest is correctly rejected with gate_scope_mismatch.",
+  "minimal_resolution": "Recover the original source snapshot/per-file hashes and effective configuration record tied to the historical gates, then perform scoped comparison/impact attestation. No need to restart Evolution, repeat Luna/Foundation/idempotency/commercial batteries, or change grants/runtime.",
+  "validation": {
+    "historical_manifest_unchanged": true,
+    "approval_unchanged": true,
+    "config_unchanged": true,
+    "source_unchanged": true,
+    "webhook_unchanged": true,
+    "focused_checks": "8 current HTTP cases plus inert container authentication/reachability PASS; DB read-only approved identity/permission and schema checks PASS",
+    "tests_reused": "lifecycle-operational-closure-v1/validation.json: 84 focused tests PASS; source fingerprint identical; no runtime/test changes in this renewal",
+    "git_diff_check": "PASS (executed before final evidence write)",
+    "resource_guard": "BUSY_BUT_SAFE / sequential listeners; no scans, models or browsers",
+    "own_processes_left_running": 0,
+    "unrelated_processes_terminated": 0
+  },
+  "new_manifest_issued": false,
+  "impact": "NONE: only additive evidence under gate-renewal-20261016 and PRIVATE_ROOT; no runtime/config/grants/Foundation/service/Git mutations.",
+  "runner_sha256": {
+    "resume.py": "c50b1a3552090f037b8b4f913ee35ed57ba98a3c541748749f4b9d2462e73b25",
+    "http_probe.py": "508b24a231a9c5eab88b1a4f67b69225a2829abd7f3bc21dc84a3d9fc4175af8",
+    "finalize-resumed.py": "798b0dfbcf666cccc134902c0fb610624d46cd3c453ec76de3ce331c0085bfe1"
+  },
+  "new_files": [
+    "resume.py",
+    "http-result-resumed.json",
+    "resume-review.json",
+    "finalize-resumed.py",
+    "closure-resumed.json"
+  ]
+}

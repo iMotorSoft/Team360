@@ -1,0 +1,82 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "Existing TelchiAI DEV controller adopts the owner-authorized Evolution container and starts conversational V1",
+  "generated_at": "2026-11-03T01:24:44.697078+00:00",
+  "EVOLUTION_ADOPTED": "YES",
+  "TELCHI_CONTROLLER_V1": "PASS",
+  "DURABLE_WORKER": "PASS",
+  "GATES": "VALID",
+  "TELCHIAI": "READY",
+  "READY_FOR_MARIO_DIALOGUE": "YES",
+  "status": {
+    "state": "READY",
+    "session_id": "b8bd137bf150a4f8fc3943d370931d8b",
+    "launcher": "OWNED",
+    "backend": "OWNED",
+    "webhook": "SESSION",
+    "evolution": "READY",
+    "postgresql": "READY",
+    "approval": "VALID",
+    "gates": "VALID",
+    "review_reasons": [],
+    "provider": "BoundEvolutionProvider",
+    "durable_worker": "PASS"
+  },
+  "runtime_attestation": {
+    "pid": 153593,
+    "database_role": "t360devv1_runtime",
+    "provider": "BoundEvolutionProvider",
+    "admission_open": true,
+    "callback_started": true,
+    "durable_worker_running": true,
+    "telchi_handler_registered": true,
+    "source_sha256": "d1a74b21df8c4986d2cfd52cf576c3bdef5f87e37369059e0fbd5ec72d44ac10",
+    "configuration_sha256": "812509adb4ab97492aae8d60f0a9c39bda1a3bf2e7c3fff53e0ad42788814846"
+  },
+  "adoption_receipt": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/evolution-dev-v1/adoption-9eefb32ec5d38b7f.json",
+  "source_sha256": "d1a74b21df8c4986d2cfd52cf576c3bdef5f87e37369059e0fbd5ec72d44ac10",
+  "configuration_sha256": "812509adb4ab97492aae8d60f0a9c39bda1a3bf2e7c3fff53e0ad42788814846",
+  "modified_files": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/whatsapp_dev.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/whatsapp_dev_lifecycle.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/transport_dev.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_controller_v1.py",
+    "data/reports/messaging/binding-activation-dev-20261023/reaccredit_v1.py",
+    "data/reports/telchi/six-gates-reaccreditation-20261021/reaccredit.py"
+  ],
+  "validations": [
+    {
+      "command": "pytest controller_v1, dev_gate_policy, whatsapp_operational_contract, telchi_transport_dev, messaging_durable_egress, messaging_durable_inbox -q",
+      "result": "67 passed, 16 skipped (opt-in PostgreSQL tests)"
+    },
+    {
+      "command": "existing six-guarantee real reaccreditation runner",
+      "result": "VALID; OpenAI direct gpt-5.6-luna medium, real identity/RBAC/Foundation, no WhatsApp egress; 108 focused tests passed"
+    },
+    {
+      "command": "telchiai-dev.sh stop && telchiai-dev.sh start",
+      "result": "STOPPED with Evolution stopped and ingress closed; READY again on same adopted container"
+    },
+    {
+      "command": "git diff --check; AST parse; final status, digest and runtime attestation readback",
+      "result": "PASS"
+    }
+  ],
+  "root_cause_resolved": "Accreditation runner used legacy 60-second Foundation budget; exact fixed query succeeded in 61.18 seconds. Runner now uses existing V1 durable 180-second capability / 300-second turn budgets; no gate assertion weakened.",
+  "limits": [
+    "WhatsApp dialogue with Mario remains to be tested manually; READY is not delivery E2E PASS",
+    "No Meta/Cloudflare configuration, production, grants, migrations, credentials, UNKNOWN retries, commit or push",
+    "Existing worktree changes preserved; private controller and adoption records updated with backups",
+    "One diagnostic foreground command hit its outer 50-second tool deadline; bounded worker cleanup verified, no functional failure inferred from interruption"
+  ],
+  "HOST_PREFLIGHT": "BUSY_BUT_SAFE: 8 CPUs, load ~1.3, ~8 GiB available, swap stable, high disk wait; one sequential probe, DuckDB threads2, PG max3, no broad parallel suites",
+  "RESOURCE_GUARD": "PASS for completed bounded workloads",
+  "CONCURRENCY_USED": "1 runner; DuckDB threads2; PG max3; two claims of one isolated probe event",
+  "UNRELATED_PROCESSES_TERMINATED": 0,
+  "OWN_PROCESSES_LEFT_RUNNING": 2,
+  "own_processes_intentionally_running": [
+    "verified controller supervisor",
+    "verified backend with durable worker and private callback"
+  ],
+  "adopted_container_intentionally_running": true
+}

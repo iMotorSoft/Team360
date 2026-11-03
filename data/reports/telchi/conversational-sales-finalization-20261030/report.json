@@ -1,0 +1,208 @@
+{
+  "status": "BACKEND_PASS_UI_PENDING",
+  "branch": "feature/console-backend-core",
+  "objective": "September and October conversational consumption of the already published Foundation; no data publication or recapture",
+  "authoritative_conversation": "conversation-accredited-r2.json",
+  "backend_conversation": "PASS: real approved DEV binding, Console effective permissions, MessageDispatcher, TelchiHandler, Luna, capability, canonical FoundationReader and committed PostgreSQL audit; no mocked business ports",
+  "visual_or_channel_e2e": "PENDING: existing TelchiAIHome.svelte is a timer-driven visual prototype with no API call. No browser, listener, AG-UI/SSE or outbound WhatsApp delivery was exercised or claimed.",
+  "cause": {
+    "deadline_owner": "modules.telchi.datalake.sales_query.query_sales: asyncio.wait_for(process.communicate(), 30); SalesCapabilities default worker timeout is 30 seconds",
+    "not_the_cause": "SQL aggregation was 226.177 ms in the baseline; the observed deadline was consumed before business SQL. No evidence attributes the timeout to model inference, HANA or a global host metric.",
+    "measured_bottleneck": "Canonical manifest validation calls validate_transition -> append_proof -> typed Reference row comparison and version_content. The original comparison JSON-serialized and SHA256-hashed every normalized row. Baseline cProfile measured 736113 reference_update.digest calls and 8396580 typed-cell conversions; original projected comparison cumulative time 38.187 s under profiler.",
+    "fix": "Compare exact typed row multisets using Counter of tuples, retaining duplicate multiplicity, nulls, schema order, decimal and timezone normalization. Bound local timestamp/decimal memoization to 8192 entries per converter, per comparison. Published fingerprints, full Reference version_content identity, capture receipts, physical hashes, CURRENT and authorization checks remain unchanged.",
+    "secondary_conversational_defects": [
+      "A real October interpretation proposed DIRECT_UNAVAILABLE despite a valid explicit daily cut and an available monetary capability. Clarified partial-period execution and inclusive day-cut semantics in Luna's prompt; no execution barrier was bypassed.",
+      "A later real September interpretation proposed /limit=null and failed the state-engine commit barrier. Clarified the existing non-null integer limit contract, safe resets and a minimal query example; backend rejection remains intact."
+    ]
+  },
+  "timings_seconds": {
+    "baseline_september_worker": {
+      "total": 42.031,
+      "manifest_reference_revalidation": 35.627,
+      "physical_validation": 2.114,
+      "sql_execute_and_fetch": 0.226,
+      "evidence": "before.json and before.jsonl; baseline allowed to finish under a bounded DEV diagnostic supervisor"
+    },
+    "final_september": {
+      "request_dispatch_to_committed_result": 27.499,
+      "initial_authorization": 0.001775,
+      "transaction_authorization": 0.016967,
+      "model_context_preparation": 0.000290,
+      "model_network_response": 6.273111,
+      "interpretation_json_parse": 0.000152,
+      "state_engine": 0.001116,
+      "capability_total": 20.843478,
+      "duckdb_connect": 0.013000,
+      "ducklake_attachment": 0.042220,
+      "current_count": 0.400865,
+      "current_metadata": 0.230778,
+      "publication_metadata": 0.029690,
+      "commit_snapshot_resolution": 0.771481,
+      "manifest_reference_revalidation": 18.571764,
+      "physical_validation": 0.091691,
+      "component_validation": 0.060376,
+      "sql_execution": 0.174813,
+      "fetch": 0.000172,
+      "serialization": 0.000173,
+      "duckdb_close": 0.024950,
+      "response_format": 0.000050,
+      "audit_save": 0.045390
+    },
+    "final_october": {
+      "request_dispatch_to_committed_result": 28.005,
+      "initial_authorization": 0.001801,
+      "transaction_authorization": 0.011218,
+      "model_context_preparation": 0.000253,
+      "model_network_response": 6.990053,
+      "interpretation_json_parse": 0.000084,
+      "state_engine": 0.000972,
+      "capability_total": 20.663779,
+      "manifest_reference_revalidation": 18.410994,
+      "physical_validation": 0.094457,
+      "sql_execution": 0.153199,
+      "fetch": 0.000171,
+      "serialization": 0.000178,
+      "duckdb_close": 0.024735,
+      "response_format": 0.000058,
+      "audit_save": 0.117949
+    },
+    "measurement_limits": "Single-request observations, not a controlled cold-cache benchmark or percentile guarantee. Physical validation/import improvements also reflect cache and host variation; cProfile independently establishes the algorithmic CPU reduction. Spans are nested and must not all be added. Source final conversation contains all recorded monotonic spans and effective worker deadlines. Capability lookup, fixed SQL-plan construction and some surrounding context/persistence overhead are included in parent durations, not isolated into independent spans; instrumentation does not claim fifteen individually isolated stages.",
+    "not_applicable": "No LLM-generated SQL, result-row interpretation by a second model, streaming inference, time-to-first-token, AG-UI/SSE, proxy or browser transport. SQL and response presentation are deterministic. Reference proof is measured within manifest validation; no separately timed Reference CURRENT lookup occurs."
+  },
+  "configuration": {
+    "temporary_dev_probe": "TEAM360_ENV=development; --sales-finalization-dev; total handler deadline 120s, worker 90s, OpenAI HTTP timeout 20s, one model attempt; profiling enabled only in the isolated probe process after existing configuration loading",
+    "diagnostic_offline_supervisor": "120s maximum, terminate followed by a 3s reap grace and kill fallback; baseline completed without timeout",
+    "effective_worker_deadline": "Monotonic worker start plus configured budget, including subprocess startup; exact values retained in each execution_result.worker_lifecycle",
+    "definitive_defaults": "Production/default budgets unchanged: Foundation worker 30s, handler 80s, interpreter HTTP timeout 45s. Permanent changes are the validation optimization, opt-in query profiling, safe worker termination/reaping, prompt corrections and tests.",
+    "resources": "One request and worker at a time; DuckDB 2 threads, 512MB memory_limit, max_temp_directory_size=0B; dedicated probe PostgreSQL pool min=max=1. Python Reference comparison allocations are not covered by DuckDB's memory setting; observed available host memory remained sufficient.",
+    "sap_timeouts_changed": false,
+    "shared_environment_or_services_changed": false
+  },
+  "sql_and_metric": {
+    "query": "WITH invoices AS (SELECT COUNT(*), COUNT(DISTINCT doc_entry), COUNT(doc_total), COALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) FROM canonical_sales_document WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?), credits AS (same aggregation FROM canonical_credit_memo_document with the same predicates) SELECT invoice counts/amount, credit counts/amount, invoice amount minus credit amount FROM invoices CROSS JOIN credits",
+    "exact_executed_sql": "Each turn's audit.execution_result.sql in conversation-accredited-r2.json contains the full actual SQL and canonical manifest-resolved Parquet relations; sql_parameters contains exact bound parameters.",
+    "parameters": {
+      "september": ["SAP_B1_HANA", "N", "BS", "2026-09-01", "2026-10-01"],
+      "october": ["SAP_B1_HANA", "N", "BS", "2026-10-01", "2026-10-30"],
+      "binding": "Each five-value group is bound to both invoice and credit predicates."
+    },
+    "metric": "Active OINV DocTotal and active ORIN DocTotal in BS by DocDate; net documentary billing = invoice DocTotal minus credit DocTotal. Not accounting revenue, cash collection, customer balance, commercial-customer classification or branch/accounting allocation.",
+    "response": "Business answer first identifies facturacion registrada and separately neto documental; periods and currency are explicit. No fabricated totals or alternative Parquet copies."
+  },
+  "reconciliation": {
+    "status": "PASS_ZERO_MONETARY_TOLERANCE",
+    "verification": "Decimal equality asserted from actual final conversational execution_result for all three amounts, one successful capability call per question, business_rbac_verified=true and exact publication/snapshot checks",
+    "september": {
+      "period": "2026-09-01 through 2026-09-30 inclusive",
+      "active_invoice_total_bs": "11079079.77",
+      "active_credit_total_bs": "488033.53",
+      "net_documentary_bs": "10591046.24",
+      "matched_invoice_rows": 36542,
+      "matched_credit_rows": 280,
+      "serialized_worker_response_bytes": 4559,
+      "model_response_bytes": 8318
+    },
+    "october": {
+      "period": "2026-10-01 through 2026-10-29 inclusive; not a full October month",
+      "active_invoice_total_bs": "11269116.22",
+      "active_credit_total_bs": "457793.30",
+      "net_documentary_bs": "10811322.92",
+      "matched_invoice_rows": 38548,
+      "matched_credit_rows": 264,
+      "serialized_worker_response_bytes": 4559,
+      "model_response_bytes": 9684
+    },
+    "row_count_scope": "Counts are matched active documentary rows from the aggregate, not a claim about every Parquet row physically scanned. Each query returns one aggregate row. Physical I/O bytes were not measured."
+  },
+  "identity": {
+    "foundation": "foundation_38680850adc058b1bb11887632b7b681",
+    "reference": "v2_sales_e02883116f4b4991c396010a",
+    "snapshot": 1408,
+    "reader": "PASS canonical live FoundationReader, full manifest/Reference proof and physical file validation; no injected snapshot or reader mock. Reference identity is the existing publication's sealed manifest binding, validated by the reader.",
+    "capability": "PASS sales.period_billed_amount.v1 via SalesCapabilities for sales.net_amount",
+    "current_modified": false,
+    "reference_modified": false
+  },
+  "permissions": {
+    "positive": "PASS actual existing owner-approved DEV phone binding and Console effective permission telchi.sales.period_billed_amount.read.v1, revalidated inside the persisted conversational turn",
+    "negative_and_isolation": "PASS offline pilot/access/safety/monetary fences, foreign tenant/workspace and missing-grant regressions. No second real actor was impersonated; no live second-tenant evidence is claimed.",
+    "users_created": 0,
+    "grants_changed": 0,
+    "credentials_changed": 0
+  },
+  "cancellation_and_cleanup": {
+    "implementation": "On worker timeout or caller cancellation, send SIGTERM; Python worker raises InterruptedError to unwind its context and close DuckDB. Wait at most 2s, then kill/reap only that child if a native call cannot cooperate. Async lock releases in all tested paths.",
+    "tests": "Two real subprocess tests PASS: request timeout and caller cancellation. Both verify finally cleanup marker, reaped child and released lock. Workloads are synthetic and do not stand in for business validation.",
+    "final_live_requests": "canceled=false and worker_reaped=true for both; DuckDB close spans present; probe pool closed in finally. PostgreSQL audits committed before responses returned.",
+    "remaining_own_processes": 0,
+    "unrelated_processes_terminated": 0
+  },
+  "validation": {
+    "expanded": "720 passed / 4 skipped, regression-final.xml and regression-final.log; entire assistant plus affected Reference projection/release and promoted binding tests. This preceded the final prompt/metadata additions, whose affected tests were re-run below.",
+    "final_focused": "209 passed / 2 skipped on final source, final-focused.xml; includes interpretation, delivery reliability, daily cut, monetary permissions, pilot access, safety, cooperative subprocess cancellation, legacy replay and projection equivalence",
+    "historical_replay_fix": "36 expanded-suite failures were immutable old-publication fixtures validated against the new runtime binding. Test-only monkeypatches now replay the ORIGINAL publication identity, first proving CURRENT rejects old payloads. Historical JSON and production validators were not changed. 53 focused tests passed after correction, then expanded suite passed.",
+    "lat_check": "PASS; lat-check.log. Existing warnings: no LAT init version and no semantic-search LLM key. No Markdown created or modified.",
+    "git_diff_check": "PASS",
+    "final_source_review": "Reviewed worker lifecycle, exact projection comparison, request instrumentation, prompt changes and DEV harness. Preexisting work preserved; no Git index/ref operations.",
+    "incomplete_or_failed_attempts_not_counted_as_pass": [
+      "Initial diagnostic module launch used __main__ instead of its module path and exited before querying; corrected, lifecycle evidence retained.",
+      "One pytest invocation named a nonexistent test_sales_query.py path; no tests ran; corrected paths passed.",
+      "Initial async cancellation tests used unavailable pytest-asyncio; converted to the repository's asyncio.run pattern; two real subprocess tests then passed.",
+      "Combined assistant + larger reader/transition regression exceeded tool harness 240s; incomplete result not counted. A completed narrower expanded suite subsequently passed. No host-resource cause inferred from that timeout.",
+      "Intermediate real conversation had an October DIRECT_UNAVAILABLE; conversation-final.json preserves it. Prompt corrected, later both questions passed.",
+      "A later original vague model preflight failed its expected period-clarification assertion before business requests. DEV preflight now explicitly states that the period is missing; same assertion retained.",
+      "Intermediate real September proposal had /limit=null, failed commit, and invoked zero capability calls; conversation-accredited.json preserves it. Existing slot contract clarified, final two-query conversation passed."
+    ]
+  },
+  "files_modified": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_query.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_reference_release.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_reference_projection.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_business_close.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/profile_sales_worker.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_sales_worker_lifecycle.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_sales_finalization_contract.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_conversational_quality.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_product_context_invalidation.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_persisted_product_context_recovery.py",
+    "data/reports/telchi/conversational-sales-finalization-20261030/"
+  ],
+  "cross_cutting_impact": "Only Telchi consumers of canonical Reference append validation, Telchi sales worker/handler/interpreter and their tests. Additional files beyond the small fix implement the requested timing, bounded DEV probes, cancellation evidence and immutable historical replay compatibility. No shared Messaging, Console, frontend, GLOBAL or production-protected code edited.",
+  "restrictions": {
+    "sap_hana_queries": 0,
+    "recapture": false,
+    "publication_repeated": false,
+    "atomic_modified": false,
+    "scheduler_activated": false,
+    "shared_service_restarts": 0,
+    "commits": 0,
+    "pushes": 0,
+    "whatsapp_sent": 0,
+    "source_loaded_into_existing_services": false
+  },
+  "host": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE for bounded sequential work; no heavy concurrent scans started",
+    "RESOURCE_GUARD": "PASS bounded task workloads and cleanup; no claim that unrelated global I/O pressure was resolved",
+    "CONCURRENCY_USED": {"pytest_workers": 1, "live_requests": 1, "duckdb_threads": 2, "probe_pool_connections": 1, "browsers": 0},
+    "initial_mem_available_mb": 6546,
+    "final_mem_available_mb": 6207,
+    "initial_swap_used_mb": 2438,
+    "final_swap_used_mb": 2688,
+    "final_load_1m": 1.34,
+    "ENVIRONMENTAL_ABORTS": 1,
+    "environmental_abort_detail": "Combined regression harness deadline at 240s, not proof of a host-pressure cause or business-query failure; not counted as PASS",
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "UNRELATED_PROCESSES_TERMINATED": 0
+  },
+  "risks": [
+    "UI and actual WhatsApp transport remain unaccredited. Existing visual prototype has no backend integration; no AG-UI/SSE completion or delivery claim.",
+    "Interpreter proposals remain stochastic. Observed false-unavailable and invalid-null proposals were corrected in prompt and final real queries passed; this is not a zero-error-rate guarantee.",
+    "Reference revalidation still costs about 18.4-18.6 seconds on final observations. Default 30s worker may remain sensitive to colder caches or host contention; only the opt-in DEV probe uses 90s, never an automatic production increase.",
+    "Other independently pinned analytical families and production/channel change-based admission evidence are not reaccredited by this sales-total task.",
+    "Source fixes were not loaded into any already-running shared service. Human/channel login, browser integration and sender delivery were not tested.",
+    "Answers conservatively retain the existing historical-completeness disclaimer; October is explicitly cut at 29 October and documentary net is not accounting revenue."
+  ],
+  "next_action": "Connect the existing TelchiAI visual composer to an authenticated backend turn endpoint using the same dispatcher/handler and authorized DEV identity, then run browser E2E for these two exact questions and verify response/stream completion. Preserve current backend evidence; do not republish Foundation or alter permissions. Coordinate frontend ownership before editing its preexisting concurrent prototype."
+}

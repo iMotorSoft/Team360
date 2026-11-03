@@ -1,0 +1,52 @@
+{
+  "branch": "feature/console-backend-core",
+  "DEV_GATE_POLICY": "CHANGE_BASED",
+  "FOUR_HOUR_EXPIRATION": "REMOVED",
+  "SIX_GATES": "VALID",
+  "CURRENT_FINGERPRINT": "VALID",
+  "source_sha256": "39e15df1240d2d3f4cb9708e92c59a2dcbe32864e9b1c7a855df23f47ed5e66a",
+  "DYNAMIC_RBAC": "PASS",
+  "REVOCATION": "PASS",
+  "PRODUCTION_UNCHANGED": "YES",
+  "PREFLIGHT": "PASS",
+  "TESTS": "191 passed in 15.53s",
+  "READY_FOR_MANUAL_START": "YES",
+  "changed_files": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/whatsapp_dev.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/WHATSAPP_DEV.md",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_whatsapp_dev.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_dev_gate_policy.py",
+    "data/reports/telchi/dev-gate-policy-v1/migrate.py",
+    "data/reports/telchi/dev-gate-policy-v1/result.json"
+  ],
+  "private_evidence": "PRIVATE_ROOT/dev-gate-policy-transition/",
+  "private_manifest": "PRIVATE_ROOT/whatsapp-dev-gates.json",
+  "migration": {
+    "old_source_and_approval_fingerprints_verified_before_edits": true,
+    "all_six_original_artifact_hashes_verified": true,
+    "real_artifact_configuration_matches_unchanged_operator_config": true,
+    "original_evidence_and_dates_preserved": true,
+    "prior_manifest_backup": "PRIVATE_ROOT/dev-gate-policy-transition/manifest-before.json",
+    "focused_revalidation": "Admission policy, invalidation, environment separation, lifecycle and dynamic access contracts; real read-only DB/Evolution preflight before and after publication",
+    "publication": "Existing atomic lifecycle writer, fsync and private 0600 file",
+    "new_runtime_or_commercial_implementation": false
+  },
+  "validation_notes": [
+    "First expanded run: 190 PASS, 1 fixture failure because inherited umask 077 masked deliberately insecure directory permissions. Corrected test subprocess umask to 022; operational evidence remains 0600 and directories 0700. Both logs preserved.",
+    "191 final tests are offline contracts; original genuine operational evidence is reused only because runtime implementations, approval and operator configuration remain unchanged.",
+    "Production legacy expiry remains enforced; DEV v2 manifests rejected in production and unknown environments.",
+    "Existing runtime identity, binding, live per-capability RBAC, Foundation authorization and model response/fallback checks remain mandatory.",
+    "Read-only preflight does not claim a fresh provider request, WhatsApp delivery or live commercial conversation.",
+    "Manual bounded process duration is independent of technical gate accreditation and was not changed."
+  ],
+  "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+  "CONCURRENCY_USED": "One sequential test runner, no browser or service workers",
+  "UNRELATED_PROCESSES_TERMINATED": 0,
+  "OWN_PROCESSES_LEFT_RUNNING": 0,
+  "services_started_or_stopped": 0,
+  "whatsapp_sent": 0,
+  "grants_changed": 0,
+  "foundation_changes": 0,
+  "commits_or_pushes": 0,
+  "next_manual_test": "Productos de la factura 260192728, tras inicio manual por el operador"
+}

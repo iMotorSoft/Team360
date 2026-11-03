@@ -1,0 +1,23 @@
+{
+  "source_event_id": "9b94fd95-e276-4127-ae63-c7a653a4ca26",
+  "source_thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+  "question": "dame los 5 mas vendidos por precio de venta de los productos terminados",
+  "previous_state": {
+    "limit": 10, "metric": "sales.net_amount",
+    "period": {"start": "2026-09-01", "end_exclusive": "2026-10-01"},
+    "pending": null, "branches": [], "reference": null, "comparison": null,
+    "sales_channel": null, "entity_mention": {"text": "LAB_FINISHED_PRODUCT", "type": null},
+    "schema_version": 2, "product_context": null, "requested_metrics": ["sales.net_amount"],
+    "temporal_reference": null, "product_search_text": null, "selected_item_codes": []
+  },
+  "proposal": {
+    "action": "DIRECT_UNAVAILABLE", "intent": "NEW_QUERY",
+    "state_delta": {
+      "set": {"/limit": 5, "/metric": "sales.net_amount",
+        "/period": {"start": "2026-09-01", "end_exclusive": "2026-10-01"},
+        "/entity_mention": {"text": "LAB_FINISHED_PRODUCT", "type": null},
+        "/schema_version": 2, "/requested_metrics": ["sales.net_amount"], "/temporal_reference": null},
+      "unset": ["/comparison", "/reference", "/product_search_text", "/selected_item_codes"]
+    }, "clarification": null
+  }
+}

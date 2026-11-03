@@ -1,0 +1,20 @@
+{
+  "gate": "TEAM360_MESSAGING_TELCHI_DATALAKE_SQL_LATENCY_V1",
+  "status": "BLOCKED",
+  "branch": "feature/console-backend-core",
+  "target": 10,
+  "supervisor_pid": 33386,
+  "runtime_expiry": null,
+  "no_restart_during_measurement": true,
+  "no_llm": true,
+  "host_preflight": "SAFE",
+  "sql_threads": 2,
+  "human_concurrency": 1,
+  "prior_verification_sha256": "db82fdb71cf6dcedc4bd4919dfa1a5febd00d54828735acccab07991e13ed5b7",
+  "limits": [
+    "SQL session preflight executes the same query before traffic; message 1 is potential runtime cold start, not untouched Data Lake/cache.",
+    "Each SQL call creates a fresh bounded worker and read-only attachment; SQL connection/modules are not retained between messages.",
+    "Milvus/LiteLLM already run on shared host; neither is started, stopped or used by this session."
+  ],
+  "error_class": "CalledProcessError"
+}

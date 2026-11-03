@@ -58,6 +58,14 @@ Ejemplos actuales, sin constituir aun un inventario machine-readable exhaustivo:
 
 Si necesita cambiar `GLOBAL`, el agente se detiene antes de editar, informa path, motivo, impacto esperado y modulo solicitante, y pide una ventana GLOBAL exclusiva. Mientras espera puede continuar otra tarea `MODULE_LOCAL`.
 
+GLOBAL es un scope real de coordinación: todos pueden leer, pero solo hay un writer GLOBAL simultáneo. Incluye AGENTS, skill, estado técnico GLOBAL, políticas e índices transversales; no depende del nombre del proceso o herramienta.
+
+La ventana declara propósito y paths. Una ventana documental no autoriza modificar bootstrap, registry, launchers, dependencias, lifecycle, infraestructura, Git ni producción. No se necesita un sistema complejo de locks: asignación explícita y coordinación bastan.
+
+Los agentes locales pueden continuar mientras no cambien condiciones GLOBAL. Si necesitan hacerlo, detienen esa parte y coordinan ownership, sin bloquear todo su trabajo local.
+
+Con autorización explícita para reconciliar documentos modificados, inspeccionar primero sus diffs y preservar trabajo preexistente. No exigir worktree limpio ni inferir ownership GLOBAL de procesos `pi`, `opencode` u otros activos.
+
 ### PRODUCTION_PROTECTED
 
 `PRODUCTION_PROTECTED` es un overlay y no una categoria excluyente. Un mismo path puede ser `GLOBAL + PRODUCTION_PROTECTED` o `SHARED + PRODUCTION_PROTECTED`; siempre prevalece la restriccion mayor.
@@ -119,7 +127,7 @@ ROUTE_HANDLERS = (
 
 El alta inicial del modulo requiere un cambio GLOBAL coordinado en `module_registry.py`. Despues, nuevas APIs se agregan a su `routes.py` `MODULE_LOCAL` sin modificar el entrypoint ni el registry por cada endpoint.
 
-El registry esta implementado y Flow esta registrado una sola vez. Su export `ROUTE_HANDLERS` permanece vacio mientras el modulo no exponga APIs HTTP; las futuras rutas de Flow se agregan dentro de su scope `MODULE_LOCAL` sin nuevas modificaciones del registry.
+El registry está implementado y Flow expone APIs desde `ROUTE_HANDLERS` en `routes.py`, registrado una sola vez. Nuevas rutas se agregan dentro de su scope `MODULE_LOCAL`; el inventario y estado vigente se consultan en el [tablero técnico GLOBAL](../SrvRestAstroLS_v1/docs/status_actual.md).
 
 ## Salida de scope
 
@@ -341,7 +349,7 @@ Próximo paso:
 
 ## Regla contra fragmentación
 
-No asumir que el contexto de una rama representa todo Team360.
+No asumir que el contexto de una rama representa todo Team360. El único estado técnico GLOBAL vigente es [status_actual.md](../SrvRestAstroLS_v1/docs/status_actual.md); LAT conserva reglas, no otra bitácora global.
 
 Antes de tomar decisiones amplias, revisar:
 

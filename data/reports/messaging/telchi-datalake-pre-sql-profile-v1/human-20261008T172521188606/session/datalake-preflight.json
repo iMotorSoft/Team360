@@ -1,0 +1,233 @@
+{
+  "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+  "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+  "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+  "period_from": "2026-01-01",
+  "period_to_exclusive": "2026-09-16",
+  "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "ducklake_snapshot_id": 1408,
+  "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+  "read_only": true,
+  "sap_accessed": false,
+  "sql_started_ms": 1791480350902.925,
+  "sql_finished_ms": 1791480353313.0051,
+  "sql_duration_ms": 2410.076927000773,
+  "foundation_resolution_ms": 6670.304,
+  "row_count": 10,
+  "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+  "rows": [
+    {
+      "item_code": "L00505",
+      "lines": 11782,
+      "quantity": "557199.0000000000",
+      "line_total": "759383.9500000000"
+    },
+    {
+      "item_code": "L02467",
+      "lines": 2,
+      "quantity": "200000.0000000000",
+      "line_total": "18280.0000000000"
+    },
+    {
+      "item_code": "M05970",
+      "lines": 928,
+      "quantity": "133931.0000000000",
+      "line_total": "37813.6100000000"
+    },
+    {
+      "item_code": "L01698",
+      "lines": 3354,
+      "quantity": "116567.0000000000",
+      "line_total": "290330.7200000000"
+    },
+    {
+      "item_code": "L01003",
+      "lines": 2324,
+      "quantity": "115269.0000000000",
+      "line_total": "351977.4200000000"
+    },
+    {
+      "item_code": "L01613",
+      "lines": 5808,
+      "quantity": "108791.0000000000",
+      "line_total": "1142555.8000000000"
+    },
+    {
+      "item_code": "L02837",
+      "lines": 5244,
+      "quantity": "101919.0000000000",
+      "line_total": "378595.4600000000"
+    },
+    {
+      "item_code": "L00003",
+      "lines": 2373,
+      "quantity": "98511.0000000000",
+      "line_total": "214459.6200000000"
+    },
+    {
+      "item_code": "M05239",
+      "lines": 715,
+      "quantity": "94065.0000000000",
+      "line_total": "17451.0600000000"
+    },
+    {
+      "item_code": "M05486",
+      "lines": 340,
+      "quantity": "93144.0000000000",
+      "line_total": "20928.7800000000"
+    }
+  ],
+  "profile": {
+    "schema": "telchi-pre-sql-profile-v1",
+    "clock": "perf_counter_ns",
+    "spans": [
+      {
+        "label": "capability_imports",
+        "start_ms": 0.014857,
+        "end_ms": 18.404116,
+        "duration_ms": 18.389259
+      },
+      {
+        "label": "private_config_read",
+        "start_ms": 18.458911,
+        "end_ms": 18.678559,
+        "duration_ms": 0.219648
+      },
+      {
+        "label": "connector_configuration",
+        "start_ms": 18.416241,
+        "end_ms": 18.94315,
+        "duration_ms": 0.526909
+      },
+      {
+        "label": "duckdb_import",
+        "start_ms": 18.953101,
+        "end_ms": 221.721583,
+        "duration_ms": 202.768482
+      },
+      {
+        "label": "duckdb_connect",
+        "start_ms": 221.829038,
+        "end_ms": 240.711739,
+        "duration_ms": 18.882701
+      },
+      {
+        "label": "load_ducklake",
+        "start_ms": 240.741657,
+        "end_ms": 301.494235,
+        "duration_ms": 60.752578
+      },
+      {
+        "label": "load_postgres",
+        "start_ms": 301.518414,
+        "end_ms": 360.10203,
+        "duration_ms": 58.583616
+      },
+      {
+        "label": "attachment_open_including_catalog_session",
+        "start_ms": 360.256478,
+        "end_ms": 1109.445131,
+        "duration_ms": 749.188653
+      },
+      {
+        "label": "query_budget_setup",
+        "start_ms": 1109.471807,
+        "end_ms": 1110.529728,
+        "duration_ms": 1.057921
+      },
+      {
+        "label": "read_only_verification",
+        "start_ms": 1110.541367,
+        "end_ms": 1111.145013,
+        "duration_ms": 0.603646
+      },
+      {
+        "label": "foundation_current_count",
+        "start_ms": 1111.1832,
+        "end_ms": 6175.541003,
+        "duration_ms": 5064.357803
+      },
+      {
+        "label": "foundation_current_metadata",
+        "start_ms": 6175.591678,
+        "end_ms": 6519.508772,
+        "duration_ms": 343.917094
+      },
+      {
+        "label": "foundation_publication_get",
+        "start_ms": 6519.523439,
+        "end_ms": 6549.097684,
+        "duration_ms": 29.574245
+      },
+      {
+        "label": "foundation_manifest_validation",
+        "start_ms": 6549.112579,
+        "end_ms": 6549.12286,
+        "duration_ms": 0.010281
+      },
+      {
+        "label": "foundation_commit_snapshot_resolution",
+        "start_ms": 6549.128482,
+        "end_ms": 7663.287635,
+        "duration_ms": 1114.159153
+      },
+      {
+        "label": "foundation_component_verification",
+        "start_ms": 7663.311018,
+        "end_ms": 7781.370976,
+        "duration_ms": 118.059958
+      },
+      {
+        "label": "foundation_resolution",
+        "start_ms": 1111.159003,
+        "end_ms": 7781.488139,
+        "duration_ms": 6670.329136
+      },
+      {
+        "label": "query_preparation",
+        "start_ms": 7781.498264,
+        "end_ms": 7781.513896,
+        "duration_ms": 0.015632
+      },
+      {
+        "label": "duckdb_sql_execute",
+        "start_ms": 7781.521468,
+        "end_ms": 10190.248343,
+        "duration_ms": 2408.726875
+      },
+      {
+        "label": "fetch",
+        "start_ms": 10190.277272,
+        "end_ms": 10191.586858,
+        "duration_ms": 1.309586
+      },
+      {
+        "label": "materialization",
+        "start_ms": 10191.602903,
+        "end_ms": 10191.617428,
+        "duration_ms": 0.014525
+      },
+      {
+        "label": "attachment_connection_close",
+        "start_ms": 10191.623995,
+        "end_ms": 10200.816362,
+        "duration_ms": 9.192367
+      },
+      {
+        "label": "result_hash",
+        "start_ms": 10200.856816,
+        "end_ms": 10200.925969,
+        "duration_ms": 0.069153
+      }
+    ],
+    "total_ms": 10201.000592,
+    "parent": {
+      "spawn_ms": 2.324595,
+      "worker_entry_ms": 81.55685,
+      "total_ms": 10364.565214,
+      "ipc_exit_decode_residual_ms": 82.00777199999902,
+      "ipc": "stdout JSON, communicate waits for exit",
+      "worker_pid": 70315
+    }
+  }
+}

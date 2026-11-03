@@ -1,0 +1,11 @@
+﻿turn_id,conversation_id,turn_index,grupo,mensaje_original,contexto_anterior,accion_esperada,independencia_actual,resumen_requisitos,decision_caso,observaciones_caso
+S01_1,S01,1,simple,Ventas de mayo de 2026,,EXECUTE,MODEL_ASSISTED_PROVISIONAL,S01_1.metric | S01_1.time,,
+S02_1,S02,1,simple,Dame las últimas 10 ventas registradas,,EXECUTE,MODEL_ASSISTED_PROVISIONAL,S02_1.metric | S02_1.limit,,
+S03_1,S03,1,simple,¿Cuál es el último mes con ventas registradas?,,EXECUTE,MODEL_ASSISTED_PROVISIONAL,S03_1.metric | S03_1.gran | S03_1.ref,,
+S04_1,S04,1,simple,Buscá Citrato de magnesio,,EXECUTE,MODEL_ASSISTED_PROVISIONAL,S04_1.metric | S04_1.product,,
+S05_1,S05,1,simple,Ventas de mayo de 2026,,EXECUTE,MODEL_ASSISTED_PROVISIONAL,S05_1.metric | S05_1.time,,
+S05_2,S05,2,simple,¿Y el mes anterior?,Ventas de mayo de 2026,EXECUTE,MODEL_ASSISTED_PROVISIONAL,S05_2.time,,
+S06_1,S06,1,simple,Quiero importes y cantidades,,ASK,MODEL_ASSISTED_PROVISIONAL,S06_1.importes | S06_1.cantidades,,
+S06_2,S06,2,simple,mayo de 2026,Quiero importes y cantidades,EXECUTE,MODEL_ASSISTED_PROVISIONAL,S06_2.time | S06_2.inherited,,
+ABRAHAM_001,ABRAHAM_001,1,abraham,"¿Cuántos clientes tenemos en horizontal, principalmente las farmacias, y cuánto se les vende por mes?",,ASK,MODEL_ASSISTED_PROVISIONAL,ABRAHAM_001.customers | ABRAHAM_001.sales | ABRAHAM_001.channel | ABRAHAM_001.pharmacies | ABRAHAM_001.monthly | ABRAHAM_001.ambiguity,,
+ABRAHAM_002,ABRAHAM_002,1,abraham,"Venta de Citrato de magnesio en la paz y cochabamba, en la paz distribucion propia y en conchabamba lo hace L&S",,ASK,MODEL_ASSISTED_PROVISIONAL,ABRAHAM_002.geo_lp | ABRAHAM_002.geo_cbba | ABRAHAM_002.rel_lp | ABRAHAM_002.rel_cbba,,

@@ -1,0 +1,1097 @@
+{
+  "scope": "Independent readback from committed PostgreSQL; compare actual results with exact independent immutable-source controls",
+  "turns": [
+    {
+      "question": "¿Cuánto stock tenemos del producto con código SAP E00003 por depósito?",
+      "classification": "DIRECT_AVAILABLE",
+      "metric": "inventory.stock_by_warehouse",
+      "capability": "inventory.stock_by_warehouse.v1",
+      "permission": "telchi.inventory.stock_by_warehouse.read.v1",
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "event_id": "2bc4ef60-d1ff-48e9-be1a-317bf9e5c0ba",
+      "thread_id": "af84f351-74ae-4ce2-a446-686eac68ba3a",
+      "committed_pg_audit_exact": true,
+      "thread_state_present": true,
+      "source": {
+        "datasets": {
+          "inventory_balance": "oitw_26775585ee26d41a5d5532d3"
+        },
+        "updated_at": "2026-11-01T17:50:16.749000+00:00",
+        "snapshot_id": 1408,
+        "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+        "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+      },
+      "coverage": {
+        "kind": "STOCK_SNAPSHOT",
+        "source_as_of": "2026-11-01T17:43:38.461000+00:00",
+        "source_scope": {
+          "kind": "CURRENT_STOCK_STATEMENT_SNAPSHOT",
+          "branch": "ONLY_ACCREDITED_REFERENCE_CROSSWALKS",
+          "limitation": "SAP statement observation; not simultaneous with other domains",
+          "history_rebuilt": false
+        },
+        "absence_is_zero": false,
+        "requested_period": {},
+        "observation_started_at": "2026-11-01T17:43:38.461000",
+        "observation_finished_at": "2026-11-01T17:46:05.375000",
+        "complete_business_history": false
+      },
+      "summary": null,
+      "controls": {
+        "unknown_unit_positions": 0
+      },
+      "result_rows": [
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "01",
+          "on_hand_qty": "0E-12",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "0E-12",
+          "committed_qty": "0E-12"
+        },
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "2A-AMD",
+          "on_hand_qty": "0E-12",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "-2.000000000000",
+          "committed_qty": "2.000000000000"
+        },
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "2A-AMK",
+          "on_hand_qty": "0E-12",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "0E-12",
+          "committed_qty": "0E-12"
+        },
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "2A-DEV",
+          "on_hand_qty": "0E-12",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "0E-12",
+          "committed_qty": "0E-12"
+        },
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "2A-EXT",
+          "on_hand_qty": "0E-12",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "0E-12",
+          "committed_qty": "0E-12"
+        },
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "2A-KIT",
+          "on_hand_qty": "0E-12",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "0E-12",
+          "committed_qty": "0E-12"
+        },
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "2A-MAG",
+          "on_hand_qty": "0E-12",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "0E-12",
+          "committed_qty": "0E-12"
+        },
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "2A-MEI",
+          "on_hand_qty": "0E-12",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "0E-12",
+          "committed_qty": "0E-12"
+        },
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "2A-MKT",
+          "on_hand_qty": "0E-12",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "0E-12",
+          "committed_qty": "0E-12"
+        },
+        {
+          "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "item_code": "E00003",
+          "warehouse": "2A-SAL",
+          "on_hand_qty": "14.000000000000",
+          "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "available_qty": "14.000000000000",
+          "committed_qty": "0E-12"
+        }
+      ],
+      "total_rows": 73,
+      "omitted_rows": 63,
+      "sql_evidence": [
+        {
+          "sql": "CREATE OR REPLACE TEMP VIEW op_stock AS SELECT * FROM (SELECT s.source_system,s.item_code,s.whs_code AS warehouse,p.inventory_uom_id,try_cast(s.on_hand AS DECIMAL(38,12)) AS on_hand_qty,try_cast(s.is_commited AS DECIMAL(38,12)) AS committed_qty,try_cast(s.on_hand AS DECIMAL(38,12))-try_cast(s.is_commited AS DECIMAL(38,12)) AS available_qty,s.source_as_of AS stock_as_of FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/full-foundation-facts-succession-v1/stock-v1/inventory_balance.parquet')) s LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_sales_448ae93a960bf7342564a2d0/products/part-00000.parquet') p ON (p.source_system=s.source_system OR (p.source_system='SAP_HANA' AND s.source_system='SAP_B1_HANA')) AND p.item_code=s.item_code)",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT item_code,warehouse,inventory_uom_id AS unit,\n            on_hand_qty,committed_qty,available_qty,stock_as_of\n            FROM op_stock WHERE item_code=? ORDER BY warehouse",
+          "parameters": [
+            "E00003"
+          ]
+        }
+      ],
+      "response": "Stock observado por depósito:\nE00003 · depósito 01: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMD: existencia 0E-12, comprometido 2.000000000000, disponible -2.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMK: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-DEV: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-EXT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-KIT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MAG: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MEI: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MKT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-SAL: existencia 14.000000000000, comprometido 0E-12, disponible 14.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nObservación fuente: 2026-11-01T17:43:38.461000 a 2026-11-01T17:46:05.375000.\nControles: unknown_unit_positions=0\nMostradas 10 de 73 filas; 63 omitidas del mensaje. No es un ranking global entre unidades.\nDepósitos no son sucursales. Disponible = existencia menos comprometido; pedidos de compra no incluidos.\nUnidades desconocidas no se infieren ni se suman. Posiciones ausentes no acreditan stock cero.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "independent_control": {
+        "positions": 73,
+        "presented_native_quantities_exact": true,
+        "omitted_positions": 23
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 70704.58035200136,
+      "reader_timings": {
+        "serialization_ms": 0.19227399934607092,
+        "planning_and_sql_ms": 27.901851999558858,
+        "foundation_resolution_ms": 64062.187
+      },
+      "pipeline_timings": {
+        "capability_ms": 64714.3395639996,
+        "state_engine_ms": 0.8987159999378491,
+        "interpretation_ms": 5704.940405999878,
+        "response_format_ms": 0.033427999369450845,
+        "total_processing_ms": 70471.06603700013
+      },
+      "evidence": "../../data/reports/telchi/operational-authorized-e2e-v1/questions-final/luna-1.json"
+    },
+    {
+      "question": "¿Cuántas líneas de consumo de producción registramos en octubre de 2026?",
+      "classification": "DIRECT_AVAILABLE",
+      "metric": "production.consumption",
+      "capability": "production.consumption.v1",
+      "permission": "telchi.production.consumption.read.v1",
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "event_id": "9ab26f4e-c2b3-4d72-b362-348f65ad15e3",
+      "thread_id": "55145303-679f-4a8e-ab23-488e32a74f9a",
+      "committed_pg_audit_exact": true,
+      "thread_state_present": true,
+      "source": {
+        "datasets": {
+          "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+          "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7",
+          "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33"
+        },
+        "updated_at": "2026-11-01T17:50:16.749000+00:00",
+        "snapshot_id": 1408,
+        "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+        "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+      },
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "dataset_rows": 41808,
+        "source_scope": {
+          "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+          "start": "2026-01-01",
+          "limitation": "No claim of modifications outside this business-date scope; no CDC",
+          "end_exclusive": "2026-11-02",
+          "absent_optional_fields": []
+        },
+        "declared_start": "2026-01-01",
+        "absence_is_zero": false,
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "last_observed_date": "2026-10-31 00:00:00",
+        "first_observed_date": "2026-01-05 00:00:00",
+        "declared_end_exclusive": "2026-11-02",
+        "observation_started_at": "2026-11-01T17:46:37.892000",
+        "observation_finished_at": "2026-11-01T17:46:53.281000",
+        "complete_business_history": false,
+        "requested_outside_capture": false
+      },
+      "summary": null,
+      "controls": {
+        "period_source_lines": 4814,
+        "included_issue_lines": 3974,
+        "unknown_native_identity_lines_affected": 0
+      },
+      "result_rows": [
+        {
+          "unit": "BOLSA",
+          "quantity": "641.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L01685",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "BOLSA",
+          "quantity": "30.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M02927",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CAPS",
+          "quantity": "100.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M05939",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CJA",
+          "quantity": "10.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L02331",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CJA",
+          "quantity": "5.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L02322",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CJA",
+          "quantity": "3.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L02157",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CJA",
+          "quantity": "3.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L02227",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "COMP",
+          "quantity": "100.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M02605",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "COMP",
+          "quantity": "100.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M05375",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "COMP",
+          "quantity": "100.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M05847",
+          "issue_lines": 1,
+          "native_factor": "1"
+        }
+      ],
+      "total_rows": 556,
+      "omitted_rows": 546,
+      "sql_evidence": [
+        {
+          "sql": "CREATE OR REPLACE TEMP VIEW op_source AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/production_issue.parquet'))",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT min(\"DocDate\") AS first_observed_date,max(\"DocDate\") AS last_observed_date,count(*) AS dataset_rows FROM op_source",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP TABLE op_period AS SELECT * FROM op_source WHERE \"DocDate\">=? AND \"DocDate\"<?",
+          "parameters": [
+            "2026-10-01",
+            "2026-11-01"
+          ]
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP VIEW op_eligible_groups AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/observed_material_actual_consumption.parquet'))",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP VIEW op_orders AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/production_order.parquet'))",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP TABLE op_consumption AS SELECT I.* FROM op_period I\n                    WHERE I.\"CANCELED\"='N' AND cast(I.\"BaseType\" AS DECIMAL(18,6))=202 ",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT \"ItemCode\" AS item_code,\"unitMsr\" AS unit,\"UomCode\" AS uom_code,\n                    \"NumPerMsr\" AS native_factor,count(*) AS issue_lines,\n                    sum(cast(\"Quantity\" AS DECIMAL(38,12))) AS quantity\n                    FROM op_consumption GROUP BY ALL ORDER BY unit NULLS LAST,uom_code NULLS LAST,native_factor NULLS LAST,quantity DESC,item_code",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT (SELECT count(*) FROM op_period) AS period_source_lines,\n                    count(*) AS included_issue_lines FROM op_consumption",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP TABLE op_unknown(doc_entry BIGINT,line_num BIGINT)",
+          "parameters": []
+        },
+        {
+          "sql": "INSERT INTO op_unknown VALUES (?,?)",
+          "batch": true,
+          "parameters": [
+            [
+              54328,
+              1
+            ],
+            [
+              54406,
+              1
+            ],
+            [
+              54485,
+              1
+            ],
+            [
+              54678,
+              1
+            ],
+            [
+              54777,
+              1
+            ],
+            [
+              54896,
+              1
+            ],
+            [
+              54956,
+              1
+            ],
+            [
+              55152,
+              1
+            ],
+            [
+              55162,
+              1
+            ],
+            [
+              55178,
+              1
+            ],
+            [
+              55327,
+              1
+            ],
+            [
+              55329,
+              1
+            ],
+            [
+              55363,
+              1
+            ],
+            [
+              55565,
+              1
+            ],
+            [
+              55700,
+              1
+            ],
+            [
+              55708,
+              1
+            ],
+            [
+              55820,
+              1
+            ],
+            [
+              55885,
+              1
+            ],
+            [
+              56055,
+              1
+            ],
+            [
+              56191,
+              1
+            ],
+            [
+              56273,
+              1
+            ],
+            [
+              56571,
+              1
+            ],
+            [
+              56608,
+              1
+            ],
+            [
+              56935,
+              1
+            ],
+            [
+              57154,
+              1
+            ],
+            [
+              57206,
+              1
+            ],
+            [
+              57683,
+              1
+            ],
+            [
+              57732,
+              1
+            ],
+            [
+              58052,
+              1
+            ],
+            [
+              58437,
+              1
+            ],
+            [
+              63017,
+              1
+            ]
+          ]
+        },
+        {
+          "sql": "SELECT count(*) FROM op_consumption I\n                    JOIN op_unknown U ON I.\"DocEntry\"=U.doc_entry AND I.\"LineNum\"=U.line_num",
+          "parameters": []
+        }
+      ],
+      "response": "Consumo registrado para producción:\n3.974 líneas de consumo de producción.\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:46:37.892000 a 2026-11-01T17:46:53.281000.\nControles: period_source_lines=4814, included_issue_lines=3974, unknown_native_identity_lines_affected=0\nMostradas 10 de 556 filas; 546 omitidas del mensaje. No es un ranking global entre unidades.\nEmisiones activas BaseType 202; identidad no equivale a materia prima clasificada. Incluye identidades de recursos/desconocidas separadas, sin inferir su naturaleza.\n31 líneas fuente desconocidas se conservan; no hay recepción de producto terminado ni vigencia histórica de BOM.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "independent_control": {
+        "all_groups": 556,
+        "included_lines": 3974,
+        "presented_groups_exact": true,
+        "source_native_decimal_control": true
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 88679.39853600001,
+      "reader_timings": {
+        "serialization_ms": 0.1862030003394466,
+        "planning_and_sql_ms": 92.62474000024667,
+        "foundation_resolution_ms": 79179.276
+      },
+      "pipeline_timings": {
+        "capability_ms": 79916.2996569994,
+        "state_engine_ms": 0.5114989999128738,
+        "interpretation_ms": 8445.693047999157,
+        "response_format_ms": 0.04461599928617943,
+        "total_processing_ms": 88388.48892100032
+      },
+      "evidence": "../../data/reports/telchi/operational-authorized-e2e-v1/questions-final/luna-2-r3.json"
+    },
+    {
+      "question": "¿Cuántas facturas de proveedores activas registramos en octubre de 2026 y cuál es su importe?",
+      "classification": "DIRECT_AVAILABLE",
+      "metric": "purchasing.invoiced_amount",
+      "capability": "purchasing.invoiced_amount.v1",
+      "permission": "telchi.purchasing.invoiced_amount.read.v1",
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "event_id": "77e8d718-61f9-411a-9bf4-2be10fc55067",
+      "thread_id": "95a2044f-c456-42e0-aa2d-e1378f9e7394",
+      "committed_pg_audit_exact": true,
+      "thread_state_present": true,
+      "source": {
+        "datasets": {
+          "ap_invoice": "0999e81c5e1cdf75dea5ba52f75a53f38ab13f334cf7d191b0ded6f654d7a7e7"
+        },
+        "updated_at": "2026-11-01T17:50:16.749000+00:00",
+        "snapshot_id": 1408,
+        "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+        "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+      },
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "dataset_rows": 7190,
+        "source_scope": {
+          "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+          "start": "2026-01-01",
+          "limitation": "No claim of modifications outside this business-date scope; no CDC",
+          "end_exclusive": "2026-11-02",
+          "absent_optional_fields": []
+        },
+        "declared_start": "2026-01-01",
+        "absence_is_zero": false,
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "last_observed_date": "2026-10-31 00:00:00",
+        "first_observed_date": "2026-01-01 00:00:00",
+        "declared_end_exclusive": "2026-11-02",
+        "observation_started_at": "2026-11-01T17:47:42.978000",
+        "observation_finished_at": "2026-11-01T17:47:50.867000",
+        "complete_business_history": false,
+        "requested_outside_capture": false
+      },
+      "summary": {
+        "amount": "4026474.580000000000",
+        "currency": "BS",
+        "documents": 605
+      },
+      "controls": {
+        "excluded_nonactive_documents": 48,
+        "excluded_other_currency_documents": 0
+      },
+      "result_rows": [
+        {
+          "amount": "1167975.070000000000",
+          "currency": "BS",
+          "documents": 303,
+          "suppliers": 160,
+          "document_status": "C"
+        },
+        {
+          "amount": "2858499.510000000000",
+          "currency": "BS",
+          "documents": 302,
+          "suppliers": 143,
+          "document_status": "O"
+        }
+      ],
+      "total_rows": 2,
+      "omitted_rows": 0,
+      "sql_evidence": [
+        {
+          "sql": "CREATE OR REPLACE TEMP VIEW op_source AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/ap_invoice.parquet'))",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT min(\"DocDate\") AS first_observed_date,max(\"DocDate\") AS last_observed_date,count(*) AS dataset_rows FROM op_source",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP TABLE op_period AS SELECT * FROM op_source WHERE \"DocDate\">=? AND \"DocDate\"<?",
+          "parameters": [
+            "2026-10-01",
+            "2026-11-01"
+          ]
+        },
+        {
+          "sql": "SELECT \"DocStatus\" AS document_status,'BS' AS currency,\n                    count(*) AS documents,count(DISTINCT \"CardCode\") AS suppliers,\n                    sum(cast(\"DocTotal\" AS DECIMAL(38,12))) AS amount\n                    FROM op_period WHERE \"CANCELED\"='N' AND \"DocCur\"='BS' GROUP BY ALL ORDER BY document_status",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT count(*) FILTER(WHERE \"CANCELED\"<>'N' OR \"CANCELED\" IS NULL) AS excluded_nonactive_documents,\n                    count(*) FILTER(WHERE \"CANCELED\"='N' AND (\"DocCur\"<>'BS' OR \"DocCur\" IS NULL)) AS excluded_other_currency_documents FROM op_period",
+          "parameters": []
+        }
+      ],
+      "response": "Facturado por proveedores:\nTotal acreditado BS 4.026.474,58 · 605 documentos de esta etapa.\nBS 1.167.975,07 · 303 documentos/pagos · estado C\nBS 2.858.499,51 · 302 documentos/pagos · estado O\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:47:42.978000 a 2026-11-01T17:47:50.867000.\nControles: excluded_nonactive_documents=48, excluded_other_currency_documents=0\nImportes de cabeceras activas en BS, separados por estado. No se suman órdenes, recepciones y facturas.\nMoneda extranjera excluida: DocTotal no acredita su importe nativo. Solicitudes y devoluciones no capturadas; no es compra neta después de devoluciones.\nLas 442 diferencias de líneas en 18 OC no acreditan su causa histórica SAP.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "independent_control": {
+        "C": {
+          "documents": 303,
+          "amount_bs": "1167975.07"
+        },
+        "O": {
+          "documents": 302,
+          "amount_bs": "2858499.51"
+        }
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 68208.69367100022,
+      "reader_timings": {
+        "serialization_ms": 0.1385120012855623,
+        "planning_and_sql_ms": 24.078611999357236,
+        "foundation_resolution_ms": 62476.765
+      },
+      "pipeline_timings": {
+        "capability_ms": 62980.10246299782,
+        "state_engine_ms": 0.16559799951210152,
+        "interpretation_ms": 4819.503717999396,
+        "response_format_ms": 0.05476800106407609,
+        "total_processing_ms": 67807.3414169994
+      },
+      "evidence": "../../data/reports/telchi/operational-authorized-e2e-v1/questions-final/luna-3.json"
+    },
+    {
+      "question": "¿Cuántos pagos activos registramos en octubre de 2026 y cuál es su importe?",
+      "classification": "DIRECT_AVAILABLE",
+      "metric": "collections.received_amount",
+      "capability": "collections.received_amount.v1",
+      "permission": "telchi.collections.received_amount.read.v1",
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "event_id": "47c05be4-f7fc-4ea6-942b-3be74afb8d03",
+      "thread_id": "7b9c0eee-d96b-41e7-b690-8145b984e804",
+      "committed_pg_audit_exact": true,
+      "thread_state_present": true,
+      "source": {
+        "datasets": {
+          "collection_payment": "7f239cc3701c6ca888a8c23d824d3cc06913dfc12af6ab6a12e745426c580ee0"
+        },
+        "updated_at": "2026-11-01T17:50:16.749000+00:00",
+        "snapshot_id": 1408,
+        "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+        "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+      },
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "dataset_rows": 50687,
+        "source_scope": {
+          "kind": "BOUNDED_OVERLAP_PLUS_GAP",
+          "start": "2026-09-21",
+          "limitation": "Historical balances/payments before overlap NOT refreshed; aging not accredited by this capture",
+          "end_exclusive": "2026-11-02"
+        },
+        "declared_start": "2026-09-21",
+        "absence_is_zero": false,
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "last_observed_date": "2026-11-01 00:00:00",
+        "first_observed_date": "2026-09-21 00:00:00",
+        "declared_end_exclusive": "2026-11-02",
+        "observation_started_at": "2026-11-01T17:48:30.543000",
+        "observation_finished_at": "2026-11-01T17:48:54.816000",
+        "complete_business_history": false,
+        "requested_outside_capture": false
+      },
+      "summary": null,
+      "controls": {
+        "excluded_nonactive_payments": 311,
+        "excluded_other_currency_payments": 0
+      },
+      "result_rows": [
+        {
+          "amount": "12180925.360000000000",
+          "currency": "BS",
+          "payments": 40077,
+          "customers": 2763
+        }
+      ],
+      "total_rows": 1,
+      "omitted_rows": 0,
+      "sql_evidence": [
+        {
+          "sql": "CREATE OR REPLACE TEMP VIEW op_source AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/collection_payment.parquet'))",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT min(\"payment_date\") AS first_observed_date,max(\"payment_date\") AS last_observed_date,count(*) AS dataset_rows FROM op_source",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP TABLE op_period AS SELECT * FROM op_source WHERE \"payment_date\">=? AND \"payment_date\"<?",
+          "parameters": [
+            "2026-10-01",
+            "2026-11-01"
+          ]
+        },
+        {
+          "sql": "SELECT 'BS' AS currency,count(*) AS payments,\n                        count(DISTINCT customer_code) AS customers,\n                        sum(cast(payment_total AS DECIMAL(38,12))) AS amount\n                        FROM op_period WHERE cancelled='N' AND currency='BS' HAVING count(*)>0",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT count(*) FILTER(WHERE cancelled<>'N' OR cancelled IS NULL) AS excluded_nonactive_payments,\n                        count(*) FILTER(WHERE cancelled='N' AND (currency<>'BS' OR currency IS NULL)) AS excluded_other_currency_payments FROM op_period",
+          "parameters": []
+        }
+      ],
+      "response": "Cobros registrados:\nBS 12.180.925,36 · 40077 documentos/pagos\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-09-21, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:48:30.543000 a 2026-11-01T17:48:54.816000.\nControles: excluded_nonactive_payments=311, excluded_other_currency_payments=0\nEventos de pagos publicados, no saldo histórico ni aging global. Pagos y aplicaciones son grains distintos y nunca se suman como ingresos independientes.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "independent_control": {
+        "payments": 40077,
+        "amount_bs": "12180925.36"
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 69819.18466000025,
+      "reader_timings": {
+        "serialization_ms": 0.16434299868706148,
+        "planning_and_sql_ms": 325.1037260015437,
+        "foundation_resolution_ms": 61524.308
+      },
+      "pipeline_timings": {
+        "capability_ms": 62338.6080809978,
+        "state_engine_ms": 0.7435930001520319,
+        "interpretation_ms": 7153.88256299957,
+        "response_format_ms": 0.03884200123138726,
+        "total_processing_ms": 69528.31621299993
+      },
+      "evidence": "../../data/reports/telchi/operational-authorized-e2e-v1/questions-final/luna-4.json"
+    },
+    {
+      "question": "¿Cuántas líneas elegibles de consumo de materiales se registraron en octubre de 2026?",
+      "classification": "DIRECT_AVAILABLE",
+      "metric": "material_supply.consumption",
+      "capability": "material_supply.consumption.v1",
+      "permission": "telchi.material_supply.consumption.read.v1",
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "event_id": "3860f639-ea25-4e02-9446-e535d62c33c7",
+      "thread_id": "1e971f4d-1061-49f6-8a21-066ed2b064f3",
+      "committed_pg_audit_exact": true,
+      "thread_state_present": true,
+      "source": {
+        "datasets": {
+          "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+          "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7",
+          "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33"
+        },
+        "updated_at": "2026-11-01T17:50:16.749000+00:00",
+        "snapshot_id": 1408,
+        "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+        "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+      },
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "dataset_rows": 41808,
+        "source_scope": {
+          "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+          "start": "2026-01-01",
+          "limitation": "No claim of modifications outside this business-date scope; no CDC",
+          "end_exclusive": "2026-11-02",
+          "absent_optional_fields": []
+        },
+        "declared_start": "2026-01-01",
+        "absence_is_zero": false,
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "last_observed_date": "2026-10-31 00:00:00",
+        "first_observed_date": "2026-01-05 00:00:00",
+        "declared_end_exclusive": "2026-11-02",
+        "observation_started_at": "2026-11-01T17:46:37.892000",
+        "observation_finished_at": "2026-11-01T17:46:53.281000",
+        "complete_business_history": false,
+        "requested_outside_capture": false
+      },
+      "summary": null,
+      "controls": {
+        "period_source_lines": 4814,
+        "included_issue_lines": 2297,
+        "unknown_native_identity_lines_affected": 0
+      },
+      "result_rows": [
+        {
+          "unit": "BOLSA",
+          "quantity": "641.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L01685",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "BOLSA",
+          "quantity": "30.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M02927",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CAPS",
+          "quantity": "100.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M05939",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CJA",
+          "quantity": "10.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L02331",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CJA",
+          "quantity": "5.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L02322",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CJA",
+          "quantity": "3.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L02157",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "CJA",
+          "quantity": "3.000000000000",
+          "uom_code": "Manual",
+          "item_code": "L02227",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "COMP",
+          "quantity": "100.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M02605",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "COMP",
+          "quantity": "100.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M05375",
+          "issue_lines": 1,
+          "native_factor": "1"
+        },
+        {
+          "unit": "COMP",
+          "quantity": "100.000000000000",
+          "uom_code": "Manual",
+          "item_code": "M05847",
+          "issue_lines": 1,
+          "native_factor": "1"
+        }
+      ],
+      "total_rows": 520,
+      "omitted_rows": 510,
+      "sql_evidence": [
+        {
+          "sql": "CREATE OR REPLACE TEMP VIEW op_source AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/production_issue.parquet'))",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT min(\"DocDate\") AS first_observed_date,max(\"DocDate\") AS last_observed_date,count(*) AS dataset_rows FROM op_source",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP TABLE op_period AS SELECT * FROM op_source WHERE \"DocDate\">=? AND \"DocDate\"<?",
+          "parameters": [
+            "2026-10-01",
+            "2026-11-01"
+          ]
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP VIEW op_eligible_groups AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/observed_material_actual_consumption.parquet'))",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP VIEW op_orders AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/production_order.parquet'))",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP TABLE op_consumption AS SELECT I.* FROM op_period I\n                    WHERE I.\"CANCELED\"='N' AND cast(I.\"BaseType\" AS DECIMAL(18,6))=202 AND EXISTS(SELECT 1 FROM op_orders O WHERE O.\"DocEntry\"=I.\"BaseEntry\")\n                        AND EXISTS(SELECT 1 FROM op_eligible_groups E WHERE E.item_code=I.\"ItemCode\"\n                        AND E.native_unit_msr IS NOT DISTINCT FROM I.\"unitMsr\"\n                        AND E.native_uom_code IS NOT DISTINCT FROM I.\"UomCode\"\n                        AND E.native_num_per_msr IS NOT DISTINCT FROM I.\"NumPerMsr\")",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT \"ItemCode\" AS item_code,\"unitMsr\" AS unit,\"UomCode\" AS uom_code,\n                    \"NumPerMsr\" AS native_factor,count(*) AS issue_lines,\n                    sum(cast(\"Quantity\" AS DECIMAL(38,12))) AS quantity\n                    FROM op_consumption GROUP BY ALL ORDER BY unit NULLS LAST,uom_code NULLS LAST,native_factor NULLS LAST,quantity DESC,item_code",
+          "parameters": []
+        },
+        {
+          "sql": "SELECT (SELECT count(*) FROM op_period) AS period_source_lines,\n                    count(*) AS included_issue_lines FROM op_consumption",
+          "parameters": []
+        },
+        {
+          "sql": "CREATE OR REPLACE TEMP TABLE op_unknown(doc_entry BIGINT,line_num BIGINT)",
+          "parameters": []
+        },
+        {
+          "sql": "INSERT INTO op_unknown VALUES (?,?)",
+          "batch": true,
+          "parameters": [
+            [
+              54328,
+              1
+            ],
+            [
+              54406,
+              1
+            ],
+            [
+              54485,
+              1
+            ],
+            [
+              54678,
+              1
+            ],
+            [
+              54777,
+              1
+            ],
+            [
+              54896,
+              1
+            ],
+            [
+              54956,
+              1
+            ],
+            [
+              55152,
+              1
+            ],
+            [
+              55162,
+              1
+            ],
+            [
+              55178,
+              1
+            ],
+            [
+              55327,
+              1
+            ],
+            [
+              55329,
+              1
+            ],
+            [
+              55363,
+              1
+            ],
+            [
+              55565,
+              1
+            ],
+            [
+              55700,
+              1
+            ],
+            [
+              55708,
+              1
+            ],
+            [
+              55820,
+              1
+            ],
+            [
+              55885,
+              1
+            ],
+            [
+              56055,
+              1
+            ],
+            [
+              56191,
+              1
+            ],
+            [
+              56273,
+              1
+            ],
+            [
+              56571,
+              1
+            ],
+            [
+              56608,
+              1
+            ],
+            [
+              56935,
+              1
+            ],
+            [
+              57154,
+              1
+            ],
+            [
+              57206,
+              1
+            ],
+            [
+              57683,
+              1
+            ],
+            [
+              57732,
+              1
+            ],
+            [
+              58052,
+              1
+            ],
+            [
+              58437,
+              1
+            ],
+            [
+              63017,
+              1
+            ]
+          ]
+        },
+        {
+          "sql": "SELECT count(*) FROM op_consumption I\n                    JOIN op_unknown U ON I.\"DocEntry\"=U.doc_entry AND I.\"LineNum\"=U.line_num",
+          "parameters": []
+        }
+      ],
+      "response": "Consumo elegible de Material Supply:\n2.297 líneas elegibles de consumo de materiales.\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:46:37.892000 a 2026-11-01T17:46:53.281000.\nControles: period_source_lines=4814, included_issue_lines=2297, unknown_native_identity_lines_affected=0\nMostradas 10 de 520 filas; 510 omitidas del mensaje. No es un ranking global entre unidades.\nSubconjunto elegible del derivado publicado, filtrado por fecha de emisión. Identidad de material no equivale a clasificación de materia prima.\nLos cinco datasets históricos de Material Supply no se actualizan. No acredita faltantes, reposición ni cobertura de demanda.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "independent_control": {
+        "all_groups": 520,
+        "included_lines": 2297,
+        "presented_groups_exact": true,
+        "source_native_decimal_control": true
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 72573.65817899881,
+      "reader_timings": {
+        "serialization_ms": 0.21017100152675994,
+        "planning_and_sql_ms": 84.11324999906356,
+        "foundation_resolution_ms": 66262.071
+      },
+      "pipeline_timings": {
+        "capability_ms": 66839.03456299959,
+        "state_engine_ms": 0.9496260008745594,
+        "interpretation_ms": 5431.879698999182,
+        "response_format_ms": 0.04489599996304605,
+        "total_processing_ms": 72302.88938299964
+      },
+      "evidence": "../../data/reports/telchi/operational-authorized-e2e-v1/questions-final/luna-5-r3.json"
+    }
+  ]
+}

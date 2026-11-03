@@ -1,0 +1,83 @@
+COMPOUND INTENT V2 — BENCHMARK PREPARATION
+Decision: PROVISIONAL. V2 implementation NOT authorized.
+Stage: TELCHI / INVESTIGATION / benchmark quality gate. No runtime, SQL,
+Foundation, SAP, WhatsApp, server or additional LLM corpus run.
+
+1. Purpose
+V1 remains rejected by the RCA. The RCA showed the 86 structural regressions are
+not 86 proven semantic errors and that two exactness predicates (12 vs 10)
+disagreed. This stage delivers a defensible measurement contract before any V2,
+without re-running the 114-turn LLM battery: it only re-scores the frozen run01
+artifacts.
+
+2. Deliverables
+- Gold schema and annotation guide (gold_schema.py, annotation_guide.md).
+- Annotated seed of 10 known cases (seed_gold.py): 8 simple controls + Abraham
+  001/002. Request-aware, not accepted-state-only.
+- Sealed holdout of 20 new turns across 5 conversations (holdout.py,
+  holdout_cases.json, holdout_manifest.json).
+- Deterministic layered evaluator and tests (evaluate.py, metrics.py,
+  canonicalize.py).
+- Documented 12/10 resolution (metrics.py, README.md).
+- Stable baseline metrics recomputed from run01 (baseline_metrics.json).
+- Objective V2 authorization gates (authorization.py, v2_passive_contract.md).
+
+3. Measurement contract
+Four layers scored separately: source_ledger (literal), request_extraction
+(raw + canonical), accepted_state, execution_eligibility.
+Named predicates: RECALL_COMPLETE, SET_EXACT (primary), and the legacy
+reproductions LEGACY_RECALL_FAMILY_EXACT (12) and LEGACY_GOLD_KEYS_EXACT (10).
+Representation equivalences are declared in canonicalize.py and applied
+symmetrically: end->end_exclusive, sort dict->list, eq->in, OR-of-eq -> in.
+Nothing else is normalized.
+
+4. 12 vs 10 resolution
+run.summarize filters candidate atoms to gold-populated field families, so facets
+added in gold-empty families are invisible (12). evaluate.raw_score restricts by
+gold top-level keys, so added facets in empty-but-present fields are visible
+(10). The two disagreeing turns are TCS_003_T02 and TCS_020_T01.
+12 answers "did it lose a requirement"; 10 answers "did it lose or invent one".
+Both are published; SET_EXACT is primary.
+
+5. Stable baseline metrics (LlmFit, 104 turns; no LLM)
+Metric                              baseline   V1
+SET_EXACT raw (no normalization)       96/104    6/104
+SET_EXACT canonical                    96/104   22/104
+RECALL_COMPLETE canonical              96/104   74/104
+preserved atoms raw                  853/883  723/883
+preserved atoms end-key-only         853/883  791/883
+preserved atoms canonical            853/883  794/883
+The raw->canonical jump recovers 16 turns (representation). 77 canonical
+regressions remain unexplained by representation. The end-key-only and raw
+values reconcile with the published RCA diagnostics (791/883 and 723/883).
+
+6. Independence
+gold_status = PROVISIONAL_GOLD. human_reviewed_cases = 0.
+Annotators: model-assisted with explicit rules; no candidate output was copied.
+No independence is claimed from using another model. This is why the decision is
+PROVISIONAL and not BENCHMARK_READY.
+
+7. Authorization
+authorization.authorize() returns INSUFFICIENT_EVIDENCE unless gold is CERTIFIED
+and the baseline is frozen; otherwise it returns AUTHORIZE only if all
+behavioural gates pass (100% literal preservation, zero new authorizations, zero
+new blocks, unchanged accepted state, no measurement regression, zero assertion
+certification, zero extra LLM calls, overhead p95 <= 50 ms and <= 2%).
+
+8. Validation
+- uv run pytest modules/telchi/investigation/validation/compound_intent_v2_benchmark -q
+  Result: 38 passed (includes end-to-end scoring of the seed and the sealed holdout).
+- Deterministic recompute over run01 reproduce 12 and 10 and the RCA atom counts.
+- No provider/SQL/runtime call.
+
+9. Host
+HOST_PREFLIGHT=BUSY_BUT_SAFE (8 CPUs, load ~1.5, MemAvailable ~5.5 GB, swap
+stable). CONCURRENCY_USED=1 (sequential). UNRELATED_PROCESSES_TERMINATED=0.
+ENVIRONMENTAL_ABORTS=0. OWN_PROCESSES_LEFT_RUNNING=0.
+
+10. Residual risk and next step
+No independent human adjudication; the re-annotation of the full LlmFit corpus
+into the request-aware schema is pending. Next step: complete request-aware
+annotation and obtain independent review, then re-evaluate a passive V2 ledger
+with authorization.py on the sealed holdout. Preserving the question does not
+produce commercial figures; DMS/pharmacy/L&S source work remains separate.

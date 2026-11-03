@@ -1,0 +1,27 @@
+{
+  "window": "GLOBAL / SRV05_PROMOTION_READINESS",
+  "timestamp_utc": "2026-10-09T12:38:39Z",
+  "branch": "feature/console-backend-core",
+  "git_diff_check": "PASS",
+  "existing_changes": "Preserved; recognized scopes from GLOBAL status. No Git mutation permitted.",
+  "host": {"load": [1.59, 1.64, 1.80], "available_mb": 5408, "swap_used_mb": 1073, "plan": "bounded sequential workers; no horizontal lifecycle"},
+  "matrix_before_services": [
+    {"area":"Srv05 import/factory","state":"READY baseline","required":"reuse structural harness","blocking":false},
+    {"area":"Routing/OpenAPI","state":"READY baseline 28 operations","required":"fresh inventory/collisions/hooks","blocking":false},
+    {"area":"Lifecycle","state":"READY controlled / NOT_TESTED active","required":"controlled lifespan plus defendible deployment conditions","blocking":true},
+    {"area":"Flow","state":"READY hardening baseline","required":"security subset + read-only PG","blocking":false},
+    {"area":"Diagnosis","state":"READY stack/post-close/isolation baseline","required":"safe stack + expanded suite","blocking":false},
+    {"area":"Embed/Mamamia360","state":"READY API baseline / NOT_TESTED browser","required":"canonical binding/HMAC/persistence; browser","blocking":true},
+    {"area":"Console/Auth","state":"READY fixtures / NOT_TESTED real identity","required":"authorized official identity + DB entitlement/permission chain","blocking":true},
+    {"area":"Messaging","state":"READY coexistence / CONDITIONAL outbound","required":"disabled consumer/import/parser tests","blocking":false},
+    {"area":"Browser/frontend","state":"NOT_TESTED","required":"safe canonical launchers, Chromium Home/embed/Flow/Console","blocking":true},
+    {"area":"Identity/RBAC DB","state":"NOT_TESTED","required":"official authorized test identity/token","blocking":true},
+    {"area":"Multi-tenant isolation","state":"NOT_TESTED two real tenants","required":"two authorized official contexts","blocking":true},
+    {"area":"LiteLLM","state":"READY adapter / NOT_TESTED proxy internals","required":"audit effective provider/fallback, minimal smoke","blocking":true},
+    {"area":"Scheduler","state":"READY controlled / NOT_TESTED enabled","required":"inspect enable conditions/dry-run; no delivery","blocking":true},
+    {"area":"Cleanup/processes","state":"READY baseline","required":"owned worker cleanup/session removal","blocking":false},
+    {"area":"Packaging","state":"NOT_TESTED wheel this run","required":"build wheel/import outside source cwd without I/O","blocking":true}
+  ],
+  "browser_decision": "Do not start canonical normal launcher: unconditional scheduler and no existing automation-disable override. messaging-only is not equivalent Srv05. No alternative server or DB changes.",
+  "side_effects_forbidden": ["email", "WhatsApp", "migrations", "provisioning", "real automation", "horizontal service lifecycle", "deployment"]
+}

@@ -1,0 +1,149 @@
+{
+  "status": "BLOCKED",
+  "branch": "feature/console-backend-core",
+  "objective": "Exact authorized sales Foundation and Reference promotion, without development or extraction",
+  "blockers": [
+    {
+      "code": "IDENTIFIED_AUTHORIZING_OWNER_MISSING",
+      "detail": "The current user message expressly authorizes the exact operation, but provides no real identity for authorized_by. SALES_FOUNDATION_PROMOTION_V1.md requires an identified real owner in a separate private authorization and prohibits automatically completing that identity. No private operational authorization was found by the bounded authorization-filename inspection. OS uid is not evidence of the authorizing business owner. No authorization document was fabricated."
+    }
+  ],
+  "environment": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "team360_telchi_ducklake",
+    "role": "team360_telchi_ducklake",
+    "data_root": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi",
+    "effective_os_uid": 1000,
+    "journal_and_data_root_os_writable": true,
+    "database_write_privileges": "NOT_EXERCISED",
+    "other_environments_touched": false
+  },
+  "current": {
+    "before": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "after": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "publication_snapshot": 1408,
+    "observed_catalog_head_snapshot": 1464,
+    "note": "Catalog head is not the Foundation-pinned data snapshot. Canonical reader resolved the expected publication and snapshot. No activation was attempted."
+  },
+  "reference": {
+    "foundation_before": "v2_reference_closure_2088d5885204313a",
+    "foundation_after": "v2_reference_closure_2088d5885204313a",
+    "independent_pointer_before": "v2_b19ceecf40d3ba09",
+    "independent_pointer_after": "v2_b19ceecf40d3ba09",
+    "divergence": "UNCHANGED_EXPECTED_PENDING_PROMOTION",
+    "authorized_candidate": "v2_sales_e02883116f4b4991c396010a",
+    "reference_and_crosswalk_file_hashes": "PASS_EXACT_PLAN_TREE_HASHES",
+    "physical_v2_candidate": "NOT_ACTIVATED_NOT_MODIFIED"
+  },
+  "identifiers_and_hashes": {
+    "foundation_candidate": "foundation_38680850adc058b1bb11887632b7b681",
+    "candidate_file_sha256": "9aae6aa2cee389ecc8328efbfa44bd69af9f4effde518247c6563cdba259df32",
+    "manifest_sha256": "ef5138ba9363508f997bb15d9c4746f9874862703761921bcb76f1256126318a",
+    "wrapper_sha256": "99cc06968cc5c8cabb6f28d0b925e84223af7b7ecd1025cef19e74423b391b67",
+    "wrapper_matches_preparation_report": true
+  },
+  "journal": {
+    "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-foundation-final-promotion-v1/journal",
+    "observed_entries": [".lock", "plan.json", "rollback-inputs.json"],
+    "activation_events_written": false,
+    "active_foundation_run": false,
+    "exclusive_promotion_locks_acquired": false
+  },
+  "cas": {"foundation": 0, "reference": 0},
+  "eight_components": {
+    "names": ["credit_memo", "material_supply", "oinm", "oitw", "purchasing", "receivables_collections", "reference", "sales"],
+    "candidate_dependencies": "PASS_CANONICAL_VALIDATE_MANIFEST",
+    "activated": false
+  },
+  "sealed_components": "PASS_CANONICAL_CANDIDATE_VALIDATION_AND_PHYSICAL_FILES",
+  "material_supply": "PASS_EXISTING_CANONICAL_REVALIDATION_CONTRACT_NO_REBUILD",
+  "snapshots_preserved": {
+    "mutations_by_this_execution": 0,
+    "historical_snapshot_validation": "Canonical manifest validation passed",
+    "postpublication_historical_queries": "NOT_APPLICABLE_NOT_PUBLISHED"
+  },
+  "september_reconciliation": {
+    "postpublication": "NOT_RUN_NOT_PUBLISHED",
+    "previous_offline_evidence": "report.json and cycle-money.json; not presented as new live verification",
+    "expected_currency": "BS",
+    "expected_invoice": "11079079.77",
+    "expected_credit": "488033.53",
+    "expected_documentary_net": "10591046.24",
+    "coverage": "2026-09-01 through 2026-09-30"
+  },
+  "october_reconciliation": {
+    "postpublication": "NOT_RUN_NOT_PUBLISHED",
+    "previous_offline_evidence": "report.json and cycle-money.json; not presented as new live verification",
+    "expected_currency": "BS",
+    "expected_invoice": "11269116.22",
+    "expected_credit": "457793.30",
+    "expected_documentary_net": "10811322.92",
+    "coverage": "2026-10-01 through 2026-10-29; partial calendar month"
+  },
+  "canonical_reader": "PASS_LIVE_EXPECTED_BASE_AND_PINNED_SNAPSHOT_ONLY",
+  "telchiai_end_to_end": {
+    "status": "NOT_RUN_NOT_PUBLISHED",
+    "all_eight_requested_questions": "NOT_RUN",
+    "capability_connection_status": "NOT_ASSESSED; do not infer TELCHIAI_NOT_ENABLED",
+    "conversational_results_fabricated": false
+  },
+  "permissions": {
+    "modified": false,
+    "presidency_effective_business_permissions": "NOT_REVALIDATED",
+    "impersonation": false,
+    "technical_privileges_granted": false
+  },
+  "rollback": {
+    "available": "Existing canonical rollback implementation; retained input hashes freshly checked",
+    "executed": false,
+    "command": "cd SrvRestAstroLS_v1/backend && uv run python -m modules.telchi.datalake.sales_foundation_promotion rollback --journal /media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-foundation-final-promotion-v1/journal --reason 'Audited operational reason'",
+    "condition": "Only after a journaled promotion and applicable canonical recovery conditions; not needed now"
+  },
+  "tests_and_gates": {
+    "live_preflight": "PASS; operational-preflight.json",
+    "candidate_check": "PASS real_promotion(journal).check(plan)",
+    "resource_guard": "Allowed, no critical reasons at canonical preflight",
+    "focused_pytest": "ENVIRONMENTAL_ABORT: command timeout at 120 seconds after four progress markers; no final test summary, no PASS claimed",
+    "focused_pytest_command": "cd SrvRestAstroLS_v1/backend && OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run pytest -q modules/telchi/datalake/tests/test_sales_foundation_promotion.py modules/telchi/datalake/tests/test_sales_refresh_cycle.py --junitxml=../../data/reports/telchi/sales-foundation-final-promotion-v1/operational-tests.xml",
+    "previous_tests": "Retained report.json evidence; wrapper hash matches, not a new successful regression run",
+    "git_diff_check": "PASS",
+    "initial_inspection_script_error": "Local report construction passed str instead of Path to file_hash; corrected inline, rerun completed. No runtime code changed.",
+    "markdown_gates": "NOT_REQUIRED_NO_MARKDOWN_CREATED_OR_MODIFIED"
+  },
+  "scheduler": {
+    "activation_attempted": false,
+    "fresh_configuration_inspection": "CONFIRMED enabled=false, installed=false, schedule=null",
+    "incremental_adapter": "Existing implementation unchanged; prior offline evidence retained"
+  },
+  "transversal_impact": {
+    "source_code_modified": false,
+    "preexisting_changes_preserved": true,
+    "pointers_modified": false,
+    "atomic_modified": false,
+    "hana_queries": 0,
+    "services_started_or_restarted": 0,
+    "commits": 0,
+    "pushes": 0
+  },
+  "host": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE_FOR_BOUNDED_PREFLIGHT",
+    "CONCURRENCY_USED": {"foreground_workers": 1, "duckdb_query_threads": 1, "browsers": 0},
+    "observations": "8 cores, approximately 6.3 GiB available RAM, 418 GiB free disk; sustained high shared-host I/O wait. Swap increased from 1443 to 1487 MiB during execution; sampled final swap I/O zero. No additional heavy workload started after test timeout.",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 1,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "cleanup_evidence": "After timeout, ps showed no pytest, uv or python processes. No background process or server was created."
+  },
+  "risks": [
+    "Sales candidate remains unpublished; business availability objective not completed.",
+    "Explicit consent is present, but the runbook identity/provenance requirement is not satisfied by an anonymous role assertion.",
+    "Focused regression interrupted; no functional failure established.",
+    "Effective business permissions and eight conversational answers remain unverified."
+  ],
+  "next_exact_action": "Supply the real authorizing owner's identity and a traceable decision reference in the private exact authorization required by SALES_FOUNDATION_PROMOTION_V1.md. Then recheck live preconditions, execute the canonical promote command once, and complete live monetary/reader/history/permission/conversation validation. Do not infer the business owner from OS uid, query HANA, alter grants, or enable scheduler.",
+  "files_created": [
+    "data/reports/telchi/sales-foundation-final-promotion-v1/operational-preflight.json",
+    "data/reports/telchi/sales-foundation-final-promotion-v1/operational-result.json"
+  ]
+}

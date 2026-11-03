@@ -1,0 +1,110 @@
+{
+  "read_only": true,
+  "migration_027_sha256": "9ff78e59b5276e0158a774aaef70162770bc907fbe71cf81159a73ec036f1694",
+  "migration_027_historical_checksum_available": false,
+  "target": {
+    "database": "team360",
+    "system_identifier": "7630993354699489317",
+    "server_address": "172.18.0.2/32",
+    "server_port": 5432
+  },
+  "organization": [
+    {
+      "id": "44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99",
+      "organization_code": "telchi",
+      "status": "active"
+    }
+  ],
+  "workspaces": [
+    {
+      "id": "d848e051-3dfc-408b-ad5a-94f2ba85ee23",
+      "slug": "team360_admin_dev",
+      "organization_id": "f1159955-b092-43e3-85b4-755acb1f9dc7",
+      "status": "testing"
+    },
+    {
+      "id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "slug": "telchi_dev",
+      "organization_id": "44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99",
+      "status": "testing"
+    }
+  ],
+  "users": [
+    {
+      "id": "67a1b108-7c65-4c80-bbca-ffc42891949c",
+      "email": "admin@team360.com",
+      "workspace_id": "d848e051-3dfc-408b-ad5a-94f2ba85ee23",
+      "status": "active"
+    },
+    {
+      "id": "73d09264-8be2-4402-8023-0142a5f26730",
+      "email": "admin@telchiai.com",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "status": "active"
+    },
+    {
+      "id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+      "email": "devfull@telchiai.com",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "status": "active"
+    }
+  ],
+  "permissions": {
+    "67a1b108-7c65-4c80-bbca-ffc42891949c": [
+      "audit.view",
+      "role.manage",
+      "user.manage"
+    ],
+    "73d09264-8be2-4402-8023-0142a5f26730": [],
+    "5015a69d-eb86-4ac9-b97f-c31dc06e2b59": [
+      "telchi.sales.source_quantity.read.v1"
+    ]
+  },
+  "cross_workspace_denied": true,
+  "pilot_global_workspace_denied": true,
+  "pilot_delegated_denied": true,
+  "admin_other_workspace_denied": true,
+  "migration": {
+    "phone_schema": null,
+    "phone_trigger_function": null
+  },
+  "audit": [
+    {
+      "event_name": "telchi.provisioning.created",
+      "correlation_id": "6b70b861-1f84-4c80-b948-65b0601cbc66",
+      "actor_user_id": "67a1b108-7c65-4c80-bbca-ffc42891949c"
+    },
+    {
+      "event_name": "telchi.provisioning.created",
+      "correlation_id": "d4142416-643a-4e42-81f7-b59d10dba7c9",
+      "actor_user_id": "67a1b108-7c65-4c80-bbca-ffc42891949c"
+    },
+    {
+      "event_name": "telchi.admin.bootstrap",
+      "correlation_id": "8515c1a9-e645-4f86-90cc-c1c36470e1ed",
+      "actor_user_id": "67a1b108-7c65-4c80-bbca-ffc42891949c"
+    },
+    {
+      "event_name": "telchi.dev.local_bootstrap",
+      "correlation_id": "c8ba6560-809d-4a44-a329-6ac939da77d0",
+      "actor_user_id": null
+    }
+  ],
+  "providers": [
+    {
+      "code": "evolution",
+      "status": "testing"
+    }
+  ],
+  "telchi_channel_count": 0,
+  "evolution": {
+    "http_status": 200,
+    "container_state": "running",
+    "instances": [
+      {
+        "name": "team360-meta-dev",
+        "state": "open"
+      }
+    ]
+  }
+}

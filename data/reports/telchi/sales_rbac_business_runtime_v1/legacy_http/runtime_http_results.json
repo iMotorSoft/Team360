@@ -1,0 +1,4975 @@
+{
+  "run_id": "20261012T222132Z",
+  "base_url": "http://127.0.0.1:45165",
+  "endpoint": "/api/telchi/assistant/dev/turn",
+  "transport": "curl",
+  "pipeline": "MessageDispatcher -> TelchiHandler -> StateEngine -> capabilities",
+  "whatsapp_e2e": false,
+  "scenarios": [
+    {
+      "id": "incident_20261011",
+      "conversation": "incident-20261011:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís últimas facturas por fecha documental para «calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+          "user_text": "dame las ultimas ventas de calenta",
+          "elapsed_ms": 3990.07,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"incident-20261011:20261012T222132Z\"}"
+          ],
+          "conversation_id": "f931313a-9351-4fc7-bd3a-4f4a4912dec3",
+          "correlation_id": "1a1d4649-55a7-4a69-a49f-b65326b56a32",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.23902999964775518,
+              "interpretation_ms": 3805.8730110060424,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 3806.2734690029174
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís últimas facturas por fecha documental para «calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "las dos",
+          "elapsed_ms": 3274.04,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"incident-20261011:20261012T222132Z\"}"
+          ],
+          "conversation_id": "f931313a-9351-4fc7-bd3a-4f4a4912dec3",
+          "correlation_id": "eeac7fce-6972-4add-979b-6a03199cffa1",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.2186070050811395,
+              "interpretation_ms": 3132.892100002209,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 3133.2085850008298
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "primero dame el importe de las ventas del mes",
+          "elapsed_ms": 6560.06,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"incident-20261011:20261012T222132Z\"}"
+          ],
+          "conversation_id": "f931313a-9351-4fc7-bd3a-4f4a4912dec3",
+          "correlation_id": "cfb93512-377c-4ed1-8004-2254465c247d",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.16429000243078917,
+              "interpretation_ms": 6456.6649879998295,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 6456.929547995969
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": "latest_available_month",
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) durante el último mes registrado. La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. Tampoco tengo metadata habilitada para resolver el último mes por entidad y métrica.",
+          "user_text": "ultimo mes registrado",
+          "elapsed_ms": 5610.95,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"incident-20261011:20261012T222132Z\"}"
+          ],
+          "conversation_id": "f931313a-9351-4fc7-bd3a-4f4a4912dec3",
+          "correlation_id": "a587dc2f-1fdc-48af-a32e-ea2db54f5985",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.24841500271577388,
+              "interpretation_ms": 5520.146363996901,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 5520.528225002636
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": "latest_available_month"
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": "latest_available_month"
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) durante el último mes registrado. La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. Tampoco tengo metadata habilitada para resolver el último mes por entidad y métrica.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": null,
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": "latest_available_month"
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "user_text": "mayo 2026",
+          "elapsed_ms": 3581.96,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"incident-20261011:20261012T222132Z\"}"
+          ],
+          "conversation_id": "f931313a-9351-4fc7-bd3a-4f4a4912dec3",
+          "correlation_id": "16d40605-e510-4bf6-8107-c4f90a27ddf7",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.18948400247609243,
+              "interpretation_ms": 3504.234601998178,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 3504.54439400346
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": "latest_available_month"
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": {
+                    "start": "2026-05-01",
+                    "end_exclusive": "2026-06-01"
+                  },
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "user_text": "todo mayo de 2026",
+          "elapsed_ms": 4509.86,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"incident-20261011:20261012T222132Z\"}"
+          ],
+          "conversation_id": "f931313a-9351-4fc7-bd3a-4f4a4912dec3",
+          "correlation_id": "9bd536e1-2ad5-4e32-bd21-c89a813c8f91",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.18021899450104684,
+              "interpretation_ms": 4401.818604004802,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4402.106018998893
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/period": {
+                    "start": "2026-05-01",
+                    "end_exclusive": "2026-06-01"
+                  },
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C01_multimetric",
+      "conversation": "c01:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís últimas facturas por fecha documental para «calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+          "user_text": "dame las ultimas ventas de calenta",
+          "elapsed_ms": 4967.75,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c01:20261012T222132Z\"}"
+          ],
+          "conversation_id": "bc2ab689-391a-427e-8eb0-d88f5aa44013",
+          "correlation_id": "282985c0-627c-4f9b-81e5-db9be16d0980",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.24205299996538088,
+              "interpretation_ms": 4913.488170001074,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4913.854735001223
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís últimas facturas por fecha documental para «calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "las dos cosas",
+          "elapsed_ms": 4540.35,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c01:20261012T222132Z\"}"
+          ],
+          "conversation_id": "bc2ab689-391a-427e-8eb0-d88f5aa44013",
+          "correlation_id": "f8a428b3-7da1-40fd-890b-46d6bff899ec",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.23006799892755225,
+              "interpretation_ms": 4474.908708994917,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4475.290494003275
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/period": null,
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": [
+                  "/branches",
+                  "/sales_channel",
+                  "/comparison",
+                  "/reference"
+                ]
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C02_priority",
+      "conversation": "c02:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís últimas facturas por fecha documental para «Calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+          "user_text": "dame las ultimas ventas de calenta",
+          "elapsed_ms": 5028.62,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c02:20261012T222132Z\"}"
+          ],
+          "conversation_id": "4d46db9c-f1a0-4c1f-99af-42bd8188be34",
+          "correlation_id": "ac6a9569-422a-4305-b981-c785ce2d64e9",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.5421429959824309,
+              "interpretation_ms": 4923.312804996385,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4924.08107999654
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís últimas facturas por fecha documental para «Calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "las dos",
+          "elapsed_ms": 4476.96,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c02:20261012T222132Z\"}"
+          ],
+          "conversation_id": "4d46db9c-f1a0-4c1f-99af-42bd8188be34",
+          "correlation_id": "6c8a90c8-0db6-4465-9630-58ee67c06271",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.5051990010542795,
+              "interpretation_ms": 4403.521428001113,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4404.334373000893
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/period": null,
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "primero la plata",
+          "elapsed_ms": 5626.06,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c02:20261012T222132Z\"}"
+          ],
+          "conversation_id": "4d46db9c-f1a0-4c1f-99af-42bd8188be34",
+          "correlation_id": "891e2cb6-7533-41c4-a845-6c2eafcf04ae",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.529615004779771,
+              "interpretation_ms": 5541.221245002816,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 5542.0355219976045
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C03_dynamic_period",
+      "conversation": "c03:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís últimas facturas por fecha documental para «calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+          "user_text": "dame las ultimas ventas de calenta",
+          "elapsed_ms": 4695.63,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c03:20261012T222132Z\"}"
+          ],
+          "conversation_id": "ae646a13-2ba3-47a5-bc0a-6e43db39ed0d",
+          "correlation_id": "30231376-9592-4f57-a2fd-b6850be9c81d",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.21181499323574826,
+              "interpretation_ms": 4650.8484599980875,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4651.156562998949
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís últimas facturas por fecha documental para «calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "las dos",
+          "elapsed_ms": 4215.69,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c03:20261012T222132Z\"}"
+          ],
+          "conversation_id": "ae646a13-2ba3-47a5-bc0a-6e43db39ed0d",
+          "correlation_id": "113a6667-ce8a-4976-a25e-ca0cf6d63f7c",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.4981099991709925,
+              "interpretation_ms": 4154.74622399779,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4155.482419999316
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "primero dame el importe",
+          "elapsed_ms": 4815.82,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c03:20261012T222132Z\"}"
+          ],
+          "conversation_id": "ae646a13-2ba3-47a5-bc0a-6e43db39ed0d",
+          "correlation_id": "57b992e7-c392-4de2-9b6f-5d4619f9e9b6",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.1439140032744035,
+              "interpretation_ms": 4753.362323994224,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4753.606840997236
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": "latest_available_month",
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) durante el último mes registrado. La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. Tampoco tengo metadata habilitada para resolver el último mes por entidad y métrica.",
+          "user_text": "el ultimo mes que tengas",
+          "elapsed_ms": 4714.05,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c03:20261012T222132Z\"}"
+          ],
+          "conversation_id": "ae646a13-2ba3-47a5-bc0a-6e43db39ed0d",
+          "correlation_id": "320ec937-342f-47e2-b0b5-14c93c4944df",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.5031140026403591,
+              "interpretation_ms": 4626.426798997272,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4627.163108998502
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": "latest_available_month"
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": "latest_available_month"
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución) durante el último mes registrado. La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. Tampoco tengo metadata habilitada para resolver el último mes por entidad y métrica.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": null,
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": "latest_available_month"
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C04_full_period",
+      "conversation": "c04:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís últimas facturas por fecha documental para «calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+          "user_text": "dame las ultimas ventas de calenta",
+          "elapsed_ms": 5507.88,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c04:20261012T222132Z\"}"
+          ],
+          "conversation_id": "d1e0509f-fca8-4e6b-a629-5e8671e59480",
+          "correlation_id": "a803962a-07a7-4493-958a-06b0de2282ce",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.535302002390381,
+              "interpretation_ms": 5415.048376999039,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 5415.916099002061
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís últimas facturas por fecha documental para «calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/period": null,
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": [
+                  "/branches",
+                  "/sales_channel",
+                  "/comparison",
+                  "/reference"
+                ]
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "las dos",
+          "elapsed_ms": 4398.44,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c04:20261012T222132Z\"}"
+          ],
+          "conversation_id": "d1e0509f-fca8-4e6b-a629-5e8671e59480",
+          "correlation_id": "3098cef2-6498-41d8-91d9-43a0edb62b85",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.5839810037286952,
+              "interpretation_ms": 4341.340222999861,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4342.157953004062
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "primero dame el importe",
+          "elapsed_ms": 3197.49,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c04:20261012T222132Z\"}"
+          ],
+          "conversation_id": "d1e0509f-fca8-4e6b-a629-5e8671e59480",
+          "correlation_id": "b66befc2-5809-4e76-b193-f03107c0948d",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.8248439989984035,
+              "interpretation_ms": 3110.0352369976463,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 3111.30774999765
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "mayo entero",
+          "elapsed_ms": 4093.23,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c04:20261012T222132Z\"}"
+          ],
+          "conversation_id": "d1e0509f-fca8-4e6b-a629-5e8671e59480",
+          "correlation_id": "10bd51d5-14c3-4684-8434-827d0a15d2ed",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.8125169988488778,
+              "interpretation_ms": 4022.693357997923,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4024.0400379989296
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año es mayo?"
+                },
+                "proposed": {
+                  "limit": 10,
+                  "metric": "sales.net_amount",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "temporal_reference": null
+                },
+                "source_turn_id": "10bd51d5-14c3-4684-8434-827d0a15d2ed",
+                "base_state_hash": "db867267693e20d015fdf7b883bdbb359aafa174dc4ccf091ac33e1d7de4e7ad"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año es mayo?"
+                },
+                "proposed": {
+                  "limit": 10,
+                  "metric": "sales.net_amount",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "temporal_reference": null
+                },
+                "source_turn_id": "10bd51d5-14c3-4684-8434-827d0a15d2ed",
+                "base_state_hash": "db867267693e20d015fdf7b883bdbb359aafa174dc4ccf091ac33e1d7de4e7ad"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": {
+                    "text": "calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿De qué año es mayo?"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C05_monetary_missing",
+      "conversation": "c05:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "cuanto facturo Calenta?",
+          "elapsed_ms": 3990.13,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c05:20261012T222132Z\"}"
+          ],
+          "conversation_id": "818a8ed3-1d96-4f2a-a1b2-cec5c362b8ff",
+          "correlation_id": "6aa6c707-13d0-4512-8294-d14a2add6380",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.32942699908744544,
+              "interpretation_ms": 3928.5211989990785,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 3928.993548004655
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C06_documentary",
+      "conversation": "c06:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "NEEDS_CLARIFICATION",
+          "committed": true,
+          "decision": "ASK",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.source_top_items"
+          ],
+          "metric": "sales.source_top_items",
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "¿De qué período querés consultar los productos más vendidos?",
+          "user_text": "cuales son los productos mas vendidos?",
+          "elapsed_ms": 5352.94,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c06:20261012T222132Z\"}"
+          ],
+          "conversation_id": "f2e0e2f3-9924-4298-b69d-a2645b498c7e",
+          "correlation_id": "9404a898-aef9-47e6-84c8-f0a16c4671a1",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.6685889966320246,
+              "interpretation_ms": 5257.300363002287,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 5258.279403002234
+            },
+            "decision": "ASK",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué período querés consultar los productos más vendidos?"
+                },
+                "proposed": {
+                  "metric": "sales.source_top_items",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "temporal_reference": null
+                },
+                "source_turn_id": "9404a898-aef9-47e6-84c8-f0a16c4671a1",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué período querés consultar los productos más vendidos?"
+                },
+                "proposed": {
+                  "metric": "sales.source_top_items",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "temporal_reference": null
+                },
+                "source_turn_id": "9404a898-aef9-47e6-84c8-f0a16c4671a1",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "¿De qué período querés consultar los productos más vendidos?",
+              "classification": "NEEDS_CLARIFICATION"
+            },
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.source_top_items",
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": [
+                  "/period",
+                  "/branches",
+                  "/sales_channel",
+                  "/comparison",
+                  "/reference"
+                ]
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿De qué período querés consultar los productos más vendidos?"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C07_temporal_continuity",
+      "conversation": "c07:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís últimas facturas por fecha documental para «Calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+          "user_text": "dame las ultimas ventas de calenta",
+          "elapsed_ms": 4885.81,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c07:20261012T222132Z\"}"
+          ],
+          "conversation_id": "e566717c-df26-4dd7-95a7-4529ca6ff899",
+          "correlation_id": "cd63ef27-65c8-472f-be18-530d161f1e10",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.5131590005476028,
+              "interpretation_ms": 4821.796058997279,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4822.502107999753
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís últimas facturas por fecha documental para «Calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": [
+                  "/period",
+                  "/branches",
+                  "/sales_channel",
+                  "/comparison",
+                  "/reference"
+                ]
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "las dos",
+          "elapsed_ms": 4515.54,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c07:20261012T222132Z\"}"
+          ],
+          "conversation_id": "e566717c-df26-4dd7-95a7-4529ca6ff899",
+          "correlation_id": "a867a28f-6b08-439b-b6b0-1a87894e3ddf",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.332255003741011,
+              "interpretation_ms": 4433.901860000333,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4434.446594998008
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "user_text": "mayo 2026",
+          "elapsed_ms": 3911.09,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c07:20261012T222132Z\"}"
+          ],
+          "conversation_id": "e566717c-df26-4dd7-95a7-4529ca6ff899",
+          "correlation_id": "5d5d0fed-82ce-4c5d-aec9-3f4858b6163b",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.5390349979279563,
+              "interpretation_ms": 3835.251888995117,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 3836.0443959973054
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución) en [2026-05-01, 2026-06-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": {
+                    "start": "2026-05-01",
+                    "end_exclusive": "2026-06-01"
+                  },
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-04-01",
+            "end_exclusive": "2026-05-01"
+          },
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución) en [2026-04-01, 2026-05-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+          "user_text": "y el mes anterior?",
+          "elapsed_ms": 3445.1,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c07:20261012T222132Z\"}"
+          ],
+          "conversation_id": "e566717c-df26-4dd7-95a7-4529ca6ff899",
+          "correlation_id": "0e19c919-16a1-40d3-b63d-9616552282fe",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.6510480016004294,
+              "interpretation_ms": 3353.254615998594,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 3354.1966159973526
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-04-01",
+                "end_exclusive": "2026-05-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-04-01",
+                "end_exclusive": "2026-05-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución) en [2026-04-01, 2026-05-01). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades. No es un problema con la fecha elegida.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/period": {
+                    "start": "2026-04-01",
+                    "end_exclusive": "2026-05-01"
+                  },
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C08_change_priority",
+      "conversation": "c08:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.latest_documents"
+          ],
+          "metric": "sales.latest_documents",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís últimas facturas por fecha documental para «Calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+          "user_text": "dame las ultimas ventas de calenta",
+          "elapsed_ms": 5747.78,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c08:20261012T222132Z\"}"
+          ],
+          "conversation_id": "ec29e303-d574-4210-af84-ed82cf1dfd92",
+          "correlation_id": "8d9b637e-7f38-4db6-b0bb-b0070b2697b1",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.26532499759923667,
+              "interpretation_ms": 5682.9292030015495,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 5683.302597004513
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís últimas facturas por fecha documental para «Calenta» (tipo de entidad pendiente de resolución). Esta operación documental no admite esos filtros o métricas.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.latest_documents",
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.latest_documents"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "las dos",
+          "elapsed_ms": 4216.25,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c08:20261012T222132Z\"}"
+          ],
+          "conversation_id": "ec29e303-d574-4210-af84-ed82cf1dfd92",
+          "correlation_id": "6bf6941c-d251-494e-898b-aad9973a2de4",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.7020789998932742,
+              "interpretation_ms": 4164.455547994294,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4165.399110999715
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.latest_documents",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.net_amount",
+                  "/period": null,
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "METRIC_MISSING",
+          "metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "metric": "sales.net_amount",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+          "user_text": "primero dame el importe",
+          "elapsed_ms": 5292.63,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c08:20261012T222132Z\"}"
+          ],
+          "conversation_id": "ec29e303-d574-4210-af84-ed82cf1dfd92",
+          "correlation_id": "a5921d82-69dc-47ce-9094-bd2633abd45d",
+          "audit": {
+            "bmd": {
+              "category": "METRIC_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.6911500022397377,
+              "interpretation_ms": 5227.980301999196,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 5228.920872003073
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount",
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "DIRECT_UNAVAILABLE",
+          "committed": true,
+          "decision": "DIRECT_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "MAPPING_MISSING",
+          "metrics": [
+            "sales.source_top_items"
+          ],
+          "metric": "sales.source_top_items",
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Entendí que pedís cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La entidad mencionada todavía no tiene una resolución ni un filtro comercial aprobado en esta consulta.",
+          "user_text": "ahora quiero cantidades",
+          "elapsed_ms": 5032.02,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c08:20261012T222132Z\"}"
+          ],
+          "conversation_id": "ec29e303-d574-4210-af84-ed82cf1dfd92",
+          "correlation_id": "21d9eada-8009-4a11-9158-9fda6c18ab20",
+          "audit": {
+            "bmd": {
+              "category": "MAPPING_MISSING"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.5381959999795072,
+              "interpretation_ms": 4946.605074001127,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4947.376590993372
+            },
+            "decision": "DIRECT_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "limit": 10,
+              "metric": "sales.net_amount",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.net_amount",
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.source_top_items",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.source_top_items",
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Entendí que pedís cantidades documentales por producto para «Calenta» (tipo de entidad pendiente de resolución). La entidad mencionada todavía no tiene una resolución ni un filtro comercial aprobado en esta consulta.",
+              "classification": "DIRECT_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "DIRECT_UNAVAILABLE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.source_top_items",
+                  "/entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C09_diagnosis",
+      "conversation": "c09:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "ANALYSIS_UNAVAILABLE",
+          "committed": true,
+          "decision": "ANALYSIS_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "ANALYSIS_REQUESTED",
+          "metrics": [],
+          "metric": null,
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Esta funcionalidad de análisis todavía no está disponible. La ejecución diferida tampoco está habilitada.",
+          "user_text": "por que bajaron las ventas?",
+          "elapsed_ms": 4595.77,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c09:20261012T222132Z\"}"
+          ],
+          "conversation_id": "f978ff16-9733-42cc-b2d4-eb50be9b1bd6",
+          "correlation_id": "528ad022-28d7-48cd-a5d4-ca5d71886544",
+          "audit": {
+            "bmd": {
+              "category": "ANALYSIS_REQUESTED"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.7246719978866167,
+              "interpretation_ms": 4543.826676002936,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 4544.832778003183
+            },
+            "decision": "ANALYSIS_UNAVAILABLE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [],
+              "temporal_reference": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Esta funcionalidad de análisis todavía no está disponible. La ejecución diferida tampoco está habilitada.",
+              "classification": "ANALYSIS_UNAVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "ANALYSIS_UNAVAILABLE",
+              "intent": "EXPLAIN",
+              "state_delta": {
+                "set": {
+                  "/metric": null,
+                  "/period": null,
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "C10_entity_period",
+      "conversation": "c10:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "NEEDS_CLARIFICATION",
+          "committed": true,
+          "decision": "ASK",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [],
+          "metric": null,
+          "entity": "Calenta",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "¿Querés ver el importe vendido, las cantidades o ambas?",
+          "user_text": "mostrame ventas de Calenta en mayo",
+          "elapsed_ms": 3339.24,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"c10:20261012T222132Z\"}"
+          ],
+          "conversation_id": "737756ac-52af-4746-bb87-d0c6dfa6fad0",
+          "correlation_id": "7c3e8d28-c35f-461f-86ed-ea1cb0d6ad6f",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.5837340067955665,
+              "interpretation_ms": 3259.8575779993553,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 3260.722976003308
+            },
+            "decision": "ASK",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "metric",
+                  "question": "¿Querés ver el importe vendido, las cantidades o ambas?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "requested_metrics": [],
+                  "temporal_reference": null
+                },
+                "source_turn_id": "7c3e8d28-c35f-461f-86ed-ea1cb0d6ad6f",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "metric",
+                  "question": "¿Querés ver el importe vendido, las cantidades o ambas?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "requested_metrics": [],
+                  "temporal_reference": null
+                },
+                "source_turn_id": "7c3e8d28-c35f-461f-86ed-ea1cb0d6ad6f",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "¿Querés ver el importe vendido, las cantidades o ambas?",
+              "classification": "NEEDS_CLARIFICATION"
+            },
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "metric": null,
+                  "entity_mention": {
+                    "text": "Calenta",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "requested_metrics": [],
+                  "temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": {
+                "slot": "metric",
+                "question": "¿Querés ver el importe vendido, las cantidades o ambas?"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "foundation_positive",
+      "conversation": "foundation-positive:20261012T222132Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "DIRECT_AVAILABLE",
+          "committed": true,
+          "decision": "EXECUTE",
+          "execution_status": "executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.source_top_items"
+          ],
+          "metric": "sales.source_top_items",
+          "entity": null,
+          "temporal_reference": null,
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "response_text": "Top 10 por cantidad documental, 01/01–15/09/2026:\nL00505: 557199.0000000000\nL02467: 200000.0000000000\nM05970: 133931.0000000000\nL01698: 116567.0000000000\nL01003: 115269.0000000000\nL01613: 108791.0000000000\nL02837: 101919.0000000000\nL00003: 98511.0000000000\nM05239: 94065.0000000000\nM05486: 93144.0000000000\nUnidades originales por producto, no comparables entre productos. Sin descontar notas de crédito ni anulaciones; no es facturación ni venta neta. Cobertura histórica completa no certificada. Actualización: 2026-09-28T18:18:35.264000. Fuente: Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9.",
+          "user_text": "Nueva consulta: top 10 productos por cantidad documental del 1 de enero al 15 de septiembre de 2026, sin filtros",
+          "elapsed_ms": 8190.37,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:45165/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"foundation-positive:20261012T222132Z\"}"
+          ],
+          "conversation_id": "e01a4ef9-5d99-467e-a515-fcb567608110",
+          "correlation_id": "56af0fd9-2e5c-4d2c-9e50-9433ac2ca71e",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 4660.365432995604,
+              "state_engine_ms": 0.19677200180012733,
+              "interpretation_ms": 3399.6547420028946,
+              "response_format_ms": 0.011705000360962003,
+              "total_processing_ms": 8061.085592999007
+            },
+            "decision": "EXECUTE",
+            "committed": true,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "limit": 10,
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "validated_state": {
+              "limit": 10,
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "requested_metrics": [
+                "sales.source_top_items"
+              ],
+              "temporal_reference": null
+            },
+            "execution_result": {
+              "rows": [
+                {
+                  "quantity": "557199.0000000000",
+                  "item_code": "L00505"
+                },
+                {
+                  "quantity": "200000.0000000000",
+                  "item_code": "L02467"
+                },
+                {
+                  "quantity": "133931.0000000000",
+                  "item_code": "M05970"
+                },
+                {
+                  "quantity": "116567.0000000000",
+                  "item_code": "L01698"
+                },
+                {
+                  "quantity": "115269.0000000000",
+                  "item_code": "L01003"
+                },
+                {
+                  "quantity": "108791.0000000000",
+                  "item_code": "L01613"
+                },
+                {
+                  "quantity": "101919.0000000000",
+                  "item_code": "L02837"
+                },
+                {
+                  "quantity": "98511.0000000000",
+                  "item_code": "L00003"
+                },
+                {
+                  "quantity": "94065.0000000000",
+                  "item_code": "M05239"
+                },
+                {
+                  "quantity": "93144.0000000000",
+                  "item_code": "M05486"
+                }
+              ],
+              "units": "source_document_units_per_item; not comparable across items",
+              "metric": "source_document_quantity_by_item",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "source": {
+                "updated_at": "2026-09-28T18:18:35.264000",
+                "snapshot_id": 1408,
+                "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+              },
+              "coverage": "fixed_query_window; historical completeness not certified",
+              "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+              "parameters": {
+                "limit": 10,
+                "metric": "sales.source_top_items",
+                "period": {
+                  "start": "2026-01-01",
+                  "end_exclusive": "2026-09-16"
+                },
+                "pending": null,
+                "branches": [],
+                "reference": null,
+                "comparison": null,
+                "sales_channel": null,
+                "entity_mention": null,
+                "schema_version": 2,
+                "requested_metrics": [
+                  "sales.source_top_items"
+                ],
+                "temporal_reference": null
+              },
+              "limitations": "Invoices only, no cancellation filter or credit subtraction; not net sales or revenue."
+            },
+            "execution_status": "executed",
+            "response_prepared": {
+              "text": "Top 10 por cantidad documental, 01/01–15/09/2026:\nL00505: 557199.0000000000\nL02467: 200000.0000000000\nM05970: 133931.0000000000\nL01698: 116567.0000000000\nL01003: 115269.0000000000\nL01613: 108791.0000000000\nL02837: 101919.0000000000\nL00003: 98511.0000000000\nM05239: 94065.0000000000\nM05486: 93144.0000000000\nUnidades originales por producto, no comparables entre productos. Sin descontar notas de crédito ni anulaciones; no es facturación ni venta neta. Cobertura histórica completa no certificada. Actualización: 2026-09-28T18:18:35.264000. Fuente: Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9.",
+              "classification": "DIRECT_AVAILABLE"
+            },
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/limit": 10,
+                  "/metric": "sales.source_top_items",
+                  "/period": {
+                    "start": "2026-01-01",
+                    "end_exclusive": "2026-09-16"
+                  },
+                  "/branches": [],
+                  "/reference": null,
+                  "/comparison": null,
+                  "/sales_channel": null,
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.source_top_items"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "server": {
+    "pid_reaped": true,
+    "log": "../../data/reports/telchi/sales_rbac_business_runtime_v1/legacy_http/dev-server.log"
+  }
+}

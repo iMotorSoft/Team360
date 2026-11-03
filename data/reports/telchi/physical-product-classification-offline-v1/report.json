@@ -1,0 +1,115 @@
+{
+  "verdict": "PARTIAL",
+  "branch": "feature/console-backend-core",
+  "scope": "TELCHI DEVELOPMENT: physical product classification and Reference-only Foundation publication, offline only",
+  "implementation": {
+    "root": "SrvRestAstroLS_v1/backend/modules/telchi/datalake",
+    "modified": {
+      "reference_update.py": "Add official OITM physical field, additive products contract, observation lineage/evidence, identity integrity, content-based versions and NOOP, immutable destination verification, bounded local threads and exact blank/null preservation",
+      "update.py": "Reference-only publication through existing boundary, corrected facts-NOOP decision, preserved eight-component manifests and dependencies, compatibility guards, explicit rejection of unsupported changes",
+      "foundation_manifest.py": "Extend preexisting untracked validator with historical five-component base and proven Reference refresh envelope; preserve earlier extensible contracts",
+      "foundation_publication.py": "Add transactional compare-and-swap check against candidate's prepared base; preserve preexisting duplicate-key validation",
+      "foundation_reader.py": "Validate refresh proofs and pin Atomic reads to original data snapshot rather than metadata-only commit; preserve preexisting reader changes"
+    },
+    "created": {
+      "reference_compatibility.py": "Reproducible fail-closed schema, row, dataset, crosswalk, identity and physical dictionary compatibility proof",
+      "tests/test_physical_reference_offline.py": "32 synthetic tests with SAP constructor forbidden",
+      "PHYSICAL_PRODUCT_CLASSIFICATION_V1.md": "Contract, component dependencies, limitations, SAP cost and controlled continuation"
+    }
+  },
+  "tests": {
+    "final_suite": "modules/telchi/datalake/tests",
+    "passed": 504,
+    "failed": 1,
+    "skipped": 0,
+    "new_tests_passed": 32,
+    "elapsed_seconds": 27.70,
+    "junit": "pytest.xml",
+    "execution": "cd SrvRestAstroLS_v1/backend; UV_OFFLINE=1 uv run --no-sync python invoking pytest.main with modules/telchi/datalake/tests -q --junitxml=../../data/reports/telchi/physical-product-classification-offline-v1/pytest.xml",
+    "offline_guard": [
+      "socket.socket.connect raises AssertionError",
+      "socket.create_connection raises AssertionError",
+      "HanaReadOnlySource.__init__ raises AssertionError"
+    ],
+    "failure": {
+      "test": "test_foundation_reader.py::test_productive_and_shared_static_scan_are_clean",
+      "assertion": "UNCLASSIFIED_DIRECT_READS == 0; observed 2",
+      "preexisting_findings": [
+        {"path": "exploratory_sql/foundation.py", "line": 151, "kind": "comment containing telchi.atomic"},
+        {"path": "exploratory_sql/test_foundation.py", "line": 67, "kind": "test query containing telchi.atomic"}
+      ],
+      "disposition": "Outside assigned implementation paths; unchanged. No allowlist expansion or hidden skip. Owner coordination required."
+    },
+    "critical_scenarios": [
+      "All six official codes persisted, null, blank, whitespace, unknown and noncanonical raw codes",
+      "MEDICAMENTO never supplies physical state; commercial classification preserved",
+      "Stable existing/custom canonical IDs, new products, source-scoped legacy/SAP identities, duplicate/remap/collision rejection",
+      "Physical-only change produces new Reference version; serialization-only and observation-only changes do not",
+      "Five- and eight-component Reference-only Foundation commits without SAP/fact extraction",
+      "Exact preserved derived component manifests, dependencies and snapshot IDs",
+      "Canonical FoundationReader, Material Supply and Receivables resolvers on synthetic metadata",
+      "Precommit and in-transaction faults preserve prior CURRENT; failed preparations mark candidate FAILED",
+      "Postcommit interruption leaves coherent new CURRENT; explicit logical rollback and stale rollback rejection",
+      "Retry after failure, repeated successful publication NOOP, immutable historical manifest preservation",
+      "Incompatible commercial/schema/identity/crosswalk/physical/Purchasing contracts rejected",
+      "Facts delta with sealed derived dependencies rejected instead of dropping components",
+      "Stale prepared candidate cannot overwrite a later commit"
+    ]
+  },
+  "documentation_gates": {
+    "lat check md": 0,
+    "lat check index": 0,
+    "lat check sections": 0,
+    "lat check code-refs": 0,
+    "lat check": 0,
+    "git diff --check": 0,
+    "notes": "LAT reports no recorded init version and no semantic-search LLM key; checks still pass. No configuration or credentials changed."
+  },
+  "resource_guard": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": "1 pytest process; new builder/proof DuckDB connections use 2 threads; existing small unit fixtures retain their own configurations",
+    "initial_load": [5.01, 3.76, 3.62],
+    "final_load": [3.09, 3.36, 3.57],
+    "logical_cpus": 8,
+    "initial_available_memory_mb": 7725,
+    "final_available_memory_mb": 8097,
+    "swap_growth_observed": false,
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "notes": "High I/O wait observed; workloads were short, sequential and synthetic. No services, browsers, background workers or remote benchmarks started."
+  },
+  "sap_static_impact": {
+    "added_column": "OITM.U_FormaFarmac",
+    "additional_queries": 0,
+    "master_queries_unchanged": 4,
+    "connectivity_queries_unchanged": 1,
+    "row_cardinality_change": false,
+    "max_hana_concurrency_unchanged": 1,
+    "fact_reextraction_required": false,
+    "expected_increment": "One projected column's payload; additional local Reference/crosswalk hashing and compatibility validation. Remote cost not measured."
+  },
+  "protected_operations": {
+    "sap_connections": 0,
+    "sap_queries": 0,
+    "shared_datalake_writes": 0,
+    "real_current_changes": 0,
+    "real_publications": 0,
+    "dependency_installs": 0,
+    "service_restarts": 0,
+    "credential_or_permission_changes": 0,
+    "commits": 0,
+    "conversational_changes": 0
+  },
+  "limitations": [
+    "Global offline verdict cannot be PASS while the preexisting reader-scanner regression fails",
+    "Live current publication was not resolved through shared services; eight-component preservation was proven on isolated synthetic contracts",
+    "Compatibility is intentionally conservative: added/deleted rows or other changed old attributes require explicit dependent-component revalidation, even though Reference builder accepts new products",
+    "Unknown extra components require an explicit compatibility adapter",
+    "Existing ancestry depth limit of 32 is retained",
+    "Incomplete immutable physical preparation fails closed and requires explicit review, not silent overwrite",
+    "Synthetic reader tests inject snapshot/component verification; no live DuckLake catalog was accessed"
+  ],
+  "next_authorization": "Coordinate the preexisting scanner scope and obtain a controlled, bounded HANA master-read refresh authorization. Shared Reference activation and Foundation publication require separate explicit permission, host preflight and real candidate compatibility review. No SAP or publication authorization is inferred from this offline work."
+}

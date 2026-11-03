@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-10-11T16:03:07.867569+00:00",
+  "model": "gpt-5.6-luna",
+  "reasoning": "medium",
+  "provider": "OpenAI direct",
+  "simulated": [
+    "identity",
+    "business permission",
+    "PG persistence",
+    "transport"
+  ],
+  "whatsapp_e2e": false,
+  "fallback": false,
+  "turns": [
+    {
+      "user_message": "¿Cuánto vendimos en septiembre?",
+      "classification": "NEEDS_CLARIFICATION",
+      "interpretation": {
+        "intent": "NEW_QUERY",
+        "action": "ASK",
+        "state_delta": {
+          "set": {
+            "metric": "sales.net_amount"
+          },
+          "unset": []
+        },
+        "clarification": {
+          "slot": "period",
+          "question": "¿De qué año querés consultar las ventas de septiembre?"
+        }
+      },
+      "committed": true,
+      "decision": "ASK",
+      "confirmed_state": {
+        "metric": null,
+        "period": null,
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": {
+          "spec": {
+            "slot": "period",
+            "question": "¿De qué año querés consultar las ventas de septiembre?"
+          },
+          "proposed": {
+            "metric": "sales.net_amount",
+            "period": null,
+            "branches": [],
+            "sales_channel": null,
+            "comparison": null,
+            "reference": null,
+            "pending": null
+          },
+          "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3",
+          "source_turn_id": "probe-0"
+        }
+      },
+      "execution_status": "not_executed",
+      "timings": {
+        "interpretation_ms": 3836.7540489998646,
+        "state_engine_ms": 0.4264429990143981,
+        "capability_ms": 0.0,
+        "response_format_ms": 0.0,
+        "total_processing_ms": 3837.3810189987125
+      }
+    }
+  ],
+  "foundation": null,
+  "controlled_capability_calls": 0,
+  "luna_metadata": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  }
+}

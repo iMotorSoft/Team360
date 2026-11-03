@@ -1,0 +1,388 @@
+{
+  "timestamp": "2026-11-02T17:08:19.112178+00:00",
+  "source_sha256": "92c866f1634f706901a391591c55660092568879ad2527682d6d490076102f12",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "preparation_ms": 0.16490300004079472,
+    "response_bytes": 7149,
+    "duration_ms": 4830.578,
+    "attempts": 1
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿Qué período querés consultar?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuántas líneas elegibles de consumo de materiales se registraron en octubre de 2026?",
+      "text": "Consumo elegible de Material Supply:\n2.297 líneas elegibles de consumo de materiales.\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:46:37.892000 a 2026-11-01T17:46:53.281000.\nControles: period_source_lines=4814, included_issue_lines=2297, unknown_native_identity_lines_affected=0\nMostradas 10 de 520 filas; 510 omitidas del mensaje. No es un ranking global entre unidades.\nSubconjunto elegible del derivado publicado, filtrado por fecha de emisión. Identidad de material no equivale a clasificación de materia prima.\nLos cinco datasets históricos de Material Supply no se actualizan. No acredita faltantes, reposición ni cobertura de demanda.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "09d09c6a-6f13-4c1d-95b3-5f03d5069d04",
+      "thread_id": "40392be9-e739-44c0-846c-3edd01e441e7",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 66169.61352399994,
+          "state_engine_ms": 0.7654849996470148,
+          "interpretation_ms": 6249.843953999516,
+          "response_format_ms": 0.06112099981692154,
+          "total_processing_ms": 72456.25406399995
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "business_scope": {
+          "domain": "material_supply",
+          "metric": "material_supply.consumption",
+          "coverage": {
+            "kind": "BOUNDED_OBSERVATION",
+            "dataset_rows": 41808,
+            "source_scope": {
+              "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+              "start": "2026-01-01",
+              "limitation": "No claim of modifications outside this business-date scope; no CDC",
+              "end_exclusive": "2026-11-02",
+              "absent_optional_fields": []
+            },
+            "declared_start": "2026-01-01",
+            "absence_is_zero": false,
+            "requested_period": {
+              "date_from": "2026-10-01",
+              "date_to_exclusive": "2026-11-01"
+            },
+            "last_observed_date": "2026-10-31 00:00:00",
+            "first_observed_date": "2026-01-05 00:00:00",
+            "declared_end_exclusive": "2026-11-02",
+            "observation_started_at": "2026-11-01T17:46:37.892000",
+            "observation_finished_at": "2026-11-01T17:46:53.281000",
+            "complete_business_history": false,
+            "requested_outside_capture": false
+          },
+          "datasets": [
+            "production_issue",
+            "observed_material_actual_consumption",
+            "production_order"
+          ],
+          "universe": "CAPTURED_NATIVE_OBSERVATIONS"
+        },
+        "contract_error": null,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "material_supply.consumption",
+          "period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-11-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "material_supply.consumption"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "material_supply.consumption",
+          "period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-11-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "material_supply.consumption"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "rows": [
+            {
+              "unit": "BOLSA",
+              "quantity": "641.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L01685",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "BOLSA",
+              "quantity": "30.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M02927",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CAPS",
+              "quantity": "100.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M05939",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CJA",
+              "quantity": "10.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L02331",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CJA",
+              "quantity": "5.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L02322",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CJA",
+              "quantity": "3.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L02157",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "CJA",
+              "quantity": "3.000000000000",
+              "uom_code": "Manual",
+              "item_code": "L02227",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "COMP",
+              "quantity": "100.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M02605",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "COMP",
+              "quantity": "100.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M05375",
+              "issue_lines": 1,
+              "native_factor": "1"
+            },
+            {
+              "unit": "COMP",
+              "quantity": "100.000000000000",
+              "uom_code": "Manual",
+              "item_code": "M05847",
+              "issue_lines": 1,
+              "native_factor": "1"
+            }
+          ],
+          "label": "Consumo elegible de Material Supply",
+          "metric": "material_supply.consumption",
+          "source": {
+            "datasets": {
+              "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+              "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7",
+              "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33"
+            },
+            "updated_at": "2026-11-01T17:50:16.749000+00:00",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+            "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+          },
+          "summary": null,
+          "timings": {
+            "serialization_ms": 0.16172499999811407,
+            "planning_and_sql_ms": 87.35311700002057,
+            "foundation_resolution_ms": 65615.22
+          },
+          "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+          "controls": {
+            "period_source_lines": 4814,
+            "included_issue_lines": 2297,
+            "unknown_native_identity_lines_affected": 0
+          },
+          "coverage": {
+            "kind": "BOUNDED_OBSERVATION",
+            "dataset_rows": 41808,
+            "source_scope": {
+              "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+              "start": "2026-01-01",
+              "limitation": "No claim of modifications outside this business-date scope; no CDC",
+              "end_exclusive": "2026-11-02",
+              "absent_optional_fields": []
+            },
+            "declared_start": "2026-01-01",
+            "absence_is_zero": false,
+            "requested_period": {
+              "date_from": "2026-10-01",
+              "date_to_exclusive": "2026-11-01"
+            },
+            "last_observed_date": "2026-10-31 00:00:00",
+            "first_observed_date": "2026-01-05 00:00:00",
+            "declared_end_exclusive": "2026-11-02",
+            "observation_started_at": "2026-11-01T17:46:37.892000",
+            "observation_finished_at": "2026-11-01T17:46:53.281000",
+            "complete_business_history": false,
+            "requested_outside_capture": false
+          },
+          "read_only": true,
+          "capability": "material_supply.consumption.v1",
+          "parameters": {
+            "limit": 10,
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "total_rows": 520,
+          "limitations": [
+            "Subconjunto elegible del derivado publicado, filtrado por fecha de emisión. Identidad de material no equivale a clasificación de materia prima.",
+            "Los cinco datasets históricos de Material Supply no se actualizan. No acredita faltantes, reposición ni cobertura de demanda.",
+            "Cantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles."
+          ],
+          "omitted_rows": 510,
+          "sap_accessed": false
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Consumo elegible de Material Supply:\n2.297 líneas elegibles de consumo de materiales.\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:46:37.892000 a 2026-11-01T17:46:53.281000.\nControles: period_source_lines=4814, included_issue_lines=2297, unknown_native_identity_lines_affected=0\nMostradas 10 de 520 filas; 510 omitidas del mensaje. No es un ranking global entre unidades.\nSubconjunto elegible del derivado publicado, filtrado por fecha de emisión. Identidad de material no equivale a clasificación de materia prima.\nLos cinco datasets históricos de Material Supply no se actualizan. No acredita faltantes, reposición ni cobertura de demanda.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.material_supply.consumption.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "material_supply.consumption",
+              "/period": {
+                "start": "2026-10-01",
+                "end_exclusive": "2026-11-01"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "material_supply.consumption"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.1415130000168574,
+        "response_bytes": 7740,
+        "duration_ms": 6249.127,
+        "attempts": 1
+      },
+      "elapsed_ms": 72935.22845699954,
+      "request_trace": {
+        "schema": "telchi-pre-sql-profile-v1",
+        "clock": "perf_counter_ns",
+        "spans": [
+          {
+            "label": "authorization_initial",
+            "start_ms": 401.087263,
+            "end_ms": 402.709773,
+            "duration_ms": 1.62251
+          },
+          {
+            "label": "authorization_transaction_revalidation",
+            "start_ms": 407.784953,
+            "end_ms": 416.126843,
+            "duration_ms": 8.34189
+          },
+          {
+            "label": "model_inference_response",
+            "start_ms": 455.071032,
+            "end_ms": 6664.76991,
+            "duration_ms": 6209.698878
+          },
+          {
+            "label": "interpretation_result_parse",
+            "start_ms": 6665.429141,
+            "end_ms": 6665.514205,
+            "duration_ms": 0.085064
+          },
+          {
+            "label": "conversation_audit_save",
+            "start_ms": 72872.417797,
+            "end_ms": 72924.676635,
+            "duration_ms": 52.258838
+          }
+        ],
+        "total_ms": 72978.720781
+      }
+    }
+  ],
+  "budgets": {
+    "worker_seconds": 180,
+    "turn_seconds": 240,
+    "model_seconds": 20,
+    "model_attempts": 1,
+    "production_changed": false
+  }
+}

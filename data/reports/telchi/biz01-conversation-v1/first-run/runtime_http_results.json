@@ -1,0 +1,1890 @@
+{
+  "run_id": "20261021T131131Z",
+  "base_url": "http://127.0.0.1:39243",
+  "endpoint": "/api/telchi/assistant/dev/turn",
+  "transport": "curl",
+  "pipeline": "MessageDispatcher -> TelchiHandler -> StateEngine -> capabilities",
+  "whatsapp_e2e": false,
+  "scenarios": [
+    {
+      "id": "BIZ01",
+      "conversation": "biz01:20261021T131131Z",
+      "turns": [
+        {
+          "http_ok": true,
+          "classification": "NEEDS_CLARIFICATION",
+          "committed": true,
+          "decision": "ASK",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.net_amount"
+          ],
+          "metric": "sales.net_amount",
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "¿De qué año querés consultar septiembre?",
+          "user_text": "¿Cuánto facturamos en septiembre?",
+          "elapsed_ms": 11824.49,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "27a315ae-38c4-4c4c-962f-602db4a98c53",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.2684619994397508,
+              "interpretation_ms": 11408.996070000285,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 11409.46278499905
+            },
+            "decision": "ASK",
+            "committed": true,
+            "contract_error": null,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "metric": "sales.net_amount",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "27a315ae-38c4-4c4c-962f-602db4a98c53",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "metric": "sales.net_amount",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "27a315ae-38c4-4c4c-962f-602db4a98c53",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "¿De qué año querés consultar septiembre?",
+              "classification": "NEEDS_CLARIFICATION"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "NEW_QUERY",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": [
+                  "/period",
+                  "/branches",
+                  "/sales_channel",
+                  "/comparison",
+                  "/reference"
+                ]
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿De qué año querés consultar septiembre?"
+              }
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "NEEDS_CLARIFICATION",
+          "committed": true,
+          "decision": "ASK",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.net_amount"
+          ],
+          "metric": "sales.net_amount",
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "¿De qué año querés consultar septiembre?",
+          "user_text": "¿Y cuánto corresponde a productos terminados de laboratorio?",
+          "elapsed_ms": 9049.38,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "7f36d550-06f2-48e8-a602-98e826cbddff",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.44429200170270633,
+              "interpretation_ms": 8884.635606000302,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 8885.305261999747
+            },
+            "decision": "ASK",
+            "committed": true,
+            "contract_error": null,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "metric": "sales.net_amount",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "27a315ae-38c4-4c4c-962f-602db4a98c53",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "metric": "sales.net_amount",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "7f36d550-06f2-48e8-a602-98e826cbddff",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "metric": "sales.net_amount",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "7f36d550-06f2-48e8-a602-98e826cbddff",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "¿De qué año querés consultar septiembre?",
+              "classification": "NEEDS_CLARIFICATION"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.net_amount",
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/business_category": "LAB_FINISHED_PRODUCT",
+                  "/requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿De qué año querés consultar septiembre?"
+              }
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "NEEDS_CLARIFICATION",
+          "committed": true,
+          "decision": "ASK",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.product_line_amount_ranking"
+          ],
+          "metric": "sales.product_line_amount_ranking",
+          "entity": "LAB_FINISHED_PRODUCT",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "¿De qué año querés consultar septiembre?",
+          "user_text": "¿Cuáles fueron los cinco productos con mayor importe vendido?",
+          "elapsed_ms": 8432.94,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "b2df8852-84ac-4b1b-a662-e0578655cab8",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.509528999828035,
+              "interpretation_ms": 8198.869173000276,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 8199.691830999654
+            },
+            "decision": "ASK",
+            "committed": true,
+            "contract_error": null,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "metric": "sales.net_amount",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.net_amount"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "7f36d550-06f2-48e8-a602-98e826cbddff",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "limit": 5,
+                  "metric": "sales.product_line_amount_ranking",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.product_line_amount_ranking"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "b2df8852-84ac-4b1b-a662-e0578655cab8",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "limit": 5,
+                  "metric": "sales.product_line_amount_ranking",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.product_line_amount_ranking"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "b2df8852-84ac-4b1b-a662-e0578655cab8",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "¿De qué año querés consultar septiembre?",
+              "classification": "NEEDS_CLARIFICATION"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/limit": 5,
+                  "/metric": "sales.product_line_amount_ranking",
+                  "/entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/business_category": "LAB_FINISHED_PRODUCT",
+                  "/requested_metrics": [
+                    "sales.product_line_amount_ranking"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿De qué año querés consultar septiembre?"
+              }
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "ERROR",
+          "committed": false,
+          "decision": "EXECUTION_FORBIDDEN",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.product_line_amount_ranking"
+          ],
+          "metric": "sales.product_line_amount_ranking",
+          "entity": "LAB_FINISHED_PRODUCT",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "No pude interpretar la consulta. No se ejecutó ninguna consulta.",
+          "user_text": "¿En qué puesto estuvo L03281 en julio y agosto?",
+          "elapsed_ms": 7597.2,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "671e5cdd-5a89-43ab-bd71-6af0fff05329",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.38379199941118713,
+              "interpretation_ms": 7384.828969999944,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 7385.2843270015
+            },
+            "decision": "EXECUTION_FORBIDDEN",
+            "committed": false,
+            "contract_error": "CONTRACT_ERROR_NO_COMMIT",
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "limit": 5,
+                  "metric": "sales.product_line_amount_ranking",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.product_line_amount_ranking"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "b2df8852-84ac-4b1b-a662-e0578655cab8",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "limit": 5,
+                  "metric": "sales.product_line_amount_ranking",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.product_line_amount_ranking"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "b2df8852-84ac-4b1b-a662-e0578655cab8",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": null,
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "No pude interpretar la consulta. No se ejecutó ninguna consulta.",
+              "classification": "ERROR"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "EXECUTE",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.product_line_amount_ranking",
+                  "/period": {
+                    "start": "2026-07-01",
+                    "end_exclusive": "2026-08-01"
+                  },
+                  "/group_by": "sap_product",
+                  "/comparison": {
+                    "start": "2026-08-01",
+                    "end_exclusive": "2026-09-01"
+                  },
+                  "/entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/business_category": "LAB_FINISHED_PRODUCT",
+                  "/requested_metrics": [
+                    "sales.product_line_amount_ranking"
+                  ],
+                  "/temporal_reference": null,
+                  "/product_search_text": null,
+                  "/selected_item_codes": [],
+                  "/ranking_target_item_code": "L03281"
+                },
+                "unset": [
+                  "/limit"
+                ]
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "ERROR",
+          "committed": false,
+          "decision": "EXECUTION_FORBIDDEN",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.product_line_amount_ranking"
+          ],
+          "metric": "sales.product_line_amount_ranking",
+          "entity": "LAB_FINISHED_PRODUCT",
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "No pude interpretar la consulta. No se ejecutó ninguna consulta.",
+          "user_text": "¿A qué cliente le vendimos más ese producto entre ambos meses?",
+          "elapsed_ms": 14437.93,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "b70953d5-4e72-4b3a-934c-2d4118ea1f42",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.2593379995232681,
+              "interpretation_ms": 14327.900999000121,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 14328.215429999545
+            },
+            "decision": "EXECUTION_FORBIDDEN",
+            "committed": false,
+            "contract_error": "CONTRACT_ERROR_NO_COMMIT",
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "limit": 5,
+                  "metric": "sales.product_line_amount_ranking",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.product_line_amount_ranking"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "b2df8852-84ac-4b1b-a662-e0578655cab8",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "limit": 5,
+                  "metric": "sales.product_line_amount_ranking",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.product_line_amount_ranking"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "b2df8852-84ac-4b1b-a662-e0578655cab8",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": null,
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "No pude interpretar la consulta. No se ejecutó ninguna consulta.",
+              "classification": "ERROR"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.commercial_line_amount_by",
+                  "/group_by": "card_code",
+                  "/breakdown_by": "period",
+                  "/entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "/schema_version": 2,
+                  "/business_category": "LAB_FINISHED_PRODUCT",
+                  "/requested_metrics": [
+                    "sales.commercial_line_amount_by"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿Qué dos meses, con sus años, querés comparar y qué producto específico tomamos como referencia?"
+              }
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "NEEDS_CLARIFICATION",
+          "committed": true,
+          "decision": "ASK",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": null,
+          "metric": null,
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "¿De qué año son julio y agosto y a qué cliente te referís?",
+          "user_text": "¿Cuánto compró ese cliente en julio y cuánto en agosto?",
+          "elapsed_ms": 6871.04,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "679c03e2-992d-408d-9d35-049bae2fa844",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.32268199902318884,
+              "interpretation_ms": 6662.146759001189,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 6662.674564000554
+            },
+            "decision": "ASK",
+            "committed": true,
+            "contract_error": null,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar septiembre?"
+                },
+                "proposed": {
+                  "limit": 5,
+                  "metric": "sales.product_line_amount_ranking",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": {
+                    "text": "LAB_FINISHED_PRODUCT",
+                    "type": null
+                  },
+                  "schema_version": 2,
+                  "product_context": null,
+                  "business_category": "LAB_FINISHED_PRODUCT",
+                  "requested_metrics": [
+                    "sales.product_line_amount_ranking"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "b2df8852-84ac-4b1b-a662-e0578655cab8",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null
+                },
+                "source_turn_id": "679c03e2-992d-408d-9d35-049bae2fa844",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null
+                },
+                "source_turn_id": "679c03e2-992d-408d-9d35-049bae2fa844",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "¿De qué año son julio y agosto y a qué cliente te referís?",
+              "classification": "NEEDS_CLARIFICATION"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {},
+                "unset": []
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+              }
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "NEEDS_CLARIFICATION",
+          "committed": true,
+          "decision": "ASK",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [],
+          "metric": null,
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "¿De qué año son julio y agosto y a qué cliente te referís?",
+          "user_text": "¿Qué otros productos nos compró durante esos meses?",
+          "elapsed_ms": 7202.08,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "57b0d23a-1a78-4655-9000-6204ebd6c86d",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 1.8488909990992397,
+              "interpretation_ms": 7081.372103000831,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 7083.821195999917
+            },
+            "decision": "ASK",
+            "committed": true,
+            "contract_error": null,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null
+                },
+                "source_turn_id": "679c03e2-992d-408d-9d35-049bae2fa844",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "57b0d23a-1a78-4655-9000-6204ebd6c86d",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "57b0d23a-1a78-4655-9000-6204ebd6c86d",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "¿De qué año son julio y agosto y a qué cliente te referís?",
+              "classification": "NEEDS_CLARIFICATION"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "ANSWER_CLARIFICATION",
+              "state_delta": {
+                "set": {
+                  "/metric": null,
+                  "/entity_mention": null,
+                  "/schema_version": 2,
+                  "/requested_metrics": [],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+              }
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "ANALYSIS_UNAVAILABLE",
+          "committed": true,
+          "decision": "ANALYSIS_UNAVAILABLE",
+          "execution_status": "not_executed",
+          "bmd_category": "ANALYSIS_REQUESTED",
+          "metrics": [],
+          "metric": null,
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "Esta funcionalidad de análisis todavía no está disponible. La ejecución diferida tampoco está habilitada.",
+          "user_text": "¿Qué porcentaje representa ese cliente sobre las ventas de L03281?",
+          "elapsed_ms": 11206.67,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "a3848a56-8faa-4edd-9d7a-70fd89826eaa",
+          "audit": {
+            "bmd": {
+              "category": "ANALYSIS_REQUESTED"
+            },
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.24110400045174174,
+              "interpretation_ms": 11112.562034999428,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 11112.954205000278
+            },
+            "decision": "ANALYSIS_UNAVAILABLE",
+            "committed": true,
+            "contract_error": null,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "57b0d23a-1a78-4655-9000-6204ebd6c86d",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "57b0d23a-1a78-4655-9000-6204ebd6c86d",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "product_target": "L03281",
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "57b0d23a-1a78-4655-9000-6204ebd6c86d",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "product_target": "L03281",
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "Esta funcionalidad de análisis todavía no está disponible. La ejecución diferida tampoco está habilitada.",
+              "classification": "ANALYSIS_UNAVAILABLE"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "ANALYSIS_UNAVAILABLE",
+              "intent": "EXPLAIN",
+              "state_delta": {
+                "set": {
+                  "/metric": null,
+                  "/entity_mention": null,
+                  "/product_target": "L03281",
+                  "/schema_version": 2,
+                  "/requested_metrics": [],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": null
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "NEEDS_CLARIFICATION",
+          "committed": true,
+          "decision": "ASK",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.commercial_line_amount_by"
+          ],
+          "metric": "sales.commercial_line_amount_by",
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "¿De qué año querés consultar las compras de otros clientes de ese producto?",
+          "user_text": "¿Qué otros clientes importantes compraron ese producto?",
+          "elapsed_ms": 8747.07,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "41e6afdf-e294-4d97-b4d4-8f0a250d1e4a",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.3411029993003467,
+              "interpretation_ms": 8579.265812999438,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 8579.812453001068
+            },
+            "decision": "ASK",
+            "committed": true,
+            "contract_error": null,
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año son julio y agosto y a qué cliente te referís?"
+                },
+                "proposed": {
+                  "metric": null,
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "57b0d23a-1a78-4655-9000-6204ebd6c86d",
+                "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "product_target": "L03281",
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar las compras de otros clientes de ese producto?"
+                },
+                "proposed": {
+                  "metric": "sales.commercial_line_amount_by",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "group_by": "card_code",
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "product_target": "L03281",
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [
+                    "sales.commercial_line_amount_by"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "41e6afdf-e294-4d97-b4d4-8f0a250d1e4a",
+                "base_state_hash": "a74d4a78ff2b204fc47675ed27e172e8f2f4cf42c31f649b232867aa36d4ea63"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "product_target": "L03281",
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "validated_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar las compras de otros clientes de ese producto?"
+                },
+                "proposed": {
+                  "metric": "sales.commercial_line_amount_by",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "group_by": "card_code",
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "product_target": "L03281",
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [
+                    "sales.commercial_line_amount_by"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "41e6afdf-e294-4d97-b4d4-8f0a250d1e4a",
+                "base_state_hash": "a74d4a78ff2b204fc47675ed27e172e8f2f4cf42c31f649b232867aa36d4ea63"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "product_target": "L03281",
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "¿De qué año querés consultar las compras de otros clientes de ese producto?",
+              "classification": "NEEDS_CLARIFICATION"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.commercial_line_amount_by",
+                  "/group_by": "card_code",
+                  "/entity_mention": null,
+                  "/product_target": "L03281",
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.commercial_line_amount_by"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿De qué año querés consultar las compras de otros clientes de ese producto?"
+              }
+            }
+          }
+        },
+        {
+          "http_ok": true,
+          "classification": "ERROR",
+          "committed": false,
+          "decision": "EXECUTION_FORBIDDEN",
+          "execution_status": "not_executed",
+          "bmd_category": null,
+          "metrics": [
+            "sales.commercial_line_amount_by"
+          ],
+          "metric": "sales.commercial_line_amount_by",
+          "entity": null,
+          "temporal_reference": null,
+          "period": null,
+          "response_text": "No pude interpretar la consulta. No se ejecutó ninguna consulta.",
+          "user_text": "¿Qué cambió entre julio y agosto?",
+          "elapsed_ms": 9543.39,
+          "http_status": "200",
+          "curl": [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            "http://127.0.0.1:39243/api/telchi/assistant/dev/turn",
+            "-H",
+            "content-type: application/json",
+            "-H",
+            "x-team360-dev-token: <redacted>",
+            "-H",
+            "accept: application/json",
+            "--max-time",
+            "180",
+            "--write-out",
+            "\\n%{http_code}",
+            "--data-binary",
+            "{\"text\": <censored>, \"conversation\": \"biz01:20261021T131131Z\"}"
+          ],
+          "conversation_id": "1ff1a389-ccce-4782-94af-ddd4d8f0f57d",
+          "correlation_id": "afc894f2-27e4-4505-8076-e253633aba31",
+          "audit": {
+            "bmd": null,
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "timings": {
+              "capability_ms": 0.0,
+              "state_engine_ms": 0.4133549991820473,
+              "interpretation_ms": 9454.326974999276,
+              "response_format_ms": 0.0,
+              "total_processing_ms": 9454.79598699967
+            },
+            "decision": "EXECUTION_FORBIDDEN",
+            "committed": false,
+            "contract_error": "CONTRACT_ERROR_NO_COMMIT",
+            "previous_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar las compras de otros clientes de ese producto?"
+                },
+                "proposed": {
+                  "metric": "sales.commercial_line_amount_by",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "group_by": "card_code",
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "product_target": "L03281",
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [
+                    "sales.commercial_line_amount_by"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "41e6afdf-e294-4d97-b4d4-8f0a250d1e4a",
+                "base_state_hash": "a74d4a78ff2b204fc47675ed27e172e8f2f4cf42c31f649b232867aa36d4ea63"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "product_target": "L03281",
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "confirmed_state": {
+              "metric": null,
+              "period": null,
+              "pending": {
+                "spec": {
+                  "slot": "period",
+                  "question": "¿De qué año querés consultar las compras de otros clientes de ese producto?"
+                },
+                "proposed": {
+                  "metric": "sales.commercial_line_amount_by",
+                  "period": null,
+                  "pending": null,
+                  "branches": [],
+                  "group_by": "card_code",
+                  "reference": null,
+                  "comparison": null,
+                  "sales_channel": null,
+                  "entity_mention": null,
+                  "product_target": "L03281",
+                  "schema_version": 2,
+                  "product_context": null,
+                  "requested_metrics": [
+                    "sales.commercial_line_amount_by"
+                  ],
+                  "temporal_reference": null,
+                  "product_search_text": null,
+                  "selected_item_codes": []
+                },
+                "source_turn_id": "41e6afdf-e294-4d97-b4d4-8f0a250d1e4a",
+                "base_state_hash": "a74d4a78ff2b204fc47675ed27e172e8f2f4cf42c31f649b232867aa36d4ea63"
+              },
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "product_target": "L03281",
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "validated_state": null,
+            "capability_calls": 0,
+            "execution_result": null,
+            "execution_status": "not_executed",
+            "response_prepared": {
+              "text": "No pude interpretar la consulta. No se ejecutó ninguna consulta.",
+              "classification": "ERROR"
+            },
+            "required_permission": null,
+            "pilot_approval_sha256": null,
+            "interpretation_proposed": {
+              "action": "ASK",
+              "intent": "REFINE",
+              "state_delta": {
+                "set": {
+                  "/metric": "sales.commercial_line_amount_by",
+                  "/group_by": "card_code",
+                  "/period_mode": "compare",
+                  "/breakdown_by": "period",
+                  "/entity_mention": null,
+                  "/product_target": "L03281",
+                  "/schema_version": 2,
+                  "/requested_metrics": [
+                    "sales.commercial_line_amount_by"
+                  ],
+                  "/temporal_reference": null
+                },
+                "unset": []
+              },
+              "clarification": {
+                "slot": "period",
+                "question": "¿De qué año son julio y agosto?"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "server": {
+    "pid_reaped": true,
+    "log": "../../data/reports/telchi/biz01-conversation-v1/first-run/dev-server.log"
+  }
+}

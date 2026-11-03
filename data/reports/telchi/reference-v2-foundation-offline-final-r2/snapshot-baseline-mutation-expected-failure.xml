@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.333" timestamp="2026-10-29T15:44:28.693023-03:00" hostname="ubuntu24"><testcase classname="modules.telchi.datalake.tests.test_reference_refresh_snapshot" name="test_reader_preserves_distinct_commit_and_derivation_snapshots" time="1.073"><failure message="AssertionError: assert (84 == 1408)&#10; +  where 84 = FoundationAccess(foundation=CurrentFoundation(foundation_publication_id='foundation_dcfb4b74c14d22a20b44742073ce607e',...eference_version': 'ref-v2', 'update_run_id': 'reference-only-f2be2af6f821da5c2f0571b8'}, manifest_base_snapshot_id=84).ducklake_snapshot_id">eight = (&lt;modules.telchi.datalake.foundation_publication.FoundationPublicationStore object at 0x7a029c3d7c20&gt;, PosixPath('/tmp...st-17/test_reader_preserves_distinct0/data/reference/_versions/ref-v2'), 'foundation_ae908e1db1cf563b452323957c1c0adf')
+
+    def test_reader_preserves_distinct_commit_and_derivation_snapshots(eight):
+        store, _, new, old_id = eight
+        result = update.publish_reference_only(connector=None, foundation_store=store,
+            reference={'reference_version': 'ref-v2', 'reference_path': str(new)}, base_data_snapshot_id=1408)
+        assert result['status'] == 'COMMITTED'
+        publication = store.current_publication()
+        assert publication.manifest['base_snapshot_id'] == 84
+        assert publication.manifest['reference_data_snapshot_id'] == 1408
+        seen = []
+        access_reader = reader.FoundationReader(snapshot_resolver=lambda *_: 9999,
+            component_verifier=lambda _, __, snapshot: seen.append(snapshot), metadata_catalog='')
+        with store.connection_factory() as db:
+            access = access_reader.resolve_on(db)
+&gt;       assert access.ducklake_snapshot_id == 1408 and seen == [1408]
+E       AssertionError: assert (84 == 1408)
+E        +  where 84 = FoundationAccess(foundation=CurrentFoundation(foundation_publication_id='foundation_dcfb4b74c14d22a20b44742073ce607e',...eference_version': 'ref-v2', 'update_run_id': 'reference-only-f2be2af6f821da5c2f0571b8'}, manifest_base_snapshot_id=84).ducklake_snapshot_id
+
+modules/telchi/datalake/tests/test_reference_refresh_snapshot.py:22: AssertionError</failure></testcase></testsuite></testsuites>

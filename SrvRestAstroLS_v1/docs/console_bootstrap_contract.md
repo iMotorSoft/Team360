@@ -2,8 +2,7 @@
 
 Fecha: 2026-06-02
 
-Estado: Fase C implementada parcialmente. Existen repositories read-only y servicio de
-armado; no implementa endpoint, escrituras DB ni migraciones.
+Estado histórico: Fase C implementada parcialmente. Existen repositories read-only y servicio de armado. Seguimiento vigente: existe un `POST /api/console/bootstrap` experimental DEV-only, pero todavía no implementa el endpoint final autenticado propuesto debajo. Production, entorno ausente o desconocido reciben 404; la futura superficie productiva conserva el requisito `Authorization: Bearer <session_token>` y validación de workspace.
 
 ## 1. Objetivo del contrato
 

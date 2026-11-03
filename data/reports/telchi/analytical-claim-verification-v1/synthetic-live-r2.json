@@ -1,0 +1,1293 @@
+{
+  "identifier": "SYNTHETIC_LIVE_CLAIM_REVISION_V1",
+  "scope": "ISOLATED_SYNTHETIC_ONLY",
+  "real_foundation": false,
+  "status": "PASS",
+  "code_digest": "39bb26d91b1171ddaaf8270f8e329480145c6ef3b32a4ad569dbf2da2d4cbe45",
+  "turns": [
+    {
+      "sql": "SELECT sum(line_total) AS total_amount FROM sales_operation",
+      "authorized": {
+        "admitted_tree_json": "{\"error\":false,\"statements\":[{\"named_param_map\":[],\"node\":{\"aggregate_handling\":\"STANDARD_HANDLING\",\"cte_map\":{\"map\":[]},\"from_table\":{\"alias\":\"\",\"at_clause\":null,\"catalog_name\":\"\",\"column_name_alias\":[],\"query_location\":44,\"sample\":null,\"schema_name\":\"\",\"table_name\":\"sales_operation\",\"type\":\"BASE_TABLE\"},\"group_expressions\":[],\"group_sets\":[],\"having\":null,\"modifiers\":[],\"qualify\":null,\"sample\":null,\"select_list\":[{\"alias\":\"total_amount\",\"catalog\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"line_total\"],\"query_location\":11,\"type\":\"COLUMN_REF\"}],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"sum\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":7,\"schema\":\"\",\"type\":\"FUNCTION\"}],\"type\":\"SELECT_NODE\",\"where_clause\":null}}]}",
+        "generated_sql": "SELECT SUM(\"sales_operation\".\"line_total\") AS \"total_amount\" FROM \"sales_operation\" AS \"sales_operation\"",
+        "sources": [
+          "sales_operation"
+        ],
+        "columns": [
+          [
+            "sales_operation",
+            "line_total"
+          ]
+        ],
+        "functions": [
+          "sum"
+        ],
+        "relations": [],
+        "parameters": [],
+        "limits": {
+          "query_seconds": 120.0,
+          "total_seconds": 900.0,
+          "cpu_seconds": 1,
+          "process_memory_bytes": 536870912,
+          "threads": 1,
+          "result_rows": 5000,
+          "result_bytes": 2097152,
+          "source_bytes": 65536,
+          "queries": 12,
+          "concurrency": 1,
+          "max_join_pairs": 10000
+        },
+        "required_permissions": [
+          "telchi.exploratory.foundation.supervised_dev.read.v1"
+        ],
+        "query_id": "fcd15f4f4844d7363c76b29b5486271e136d0246224bd264fa43ac5e783cc5b1",
+        "context_digest": "1833bdd18faaa4601f3470f3e2bf5deac77ac7ae4fd80d0c1cdc68c561166577",
+        "declared_grain": "aggregate",
+        "mandatory_checks": [
+          "integrity",
+          "provenance",
+          "grain",
+          "counts",
+          "sums",
+          "percentages",
+          "duplicates",
+          "cardinality",
+          "partitions"
+        ],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "result": {
+        "query_id": "fcd15f4f4844d7363c76b29b5486271e136d0246224bd264fa43ac5e783cc5b1",
+        "schema": [
+          {
+            "name": "total_amount",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          }
+        ],
+        "declared_grain": "",
+        "rows": [
+          [
+            "1.000000"
+          ]
+        ],
+        "aggregates": [],
+        "returned_count": 1,
+        "total_count": null,
+        "truncated": false,
+        "elapsed_seconds": 0.0,
+        "cpu_seconds": null,
+        "peak_memory_bytes": null,
+        "bytes_read": null,
+        "source": "telchi_foundation_adaptive_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "evidence": [
+          "1833bdd18faaa4601f3470f3e2bf5deac77ac7ae4fd80d0c1cdc68c561166577"
+        ],
+        "status": "COMPLETED",
+        "limitations": [],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "evidence_manifest": {
+        "result_id": "806b7872f1a8476692ffdff6",
+        "query_id": "fcd15f4f4844d7363c76b29b5486271e136d0246224bd264fa43ac5e783cc5b1",
+        "execution_version": "fd8dfcf6295341fb92a0da6d",
+        "dataset": "telchi_foundation_adaptive_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "90812bd463920812312d7310",
+            "alias": "total_amount",
+            "sql_type": "DECIMAL(38,6)",
+            "expression": "sum(line_total)",
+            "source_fields": [
+              "sales_operation.line_total"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_amount_bs",
+            "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+            "grain": "commercial_line",
+            "transformations": [
+              "sum(line_total)"
+            ],
+            "unit": "money",
+            "currency": "BS",
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          }
+        ],
+        "row_ids": [
+          "a7e15960869e408eb47ca692"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "2026-08-01",
+          "2026-09-01"
+        ],
+        "filter_expression": "entire_authorized_universe",
+        "group_expressions": [],
+        "limitations": [
+          "Current materialized publication, not certified historical classification.",
+          "Published rows only; complete calendar coverage is not certified.",
+          "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+          "No classifier rule/version or causal mechanism is accredited."
+        ]
+      }
+    },
+    {
+      "sql": "SELECT sales_channel_code AS channel_code, count(line_num) AS line_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_code ORDER BY line_amount_bs DESC",
+      "authorized": {
+        "admitted_tree_json": "{\"error\":false,\"statements\":[{\"named_param_map\":[],\"node\":{\"aggregate_handling\":\"STANDARD_HANDLING\",\"cte_map\":{\"map\":[]},\"from_table\":{\"alias\":\"\",\"at_clause\":null,\"catalog_name\":\"\",\"column_name_alias\":[],\"query_location\":113,\"sample\":null,\"schema_name\":\"\",\"table_name\":\"sales_operation\",\"type\":\"BASE_TABLE\"},\"group_expressions\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"sales_channel_code\"],\"query_location\":138,\"type\":\"COLUMN_REF\"}],\"group_sets\":[[0]],\"having\":null,\"modifiers\":[{\"orders\":[{\"expression\":{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"line_amount_bs\"],\"query_location\":166,\"type\":\"COLUMN_REF\"},\"null_order\":\"ORDER_DEFAULT\",\"type\":\"DESCENDING\"}],\"type\":\"ORDER_MODIFIER\"}],\"qualify\":null,\"sample\":null,\"select_list\":[{\"alias\":\"channel_code\",\"class\":\"COLUMN_REF\",\"column_names\":[\"sales_channel_code\"],\"query_location\":7,\"type\":\"COLUMN_REF\"},{\"alias\":\"line_count\",\"catalog\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"line_num\"],\"query_location\":49,\"type\":\"COLUMN_REF\"}],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"count\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":43,\"schema\":\"\",\"type\":\"FUNCTION\"},{\"alias\":\"line_amount_bs\",\"catalog\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"line_total\"],\"query_location\":78,\"type\":\"COLUMN_REF\"}],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"sum\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":74,\"schema\":\"\",\"type\":\"FUNCTION\"}],\"type\":\"SELECT_NODE\",\"where_clause\":null}}]}",
+        "generated_sql": "SELECT \"sales_operation\".\"sales_channel_code\" AS \"channel_code\", COUNT(\"sales_operation\".\"line_num\") AS \"line_count\", SUM(\"sales_operation\".\"line_total\") AS \"line_amount_bs\" FROM \"sales_operation\" AS \"sales_operation\" GROUP BY \"sales_operation\".\"sales_channel_code\" ORDER BY \"line_amount_bs\" DESC",
+        "sources": [
+          "sales_operation"
+        ],
+        "columns": [
+          [
+            "sales_operation",
+            "line_num"
+          ],
+          [
+            "sales_operation",
+            "line_total"
+          ],
+          [
+            "sales_operation",
+            "sales_channel_code"
+          ]
+        ],
+        "functions": [
+          "count",
+          "sum"
+        ],
+        "relations": [],
+        "parameters": [],
+        "limits": {
+          "query_seconds": 120.0,
+          "total_seconds": 900.0,
+          "cpu_seconds": 1,
+          "process_memory_bytes": 536870912,
+          "threads": 1,
+          "result_rows": 5000,
+          "result_bytes": 2097152,
+          "source_bytes": 65536,
+          "queries": 12,
+          "concurrency": 1,
+          "max_join_pairs": 10000
+        },
+        "required_permissions": [
+          "telchi.exploratory.foundation.supervised_dev.read.v1"
+        ],
+        "query_id": "85713e53252fc6189d789af147278f1f865668f0936eb8b6a22152e15ea04439",
+        "context_digest": "1833bdd18faaa4601f3470f3e2bf5deac77ac7ae4fd80d0c1cdc68c561166577",
+        "declared_grain": "aggregate",
+        "mandatory_checks": [
+          "integrity",
+          "provenance",
+          "grain",
+          "counts",
+          "sums",
+          "percentages",
+          "duplicates",
+          "cardinality",
+          "partitions"
+        ],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "result": {
+        "query_id": "85713e53252fc6189d789af147278f1f865668f0936eb8b6a22152e15ea04439",
+        "schema": [
+          {
+            "name": "channel_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_count",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "line_amount_bs",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          }
+        ],
+        "declared_grain": "",
+        "rows": [
+          [
+            "X",
+            1,
+            "0.700000"
+          ],
+          [
+            null,
+            2,
+            "0.300000"
+          ]
+        ],
+        "aggregates": [],
+        "returned_count": 2,
+        "total_count": null,
+        "truncated": false,
+        "elapsed_seconds": 0.0,
+        "cpu_seconds": null,
+        "peak_memory_bytes": null,
+        "bytes_read": null,
+        "source": "telchi_foundation_adaptive_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "evidence": [
+          "1833bdd18faaa4601f3470f3e2bf5deac77ac7ae4fd80d0c1cdc68c561166577"
+        ],
+        "status": "COMPLETED",
+        "limitations": [],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "evidence_manifest": {
+        "result_id": "704b666caace4e9eac6a72b5",
+        "query_id": "85713e53252fc6189d789af147278f1f865668f0936eb8b6a22152e15ea04439",
+        "execution_version": "b8c9d4e1ee754f79bd116baf",
+        "dataset": "telchi_foundation_adaptive_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "ab6fa04b7a49a12125f89201",
+            "alias": "channel_code",
+            "sql_type": "VARCHAR",
+            "expression": "sales_channel_code",
+            "source_fields": [
+              "sales_operation.sales_channel_code"
+            ],
+            "source_or_calculation": "SOURCE",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [],
+            "unit": null,
+            "currency": null,
+            "classification": "MATERIALIZED_SOURCE",
+            "limitations": []
+          },
+          {
+            "column_id": "6646ad5d64d4e7c5e3e7f31d",
+            "alias": "line_count",
+            "sql_type": "BIGINT",
+            "expression": "count(line_num)",
+            "source_fields": [
+              "sales_operation.line_num"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_count",
+            "metric_definition": "Count of source commercial lines in the identified result group.",
+            "grain": "commercial_line",
+            "transformations": [
+              "count(line_num)"
+            ],
+            "unit": "lines",
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "90812bd463920812312d7310",
+            "alias": "line_amount_bs",
+            "sql_type": "DECIMAL(38,6)",
+            "expression": "sum(line_total)",
+            "source_fields": [
+              "sales_operation.line_total"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_amount_bs",
+            "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+            "grain": "commercial_line",
+            "transformations": [
+              "sum(line_total)"
+            ],
+            "unit": "money",
+            "currency": "BS",
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          }
+        ],
+        "row_ids": [
+          "ae0d544a918f4d6ba25e5045",
+          "34fab425ed504fcdbc1fda87"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "2026-08-01",
+          "2026-09-01"
+        ],
+        "filter_expression": "entire_authorized_universe",
+        "group_expressions": [
+          "sales_channel_code"
+        ],
+        "limitations": [
+          "Current materialized publication, not certified historical classification.",
+          "Published rows only; complete calendar coverage is not certified.",
+          "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+          "No classifier rule/version or causal mechanism is accredited."
+        ]
+      }
+    },
+    {
+      "sql": "SELECT sales_channel_code AS channel_code, sales_channel_semantic_status AS channel_status, count(line_num) AS line_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_code, sales_channel_semantic_status ORDER BY line_amount_bs DESC",
+      "authorized": {
+        "admitted_tree_json": "{\"error\":false,\"statements\":[{\"named_param_map\":[],\"node\":{\"aggregate_handling\":\"STANDARD_HANDLING\",\"cte_map\":{\"map\":[]},\"from_table\":{\"alias\":\"\",\"at_clause\":null,\"catalog_name\":\"\",\"column_name_alias\":[],\"query_location\":162,\"sample\":null,\"schema_name\":\"\",\"table_name\":\"sales_operation\",\"type\":\"BASE_TABLE\"},\"group_expressions\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"sales_channel_code\"],\"query_location\":187,\"type\":\"COLUMN_REF\"},{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"sales_channel_semantic_status\"],\"query_location\":207,\"type\":\"COLUMN_REF\"}],\"group_sets\":[[0,1]],\"having\":null,\"modifiers\":[{\"orders\":[{\"expression\":{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"line_amount_bs\"],\"query_location\":246,\"type\":\"COLUMN_REF\"},\"null_order\":\"ORDER_DEFAULT\",\"type\":\"DESCENDING\"}],\"type\":\"ORDER_MODIFIER\"}],\"qualify\":null,\"sample\":null,\"select_list\":[{\"alias\":\"channel_code\",\"class\":\"COLUMN_REF\",\"column_names\":[\"sales_channel_code\"],\"query_location\":7,\"type\":\"COLUMN_REF\"},{\"alias\":\"channel_status\",\"class\":\"COLUMN_REF\",\"column_names\":[\"sales_channel_semantic_status\"],\"query_location\":43,\"type\":\"COLUMN_REF\"},{\"alias\":\"line_count\",\"catalog\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"line_num\"],\"query_location\":98,\"type\":\"COLUMN_REF\"}],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"count\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":92,\"schema\":\"\",\"type\":\"FUNCTION\"},{\"alias\":\"line_amount_bs\",\"catalog\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"line_total\"],\"query_location\":127,\"type\":\"COLUMN_REF\"}],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"sum\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":123,\"schema\":\"\",\"type\":\"FUNCTION\"}],\"type\":\"SELECT_NODE\",\"where_clause\":null}}]}",
+        "generated_sql": "SELECT \"sales_operation\".\"sales_channel_code\" AS \"channel_code\", \"sales_operation\".\"sales_channel_semantic_status\" AS \"channel_status\", COUNT(\"sales_operation\".\"line_num\") AS \"line_count\", SUM(\"sales_operation\".\"line_total\") AS \"line_amount_bs\" FROM \"sales_operation\" AS \"sales_operation\" GROUP BY \"sales_operation\".\"sales_channel_code\", \"sales_operation\".\"sales_channel_semantic_status\" ORDER BY \"line_amount_bs\" DESC",
+        "sources": [
+          "sales_operation"
+        ],
+        "columns": [
+          [
+            "sales_operation",
+            "line_num"
+          ],
+          [
+            "sales_operation",
+            "line_total"
+          ],
+          [
+            "sales_operation",
+            "sales_channel_code"
+          ],
+          [
+            "sales_operation",
+            "sales_channel_semantic_status"
+          ]
+        ],
+        "functions": [
+          "count",
+          "sum"
+        ],
+        "relations": [],
+        "parameters": [],
+        "limits": {
+          "query_seconds": 120.0,
+          "total_seconds": 900.0,
+          "cpu_seconds": 1,
+          "process_memory_bytes": 536870912,
+          "threads": 1,
+          "result_rows": 5000,
+          "result_bytes": 2097152,
+          "source_bytes": 65536,
+          "queries": 12,
+          "concurrency": 1,
+          "max_join_pairs": 10000
+        },
+        "required_permissions": [
+          "telchi.exploratory.foundation.supervised_dev.read.v1"
+        ],
+        "query_id": "8a80079bc43912fd7abbb5f2e26d115b3f1b2c5249770698f90b5f12227d9e6a",
+        "context_digest": "1833bdd18faaa4601f3470f3e2bf5deac77ac7ae4fd80d0c1cdc68c561166577",
+        "declared_grain": "aggregate",
+        "mandatory_checks": [
+          "integrity",
+          "provenance",
+          "grain",
+          "counts",
+          "sums",
+          "percentages",
+          "duplicates",
+          "cardinality",
+          "partitions"
+        ],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "result": {
+        "query_id": "8a80079bc43912fd7abbb5f2e26d115b3f1b2c5249770698f90b5f12227d9e6a",
+        "schema": [
+          {
+            "name": "channel_code",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "channel_status",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "line_count",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "line_amount_bs",
+            "sql_type": "DECIMAL(38,6)",
+            "nullable": true
+          }
+        ],
+        "declared_grain": "",
+        "rows": [
+          [
+            "X",
+            "SUPPORTED",
+            1,
+            "0.700000"
+          ],
+          [
+            null,
+            null,
+            2,
+            "0.300000"
+          ]
+        ],
+        "aggregates": [],
+        "returned_count": 2,
+        "total_count": null,
+        "truncated": false,
+        "elapsed_seconds": 0.0,
+        "cpu_seconds": null,
+        "peak_memory_bytes": null,
+        "bytes_read": null,
+        "source": "telchi_foundation_adaptive_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "evidence": [
+          "1833bdd18faaa4601f3470f3e2bf5deac77ac7ae4fd80d0c1cdc68c561166577"
+        ],
+        "status": "COMPLETED",
+        "limitations": [],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "evidence_manifest": {
+        "result_id": "5004afaebe6b4a49b84ae5df",
+        "query_id": "8a80079bc43912fd7abbb5f2e26d115b3f1b2c5249770698f90b5f12227d9e6a",
+        "execution_version": "42b961fa930c42828e2ceeb4",
+        "dataset": "telchi_foundation_adaptive_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "ab6fa04b7a49a12125f89201",
+            "alias": "channel_code",
+            "sql_type": "VARCHAR",
+            "expression": "sales_channel_code",
+            "source_fields": [
+              "sales_operation.sales_channel_code"
+            ],
+            "source_or_calculation": "SOURCE",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [],
+            "unit": null,
+            "currency": null,
+            "classification": "MATERIALIZED_SOURCE",
+            "limitations": []
+          },
+          {
+            "column_id": "396bce769be9438cc5fcd00f",
+            "alias": "channel_status",
+            "sql_type": "VARCHAR",
+            "expression": "sales_channel_semantic_status",
+            "source_fields": [
+              "sales_operation.sales_channel_semantic_status"
+            ],
+            "source_or_calculation": "SOURCE",
+            "metric": null,
+            "metric_definition": null,
+            "grain": "group_dimension",
+            "transformations": [],
+            "unit": null,
+            "currency": null,
+            "classification": "MATERIALIZED_SOURCE",
+            "limitations": []
+          },
+          {
+            "column_id": "6646ad5d64d4e7c5e3e7f31d",
+            "alias": "line_count",
+            "sql_type": "BIGINT",
+            "expression": "count(line_num)",
+            "source_fields": [
+              "sales_operation.line_num"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_count",
+            "metric_definition": "Count of source commercial lines in the identified result group.",
+            "grain": "commercial_line",
+            "transformations": [
+              "count(line_num)"
+            ],
+            "unit": "lines",
+            "currency": null,
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          },
+          {
+            "column_id": "90812bd463920812312d7310",
+            "alias": "line_amount_bs",
+            "sql_type": "DECIMAL(38,6)",
+            "expression": "sum(line_total)",
+            "source_fields": [
+              "sales_operation.line_total"
+            ],
+            "source_or_calculation": "CALCULATION",
+            "metric": "line_amount_bs",
+            "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+            "grain": "commercial_line",
+            "transformations": [
+              "sum(line_total)"
+            ],
+            "unit": "money",
+            "currency": "BS",
+            "classification": "DERIVED_NOT_OFFICIAL",
+            "limitations": []
+          }
+        ],
+        "row_ids": [
+          "6173ec8bfa6a4621ae45ec1b",
+          "146457a1ee8347a1aade934a"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "2026-08-01",
+          "2026-09-01"
+        ],
+        "filter_expression": "entire_authorized_universe",
+        "group_expressions": [
+          "sales_channel_code",
+          "sales_channel_semantic_status"
+        ],
+        "limitations": [
+          "Current materialized publication, not certified historical classification.",
+          "Published rows only; complete calendar coverage is not certified.",
+          "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+          "No classifier rule/version or causal mechanism is accredited."
+        ]
+      }
+    }
+  ],
+  "model": "gpt-5.6-luna",
+  "reasoning": "medium",
+  "fallback": false,
+  "queries_cap": 4,
+  "calls_cap": 5,
+  "preflight": {
+    "ready": true
+  },
+  "initial_hypothesis": {
+    "hypothesis": "La suma de line_total de las líneas sin canal equivale a la suma de line_total de todo el universo de ventas; si la igualdad se sostiene, todas las ventas carecen de canal.",
+    "hypothesis_state": "OPEN",
+    "test": "equal_missing_and_total",
+    "sql": "SELECT sum(line_total) AS total_amount FROM sales_operation"
+  },
+  "hypothesis_verification": {
+    "claim": {
+      "kind": "hypothesis_equal",
+      "text": "La suma de line_total de las líneas sin canal equivale a la suma de line_total de todo el universo de ventas; si la igualdad se sostiene, todas las ventas carecen de canal.",
+      "dependencies": [
+        {
+          "kind": "measure",
+          "result_id": "9a6771b1377c4643adeff41c",
+          "column_id": "90812bd463920812312d7310",
+          "row_id": "9780d9fec4ca45ee82eb3e28",
+          "value": "0.30",
+          "metric": "line_amount_bs",
+          "unit": "money",
+          "currency": "BS",
+          "grain": "commercial_line",
+          "classification": "observed",
+          "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot": "1408",
+          "temporal_scope": [
+            "2026-08-01",
+            "2026-09-01"
+          ]
+        },
+        {
+          "kind": "measure",
+          "result_id": "806b7872f1a8476692ffdff6",
+          "column_id": "90812bd463920812312d7310",
+          "row_id": "a7e15960869e408eb47ca692",
+          "value": "1.000000",
+          "metric": "line_amount_bs",
+          "unit": "money",
+          "currency": "BS",
+          "grain": "commercial_line",
+          "classification": "observed",
+          "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot": "1408",
+          "temporal_scope": [
+            "2026-08-01",
+            "2026-09-01"
+          ]
+        }
+      ]
+    },
+    "state": "UNVERIFIED",
+    "match": false,
+    "reason": "hypothesis_contradicted_by_observation",
+    "evidence": [
+      {
+        "result_id": "9a6771b1377c4643adeff41c",
+        "column": {
+          "column_id": "90812bd463920812312d7310",
+          "alias": "missing_amount",
+          "sql_type": "DECIMAL(38,6)",
+          "expression": "sum(line_total)",
+          "source_fields": [
+            "sales_operation.line_total"
+          ],
+          "source_or_calculation": "CALCULATION",
+          "metric": "line_amount_bs",
+          "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+          "grain": "commercial_line",
+          "transformations": [
+            "sum(line_total)"
+          ],
+          "unit": "money",
+          "currency": "BS",
+          "classification": "DERIVED_NOT_OFFICIAL",
+          "limitations": []
+        },
+        "row_id": "9780d9fec4ca45ee82eb3e28",
+        "observed": "0.300000"
+      },
+      {
+        "result_id": "806b7872f1a8476692ffdff6",
+        "column": {
+          "column_id": "90812bd463920812312d7310",
+          "alias": "total_amount",
+          "sql_type": "DECIMAL(38,6)",
+          "expression": "sum(line_total)",
+          "source_fields": [
+            "sales_operation.line_total"
+          ],
+          "source_or_calculation": "CALCULATION",
+          "metric": "line_amount_bs",
+          "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+          "grain": "commercial_line",
+          "transformations": [
+            "sum(line_total)"
+          ],
+          "unit": "money",
+          "currency": "BS",
+          "classification": "DERIVED_NOT_OFFICIAL",
+          "limitations": []
+        },
+        "row_id": "a7e15960869e408eb47ca692",
+        "observed": "1.000000"
+      }
+    ],
+    "required": "Use issued evidence IDs and observed semantics; revise, query, or withdraw. Causality requires accredited mechanism evidence."
+  },
+  "feedback": {
+    "status": "INDEPENDENT_VERIFICATION_DISCREPANCY",
+    "rejected_claims": [
+      {
+        "claim": {
+          "kind": "hypothesis_equal",
+          "text": "La suma de line_total de las líneas sin canal equivale a la suma de line_total de todo el universo de ventas; si la igualdad se sostiene, todas las ventas carecen de canal.",
+          "dependencies": [
+            {
+              "kind": "measure",
+              "result_id": "9a6771b1377c4643adeff41c",
+              "column_id": "90812bd463920812312d7310",
+              "row_id": "9780d9fec4ca45ee82eb3e28",
+              "value": "0.30",
+              "metric": "line_amount_bs",
+              "unit": "money",
+              "currency": "BS",
+              "grain": "commercial_line",
+              "classification": "observed",
+              "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+              "snapshot": "1408",
+              "temporal_scope": [
+                "2026-08-01",
+                "2026-09-01"
+              ]
+            },
+            {
+              "kind": "measure",
+              "result_id": "806b7872f1a8476692ffdff6",
+              "column_id": "90812bd463920812312d7310",
+              "row_id": "a7e15960869e408eb47ca692",
+              "value": "1.000000",
+              "metric": "line_amount_bs",
+              "unit": "money",
+              "currency": "BS",
+              "grain": "commercial_line",
+              "classification": "observed",
+              "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+              "snapshot": "1408",
+              "temporal_scope": [
+                "2026-08-01",
+                "2026-09-01"
+              ]
+            }
+          ]
+        },
+        "state": "UNVERIFIED",
+        "match": false,
+        "reason": "hypothesis_contradicted_by_observation",
+        "required": "Use issued evidence IDs and observed semantics; revise, query, or withdraw. Causality requires accredited mechanism evidence.",
+        "evidence": [
+          {
+            "result_id": "9a6771b1377c4643adeff41c",
+            "column": {
+              "column_id": "90812bd463920812312d7310",
+              "alias": "missing_amount",
+              "sql_type": "DECIMAL(38,6)",
+              "expression": "sum(line_total)",
+              "source_fields": [
+                "sales_operation.line_total"
+              ],
+              "source_or_calculation": "CALCULATION",
+              "metric": "line_amount_bs",
+              "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+              "grain": "commercial_line",
+              "transformations": [
+                "sum(line_total)"
+              ],
+              "unit": "money",
+              "currency": "BS",
+              "classification": "DERIVED_NOT_OFFICIAL",
+              "limitations": []
+            },
+            "row_id": "9780d9fec4ca45ee82eb3e28",
+            "observed": "0.300000"
+          },
+          {
+            "result_id": "806b7872f1a8476692ffdff6",
+            "column": {
+              "column_id": "90812bd463920812312d7310",
+              "alias": "total_amount",
+              "sql_type": "DECIMAL(38,6)",
+              "expression": "sum(line_total)",
+              "source_fields": [
+                "sales_operation.line_total"
+              ],
+              "source_or_calculation": "CALCULATION",
+              "metric": "line_amount_bs",
+              "metric_definition": "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+              "grain": "commercial_line",
+              "transformations": [
+                "sum(line_total)"
+              ],
+              "unit": "money",
+              "currency": "BS",
+              "classification": "DERIVED_NOT_OFFICIAL",
+              "limitations": []
+            },
+            "row_id": "a7e15960869e408eb47ca692",
+            "observed": "1.000000"
+          }
+        ]
+      }
+    ],
+    "instruction": "Reconsider the hypothesis using the contradiction. Choose a new query, correct semantics or explicitly withdraw. No expected business answer is supplied."
+  },
+  "revision_events": [
+    {
+      "action": "query",
+      "sql": "SELECT sales_channel_code AS channel_code, count(line_num) AS line_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_code ORDER BY line_amount_bs DESC",
+      "objective": "Revisar la hipótesis contradicha desglosando el importe y volumen por canal, incluyendo explícitamente los valores NULL.",
+      "justification": "La observación previa mostró que las líneas sin canal suman 0.30 BS frente a 1.00 BS del universo; por tanto, la igualdad inicial quedó contradicha y hace falta observar la distribución completa por canal.",
+      "requested_sources": [
+        "sales_operation"
+      ],
+      "expected_grain": "un grupo por sales_channel_code, incluyendo NULL",
+      "expected_result": "Importe BS y cantidad de líneas por cada canal publicado, para comprobar qué parte del universo no carece de canal.",
+      "candidate_relations": [],
+      "hypothesis": "Las líneas sin canal representan sólo una parte del universo; existen otras líneas con canales publicados.",
+      "prior_observation_interpretation": "La suma sin canal (0.30 BS) no equivale al total del universo (1.00 BS), por lo que no todas las ventas carecen de canal.",
+      "hypothesis_state": "OPEN",
+      "evidence_turns": [
+        1
+      ]
+    },
+    {
+      "action": "query",
+      "sql": "SELECT sales_channel_code AS channel_code, sales_channel_semantic_status AS channel_status, count(line_num) AS line_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_code, sales_channel_semantic_status ORDER BY line_amount_bs DESC",
+      "objective": "Determinar si las líneas sin código de canal están marcadas con un estado semántico que permita interpretar el valor nulo como ausencia real, dato no clasificado o categoría distinta.",
+      "justification": "La observación previa contradice la hipótesis de que todo el universo carece de canal: el grupo X suma 0.70 BS y el grupo nulo 0.30 BS. Es necesario revisar el estado semántico asociado a cada código antes de concluir qué significa el nulo.",
+      "requested_sources": [
+        "sales_operation"
+      ],
+      "expected_grain": "una fila por combinación de sales_channel_code y sales_channel_semantic_status",
+      "expected_result": "Conteo de líneas y suma line_total por código de canal y estado semántico, incluyendo el grupo nulo.",
+      "candidate_relations": [],
+      "hypothesis": "Las líneas con sales_channel_code nulo representan una clasificación ausente o no publicada, mientras que X es el único canal publicado no nulo.",
+      "prior_observation_interpretation": "El universo observado contiene 3 líneas y 1.00 BS: X concentra 2 líneas y 0.70 BS; el grupo nulo concentra 1 línea y 0.30 BS. Por tanto, la hipótesis de ausencia universal de canal está contradicha.",
+      "hypothesis_state": "OPEN",
+      "evidence_turns": [
+        1
+      ]
+    },
+    {
+      "action": "final",
+      "answer": "La hipótesis inicial queda descartada: no todas las ventas carecen de canal. En el universo autorizado de agosto de 2026, las líneas con canal X suman 0,70 BS (1 línea) y las líneas sin canal suman 0,30 BS (2 líneas), frente a un total de 1,00 BS. Por tanto, existe una ausencia parcial de clasificación, no total. Riesgos y limitaciones: son importes de líneas comerciales antes de notas de crédito y ajustes globales, no totales de cabecera ni cobros; la clasificación es la publicación materializada actual, no una categoría histórica certificada, y no se acredita cobertura completa del calendario. Siguiente paso: investigar el origen o regla de clasificación de las dos líneas sin canal, si se necesita explicar o corregir la ausencia.",
+      "claims": [
+        {
+          "kind": "measure",
+          "result_id": "704b666caace4e9eac6a72b5",
+          "column_id": "90812bd463920812312d7310",
+          "row_id": "ae0d544a918f4d6ba25e5045",
+          "metric": "line_amount_bs",
+          "value": "0.700000",
+          "unit": "money",
+          "currency": "BS",
+          "grain": "commercial_line",
+          "classification": "observed",
+          "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot": "1408",
+          "temporal_scope": [
+            "2026-08-01",
+            "2026-09-01"
+          ]
+        },
+        {
+          "kind": "measure",
+          "result_id": "704b666caace4e9eac6a72b5",
+          "column_id": "6646ad5d64d4e7c5e3e7f31d",
+          "row_id": "ae0d544a918f4d6ba25e5045",
+          "metric": "line_count",
+          "value": "1",
+          "unit": "lines",
+          "currency": null,
+          "grain": "commercial_line",
+          "classification": "observed",
+          "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot": "1408",
+          "temporal_scope": [
+            "2026-08-01",
+            "2026-09-01"
+          ]
+        },
+        {
+          "kind": "measure",
+          "result_id": "704b666caace4e9eac6a72b5",
+          "column_id": "90812bd463920812312d7310",
+          "row_id": "34fab425ed504fcdbc1fda87",
+          "metric": "line_amount_bs",
+          "value": "0.300000",
+          "unit": "money",
+          "currency": "BS",
+          "grain": "commercial_line",
+          "classification": "observed",
+          "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot": "1408",
+          "temporal_scope": [
+            "2026-08-01",
+            "2026-09-01"
+          ]
+        },
+        {
+          "kind": "measure",
+          "result_id": "704b666caace4e9eac6a72b5",
+          "column_id": "6646ad5d64d4e7c5e3e7f31d",
+          "row_id": "34fab425ed504fcdbc1fda87",
+          "metric": "line_count",
+          "value": "2",
+          "unit": "lines",
+          "currency": null,
+          "grain": "commercial_line",
+          "classification": "observed",
+          "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot": "1408",
+          "temporal_scope": [
+            "2026-08-01",
+            "2026-09-01"
+          ]
+        },
+        {
+          "kind": "measure",
+          "result_id": "806b7872f1a8476692ffdff6",
+          "column_id": "90812bd463920812312d7310",
+          "row_id": "a7e15960869e408eb47ca692",
+          "metric": "line_amount_bs",
+          "value": "1.000000",
+          "unit": "money",
+          "currency": "BS",
+          "grain": "commercial_line",
+          "classification": "observed",
+          "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot": "1408",
+          "temporal_scope": [
+            "2026-08-01",
+            "2026-09-01"
+          ]
+        }
+      ],
+      "conclusions": [
+        {
+          "text": "La hipótesis de que todas las ventas carecen de canal está contradicha: se observó un grupo con canal X y otro sin canal.",
+          "state": "VERIFIED",
+          "evidence_turns": [
+            1
+          ]
+        },
+        {
+          "text": "La ausencia de canal es parcial dentro del universo observado, pero no puede interpretarse como causa ni como deficiencia histórica completa de cobertura.",
+          "state": "VERIFIED_WITH_LIMITATIONS",
+          "evidence_turns": [
+            1
+          ]
+        }
+      ],
+      "prior_observation_interpretation": "La observación anterior mostró 0,30 BS sin canal frente a 1,00 BS total y un grupo separado de 0,70 BS con canal X; la igualdad propuesta no se sostuvo.",
+      "hypothesis_state": "CONTRADICTED"
+    }
+  ],
+  "final_verifications": [
+    {
+      "claim": {
+        "kind": "measure",
+        "result_id": "704b666caace4e9eac6a72b5",
+        "column_id": "90812bd463920812312d7310",
+        "row_id": "ae0d544a918f4d6ba25e5045",
+        "metric": "line_amount_bs",
+        "value": "0.700000",
+        "unit": "money",
+        "currency": "BS",
+        "grain": "commercial_line",
+        "classification": "observed",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "temporal_scope": [
+          "2026-08-01",
+          "2026-09-01"
+        ]
+      },
+      "state": "VERIFIED_WITH_LIMITATIONS",
+      "match": true,
+      "reason": "independent_reference_rows_and_server_evidence_binding",
+      "limitations": [
+        "Current materialized publication, not certified historical classification.",
+        "Published rows only; complete calendar coverage is not certified.",
+        "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+        "No classifier rule/version or causal mechanism is accredited."
+      ]
+    },
+    {
+      "claim": {
+        "kind": "measure",
+        "result_id": "704b666caace4e9eac6a72b5",
+        "column_id": "6646ad5d64d4e7c5e3e7f31d",
+        "row_id": "ae0d544a918f4d6ba25e5045",
+        "metric": "line_count",
+        "value": "1",
+        "unit": "lines",
+        "currency": null,
+        "grain": "commercial_line",
+        "classification": "observed",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "temporal_scope": [
+          "2026-08-01",
+          "2026-09-01"
+        ]
+      },
+      "state": "VERIFIED_WITH_LIMITATIONS",
+      "match": true,
+      "reason": "independent_reference_rows_and_server_evidence_binding",
+      "limitations": [
+        "Current materialized publication, not certified historical classification.",
+        "Published rows only; complete calendar coverage is not certified.",
+        "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+        "No classifier rule/version or causal mechanism is accredited."
+      ]
+    },
+    {
+      "claim": {
+        "kind": "measure",
+        "result_id": "704b666caace4e9eac6a72b5",
+        "column_id": "90812bd463920812312d7310",
+        "row_id": "34fab425ed504fcdbc1fda87",
+        "metric": "line_amount_bs",
+        "value": "0.300000",
+        "unit": "money",
+        "currency": "BS",
+        "grain": "commercial_line",
+        "classification": "observed",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "temporal_scope": [
+          "2026-08-01",
+          "2026-09-01"
+        ]
+      },
+      "state": "VERIFIED_WITH_LIMITATIONS",
+      "match": true,
+      "reason": "independent_reference_rows_and_server_evidence_binding",
+      "limitations": [
+        "Current materialized publication, not certified historical classification.",
+        "Published rows only; complete calendar coverage is not certified.",
+        "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+        "No classifier rule/version or causal mechanism is accredited."
+      ]
+    },
+    {
+      "claim": {
+        "kind": "measure",
+        "result_id": "704b666caace4e9eac6a72b5",
+        "column_id": "6646ad5d64d4e7c5e3e7f31d",
+        "row_id": "34fab425ed504fcdbc1fda87",
+        "metric": "line_count",
+        "value": "2",
+        "unit": "lines",
+        "currency": null,
+        "grain": "commercial_line",
+        "classification": "observed",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "temporal_scope": [
+          "2026-08-01",
+          "2026-09-01"
+        ]
+      },
+      "state": "VERIFIED_WITH_LIMITATIONS",
+      "match": true,
+      "reason": "independent_reference_rows_and_server_evidence_binding",
+      "limitations": [
+        "Current materialized publication, not certified historical classification.",
+        "Published rows only; complete calendar coverage is not certified.",
+        "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+        "No classifier rule/version or causal mechanism is accredited."
+      ]
+    },
+    {
+      "claim": {
+        "kind": "measure",
+        "result_id": "806b7872f1a8476692ffdff6",
+        "column_id": "90812bd463920812312d7310",
+        "row_id": "a7e15960869e408eb47ca692",
+        "metric": "line_amount_bs",
+        "value": "1.000000",
+        "unit": "money",
+        "currency": "BS",
+        "grain": "commercial_line",
+        "classification": "observed",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "temporal_scope": [
+          "2026-08-01",
+          "2026-09-01"
+        ]
+      },
+      "state": "VERIFIED_WITH_LIMITATIONS",
+      "match": true,
+      "reason": "independent_reference_rows_and_server_evidence_binding",
+      "limitations": [
+        "Current materialized publication, not certified historical classification.",
+        "Published rows only; complete calendar coverage is not certified.",
+        "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+        "No classifier rule/version or causal mechanism is accredited."
+      ]
+    }
+  ],
+  "business_answer": "Resultado principal: evidencia verificada de la población publicada.\nImporte comercial de líneas: 0.700000 BS; filtro entire_authorized_universe; grupo {\"sales_operation.sales_channel_code\":\"X\"} [VERIFIED_WITH_LIMITATIONS; 704b666caace4e9eac6a72b5/90812bd463920812312d7310/ae0d544a918f4d6ba25e5045]\nLíneas: 1 lines; filtro entire_authorized_universe; grupo {\"sales_operation.sales_channel_code\":\"X\"} [VERIFIED_WITH_LIMITATIONS; 704b666caace4e9eac6a72b5/6646ad5d64d4e7c5e3e7f31d/ae0d544a918f4d6ba25e5045]\nImporte comercial de líneas: 0.300000 BS; filtro entire_authorized_universe; grupo {\"sales_operation.sales_channel_code\":null} [VERIFIED_WITH_LIMITATIONS; 704b666caace4e9eac6a72b5/90812bd463920812312d7310/34fab425ed504fcdbc1fda87]\nLíneas: 2 lines; filtro entire_authorized_universe; grupo {\"sales_operation.sales_channel_code\":null} [VERIFIED_WITH_LIMITATIONS; 704b666caace4e9eac6a72b5/6646ad5d64d4e7c5e3e7f31d/34fab425ed504fcdbc1fda87]\nImporte comercial de líneas: 1.000000 BS; filtro entire_authorized_universe; grupo {} [VERIFIED_WITH_LIMITATIONS; 806b7872f1a8476692ffdff6/90812bd463920812312d7310/a7e15960869e408eb47ca692]\nExplicación causal: no acreditada. Las distribuciones observadas no prueban el mecanismo del clasificador.\nAnomalías y limitaciones: Current materialized publication, not certified historical classification. Published rows only; complete calendar coverage is not certified. Line amounts precede credit memos/global adjustments; not net billing or collections. No classifier rule/version or causal mechanism is accredited.\nImpacto: una clasificación incompleta no demuestra ausencia ni pérdida de ventas.\nPróximo paso: contrastar documentos y reglas/versiones acreditadas del clasificador antes de reclasificar.",
+  "calls": [
+    {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "fallback": false,
+      "max_output_tokens": 4096,
+      "elapsed_seconds": 2.250751952997234,
+      "usage": {
+        "input_tokens": 2981,
+        "input_tokens_details": {
+          "cache_write_tokens": 1731,
+          "cached_tokens": 1247
+        },
+        "output_tokens": 136,
+        "output_tokens_details": {
+          "reasoning_tokens": 57
+        },
+        "total_tokens": 3117
+      },
+      "output_text": "{\"hypothesis\":\"La suma de line_total de las líneas sin canal equivale a la suma de line_total de todo el universo de ventas; si la igualdad se sostiene, todas las ventas carecen de canal.\",\"hypothesis_state\":\"OPEN\",\"test\":\"equal_missing_and_total\",\"sql\":\"SELECT sum(line_total) AS total_amount FROM sales_operation\"}",
+      "output_messages": [
+        "{\"hypothesis\":\"La suma de line_total de las líneas sin canal equivale a la suma de line_total de todo el universo de ventas; si la igualdad se sostiene, todas las ventas carecen de canal.\",\"hypothesis_state\":\"OPEN\",\"test\":\"equal_missing_and_total\",\"sql\":\"SELECT sum(line_total) AS total_amount FROM sales_operation\"}"
+      ],
+      "non_executable_messages": [],
+      "output_types": [
+        "reasoning",
+        "message"
+      ],
+      "message_metadata": [
+        {
+          "id": "msg_0676585f13dd2614016ae1316229d087d1ae5cb438e9949fec",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "phase": "final_answer"
+        }
+      ],
+      "identical_message_copies": 1
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "fallback": false,
+      "max_output_tokens": 4096,
+      "elapsed_seconds": 4.087537141997018,
+      "usage": {
+        "input_tokens": 4026,
+        "input_tokens_details": {
+          "cache_write_tokens": 2776,
+          "cached_tokens": 1247
+        },
+        "output_tokens": 343,
+        "output_tokens_details": {
+          "reasoning_tokens": 82
+        },
+        "total_tokens": 4369
+      },
+      "output_text": "{\"action\":\"query\",\"sql\":\"SELECT sales_channel_code AS channel_code, count(line_num) AS line_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_code ORDER BY line_amount_bs DESC\",\"objective\":\"Revisar la hipótesis contradicha desglosando el importe y volumen por canal, incluyendo explícitamente los valores NULL.\",\"justification\":\"La observación previa mostró que las líneas sin canal suman 0.30 BS frente a 1.00 BS del universo; por tanto, la igualdad inicial quedó contradicha y hace falta observar la distribución completa por canal.\",\"requested_sources\":[\"sales_operation\"],\"expected_grain\":\"un grupo por sales_channel_code, incluyendo NULL\",\"expected_result\":\"Importe BS y cantidad de líneas por cada canal publicado, para comprobar qué parte del universo no carece de canal.\",\"candidate_relations\":[],\"hypothesis\":\"Las líneas sin canal representan sólo una parte del universo; existen otras líneas con canales publicados.\",\"prior_observation_interpretation\":\"La suma sin canal (0.30 BS) no equivale al total del universo (1.00 BS), por lo que no todas las ventas carecen de canal.\",\"hypothesis_state\":\"OPEN\",\"evidence_turns\":[1]}",
+      "output_messages": [
+        "{\"action\":\"query\",\"sql\":\"SELECT sales_channel_code AS channel_code, count(line_num) AS line_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_code ORDER BY line_amount_bs DESC\",\"objective\":\"Revisar la hipótesis contradicha desglosando el importe y volumen por canal, incluyendo explícitamente los valores NULL.\",\"justification\":\"La observación previa mostró que las líneas sin canal suman 0.30 BS frente a 1.00 BS del universo; por tanto, la igualdad inicial quedó contradicha y hace falta observar la distribución completa por canal.\",\"requested_sources\":[\"sales_operation\"],\"expected_grain\":\"un grupo por sales_channel_code, incluyendo NULL\",\"expected_result\":\"Importe BS y cantidad de líneas por cada canal publicado, para comprobar qué parte del universo no carece de canal.\",\"candidate_relations\":[],\"hypothesis\":\"Las líneas sin canal representan sólo una parte del universo; existen otras líneas con canales publicados.\",\"prior_observation_interpretation\":\"La suma sin canal (0.30 BS) no equivale al total del universo (1.00 BS), por lo que no todas las ventas carecen de canal.\",\"hypothesis_state\":\"OPEN\",\"evidence_turns\":[1]}"
+      ],
+      "non_executable_messages": [],
+      "output_types": [
+        "reasoning",
+        "message"
+      ],
+      "message_metadata": [
+        {
+          "id": "msg_0fe647c4cfcaed0a016ae13164b50887d1939687604051885d",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "phase": "final_answer"
+        }
+      ],
+      "identical_message_copies": 1
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "fallback": false,
+      "max_output_tokens": 4096,
+      "elapsed_seconds": 5.607783430001291,
+      "usage": {
+        "input_tokens": 4624,
+        "input_tokens_details": {
+          "cache_write_tokens": 3374,
+          "cached_tokens": 1247
+        },
+        "output_tokens": 462,
+        "output_tokens_details": {
+          "reasoning_tokens": 124
+        },
+        "total_tokens": 5086
+      },
+      "output_text": "{\"action\":\"query\",\"sql\":\"SELECT sales_channel_code AS channel_code, sales_channel_semantic_status AS channel_status, count(line_num) AS line_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_code, sales_channel_semantic_status ORDER BY line_amount_bs DESC\",\"objective\":\"Determinar si las líneas sin código de canal están marcadas con un estado semántico que permita interpretar el valor nulo como ausencia real, dato no clasificado o categoría distinta.\",\"justification\":\"La observación previa contradice la hipótesis de que todo el universo carece de canal: el grupo X suma 0.70 BS y el grupo nulo 0.30 BS. Es necesario revisar el estado semántico asociado a cada código antes de concluir qué significa el nulo.\",\"requested_sources\":[\"sales_operation\"],\"expected_grain\":\"una fila por combinación de sales_channel_code y sales_channel_semantic_status\",\"expected_result\":\"Conteo de líneas y suma line_total por código de canal y estado semántico, incluyendo el grupo nulo.\",\"candidate_relations\":[],\"hypothesis\":\"Las líneas con sales_channel_code nulo representan una clasificación ausente o no publicada, mientras que X es el único canal publicado no nulo.\",\"prior_observation_interpretation\":\"El universo observado contiene 3 líneas y 1.00 BS: X concentra 2 líneas y 0.70 BS; el grupo nulo concentra 1 línea y 0.30 BS. Por tanto, la hipótesis de ausencia universal de canal está contradicha.\",\"hypothesis_state\":\"OPEN\",\"evidence_turns\":[1]}",
+      "output_messages": [
+        "{\"action\":\"query\",\"sql\":\"SELECT sales_channel_code AS channel_code, sales_channel_semantic_status AS channel_status, count(line_num) AS line_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_code, sales_channel_semantic_status ORDER BY line_amount_bs DESC\",\"objective\":\"Determinar si las líneas sin código de canal están marcadas con un estado semántico que permita interpretar el valor nulo como ausencia real, dato no clasificado o categoría distinta.\",\"justification\":\"La observación previa contradice la hipótesis de que todo el universo carece de canal: el grupo X suma 0.70 BS y el grupo nulo 0.30 BS. Es necesario revisar el estado semántico asociado a cada código antes de concluir qué significa el nulo.\",\"requested_sources\":[\"sales_operation\"],\"expected_grain\":\"una fila por combinación de sales_channel_code y sales_channel_semantic_status\",\"expected_result\":\"Conteo de líneas y suma line_total por código de canal y estado semántico, incluyendo el grupo nulo.\",\"candidate_relations\":[],\"hypothesis\":\"Las líneas con sales_channel_code nulo representan una clasificación ausente o no publicada, mientras que X es el único canal publicado no nulo.\",\"prior_observation_interpretation\":\"El universo observado contiene 3 líneas y 1.00 BS: X concentra 2 líneas y 0.70 BS; el grupo nulo concentra 1 línea y 0.30 BS. Por tanto, la hipótesis de ausencia universal de canal está contradicha.\",\"hypothesis_state\":\"OPEN\",\"evidence_turns\":[1]}"
+      ],
+      "non_executable_messages": [],
+      "output_types": [
+        "reasoning",
+        "message"
+      ],
+      "message_metadata": [
+        {
+          "id": "msg_021e4d89cc55d795016ae13169ff4487d1859a58614d65f26e",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "phase": "final_answer"
+        }
+      ],
+      "identical_message_copies": 1
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "fallback": false,
+      "max_output_tokens": 4096,
+      "elapsed_seconds": 10.913765170997067,
+      "usage": {
+        "input_tokens": 5327,
+        "input_tokens_details": {
+          "cache_write_tokens": 4077,
+          "cached_tokens": 1247
+        },
+        "output_tokens": 1389,
+        "output_tokens_details": {
+          "reasoning_tokens": 376
+        },
+        "total_tokens": 6716
+      },
+      "output_text": "{\"action\":\"final\",\"answer\":\"La hipótesis inicial queda descartada: no todas las ventas carecen de canal. En el universo autorizado de agosto de 2026, las líneas con canal X suman 0,70 BS (1 línea) y las líneas sin canal suman 0,30 BS (2 líneas), frente a un total de 1,00 BS. Por tanto, existe una ausencia parcial de clasificación, no total. Riesgos y limitaciones: son importes de líneas comerciales antes de notas de crédito y ajustes globales, no totales de cabecera ni cobros; la clasificación es la publicación materializada actual, no una categoría histórica certificada, y no se acredita cobertura completa del calendario. Siguiente paso: investigar el origen o regla de clasificación de las dos líneas sin canal, si se necesita explicar o corregir la ausencia.\",\"claims\":[{\"kind\":\"measure\",\"result_id\":\"704b666caace4e9eac6a72b5\",\"column_id\":\"90812bd463920812312d7310\",\"row_id\":\"ae0d544a918f4d6ba25e5045\",\"metric\":\"line_amount_bs\",\"value\":\"0.700000\",\"unit\":\"money\",\"currency\":\"BS\",\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]},{\"kind\":\"measure\",\"result_id\":\"704b666caace4e9eac6a72b5\",\"column_id\":\"6646ad5d64d4e7c5e3e7f31d\",\"row_id\":\"ae0d544a918f4d6ba25e5045\",\"metric\":\"line_count\",\"value\":\"1\",\"unit\":\"lines\",\"currency\":null,\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]},{\"kind\":\"measure\",\"result_id\":\"704b666caace4e9eac6a72b5\",\"column_id\":\"90812bd463920812312d7310\",\"row_id\":\"34fab425ed504fcdbc1fda87\",\"metric\":\"line_amount_bs\",\"value\":\"0.300000\",\"unit\":\"money\",\"currency\":\"BS\",\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]},{\"kind\":\"measure\",\"result_id\":\"704b666caace4e9eac6a72b5\",\"column_id\":\"6646ad5d64d4e7c5e3e7f31d\",\"row_id\":\"34fab425ed504fcdbc1fda87\",\"metric\":\"line_count\",\"value\":\"2\",\"unit\":\"lines\",\"currency\":null,\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]},{\"kind\":\"measure\",\"result_id\":\"806b7872f1a8476692ffdff6\",\"column_id\":\"90812bd463920812312d7310\",\"row_id\":\"a7e15960869e408eb47ca692\",\"metric\":\"line_amount_bs\",\"value\":\"1.000000\",\"unit\":\"money\",\"currency\":\"BS\",\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]}],\"conclusions\":[{\"text\":\"La hipótesis de que todas las ventas carecen de canal está contradicha: se observó un grupo con canal X y otro sin canal.\",\"state\":\"VERIFIED\",\"evidence_turns\":[1]},{\"text\":\"La ausencia de canal es parcial dentro del universo observado, pero no puede interpretarse como causa ni como deficiencia histórica completa de cobertura.\",\"state\":\"VERIFIED_WITH_LIMITATIONS\",\"evidence_turns\":[1]}],\"prior_observation_interpretation\":\"La observación anterior mostró 0,30 BS sin canal frente a 1,00 BS total y un grupo separado de 0,70 BS con canal X; la igualdad propuesta no se sostuvo.\",\"hypothesis_state\":\"CONTRADICTED\"}",
+      "output_messages": [
+        "{\"action\":\"final\",\"answer\":\"La hipótesis inicial queda descartada: no todas las ventas carecen de canal. En el universo autorizado de agosto de 2026, las líneas con canal X suman 0,70 BS (1 línea) y las líneas sin canal suman 0,30 BS (2 líneas), frente a un total de 1,00 BS. Por tanto, existe una ausencia parcial de clasificación, no total. Riesgos y limitaciones: son importes de líneas comerciales antes de notas de crédito y ajustes globales, no totales de cabecera ni cobros; la clasificación es la publicación materializada actual, no una categoría histórica certificada, y no se acredita cobertura completa del calendario. Siguiente paso: investigar el origen o regla de clasificación de las dos líneas sin canal, si se necesita explicar o corregir la ausencia.\",\"claims\":[{\"kind\":\"measure\",\"result_id\":\"704b666caace4e9eac6a72b5\",\"column_id\":\"90812bd463920812312d7310\",\"row_id\":\"ae0d544a918f4d6ba25e5045\",\"metric\":\"line_amount_bs\",\"value\":\"0.700000\",\"unit\":\"money\",\"currency\":\"BS\",\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]},{\"kind\":\"measure\",\"result_id\":\"704b666caace4e9eac6a72b5\",\"column_id\":\"6646ad5d64d4e7c5e3e7f31d\",\"row_id\":\"ae0d544a918f4d6ba25e5045\",\"metric\":\"line_count\",\"value\":\"1\",\"unit\":\"lines\",\"currency\":null,\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]},{\"kind\":\"measure\",\"result_id\":\"704b666caace4e9eac6a72b5\",\"column_id\":\"90812bd463920812312d7310\",\"row_id\":\"34fab425ed504fcdbc1fda87\",\"metric\":\"line_amount_bs\",\"value\":\"0.300000\",\"unit\":\"money\",\"currency\":\"BS\",\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]},{\"kind\":\"measure\",\"result_id\":\"704b666caace4e9eac6a72b5\",\"column_id\":\"6646ad5d64d4e7c5e3e7f31d\",\"row_id\":\"34fab425ed504fcdbc1fda87\",\"metric\":\"line_count\",\"value\":\"2\",\"unit\":\"lines\",\"currency\":null,\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]},{\"kind\":\"measure\",\"result_id\":\"806b7872f1a8476692ffdff6\",\"column_id\":\"90812bd463920812312d7310\",\"row_id\":\"a7e15960869e408eb47ca692\",\"metric\":\"line_amount_bs\",\"value\":\"1.000000\",\"unit\":\"money\",\"currency\":\"BS\",\"grain\":\"commercial_line\",\"classification\":\"observed\",\"publication\":\"foundation_afd08d9eca6a725be53cdc3f9d5709c9\",\"snapshot\":\"1408\",\"temporal_scope\":[\"2026-08-01\",\"2026-09-01\"]}],\"conclusions\":[{\"text\":\"La hipótesis de que todas las ventas carecen de canal está contradicha: se observó un grupo con canal X y otro sin canal.\",\"state\":\"VERIFIED\",\"evidence_turns\":[1]},{\"text\":\"La ausencia de canal es parcial dentro del universo observado, pero no puede interpretarse como causa ni como deficiencia histórica completa de cobertura.\",\"state\":\"VERIFIED_WITH_LIMITATIONS\",\"evidence_turns\":[1]}],\"prior_observation_interpretation\":\"La observación anterior mostró 0,30 BS sin canal frente a 1,00 BS total y un grupo separado de 0,70 BS con canal X; la igualdad propuesta no se sostuvo.\",\"hypothesis_state\":\"CONTRADICTED\"}"
+      ],
+      "non_executable_messages": [],
+      "output_types": [
+        "reasoning",
+        "message"
+      ],
+      "message_metadata": [
+        {
+          "id": "msg_04466c1847315ce6016ae131715e0087d198076d857035e93c",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "phase": "final_answer"
+        }
+      ],
+      "identical_message_copies": 1
+    }
+  ],
+  "preflight_calls": [
+    {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "fallback": false,
+      "max_output_tokens": 4096,
+      "elapsed_seconds": 1.3783553309986019,
+      "usage": {
+        "input_tokens": 29,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 12,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 41
+      },
+      "output_text": "{\"ready\":true}",
+      "output_messages": [
+        "{\"ready\":true}"
+      ],
+      "non_executable_messages": [],
+      "output_types": [
+        "message"
+      ],
+      "message_metadata": [
+        {
+          "id": "msg_0300b75c28a76fee016ae1315fceec87d18618dab0f09867d8",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "phase": "final_answer"
+        }
+      ],
+      "identical_message_copies": 1
+    }
+  ],
+  "elapsed_seconds": 24.9076347260052
+}

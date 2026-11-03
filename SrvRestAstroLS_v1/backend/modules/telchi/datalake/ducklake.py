@@ -9,6 +9,8 @@ from pathlib import Path
 from statistics import median
 from typing import Any, Iterator
 
+from .query_profile import measured, span
+
 CATALOG_ALIAS = "telchi"
 CATALOG_DATABASE = "team360_telchi_ducklake"
 RUNTIME_ROLE = "team360_telchi_ducklake"
@@ -34,7 +36,7 @@ def _env_file(path: Path) -> dict[str, str]:
 
 class DuckLakeConnector:
     def __init__(self) -> None:
-        private = _env_file(Path(os.getenv("TEAM360_TELCHI_DUCKLAKE_PRIVATE_CONFIG", str(PRIVATE_CONFIG))))
+        private = measured('private_config_read', _env_file, Path(os.getenv("TEAM360_TELCHI_DUCKLAKE_PRIVATE_CONFIG", str(PRIVATE_CONFIG))))
         self.host = os.getenv("TELCHI_DUCKLAKE_PG_HOST", private.get("TELCHI_DUCKLAKE_PG_HOST", "localhost"))
         self.port = int(os.getenv("TELCHI_DUCKLAKE_PG_PORT", private.get("TELCHI_DUCKLAKE_PG_PORT", "5432")))
         self.database = os.getenv("TELCHI_DUCKLAKE_PG_DATABASE", private.get("TELCHI_DUCKLAKE_PG_DATABASE", CATALOG_DATABASE))
@@ -48,22 +50,23 @@ class DuckLakeConnector:
 
     @contextlib.contextmanager
     def session(self, *, read_only: bool = False) -> Iterator[object]:
-        import duckdb
+        with span('duckdb_import'):
+            import duckdb
         self.data_path.mkdir(parents=True, exist_ok=True, mode=0o750)
         previous = os.environ.get("PGPASSWORD")
         os.environ["PGPASSWORD"] = self.password
-        connection = duckdb.connect()
+        connection = measured('duckdb_connect', duckdb.connect)
         try:
-            connection.execute("LOAD ducklake")
-            connection.execute("LOAD postgres")
+            measured('load_ducklake', connection.execute, "LOAD ducklake")
+            measured('load_postgres', connection.execute, "LOAD postgres")
             options = "READ_ONLY" if read_only else "DATA_INLINING_ROW_LIMIT 0"
-            connection.execute(
+            measured('attachment_open_including_catalog_session', connection.execute,
                 f"ATTACH 'ducklake:postgres:dbname={self.database} host={self.host} port={self.port} user={self.user}' "
                 f"AS {CATALOG_ALIAS} (DATA_PATH '{self.data_path.resolve()}', {options})"
             )
             yield connection
         finally:
-            connection.close()
+            measured('attachment_connection_close', connection.close)
             if previous is None:
                 os.environ.pop("PGPASSWORD", None)
             else:

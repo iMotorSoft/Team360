@@ -1,0 +1,476 @@
+{
+  "start_utc": "2026-10-28T13:00:21.697723+00:00",
+  "start_monotonic": 14675.017781441,
+  "first_host_preflight_utc": "2026-10-28T12:58:59Z",
+  "question": "Durante 2026, ¿en qué mes vendimos más materias primas y cuál fue el cliente al que más le vendimos en ese mes?",
+  "clarification_human": "Sí. Ambos investigadores recibieron la misma pregunta,\nestán congelados y utilizan Foundation snapshot 1408.\n\n\"Más\" significa mayor importe comercial facturado\nde líneas de venta, expresado en bolivianos (Bs).\nNo sumar cantidades físicas de unidades incompatibles.\n\n\"Materias primas\" significa productos identificados como\nmaterias primas mediante información empresarial acreditada\ndel Data Lake.\n\nInvestigá qué clasificación disponible permite identificar\nese universo. No supongas que el nombre del producto\nconstituye una clasificación oficial.\n\nSi la clasificación es incompleta, entregá los resultados\nverificables disponibles y explicá sus limitaciones.\n\nIdentificá el mes de mayor venta, el principal cliente\nfacturado de ese mes y los cinco principales clientes.\n\nDiferenciá meses completos de meses parciales.\n\nContinuá la investigación en modo READ_ONLY.",
+  "interpretation": "Rank monthly commercial line amounts in observed Bs currency for accredited raw-material products; top five invoiced customers in winning month. No net billing interpretation.",
+  "hypotheses": [
+    "Authorized product projection may not expose an accredited raw-material classification.",
+    "Authorized invoice projection may not expose customer identity.",
+    "Observed document dates do not certify complete monthly coverage."
+  ],
+  "resources_initial": {
+    "mem_available": "6861796 kB",
+    "swap_total": "31250428 kB",
+    "swap_free": "31249904 kB",
+    "self_maxrss_kib": 35480,
+    "load": [
+      5.68212890625,
+      4.9443359375,
+      3.712890625
+    ]
+  },
+  "queries": [],
+  "limitations": [
+    "No access to other researcher evidence.",
+    "Operational source foundation_dev.py contains legacy business prompt literals; not used as evidence or executed.",
+    "No OS RSS/CPU/scan-byte sandbox.",
+    "Pi LLM calls/tokens/cost not exposed to runner; no equal enforceable LLM cap to A. No auxiliary model calls."
+  ],
+  "context": {
+    "identity": "supervised-local-uid:1000",
+    "organization": "TELCHI",
+    "workspace": "foundation_supervised_dev",
+    "environment": "dev",
+    "permissions": "frozenset({'telchi.exploratory.foundation.supervised_dev.read.v1'})",
+    "catalog": {
+      "dataset": "telchi_foundation_direct_ask_dev_v1",
+      "organization": "TELCHI",
+      "workspace": "foundation_supervised_dev",
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "tables": [
+        {
+          "name": "sales_document",
+          "columns": [
+            {
+              "name": "doc_entry",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "doc_num",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "doc_date",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "currency",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "slp_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "series",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "sales_channel_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "sales_channel_semantic_status",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "raw_extraction_id",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "source_as_of",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "user_sign",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            }
+          ],
+          "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+          "grain": [
+            "doc_entry"
+          ],
+          "max_rows": 1000000,
+          "semantic_constraints": [
+            "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+            "doc_date is normalized to ISO calendar DATE (YYYY-MM-DD), not timestamp text; source_as_of remains raw provenance.",
+            "Current classification, not historical or certified complete calendar coverage.",
+            "Line money before credit memos/global adjustments; not net billing or collections.",
+            "Seller category, warehouse, series and creator are not operation channel."
+          ]
+        },
+        {
+          "name": "sales_line",
+          "columns": [
+            {
+              "name": "doc_entry",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "line_num",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "item_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "currency",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "line_total",
+              "sql_type": "DECIMAL(38,6)",
+              "nullable": true
+            },
+            {
+              "name": "raw_extraction_id",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "source_as_of",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "whs_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            }
+          ],
+          "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+          "grain": [
+            "doc_entry",
+            "line_num"
+          ],
+          "max_rows": 1000000,
+          "semantic_constraints": [
+            "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+            "doc_date is normalized to ISO calendar DATE (YYYY-MM-DD), not timestamp text; source_as_of remains raw provenance.",
+            "Current classification, not historical or certified complete calendar coverage.",
+            "Line money before credit memos/global adjustments; not net billing or collections.",
+            "Seller category, warehouse, series and creator are not operation channel."
+          ]
+        },
+        {
+          "name": "document_metadata",
+          "columns": [
+            {
+              "name": "doc_entry",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "user_sign",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            }
+          ],
+          "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+          "grain": [
+            "doc_entry"
+          ],
+          "max_rows": 1000000,
+          "semantic_constraints": [
+            "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+            "doc_date is normalized to ISO calendar DATE (YYYY-MM-DD), not timestamp text; source_as_of remains raw provenance.",
+            "Current classification, not historical or certified complete calendar coverage.",
+            "Line money before credit memos/global adjustments; not net billing or collections.",
+            "Seller category, warehouse, series and creator are not operation channel."
+          ]
+        },
+        {
+          "name": "line_metadata",
+          "columns": [
+            {
+              "name": "doc_entry",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "line_num",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "whs_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            }
+          ],
+          "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+          "grain": [
+            "doc_entry",
+            "line_num"
+          ],
+          "max_rows": 1000000,
+          "semantic_constraints": [
+            "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+            "doc_date is normalized to ISO calendar DATE (YYYY-MM-DD), not timestamp text; source_as_of remains raw provenance.",
+            "Current classification, not historical or certified complete calendar coverage.",
+            "Line money before credit memos/global adjustments; not net billing or collections.",
+            "Seller category, warehouse, series and creator are not operation channel."
+          ]
+        },
+        {
+          "name": "sales_operation",
+          "columns": [
+            {
+              "name": "doc_entry",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "line_num",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "item_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "line_total",
+              "sql_type": "DECIMAL(38,6)",
+              "nullable": true
+            },
+            {
+              "name": "currency",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "doc_num",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "doc_date",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "slp_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "series",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "user_sign",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "whs_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "sales_channel_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "sales_channel_semantic_status",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "raw_extraction_id",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "source_as_of",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            }
+          ],
+          "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+          "grain": [
+            "doc_entry",
+            "line_num"
+          ],
+          "max_rows": 1000000,
+          "semantic_constraints": [
+            "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+            "doc_date is normalized to ISO calendar DATE (YYYY-MM-DD), not timestamp text; source_as_of remains raw provenance.",
+            "Current classification, not historical or certified complete calendar coverage.",
+            "Line money before credit memos/global adjustments; not net billing or collections.",
+            "Seller category, warehouse, series and creator are not operation channel."
+          ]
+        },
+        {
+          "name": "salesperson",
+          "columns": [
+            {
+              "name": "slp_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "name",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "salesperson_category_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "salesperson_category_name",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            }
+          ],
+          "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+          "grain": [
+            "slp_code"
+          ],
+          "max_rows": 1000000,
+          "semantic_constraints": [
+            "Pinned published active SAP OINV/INV1 population; no prescribed product or period.",
+            "doc_date is normalized to ISO calendar DATE (YYYY-MM-DD), not timestamp text; source_as_of remains raw provenance.",
+            "Current classification, not historical or certified complete calendar coverage.",
+            "Line money before credit memos/global adjustments; not net billing or collections.",
+            "Seller category, warehouse, series and creator are not operation channel."
+          ]
+        },
+        {
+          "name": "product",
+          "columns": [
+            {
+              "name": "item_code",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "item_name",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            },
+            {
+              "name": "inventory_uom_id",
+              "sql_type": "VARCHAR",
+              "nullable": true
+            }
+          ],
+          "permission": "telchi.exploratory.foundation.supervised_dev.read.v1",
+          "grain": [
+            "item_code"
+          ],
+          "max_rows": 1000000,
+          "semantic_constraints": [
+            "Published SAP product reference. Names are discovery evidence, not accredited brand membership.",
+            "Inventory UoM identifier does not establish physical conversion factors."
+          ]
+        }
+      ],
+      "known_relations": [
+        {
+          "left_table": "sales_document",
+          "left_column": "doc_entry",
+          "right_table": "sales_line",
+          "right_column": "doc_entry",
+          "rationale": ""
+        }
+      ],
+      "synthetic_only": false
+    },
+    "sources": [
+      "sales_document",
+      "sales_line",
+      "document_metadata",
+      "line_metadata",
+      "sales_operation",
+      "salesperson",
+      "product"
+    ],
+    "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot": "1408",
+    "effective_budget": {
+      "query_seconds": 120.0,
+      "total_seconds": 900.0,
+      "cpu_seconds": 1,
+      "process_memory_bytes": 536870912,
+      "threads": 1,
+      "result_rows": 5000,
+      "result_bytes": 2097152,
+      "source_bytes": 65536,
+      "queries": 12,
+      "concurrency": 1,
+      "max_join_pairs": 10000
+    },
+    "investigation_id": "TELCHIAI_DIRECT_ASK_V1",
+    "version": "telchiai.exploratory_sql.v1"
+  },
+  "catalog_findings": {
+    "product_fields": [
+      "item_code",
+      "item_name",
+      "inventory_uom_id"
+    ],
+    "customer_fields": [],
+    "classification": "No product classification field in authorized CATALOG; names not accredited membership. Salesperson category describes salesperson, not product."
+  },
+  "first_useful_result_utc": "2026-10-28T13:00:21.698333+00:00",
+  "first_useful_result_monotonic": 14675.018402413,
+  "status": "BLOCKED_BEFORE_SQL",
+  "errors": [
+    {
+      "type": "BlockingIOError",
+      "reason": "Shared DEV interprocess execution lock occupied; no retries or concurrent scans performed."
+    },
+    {
+      "type": "Evidence logging command error",
+      "reason": "python executable absent in shell; corrected to python3, no SQL involved."
+    }
+  ],
+  "query_count": 0,
+  "end_utc": "2026-10-28T13:00:48.587486+00:00",
+  "end_monotonic": 14701.907573507,
+  "first_useful_result_type": "Authorized catalog inspection; not business-data result",
+  "business_result_available": false,
+  "llm_usage": {
+    "calls": "Not exposed by harness tools; session includes earlier clarification turns.",
+    "tokens": null,
+    "cost": null,
+    "auxiliary_models": 0,
+    "asymmetry": "No identical enforceable LLM cap to investigator A."
+  },
+  "findings": {
+    "winning_month": null,
+    "top_customer": null,
+    "top_five_customers": null,
+    "month_completeness": "Not assessed: no SQL executed; published rows alone do not certify calendar coverage.",
+    "classification_scope": "Only product item_code/item_name/inventory_uom_id exposed; no accredited raw-material classification accessible through authorized projection. No assertion about unavailable Data Lake domains.",
+    "customer_scope": "No invoiced customer code/name in authorized logical tables."
+  },
+  "elapsed_investigation_seconds": 106.88979206600015,
+  "elapsed_investigation_note": "Approximate includes source inspection before runner; UTC first host preflight is exact. Monotonic start captured at runner initialization."
+}

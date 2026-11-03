@@ -1,0 +1,147 @@
+{
+  "verdict": "PARTIAL",
+  "branch": "feature/console-backend-core",
+  "objective": "Foundation final closure followed continuously by authorized isolated WhatsApp/backend validation",
+  "foundation_verdict": "FOUNDATION_INTEGRITY_PASS",
+  "reconciliation_verdict": "FOUNDATION_RECONCILIATION_INTEGRITY_PASS",
+  "whatsapp_isolated_e2e": "NOT_ACHIEVED",
+  "whatsapp_backend_e2e": "NOT_FULLY_ACCRREDITED: functional backend passed, durable asynchronous admission/recovery gate remains open",
+  "integrity": {
+    "cause": "Canonical compact JSON digest and seal-serialized file byte digest have distinct contracts; their difference is not evidence of corruption",
+    "canonical_digest": "186b43c23179242482f68d38a10498999549f8e6949a34bbb5fc2bb38379cae1",
+    "serialized_file_digest": "2b911dfe08ccec031950373ae666ae2205f776d8ebd38b7eab05d528f362e05b",
+    "forensic_investigation_repeated": false,
+    "contract_regression": "Existing test_operational_reconciliation_digest.py rerun; canonical content, serialization differences and repeated-call tampering rejection remain covered",
+    "current": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+    "reference": "v2_sales_448ae93a960bf7342564a2d0",
+    "manifest_sha256": "5b42eb99b9088c319e10f4fee833fe7b44bad437c8f44db285ba99cdf0dd3cbc",
+    "components": ["credit_memo", "material_supply", "oinm", "oitw", "purchasing", "receivables_collections", "reference", "sales"],
+    "live_validation": "Canonical real_promotion.validate(current) and verify_reader(current), without promoting or replacing any validator",
+    "canonical_manifest_physical_seconds": 61.34000361499966,
+    "live_reader_seconds": 202.0026841630006,
+    "total_live_integrity_seconds": 263.8570432662964,
+    "physical_and_sealed_inputs": "PASS: canonical manifest/ancestry validation, sealed sales verification, physical files and operational bidirectional source replay/reconciliation",
+    "dependencies_classifications": "PASS within canonical inherited contracts; no new classification or coverage claims",
+    "stock_reader": "LIVE_READER_RAW_AGGREGATES_EXACT: 1385179 source rows; units/unknowns preserved",
+    "observation_readers": "SOURCE_OBSERVATION_READERS_EXACT: all 19 datasets",
+    "retained_snapshots": [1322, 1408, 1506],
+    "recovery_and_rollback": "PASS isolated existing fault-injection fixtures, not rollback of live CURRENT",
+    "live_noop": "PASS: actual FoundationPublicationStore.logical_commit(CURRENT) returned ALREADY_CURRENT and rolled back without a pointer update",
+    "current_unchanged": true,
+    "publications_created": 0,
+    "historical_evidence_modified": false,
+    "reconciliation_or_manifest_modified": false,
+    "evidence": ["live-integrity.json", "live-integrity.log", "retained-snapshots.json", "live-noop.json", "integrity-tests.log"],
+    "prior_hash_contract_evidence": "data/reports/telchi/foundation-reconciliation-integrity-closure-v1/report.json"
+  },
+  "whatsapp_backend": {
+    "functional_status": "LOCAL_BACKEND_FUNCTIONAL_PASS",
+    "external_inbound": false,
+    "external_outbound": false,
+    "instance_binding_provenance": "team360-meta-dev / evolution; original binding verified read-only in PostgreSQL",
+    "workspace": "telchi_dev",
+    "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+    "identity": "Existing approved DEV pilot; real verified phone binding and Console effective permissions; phone itself was not treated as authorization",
+    "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+    "isolation": "Locally constructed normalized inbound messages and unique synthetic receiver/storage namespace; no persistent channel/binding or grants changed",
+    "execution": "MessagingService -> real MessageDispatcher -> PostgresPhoneIdentityResolver -> BusinessAuthorization -> TelchiHandler -> Luna/State Engine -> Foundation -> committed PostgreSQL audit and outbound intent",
+    "transport": "Controlled sender port replaces external transport; acceptance is SIMULATED, not delivered/read. No claim of real webhook ingress",
+    "queries": [
+      {"operation": "inventory.stock_by_warehouse", "positions": 73, "presented": 10, "elapsed_seconds": 62.878788854999584},
+      {"operation": "production.consumption", "included_lines": 3974, "elapsed_seconds": 64.74866623700109},
+      {"operation": "purchasing.invoiced_amount", "documents": 605, "amount_bs": "4026474.58", "elapsed_seconds": 68.5154487259988},
+      {"operation": "collections.received_amount", "payments": 40077, "amount_bs": "12180925.36", "elapsed_seconds": 65.89234896599919},
+      {"operation": "material_supply.consumption", "eligible_lines": 2297, "elapsed_seconds": 66.40541185199982}
+    ],
+    "functional_parity": "5/5 EXACT: fresh rows, summary, controls, coverage, omitted rows, row counts and source match previously independently accredited business controls",
+    "rbac": "5/5 actual required permissions and business_rbac_verified=true in committed audit; zero grants changed",
+    "prior_real_negative_rbac_evidence_reused": "data/reports/telchi/operational-authorized-e2e-v1/rbac-probes-r2.json; unchanged authorization runtime and grants; fresh positive rechecks executed",
+    "model": "OpenAI direct / gpt-5.6-luna / medium; returned reasoning verified, no fallback; preflight and all five questions executed",
+    "idempotency": "10 sequential duplicate replays; exactly one analytical capability execution and one logical outbound per query",
+    "recovery_executed_real_pg": "Known simulated outbound failure on Material Supply; reconstructed service and explicit retry accepted; same durable intent, two transport attempts, no second analytical execution",
+    "backend_budget": "Explicit DEV-only 300s worker / 360s turn; normal runtime defaults unchanged; >60s was not a functional failure",
+    "business_presentation": "Business result, currency/native unit, requested period/coverage and limitations retained; no SQL or read_parquet expression sent to controlled recipient. Permission and lineage retained in audit",
+    "pool_closed": true,
+    "evidence": ["backend-five-real.json", "backend-five-real.log", "parity-and-authorization.json", "privacy-check.json"],
+    "not_proven": ["Real provider inbound authenticity/receipt", "Actual WhatsApp delivery/read", "Full Srv05 live transport lifecycle", "Durable asynchronous receipt and execution recovery"]
+  },
+  "real_transport_impediments": [
+    {
+      "id": "EVOLUTION_UNAVAILABLE_AND_OWNERSHIP_MISMATCH",
+      "classification": "CONCRETE_ENVIRONMENT_OWNERSHIP_DEPENDENCY",
+      "finding": "GET connectionState fails with connection refused at configured local port 18180. Existing evolution-api is created/not running. Its container ID does not match the private owned-runtime record; prior admission is closed",
+      "action": "Preserved existing containers and services; did not start or adopt a different container",
+      "evidence": ["whatsapp-preflight.json", "evolution-container.json"]
+    },
+    {
+      "id": "SRV05_TRANSPORT_V1_CONFIGURATION_MISSING",
+      "classification": "CONCRETE_CONFIGURATION_DEPENDENCY",
+      "finding": "Constructing the actual Srv05/Telchi app from the approved private launcher environment fails closed: V1 runtime configuration required; legacy fallback forbidden",
+      "action": "No fabricated signer/trust profile, legacy fallback, credential copy or bypass",
+      "evidence": ["srv05-live-construction.json"]
+    },
+    {
+      "id": "SOURCE_GATES_REQUIRE_REACCREDITATION",
+      "classification": "EVIDENCE_DEPENDENCY",
+      "finding": "Workspace, identity, instance, approval and configuration fingerprints match; source fingerprint does not. This mismatch existed before this task added its probe",
+      "action": "Preserved private gate manifest. Did not simply replace its hash or claim local fixture tests renew real transport guarantees",
+      "evidence": ["whatsapp-preflight.json", "gate-scope.json"]
+    }
+  ],
+  "unclosed_implementation_gate": {
+    "id": "DURABLE_ASYNCHRONOUS_INBOUND_EXECUTION",
+    "classification": "CONFIRMED_IMPLEMENTATION_GAP_NOT_AN_EXTERNAL_AUTHORIZATION_DEPENDENCY",
+    "finding": "Evolution webhook awaits service.process, which awaits dispatcher/Luna. Existing persisted claim is a duplication fence, not a queued job. A crash after claim can remain execution_uncertain; a crash between committed handler result and outbound intent has no complete automatic recovery",
+    "source": ["SrvRestAstroLS_v1/backend/modules/messaging/webhooks/evolution_whatsapp.py", "SrvRestAstroLS_v1/backend/modules/messaging/service.py", "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md"],
+    "fixture_evidence": "test_messaging_horizontal_runtime.py interruption-after-claim, durable-intent resume, controlled-retry and acceptance-commit-failure cases passed; these tests establish existing limits, not the requested queue/restart guarantees",
+    "resolved": false,
+    "scope_of_delivery": "This execution closed integrity and exercised the local backend continuously; it did not implement the durable queue/worker or complete the overall mission",
+    "required_next_work": "Implement transactional durable admission/worker/recovery on existing Messaging persistence with explicit authorized Srv05 lifecycle, then real isolated ingress/outbound and crash-stage validation; never acknowledge an unpersisted job or infer delivered from accepted"
+  },
+  "srv05_test_contract_fix": {
+    "classification": "PREEXISTING_TEST_EXPECTATION_MISMATCH",
+    "reproduced_before": "1 failed, 1 passed",
+    "cause": "Expected build_service call omitted existing transport_runtime injection and expected lifecycle omitted existing v1_start/v1_stop",
+    "fix": "Only update assertions to require the actual app-owned transport runtime and lifecycle order",
+    "runtime_changed": false,
+    "after": "2 passed; also included in final 13 passed batch",
+    "evidence": ["srv05-before.log", "srv05-after.log", "final-focused-tests.log"]
+  },
+  "validation": {
+    "integrity_tests": "42 passed in 10.46s",
+    "whatsapp_isolation_transport_security_contracts": "180 passed in 8.36s; fixture scope, not external delivery",
+    "final_focused_tests": "13 passed in 1.00s",
+    "lat_check": "PASS; preexisting init-version and semantic-search-key warnings",
+    "git_diff_check": "PASS",
+    "new_probe_help_import": "PASS",
+    "real_commands": [
+      "real_promotion(...).validate(store.current_publication()); real_promotion(...).verify_reader(current), without promote",
+      "FoundationPublicationStore.logical_commit(current) -> ALREADY_CURRENT",
+      "uv run python -u -m modules.telchi.assistant.tests.live_final_whatsapp_backend --output ../../data/reports/telchi/final-closure-whatsapp-e2e-v1/backend-five-real.json",
+      "lat check",
+      "git diff --check"
+    ]
+  },
+  "files_changed_by_this_execution": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_final_whatsapp_backend.py",
+    "SrvRestAstroLS_v1/backend/tests/test_telchi_assistant_srv05.py",
+    "data/reports/telchi/final-closure-whatsapp-e2e-v1/"
+  ],
+  "resources": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS for workloads executed; no promotion guard disabled or modified",
+    "policy": "Elevated HDD I/O wait alone did not block work; sequential scans completed with observable CPU/I/O progress",
+    "cores": 8,
+    "available_memory_mb_initial": 7320,
+    "available_memory_mb_final": 7447,
+    "swap_used_mb_initial": 2230,
+    "swap_used_mb_final": 2229,
+    "CONCURRENCY_USED": "One heavy live scan/analytical operation at a time; one PG connection in local backend; canonical validation and reader connections threads=1, reader connection memory_limit=512MB; nested existing validators retained their own defaults; cheap tests/metadata were allowed alongside",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0
+  },
+  "cross_module_impact": "No runtime/transport/auth code, shared services, scheduler, HANA, Foundation, grants, private gate manifest or production changed. Only a preexisting Srv05 integration test expectation and a local probe changed. Probe committed isolated DEV message/audit/intent rows and used the authorized model",
+  "restrictions": {"sap_calls": 0, "recaptures": 0, "real_whatsapp_messages": 0, "commits": 0, "pushes": 0, "services_restarted": 0},
+  "next_step": "Reconcile authorized Evolution container ownership and provision approved V1 runtime configuration; complete durable asynchronous Messaging gate and scoped real gate reaccreditation, then perform actual authorized WhatsApp inbound/outbound. Do not rerun Foundation capture or optimize Luna latency first"
+}

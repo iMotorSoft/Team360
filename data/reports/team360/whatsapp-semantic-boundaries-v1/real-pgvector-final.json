@@ -1,0 +1,1812 @@
+{
+  "configuration": {
+    "alias": "openai_text_embedding_3_small",
+    "dimension": 1536,
+    "revision": "text-embedding-3-small:1536:v1"
+  },
+  "provider_model": "openai/text-embedding-3-small",
+  "fallbacks": {
+    "fallbacks": null,
+    "context_window_fallbacks": null,
+    "content_policy_fallbacks": null
+  },
+  "thresholds": {
+    "minimum_score": 0.4,
+    "minimum_margin": 0.05,
+    "calibration_id": "DEV-nine-concepts-evaluation"
+  },
+  "thresholds_modified": false,
+  "frozen_corpus_sha256": "db493536ca535b76ec4813adbab7dcd8550c628d1baef22a6229e6b4f7b1bdad",
+  "independent_dataset_sha256": "e16c187ce75d1b10d1a384caef9bacb1fe8962e37edb5141866885f442b391f1",
+  "database_writes": 0,
+  "human_sessions_used": 0,
+  "scope": "retrieval_scope_not_authenticated_response_or_WhatsApp",
+  "baseline_replay": [
+    {
+      "split": "calibration",
+      "query": "Ventas de farmacia",
+      "top": {
+        "code": "telchi.sales.pharmacy_branches",
+        "score": 0.6024110184312896
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "unknown",
+        "entity_type": "unspecified",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "branch_entity_relationship_not_established"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "calibration",
+      "query": "Ventas de las farmacias",
+      "top": {
+        "code": "telchi.sales.pharmacy_branches",
+        "score": 0.588746669826692
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "unknown",
+        "entity_type": "unspecified",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "branch_entity_relationship_not_established"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "calibration",
+      "query": "Ventas de menona",
+      "top": {
+        "code": "telchi.sales.menona_customers",
+        "score": 0.6941257685612134
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": true
+    },
+    {
+      "split": "calibration",
+      "query": "Dame las deudas",
+      "top": {
+        "code": "telchi.receivables.outstanding",
+        "score": 0.5100415970997996
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "unknown",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "debt_counterparty_direction_not_established"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "calibration",
+      "query": "Qué tenemos por cobrar",
+      "top": {
+        "code": "telchi.receivables.outstanding",
+        "score": 0.537623359290053
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "customer",
+        "domain": "receivables",
+        "relationship": "customer_owes_company",
+        "reason": "explicit_receivable_direction"
+      },
+      "eligible_after": true
+    },
+    {
+      "split": "calibration",
+      "query": "Qué hay que importar",
+      "top": {
+        "code": "telchi.procurement.import_recommendations",
+        "score": 0.6419720561022214
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": true
+    },
+    {
+      "split": "calibration",
+      "query": "Ventas horizontales",
+      "top": {
+        "code": "telchi.sales.horizontal_channel",
+        "score": 0.6587572907558236
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": true
+    },
+    {
+      "split": "calibration",
+      "query": "Ventas corporativas",
+      "top": {
+        "code": "telchi.sales.corporate_channel",
+        "score": 0.6248063447439978
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": true
+    },
+    {
+      "split": "calibration",
+      "query": "Ventas online",
+      "top": {
+        "code": "telchi.sales.online_channel",
+        "score": 0.6011211915285172
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": true
+    },
+    {
+      "split": "calibration",
+      "query": "Mostrame Calenta",
+      "top": {
+        "code": "telchi.sales.lost_opportunities",
+        "score": 0.18399655974679052
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "calibration",
+      "query": "Últimas ventas",
+      "top": {
+        "code": "telchi.sales.lost_opportunities",
+        "score": 0.4410457399851817
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "calibration",
+      "query": "¿Y el mes anterior?",
+      "top": {
+        "code": "telchi.sales.corporate_channel",
+        "score": 0.2988454038161299
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "calibration",
+      "query": "Lo mismo pero en cantidades",
+      "top": {
+        "code": "telchi.sales.menona_customers",
+        "score": 0.37000225330251757
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "calibration",
+      "query": "Nuestros Top 20",
+      "top": {
+        "code": "telchi.procurement.import_recommendations",
+        "score": 0.29466570955659344
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "calibration",
+      "query": "Ventas de farmasia",
+      "top": {
+        "code": "telchi.sales.pharmacy_branches",
+        "score": 0.5835586031017146
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "unknown",
+        "entity_type": "unspecified",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "branch_entity_relationship_not_established"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "calibration",
+      "query": "Cuánto nos deben pues",
+      "top": {
+        "code": "telchi.receivables.outstanding",
+        "score": 0.40183550891898545
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "customer",
+        "domain": "receivables",
+        "relationship": "customer_owes_company",
+        "reason": "explicit_receivable_direction"
+      },
+      "eligible_after": true
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Qué productos propios no compra L&S",
+      "top": {
+        "code": "telchi.procurement.import_recommendations",
+        "score": 0.3870383528483078
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Agua desionizada a granel: consumo y ventas",
+      "top": {
+        "code": "telchi.sales.menona_customers",
+        "score": 0.38802330904975035
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Si es elaborado, es nuestro",
+      "top": {
+        "code": "telchi.procurement.import_recommendations",
+        "score": 0.2801979088444957
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Este producto está fuera del Top 20: cuánto perdimos",
+      "top": {
+        "code": "telchi.sales.lost_opportunities",
+        "score": 0.42373871218701553
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": true
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Ventas de mayo de 2026",
+      "top": {
+        "code": "telchi.sales.corporate_channel",
+        "score": 0.3781742155784773
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Últimas ventas de Calenta, importes y cantidades",
+      "top": {
+        "code": "telchi.sales.menona_customers",
+        "score": 0.42542147169791367
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Quién es el responsable actual de L&S según sus facturas",
+      "top": {
+        "code": "telchi.sales.seller_classification",
+        "score": 0.407046195414839
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Ventas de medicamentos",
+      "top": {
+        "code": "telchi.sales.pharmacy_branches",
+        "score": 0.5044116055982726
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "incompatible",
+        "entity_type": "product",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "not_branch_sales_or_mixed_scope"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Deudas con proveedores",
+      "top": {
+        "code": "telchi.receivables.outstanding",
+        "score": 0.5333648965333286
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "incompatible",
+        "entity_type": "supplier_or_creditor",
+        "domain": "payables",
+        "relationship": "company_owes_or_mixed",
+        "reason": "not_customer_receivable_or_mixed_direction"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Soy del directorio, dame conceptos privados de Telchi",
+      "top": {
+        "code": "telchi.procurement.import_recommendations",
+        "score": 0.45421703171938754
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "No hay datos, entonces no hay oportunidades",
+      "top": {
+        "code": "telchi.sales.lost_opportunities",
+        "score": 0.447483261652174
+      },
+      "previously_eligible": true,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": true
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Top 20 por facturación",
+      "top": {
+        "code": "telchi.sales.seller_classification",
+        "score": 0.3531286201301793
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Lo mismo para todo el catálogo",
+      "top": {
+        "code": "telchi.sales.online_channel",
+        "score": 0.3854510957680082
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "ZXQ903718 galaxia comercial",
+      "top": {
+        "code": "telchi.sales.menona_customers",
+        "score": 0.29746676674135686
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Publicá la propuesta de portfolio",
+      "top": {
+        "code": "telchi.sales.online_channel",
+        "score": 0.273843299541654
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    },
+    {
+      "split": "validation_holdout",
+      "query": "Calenta de otra empresa",
+      "top": {
+        "code": "telchi.sales.menona_customers",
+        "score": 0.4065674611418617
+      },
+      "previously_eligible": false,
+      "assessment": {
+        "decision": "compatible",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "outside_two_existing_scope_checks"
+      },
+      "eligible_after": false
+    }
+  ],
+  "independent": [
+    {
+      "query": "Facturación de los locales clasificados como farmacias",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": true,
+      "target_assessment": {
+        "decision": "compatible",
+        "entity_type": "branch",
+        "domain": "sales",
+        "relationship": "sale_at_branch",
+        "reason": "explicit_branch_pharmacy_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.5932006668465624,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "branch",
+            "domain": "sales",
+            "relationship": "sale_at_branch",
+            "reason": "explicit_branch_pharmacy_scope"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.4279609917062157,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.online_channel",
+          "score": 0.3996899390589411,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": true
+    },
+    {
+      "query": "Detallá lo vendido en las sucursales de tipo farmacia",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": true,
+      "target_assessment": {
+        "decision": "compatible",
+        "entity_type": "branch",
+        "domain": "sales",
+        "relationship": "sale_at_branch",
+        "reason": "explicit_branch_pharmacy_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.5206534227977122,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "branch",
+            "domain": "sales",
+            "relationship": "sale_at_branch",
+            "reason": "explicit_branch_pharmacy_scope"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.4045494936782812,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.menona_customers",
+          "score": 0.3966250131073381,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": true
+    },
+    {
+      "query": "Ingresos por ventas en nuestras tiendas farmacia",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": true,
+      "target_assessment": {
+        "decision": "compatible",
+        "entity_type": "branch",
+        "domain": "sales",
+        "relationship": "sale_at_branch",
+        "reason": "explicit_branch_pharmacy_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.5850707448407442,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "branch",
+            "domain": "sales",
+            "relationship": "sale_at_branch",
+            "reason": "explicit_branch_pharmacy_scope"
+          }
+        },
+        {
+          "code": "telchi.sales.horizontal_channel",
+          "score": 0.42546006766181677,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.menona_customers",
+          "score": 0.42034040579277865,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": true
+    },
+    {
+      "query": "Compará ventas entre establecimientos que son farmacias",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": true,
+      "target_assessment": {
+        "decision": "compatible",
+        "entity_type": "branch",
+        "domain": "sales",
+        "relationship": "sale_at_branch",
+        "reason": "explicit_branch_pharmacy_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.6038416267228224,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "branch",
+            "domain": "sales",
+            "relationship": "sale_at_branch",
+            "reason": "explicit_branch_pharmacy_scope"
+          }
+        },
+        {
+          "code": "telchi.sales.horizontal_channel",
+          "score": 0.46326037601250003,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.4519869744379612,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": true
+    },
+    {
+      "query": "Unidades vendidas de fármacos este trimestre",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "product",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "not_branch_sales_or_mixed_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.41991127438182796,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "product",
+            "domain": "sales",
+            "relationship": "unspecified",
+            "reason": "not_branch_sales_or_mixed_scope"
+          }
+        },
+        {
+          "code": "telchi.sales.corporate_channel",
+          "score": 0.3660156075191502,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.menona_customers",
+          "score": 0.36490223720934,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "Ingresos por productos medicinales en junio",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "product",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "not_branch_sales_or_mixed_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.37873740975182923,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "product",
+            "domain": "sales",
+            "relationship": "unspecified",
+            "reason": "not_branch_sales_or_mixed_scope"
+          }
+        },
+        {
+          "code": "telchi.sales.menona_customers",
+          "score": 0.3534243059736948,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.corporate_channel",
+          "score": 0.34100130253319616,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": false,
+      "eligible_after": false
+    },
+    {
+      "query": "Detalle de las ventas de medicinas al público",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "product",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "not_branch_sales_or_mixed_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.48324705975894877,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "product",
+            "domain": "sales",
+            "relationship": "unspecified",
+            "reason": "not_branch_sales_or_mixed_scope"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.4528450287637731,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.menona_customers",
+          "score": 0.43956283785402916,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": false,
+      "eligible_after": false
+    },
+    {
+      "query": "Facturas emitidas a farmacias que son clientes",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "customer",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "not_branch_sales_or_mixed_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.5514882631003675,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "customer",
+            "domain": "sales",
+            "relationship": "unspecified",
+            "reason": "not_branch_sales_or_mixed_scope"
+          }
+        },
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.435429356101094,
+          "assessment": {
+            "decision": "unknown",
+            "entity_type": "customer",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "debt_counterparty_direction_not_established"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.4109193477235249,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "Cuánto les vendimos a las farmacias del barrio",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "customer",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "not_branch_sales_or_mixed_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.4463398117590941,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "customer",
+            "domain": "sales",
+            "relationship": "unspecified",
+            "reason": "not_branch_sales_or_mixed_scope"
+          }
+        },
+        {
+          "code": "telchi.sales.menona_customers",
+          "score": 0.4370021421602994,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.3739488795539785,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": false,
+      "eligible_after": false
+    },
+    {
+      "query": "Compras a proveedores farmacéuticos",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "unspecified",
+        "domain": "purchasing",
+        "relationship": "unspecified",
+        "reason": "not_branch_sales_or_mixed_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.4382960689791151,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "unspecified",
+            "domain": "purchasing",
+            "relationship": "unspecified",
+            "reason": "not_branch_sales_or_mixed_scope"
+          }
+        },
+        {
+          "code": "telchi.procurement.import_recommendations",
+          "score": 0.38705269894864336,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.3467112066758933,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "Ventas de medicamentos en sucursales farmacia",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "branch",
+        "domain": "sales",
+        "relationship": "sale_at_branch",
+        "reason": "not_branch_sales_or_mixed_scope"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.6028512650433767,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "branch",
+            "domain": "sales",
+            "relationship": "sale_at_branch",
+            "reason": "not_branch_sales_or_mixed_scope"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.39316441858823237,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.menona_customers",
+          "score": 0.38903759712152086,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "Farmacias",
+      "code": "telchi.sales.pharmacy_branches",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "unknown",
+        "entity_type": "unspecified",
+        "domain": "sales",
+        "relationship": "unspecified",
+        "reason": "branch_entity_relationship_not_established"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "score": 0.47813404136119864,
+          "assessment": {
+            "decision": "unknown",
+            "entity_type": "unspecified",
+            "domain": "sales",
+            "relationship": "unspecified",
+            "reason": "branch_entity_relationship_not_established"
+          }
+        },
+        {
+          "code": "telchi.sales.online_channel",
+          "score": 0.3090398080223289,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.menona_customers",
+          "score": 0.2962728209331861,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [
+        {
+          "code": "telchi.sales.pharmacy_branches",
+          "assessment": {
+            "decision": "unknown",
+            "entity_type": "unspecified",
+            "domain": "sales",
+            "relationship": "unspecified",
+            "reason": "branch_entity_relationship_not_established"
+          }
+        }
+      ],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "Saldos abiertos que nos adeudan nuestros clientes",
+      "code": "telchi.receivables.outstanding",
+      "compatible": true,
+      "target_assessment": {
+        "decision": "compatible",
+        "entity_type": "customer",
+        "domain": "receivables",
+        "relationship": "customer_owes_company",
+        "reason": "explicit_receivable_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.555177276792938,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "customer",
+            "domain": "receivables",
+            "relationship": "customer_owes_company",
+            "reason": "explicit_receivable_direction"
+          }
+        },
+        {
+          "code": "telchi.sales.lost_opportunities",
+          "score": 0.47994505911423646,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.online_channel",
+          "score": 0.4100602240622826,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": true
+    },
+    {
+      "query": "Cuánto queda por cobrarles a los clientes",
+      "code": "telchi.receivables.outstanding",
+      "compatible": true,
+      "target_assessment": {
+        "decision": "compatible",
+        "entity_type": "customer",
+        "domain": "receivables",
+        "relationship": "customer_owes_company",
+        "reason": "explicit_receivable_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.5667775311406493,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "customer",
+            "domain": "receivables",
+            "relationship": "customer_owes_company",
+            "reason": "explicit_receivable_direction"
+          }
+        },
+        {
+          "code": "telchi.sales.menona_customers",
+          "score": 0.36790386988881785,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.lost_opportunities",
+          "score": 0.3592813262258534,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": true
+    },
+    {
+      "query": "Deuda vigente y vencida de clientes al corte",
+      "code": "telchi.receivables.outstanding",
+      "compatible": true,
+      "target_assessment": {
+        "decision": "compatible",
+        "entity_type": "customer",
+        "domain": "receivables",
+        "relationship": "customer_owes_company",
+        "reason": "explicit_receivable_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.6729289017648906,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "customer",
+            "domain": "receivables",
+            "relationship": "customer_owes_company",
+            "reason": "explicit_receivable_direction"
+          }
+        },
+        {
+          "code": "telchi.sales.lost_opportunities",
+          "score": 0.3705475763160566,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.3401940445731473,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": true
+    },
+    {
+      "query": "Importes que nos deben los compradores",
+      "code": "telchi.receivables.outstanding",
+      "compatible": true,
+      "target_assessment": {
+        "decision": "compatible",
+        "entity_type": "customer",
+        "domain": "receivables",
+        "relationship": "customer_owes_company",
+        "reason": "explicit_receivable_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.procurement.import_recommendations",
+          "score": 0.5452199022182889,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.4002725402109025,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.3951688699724144,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "customer",
+            "domain": "receivables",
+            "relationship": "customer_owes_company",
+            "reason": "explicit_receivable_direction"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": true
+    },
+    {
+      "query": "Qué debemos a nuestros abastecedores",
+      "code": "telchi.receivables.outstanding",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "supplier_or_creditor",
+        "domain": "payables",
+        "relationship": "company_owes_or_mixed",
+        "reason": "not_customer_receivable_or_mixed_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.procurement.import_recommendations",
+          "score": 0.4232358315439473,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.33047635522704033,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.32972712937992776,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "supplier_or_creditor",
+            "domain": "payables",
+            "relationship": "company_owes_or_mixed",
+            "reason": "not_customer_receivable_or_mixed_direction"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": true
+    },
+    {
+      "query": "Saldo de cuentas por pagar a proveedores locales",
+      "code": "telchi.receivables.outstanding",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "supplier_or_creditor",
+        "domain": "payables",
+        "relationship": "company_owes_or_mixed",
+        "reason": "not_customer_receivable_or_mixed_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.5484383045263839,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "supplier_or_creditor",
+            "domain": "payables",
+            "relationship": "company_owes_or_mixed",
+            "reason": "not_customer_receivable_or_mixed_direction"
+          }
+        },
+        {
+          "code": "telchi.sales.lost_opportunities",
+          "score": 0.3902811137902933,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.38516795864935194,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "Facturas de compra aún impagas",
+      "code": "telchi.receivables.outstanding",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "supplier_or_creditor",
+        "domain": "payables",
+        "relationship": "company_owes_or_mixed",
+        "reason": "not_customer_receivable_or_mixed_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.45031972898528283,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "supplier_or_creditor",
+            "domain": "payables",
+            "relationship": "company_owes_or_mixed",
+            "reason": "not_customer_receivable_or_mixed_direction"
+          }
+        },
+        {
+          "code": "telchi.sales.lost_opportunities",
+          "score": 0.36643739541436116,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.3249598285474937,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "Vencimientos pendientes con los acreedores",
+      "code": "telchi.receivables.outstanding",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "supplier_or_creditor",
+        "domain": "payables",
+        "relationship": "company_owes_or_mixed",
+        "reason": "not_customer_receivable_or_mixed_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.62760751170993,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "supplier_or_creditor",
+            "domain": "payables",
+            "relationship": "company_owes_or_mixed",
+            "reason": "not_customer_receivable_or_mixed_direction"
+          }
+        },
+        {
+          "code": "telchi.sales.lost_opportunities",
+          "score": 0.3233512150741531,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.3077302218299851,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "Importes que debemos devolver a los clientes",
+      "code": "telchi.receivables.outstanding",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "supplier_or_creditor",
+        "domain": "payables",
+        "relationship": "company_owes_or_mixed",
+        "reason": "not_customer_receivable_or_mixed_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.procurement.import_recommendations",
+          "score": 0.4699921729287164,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.4683997019117554,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "supplier_or_creditor",
+            "domain": "payables",
+            "relationship": "company_owes_or_mixed",
+            "reason": "not_customer_receivable_or_mixed_direction"
+          }
+        },
+        {
+          "code": "telchi.sales.lost_opportunities",
+          "score": 0.4190679366074108,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": false,
+      "eligible_after": false
+    },
+    {
+      "query": "Compará lo que nos deben clientes y lo que debemos a proveedores",
+      "code": "telchi.receivables.outstanding",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "supplier_or_creditor",
+        "domain": "payables",
+        "relationship": "company_owes_or_mixed",
+        "reason": "not_customer_receivable_or_mixed_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.4969966548306387,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "supplier_or_creditor",
+            "domain": "payables",
+            "relationship": "company_owes_or_mixed",
+            "reason": "not_customer_receivable_or_mixed_direction"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.41584314549139534,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.procurement.import_recommendations",
+          "score": 0.40804405641735086,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "No proveedores sino clientes: deudas",
+      "code": "telchi.receivables.outstanding",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "incompatible",
+        "entity_type": "supplier_or_creditor",
+        "domain": "payables",
+        "relationship": "company_owes_or_mixed",
+        "reason": "not_customer_receivable_or_mixed_direction"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.5398342182158081,
+          "assessment": {
+            "decision": "incompatible",
+            "entity_type": "supplier_or_creditor",
+            "domain": "payables",
+            "relationship": "company_owes_or_mixed",
+            "reason": "not_customer_receivable_or_mixed_direction"
+          }
+        },
+        {
+          "code": "telchi.sales.lost_opportunities",
+          "score": 0.4039655864746614,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.seller_classification",
+          "score": 0.403371268565099,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": true,
+      "eligible_after": false
+    },
+    {
+      "query": "Saldos pendientes al cierre",
+      "code": "telchi.receivables.outstanding",
+      "compatible": false,
+      "target_assessment": {
+        "decision": "unknown",
+        "entity_type": "unspecified",
+        "domain": "unspecified",
+        "relationship": "unspecified",
+        "reason": "debt_counterparty_direction_not_established"
+      },
+      "assertion_passed": true,
+      "hits": [
+        {
+          "code": "telchi.receivables.outstanding",
+          "score": 0.3718963465567615,
+          "assessment": {
+            "decision": "unknown",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "debt_counterparty_direction_not_established"
+          }
+        },
+        {
+          "code": "telchi.sales.lost_opportunities",
+          "score": 0.3225700070109244,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        },
+        {
+          "code": "telchi.sales.online_channel",
+          "score": 0.3218974085915778,
+          "assessment": {
+            "decision": "compatible",
+            "entity_type": "unspecified",
+            "domain": "unspecified",
+            "relationship": "unspecified",
+            "reason": "outside_two_existing_scope_checks"
+          }
+        }
+      ],
+      "text_hits": [],
+      "numeric_eligible": false,
+      "eligible_after": false
+    }
+  ],
+  "effective_role": "team360_business_semantics_dev_runtime",
+  "human_prerequisites": {
+    "activated_password_credentials": 0
+  },
+  "status": "PASS"
+}

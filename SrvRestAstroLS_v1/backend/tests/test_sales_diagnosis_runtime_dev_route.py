@@ -7,7 +7,14 @@ from __future__ import annotations
 
 import os
 
-from litestar.status_codes import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
+import pytest
+
+from litestar.status_codes import (
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 from litestar.testing import TestClient
 
 from ls_iMotorSoft_Srv01 import create_app
@@ -66,6 +73,40 @@ def _default_payload(**overrides: dict) -> dict:
     }
     payload.update(overrides)
     return payload
+
+
+@pytest.fixture(autouse=True)
+def _explicit_dev_environment(monkeypatch):
+    monkeypatch.setenv("TEAM360_ENV", "development")
+
+
+@pytest.mark.parametrize("environment", ["dev", "development"])
+def test_dev_surface_allows_only_explicit_dev_environments(monkeypatch, environment):
+    monkeypatch.setenv("TEAM360_ENV", environment)
+    with _client() as client:
+        response = client.post(DEV_TURN_PATH, json=_default_payload())
+    assert response.status_code == HTTP_201_CREATED
+
+
+def test_dev_surface_rejects_production(monkeypatch):
+    monkeypatch.setenv("TEAM360_ENV", "production")
+    with _client() as client:
+        response = client.post(DEV_TURN_PATH, json=_default_payload())
+    assert response.status_code == HTTP_404_NOT_FOUND
+
+
+def test_dev_surface_rejects_absent_environment(monkeypatch):
+    monkeypatch.delenv("TEAM360_ENV", raising=False)
+    with _client() as client:
+        response = client.post(DEV_TURN_PATH, json=_default_payload())
+    assert response.status_code == HTTP_404_NOT_FOUND
+
+
+def test_dev_surface_rejects_invalid_environment(monkeypatch):
+    monkeypatch.setenv("TEAM360_ENV", "staging")
+    with _client() as client:
+        response = client.post(DEV_TURN_PATH, json=_default_payload())
+    assert response.status_code == HTTP_404_NOT_FOUND
 
 
 class TestDevSalesDiagnosisRouteStateRepository:
@@ -287,19 +328,32 @@ class TestDevSalesDiagnosisRouteMilvus:
 class TestDevSalesDiagnosisRouteLiteLLM:
     """Tests for LiteLLM LLM provider opt-in in the dev endpoint."""
 
-    def test_litellm_mode_is_accepted_with_env_config(self):
-        os.environ[_DEV_LLM_PROVIDER_ENV] = "litellm"
-        os.environ["TEAM360_LITELLM_BASE_URL"] = "http://localhost:4000"
-        os.environ["TEAM360_LITELLM_API_KEY"] = "sk-test-key"
-        try:
-            provider = _resolve_llm_provider({})
-            assert isinstance(provider, _DevLiteLLMProvider)
-        finally:
-            os.environ.pop(_DEV_LLM_PROVIDER_ENV, None)
-            os.environ.pop("TEAM360_LITELLM_BASE_URL", None)
-            os.environ.pop("TEAM360_LITELLM_API_KEY", None)
-            os.environ.pop("LITELLM_API_KEY", None)
-            os.environ.pop("LITELLM_MASTER_KEY", None)
+    def test_litellm_mode_is_accepted_with_env_config(self, monkeypatch):
+        # Restore inherited configuration; fallback keys belong to the caller.
+        monkeypatch.setenv(_DEV_LLM_PROVIDER_ENV, "litellm")
+        monkeypatch.setenv("TEAM360_LITELLM_BASE_URL", "http://localhost:4000")
+        monkeypatch.setenv("TEAM360_LITELLM_API_KEY", "sk-test-key")
+        provider = _resolve_llm_provider({})
+        assert isinstance(provider, _DevLiteLLMProvider)
+
+    @pytest.mark.parametrize("inherited", [False, True])
+    def test_litellm_config_setup_restores_inherited_environment(self, monkeypatch, inherited):
+        keys = (
+            _DEV_LLM_PROVIDER_ENV,
+            "TEAM360_LITELLM_BASE_URL",
+            "TEAM360_LITELLM_API_KEY",
+            "LITELLM_API_KEY",
+            "LITELLM_MASTER_KEY",
+        )
+        for key in keys:
+            if inherited:
+                monkeypatch.setenv(key, "test-inherited-value")
+            else:
+                monkeypatch.delenv(key, raising=False)
+        before = {key: os.environ.get(key) for key in keys}
+        with monkeypatch.context() as setup:
+            self.test_litellm_mode_is_accepted_with_env_config(setup)
+        assert {key: os.environ.get(key) for key in keys} == before
 
     def test_litellm_mode_without_config_returns_controlled_error(self):
         os.environ[_DEV_LLM_PROVIDER_ENV] = "litellm"

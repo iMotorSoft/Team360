@@ -1,0 +1,86 @@
+{
+  "phase": "GLOBAL operational validation, no runtime correction",
+  "branch": "feature/console-backend-core",
+  "full_gate": "TEAM360_FULL_GATE_DEGRADED",
+  "structural_gate": "PASS",
+  "operational_gate": "DEGRADED",
+  "promotion": "NOT_AUTHORIZED; insufficient evidence for technically eligible conclusion",
+  "prior_evidence": "../final-run/report.json",
+  "attempts_preserved": ["../operational-followup-20261007/report.json", "../operational-followup-20261007-r2/report.json"],
+  "lifespan_scope": "Real Srv05 ASGI startup/shutdown on PG, scheduler task and hooks unchanged. Explicit harness-only settings projection disables automation after real DB read. Not unmodified DB-enabled automation, not a live network Uvicorn certification.",
+  "safety": {
+    "runtime_functional_files_modified": [],
+    "production_modified": false,
+    "horizontal_lifecycle_administered": false,
+    "gmail_or_whatsapp_delivery_attempted": false,
+    "scheduler_delivery_attempts": 0,
+    "python_non_dependency_socket_attempts": 0,
+    "pool": "read-only PGOPTIONS; checked again inside actual lifespan",
+    "state_write_exception": "Same real SyncPostgresConversationStateRepository, explicit local DEV DSN connection options; writes only two fresh UUID session IDs per successful invocation, then exact-ID cleanup",
+    "egress_scope": "Python connect/connect_ex allowlist for local dependency ports; libpq/grpc endpoints validated separately. Not an OS firewall or proof of proxy upstream policy.",
+    "external_ai_usage": "Authorized LiteLLM generation/embedding calls with synthetic prompts; these calls consume provider quota. No delivery requests or corpus changes."
+  },
+  "default_admin": {
+    "classification": "DEMO_MODE_INTENTIONAL",
+    "production_risk": "SECURITY_DEBT: no environment guard, absent/unknown TEAM360_FLOW_ACCESS_MODE falls back to permissive default_admin, including Directorio and configuration capabilities",
+    "evidence": ["backend/modules/flow/access_mode.py", "backend/modules/flow/routes.py:_require_flow_actor", "backend/tests/test_flow_access_mode.py", "backend/tests/test_flow_director_authorization.py", "backend/modules/flow/README.md"],
+    "observed_mode": "default_admin",
+    "changed": false
+  },
+  "mamamia": {
+    "status": "PASS for existing local binding/context and API authorization only",
+    "canonical_client_id": "mamamia360",
+    "previous_probe_client_id": "mamamia360_embed",
+    "root_cause": "Prior harness queried a noncanonical client ID, not an absent canonical binding",
+    "official_provisioning": "Manual seed migration 009; production configuration migration 010. Neither executed in this phase.",
+    "model": "Distributor embed binding to Team360 public workspace/package/knowledge scope; not independent customer DB",
+    "limitations": "No production DB access; no browser loading or distributor business-RBAC assertion. Wrong-tenant scope lookup is a nonexistent tenant rejection, not a second real tenant test."
+  },
+  "diagnosis": {
+    "stack_status": "PASS: 3 persisted turns, real retrieval and generation, turn 2 completes diagnosis",
+    "generation_status": "success; client/runtime fallback false on all three public turns",
+    "alias": "openai_gpt-5.4-nano",
+    "provider": "LiteLLM; exact upstream/provider and internal fallback audit NOT_TESTED",
+    "embedding_alias": "openai_text_embedding_3_small",
+    "dimension": 1536,
+    "retrieval": "5 hits per public turn, all in resolved public scope and canonical version-filtered collection",
+    "latencies_ms": [3215, 5227, 3406],
+    "quality_observation": "Turn 3 requests final diagnosis after turn 2 completed; runtime returns reflect_and_ask with diagnosis_status=completed and asks to define approval despite mandatory approval already stated. Also describes stock in spreadsheet although initial prompt said system; second prompt mentions Excel and may be ambiguous.",
+    "quality_classification": "Observed contract/quality concern reproduced in r2 and final; no runtime correction, cause not proven. Stack PASS is not conversational quality PASS.",
+    "recommended_debug_window": "Separate Diagnosis PRODUCTION_PROTECTED investigation with exact prompts and recorded decisions before any fix"
+  },
+  "console": {
+    "status": "PASS_CONTROLLED_FIXTURE",
+    "fixture": "Existing test_console_bootstrap_service._service repository fakes; ephemeral Ed25519 key pair; real Srv05 bootstrap/me handlers",
+    "limits": "Real user identity/membership and PostgreSQL RBAC NOT_TESTED; capability omission is not a protected worker-route access test; bootstrap is not a login implementation"
+  },
+  "messaging": {
+    "status": "PASS for coexistence and existing adapter tests",
+    "evolution": "NOT_REQUIRED in tested runtime; disabled consumer returns 503; no private messaging env loaded or webhook changed",
+    "gupshup": "Empty webhook ignored with 200, outbound NOT_TESTED",
+    "real_persistence_delivery": "NOT_TESTED in this phase; no authorized sandbox/target selected"
+  },
+  "frontend": {
+    "status": "NOT_TESTED",
+    "reason": "No frontend/backend network listeners available on 3050/7050 at inspection or closure. Did not start launchers against DB-enabled automation, build frontend, replace URLs or introduce another server.",
+    "surfaces": ["Diagnosis Home", "web", "embed loader/manifest/assets", "Console", "Flow UI"],
+    "telchiai": "NOT_APPLICABLE: not an integrated Srv05 HTTP surface; no Telchi, SAP or Data Lake work performed"
+  },
+  "processes": "Only gate Python/pytest workers and suite-owned temporary Uvicorn processes. All worker sessions cleaned, scheduler removed, pool closed, no horizontal service lifecycle operations.",
+  "data": "Existing local_embed_demo and mamamia360 bindings read only; official Console fakes; synthetic prompts; fresh full_gate_<UUID> sessions; exact-ID cleanup removed 2 rows in final run, 0 remaining.",
+  "test_count": {"passed": 812, "skipped": 2},
+  "failures": [
+    "Initial focused harness test had import-path error, corrected in test only",
+    "First followup worker counted scheduler tasks in caller loop rather than Litestar lifespan portal loop; corrected in harness only; evidence preserved"
+  ],
+  "remaining": [
+    "Unmodified enabled Flow automation with safe transport sandbox",
+    "Gmail DWD auth probe with explicitly selected authorized account",
+    "Gupshup/Evolution sandbox transport, callbacks and operational persistence",
+    "Browser E2E and static embed loading/CORS/isolation",
+    "Actual DB Console identity and authorization boundary",
+    "Second-real-tenant cross-session isolation",
+    "LiteLLM exact upstream and proxy-internal fallback audit",
+    "Diagnosis repeated question and post-completion decision concern"
+  ]
+}

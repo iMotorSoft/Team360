@@ -1,0 +1,40 @@
+{
+  "mode": "read-only authenticated GET; no upstream failure injection or routing change",
+  "/model/info": {
+    "status": 200,
+    "models": [
+      {
+        "alias": "openai_gpt-5.4-nano",
+        "upstream": "openai/gpt-5.4-nano"
+      },
+      {
+        "alias": "openai_text_embedding_3_small",
+        "upstream": "openai/text-embedding-3-small"
+      }
+    ]
+  },
+  "/router/settings": {
+    "status": 200,
+    "routing_strategy": "simple-shuffle",
+    "fallbacks": {
+      "fallbacks": {
+        "present": true,
+        "nonempty": false
+      },
+      "default_fallbacks": {
+        "present": false,
+        "nonempty": false
+      },
+      "context_window_fallbacks": {
+        "present": true,
+        "nonempty": false
+      },
+      "content_policy_fallbacks": {
+        "present": true,
+        "nonempty": false
+      }
+    },
+    "model_group_alias_nonempty": false,
+    "default_params_fallback_nonempty": false
+  }
+}

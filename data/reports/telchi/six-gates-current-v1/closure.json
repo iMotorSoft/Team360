@@ -1,0 +1,45 @@
+{
+  "branch": "feature/console-backend-core",
+  "SIX_GATES": "VALID",
+  "GATE_FAILURES": [],
+  "CURRENT_CODE_FINGERPRINT": "VALID",
+  "CURRENT_PILOT_CONTRACT": "VALID",
+  "REAL_SECURITY_BOUNDARIES": "PASS",
+  "READY_FOR_MANUAL_START": "YES",
+  "source_sha256": "0e370c0bd4a8fed6d2f50d365d9e28d435486db6cf400b39a96615859eea2a07",
+  "approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+  "manifest_sha256": "e50b50574e75012ef3af5dc48c7a33d689bf21ccf2ef34cb115e930a5297ec10",
+  "technical_evidence_expires_at": "2026-10-18T19:14:27.874593+00:00",
+  "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/six-gates-20261018T151231614616Z/final-accreditation.json",
+  "artifact_sha256": "2b7e698483d0d958331f866c2f4a385252832041d4f8273b3a1ed4796f713d19",
+  "validations": {
+    "command": "uv run pytest modules/telchi/assistant/tests/test_pilot_access.py modules/telchi/assistant/tests/test_assistant.py modules/telchi/assistant/tests/test_safety.py tests/test_srv05_horizontal_composition.py -q",
+    "result": "101 passed, 1 warning in 2.51s"
+  },
+  "final_review": {
+    "git_diff_check": "PASS",
+    "python_ast_and_json_validation": "PASS using backend/.venv/bin/python; bare python unavailable",
+    "cleanup": "PID 53219 absent; port 18181 has no listener; PG pool closed",
+    "files_created": ["reaccredit.py", "publish.py", "result.json", "closure.json"],
+    "files_directory": "data/reports/telchi/six-gates-current-v1/",
+    "private_change": "whatsapp-dev-gates.json atomically published with private backup and hashed evidence",
+    "existing_worktree": "Preserved; no runtime or Markdown changes"
+  },
+  "lifecycle": "STOPPED",
+  "whatsapp_sends": 0,
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "impact": "Evidence/private manifest only; no runtime, security policy, grants, bindings, webhook or Foundation changes.",
+  "legacy_dependencies": {
+    "obsolete_runners": [
+      "gate-renewal-final-20261016/current_probes.py: approval permission and removed PERMISSION constant",
+      "gate-renewal-final-20261016/complete.py: approval expires_at and previous manifest expiry cap",
+      "scripts/telchi_durable_idempotency_probe.py CLI: fixed approval permission"
+    ],
+    "correction_applied": "Only evidence runners adapted; current policy has permission=None, live pilot revocation callback and per-capability RBAC. Runtime/Luna/State Engine/Foundation unchanged.",
+    "evidence_expiry": "Current validator still requires technical expires_at and uses it as session deadline. Independent from pilot access; no policy change authorized or applied.",
+    "minimal_owner_proposal": "If technical evidence TTL is deemed artificial: authorize removing only gate TTL rejection and its session-deadline coupling; keep source/access fingerprints, artifact integrity, explicit revocation and bounded manual session. Not implemented."
+  },
+  "limits": "Not WhatsApp E2E; recording egress certifies logical intent only. No provider outage induced. Manual start remains separate.",
+  "next_step": "Manual operator start, then WhatsApp latest five invoices; no automatic start performed."
+}

@@ -1,0 +1,61 @@
+[
+  {
+    "command": [
+      "lat",
+      "check",
+      "md"
+    ],
+    "returncode": 0,
+    "stdout": "Scanned 32 .md\nmd: All links OK\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "lat",
+      "check",
+      "index"
+    ],
+    "returncode": 0,
+    "stdout": "index: All directory index files OK\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "lat",
+      "check",
+      "sections"
+    ],
+    "returncode": 0,
+    "stdout": "sections: All sections have valid leading paragraphs\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "lat",
+      "check",
+      "code-refs"
+    ],
+    "returncode": 0,
+    "stdout": "Scanned 47 .astro, 1 .bak, 4 .css, 175 .csv, 1 .diff, 1 .example, 183 .html, 2 .ico, 27 .js, 770 .json, 15 .jsonl, 7 .mjs, 3 .parquet, 6 .patch, 1 .pdf, 10 .pid, 27 .png, 1304 .py, 12 .sh, 2 .sha256, 138 .sql, 6 .stderr, 68 .svelte, 1 .toml, 92 .ts, 198 .txt, 2 .webm, 1 .xlsx, 24 .xml, 19 .yaml, 1 .zip, 5 (no ext)\ncode-refs: All references OK\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "lat",
+      "check"
+    ],
+    "returncode": 0,
+    "stdout": "Scanned 47 .astro, 1 .bak, 4 .css, 175 .csv, 1 .diff, 1 .example, 183 .html, 2 .ico, 27 .js, 770 .json, 15 .jsonl, 32 .md, 7 .mjs, 3 .parquet, 6 .patch, 1 .pdf, 10 .pid, 27 .png, 1304 .py, 12 .sh, 2 .sha256, 138 .sql, 6 .stderr, 68 .svelte, 1 .toml, 92 .ts, 198 .txt, 2 .webm, 1 .xlsx, 24 .xml, 19 .yaml, 1 .zip, 5 (no ext) in 1.3s\n\nWarning: No init version recorded \u2014 run lat init to set up agent hooks and configuration.\nAll checks passed\nWarning: No LLM key found \u2014 semantic search (lat search) will not work. Provide a key via LAT_LLM_KEY, LAT_LLM_KEY_FILE, LAT_LLM_KEY_HELPER, or run lat init to configure.\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

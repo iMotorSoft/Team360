@@ -35,7 +35,14 @@ dev-dependencies = []
 
 [tool.hatch.build.targets.wheel]
 packages = ["modules", "routes", "models", "services", "middleware", "db"]
-include = ["globalVar.py", "ls_iMotorSoft_Srv01.py"]
+# `packages` restricts normal selection to these directories; top-level runtime
+# modules must be explicitly mapped into the wheel (not merely `include`d).
+[tool.hatch.build.targets.wheel.force-include]
+"globalVar.py" = "globalVar.py"
+"ls_iMotorSoft_Srv01.py" = "ls_iMotorSoft_Srv01.py"
+"ls_iMotorSoft_Srv05.py" = "ls_iMotorSoft_Srv05.py"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Source/checkout is the deployment contract; never test stale force-included modules.
+pythonpath = ["."]

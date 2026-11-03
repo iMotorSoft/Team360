@@ -1,0 +1,85 @@
+{
+  "schema": "telchi-pre-sql-profile-v1",
+  "clock": "perf_counter_ns",
+  "spans": [
+    {
+      "label": "private_config_read",
+      "start_ms": 0.046002,
+      "end_ms": 0.267091,
+      "duration_ms": 0.221089
+    },
+    {
+      "label": "duckdb_import",
+      "start_ms": 0.581423,
+      "end_ms": 40.927187,
+      "duration_ms": 40.345764
+    },
+    {
+      "label": "duckdb_connect",
+      "start_ms": 40.981921,
+      "end_ms": 54.197672,
+      "duration_ms": 13.215751
+    },
+    {
+      "label": "load_ducklake",
+      "start_ms": 54.226558,
+      "end_ms": 109.509702,
+      "duration_ms": 55.283144
+    },
+    {
+      "label": "load_postgres",
+      "start_ms": 109.5446,
+      "end_ms": 164.903368,
+      "duration_ms": 55.358768
+    },
+    {
+      "label": "attachment_open_including_catalog_session",
+      "start_ms": 165.042775,
+      "end_ms": 203.942549,
+      "duration_ms": 38.899774
+    },
+    {
+      "label": "foundation_current_count",
+      "start_ms": 205.406998,
+      "end_ms": 557.881678,
+      "duration_ms": 352.47468
+    },
+    {
+      "label": "foundation_current_metadata",
+      "start_ms": 557.896893,
+      "end_ms": 755.496919,
+      "duration_ms": 197.600026
+    },
+    {
+      "label": "foundation_publication_get",
+      "start_ms": 755.510445,
+      "end_ms": 782.986573,
+      "duration_ms": 27.476128
+    },
+    {
+      "label": "foundation_manifest_validation",
+      "start_ms": 782.999854,
+      "end_ms": 783.009335,
+      "duration_ms": 0.009481
+    },
+    {
+      "label": "foundation_commit_snapshot_resolution",
+      "start_ms": 783.01466,
+      "end_ms": 1453.026797,
+      "duration_ms": 670.012137
+    },
+    {
+      "label": "foundation_component_verification",
+      "start_ms": 1453.049822,
+      "end_ms": 1564.90781,
+      "duration_ms": 111.857988
+    },
+    {
+      "label": "attachment_connection_close",
+      "start_ms": 4067.02498,
+      "end_ms": 4076.769872,
+      "duration_ms": 9.744892
+    }
+  ],
+  "total_ms": 4076.808014
+}

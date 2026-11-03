@@ -1,0 +1,203 @@
+{
+  "fixture": true,
+  "endpoint": "/api/telchi/assistant/dev/turn",
+  "cases": {
+    "M08": {
+      "curl": [
+        "curl",
+        "-sS",
+        "-X",
+        "POST",
+        "http://127.0.0.1:44317/api/telchi/assistant/dev/turn",
+        "-H",
+        "content-type: application/json",
+        "-H",
+        "x-team360-dev-token: <redacted>",
+        "-H",
+        "accept: application/json",
+        "--max-time",
+        "180",
+        "--write-out",
+        "\\n%{http_code}",
+        "--data-binary",
+        "{\"text\": <censored>, \"conversation\": \"security-20261012T225728-denied\"}"
+      ],
+      "http_status": "200",
+      "elapsed_ms": 207.04,
+      "response": {
+        "ok": true,
+        "text": "No se pudo autorizar esta operaci\u00f3n: requiere un permiso comercial espec\u00edfico. No se consult\u00f3 Foundation.",
+        "classification": "DENIED",
+        "conversation_key": "security-20261012T225728-denied",
+        "conversation_id": "f41d6c2a-6217-4487-b52a-2ce6559cce35",
+        "correlation_id": "b2e3c8e9-a70d-4389-be66-e9035e23dc2f",
+        "elapsed_ms": 171.54,
+        "audit": {
+          "bmd": null,
+          "owner": [
+            "dev",
+            "telchi",
+            "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+            "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+            "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+          ],
+          "timings": {
+            "capability_ms": 0.0,
+            "state_engine_ms": 0.6008389973430894,
+            "interpretation_ms": 0.34993000008398667,
+            "response_format_ms": 0.0,
+            "total_processing_ms": 10.331564000807703
+          },
+          "decision": "DENIED",
+          "committed": true,
+          "previous_state": {
+            "metric": null,
+            "period": null,
+            "pending": null,
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "confirmed_state": {
+            "metric": "sales.net_amount",
+            "period": {
+              "start": "2026-05-01",
+              "end_exclusive": "2026-06-01"
+            },
+            "pending": null,
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "validated_state": {
+            "metric": "sales.net_amount",
+            "period": {
+              "start": "2026-05-01",
+              "end_exclusive": "2026-06-01"
+            },
+            "pending": null,
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "capability_calls": 0,
+          "execution_result": null,
+          "execution_status": "not_executed",
+          "response_prepared": {
+            "text": "No se pudo autorizar esta operaci\u00f3n: requiere un permiso comercial espec\u00edfico. No se consult\u00f3 Foundation.",
+            "classification": "DENIED"
+          },
+          "required_permission": "telchi.sales.period_billed_amount.read.v1",
+          "interpretation_proposed": {
+            "action": "EXECUTE",
+            "intent": "NEW_QUERY",
+            "state_delta": {
+              "set": {
+                "/metric": "sales.net_amount",
+                "/period": {
+                  "start": "2026-05-01",
+                  "end_exclusive": "2026-06-01"
+                }
+              },
+              "unset": []
+            },
+            "clarification": null
+          }
+        }
+      }
+    },
+    "M09": {
+      "curl": [
+        "curl",
+        "-sS",
+        "-X",
+        "POST",
+        "http://127.0.0.1:44317/api/telchi/assistant/dev/turn",
+        "-H",
+        "content-type: application/json",
+        "-H",
+        "x-team360-dev-token: <redacted>",
+        "-H",
+        "accept: application/json",
+        "--max-time",
+        "180",
+        "--write-out",
+        "\\n%{http_code}",
+        "--data-binary",
+        "{\"text\": <censored>, \"conversation\": \"security-20261012T225728-reject\"}"
+      ],
+      "http_status": "200",
+      "elapsed_ms": 135.06,
+      "response": {
+        "ok": true,
+        "text": "No pude interpretar la consulta. No se ejecut\u00f3 ninguna consulta.",
+        "classification": "ERROR",
+        "conversation_key": "security-20261012T225728-reject",
+        "conversation_id": "f156ceee-5273-4dd9-befd-4559f6316f48",
+        "correlation_id": "54102f07-7bda-4d90-a901-4ef9701e2612",
+        "elapsed_ms": 72.95,
+        "audit": {
+          "bmd": null,
+          "owner": [
+            "dev",
+            "telchi",
+            "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+            "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+            "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+          ],
+          "timings": {
+            "capability_ms": 0.0,
+            "state_engine_ms": 0.3091280013904907,
+            "interpretation_ms": 0.21037200349383056,
+            "response_format_ms": 0.0,
+            "total_processing_ms": 0.6017049963702448
+          },
+          "decision": "EXECUTION_FORBIDDEN",
+          "committed": false,
+          "previous_state": {
+            "metric": "sales.coverage",
+            "period": null,
+            "pending": null,
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "confirmed_state": {
+            "metric": "sales.coverage",
+            "period": null,
+            "pending": null,
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "validated_state": null,
+          "capability_calls": 0,
+          "execution_result": null,
+          "execution_status": "not_executed",
+          "response_prepared": {
+            "text": "No pude interpretar la consulta. No se ejecut\u00f3 ninguna consulta.",
+            "classification": "ERROR"
+          },
+          "required_permission": null,
+          "interpretation_proposed": {
+            "action": "EXECUTE",
+            "intent": "NEW_QUERY",
+            "state_delta": {
+              "set": {
+                "/unknown": "EXECUTE"
+              },
+              "unset": []
+            },
+            "clarification": null
+          }
+        }
+      }
+    }
+  },
+  "own_server_reaped": true
+}

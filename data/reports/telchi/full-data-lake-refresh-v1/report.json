@@ -1,0 +1,797 @@
+{
+  "status": "PARTIAL",
+  "objective_completed": false,
+  "reason": "23 source captures do not constitute a new published Foundation; existing canonical validator requires an explicit multidomain successor adapter, Reference has 140 new identities, and pre-overlap historical receivable balances remain stale.",
+  "branch": "feature/console-backend-core",
+  "reported_at": "2026-11-01T18:33:09.130943+00:00",
+  "cycle_plan": {
+    "budgets": {
+      "collections": {
+        "batch_rows": 10000,
+        "max_rows_per_statement": 500000,
+        "max_selects": 100,
+        "operation_seconds": 1800,
+        "statement_seconds": 60,
+        "total_seconds": 3600
+      },
+      "inventory": {
+        "batch_rows": 10000,
+        "max_rows_per_statement": 1600000,
+        "max_selects": 40,
+        "operation_seconds": 1800,
+        "statement_seconds": 60,
+        "total_seconds": 2400
+      },
+      "production": {
+        "batch_rows": 10000,
+        "max_rows_per_statement": 300000,
+        "max_selects": 80,
+        "operation_seconds": 1200,
+        "statement_seconds": 60,
+        "total_seconds": 2400
+      },
+      "purchasing": {
+        "batch_rows": 10000,
+        "max_rows_per_statement": 300000,
+        "max_selects": 100,
+        "operation_seconds": 1200,
+        "statement_seconds": 60,
+        "total_seconds": 2400
+      },
+      "reference": {
+        "batch_rows": 10000,
+        "max_rows_per_statement": 100000,
+        "max_selects": 40,
+        "operation_seconds": 1200,
+        "statement_seconds": 60,
+        "total_seconds": 1800
+      }
+    },
+    "collections_start": "2026-09-21",
+    "contract": "full-data-lake-refresh-capture-v1",
+    "end_exclusive": "2026-11-02",
+    "foundation_publication": "NOT_PERFORMED_BY_CAPTURE",
+    "sap_write_count": 0,
+    "scheduler_enabled": false,
+    "source_clock": {
+      "source_date": "2026-11-01",
+      "source_local": "2026-11-01T13:43:37.492000",
+      "utc": "2026-11-01T17:43:37.492000"
+    },
+    "source_timezone": "Observed source-local/UTC offset only; IANA timezone not accredited",
+    "started_at": "2026-11-01T17:43:37.782660+00:00",
+    "year_start": "2026-01-01"
+  },
+  "source_cutoff_semantics": "Cycle start clock is an anchor, not a distributed transaction. Dataset source observations differ and are recorded. UTC-04:00 is observed, IANA zone unaccredited; document maxima are not coverage proofs.",
+  "foundation": {
+    "before": "foundation_5a76699adba7eb2ab388167244e7869b",
+    "after": "foundation_5a76699adba7eb2ab388167244e7869b",
+    "candidate": null,
+    "new_publication": false,
+    "commit_snapshot": 1485,
+    "independent_data_snapshot": 1408,
+    "derivation_snapshot": 1322,
+    "logical_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "logical_component_count": 8,
+    "legacy_catalog_component_count": 5,
+    "warning": "Legacy as_dict component_count=5 counts catalog-backed components; it is not the logical component registry size."
+  },
+  "reference": {
+    "before": "v2_sales_3b5cfb885a90e82fcf905d2b",
+    "after": "v2_sales_3b5cfb885a90e82fcf905d2b",
+    "candidate": null,
+    "new_sap_product_identities": 140,
+    "physical_classification": "Existing published files untouched; captured SAP observations not promoted or inferred",
+    "crosswalks": "Existing canonical IDs and classifications untouched; merge pending",
+    "legacy_top_level_manifest_field": "v2_04de6eed3805f591777012c7"
+  },
+  "domain_matrix": [
+    {
+      "domain": "Ventas",
+      "previous_coverage": "Documentos hasta 01/11; corte publicado 2026-11-01T13:55:47.173006+00:00; ledger [2026-09-01,2026-11-02)",
+      "new_coverage": "Sin recaptura en este ciclo",
+      "status": "PREVIOUS_PUBLISHED_NOT_REFRESHED_THIS_CYCLE",
+      "publication": "sales_6daf72e9a14c5852e35c465f",
+      "reader": "CURRENT canonical pinned reader verified; 377816 headers",
+      "luna": "Sales capabilities previously demonstrated on same CURRENT; no live Luna re-test this cycle; no WhatsApp readiness claim"
+    },
+    {
+      "domain": "Inventario",
+      "previous_coverage": "Movimientos 2022-03-31 a 2026-09-24; stock publicado 24/09; component metadata and actual row extraction timestamps differ (live-reader.json)",
+      "new_coverage": "Stock observado 2026-11-01 17:43:38–17:46:05 UTC, 1385179 rows; movements [2026-09-17,2026-11-02), 257632 rows, native prefix <=20962453 only",
+      "status": "CAPTURED_NOT_PUBLISHED; MOVEMENTS_PREFIX_NOT_CLOSED",
+      "publication": "update_publication_b567d267b6340baf3939083e4c4cea27",
+      "reader": "Old CURRENT stock/movement relations read and counted; no candidate binding",
+      "luna": "NOT_ACCREDITED_FOR_LUNA"
+    },
+    {
+      "domain": "Producción",
+      "previous_coverage": "Derived Material Supply component cutoff 2026-09-24; not a standalone order/receipt publication",
+      "new_coverage": "2026 orders/issues observed 01/11; document max 31/10; BOM snapshot 1061 headers/8038 lines; 4521 orders/41808 issue lines",
+      "status": "CAPTURED_NOT_PUBLISHED; BUSINESS_DERIVATION_PENDING",
+      "publication": "material_supply_137a23480171bda867ff8b12",
+      "reader": "Old Material Supply CURRENT resolver verified; new production source facts not bound",
+      "luna": "NOT_ACCREDITED_FOR_LUNA"
+    },
+    {
+      "domain": "Compras",
+      "previous_coverage": "2026-01-01 to 2026-09-23 documentary source availability",
+      "new_coverage": "2026 bounded document-state capture; PO document max 30/10, receipt/AP max 31/10; observed 01/11 17:46:55–17:48:07 UTC",
+      "status": "CAPTURED_NOT_PUBLISHED; LINEAGE_PENDING",
+      "publication": "purchasing_4ab178d62c5f5ba27d7180a8",
+      "reader": "CURRENT read_component verified 8 datasets and exact hashes/row fingerprints (purchasing-reader-r2.json)",
+      "luna": "NOT_ACCREDITED_FOR_LUNA"
+    },
+    {
+      "domain": "Cobranzas / CxC",
+      "previous_coverage": "Source cutoff stored 2026-09-28T18:18:35.264000; historical business tables retain derivation snapshot 1322",
+      "new_coverage": "Overlap [2026-09-21,2026-11-02); 7 families; invoice prefix <=11582386, 51582 rows; all older mutable balances NOT refreshed",
+      "status": "PARTIAL_CAPTURE_NOT_PUBLISHED; HISTORICAL_BALANCES_PENDING",
+      "publication": "receivables_collections_633d1fbbfdd87e6665b1aad3",
+      "reader": "CURRENT three business datasets verified at exact derivation; 3708581 rows, old cutoff",
+      "luna": "NOT_ACCREDITED_FOR_LUNA; NO_CURRENT_AGING_CLAIM"
+    },
+    {
+      "domain": "Reference",
+      "previous_coverage": "v2_sales_3b5cfb885a90e82fcf905d2b; source_as_of 2026-11-01T13:59:40.724221+00:00",
+      "new_coverage": "Source observations 01/11 17:50:07–17:50:39 UTC: OITM17118/OCRD14208/OWHS82/OSLP264; 140 OITM identities absent from published SAP Reference",
+      "status": "CAPTURED_NOT_MERGED_OR_PUBLISHED",
+      "publication": "v2_sales_3b5cfb885a90e82fcf905d2b",
+      "reader": "CURRENT pinned Reference files retained; new identities not available through published Reference",
+      "luna": "Only previously accredited sales/product operations; no new capability or permissions"
+    },
+    {
+      "domain": "Precios",
+      "previous_coverage": "No accredited published price-list component found",
+      "new_coverage": "No ITM1/OPLN extraction; OITM AvgPrice/LastPurPrc are not price lists",
+      "status": "PENDING_FUNCTIONAL_CONTRACT",
+      "publication": null,
+      "reader": "NOT_ACCREDITED",
+      "luna": "NOT_ACCREDITED_FOR_LUNA"
+    },
+    {
+      "domain": "Material Supply",
+      "previous_coverage": "Historical derivation 2026-06-26 to 2026-09-24, component as_of 2026-09-24T13:53:07.952772+00:00",
+      "new_coverage": "No new derivation; dependency captures available but not integrated",
+      "status": "OLD_PUBLISHED_RETAINED_NOT_REFRESHED",
+      "publication": "material_supply_137a23480171bda867ff8b12",
+      "reader": "PRODUCTIVE_CURRENT resolver verified; existing sealed datasets preserved",
+      "luna": "NOT_ACCREDITED_FOR_LUNA"
+    },
+    {
+      "domain": "Contabilidad",
+      "previous_coverage": "No published OJDT/JDT1/OACT journal or ledger contract",
+      "new_coverage": "Exact 10 existing invoice–TransId pairs and finite extraction proposal prepared offline; zero SAP accounting queries",
+      "status": "FUNCTIONAL_EXTENSION_PENDING",
+      "publication": null,
+      "reader": "NO_JOURNAL_LEDGER_READER",
+      "luna": "NOT_ACCREDITED_FOR_LUNA"
+    }
+  ],
+  "sap": {
+    "max_concurrency_this_execution": 1,
+    "domain_stats": {
+      "collections": {
+        "selects": 36,
+        "driver_seconds": 115.817,
+        "query_failures": 0,
+        "all_connections_closed": true,
+        "all_cursors_closed": true,
+        "parquet_bytes": 5330413,
+        "budgets": {
+          "budget": {
+            "batch_rows": 10000,
+            "max_rows_per_statement": 500000,
+            "max_selects": 100,
+            "operation_seconds": 1800,
+            "statement_seconds": 60,
+            "total_seconds": 3600
+          },
+          "started_at": "2026-11-01T17:48:07.418288+00:00"
+        }
+      },
+      "inventory": {
+        "selects": 5,
+        "driver_seconds": 147.012,
+        "query_failures": 0,
+        "all_connections_closed": true,
+        "all_cursors_closed": true,
+        "parquet_bytes": 504099,
+        "budgets": {
+          "budget": {
+            "batch_rows": 10000,
+            "max_rows_per_statement": 1600000,
+            "max_selects": 40,
+            "operation_seconds": 1800,
+            "statement_seconds": 60,
+            "total_seconds": 2400
+          },
+          "started_at": "2026-11-01T17:43:37.828919+00:00"
+        }
+      },
+      "movements": {
+        "selects": 38,
+        "driver_seconds": 110.185,
+        "query_failures": 1,
+        "all_connections_closed": true,
+        "all_cursors_closed": true,
+        "parquet_bytes": 8499117,
+        "budgets": {
+          "budget": {
+            "batch_rows": 10000,
+            "max_rows_per_statement": 2000000,
+            "max_selects": 100,
+            "operation_seconds": 1800,
+            "statement_seconds": 60,
+            "total_seconds": 2400
+          },
+          "started_at": "2026-11-01T17:52:37.486812+00:00"
+        }
+      },
+      "production": {
+        "selects": 25,
+        "driver_seconds": 44.758,
+        "query_failures": 0,
+        "all_connections_closed": true,
+        "all_cursors_closed": true,
+        "parquet_bytes": 919225,
+        "budgets": {
+          "budget": {
+            "batch_rows": 10000,
+            "max_rows_per_statement": 300000,
+            "max_selects": 80,
+            "operation_seconds": 1200,
+            "statement_seconds": 60,
+            "total_seconds": 2400
+          },
+          "started_at": "2026-11-01T17:46:05.839172+00:00"
+        }
+      },
+      "purchasing": {
+        "selects": 36,
+        "driver_seconds": 69.451,
+        "query_failures": 0,
+        "all_connections_closed": true,
+        "all_cursors_closed": true,
+        "parquet_bytes": 2272019,
+        "budgets": {
+          "budget": {
+            "batch_rows": 10000,
+            "max_rows_per_statement": 300000,
+            "max_selects": 100,
+            "operation_seconds": 1200,
+            "statement_seconds": 60,
+            "total_seconds": 2400
+          },
+          "started_at": "2026-11-01T17:46:53.695656+00:00"
+        }
+      },
+      "reference": {
+        "selects": 20,
+        "driver_seconds": 30.918,
+        "query_failures": 0,
+        "all_connections_closed": true,
+        "all_cursors_closed": true,
+        "parquet_bytes": 564834,
+        "budgets": {
+          "budget": {
+            "batch_rows": 10000,
+            "max_rows_per_statement": 100000,
+            "max_selects": 40,
+            "operation_seconds": 1200,
+            "statement_seconds": 60,
+            "total_seconds": 1800
+          },
+          "started_at": "2026-11-01T17:50:06.589143+00:00"
+        }
+      }
+    },
+    "source_cycle_clock_selects": 1,
+    "initial_clock_and_stock_volume_selects": 2,
+    "total_selects": 163,
+    "sales_selects": 0,
+    "accounting_selects": 0,
+    "prices_selects": 0,
+    "material_supply_selects": 0,
+    "expected_optional_column_probe_rejections": 1,
+    "drift_reconciliation": "2 source controls changed after cursor; frozen prefixes revalidated without recapturing or marking whole windows complete",
+    "first_capture_global_flock": "Initial capture run was sequential but added canonical cross-run extraction flock only for subsequent runs; do not claim retrospective global exclusion. No overlapping HANA operations observed."
+  },
+  "captures": {
+    "dataset_count": 23,
+    "total_rows": 2192262,
+    "complete_statement_receipts": 21,
+    "frozen_prefix_receipts": 2,
+    "raw_root": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/full-data-lake-refresh-capture-v1/full-refresh-20261101-v1",
+    "audit": "offline-audit.json",
+    "stock_diff": {
+      "base": "foundation_5a76699adba7eb2ab388167244e7869b",
+      "comparison": "Three stock quantities only; no in-place writes",
+      "current_master_identities_not_in_published_reference": 140,
+      "missing_previous_keys": 0,
+      "new_keys": 13554,
+      "quantity_modified_existing_keys": 17915,
+      "snapshot": 1408
+    },
+    "new_and_modified_other_domains": "NOT_YET_COMPUTED; no claim that document maxima quantify changes"
+  },
+  "reconciliation": {
+    "direct_native_links": {
+      "allocation_payment": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "ap_invoice_orphan_lines": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "bom_header_for_lines": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "production_issue_orders": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "production_issue_products": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 13503
+      },
+      "production_products": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "purchase_order_orphan_lines": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "purchase_receipt_orphan_lines": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "purchase_supplier": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "reconciliation_event_for_participant": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "stock_products": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      },
+      "stock_warehouses": {
+        "interpretation": "DIRECT_NATIVE_KEYS_ONLY; unmatched is not proof that the SAP entity does not exist",
+        "unmatched_rows": 0
+      }
+    },
+    "production_unmatched": {
+      "bom_type_evidence": [
+        [
+          290,
+          42,
+          13472
+        ],
+        [
+          null,
+          1,
+          31
+        ]
+      ],
+      "conclusion": "Rows not in OITM are not automatically material consumption; only observed BOM Type may classify them; no ORSC extraction performed",
+      "raw_unmatched": 13503
+    },
+    "limitations": [
+      "Do not interpret 13472 issue rows with BOM Type=290 as material consumption; 31 further unmatched rows lack that evidence",
+      "No receipt/PO linkage inferred from date or amount",
+      "Allocation links to older invoices require historical key reconciliation",
+      "No accounting branch inferred from warehouses/salespeople"
+    ]
+  },
+  "dependencies": {
+    "status": "NOT_REDERIVED_FOR_NEW_INPUTS",
+    "material_supply": "Historical component retained; new multidomain inputs not bound",
+    "foundation_precheck": {
+      "base": "foundation_5a76699adba7eb2ab388167244e7869b",
+      "candidate_created": false,
+      "catalog_written": false,
+      "current_modified": false,
+      "kind": "FoundationReaderError",
+      "reason": "Sales facts transition inheritance requires an explicit reader-compatible adapter",
+      "status": "ADAPTER_REQUIRED"
+    },
+    "publication_compatibility": "Existing strict validator was not loosened"
+  },
+  "readers": {
+    "foundation": {
+      "access": {
+        "FOUNDATION_PUBLICATION_ID_USED": "foundation_5a76699adba7eb2ab388167244e7869b",
+        "committed_at": "2026-11-01T14:55:59.253936+00:00",
+        "component_count": 5,
+        "credit_memo_publication_id": "credit_memo_29bf92c1dbeb692d02665629",
+        "credit_memo_source_as_of": "2026-11-01T13:55:47.173006+00:00",
+        "data_as_of": "2026-11-01T13:59:40.724221+00:00",
+        "ducklake_snapshot_id": 1408,
+        "foundation_data_as_of": "2026-11-01T13:59:40.724221+00:00",
+        "foundation_publication_id": "foundation_5a76699adba7eb2ab388167244e7869b",
+        "foundation_resolution_ms": 47906.067,
+        "logical_manifest_components": [
+          "credit_memo",
+          "material_supply",
+          "oinm",
+          "oitw",
+          "purchasing",
+          "receivables_collections",
+          "reference",
+          "sales"
+        ],
+        "manifest_base_snapshot_id": 1322,
+        "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+        "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+        "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+        "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+        "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_sales_3b5cfb885a90e82fcf905d2b",
+        "reference_source_as_of": "2026-11-01T13:59:40.724221+00:00",
+        "reference_version": "v2_sales_3b5cfb885a90e82fcf905d2b",
+        "sales_publication_id": "sales_6daf72e9a14c5852e35c465f",
+        "sales_source_as_of": "2026-11-01T13:55:45.750071+00:00",
+        "validated_at": null
+      },
+      "components": {
+        "credit_memo": {
+          "max_document": "2026-10-31T00:00:00",
+          "max_extraction": "2026-11-01T13:55:43.183108+00:00",
+          "min_document": "2026-01-01T00:00:00",
+          "min_extraction": "2026-09-24T12:59:42.721586+00:00",
+          "row_count": 2551
+        },
+        "material_supply": {
+          "datasets": {
+            "material_actual_consumption": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_DERIVATION_V1/material_actual_consumption/full/material-supply-derivation-2026-09-24_material_actual_consumption_full_1790296840828337066/part-00000.parquet"
+              ],
+              "logical_hash": null,
+              "rows": 791
+            },
+            "material_equivalent_demand": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_equivalent_demand/sales-facts-revalidation-v1/part-00000.parquet"
+              ],
+              "logical_hash": null,
+              "rows": 1086
+            },
+            "material_lead_time_profile": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/material_lead_time_profile/full/material-supply-final-1790303719477148466_material_lead_time_profile_full/part-00000.parquet"
+              ],
+              "logical_hash": null,
+              "rows": 11445
+            },
+            "material_supply_status": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/material_supply/material_supply_status/sales-facts-revalidation-v1/part-00000.parquet"
+              ],
+              "logical_hash": null,
+              "rows": 1188
+            },
+            "open_purchase_pipeline": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/open_purchase_pipeline/full/material-supply-final-1790303719477148466_open_purchase_pipeline_full/part-00000.parquet"
+              ],
+              "logical_hash": null,
+              "rows": 18717
+            }
+          },
+          "publication": "material_supply_137a23480171bda867ff8b12",
+          "source_as_of": "2026-09-24T13:53:07.952772+00:00"
+        },
+        "oinm": {
+          "max_document": "2026-09-24T00:00:00",
+          "max_extraction": "2026-09-24T13:53:07.952772+00:00",
+          "min_document": "2022-03-31T00:00:00",
+          "min_extraction": "2026-09-18T01:51:35.595808+00:00",
+          "row_count": 1576871
+        },
+        "oitw": {
+          "max_document": null,
+          "max_extraction": "2026-09-24T13:53:07.952772+00:00",
+          "min_document": null,
+          "min_extraction": "2026-09-24T13:53:07.952772+00:00",
+          "row_count": 1371625
+        },
+        "purchasing": {
+          "datasets": {
+            "ap_invoice": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/ap_invoice/full/purchasing_4ab178d62c5f5ba27d7180a8_ap_invoice/part-00000.parquet"
+              ],
+              "logical_hash": "3da2c9ec22d1e2d14bdc7c94b3051a750779f96e7b1c1f1fcd46a28814627ce6",
+              "rows": 6169
+            },
+            "ap_invoice_line": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/ap_invoice_line/full/purchasing_4ab178d62c5f5ba27d7180a8_ap_invoice_line/part-00000.parquet"
+              ],
+              "logical_hash": "fedcb6e73a4ea39c5b8cb0061e93075a80700d56e8c7fe805df68a7c54111e75",
+              "rows": 21679
+            },
+            "purchase_inventory_receipt": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_inventory_receipt/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_inventory_receipt/part-00000.parquet"
+              ],
+              "logical_hash": "e306807a7b90a99a5b6503ca08bc555bdd95b93c0af82c0514c33eea1ab2ecd8",
+              "rows": 17196
+            },
+            "purchase_order": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_order/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_order/part-00000.parquet"
+              ],
+              "logical_hash": "feda60a8f17ab0a1b8e37f92a7dd10dabc030f0766b220c366825dace5bec266",
+              "rows": 3337
+            },
+            "purchase_order_line": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_order_line/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_order_line/part-00000.parquet"
+              ],
+              "logical_hash": "b19ebfa053cf94ac00129ca0f050857d78105d8e41430d733f91f93a996fae8b",
+              "rows": 18584
+            },
+            "purchase_receipt": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_receipt/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_receipt/part-00000.parquet"
+              ],
+              "logical_hash": "10a7456c567f7e2601cd03e153b820c297868696ccd17ebfa0b1d57afa9c4057",
+              "rows": 3471
+            },
+            "purchase_receipt_line": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_receipt_line/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_receipt_line/part-00000.parquet"
+              ],
+              "logical_hash": "08eb13801d2b605ba2fadfb1c7c87865accb3f67442954e1db5e9a36f4d4df97",
+              "rows": 16921
+            },
+            "purchasing_document_lineage": {
+              "files": [
+                "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchasing_document_lineage/full/purchasing_4ab178d62c5f5ba27d7180a8_purchasing_document_lineage/part-00000.parquet"
+              ],
+              "logical_hash": "060ce59a17992385a5135dae88c6801bf1cb7adbc3bcf7e67c1d001fde148160",
+              "rows": 38600
+            }
+          },
+          "publication": "purchasing_4ab178d62c5f5ba27d7180a8",
+          "source_as_of": "2026-09-23"
+        },
+        "receivables_collections": {
+          "datasets": {
+            "collection_method_fact": {
+              "files": null,
+              "logical_hash": null,
+              "rows": 1849408
+            },
+            "commercial_term_classification": {
+              "files": null,
+              "logical_hash": null,
+              "rows": 37
+            },
+            "receivable_settlement_status": {
+              "files": null,
+              "logical_hash": null,
+              "rows": 1859136
+            }
+          },
+          "publication": "receivables_collections_633d1fbbfdd87e6665b1aad3",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        },
+        "sales": {
+          "max_document": "2026-11-01T00:00:00",
+          "max_extraction": "2026-11-01T13:55:45.750071+00:00",
+          "min_document": "2022-03-31T00:00:00",
+          "min_extraction": "2026-09-17T15:13:36.819184+00:00",
+          "row_count": 377816
+        }
+      },
+      "observed_at": "2026-11-01T17:58:02.957361+00:00"
+    },
+    "purchasing": {
+      "data": {
+        "ap_invoice": 6169,
+        "ap_invoice_line": 21679,
+        "purchase_inventory_receipt": 17196,
+        "purchase_order": 3337,
+        "purchase_order_line": 18584,
+        "purchase_receipt": 3471,
+        "purchase_receipt_line": 16921,
+        "purchasing_document_lineage": 38600
+      },
+      "foundation": "foundation_5a76699adba7eb2ab388167244e7869b",
+      "manifest_validation_reused": "live-reader.json on identical live manifest hash",
+      "observed_at": "2026-11-01T18:21:08.900370+00:00",
+      "prior_probe": "pinned_component is a candidate-only API; its correct rejection of CURRENT was a harness misuse, not a data defect",
+      "status": "CURRENT_READER_PASS"
+    },
+    "material_supply": {
+      "data": {
+        "mode": "PRODUCTIVE_CURRENT"
+      },
+      "foundation": "foundation_5a76699adba7eb2ab388167244e7869b",
+      "observed_at": "2026-11-01T18:19:28.043121+00:00",
+      "status": "CURRENT_READER_PASS"
+    },
+    "receivables_collections": {
+      "data": {
+        "collection_method_fact": {
+          "derivation_id_max": "rc_business_ff4bd2d442e3dcb9f63ff45f41d8ead6",
+          "derivation_id_min": "rc_business_ff4bd2d442e3dcb9f63ff45f41d8ead6",
+          "derivation_version_max": "receivables-collections-business-v1.0.0",
+          "derivation_version_min": "receivables-collections-business-v1.0.0",
+          "row_count": 1849408,
+          "sealed_logical_fingerprint": "6282937899575969296",
+          "source_as_of_max": "2026-09-28T18:18:35.264000",
+          "source_as_of_min": "2026-09-28T18:18:35.264000",
+          "valid": true
+        },
+        "commercial_term_classification": {
+          "derivation_id_max": "rc_business_ff4bd2d442e3dcb9f63ff45f41d8ead6",
+          "derivation_id_min": "rc_business_ff4bd2d442e3dcb9f63ff45f41d8ead6",
+          "derivation_version_max": "receivables-collections-business-v1.0.0",
+          "derivation_version_min": "receivables-collections-business-v1.0.0",
+          "row_count": 37,
+          "sealed_logical_fingerprint": "8698909604045268845",
+          "source_as_of_max": "2026-09-28T18:18:35.264000",
+          "source_as_of_min": "2026-09-28T18:18:35.264000",
+          "valid": true
+        },
+        "receivable_settlement_status": {
+          "derivation_id_max": "rc_business_ff4bd2d442e3dcb9f63ff45f41d8ead6",
+          "derivation_id_min": "rc_business_ff4bd2d442e3dcb9f63ff45f41d8ead6",
+          "derivation_version_max": "receivables-collections-business-v1.0.0",
+          "derivation_version_min": "receivables-collections-business-v1.0.0",
+          "row_count": 1859136,
+          "sealed_logical_fingerprint": "9948819275590652457",
+          "source_as_of_max": "2026-09-28T18:18:35.264000",
+          "source_as_of_min": "2026-09-28T18:18:35.264000",
+          "valid": true
+        }
+      },
+      "foundation": "foundation_5a76699adba7eb2ab388167244e7869b",
+      "observed_at": "2026-11-01T18:20:31.959651+00:00",
+      "status": "CURRENT_READER_PASS"
+    }
+  },
+  "luna": {
+    "this_cycle": "NOT_RUN",
+    "reason": "No new publication exists; do not infer conversational capabilities from source capture",
+    "previous_real_evidence": "data/reports/telchi/incremental-foundation-succession-v1/luna-r2.json",
+    "previous_evidence_same_current": true,
+    "domains_previously_demonstrated": [
+      "sales documentary amount",
+      "sales physical classification"
+    ],
+    "whatsapp_sent": 0,
+    "channel_gates": "NOT_REACCREDITED",
+    "permissions_modified": false
+  },
+  "publication": {
+    "promoted": false,
+    "cas": "NOT_EXECUTED",
+    "journal": "Source capture intents/checkpoints only; no Foundation promotion journal prepared",
+    "noop": "Offline completed-capture reuse tested; live publication NOOP not rerun",
+    "recovery": "Raw/checkpoint/hash verified; source advance prefix evidence retains original failure; no automatic uncertain retry",
+    "rollback": "NOT_NEEDED_NO_PROMOTION; isolated canonical promotion/recovery/rollback tests PASS; live rollback not executed",
+    "watermarks_advanced": false,
+    "shared_atomic_modified": false
+  },
+  "accounting_proposal": "accounting-extraction-proposal.json",
+  "operational_contract": "SrvRestAstroLS_v1/backend/modules/telchi/datalake/full_refresh_contracts.json",
+  "scheduler": {
+    "enabled": false,
+    "installed": false,
+    "frequency": null
+  },
+  "validation": {
+    "focused": "202 passed in 27.14s; pytest-final.xml",
+    "succession_publication_recovery_rollback": "46 passed in 20.97s with isolated tmpfs fixtures; pytest-succession-r2.xml",
+    "full_datalake": "699 passed in 143.17s with isolated tmpfs fixtures; pytest-datalake-final.xml",
+    "assistant": "Not rerun; no assistant/RBAC implementation changed; Luna not re-accredited",
+    "LAT": "PASS md/index/sections/code-refs/full; lat-final.log. Nonblocking configuration warnings retained.",
+    "diff_check": "PASS; diff-check.log"
+  },
+  "interruptions": [
+    {
+      "command": "First full Data Lake suite",
+      "classification": "ENVIRONMENTAL_ABORT",
+      "reason": "External 420s command budget; partial progress was not reported as a full PASS",
+      "replacement": "Complete 699-test run with bounded isolated tmpfs fixtures"
+    },
+    {
+      "command": "First three-file succession regression",
+      "classification": "ENVIRONMENTAL_ABORT",
+      "reason": "External 180s budget on HDD fixtures",
+      "replacement": "Complete 46-test isolated tmpfs run"
+    },
+    {
+      "command": "First purchasing reader diagnostic",
+      "classification": "DIAGNOSTIC_MISUSE",
+      "reason": "Candidate-only pinned_component correctly rejected CURRENT",
+      "replacement": "Canonical live manifest binding plus read_component exact file/row validation PASS"
+    },
+    {
+      "command": "First final Reference pointer diagnostic",
+      "classification": "DIAGNOSTIC_MISUSE",
+      "reason": "Compared pointer with inherited historical manifest reference_version instead of canonical Foundation row/component; live row/component/pointer agree and never changed",
+      "replacement": "final-current.json verifies actual canonical Reference; no runtime or manifest rewrite"
+    }
+  ],
+  "resources": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS_FOR_COMPLETED_OPERATIONS",
+    "hana_concurrency": 1,
+    "pytest_workers": 1,
+    "duckdb_threads": "2 for own capture/audit/live SQL; existing component reader retains its safe profile",
+    "duckdb_memory": "256MB capture / 512MB audit / 768MB live read",
+    "disk_free_observed_gb": 447,
+    "unrelated_processes_terminated": 0,
+    "environmental_aborts": 2,
+    "own_processes_left_running": 0,
+    "adaptation": "Observed source progress despite high global I/O wait. Real source/raw receipts persisted on disk. Only disposable isolated test fixtures used tmpfs after external HDD-test timeouts.",
+    "cleanup": "cleanup.json: two own tmpfs fixture roots removed, 41.44 MB total. Unrelated TebaAI Python 185362/parent 185361 under existing OpenCode 16183 left untouched.",
+    "final_available_memory_mb": 6518,
+    "final_swap_mb": 3435
+  },
+  "files_modified": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/source.py": "c0a97dcb23ef4070c5ab2e464ef99dff30c1485f5ba9ec871abc971b3878051c",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/full_refresh.py": "c07f4aaa196d8b107bc2c084d8f34123453968a855fce165ae9fd662cd869f6e",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/full_refresh_capture.py": "ade196dadbce28a5e60c562ddd39538ad1c6a130afe82c492d53ad95f9a21e1f",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/full_refresh_reconciliation.py": "7a67d946f7a11919a1056115cccae3171ad498f36ad2211d92dbe793345c2c62",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/full_refresh_audit.py": "9dcf10800f0f3f8e72c7fd6c64e5576577e167efd730b419fa3d02b689c7db36",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/full_refresh_contracts.json": "55ece3824f4a74a6fa70538744f383e968ce40cd7edf2992ceac7f61028e2524",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_full_refresh_capture.py": "a579d5121c587962c46f1777fc8d9aab1bc8be20699f9365abe162ad1dbfcc23",
+    "SrvRestAstroLS_v1/backend/modules/telchi/status_actual.md": "76d6897ba1a6f6a2138083f942cb6b96c701ecdd8039f4a6945a9f0f4ac018a7"
+  },
+  "evidence_directory": "data/reports/telchi/full-data-lake-refresh-v1",
+  "transversal_impact": "New capture/audit APIs in Telchi; existing source query method and consumer contracts preserved. No GLOBAL, permissions, credentials, shared Atomic, runtime service or other module implementation edited. Other writers preserved.",
+  "risks": [
+    "No new Foundation was published; stale domains remain stale for TelchiAI",
+    "A canonical multidomain reader-compatible successor must be implemented and tested, not a hand-edited manifest or second publisher",
+    "140 new product identities need canonical merge preserving physical/commercial classifications",
+    "Receivable state before 2026-09-21 was not refreshed",
+    "Production issue resource/material distinction has 31 unresolved rows",
+    "Current SAP-derived offset is not timezone accreditation",
+    "New source files invalidate any previous source-digest readiness unless the affected guarantees are reconciled"
+  ],
+  "next_action_exact": "Implement the explicit independent-component successor branch in the existing foundation_manifest/foundation_reader/sales_succession/Promotion chain, with tests retaining sealed sales, historical snapshots and permissions. Reuse the 21 complete captures and two prefix proofs; merge the 140 new product identities with existing Reference merge contracts; complete historical receivable key/state reconciliation, purchasing lineage and Material Supply rederivation. Only then prepare a coherent candidate, promote with canonical CAS/journal and verify readers/Luna. Accounting remains a separate source-accreditation proposal; do not repeat completed captures.",
+  "final_current": {
+    "current": "foundation_5a76699adba7eb2ab388167244e7869b",
+    "reference": "v2_sales_3b5cfb885a90e82fcf905d2b",
+    "reference_pointer": "v2_sales_3b5cfb885a90e82fcf905d2b",
+    "manifest_sha256": "0cb36041830c88e3c577a1026539fc976b76308a2ab7bfb4a503a2f045bf7784",
+    "committed_at": "2026-11-01T14:55:59.253936+00:00",
+    "component_count": 8,
+    "verified_at": "2026-11-01T18:33:09.048067+00:00",
+    "legacy_top_level_reference_version": "v2_04de6eed3805f591777012c7",
+    "canonical_reference_authority": "Foundation row + reference component + pinned canonical reader; inherited top-level legacy field is not CURRENT authority"
+  },
+  "restrictions": {
+    "sap_write_count": 0,
+    "new_accounting_source_access": false,
+    "permissions_modified": false,
+    "credentials_modified": false,
+    "scheduler_activated": false,
+    "shared_atomic_modified": false,
+    "foundation_promoted": false,
+    "commits": 0,
+    "pushes": 0,
+    "unrelated_processes_terminated": 0
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "task": "TELCHIAI_AUTHORIZED_FOUNDATION_RESEARCH_V1",
+  "branch": "feature/console-backend-core",
+  "stage": "DEVELOPMENT",
+  "scope": "Phase A source inspection; Phase B not implemented; Phase C not completed",
+  "implementation_complete": false,
+  "sources": ["Existing repository source", "Existing reports, explicitly historical, not freshly accredited"],
+  "foundation_live_read_performed": false,
+  "postgres_access_performed": false,
+  "openai_calls_performed": false,
+  "findings": [
+    {
+      "id": "A1",
+      "finding": "The conversational V1 interpreter exposes a closed metric/action vocabulary and explicitly directs unsupported analyses to unavailability. It is not the SQL investigator.",
+      "evidence": ["SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py:22-106", "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md: Alcance comercial conversacional V1"]
+    },
+    {
+      "id": "A2",
+      "finding": "Direct Ask removes the historical SKU/date seal but still constructs a manual catalog from earlier sealed projections. Product exposes only item_code, item_name, inventory_uom_id. Invoice customer and product business classification are absent from the model catalog.",
+      "evidence": ["SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/ask_sources.py:PRODUCT_COLUMNS", "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/ask_sources.py:CATALOG", "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/adaptive_sources.py:CATALOG"]
+    },
+    {
+      "id": "A3",
+      "finding": "The SQL investigator's authorization is supervised-local-uid plus sealed catalog equality, not authenticated Team360 RBAC. It must not be relabeled Presidencia or FULL_ACCESS.",
+      "evidence": ["SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/foundation.py:local_context", "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/validator.py:authorize"]
+    },
+    {
+      "id": "A4",
+      "finding": "Existing conversational authorization already calls PermissionConsoleRepository.list_effective_permissions and verifies identity/channel/policy scope. Its whole_workspace_scope_verified flag rejects unsupported partial scopes; it is not a row policy compiler.",
+      "evidence": ["SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py:BusinessAuthorization.allowed", "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py:load", "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py:load_result"]
+    },
+    {
+      "id": "A5",
+      "finding": "FoundationReader offers pinned sales, credit memo, inventory and receivables relations, reference files and sealed commercial semantics. Restricted discovery is therefore not equivalent to absence of all those sources. Publication membership and schemas still require a fresh read-only inspection.",
+      "evidence": ["SrvRestAstroLS_v1/backend/modules/telchi/datalake/foundation_reader.py:FoundationAccess", "SrvRestAstroLS_v1/backend/modules/telchi/datalake/category_line_amount_query.py:scoped_source"]
+    },
+    {
+      "id": "A6",
+      "finding": "The validator recursively checks table permissions through CTEs and derived tables, denies physical references, emits new SQL and rejects unknown AST. Column availability is currently the sealed projection, not a live column entitlement resolver. Scalar subqueries, windows, casts and other constructs are outside its current subset.",
+      "evidence": ["SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/validator.py:Visitor.from_table", "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/validator.py:Visitor.expr", "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/validator.py:validate"]
+    },
+    {
+      "id": "A7",
+      "finding": "Each manual logical table has max_rows=1000000 while the default join-pair budget is 10000. The product-of-bounds calculation can reject otherwise useful joins before execution. Keep resource controls; do not globally increase the budget to mask this limitation.",
+      "evidence": ["SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/contracts.py:Budget.max_join_pairs", "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/validator.py:Visitor.from_table", "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/foundation.py:_table"]
+    },
+    {
+      "id": "A8",
+      "finding": "Existing scoped FULL_ACCESS expands enabled workspace capability permissions in its module namespace. It does not provide a distinct, independently accredited business-data discovery policy. Do not grant this technical profile to Presidencia as a shortcut.",
+      "evidence": ["SrvRestAstroLS_v1/backend/modules/console/repositories.py:PermissionConsoleRepository.LIST_EFFECTIVE_PERMISSIONS_SQL"]
+    },
+    {
+      "id": "A9",
+      "finding": "Historical internal-exception evidence already reports the supplied August raw-material line amount on a partial BS population, but explicitly does not accredit the excluded line as USD. This is not a fresh monthly/customer reconciliation and cannot establish how free Pi obtained its result.",
+      "evidence": ["data/reports/telchi/business-answer-historical-ranking-v1/report.md:73", "data/reports/telchi/direct-ask-v1/20261028T123531.640411Z/turn-003.json", "data/reports/telchi/blind-benchmark-v1/20261028T101941Z/investigator-b-20261028T125859Z/evidence.json"]
+    }
+  ],
+  "necessary_controls": ["Authenticated identity and tenant/workspace/module scope", "Effective grants from existing Team360 RBAC", "Fail-closed source/column/row authorization", "Pinned published Foundation bindings", "READ_ONLY", "Structural SQL validation and host/filesystem/network denial", "Resource budgets and cancellation", "Owner-scoped evidence and permission revalidation", "Independent monetary and semantic verification"],
+  "artificial_restrictions_removed_in_this_execution": [],
+  "next_implementation_seams_not_implemented": [
+    "Reuse existing Console effective permission resolution through a Telchi-local authorization adapter; no role-name or prompt-derived authority.",
+    "Build discovery from the selected Foundation publication's actual components, reference datasets and schemas; intersect with approved source/column/row policies before sending metadata to Luna.",
+    "Materialize server-authorized logical projections and row predicates before model SQL execution; withhold a row-scoped source if the predicate cannot be accredited.",
+    "Adapt the existing validator/executor to a trusted, authorization-bound catalog instead of accepting arbitrary caller-owned catalogs or weakening sealed-catalog checks.",
+    "Revalidate dependencies before each query, evidence retrieval, resume and presentation; remove protected observations from resumed model context after revocation.",
+    "Integrate the same investigator behind a DEV opt-in in TelchiHandler while preserving V1 state and execution compatibility.",
+    "Keep business classification, candidate relationships, currency and time coverage limitations in independent verification; do not treat SQL success as semantic accreditation."
+  ],
+  "proposed_role_matrix_not_grants": [
+    {"profile": "PRESIDENCIA", "business_scope": "All published Telchi enterprise data within explicitly approved effective scope; same for owner and Abraham", "technical_administration": "No implicit grants", "binding_accredited_in_this_execution": false},
+    {"profile": "FULL_ACCESS", "business_scope": "Same enterprise discovery only when effective grants establish it", "technical_administration": "Only separately explicit technical permissions; existing module FULL_ACCESS must not be copied to Presidencia", "binding_accredited_in_this_execution": false},
+    {"profile": "Executive, management, department, operational, delivery and future profiles", "business_scope": "Pending Mario approval; deny unmapped sources/columns/row scopes", "technical_administration": "No new grants", "binding_accredited_in_this_execution": false}
+  ],
+  "gates": {
+    "EXISTING_RBAC_REUSED": {"status": "PARTIAL", "evidence": "A4: existing V1 reuse inspected; SQL bridge absent (A3)"},
+    "FOUNDATION_AUTHORIZED_DISCOVERY": {"status": "BLOCKED", "evidence": "A2/A3/A5: manual catalog; no live authorized discovery inspection performed"},
+    "FULL_ACCESS_BUSINESS_SCOPE": {"status": "NOT_RUN", "evidence": "A8: existing expansion inspected; no real identity accreditation"},
+    "PRESIDENCIA_BUSINESS_SCOPE": {"status": "NOT_RUN", "evidence": "Owner/Abraham bindings and equal effective scope not queried"},
+    "NO_TECHNICAL_PRIVILEGE_ESCALATION": {"status": "PARTIAL", "evidence": "No code, grants or infrastructure changes; requested new design not implemented/tested"},
+    "ROLE_RESTRICTED_DATA_ACCESS": {"status": "NOT_RUN", "evidence": "No new controlled role fixtures or live role tests"},
+    "ROW_COLUMN_AUTHORIZATION": {"status": "PARTIAL", "evidence": "A4/A6: sealed columns and whole-workspace guard exist; dynamic entitlement enforcement absent"},
+    "SQL_READONLY_EXECUTION": {"status": "PARTIAL", "evidence": "A6 and FoundationReadonlyExecutor inspected; no fresh real SQL execution; targeted suite timed out"},
+    "CROSS_TENANT_ISOLATION": {"status": "NOT_RUN", "evidence": "No two-tenant investigation tests completed"},
+    "EVIDENCE_ACCESS_CONTROL": {"status": "PARTIAL", "evidence": "A4: V1 owner-scoped retrieval inspected; new SQL data-dependency checks absent"},
+    "DYNAMIC_REVOCATION": {"status": "NOT_RUN", "evidence": "No end-to-end revoke/query/resume/presentation test"},
+    "INDEPENDENT_CLAIM_VERIFICATION": {"status": "PARTIAL", "evidence": "Existing historical direct-ask report explicitly limits verifier scope; no new general verification"},
+    "RAW_MATERIALS_RECONCILIATION": {"status": "BLOCKED", "evidence": "A9 plus current host I/O pressure; no independent reproduction in this execution"},
+    "GENERAL_RESEARCH_CAPABILITY": {"status": "PARTIAL", "evidence": "Existing adaptive SQL loop, but A2 manual catalog and A6/A7 technical restrictions; no new unseen-question demonstration"},
+    "TELCHIAI_V1_REGRESSION": {"status": "NOT_RUN", "evidence": "No completed V1 regression; exploratory targeted tests aborted at command deadline"},
+    "WHATSAPP_UNCHANGED": {"status": "PASS", "evidence": "This execution writes only this new diagnostic report; no channel operations or transport edits; not an E2E claim"},
+    "WEB_UNCHANGED": {"status": "PASS", "evidence": "This execution writes only this new diagnostic report; no browser, frontend or Web changes"}
+  },
+  "validation": {
+    "git_diff_check": "PASS before report creation; final check required separately",
+    "targeted_command": "cd SrvRestAstroLS_v1/backend && UV_NO_SYNC=1 uv run --no-sync pytest modules/telchi/exploratory_sql/test_exploratory_sql.py modules/telchi/exploratory_sql/test_ask.py -q -p no:cacheprovider",
+    "targeted_result": "ENVIRONMENTAL_ABORT: command deadline 120 seconds; output showed progress and no reported assertion failure, but no final pytest summary. No PASS inferred; root cause of duration not proven.",
+    "concurrency": "One pytest process, no xdist; no live Foundation scans or model calls initiated",
+    "host_observation": "8 CPUs, approximately 7.8 GiB MemAvailable initially; vmstat observed 65-80 percent I/O wait and 10-12 blocked tasks; no material swap pressure. Heavy reads deferred rather than overriding guard.",
+    "heavy_workload_status": "RESOURCE_BLOCKED / BLOCKED_HOST",
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0,
+    "cleanup_evidence": "After timeout, process listing plus targeted pgrep showed no remaining pytest/uv runner matching this command. No servers or browsers created."
+  },
+  "limits": [
+    "No implementation or activation claimed.",
+    "No fresh proof that all Foundation domains are published or accessible.",
+    "No authenticated Presidencia or FULL_ACCESS identity binding inspected.",
+    "Free-Pi SQL/source/classification trace not established by the restricted investigator evidence inspected here.",
+    "No matching of supplied business figures used as test oracle.",
+    "Existing concurrent worktree changes preserved; no commit, push, migration, grant or shared PostgreSQL write."
+  ]
+}

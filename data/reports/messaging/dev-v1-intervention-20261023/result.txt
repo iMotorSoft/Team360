@@ -1,0 +1,52 @@
+TEAM360 / TELCHIAI — OWNER-AUTHORIZED DEV V1 INTERVENTION
+Branch: feature/console-backend-core
+Scope: existing Srv05/Messaging source, three hash-approved additive migrations in team360/public and evolution_api/evolution_api, private recovery backups and UDS mount proof. No exclusivity/binding investigation or cleanup.
+
+COMPLETED
+1. Captured consistent pg_dump custom archives using exported READ ONLY repeatable-read snapshots. Private backup:
+   /media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/backups/evolution-v1-dev-20261023T135645Z
+   team360.dump SHA256 deb8ef24a993d542197f8d64e452471f8e400547aa4a57be3e6977411c129841
+   evolution_api.dump SHA256 403495eec052e47a3aa64daa07145543cefc5d0a948ddd83e65d175c1c28b0e3
+   Original private environment/control, image reference, full container inspection and store archive retained there. Source originals retained under source-before/. Prior failed verification attempts retained privately, not deleted.
+2. Restored both archives into fresh empty databases in a temporary network=none PostgreSQL 18.4 + pgvector container, NOT the existing PostgreSQL. Compared every row by canonical ordered SHA256 across all 90 Team360 and 37 Evolution tables, live column order/definitions and constraints. PASS. Historical dropped-column physical attnum gaps differ after pg_dump/restore, so comparison uses dense live column order; no schema/data discrepancy hidden. Isolated restore used --no-owner/--no-privileges; original ownership/ACL remain in archives, not recreated as live service roles in the fixture. Temporary recovery server removed.
+3. Applied ONLY these exact SQL artifacts, transactionally per target, using dedicated non-login DDL owners; schema CREATE revoked afterward:
+   team360/public, 032_team360_transport_evidence_v1.sql
+   SHA256 699478217e4eb95c0d36615bb98180d680af48609c0799f689694a1c60d438c2
+   evolution_api/evolution_api, 20261022200000_offline_transport_lab_v1/migration.sql
+   SHA256 8f9c3ba97c45a454b48ac31a45729f8e05dd4fdb015f0a328d87a833224820ab
+   evolution_api/evolution_api, 20261022200100_durable_transport_lab_v1/migration.sql
+   SHA256 3aa86250b09a44897968fb1c8995ddf9be019e406f75753ebb9d25e951d5e2aa
+   DDL owners t360devv1_ddl / evodevv1_ddl: NOLOGIN, NOSUPERUSER, NOCREATEDB, NOCREATEROLE, NOINHERIT, NOREPLICATION, NOBYPASSRLS; no memberships granted. No runtime or business role grants issued. Evolution migration bookkeeping appended exactly 2 checksummed records; previous 57 ledger records preserved exactly. No Prisma/npm automigration command used. Team360 has no generic migration ledger; external migration-result.json records exact artifacts/targets/commit status. New ot_* tables empty: no live trust/target/revision invented.
+4. Incorporated exact accredited R2 source bytes into existing checkout: Srv05 entrypoint, Messaging service/repository/domain/provider/transport lifecycle and webhook handler wiring, corresponding tests and the exact 032 artifact. Every installed file matched source-manifest-r2.json / accredited artifact hashes. No unrelated lab tree copied, no business logic or runtime-global Srv01 changes. Existing modifications preserved; detailed paths/hashes in result.json and source-plan.json, relative pre-change diff in existing-source.patch. 22 source/test/SQL paths installed or changed.
+5. Verified private directory /media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/evolution-dev-v1 (0700), temporary UDS (0600) and actual candidate-container-to-host mount access with SO_PEERCRED UID 1000. Used exact candidate image, network=none, direct short Node net client (NOT Evolution main). Mount transport proof PASS; no signing identities fabricated. Temporary socket/container removed. This is NOT a signed operational callback PASS.
+
+VALIDATION / PRESERVATION
+- 161 PASS / 16 explicit opt-in skips in changed Messaging/Srv05 test files, 12.74s. Existing Diagnosis in-memory warning; no Diagnosis request. Skipped durable PG tests not presented as PASS. Existing 427 PASS / 1 skip not rerun.
+- Actual PostgreSQL postchecks compared all preexisting table rows against premigration snapshots; unchanged, apart from the two authorized additive Prisma ledger entries. 1,335 Telchi events + 164 historical events intact; all five protected events intact; UNKNOWN never replayed/reclassified.
+- Existing Evolution Instance, Message, Webhook and every original Evolution table unchanged by full-row digest. Original Meta/environment/control/image reference unchanged byte for byte. No Meta administrative calls, subscriptions, webhook configuration or Cloudflare changes.
+- Missing Srv05 V1 configuration demonstrably fails closed before DB/network or legacy provider construction.
+- git diff --check PASS; source delta/hash review PASS. No Markdown modified: LAT Markdown gates NOT_APPLICABLE. No commit/push. No production changes.
+
+BLOCKED STEP / NOT CLAIMED
+The approved packet has no distinct accredited requester and approver identities/public-key references or independent signed approvals. Step 3 credential provisioning therefore STOPPED as requested by owner. No credential, operational trust, revision, approval, service key or business authority invented or copied from laboratory.
+Actual signed callback, frozen operational provider and service startup depend on that trust/configuration. Existing Evolution container 3dcb3355f774 remains Created on its original image, not replaced or started into a half-configured/legacy runtime. The candidate image remains available locally; replacement/direct node launch follows authenticated configuration, not npm db:deploy/start.sh. Source and DDL portions of installation are complete, operational V1 activation is NOT complete. No legacy fallback used.
+Required owner input: two distinct authorized requester/approver actor IDs and references to their public Ed25519 signing identities (or explicit independently controlled provisioning/custody assignments), then independently signed prepare/activate approvals for the existing Telchi DEV scope. Do not send private keys in chat. Existing enterprise organization/channel identity must be used, not invented. Service runtime DSNs/grants, trust and operational callback are finalized within the authorized window after those identities; no extra architecture needed.
+
+RECOVERY
+Admission remains closed. Retain additive tables and all audit/history/UNKNOWN. Do not DROP, downgrade to a bare legacy image, decrement revision or replay. If later activation fails, close admission while retaining V1-compatible callback/reconciliation. The verified archives and original source/configuration permit reviewed recovery, but no live restore is executed here; operational restore requires identity/epoch review. No shared PostgreSQL or unrelated service restarted/stopped.
+
+RESOURCE / HARNESS LIMITS
+Initial host SAFE (8 cores, load 1.49, ~5.2 GiB available, swap stable). Later unrelated load increased and disk wait rose; two restore-verifier calls timed out (120s/180s). Both own recovery containers were identified, stopped and removed; no migrations applied until final restore proof. Verification resumed against existing archive hashes, using one sequential temporary PG, bounded 512 MiB/2 CPUs and tmpfs for disposable restore data; fsync/full_page_writes/synchronous_commit disabled ONLY on that disposable network-isolated recovery target, not any existing DB. This tests archive restore/content/schema, not crash durability of the fixture. Final host improved (~7.2 GiB available, load ~2.9). No broad suite or service restart.
+Intermediate failures were in operational harness checks: readiness timeout, physical-column ordinal comparison, psql separator, initial inet text /32 representation and overlong temporary Unix socket name. Corrected harness checks; no accredited runtime source changed to hide environmental failures. Active migrations executed only after corrected target identity and restored content checks passed. All intermediates/evidence retained.
+RESOURCE_GUARD=PASS for final bounded execution; ENVIRONMENTAL_ABORTS=2; UNRELATED_PROCESSES_TERMINATED=0; OWN_PROCESSES_LEFT_RUNNING=0. Final podman inventory shows only original Created Evolution; no own Docker recovery containers remain.
+
+V1_INSTALLED_IN_DEV=NO
+THREE_MIGRATIONS=PASS
+V1_CREDENTIALS=FAIL (BLOCKED: missing independent identities/approvals, not a demonstrated software defect)
+PRIVATE_CALLBACK=FAIL (BLOCKED: mount/UID PASS, signed operational callback not configured)
+SRV05_PROVIDER_V1=FAIL (BLOCKED operationally; accredited source selection/no-fallback tests PASS)
+BACKUP_RECOVERY=PASS
+META_UNCHANGED=YES
+HISTORY_PRESERVED=YES
+REAL_MESSAGES_SENT=0
+READY_FOR_WHATSAPP_TEST=NO

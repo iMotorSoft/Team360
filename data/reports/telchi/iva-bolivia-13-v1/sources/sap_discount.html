@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiscountPercent Property - SAP B1 SDK Help</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="expand-collapse.css">
+
+<script async src="https://www.sap.com/sharedlibs/globaltop/script-latest.min.js"></script>
+<script src="https://cdn.schemaapp.com/javascript/highlight.js"></script><script src="https://cdn.schemaapp.com/javascript/schemaFunctions.min.js"></script><script>schemaLoad("Acronym/Helpsap", "325UM-NQRHZ-P7T97-M5SY8");</script>
+<meta name="semaphore_tech_ids" content="73554900100700000803,01200615320800000816">
+<meta name="product" content="SAP Business One">
+<meta name="version" content="10.0">
+<meta name="language" content="en-US">
+<meta name="contenthash" content="0553f5d73a6893f5179d1b0c9ce3df359872b192fbcc351c0f671baaa550de2d61a9144de97cfc6458fad1c85daa250191e165edbd286a2bd79405edad162b83">
+<meta name="contentloio" content="089315d8d0f8475a9fc84fb919b501a3">
+<meta name="created_timestamp" content="2026-08-23 06:53.09">
+<meta name="updated_timestamp" content="2026-05-12 08:09.02">
+<link rel="canonical" href="/doc/089315d8d0f8475a9fc84fb919b501a3/10.0/en-US/SDKHelp/SAPbobsCOM~Document_Lines~DiscountPercent.html">
+
+<script>
+var domain = window.location.origin;
+var adobeScript = "https://www.sap.com/tmgr/ccc66c06b30b/6fef444d50e0/launch-";
+adobeScript += domain.includes("localhost") ? "c29560858f22-development.min.js" : "dec827c65643-staging.min.js";
+window.SAP = window.SAP || {};
+
+window.SAP.global = {
+"trustArc": {
+"domain": "help.sap.com",
+"privacyPolicyLink": `${domain}/docs/privacy`,
+"cookieLink": `${domain}/docs/privacy/cookie-statement`
+},
+"isProd": false,
+"tagManagerUrl": adobeScript,
+"applyConsentNoPageReload": true
+};
+
+window.adobeDataLayer = window.adobeDataLayer || [];
+window.adobeDataLayer.push({
+"event": "globalDL",
+"site": { 
+"name": "help",
+"country": "glo"
+},
+"user": {
+"loginStatus": "no", 
+}
+});
+
+const page = {
+"name": "", 
+"section": location.pathname.slice(1, location.pathname.indexOf("/", 1)), 
+"language": "en", 
+"country": "US", 
+"referrer": "null", 
+"url": location.href, 
+"details": { 
+"productID":  "SAP_BUSINESS_ONE", 
+"deliverableID": "089315d8d0f8475a9fc84fb919b501a3", 
+"topicID": "n/a", 
+"version": "10.0", 
+"machineTranslated": "no", 
+}
+}
+
+const user = { 
+"loginStatus": "no", 
+'type': "visitor"
+}
+
+var runPageViewEvent = function(){
+window.adobeDataLayer.push({
+"event": "pageView",
+"page": page,
+"user": user})
+};
+
+runPageViewEvent();
+
+window.adobeDataLayer.push({
+'event': "stBeaconReady"
+}); 
+
+var onConsentChange = function(event) {
+  if (typeof runPageViewEvent === 'function') {
+    runPageViewEvent();
+  } 
+  window.adobeDataLayer.push({
+    'event': "stBeaconReady"
+  });
+};
+document.addEventListener('setUserConsent', onConsentChange);
+window.addEventListener('message', function(e) {
+  try {
+    var payload = e.data;
+    if (typeof payload === 'string') { payload = JSON.parse(payload); }
+    if (payload && payload.message === 'submit_preferences' && payload.source === 'preference_manager') {
+      onConsentChange();
+    }
+  } catch (err) {
+    console.warn('Consent message parsing failed', err);
+  }
+});
+</script>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <header>
+        <div class="container">
+            <h1>📚 SAP Business One SDK Help</h1>
+            <div class="search-container">
+                <input type="text" id="search" placeholder="Search documentation..." autocomplete="off">
+                <div id="search-results"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb">
+        <div class="container">
+            <a href="index.html">Home</a> › <span>DiscountPercent Property</span>
+        </div>
+    </nav>
+
+    <!-- Main Content (preserved from original) -->
+    <main class="container">
+        <article>
+            <body id="dxBody" topmargin="0">
+<img id="collapseImage" src="collapse.gif" style="display:none; height:0; width:0;"/>
+<img id="expandImage" src="expand.gif" style="display:none; height:0; width:0;"/>
+<img id="collapseAllImage" src="collapse.gif" style="display:none; height:0; width:0;">
+<img id="expandAllImage" src="expand.gif" style="display:none; height:0; width:0;"/>
+<img id="copyImage" src="copycode.gif" style="display:none; height:0; width:0;"/>
+<img id="copyHoverImage" src="copycodeHighlight.gif" style="display:none; height:0; width:0;"/>
+<input class="userDataStyle" id="userDataCache" name="userDataCache" type="hidden"/>
+<div id="pagetop">
+<table id="pagetoptable1" width="100%">
+<tr id="pagetoptable1row2">
+<td align="left" colspan="2">
+<span id="pagetitle">
+                        DiscountPercent Property
+                    </span>
+</td>
+</tr>
+<tr id="pagetoptable1row3">
+<td colspan="2">
+<a href="#seealsobookmark" onclick="javascript:openSectionById('seeAlsoSectionHeader');">See Also</a> 
+                    
+                </td>
+</tr>
+</table>
+</div>
+<div id="pagebody" valign="bottom">
+<a name="topBookmark"></a>
+<div id="mainbody">
+<div class="saveHistory" id="allHistory" onload="loadAll()" onsave="saveAll()"></div>
+<h1 class="heading"><span class="expandcollapse" tabindex="0">Description</span></h1><div class="section" id="descriptionSection" name="collapseableSection"><p>Sets or returns the discount percentage you specify for a customer, or the discount percentage a supplier specifies for you.</p>
+<p>Field name: <em>Discount</em>.</p></div>
+<h1 class="heading"><span class="expandcollapse" tabindex="0">Property type</span></h1><div class="section" id="propertytypeSection" name="collapseableSection">Read-write property</div>
+<h1 class="heading"><span class="expandcollapse" tabindex="0">Syntax</span></h1><div class="section" id="syntaxSection" name="collapseableSection"><div class="LanguageSpecific" id="Syntax_VB"><table cellpadding="0" cellspacing="0" class="syntaxtable" width="100%"><tr><th>Visual Basic</th></tr><tr><td><pre class="syntax" lang="VB">Public Property DiscountPercent() As Double</pre></td></tr></table></div></div>
+<h1 class="heading"><span class="expandcollapse" tabindex="0">Remarks</span></h1><div class="section" id="remarksSection" name="collapseableSection">You can either set the DiscountPercent property and let the application calculates the <a href="SAPbobsCOM~Document_Lines~PriceAfterVAT.html">PriceAfterVAT</a> property accordingly, or set PriceAfterVAT and let the application calculates the DiscountPercent property accordingly. But not both properties at the same script.<br/><p>SAP Business One automatically completes the value for this property from <a href="SAPbobsCOM~PaymentTermsTypes.html">PaymentTermsTypes</a> object (OCTG table) according to the selected payment terms (<a href="SAPbobsCOM~BusinessPartners~PayTermsGrpCode.html">PayTermsGrpCode</a> property).</p>
+<p>For business partners defined as type 'Other' (neither a customer nor a supplier) you do not have to set this property.</p>
+<p>(For 5% discount set the value 5, not 0.05.)</p></div>
+<a name="seealsobookmark"></a>
+<h1 class="heading"><span class="expandcollapse" tabindex="0">See Also</span></h1><div class="section" id="seealsoSection" name="collapseableSection"><p id="dxseealsocontent"><a href="SAPbobsCOM~Document_Lines.html">Document_Lines Object</a>
+ | <a href="SAPbobsCOM~SpecialPrices~DiscountPercent.html">DiscountPercent Property</a>
+</p>
+</div>
+</div>
+<div id="pagefooter">
+<hr size="1"/><p><i><a href="Copyright.html">© Copyright 2026 SAP SE or an SAP affiliate company. All rights reserved.</a></i></p>
+</div>
+</div>
+</img></body>
+        </article>
+    </main>
+
+    <script src="search-index.js"></script>
+    <script src="script.js"></script>
+    <script src="expand-collapse.js"></script>
+</body>
+</html>

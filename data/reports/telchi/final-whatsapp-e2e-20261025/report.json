@@ -1,0 +1,48 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "Verify the existing Mario September 2026 exchange without replay or sending; close DEV admission",
+  "private_evidence_directory": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/evolution-dev-v1/final-e2e-verification-20261025T1557Z",
+  "results": {
+    "INBOUND_META": "CORRELATED_VIA_EVOLUTION; raw Meta request not independently recovered",
+    "IDENTITY_RBAC": "VERIFIED: approved phone binding, active devfull identity, telchi_dev workspace, effective telchi.sales.period_billed_amount.read.v1",
+    "TELCHIAI_RESPONSE": "VERIFIED: committed EXECUTE, capability_calls=1, audit text equals outbound text and reported answer",
+    "OUTBOUND_V1": "VERIFIED: BoundEvolutionProvider attestation, durable transport delegation revision 1, one Evolution ot_attempt ACCEPTED",
+    "META_MESSAGE_ID": "RECOVERED: complete inbound and outbound IDs retained in private evidence",
+    "DELIVERY_CONFIRMED": "YES: matching signed sent/delivered/read callbacks in Team360 and published callbacks in Evolution",
+    "DUPLICATES": "0 observed: one inbound, one execution, one outbound intent, one transport attempt, empty attempt_history",
+    "LEGACY_REPLAY": "NONE_OBSERVED: legacy channel digest unchanged; active channel grows by exactly five expected exchange rows",
+    "ADMISSION_CLOSED": "PARTIAL: assistant approval revoked, authenticated ingress returns 403, Evolution webhook already disabled; V1 sender in-memory admission remains open and revision not revoked",
+    "WHATSAPP_E2E": "DEGRADED_NOT_PASS: delivery verified; raw Meta ingress not independently recovered and total transport admission closure not completed"
+  },
+  "observed_exchange": {
+    "inbound_received_utc": "2026-10-25T15:54:31.154841Z",
+    "question": "¿Cuáles fueron las ventas de Telchi durante septiembre de 2026?",
+    "workspace": "telchi_dev",
+    "identity_note": "The approved sender resolves to an existing account named devfull, not a database display name Mario. Binding/approval establish the pilot correlation; the person's real-world identity is not independently authenticated by this audit.",
+    "billed_bs": "8891439.79",
+    "documentary_net_bs": "8562769.55",
+    "period": ["2026-09-01", "2026-10-01 exclusive"],
+    "source_updated_at": "2026-09-28T18:18:35.264000",
+    "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot_id": 1408,
+    "capability": "sales.period_billed_amount.v1",
+    "sent_utc": "2026-10-25T15:55:03Z",
+    "delivered_utc": "2026-10-25T15:55:03Z",
+    "read_utc": "2026-10-25T15:55:08Z"
+  },
+  "anomalies": [
+    "Evolution ChannelStartupService logged PostgreSQL 42501 permission denied for table Message at inbound receipt. No matching Evolution Message row was recovered. Team360 inbound/audit persisted successfully.",
+    "Evolution logged DELIVERY_UNKNOWN callback_reconciliation warnings despite matching published ot_callback and verified Team360 callback rows. The persisted correlated callbacks, not warning labels or HTTP 200, establish delivery.",
+    "Legacy lifecycle status refers to a different historical session and does not establish ownership or closure of the active V1 runtime.",
+    "Revoking the DEV pilot approval closes assistant access without changing Console grants; a future opening requires explicit owner review. Sender process/revision remains armed, so complete transport closure is not certified."
+  ],
+  "validation": {
+    "read_only_database_queries": "Team360 events, signed callbacks, Console effective permissions, verified phone binding, Evolution ot_attempt/ot_callback, legacy digest comparison",
+    "prior_actual_v1_gate_integrity": "VALID before approval revocation",
+    "closure_probe": "POST empty JSON with valid webhook token rejected 403 before message decoding; event count remains five",
+    "focused_tests": "backend/.venv/bin/python -m pytest modules/telchi/assistant/tests/test_whatsapp_dev.py -q: 36 passed",
+    "git_diff_check": "PASS",
+    "scope": "No query replay, no message sends, no model invocation, no production/Meta/Cloudflare changes, no database cleanup, no process restarts or termination, no commit/push"
+  },
+  "next_step": "Owner-authorized complete V1 transport admission closure using its supported administration/lifecycle; preserve callback reconciliation and all conversation evidence. Do not repeat the business query."
+}

@@ -1,0 +1,131 @@
+{
+  "generated_at": "2026-10-18T15:06:20.245648+00:00",
+  "branch": "feature/console-backend-core",
+  "source_sha256": "0e370c0bd4a8fed6d2f50d365d9e28d435486db6cf400b39a96615859eea2a07",
+  "approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+  "runner_sha256": "4fabc3401cadc4120b28bfdd31166562a5f6705c250b70a1511f5d525fb47069",
+  "configuration_sha256": "3f69ac997b76af9549a2588edd018bac160bc06ee571d4dba8b0df254f9e359c",
+  "observations": [
+    {
+      "case": "missing_token",
+      "status": 401,
+      "expected": 401,
+      "passed": true,
+      "entries": {},
+      "known_source_errors": []
+    },
+    {
+      "case": "unauthorized_sender",
+      "status": 403,
+      "expected": 403,
+      "passed": true,
+      "entries": {},
+      "known_source_errors": []
+    },
+    {
+      "case": "revoked_access",
+      "status": 403,
+      "expected": 403,
+      "passed": true,
+      "entries": {},
+      "known_source_errors": []
+    },
+    {
+      "case": "authorized_pilot",
+      "status": 200,
+      "expected": 200,
+      "passed": true,
+      "entries": {
+        "real_ingress": 44,
+        "build_service": 8,
+        "messaging_process": 38,
+        "identity_resolution": 16
+      },
+      "known_source_errors": []
+    }
+  ],
+  "host_preflight": "BUSY_BUT_SAFE: 8 CPUs, load 3.49/2.69/2.08, MemAvailable 5071 MiB; vmstat 63-71% idle, no swap IO in interval samples. One listener, sequential requests, PG pool max 2",
+  "scope": "Production Srv05 + PilotBoundary + webhook builder + dispatcher + real PG identity over loopback HTTP. Lifespan disabled. Admission-only handler double and fail-closed egress double; NOT business/model/Foundation/delivery E2E.",
+  "affected_gate": "http_auth: positive messages.upsert admission invalidated by removal of base pilot permission",
+  "gates_published": false,
+  "unrelated_processes_terminated": 0,
+  "historical_evidence": {
+    "assistant_foundation": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "business_authorization": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "durable_idempotency": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "http_auth": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "38fd6b6b5890a302137b27bacd9fbc968a0725735e7fc7c704b80473fac445b8",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "identity_tenant_isolation": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    },
+    "model_no_fallback": {
+      "status": "PASS",
+      "kind": "real",
+      "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+      "artifact_integrity": true,
+      "applicability": "Supporting evidence preserved; not reaccredited by this blocked probe"
+    }
+  },
+  "manifest_source_matches": false,
+  "manifest_approval_matches": false,
+  "previous_attempts": [
+    "Original unmodified composition blocked before listener; see ingress-operational-v1/closure.json. This probe explicitly fences business execution and delivery after admission."
+  ],
+  "session_before": "STOPPED",
+  "database_scope": {
+    "status": "PASS",
+    "tenant_matches": true,
+    "workspace_matches": true
+  },
+  "own_processes_left_running": 0,
+  "listener": {
+    "host": "127.0.0.1",
+    "port": 44159,
+    "process": {
+      "pid": 50616,
+      "start_ticks": "1296548",
+      "uid": 1000,
+      "boot_id": "678838d9-2dd5-4443-bb73-4cc15315de3a",
+      "executable": "/usr/bin/python3.12",
+      "command_sha256": "2daa2a519b9a4056aade5a70caba6bfa7213a8889d0448131330929a007e46c1"
+    }
+  },
+  "admitted_identities": 1,
+  "recording_egress_attempts": 1,
+  "real_outbound_calls": 0,
+  "listener_closed": true,
+  "pool_closed": true,
+  "session_after": "STOPPED",
+  "source_unchanged": true,
+  "private_inputs_unchanged": true,
+  "status": "PASS",
+  "private_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/ingress-operational-20261018T150620245452Z/result.json",
+  "private_artifact_sha256": "26e9b7e551f728d1487183c9a6fde7debe7be76e21f3a751a6bf261d44daadea"
+}

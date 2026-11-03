@@ -9,6 +9,8 @@ respuesta `POST /api/console/bootstrap`.
 Controlado por variable de entorno `TEAM360_PASETO_ENABLED=true`. Cuando está
 deshabilitado, el endpoint funciona exactamente como antes (sin token).
 
+Nota de seguridad vigente: este endpoint experimental todavía recibe `workspace_id` y `user_id` del body y no implementa la sesión previa requerida por el contrato Console final. En consecuencia sólo está disponible con `TEAM360_ENV=dev|development` explícito. Production, entorno ausente o desconocido responden 404 antes de consultar PostgreSQL o emitir un token. Esto no modifica criptografía, claims ni `/api/console/me`; una habilitación productiva futura deberá usar la frontera de identidad Team360 existente, no otro sistema auth.
+
 ## Endpoint
 
 | Método | Ruta |

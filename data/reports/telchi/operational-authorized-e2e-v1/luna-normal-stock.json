@@ -1,0 +1,182 @@
+{
+  "timestamp": "2026-11-02T17:01:27.058639+00:00",
+  "source_sha256": "db3868f8057e81c64a914d7dfd6b8f2456efe23c85f4e0639bdcc182a5df8abc",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "preparation_ms": 0.1119860007747775,
+    "response_bytes": 5445,
+    "duration_ms": 6577.063,
+    "attempts": 1
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿Qué período querés consultar?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuánto stock tenemos del producto con código SAP E00003 por depósito?",
+      "text": "No hay un resultado Foundation verificable. Intentá nuevamente.",
+      "classification": "ERROR",
+      "event_id": "bc12cec1-7518-4515-a567-68b9ffca4290",
+      "thread_id": "17983b4f-3780-495a-9ba6-4fdd7f5a72d5",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 60133.847153000715,
+          "state_engine_ms": 0.8734240000194404,
+          "interpretation_ms": 4624.8668280004495,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 64805.423922000045
+        },
+        "decision": "ERROR",
+        "committed": true,
+        "contract_error": null,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "validated_state": {
+          "metric": "inventory.stock_by_warehouse",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "product_target": "E00003",
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "inventory.stock_by_warehouse"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": null,
+        "execution_status": "failed",
+        "response_prepared": {
+          "text": "No hay un resultado Foundation verificable. Intentá nuevamente.",
+          "classification": "ERROR"
+        },
+        "required_permission": "telchi.inventory.stock_by_warehouse.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "inventory.stock_by_warehouse",
+              "/entity_mention": null,
+              "/product_target": "E00003",
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "inventory.stock_by_warehouse"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.12361700009932974,
+        "response_bytes": 5741,
+        "duration_ms": 4619.094,
+        "attempts": 1
+      },
+      "elapsed_ms": 68639.34964199961,
+      "request_trace": {
+        "schema": "telchi-pre-sql-profile-v1",
+        "clock": "perf_counter_ns",
+        "spans": [
+          {
+            "label": "authorization_initial",
+            "start_ms": 2894.144781,
+            "end_ms": 2894.602477,
+            "duration_ms": 0.457696
+          },
+          {
+            "label": "authorization_transaction_revalidation",
+            "start_ms": 3530.104281,
+            "end_ms": 3536.704376,
+            "duration_ms": 6.600095
+          },
+          {
+            "label": "model_inference_response",
+            "start_ms": 3575.792805,
+            "end_ms": 8155.691526,
+            "duration_ms": 4579.898721
+          },
+          {
+            "label": "interpretation_result_parse",
+            "start_ms": 8156.398112,
+            "end_ms": 8156.485495,
+            "duration_ms": 0.087383
+          },
+          {
+            "label": "conversation_audit_save",
+            "start_ms": 68342.165566,
+            "end_ms": 68652.198449,
+            "duration_ms": 310.032883
+          }
+        ],
+        "total_ms": 68672.29116
+      }
+    }
+  ]
+}

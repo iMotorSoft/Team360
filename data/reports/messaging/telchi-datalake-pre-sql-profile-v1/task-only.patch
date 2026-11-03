@@ -1,0 +1,376 @@
+--- before/modules/messaging/service.py
++++ SrvRestAstroLS_v1/backend/modules/messaging/service.py
+@@ -10,6 +10,7 @@
+ from .domain.messages import InboundMessage
+ from .domain.whatsapp import WhatsAppMessageSenderPort
+ from .repository import MessagingRepository, ChannelBinding
++from .profile_trace import active_trace, span, aspan
+ 
+ 
+ def epoch_ms():
+@@ -39,10 +40,15 @@
+             async with transaction(self.pool) as conn:
+                 await self.repository.delivery(conn, self.binding, event)
+             return 'status'
+-        if event.sender != self.authorized_sender:
+-            return 'unauthorized'
++        with span('messaging_allowlist'):
++            if event.sender != self.authorized_sender:
++                return 'unauthorized'
+         timings = {'t0_ms': t0_ms, 't1_ms': t1_ms}
+-        async with transaction(self.pool) as conn:
++        trace = (active_trace() if self.tenant == 'telchi'
++                 and event.text_body.strip().lower() == 'hola' else None)
++        if trace is not None:
++            timings['pre_sql_profile'] = {'schema': 'telchi-pre-sql-profile-v1', 'spans': trace.events}
++        async with aspan('messaging_claim_conversation_commit'), transaction(self.pool) as conn:
+             claimed = await self.repository.claim(conn, self.binding, event, timings)
+         if not claimed:
+             return 'duplicate'
+@@ -51,33 +57,38 @@
+         audit = None
+         if self.telchi_capability is not None and self.tenant == 'telchi':
+             from .telchi_sql import is_telchi_trigger
+-            if is_telchi_trigger(event.text_body):
++            with span('messaging_trigger_tenant_resolution'):
++                triggered = is_telchi_trigger(event.text_body)
++            if triggered:
+                 audit = {'tenant': self.tenant, 'dev_only': True, 'trigger': 'hola',
+                          'capability': self.telchi_capability.capability,
+                          'query_hash': self.telchi_capability.query_hash, 'status': 'started',
+                          'timings': {'t0_ms': t0_ms, 't1_ms': timings['t2_ms']}}
+                 # Persist execution intent after durable inbound claim and before SQL.
+-                async with transaction(self.pool) as conn:
++                async with aspan('messaging_sql_intent_persistence'), transaction(self.pool) as conn:
+                     await self.repository.record_sql_gate(conn, self.binding, claimed, audit)
+                 audit['capability_started_ms'] = epoch_ms()
+-                reply, result = await self.telchi_capability.execute()
++                async with aspan('messaging_capability_execute_including_format'):
++                    reply, result = await self.telchi_capability.execute()
+                 # Adapter includes formatting. Exact inner SQL timestamps live in result.
+                 audit['timings']['t4_ms'] = epoch_ms()
+                 audit.update(result)
+                 if result.get('result'):
+                     audit['timings']['t2_ms'] = result['result']['sql_started_ms']
+                     audit['timings']['t3_ms'] = result['result']['sql_finished_ms']
+-                async with transaction(self.pool) as conn:
++                async with aspan('messaging_sql_result_persistence'), transaction(self.pool) as conn:
+                     await self.repository.record_sql_gate(conn, self.binding, claimed, audit)
+                 timings['sql_gate'] = audit
+         timings['t3_ms'] = epoch_ms()
+         if reply is None:
+             return 'received'
+-        async with transaction(self.pool) as conn:
++        async with aspan('messaging_outbound_intent_persistence'), transaction(self.pool) as conn:
+             outbound_id = await self.repository.intent(conn, self.binding, claimed, event, reply, timings)
+         # Durable intent precedes I/O. Never retry it on duplicates or restart.
+         def dispatch():
+             timings['t4_ms'] = epoch_ms()
++            if trace is not None:
++                timings['pre_sql_profile']['pre_send_ms'] = (time.perf_counter_ns()-trace.origin)/1e6
+             if audit is not None:
+                 audit['timings']['t5_ms'] = timings['t4_ms']
+             return self.sender.send_text(destination=event.sender, text=reply)
+--- before/modules/messaging/telchi_sql.py
++++ SrvRestAstroLS_v1/backend/modules/messaging/telchi_sql.py
+@@ -2,6 +2,7 @@
+ from __future__ import annotations
+ 
+ from decimal import Decimal
++from .profile_trace import span
+ 
+ ERROR_TEXT = 'No pude consultar los datos de Telchi en este momento.'
+ 
+@@ -36,7 +37,8 @@
+         from modules.telchi.datalake.messaging_sales_query import TelchiQueryError
+         try:
+             result = await self.query(timeout_seconds=self.timeout_seconds)
+-            text = format_sales(result)
++            with span('messaging_formatting'):
++                text = format_sales(result)
+             # Top 10 small canonical result, no raw transport payload or secrets.
+             return text, {'status': 'succeeded', 'result': result}
+         except TelchiQueryError as exc:
+--- before/modules/messaging/telchi_sql_benchmark.py
++++ SrvRestAstroLS_v1/backend/modules/messaging/telchi_sql_benchmark.py
+@@ -42,6 +42,9 @@
+             'timings':timings, 'durations_ms':durations, 'transport_status':row['transport_status'],
+             'result':result, 'response_text':payload['text'],
+             'capability_started_ms':audit['capability_started_ms']})
++        profile = payload.get('timings', {}).get('pre_sql_profile')
++        if profile is not None:
++            samples[-1]['messaging_profile'] = profile
+     samples.sort(key=lambda sample:sample['timings']['t0_ms'])
+     sequential = all(previous['timings']['t7_ms'] <= current['timings']['t0_ms']
+                      for previous,current in zip(samples,samples[1:]))
+--- before/modules/messaging/webhooks/evolution_whatsapp.py
++++ SrvRestAstroLS_v1/backend/modules/messaging/webhooks/evolution_whatsapp.py
+@@ -17,19 +17,21 @@
+ from modules.messaging.repository import MessagingRepository
+ from modules.messaging.service import MessagingService, epoch_ms
+ from modules.messaging.settings import MessagingDevSettings
++from modules.messaging.profile_trace import enabled, span, aspan
+ 
+ 
+ async def build_service(settings, config):
+     repository = MessagingRepository()
+     pool = get_pool()
+-    async with transaction(pool) as conn:
++    async with aspan('messaging_binding_lookup'), transaction(pool) as conn:
+         binding = await repository.binding(conn, workspace_slug=settings.workspace_slug,
+                                            channel_alias=settings.channel_alias,
+                                            provider='evolution', instance=config.instance)
+     capability = None
+     if settings.telchi_tenant == 'telchi':
+         from modules.messaging.telchi_sql import TelchiSqlAdapter
+-        capability = TelchiSqlAdapter()
++        with span('messaging_capability_resolution'):
++            capability = TelchiSqlAdapter()
+     return MessagingService(pool=pool, repository=repository, binding=binding,
+                             sender=EvolutionProvider(config), authorized_sender=settings.authorized_sender,
+                             telchi_capability=capability, tenant=settings.telchi_tenant)
+@@ -41,23 +43,34 @@
+ 
+     @post(status_code=200, request_max_body_size=1_048_576)
+     async def receive(self, request: Request) -> dict[str, object]:
++        if enabled():
++            from modules.telchi.datalake.query_profile import Trace
++            with Trace().activate():
++                return await self._receive(request)
++        return await self._receive(request)
++
++    async def _receive(self, request: Request) -> dict[str, object]:
+         t0 = epoch_ms()
+         received_at = datetime.now(timezone.utc)
+         try:
+-            settings = MessagingDevSettings.from_env()
+-            config = EvolutionConfig.from_env()
++            with span('messaging_config'):
++                settings = MessagingDevSettings.from_env()
++                config = EvolutionConfig.from_env()
+         except (ValueError, EvolutionConfigurationError):
+             raise HTTPException(status_code=503, detail='DEV messaging not configured') from None
+         token = request.headers.get('x-team360-webhook-token', '')
+-        if not hmac.compare_digest(token.encode(), settings.webhook_token.encode()):
+-            raise HTTPException(status_code=401, detail='Invalid webhook credentials')
++        with span('messaging_auth'):
++            if not hmac.compare_digest(token.encode(), settings.webhook_token.encode()):
++                raise HTTPException(status_code=401, detail='Invalid webhook credentials')
+         try:
+-            payload = json.loads(await request.body())
++            async with aspan('messaging_body_decode'):
++                payload = json.loads(await request.body())
+         except (ValueError, UnicodeDecodeError):
+             raise HTTPException(status_code=400, detail='Invalid JSON') from None
+-        events = normalize_events(payload, instance=config.instance,
+-                                  recipient=os.getenv('META_TEAM360_PHONE_NUMBER_ID', '').strip(),
+-                                  received_at=received_at)
++        with span('messaging_normalization'):
++            events = normalize_events(payload, instance=config.instance,
++                                      recipient=os.getenv('META_TEAM360_PHONE_NUMBER_ID', '').strip(),
++                                      received_at=received_at)
+         t1 = epoch_ms()
+         if not events:
+             return {'ok': True, 'results': {'ignored': 1}}
+--- before/modules/telchi/datalake/ducklake.py
++++ SrvRestAstroLS_v1/backend/modules/telchi/datalake/ducklake.py
+@@ -8,6 +8,8 @@
+ from pathlib import Path
+ from statistics import median
+ from typing import Any, Iterator
++
++from .query_profile import measured, span
+ 
+ CATALOG_ALIAS = "telchi"
+ CATALOG_DATABASE = "team360_telchi_ducklake"
+@@ -34,7 +36,7 @@
+ 
+ class DuckLakeConnector:
+     def __init__(self) -> None:
+-        private = _env_file(Path(os.getenv("TEAM360_TELCHI_DUCKLAKE_PRIVATE_CONFIG", str(PRIVATE_CONFIG))))
++        private = measured('private_config_read', _env_file, Path(os.getenv("TEAM360_TELCHI_DUCKLAKE_PRIVATE_CONFIG", str(PRIVATE_CONFIG))))
+         self.host = os.getenv("TELCHI_DUCKLAKE_PG_HOST", private.get("TELCHI_DUCKLAKE_PG_HOST", "localhost"))
+         self.port = int(os.getenv("TELCHI_DUCKLAKE_PG_PORT", private.get("TELCHI_DUCKLAKE_PG_PORT", "5432")))
+         self.database = os.getenv("TELCHI_DUCKLAKE_PG_DATABASE", private.get("TELCHI_DUCKLAKE_PG_DATABASE", CATALOG_DATABASE))
+@@ -48,22 +50,23 @@
+ 
+     @contextlib.contextmanager
+     def session(self, *, read_only: bool = False) -> Iterator[object]:
+-        import duckdb
++        with span('duckdb_import'):
++            import duckdb
+         self.data_path.mkdir(parents=True, exist_ok=True, mode=0o750)
+         previous = os.environ.get("PGPASSWORD")
+         os.environ["PGPASSWORD"] = self.password
+-        connection = duckdb.connect()
++        connection = measured('duckdb_connect', duckdb.connect)
+         try:
+-            connection.execute("LOAD ducklake")
+-            connection.execute("LOAD postgres")
++            measured('load_ducklake', connection.execute, "LOAD ducklake")
++            measured('load_postgres', connection.execute, "LOAD postgres")
+             options = "READ_ONLY" if read_only else "DATA_INLINING_ROW_LIMIT 0"
+-            connection.execute(
++            measured('attachment_open_including_catalog_session', connection.execute,
+                 f"ATTACH 'ducklake:postgres:dbname={self.database} host={self.host} port={self.port} user={self.user}' "
+                 f"AS {CATALOG_ALIAS} (DATA_PATH '{self.data_path.resolve()}', {options})"
+             )
+             yield connection
+         finally:
+-            connection.close()
++            measured('attachment_connection_close', connection.close)
+             if previous is None:
+                 os.environ.pop("PGPASSWORD", None)
+             else:
+--- before/modules/telchi/datalake/foundation_reader.py
++++ SrvRestAstroLS_v1/backend/modules/telchi/datalake/foundation_reader.py
+@@ -20,6 +20,7 @@
+ from typing import Any, Callable, Iterator, Mapping
+ 
+ from .ducklake import DATA_ROOT, DuckLakeConnector
++from .query_profile import measured
+ from .foundation_publication import (
+     COMPONENT_NAMES,
+     CURRENT,
+@@ -243,18 +244,18 @@
+             yield connection
+ 
+         store = FoundationPublicationStore(same_connection, catalog=self.metadata_catalog)
+-        current_count = store.current_count()
++        current_count = measured('foundation_current_count', store.current_count)
+         if current_count != 1:
+             raise FoundationReaderError(
+                 f"CURRENT_PUBLICATION_COUNT={current_count}; expected exactly one"
+             )
+-        foundation = _get_current_foundation_metadata(store)
+-        publication = store.get(foundation.foundation_publication_id)
++        foundation = measured('foundation_current_metadata', _get_current_foundation_metadata, store)
++        publication = measured('foundation_publication_get', store.get, foundation.foundation_publication_id)
+         if publication is None or publication.status != CURRENT:
+             raise FoundationReaderError("CURRENT publication disappeared during resolution")
+-        _validate_manifest(publication, foundation)
+-        snapshot_id = int(self.snapshot_resolver(connection, foundation.foundation_publication_id))
+-        self.component_verifier(connection, publication, snapshot_id)
++        measured('foundation_manifest_validation', _validate_manifest, publication, foundation)
++        snapshot_id = int(measured('foundation_commit_snapshot_resolution', self.snapshot_resolver, connection, foundation.foundation_publication_id))
++        measured('foundation_component_verification', self.component_verifier, connection, publication, snapshot_id)
+         base_snapshot_id = publication.manifest.get("base_snapshot_id")
+         if not isinstance(base_snapshot_id, int):
+             raise FoundationReaderError("foundation manifest base snapshot is missing (fail closed)")
+--- before/modules/telchi/datalake/messaging_sales_query.py
++++ SrvRestAstroLS_v1/backend/modules/telchi/datalake/messaging_sales_query.py
+@@ -11,6 +11,8 @@
+ import json
+ import sys
+ import time
++
++from .query_profile import Trace, enabled, measured, span
+ 
+ CAPABILITY = 'telchi.sales_top_items.source_quantity.20260101_20260915.v1'
+ PERIOD_FROM = '2026-01-01'
+@@ -32,31 +34,38 @@
+ 
+ 
+ def execute_fixed_query(connector=None):
+-    from .ducklake import DuckLakeConnector
+-    from .foundation_reader import FoundationReader
++    with span('capability_imports'):
++        from .ducklake import DuckLakeConnector
++        from .foundation_reader import FoundationReader
+ 
+-    connector = connector or DuckLakeConnector()
++    connector = connector or measured('connector_configuration', DuckLakeConnector)
+     with connector.session(read_only=True) as connection:
+         # Small fixed budget in this task-owned connection, not server settings.
+-        connection.execute("SET threads=2")
+-        connection.execute("SET memory_limit='512MB'")
+-        connection.execute("SET max_temp_directory_size='0B'")
++        with span('query_budget_setup'):
++            connection.execute("SET threads=2")
++            connection.execute("SET memory_limit='512MB'")
++            connection.execute("SET max_temp_directory_size='0B'")
+         # Verify the effective attachment, not merely a requested flag.
+-        attached = connection.execute(
+-            "SELECT readonly FROM duckdb_databases() WHERE database_name='telchi'"
+-        ).fetchone()
++        with span('read_only_verification'):
++            attached = connection.execute(
++                "SELECT readonly FROM duckdb_databases() WHERE database_name='telchi'"
++            ).fetchone()
+         if attached is None or attached[0] is not True:
+             raise TelchiQueryError('datalake_not_read_only')
+-        access = FoundationReader(connector).resolve_on(connection)
+-        sql = SQL_TEMPLATE.format(documents=access.sales('sales_document'), lines=access.sales('sales_line'))
++        access = measured('foundation_resolution', FoundationReader(connector).resolve_on, connection)
++        with span('query_preparation'):
++            sql = SQL_TEMPLATE.format(documents=access.sales('sales_document'), lines=access.sales('sales_line'))
+         t2 = time.time_ns() / 1_000_000
+         started = time.perf_counter()
+-        rows = connection.execute(sql, [PERIOD_FROM, PERIOD_TO_EXCLUSIVE]).fetchall()
++        cursor = measured('duckdb_sql_execute', connection.execute, sql, [PERIOD_FROM, PERIOD_TO_EXCLUSIVE])
++        rows = measured('fetch', cursor.fetchall)
+         elapsed = (time.perf_counter() - started) * 1000
+         t3 = time.time_ns() / 1_000_000
+-        records = [{'item_code': row[0], 'lines': int(row[1]),
+-                    'quantity': str(row[2]), 'line_total': str(row[3])} for row in rows]
+-    result_hash = hashlib.sha256(json.dumps(records, sort_keys=True).encode()).hexdigest()
++        with span('materialization'):
++            records = [{'item_code': row[0], 'lines': int(row[1]),
++                        'quantity': str(row[2]), 'line_total': str(row[3])} for row in rows]
++    with span('result_hash'):
++        result_hash = hashlib.sha256(json.dumps(records, sort_keys=True).encode()).hexdigest()
+     return {'capability': CAPABILITY, 'query_hash': QUERY_HASH,
+             'executed_sql_hash': hashlib.sha256(sql.encode()).hexdigest(),
+             'period_from': PERIOD_FROM, 'period_to_exclusive': PERIOD_TO_EXCLUSIVE,
+@@ -87,9 +96,11 @@
+     uses process-global PGPASSWORD; isolation also prevents concurrent callers
+     racing the existing connector's environment restoration.
+     """
++    profile_start = time.perf_counter_ns()
+     process = await asyncio.create_subprocess_exec(
+         sys.executable, '-m', __name__, stdout=asyncio.subprocess.PIPE,
+         stderr=asyncio.subprocess.DEVNULL)
++    spawn_end = time.perf_counter_ns()
+     try:
+         try:
+             stdout, _ = await asyncio.wait_for(process.communicate(), timeout_seconds)
+@@ -101,7 +112,19 @@
+             envelope = json.loads(stdout)
+             if 'error' in envelope:
+                 raise TelchiQueryError(envelope['error'])
+-            return envelope['result']
++            result = envelope['result']
++            if enabled() and 'profile' in result:
++                end = time.perf_counter_ns()
++                result['profile']['parent'] = {
++                    'spawn_ms': (spawn_end-profile_start)/1e6,
++                    'worker_entry_ms': (envelope['worker_entry_ns']-profile_start)/1e6,
++                    'total_ms': (end-profile_start)/1e6,
++                    'ipc_exit_decode_residual_ms': (end-profile_start)/1e6
++                        - (envelope['worker_entry_ns']-profile_start)/1e6
++                        - result['profile']['total_ms'],
++                    'ipc': 'stdout JSON, communicate waits for exit',
++                    'worker_pid': process.pid}
++            return result
+         except (ValueError, KeyError):
+             raise TelchiQueryError('datalake_invalid_result') from None
+     finally:
+@@ -112,8 +135,16 @@
+ 
+ def _worker():
+     try:
+-        result = execute_fixed_query()
+-        print(json.dumps({'result': result}))
++        entry = time.perf_counter_ns()
++        if enabled():
++            trace = Trace()
++            with trace.activate():
++                result = execute_fixed_query()
++            result['profile'] = trace.export()
++            print(json.dumps({'result': result, 'worker_entry_ns': entry}))
++        else:
++            result = execute_fixed_query()
++            print(json.dumps({'result': result}))
+     except Exception as exc:
+         # Inspect only exception class, never stringify exceptions/DSNs/SQL.
+         import duckdb

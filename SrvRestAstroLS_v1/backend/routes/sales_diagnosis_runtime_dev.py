@@ -39,7 +39,11 @@ import os
 
 from litestar import post
 from litestar.exceptions import HTTPException
-from litestar.status_codes import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
+from litestar.status_codes import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 
 from modules.sales_diagnosis_runtime import (
     AssistantConversationRuntime,
@@ -53,6 +57,7 @@ from modules.sales_diagnosis_runtime.errors import (
     InvalidAssistantRuntimeInputError,
     UnsafeResponseError,
 )
+from modules.security.environment import is_explicit_development_environment
 from modules.automation_diagnosis.assistant_instances import get_assistant_instance_config
 from modules.automation_diagnosis.litellm_client import LiteLLMClient
 from modules.sales_diagnosis_runtime.milvus_provider import (
@@ -451,6 +456,9 @@ def _event_to_dict(event) -> dict:
 
 @post("/api/dev/sales-diagnosis-runtime/turn")
 async def dev_sales_diagnosis_turn(data: DevTurnRequest) -> dict:
+    if not is_explicit_development_environment():
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found")
+
     _validate_codes(data)
 
     runtime = _build_dev_runtime(data.metadata)

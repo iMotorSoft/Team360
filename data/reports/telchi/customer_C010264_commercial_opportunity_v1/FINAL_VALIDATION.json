@@ -1,0 +1,314 @@
+{
+  "status": "PARTIAL",
+  "frequency_sql_reconciliation": "PASS",
+  "global_candidate_order": "PASS",
+  "customer_candidate_order": "PASS",
+  "group_A": "PASS_FOR_PROVISIONAL_UNIVERSE",
+  "group_B": "PASS_FOR_PROVISIONAL_UNIVERSE",
+  "group_C": "PASS_FOR_PROVISIONAL_UNIVERSE",
+  "membership_certification": "NOT_CERTIFIED",
+  "independent_rank_sql": "WITH u AS (SELECT item_code,invoice_documents FROM read_json_auto('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/customer_C010264_commercial_opportunity_v1/GLOBAL_SOLD_PRODUCT_EVIDENCE.json') WHERE coalesce(product_business_type,'UNKNOWN')<>'SERVICE' AND (portfolio_family='LITEL' OR (product_business_type IN ('LAB_FINISHED_PRODUCT','FRACTIONATED_PRODUCT','RAW_MATERIAL','OTHER_INPUT','SEMI_FINISHED') AND business_type_status IN ('VALIDATED','SUPPORTED')))), g AS (SELECT item_code,row_number() OVER(ORDER BY invoice_documents DESC,item_code) AS position FROM u), h AS (SELECT p.item_code,cast(p.invoice_documents AS BIGINT) invoice_documents FROM read_csv_auto('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/customer_C010264_commercial_opportunity_v1/CUSTOMER_PURCHASES_MEMBERSHIP_UNCERTAIN.csv') p JOIN u USING(item_code)), c AS (SELECT item_code,row_number() OVER(ORDER BY invoice_documents DESC,item_code) AS position FROM h) SELECT 'G' kind,item_code,position FROM g WHERE position<=20 UNION ALL SELECT 'C',item_code,position FROM c WHERE position<=20 UNION ALL SELECT 'A',g.item_code,g.position FROM g WHERE g.position<=20 AND NOT EXISTS(SELECT 1 FROM h WHERE h.item_code=g.item_code) UNION ALL SELECT 'B',g.item_code,g.position FROM g WHERE g.position<=20 AND EXISTS(SELECT 1 FROM h WHERE h.item_code=g.item_code) AND NOT EXISTS(SELECT 1 FROM c WHERE c.item_code=g.item_code AND c.position<=20) ORDER BY kind,position",
+  "independent_rank_result": [
+    [
+      "A",
+      "L00503",
+      1
+    ],
+    [
+      "A",
+      "L00505",
+      2
+    ],
+    [
+      "A",
+      "L03722",
+      7
+    ],
+    [
+      "A",
+      "L01013",
+      8
+    ],
+    [
+      "A",
+      "L03409",
+      10
+    ],
+    [
+      "B",
+      "L03612",
+      3
+    ],
+    [
+      "B",
+      "L02837",
+      15
+    ],
+    [
+      "B",
+      "L03402",
+      17
+    ],
+    [
+      "B",
+      "L02822",
+      18
+    ],
+    [
+      "B",
+      "L03024",
+      19
+    ],
+    [
+      "B",
+      "L01041",
+      20
+    ],
+    [
+      "C",
+      "L01052",
+      1
+    ],
+    [
+      "C",
+      "L01601",
+      2
+    ],
+    [
+      "C",
+      "L01613",
+      3
+    ],
+    [
+      "C",
+      "L01730",
+      4
+    ],
+    [
+      "C",
+      "L03281",
+      5
+    ],
+    [
+      "C",
+      "L00060",
+      6
+    ],
+    [
+      "C",
+      "L01072",
+      7
+    ],
+    [
+      "C",
+      "L01083",
+      8
+    ],
+    [
+      "C",
+      "L01106",
+      9
+    ],
+    [
+      "C",
+      "L01114",
+      10
+    ],
+    [
+      "C",
+      "L01600",
+      11
+    ],
+    [
+      "C",
+      "L01643",
+      12
+    ],
+    [
+      "C",
+      "L01651",
+      13
+    ],
+    [
+      "C",
+      "L01728",
+      14
+    ],
+    [
+      "C",
+      "L01757",
+      15
+    ],
+    [
+      "C",
+      "L02006",
+      16
+    ],
+    [
+      "C",
+      "L02944",
+      17
+    ],
+    [
+      "C",
+      "L03422",
+      18
+    ],
+    [
+      "C",
+      "L00056",
+      19
+    ],
+    [
+      "C",
+      "L01001",
+      20
+    ],
+    [
+      "G",
+      "L00503",
+      1
+    ],
+    [
+      "G",
+      "L00505",
+      2
+    ],
+    [
+      "G",
+      "L03612",
+      3
+    ],
+    [
+      "G",
+      "L03281",
+      4
+    ],
+    [
+      "G",
+      "L01757",
+      5
+    ],
+    [
+      "G",
+      "L03422",
+      6
+    ],
+    [
+      "G",
+      "L03722",
+      7
+    ],
+    [
+      "G",
+      "L01013",
+      8
+    ],
+    [
+      "G",
+      "L01613",
+      9
+    ],
+    [
+      "G",
+      "L03409",
+      10
+    ],
+    [
+      "G",
+      "L01001",
+      11
+    ],
+    [
+      "G",
+      "L00056",
+      12
+    ],
+    [
+      "G",
+      "L01114",
+      13
+    ],
+    [
+      "G",
+      "L01106",
+      14
+    ],
+    [
+      "G",
+      "L02837",
+      15
+    ],
+    [
+      "G",
+      "L01643",
+      16
+    ],
+    [
+      "G",
+      "L03402",
+      17
+    ],
+    [
+      "G",
+      "L02822",
+      18
+    ],
+    [
+      "G",
+      "L03024",
+      19
+    ],
+    [
+      "G",
+      "L01041",
+      20
+    ]
+  ],
+  "independent_complement_sql": "WITH u AS (SELECT item_code,invoice_documents FROM read_json_auto('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/customer_C010264_commercial_opportunity_v1/GLOBAL_SOLD_PRODUCT_EVIDENCE.json') WHERE coalesce(product_business_type,'UNKNOWN')<>'SERVICE' AND (portfolio_family='LITEL' OR (product_business_type IN ('LAB_FINISHED_PRODUCT','FRACTIONATED_PRODUCT','RAW_MATERIAL','OTHER_INPUT','SEMI_FINISHED') AND business_type_status IN ('VALIDATED','SUPPORTED')))), g AS (SELECT item_code,row_number() OVER(ORDER BY invoice_documents DESC,item_code) AS position FROM u) SELECT item_code FROM g WHERE position>20 AND NOT EXISTS(SELECT 1 FROM read_csv_auto('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/customer_C010264_commercial_opportunity_v1/CUSTOMER_PURCHASES_MEMBERSHIP_UNCERTAIN.csv') p WHERE p.item_code=g.item_code) ORDER BY position LIMIT 10",
+  "independent_complement_result": [
+    "L01047",
+    "L01048",
+    "L03658",
+    "L01639",
+    "L01685",
+    "L01660",
+    "L02927",
+    "L00003",
+    "L02922",
+    "L01056"
+  ],
+  "counts": {
+    "global_sold": 6581,
+    "candidate_universe": 915,
+    "customer_H": 98,
+    "G": 20,
+    "C": 20,
+    "A": 5,
+    "B": 6,
+    "C_opportunities": 10
+  },
+  "frontier": {
+    "candidate_cutoff": 4186,
+    "candidate_position21_frequency": 4081,
+    "outside_candidate_max_frequency": 2006,
+    "outside_can_displace_if_current20_accepted": false,
+    "all_top20_membership_unconfirmed": true,
+    "customer_cutoff": 13,
+    "customer_position21_frequency": 13,
+    "review_shortlist": 36
+  },
+  "baseline_preserved": {
+    "CUSTOMER_MONTHLY.csv": true,
+    "CUSTOMER_PROFILE.csv": true,
+    "DIRECTORIO_RESUMEN.md": true,
+    "SQL_EVIDENCE.json": true,
+    "GATES.md": true,
+    "SQL_VALIDATION.md": true,
+    "BUSINESS_SEMANTICS_CANDIDATE.md": true,
+    "CUSTOMER_PURCHASES_MEMBERSHIP_UNCERTAIN.csv": true,
+    "CUSTOMER_CREDIT_PRODUCTS.csv": true,
+    "FOUNDATION_BINDING.json": true,
+    "CUSTOMER_INVOICE_LINES.csv": true
+  }
+}

@@ -1,0 +1,2244 @@
+{
+  "method": "Separate raw rows, Python Decimal and independent classification/customer lookup; no investigative SUM or classification/customer join reused",
+  "sql": [
+    {
+      "sql": "SELECT \"ItemCode\",is_raw_material,material_class,material_name FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/material_supply_status/full/material-supply-final-1790303719477148466_material_supply_status_full/part-00000.parquet'], union_by_name=true)",
+      "parameters": []
+    },
+    {
+      "sql": "WITH active AS (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA'\n            AND source_table='OINV' AND canceled='N' AND doc_date>='2026-01-01' AND doc_date<'2027-01-01'),\n            unclassified AS (SELECT l.currency,count(*) AS n,sum(TRY_CAST(l.line_total AS DECIMAL(38,6))) AS amount\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND NOT EXISTS (SELECT 1 FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/material_supply_status/full/material-supply-final-1790303719477148466_material_supply_status_full/part-00000.parquet'], union_by_name=true) m WHERE m.\"ItemCode\"=l.item_code)\n                AND EXISTS (SELECT 1 FROM active d WHERE d.doc_entry=l.doc_entry) GROUP BY l.currency)\n            SELECT min(doc_date),max(doc_date),min(source_as_of),max(source_as_of),\n            (SELECT count(*) FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet') WHERE source_system='SAP_HANA'),\n            (SELECT count(*)-count(DISTINCT code) FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet') WHERE source_system='SAP_HANA'),\n            (SELECT to_json(list(struct_pack(currency:=currency,lines:=n,amount:=amount))) FROM unclassified),\n            to_json(list(DISTINCT strftime(TRY_CAST(doc_date AS DATE),'%Y-%m'))),\n            count(*)-count(DISTINCT doc_entry) FROM active",
+      "parameters": []
+    },
+    {
+      "sql": "SELECT l.doc_entry,l.line_num,l.item_code,l.currency,l.line_total,\n                l.raw_extraction_id,l.source_as_of,d.card_code,d.currency AS document_currency,\n                CAST(TRY_CAST(d.doc_date AS DATE) AS VARCHAR),d.raw_extraction_id AS document_extraction\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND d.canceled='N'\n                AND d.doc_date>=? AND d.doc_date<?\n                AND l.item_code IN (SELECT item_code FROM verify_raw_items)",
+      "parameters": [
+        "2026-01-01",
+        "2026-02-01"
+      ]
+    },
+    {
+      "sql": "SELECT l.doc_entry,l.line_num,l.item_code,l.currency,l.line_total,\n                l.raw_extraction_id,l.source_as_of,d.card_code,d.currency AS document_currency,\n                CAST(TRY_CAST(d.doc_date AS DATE) AS VARCHAR),d.raw_extraction_id AS document_extraction\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND d.canceled='N'\n                AND d.doc_date>=? AND d.doc_date<?\n                AND l.item_code IN (SELECT item_code FROM verify_raw_items)",
+      "parameters": [
+        "2026-02-01",
+        "2026-03-01"
+      ]
+    },
+    {
+      "sql": "SELECT l.doc_entry,l.line_num,l.item_code,l.currency,l.line_total,\n                l.raw_extraction_id,l.source_as_of,d.card_code,d.currency AS document_currency,\n                CAST(TRY_CAST(d.doc_date AS DATE) AS VARCHAR),d.raw_extraction_id AS document_extraction\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND d.canceled='N'\n                AND d.doc_date>=? AND d.doc_date<?\n                AND l.item_code IN (SELECT item_code FROM verify_raw_items)",
+      "parameters": [
+        "2026-03-01",
+        "2026-04-01"
+      ]
+    },
+    {
+      "sql": "SELECT l.doc_entry,l.line_num,l.item_code,l.currency,l.line_total,\n                l.raw_extraction_id,l.source_as_of,d.card_code,d.currency AS document_currency,\n                CAST(TRY_CAST(d.doc_date AS DATE) AS VARCHAR),d.raw_extraction_id AS document_extraction\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND d.canceled='N'\n                AND d.doc_date>=? AND d.doc_date<?\n                AND l.item_code IN (SELECT item_code FROM verify_raw_items)",
+      "parameters": [
+        "2026-04-01",
+        "2026-05-01"
+      ]
+    },
+    {
+      "sql": "SELECT l.doc_entry,l.line_num,l.item_code,l.currency,l.line_total,\n                l.raw_extraction_id,l.source_as_of,d.card_code,d.currency AS document_currency,\n                CAST(TRY_CAST(d.doc_date AS DATE) AS VARCHAR),d.raw_extraction_id AS document_extraction\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND d.canceled='N'\n                AND d.doc_date>=? AND d.doc_date<?\n                AND l.item_code IN (SELECT item_code FROM verify_raw_items)",
+      "parameters": [
+        "2026-05-01",
+        "2026-06-01"
+      ]
+    },
+    {
+      "sql": "SELECT l.doc_entry,l.line_num,l.item_code,l.currency,l.line_total,\n                l.raw_extraction_id,l.source_as_of,d.card_code,d.currency AS document_currency,\n                CAST(TRY_CAST(d.doc_date AS DATE) AS VARCHAR),d.raw_extraction_id AS document_extraction\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND d.canceled='N'\n                AND d.doc_date>=? AND d.doc_date<?\n                AND l.item_code IN (SELECT item_code FROM verify_raw_items)",
+      "parameters": [
+        "2026-06-01",
+        "2026-07-01"
+      ]
+    },
+    {
+      "sql": "SELECT l.doc_entry,l.line_num,l.item_code,l.currency,l.line_total,\n                l.raw_extraction_id,l.source_as_of,d.card_code,d.currency AS document_currency,\n                CAST(TRY_CAST(d.doc_date AS DATE) AS VARCHAR),d.raw_extraction_id AS document_extraction\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND d.canceled='N'\n                AND d.doc_date>=? AND d.doc_date<?\n                AND l.item_code IN (SELECT item_code FROM verify_raw_items)",
+      "parameters": [
+        "2026-07-01",
+        "2026-08-01"
+      ]
+    },
+    {
+      "sql": "SELECT l.doc_entry,l.line_num,l.item_code,l.currency,l.line_total,\n                l.raw_extraction_id,l.source_as_of,d.card_code,d.currency AS document_currency,\n                CAST(TRY_CAST(d.doc_date AS DATE) AS VARCHAR),d.raw_extraction_id AS document_extraction\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND d.canceled='N'\n                AND d.doc_date>=? AND d.doc_date<?\n                AND l.item_code IN (SELECT item_code FROM verify_raw_items)",
+      "parameters": [
+        "2026-08-01",
+        "2026-09-01"
+      ]
+    },
+    {
+      "sql": "SELECT l.doc_entry,l.line_num,l.item_code,l.currency,l.line_total,\n                l.raw_extraction_id,l.source_as_of,d.card_code,d.currency AS document_currency,\n                CAST(TRY_CAST(d.doc_date AS DATE) AS VARCHAR),d.raw_extraction_id AS document_extraction\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.source_table='INV1'\n                AND d.source_system='SAP_B1_HANA' AND d.source_table='OINV' AND d.canceled='N'\n                AND d.doc_date>=? AND d.doc_date<?\n                AND l.item_code IN (SELECT item_code FROM verify_raw_items)",
+      "parameters": [
+        "2026-09-01",
+        "2026-10-01"
+      ]
+    },
+    {
+      "sql": "SELECT code,name FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet') WHERE source_system='SAP_HANA' AND code IN (SELECT code FROM verify_customer_keys)",
+      "parameters": []
+    }
+  ],
+  "months": [
+    {
+      "month": "2026-01",
+      "amount_bs": "905746.26",
+      "bs_lines": 2357,
+      "bs_documents": 2062,
+      "all_currency_lines": 2357,
+      "excluded_currency_amounts": {},
+      "date_min": "2026-01-01",
+      "date_max": "2026-01-31",
+      "customer_sum_bs": "905746.26",
+      "sku_sum_bs": "905746.26"
+    },
+    {
+      "month": "2026-02",
+      "amount_bs": "736534.55",
+      "bs_lines": 2064,
+      "bs_documents": 1715,
+      "all_currency_lines": 2064,
+      "excluded_currency_amounts": {},
+      "date_min": "2026-02-01",
+      "date_max": "2026-02-28",
+      "customer_sum_bs": "736534.55",
+      "sku_sum_bs": "736534.55"
+    },
+    {
+      "month": "2026-03",
+      "amount_bs": "878435.96",
+      "bs_lines": 2535,
+      "bs_documents": 2168,
+      "all_currency_lines": 2535,
+      "excluded_currency_amounts": {},
+      "date_min": "2026-03-01",
+      "date_max": "2026-03-31",
+      "customer_sum_bs": "878435.96",
+      "sku_sum_bs": "878435.96"
+    },
+    {
+      "month": "2026-04",
+      "amount_bs": "802489.30",
+      "bs_lines": 2389,
+      "bs_documents": 2001,
+      "all_currency_lines": 2389,
+      "excluded_currency_amounts": {},
+      "date_min": "2026-04-01",
+      "date_max": "2026-04-30",
+      "customer_sum_bs": "802489.30",
+      "sku_sum_bs": "802489.30"
+    },
+    {
+      "month": "2026-05",
+      "amount_bs": "659880.78",
+      "bs_lines": 3239,
+      "bs_documents": 2939,
+      "all_currency_lines": 3239,
+      "excluded_currency_amounts": {},
+      "date_min": "2026-05-01",
+      "date_max": "2026-05-31",
+      "customer_sum_bs": "659880.78",
+      "sku_sum_bs": "659880.78"
+    },
+    {
+      "month": "2026-06",
+      "amount_bs": "1038334.36",
+      "bs_lines": 2018,
+      "bs_documents": 1766,
+      "all_currency_lines": 2018,
+      "excluded_currency_amounts": {},
+      "date_min": "2026-06-01",
+      "date_max": "2026-06-30",
+      "customer_sum_bs": "1038334.36",
+      "sku_sum_bs": "1038334.36"
+    },
+    {
+      "month": "2026-07",
+      "amount_bs": "830996.12",
+      "bs_lines": 2310,
+      "bs_documents": 1952,
+      "all_currency_lines": 2310,
+      "excluded_currency_amounts": {},
+      "date_min": "2026-07-01",
+      "date_max": "2026-07-31",
+      "customer_sum_bs": "830996.12",
+      "sku_sum_bs": "830996.12"
+    },
+    {
+      "month": "2026-08",
+      "amount_bs": "933133.62",
+      "bs_lines": 2070,
+      "bs_documents": 1766,
+      "all_currency_lines": 2071,
+      "excluded_currency_amounts": {
+        "USD": "698.25"
+      },
+      "date_min": "2026-08-01",
+      "date_max": "2026-08-31",
+      "customer_sum_bs": "933133.62",
+      "sku_sum_bs": "933133.62"
+    },
+    {
+      "month": "2026-09",
+      "amount_bs": "922182.18",
+      "bs_lines": 2032,
+      "bs_documents": 1745,
+      "all_currency_lines": 2032,
+      "excluded_currency_amounts": {},
+      "date_min": "2026-09-01",
+      "date_max": "2026-09-24",
+      "customer_sum_bs": "922182.18",
+      "sku_sum_bs": "922182.18"
+    }
+  ],
+  "checks": {
+    "unique_raw_line_keys": 21015,
+    "duplicate_line_keys": 0,
+    "header_and_customer_duplicates": 0,
+    "classification_conflicts": 0,
+    "classification_flag_class_agree": true,
+    "independent_customer_and_sku_sums_reconcile": true,
+    "no_physical_quantities_summed": true,
+    "queries": 12
+  },
+  "limitations": [],
+  "binding": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 1449.567,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "classification": {
+    "rows": 1188,
+    "unique_items": 1188,
+    "raw_material_items": 1040,
+    "duplicate_item_rows": 0,
+    "codes": [
+      "E00004",
+      "E00005",
+      "E00006",
+      "E00009",
+      "E00010",
+      "E00012",
+      "E00013",
+      "E00014",
+      "E00015",
+      "E00016",
+      "E00021",
+      "E00022",
+      "E00026",
+      "L00002",
+      "L00003",
+      "L00005",
+      "L00006",
+      "L00007",
+      "L00008",
+      "L00010",
+      "L00011",
+      "L00012",
+      "L00013",
+      "L00015",
+      "L00016",
+      "L00017",
+      "L00018",
+      "L00023",
+      "L00025",
+      "L00028",
+      "L00030",
+      "L00031",
+      "L00033",
+      "L00034",
+      "L00035",
+      "L00039",
+      "L00043",
+      "L00044",
+      "L00046",
+      "L00048",
+      "L00051",
+      "L00052",
+      "L00053",
+      "L00054",
+      "L00055",
+      "L00078",
+      "L00079",
+      "L00080",
+      "L00083",
+      "L00085",
+      "L00087",
+      "L00088",
+      "L00089",
+      "L00090",
+      "L00092",
+      "L00093",
+      "L00094",
+      "L00095",
+      "L00097",
+      "L00098",
+      "L00099",
+      "L00100",
+      "L00101",
+      "L00102",
+      "L00103",
+      "L00104",
+      "L00105",
+      "L00106",
+      "L00109",
+      "L00110",
+      "L00111",
+      "L00112",
+      "L00113",
+      "L00115",
+      "L00116",
+      "L00117",
+      "L00118",
+      "L00119",
+      "L00120",
+      "L00122",
+      "L00123",
+      "L00124",
+      "L00125",
+      "L00127",
+      "L00128",
+      "L00129",
+      "L00130",
+      "L00131",
+      "L00132",
+      "L00138",
+      "L00139",
+      "L00141",
+      "L00143",
+      "L00144",
+      "L00145",
+      "L00146",
+      "L00147",
+      "L00148",
+      "L00149",
+      "L00151",
+      "L00153",
+      "L00154",
+      "L00155",
+      "L00156",
+      "L00157",
+      "L00158",
+      "L00159",
+      "L00160",
+      "L00161",
+      "L00162",
+      "L00165",
+      "L00167",
+      "L00168",
+      "L00169",
+      "L00170",
+      "L00172",
+      "L00173",
+      "L00174",
+      "L00175",
+      "L00176",
+      "L00180",
+      "L00181",
+      "L00182",
+      "L00183",
+      "L00184",
+      "L00186",
+      "L00187",
+      "L00188",
+      "L00189",
+      "L00190",
+      "L00191",
+      "L00192",
+      "L00194",
+      "L00195",
+      "L00197",
+      "L00198",
+      "L00200",
+      "L00201",
+      "L00203",
+      "L00204",
+      "L00206",
+      "L00207",
+      "L00208",
+      "L00209",
+      "L00210",
+      "L00211",
+      "L00212",
+      "L00213",
+      "L00216",
+      "L00218",
+      "L00219",
+      "L00221",
+      "L00222",
+      "L00224",
+      "L00226",
+      "L00227",
+      "L00228",
+      "L00229",
+      "L00230",
+      "L00231",
+      "L00233",
+      "L00234",
+      "L00236",
+      "L00238",
+      "L00239",
+      "L00240",
+      "L00241",
+      "L00242",
+      "L00244",
+      "L00247",
+      "L00251",
+      "L00252",
+      "L00391",
+      "L00392",
+      "L00398",
+      "L00399",
+      "L00437",
+      "L00488",
+      "L00489",
+      "L00490",
+      "L00491",
+      "L00492",
+      "L00493",
+      "L00494",
+      "L00496",
+      "L00497",
+      "L00498",
+      "L00499",
+      "L00500",
+      "L00509",
+      "L00510",
+      "L00524",
+      "L00525",
+      "L00526",
+      "L00527",
+      "L00534",
+      "L00538",
+      "L00539",
+      "L00540",
+      "L00541",
+      "L00542",
+      "L00543",
+      "L00544",
+      "L00545",
+      "L00546",
+      "L00547",
+      "L00549",
+      "L00550",
+      "L00552",
+      "L00553",
+      "L00554",
+      "L00555",
+      "L00557",
+      "L00558",
+      "L00560",
+      "L00561",
+      "L00562",
+      "L00565",
+      "L00566",
+      "L00567",
+      "L00578",
+      "L00580",
+      "L00581",
+      "L00582",
+      "L00583",
+      "L00584",
+      "L00585",
+      "L00586",
+      "L00587",
+      "L00588",
+      "L00589",
+      "L00592",
+      "L00593",
+      "L00594",
+      "L00595",
+      "L00596",
+      "L00597",
+      "L00598",
+      "L00599",
+      "L00600",
+      "L00601",
+      "L00602",
+      "L00603",
+      "L00604",
+      "L00605",
+      "L00606",
+      "L00607",
+      "L00608",
+      "L00609",
+      "L00610",
+      "L00611",
+      "L00612",
+      "L00613",
+      "L00614",
+      "L00615",
+      "L00616",
+      "L00617",
+      "L00618",
+      "L00619",
+      "L00620",
+      "L00621",
+      "L00622",
+      "L00623",
+      "L00624",
+      "L00625",
+      "L00626",
+      "L00627",
+      "L00628",
+      "L00629",
+      "L00630",
+      "L00631",
+      "L00634",
+      "L00635",
+      "L00636",
+      "L00637",
+      "L00638",
+      "L00639",
+      "L00640",
+      "L00641",
+      "L00642",
+      "L00644",
+      "L00645",
+      "L00646",
+      "L00647",
+      "L00648",
+      "L00649",
+      "L00650",
+      "L00651",
+      "L00653",
+      "L00654",
+      "L00655",
+      "L00656",
+      "L00657",
+      "L00658",
+      "L00659",
+      "L00660",
+      "L00661",
+      "L00662",
+      "L00663",
+      "L00664",
+      "L00665",
+      "L00666",
+      "L00667",
+      "L00668",
+      "L00669",
+      "L00670",
+      "L00671",
+      "L00672",
+      "L00673",
+      "L00674",
+      "L00675",
+      "L00676",
+      "L00677",
+      "L00678",
+      "L00679",
+      "L00680",
+      "L00681",
+      "L00682",
+      "L00683",
+      "L00684",
+      "L00685",
+      "L00686",
+      "L00687",
+      "L00688",
+      "L00689",
+      "L00690",
+      "L00691",
+      "L00692",
+      "L00693",
+      "L00694",
+      "L00695",
+      "L00696",
+      "L00697",
+      "L00698",
+      "L00699",
+      "L00700",
+      "L00701",
+      "L00702",
+      "L00703",
+      "L00704",
+      "L00705",
+      "L00706",
+      "L00708",
+      "L00709",
+      "L00710",
+      "L00712",
+      "L00714",
+      "L00715",
+      "L00716",
+      "L00717",
+      "L00718",
+      "L00719",
+      "L00720",
+      "L00721",
+      "L00722",
+      "L00723",
+      "L00724",
+      "L00725",
+      "L00726",
+      "L00728",
+      "L00729",
+      "L00731",
+      "L00733",
+      "L00735",
+      "L00736",
+      "L00737",
+      "L00738",
+      "L00739",
+      "L00740",
+      "L00742",
+      "L00745",
+      "L00746",
+      "L00747",
+      "L00748",
+      "L00749",
+      "L00755",
+      "L00757",
+      "L00758",
+      "L00759",
+      "L00760",
+      "L00761",
+      "L00762",
+      "L00763",
+      "L00764",
+      "L00767",
+      "L00769",
+      "L00774",
+      "L00775",
+      "L00795",
+      "L00796",
+      "L00798",
+      "L00801",
+      "L00802",
+      "L00803",
+      "L00804",
+      "L00805",
+      "L00808",
+      "L00809",
+      "L00810",
+      "L00815",
+      "L00817",
+      "L00818",
+      "L00821",
+      "L00822",
+      "L00823",
+      "L00824",
+      "L00825",
+      "L00826",
+      "L00827",
+      "L00828",
+      "L00829",
+      "L00830",
+      "L00831",
+      "L00832",
+      "L00833",
+      "L00834",
+      "L00835",
+      "L00836",
+      "L00838",
+      "L00839",
+      "L00841",
+      "L00842",
+      "L00843",
+      "L00844",
+      "L00846",
+      "L00847",
+      "L00848",
+      "L00849",
+      "L00850",
+      "L00851",
+      "L00852",
+      "L00853",
+      "L00854",
+      "L00855",
+      "L00856",
+      "L00859",
+      "L00860",
+      "L00861",
+      "L00862",
+      "L00866",
+      "L00881",
+      "L00882",
+      "L00890",
+      "L00896",
+      "L00899",
+      "L00900",
+      "L00901",
+      "L00902",
+      "L00903",
+      "L00904",
+      "L00905",
+      "L00906",
+      "L00907",
+      "L00908",
+      "L00913",
+      "L00915",
+      "L00916",
+      "L00919",
+      "L00920",
+      "L00921",
+      "L00922",
+      "L00923",
+      "L00924",
+      "L00925",
+      "L00926",
+      "L00927",
+      "L00928",
+      "L00933",
+      "L00934",
+      "L00935",
+      "L00936",
+      "L00937",
+      "L00938",
+      "L00939",
+      "L00944",
+      "L00945",
+      "L00947",
+      "L00948",
+      "L00949",
+      "L00950",
+      "L00951",
+      "L00953",
+      "L00954",
+      "L00956",
+      "L00959",
+      "L00960",
+      "L00961",
+      "L00962",
+      "L00965",
+      "L00966",
+      "L00967",
+      "L00968",
+      "L00969",
+      "L00970",
+      "L00971",
+      "L00972",
+      "L00973",
+      "L00975",
+      "L00977",
+      "L00978",
+      "L00979",
+      "L00980",
+      "L00981",
+      "L00987",
+      "L00990",
+      "L00992",
+      "L00993",
+      "L00994",
+      "L00995",
+      "L01008",
+      "L01010",
+      "L01014",
+      "L01024",
+      "L01035",
+      "L01043",
+      "L01053",
+      "L01061",
+      "L01089",
+      "L01090",
+      "L01091",
+      "L01092",
+      "L01094",
+      "L01107",
+      "L01108",
+      "L01109",
+      "L01110",
+      "L01113",
+      "L01116",
+      "L01119",
+      "L01120",
+      "L01128",
+      "L01133",
+      "L01134",
+      "L01137",
+      "L01138",
+      "L01150",
+      "L01176",
+      "L01177",
+      "L01184",
+      "L01216",
+      "L01217",
+      "L01218",
+      "L01219",
+      "L01220",
+      "L01221",
+      "L01222",
+      "L01223",
+      "L01224",
+      "L01225",
+      "L01226",
+      "L01227",
+      "L01228",
+      "L01229",
+      "L01230",
+      "L01231",
+      "L01232",
+      "L01233",
+      "L01234",
+      "L01235",
+      "L01236",
+      "L01237",
+      "L01238",
+      "L01239",
+      "L01241",
+      "L01253",
+      "L01255",
+      "L01269",
+      "L01270",
+      "L01281",
+      "L01287",
+      "L01296",
+      "L01299",
+      "L01301",
+      "L01302",
+      "L01304",
+      "L01310",
+      "L01327",
+      "L01333",
+      "L01355",
+      "L01365",
+      "L01368",
+      "L01410",
+      "L01412",
+      "L01417",
+      "L01428",
+      "L01438",
+      "L01439",
+      "L01488",
+      "L01489",
+      "L01491",
+      "L01492",
+      "L01497",
+      "L01498",
+      "L01499",
+      "L01501",
+      "L01502",
+      "L01504",
+      "L01505",
+      "L01506",
+      "L01508",
+      "L01509",
+      "L01511",
+      "L01524",
+      "L01530",
+      "L01536",
+      "L01538",
+      "L01544",
+      "L01571",
+      "L01572",
+      "L01583",
+      "L01676",
+      "L01745",
+      "L01750",
+      "L01752",
+      "L01753",
+      "L01763",
+      "L01764",
+      "L01766",
+      "L01767",
+      "L01768",
+      "L01770",
+      "L01771",
+      "L01772",
+      "L01773",
+      "L01774",
+      "L01775",
+      "L01776",
+      "L01777",
+      "L01778",
+      "L01779",
+      "L01780",
+      "L01781",
+      "L01782",
+      "L01783",
+      "L01784",
+      "L01785",
+      "L01787",
+      "L01788",
+      "L01791",
+      "L01793",
+      "L01794",
+      "L01796",
+      "L01797",
+      "L01799",
+      "L01800",
+      "L01802",
+      "L01805",
+      "L01807",
+      "L01810",
+      "L01811",
+      "L01816",
+      "L01817",
+      "L01821",
+      "L01824",
+      "L01825",
+      "L01828",
+      "L01829",
+      "L01830",
+      "L01831",
+      "L01832",
+      "L01833",
+      "L01834",
+      "L01837",
+      "L01838",
+      "L01839",
+      "L01850",
+      "L01860",
+      "L01861",
+      "L01872",
+      "L01873",
+      "L01874",
+      "L01876",
+      "L01878",
+      "L01879",
+      "L01883",
+      "L01884",
+      "L01897",
+      "L01898",
+      "L01900",
+      "L01907",
+      "L01917",
+      "L01929",
+      "L01931",
+      "L01942",
+      "L01957",
+      "L01958",
+      "L01959",
+      "L01960",
+      "L01978",
+      "L01983",
+      "L01984",
+      "L01988",
+      "L01995",
+      "L01996",
+      "L02000",
+      "L02010",
+      "L02026",
+      "L02036",
+      "L02054",
+      "L02066",
+      "L02067",
+      "L02068",
+      "L02069",
+      "L02070",
+      "L02102",
+      "L02103",
+      "L02104",
+      "L02106",
+      "L02113",
+      "L02122",
+      "L02123",
+      "L02125",
+      "L02157",
+      "L02227",
+      "L02238",
+      "L02266",
+      "L02345",
+      "L02346",
+      "L02412",
+      "L02417",
+      "L02443",
+      "L02467",
+      "L02475",
+      "L02502",
+      "L02538",
+      "L02599",
+      "L02634",
+      "L02818",
+      "L02821",
+      "L02828",
+      "L02833",
+      "L02836",
+      "L02863",
+      "L02865",
+      "L02867",
+      "L02868",
+      "L02869",
+      "L02870",
+      "L02872",
+      "L02890",
+      "L02893",
+      "L02894",
+      "L02899",
+      "L02900",
+      "L02904",
+      "L02908",
+      "L02910",
+      "L02911",
+      "L02912",
+      "L02919",
+      "L02921",
+      "L02931",
+      "L02934",
+      "L02935",
+      "L02943",
+      "L02948",
+      "L02949",
+      "L02952",
+      "L02955",
+      "L02969",
+      "L02970",
+      "L02977",
+      "L02990",
+      "L02991",
+      "L02992",
+      "L03000",
+      "L03002",
+      "L03013",
+      "L03014",
+      "L03019",
+      "L03025",
+      "L03026",
+      "L03031",
+      "L03032",
+      "L03033",
+      "L03034",
+      "L03036",
+      "L03037",
+      "L03069",
+      "L03071",
+      "L03074",
+      "L03079",
+      "L03080",
+      "L03081",
+      "L03082",
+      "L03083",
+      "L03090",
+      "L03091",
+      "L03092",
+      "L03103",
+      "L03118",
+      "L03119",
+      "L03120",
+      "L03121",
+      "L03151",
+      "L03153",
+      "L03154",
+      "L03157",
+      "L03158",
+      "L03159",
+      "L03160",
+      "L03161",
+      "L03166",
+      "L03167",
+      "L03180",
+      "L03181",
+      "L03186",
+      "L03187",
+      "L03188",
+      "L03189",
+      "L03190",
+      "L03191",
+      "L03192",
+      "L03195",
+      "L03197",
+      "L03198",
+      "L03203",
+      "L03204",
+      "L03205",
+      "L03219",
+      "L03240",
+      "L03252",
+      "L03253",
+      "L03254",
+      "L03263",
+      "L03264",
+      "L03265",
+      "L03266",
+      "L03275",
+      "L03276",
+      "L03277",
+      "L03278",
+      "L03279",
+      "L03280",
+      "L03285",
+      "L03286",
+      "L03287",
+      "L03298",
+      "L03303",
+      "L03304",
+      "L03309",
+      "L03311",
+      "L03312",
+      "L03313",
+      "L03315",
+      "L03316",
+      "L03317",
+      "L03318",
+      "L03319",
+      "L03324",
+      "L03328",
+      "L03332",
+      "L03335",
+      "L03337",
+      "L03338",
+      "L03339",
+      "L03340",
+      "L03341",
+      "L03346",
+      "L03349",
+      "L03350",
+      "L03357",
+      "L03358",
+      "L03360",
+      "L03361",
+      "L03363",
+      "L03366",
+      "L03374",
+      "L03375",
+      "L03376",
+      "L03377",
+      "L03378",
+      "L03379",
+      "L03383",
+      "L03395",
+      "L03398",
+      "L03403",
+      "L03406",
+      "L03407",
+      "L03408",
+      "L03417",
+      "L03418",
+      "L03421",
+      "L03423",
+      "L03424",
+      "L03425",
+      "L03427",
+      "L03428",
+      "L03429",
+      "L03430",
+      "L03442",
+      "L03444",
+      "L03454",
+      "L03455",
+      "L03471",
+      "L03474",
+      "L03475",
+      "L03478",
+      "L03479",
+      "L03480",
+      "L03481",
+      "L03482",
+      "L03483",
+      "L03484",
+      "L03485",
+      "L03489",
+      "L03490",
+      "L03493",
+      "L03494",
+      "L03495",
+      "L03528",
+      "L03529",
+      "L03530",
+      "L03531",
+      "L03532",
+      "L03533",
+      "L03534",
+      "L03535",
+      "L03536",
+      "L03537",
+      "L03547",
+      "L03549",
+      "L03552",
+      "L03553",
+      "L03559",
+      "L03562",
+      "L03563",
+      "L03564",
+      "L03565",
+      "L03566",
+      "L03567",
+      "L03568",
+      "L03569",
+      "L03570",
+      "L03571",
+      "L03578",
+      "L03579",
+      "L03582",
+      "L03584",
+      "L03586",
+      "L03590",
+      "L03591",
+      "L03593",
+      "L03601",
+      "L03602",
+      "L03604",
+      "L03605",
+      "L03606",
+      "L03616",
+      "L03618",
+      "L03619",
+      "L03621",
+      "L03634",
+      "L03635",
+      "L03636",
+      "L03645",
+      "L03651",
+      "L03652",
+      "L03653",
+      "L03654",
+      "L03655",
+      "L03657",
+      "L03681",
+      "L03684",
+      "L03686",
+      "L03727",
+      "L03729",
+      "L03730",
+      "L03731",
+      "L03732",
+      "L03733",
+      "L03734",
+      "L03745",
+      "L03752",
+      "L03785",
+      "L03786",
+      "L03787",
+      "L03789",
+      "L03791",
+      "L03792",
+      "L03794",
+      "M01000",
+      "M02022",
+      "M02528",
+      "M02591",
+      "M02602",
+      "M02605",
+      "M02639",
+      "M02923",
+      "M02927",
+      "M03065",
+      "M03134",
+      "M03242",
+      "M03592",
+      "M03695",
+      "M04120",
+      "M04470",
+      "M04741",
+      "M04761",
+      "M04925",
+      "M04965",
+      "M04993",
+      "M05152",
+      "M05187",
+      "M05189",
+      "M05191",
+      "M05344",
+      "M05375",
+      "M05819",
+      "M05829",
+      "M05847",
+      "M05849",
+      "M05939",
+      "M05970",
+      "M06876",
+      "M06877",
+      "M06879",
+      "M06938",
+      "M07088",
+      "M07458",
+      "M07525",
+      "M07526",
+      "M07531",
+      "M07532",
+      "M07535",
+      "M07536",
+      "M07742",
+      "M07868",
+      "M08095",
+      "M08209",
+      "M08222",
+      "M08764",
+      "P00020",
+      "P00021",
+      "P00023",
+      "P00025",
+      "P00029",
+      "P00030",
+      "P00031",
+      "T01370"
+    ],
+    "classes": {
+      "RAW_MATERIAL": 1040,
+      "OTHER": 148
+    },
+    "scope": "Current published material supply classification; structural BOM components, not certified complete commercial taxonomy"
+  },
+  "sales_coverage": {
+    "date_min": "2026-01-01T00:00:00",
+    "date_max": "2026-09-24T00:00:00",
+    "source_as_of_min": "2026-09-24T12:59:42.721586+00:00",
+    "source_as_of_max": "2026-09-24T13:53:07.952772+00:00",
+    "months": [
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09"
+    ]
+  },
+  "sap_products": 16934,
+  "unclassified_sales_lines_2026": [
+    {
+      "currency": "BS",
+      "lines": 626619,
+      "amount": 63653520.63
+    },
+    {
+      "currency": "",
+      "lines": 1,
+      "amount": 0.0
+    },
+    {
+      "currency": "USD",
+      "lines": 1,
+      "amount": 83.15
+    }
+  ],
+  "customer_duplicate_codes": 0,
+  "header_duplicate_keys": 0,
+  "winner": {
+    "month": "2026-06",
+    "amount_bs": "1038334.36",
+    "customer_code": "C000163",
+    "customer_name": "GRANOS S.A.",
+    "customer_amount_bs": "182882.7"
+  },
+  "customer_ranking": [
+    {
+      "code": "C000163",
+      "name": "GRANOS S.A.",
+      "amount_bs": "182882.7"
+    },
+    {
+      "code": "C005843",
+      "name": "CORPOLAB LTDA",
+      "amount_bs": "85956"
+    },
+    {
+      "code": "C012100",
+      "name": "NUTRI-MIX S.R.L.",
+      "amount_bs": "75276.76"
+    },
+    {
+      "code": "C000340",
+      "name": "CERVECERIA NACIONAL POTOSI LTDA.",
+      "amount_bs": "58072.5"
+    },
+    {
+      "code": "C011936",
+      "name": "QUIMERA BOLIVIA SRL",
+      "amount_bs": "57420"
+    },
+    {
+      "code": "C000360",
+      "name": "VANI BOLIVIA",
+      "amount_bs": "56000"
+    },
+    {
+      "code": "CG2A",
+      "name": "CONTROL TRIBUTARIO",
+      "amount_bs": "55449.98"
+    },
+    {
+      "code": "C010194",
+      "name": "ERWIN LEON SUPEPI",
+      "amount_bs": "42238.5"
+    },
+    {
+      "code": "C003582",
+      "name": "GENERICO PUBLICO",
+      "amount_bs": "42174.38"
+    },
+    {
+      "code": "CGRC",
+      "name": "CONTROL TRIBUTARIO",
+      "amount_bs": "35316.20"
+    },
+    {
+      "code": "C012108",
+      "name": "BOLIQUIM S.R.L.",
+      "amount_bs": "26535"
+    },
+    {
+      "code": "C000168",
+      "name": "INDUSTRIAS LURI SRL",
+      "amount_bs": "21750"
+    },
+    {
+      "code": "C011566",
+      "name": "EMPRESA MINERA PAITITI S.A. EMIPA",
+      "amount_bs": "21750"
+    },
+    {
+      "code": "C012105",
+      "name": "ERNESTO MALDONADO ASCUI",
+      "amount_bs": "19662"
+    },
+    {
+      "code": "CGCM",
+      "name": "CONTROL TRIBUTARIO",
+      "amount_bs": "15276.24"
+    },
+    {
+      "code": "C000207",
+      "name": "ALIMENTOS AGUA CLARA S.A.",
+      "amount_bs": "11571"
+    },
+    {
+      "code": "C004991",
+      "name": "SOCIEDAD AGROINDUSTRIAL NUTRIOIL S.A.",
+      "amount_bs": "9952.8"
+    },
+    {
+      "code": "C004107",
+      "name": "PISCINA AZUL AZUL -EL ALTO",
+      "amount_bs": "9348.15"
+    },
+    {
+      "code": "C007891",
+      "name": "VET. NUEVO HORIZONTE",
+      "amount_bs": "9330.75"
+    },
+    {
+      "code": "C000173",
+      "name": "NATESSENT S.R.L.",
+      "amount_bs": "9222.00"
+    },
+    {
+      "code": "C011101",
+      "name": "ANA EVELYN GIL ALARCON",
+      "amount_bs": "9082.80"
+    },
+    {
+      "code": "C000107",
+      "name": "MANCHACO SOCIAL EPSA",
+      "amount_bs": "8769.6"
+    },
+    {
+      "code": "C011382",
+      "name": "25022 - FRANZ KLIPPENSTEIN BUHLER",
+      "amount_bs": "8487.5"
+    },
+    {
+      "code": "C011831",
+      "name": "NUTRIPOLLO LTDA.",
+      "amount_bs": "7612.5"
+    },
+    {
+      "code": "C003933",
+      "name": "DISTRIBUIDORA DISVET - COLUMBIA",
+      "amount_bs": "7286.25"
+    },
+    {
+      "code": "C000144",
+      "name": "LABORATORIOS INDUSTRIAL FARMACEUTICOS FARCOS LTDA.",
+      "amount_bs": "6090"
+    },
+    {
+      "code": "C004262",
+      "name": "GRANJA PORCINA EL ESPINO",
+      "amount_bs": "6053.02"
+    },
+    {
+      "code": "C011370",
+      "name": "MAXI KING S.R.L.",
+      "amount_bs": "5568"
+    },
+    {
+      "code": "C002468",
+      "name": "MI PISCINA AQUABLUE",
+      "amount_bs": "5481"
+    },
+    {
+      "code": "C002555",
+      "name": "GRUPO EMPRESARIAL QUISBER",
+      "amount_bs": "4193.4"
+    },
+    {
+      "code": "C000222",
+      "name": "EDUARDO S.A.",
+      "amount_bs": "4136.85"
+    },
+    {
+      "code": "C000223",
+      "name": "SCANBIOTEK SRL",
+      "amount_bs": "4002.00"
+    },
+    {
+      "code": "C007743",
+      "name": "H2OASIS - LA PAZ",
+      "amount_bs": "3875.85"
+    },
+    {
+      "code": "C003728",
+      "name": "VENTAS CORPORATIVAS- HORIZONTAL",
+      "amount_bs": "3697.5"
+    },
+    {
+      "code": "CGV1",
+      "name": "CONTROL TRIBUTARIO",
+      "amount_bs": "3603.14"
+    },
+    {
+      "code": "C004311",
+      "name": "LABORATORIOS FARMACEUTICOS LAFAR S.A",
+      "amount_bs": "3523.5"
+    },
+    {
+      "code": "C000109",
+      "name": "LUSSAC LTDA. CBBA",
+      "amount_bs": "3393"
+    },
+    {
+      "code": "C004267",
+      "name": "INDUSTRIAS OZONO",
+      "amount_bs": "3349.5"
+    },
+    {
+      "code": "C011821",
+      "name": "AGRO TARIJA",
+      "amount_bs": "3250"
+    },
+    {
+      "code": "C006302",
+      "name": "INDAPEC",
+      "amount_bs": "3219.00"
+    },
+    {
+      "code": "C003579",
+      "name": "VERMIKRES PLUS",
+      "amount_bs": "3045"
+    },
+    {
+      "code": "C010306",
+      "name": "AGROPECUARIA AGROTECNO YACUIBA",
+      "amount_bs": "2914.5"
+    },
+    {
+      "code": "C010465",
+      "name": "COMERCIAL BOQUERON",
+      "amount_bs": "2914.5"
+    },
+    {
+      "code": "C005122",
+      "name": "FABRICA DE ALIMENTOS ALINA SRL",
+      "amount_bs": "2827.5"
+    },
+    {
+      "code": "C012102",
+      "name": "COMAYO R.L.",
+      "amount_bs": "2556.06"
+    },
+    {
+      "code": "C007358",
+      "name": "MABATE",
+      "amount_bs": "2300"
+    },
+    {
+      "code": "C010528",
+      "name": "AGROP. AGROFRUTT (VALLEGRANDE]",
+      "amount_bs": "2240.25"
+    },
+    {
+      "code": "C011698",
+      "name": "BOVINSA LTDA",
+      "amount_bs": "2192.4"
+    },
+    {
+      "code": "C004379",
+      "name": "1160 - SAWAZTKY HIEBERT JOHAN",
+      "amount_bs": "2162.5"
+    },
+    {
+      "code": "C007725",
+      "name": "PISCINA PARAISO - EL ALTO",
+      "amount_bs": "2131.5"
+    },
+    {
+      "code": "C003729",
+      "name": "VENTAS CORPORATIVAS - PUBLICO",
+      "amount_bs": "2096.7"
+    },
+    {
+      "code": "C011235",
+      "name": "PISICINA VIRGEN DE COPACABANA - LA PAZ",
+      "amount_bs": "1844.4"
+    },
+    {
+      "code": "C000130",
+      "name": "SOCIEDAD SYNERGY LTDA",
+      "amount_bs": "1837.79"
+    },
+    {
+      "code": "C000057",
+      "name": "PANADERIA VICTORIA LTDA",
+      "amount_bs": "1740"
+    },
+    {
+      "code": "C008142",
+      "name": "AMAFOODS S.R.L",
+      "amount_bs": "1740"
+    },
+    {
+      "code": "C007513",
+      "name": "MARIA CUELLAR [ VALLEGRANDE ]",
+      "amount_bs": "1675"
+    },
+    {
+      "code": "C007959",
+      "name": "CAPININE S.R.L.",
+      "amount_bs": "1674.75"
+    },
+    {
+      "code": "C001074",
+      "name": "QUESERIA QUÉ QUESO",
+      "amount_bs": "1631.25"
+    },
+    {
+      "code": "C003526",
+      "name": "12320 - KORNELSEN MARILYN",
+      "amount_bs": "1560.60"
+    },
+    {
+      "code": "C005343",
+      "name": "PISCINA H2O - EL ALTO",
+      "amount_bs": "1496.4"
+    },
+    {
+      "code": "C011106",
+      "name": "AGROP. SAN FRANCISCO (CARLOS)",
+      "amount_bs": "1457.25"
+    },
+    {
+      "code": "C003542",
+      "name": "13631 - FROESE 0 ABRAM FRIESSEN",
+      "amount_bs": "1442.95"
+    },
+    {
+      "code": "C007088",
+      "name": "AGRO CAMPO VET TARIJA",
+      "amount_bs": "1435.5"
+    },
+    {
+      "code": "C005560",
+      "name": "1000 - GENÉRICO MENONAS",
+      "amount_bs": "1399.56"
+    },
+    {
+      "code": "C003352",
+      "name": "564 - PETER BANMAN HARMS -  FRANZ KLASSEN LOEWEN",
+      "amount_bs": "1326.9"
+    },
+    {
+      "code": "C000265",
+      "name": "PASTELERIA TORTAS DOLLY",
+      "amount_bs": "1305"
+    },
+    {
+      "code": "C007835",
+      "name": "SAUNA PISCINA ACUARIO - LA PAZ",
+      "amount_bs": "1291.95"
+    },
+    {
+      "code": "C004385",
+      "name": "9858 - DAVID MARTENS FRIESSEN",
+      "amount_bs": "1250"
+    },
+    {
+      "code": "C004767",
+      "name": "7252 - WALL WILHELM PETERS",
+      "amount_bs": "1212.08"
+    },
+    {
+      "code": "C010623",
+      "name": "PISCINA ARCANGEL - LA PAZ",
+      "amount_bs": "1148.4"
+    },
+    {
+      "code": "C011275",
+      "name": "PAULINA ALEJANDRO",
+      "amount_bs": "1096.2"
+    },
+    {
+      "code": "C003424",
+      "name": "2919 - HILDERBRANT 0 ALVIN SCHROEDER",
+      "amount_bs": "1071.36"
+    },
+    {
+      "code": "C008067",
+      "name": "PLAY LAND",
+      "amount_bs": "974.4"
+    },
+    {
+      "code": "C005753",
+      "name": "OVOPROT",
+      "amount_bs": "913.51"
+    },
+    {
+      "code": "C005209",
+      "name": "BALNEARIO WILSON",
+      "amount_bs": "870"
+    },
+    {
+      "code": "C003338",
+      "name": "495 - FRANZ ENNS PETERS - JACOB WIELER HAMN",
+      "amount_bs": "842.0"
+    },
+    {
+      "code": "C000073",
+      "name": "RESTAURANT CHALET LA SUISSE",
+      "amount_bs": "835.2"
+    },
+    {
+      "code": "C003409",
+      "name": "ASOPLE",
+      "amount_bs": "835.2"
+    },
+    {
+      "code": "C003341",
+      "name": "509 - ABRAHAM HIRBERT KLASSEN - DAVID GIESBRECHT WIELER",
+      "amount_bs": "805.18"
+    },
+    {
+      "code": "C003904",
+      "name": "CLINICA MELENDRES",
+      "amount_bs": "783"
+    },
+    {
+      "code": "C008209",
+      "name": "24004 - ABRAHAM FRIESEN REIMER",
+      "amount_bs": "720"
+    },
+    {
+      "code": "C003354",
+      "name": "572 - SCHMITT PETERS ABRAHAM",
+      "amount_bs": "704.7"
+    },
+    {
+      "code": "C003336",
+      "name": "492 - GERHARD REMPEL BLATZ - JACOB EPP GIESBRECHT",
+      "amount_bs": "695.23"
+    },
+    {
+      "code": "C003334",
+      "name": "480 - ABRAM THIESSEN FRIESEN",
+      "amount_bs": "677.13"
+    },
+    {
+      "code": "S0001",
+      "name": "ROBERTO ABRAHAN TELCHI ASBUN",
+      "amount_bs": "669.01"
+    },
+    {
+      "code": "C003342",
+      "name": "516 - WILHELM LOEWEN WIEBE",
+      "amount_bs": "663.55"
+    },
+    {
+      "code": "C003461",
+      "name": "7379 - TONI HILDEBRAND WIEBE",
+      "amount_bs": "657"
+    },
+    {
+      "code": "C006687",
+      "name": "CLINICA NEUROCENTER",
+      "amount_bs": "652.50"
+    },
+    {
+      "code": "C003531",
+      "name": "12985 - LOEWEN REIMER CORNELIUS",
+      "amount_bs": "643.68"
+    },
+    {
+      "code": "C006111",
+      "name": "1280 - GUENTHER LOEWEN JOHANN",
+      "amount_bs": "625"
+    },
+    {
+      "code": "C006186",
+      "name": "7544 - GERHARD  JANZEN GERBRANDT",
+      "amount_bs": "625"
+    },
+    {
+      "code": "C003359",
+      "name": "587 - JACOB WIEBE NEUSTATETER",
+      "amount_bs": "585"
+    },
+    {
+      "code": "C011264",
+      "name": "4317 - FRANZ PETERS REIMER",
+      "amount_bs": "583.2"
+    },
+    {
+      "code": "C000018",
+      "name": "CODIGO GENERICO DELIVERY",
+      "amount_bs": "519.39"
+    },
+    {
+      "code": "C004382",
+      "name": "1467 - REIMER 0 ABRAM KLASSEN",
+      "amount_bs": "510"
+    },
+    {
+      "code": "C006549",
+      "name": "GENERICO PUBLICO",
+      "amount_bs": "500.25"
+    },
+    {
+      "code": "C012032",
+      "name": "26013 - PETER NEUFELD REMPEL",
+      "amount_bs": "497.66"
+    },
+    {
+      "code": "C003469",
+      "name": "8159 - ISSA EPP FEHR - JOHAN FRIESEN NEUDORF",
+      "amount_bs": "490.95"
+    },
+    {
+      "code": "E000040",
+      "name": "SUAREZ CHUVE IGNACIO JUAN",
+      "amount_bs": "455"
+    },
+    {
+      "code": "C004878",
+      "name": "EMSERSO S.A.",
+      "amount_bs": "435"
+    },
+    {
+      "code": "C005828",
+      "name": "CENDIALISIS INTEGRAL S.R.L.",
+      "amount_bs": "413.25"
+    },
+    {
+      "code": "C004038",
+      "name": "916 - ISAACK BANMAN HILDEBRANST",
+      "amount_bs": "397.01"
+    },
+    {
+      "code": "C010622",
+      "name": "INPASTAS S.A.",
+      "amount_bs": "391.5"
+    },
+    {
+      "code": "C004045",
+      "name": "515 - JOHAN FERH LOEWEN",
+      "amount_bs": "383.83"
+    },
+    {
+      "code": "C008666",
+      "name": "TERBOL S.A.",
+      "amount_bs": "368.10"
+    },
+    {
+      "code": "C000002",
+      "name": "LABORATORIOS IFA S.A.",
+      "amount_bs": "365.40"
+    },
+    {
+      "code": "C003448",
+      "name": "5845 - PETER KRAHN NEUFELD - ISAAK NEUFELD WIELER",
+      "amount_bs": "350"
+    },
+    {
+      "code": "C006415",
+      "name": "6415 - PETER NEUFELD NEUFELD",
+      "amount_bs": "350"
+    },
+    {
+      "code": "C002955",
+      "name": "SAUNA PISCINA AMAZONAS - EL ALTO",
+      "amount_bs": "348"
+    },
+    {
+      "code": "C003450",
+      "name": "5938 - PETERS BANMAN KATHARINA ( CLINICA ALEMANA) POZO EL TIGRE",
+      "amount_bs": "345.85"
+    },
+    {
+      "code": "C007167",
+      "name": "ASOC AGALECH",
+      "amount_bs": "339.3"
+    },
+    {
+      "code": "C005176",
+      "name": "5889 - DE UNGER 0 KATHARINA REIMER",
+      "amount_bs": "328.61"
+    },
+    {
+      "code": "CGCT",
+      "name": "Control Tributario",
+      "amount_bs": "323.57"
+    },
+    {
+      "code": "C003374",
+      "name": "1118 - PETERS 0 JOHANN FRIESEN",
+      "amount_bs": "321.03"
+    },
+    {
+      "code": "C005214",
+      "name": "VET. SANTISIMA TRINIDAD",
+      "amount_bs": "304.5"
+    },
+    {
+      "code": "C002037",
+      "name": "ODONTOCLINICA INTEGRAL",
+      "amount_bs": "282.75"
+    },
+    {
+      "code": "C000143",
+      "name": "AVICOLA SOFIA",
+      "amount_bs": "268.83"
+    },
+    {
+      "code": "C006267",
+      "name": "267 - DIEDRICH TEICHROEB DYCK - HEINRICH NEUDORF HARMS",
+      "amount_bs": "266.0"
+    },
+    {
+      "code": "C003992",
+      "name": "519 - PETER NEUTAETER REDEKOP - JACOB ENNS PETERS",
+      "amount_bs": "262.58"
+    },
+    {
+      "code": "C003382",
+      "name": "1287 - DAVID FEHR HARMS O PETER WALL REMPEL",
+      "amount_bs": "235.98"
+    },
+    {
+      "code": "C000060",
+      "name": "PRODUCTORA DE ALIMENTOS S.A. PRODASA",
+      "amount_bs": "227.07"
+    },
+    {
+      "code": "C007090",
+      "name": "UNIDENT JORGE LANDIVAR",
+      "amount_bs": "221.85"
+    },
+    {
+      "code": "C004442",
+      "name": "VETERINARIA ZOO-LIFE",
+      "amount_bs": "217.5"
+    },
+    {
+      "code": "C011752",
+      "name": "25051 - JACOB FRIESEN LOEWEN - JACOB THIESEN FROESE",
+      "amount_bs": "208.8"
+    },
+    {
+      "code": "C006379",
+      "name": "8288 - HERMAN FRIESEN",
+      "amount_bs": "203.4"
+    },
+    {
+      "code": "C011953",
+      "name": "26007 - PETER FRIESSEN FEHR",
+      "amount_bs": "193.95"
+    },
+    {
+      "code": "C003345",
+      "name": "533 - FRIESSEN GIESBRECHT EVA",
+      "amount_bs": "166.95"
+    },
+    {
+      "code": "C003444",
+      "name": "5425 - BERNARDO LOEWEN REIMER",
+      "amount_bs": "166.95"
+    },
+    {
+      "code": "C003351",
+      "name": "555 - CORNELIUS PETERS DRIEDGER",
+      "amount_bs": "162"
+    },
+    {
+      "code": "C005842",
+      "name": "FRIGORIFICO BFC S.A",
+      "amount_bs": "161.52"
+    },
+    {
+      "code": "C004114",
+      "name": "8430 - JOHANN JANZEN",
+      "amount_bs": "160.2"
+    },
+    {
+      "code": "C007526",
+      "name": "AGROPARTNERS S.R.L.",
+      "amount_bs": "152.25"
+    },
+    {
+      "code": "C007485",
+      "name": "858 - MARIA PETERS de NEUDORF",
+      "amount_bs": "146.44"
+    },
+    {
+      "code": "C011743",
+      "name": "FCIA CAR YEL (la guardia)",
+      "amount_bs": "139.2"
+    },
+    {
+      "code": "C000040",
+      "name": "INMOBILIARIA LAS MISIONES S.A.",
+      "amount_bs": "133.11"
+    },
+    {
+      "code": "C003781",
+      "name": "CIAT",
+      "amount_bs": "130.5"
+    },
+    {
+      "code": "E000045",
+      "name": "ROJAS ROMERO ELISEO",
+      "amount_bs": "130"
+    },
+    {
+      "code": "C003350",
+      "name": "553   - DAVID WIEBE TEICHROEB - JOHANN WIEBE FRIESSEN",
+      "amount_bs": "117"
+    },
+    {
+      "code": "C000103",
+      "name": "SINEC",
+      "amount_bs": "108.75"
+    },
+    {
+      "code": "C005331",
+      "name": "FARMACIA  FARMAYAN",
+      "amount_bs": "108.75"
+    },
+    {
+      "code": "C003452",
+      "name": "6027 -ISAAK LOWEN BANMAN",
+      "amount_bs": "104.4"
+    },
+    {
+      "code": "C011315",
+      "name": "25012 - CORNELIUS FRIESEN HILDEBRAND - JACOBO FEHR",
+      "amount_bs": "101.7"
+    },
+    {
+      "code": "C004408",
+      "name": "8014 -DAVID HIEBERT HARMS",
+      "amount_bs": "100.17"
+    },
+    {
+      "code": "C004150",
+      "name": "617 - ISAAC PETERS KLASSEN",
+      "amount_bs": "99"
+    },
+    {
+      "code": "C000066",
+      "name": "EMPACAR SA",
+      "amount_bs": "87.0"
+    },
+    {
+      "code": "C006341",
+      "name": "YACULAB SRL",
+      "amount_bs": "87"
+    },
+    {
+      "code": "C003364",
+      "name": "872 - EPP KLASSEN PETER",
+      "amount_bs": "82.61"
+    },
+    {
+      "code": "C004634",
+      "name": "UNIFRANZT S.A.",
+      "amount_bs": "75.18"
+    },
+    {
+      "code": "C000037",
+      "name": "CIASA S.A.",
+      "amount_bs": "74.47"
+    },
+    {
+      "code": "C003339",
+      "name": "499 - ABRAHAM KLASSEN DYCK  -  JACOB GIESBRECHT REDECOP",
+      "amount_bs": "73.44"
+    },
+    {
+      "code": "E000251",
+      "name": "ZARRAGA MATAREGUA LUIS CARLOS",
+      "amount_bs": "66.57"
+    },
+    {
+      "code": "C007773",
+      "name": "VETERINARIA CHISPITA",
+      "amount_bs": "65.25"
+    },
+    {
+      "code": "C004003",
+      "name": "490 - JACOB LOEWEN NEUFELD",
+      "amount_bs": "63.5"
+    },
+    {
+      "code": "CGEC",
+      "name": "CONTROL TRIBUTARIO",
+      "amount_bs": "61.29"
+    },
+    {
+      "code": "C004348",
+      "name": "945 - FRANZ MARTENS WIEBE - DIEDRICH GOERTZEN HILDEBRAND",
+      "amount_bs": "56.69"
+    },
+    {
+      "code": "C011004",
+      "name": "RICARDO CLAURE MORENO",
+      "amount_bs": "56.03"
+    },
+    {
+      "code": "C004833",
+      "name": "COPELME S.A",
+      "amount_bs": "53.38"
+    },
+    {
+      "code": "C000058",
+      "name": "CORPORACION MATHIESEN SA",
+      "amount_bs": "52.2"
+    },
+    {
+      "code": "E000181",
+      "name": "RIVERO TAPIA MANUELA",
+      "amount_bs": "51"
+    },
+    {
+      "code": "C001225",
+      "name": "FARMACIA 24 DE OCTUBRE",
+      "amount_bs": "43.5"
+    },
+    {
+      "code": "C005208",
+      "name": "UNIVERSIDAD CATOLICA BOLIVIANA SAN PABLO",
+      "amount_bs": "43.5"
+    },
+    {
+      "code": "C011609",
+      "name": "FARMACIA LAB FARMA",
+      "amount_bs": "43.5"
+    },
+    {
+      "code": "E000012",
+      "name": "ARUSTARI MIGUEL SANDRA SABINA",
+      "amount_bs": "36"
+    },
+    {
+      "code": "C007332",
+      "name": "FERR & LUB SANDOVAL",
+      "amount_bs": "20.45"
+    },
+    {
+      "code": "E000352",
+      "name": "LELARGE LOPEZ KEYLA GEORGINA",
+      "amount_bs": "20.37"
+    },
+    {
+      "code": "E000236",
+      "name": "MENDEZ ROCHA PATRICIA",
+      "amount_bs": "19.8"
+    },
+    {
+      "code": "C011065",
+      "name": "FARMACIA EMERPHARMA",
+      "amount_bs": "19.58"
+    },
+    {
+      "code": "C004804",
+      "name": "Q Y Q MEDICAL LTDA",
+      "amount_bs": "17.62"
+    },
+    {
+      "code": "E000005",
+      "name": "PESSOA DURAN ELIZABETH",
+      "amount_bs": "17.2"
+    },
+    {
+      "code": "C002372",
+      "name": "FARMACIA SANTIAMEN",
+      "amount_bs": "16.97"
+    },
+    {
+      "code": "E000477",
+      "name": "SILVA OMAÑA DAVID RICARDO",
+      "amount_bs": "16.5"
+    },
+    {
+      "code": "C010905",
+      "name": "CECILIA ALEJANDRA ANTELO VARGAS",
+      "amount_bs": "14.53"
+    },
+    {
+      "code": "S0007",
+      "name": "SULZER TEJADA JESSICA",
+      "amount_bs": "13.49"
+    },
+    {
+      "code": "E000176",
+      "name": "VILLARROEL ORDOÑES JOSE MAURICIO",
+      "amount_bs": "11"
+    },
+    {
+      "code": "E000457",
+      "name": "JUAN PABLO LECOÑA VEDIA",
+      "amount_bs": "7.2"
+    },
+    {
+      "code": "E000081",
+      "name": "CAMPOS JIMENEZ ROXANA",
+      "amount_bs": "3.6"
+    },
+    {
+      "code": "E000441",
+      "name": "BARRIENTOS MELAZZIMI DIEGO ELEAZAR",
+      "amount_bs": "3.6"
+    },
+    {
+      "code": "C011644",
+      "name": "NACIR",
+      "amount_bs": "3"
+    },
+    {
+      "code": "E000338",
+      "name": "VALLEJOS MARAZ CARLOS ANDRES",
+      "amount_bs": "2.22"
+    },
+    {
+      "code": "C010341",
+      "name": "LA REJA",
+      "amount_bs": "2.21"
+    }
+  ],
+  "currency_totals": {
+    "BS": "7707733.13",
+    "USD": "698.25"
+  },
+  "coverage_material_sales": {
+    "min": "2026-01-01",
+    "max": "2026-09-24"
+  },
+  "elapsed_seconds": 8.279392481999821
+}

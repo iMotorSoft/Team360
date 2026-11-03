@@ -1,0 +1,506 @@
+{
+  "read_only": true,
+  "sap_accessed": false,
+  "production_capability_implemented": false,
+  "period": [
+    "2026-09-01",
+    "2026-10-01"
+  ],
+  "threads": 1,
+  "memory_limit": "256MB",
+  "queries": [
+    {
+      "name": "classification_integrity",
+      "sql": "SELECT COUNT(*) row_count,COUNT(DISTINCT \"ItemCode\") unique_codes,\nCOUNT(*) FILTER(WHERE valid_from IS NOT NULL OR valid_to IS NOT NULL) dated_rows FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet')",
+      "parameters": [],
+      "rows": [
+        {
+          "row_count": 42147,
+          "unique_codes": 42147,
+          "dated_rows": 0
+        }
+      ],
+      "elapsed_seconds": 0.012
+    },
+    {
+      "name": "invoice_headers",
+      "sql": "SELECT canceled,currency,COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nMIN(doc_date) first_date,MAX(doc_date) last_date,MIN(source_as_of) source_as_of_min,MAX(source_as_of) source_as_of_max,\nSUM(CAST(doc_total AS DECIMAL(38,6))) doc_total,\nCOUNT(*) FILTER(WHERE try_cast(doc_total AS DECIMAL(38,6)) IS NULL) invalid_amounts\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV' AND doc_date>='2026-09-01' AND doc_date<'2026-10-01') GROUP BY ALL ORDER BY 1,2",
+      "parameters": [],
+      "rows": [
+        {
+          "canceled": "C",
+          "currency": "BS",
+          "documents": 1,
+          "unique_documents": 1,
+          "first_date": "2026-09-12T00:00:00",
+          "last_date": "2026-09-12T00:00:00",
+          "source_as_of_min": "2026-09-24T12:59:42.721586+00:00",
+          "source_as_of_max": "2026-09-24T12:59:42.721586+00:00",
+          "doc_total": "87.500000",
+          "invalid_amounts": 0
+        },
+        {
+          "canceled": "N",
+          "currency": "BS",
+          "documents": 30301,
+          "unique_documents": 30301,
+          "first_date": "2026-09-01T00:00:00",
+          "last_date": "2026-09-24T00:00:00",
+          "source_as_of_min": "2026-09-24T12:59:42.721586+00:00",
+          "source_as_of_max": "2026-09-24T13:53:07.952772+00:00",
+          "doc_total": "8891439.790000",
+          "invalid_amounts": 0
+        },
+        {
+          "canceled": "Y",
+          "currency": "BS",
+          "documents": 1,
+          "unique_documents": 1,
+          "first_date": "2026-09-12T00:00:00",
+          "last_date": "2026-09-12T00:00:00",
+          "source_as_of_min": "2026-09-24T12:59:42.721586+00:00",
+          "source_as_of_max": "2026-09-24T12:59:42.721586+00:00",
+          "doc_total": "87.500000",
+          "invalid_amounts": 0
+        }
+      ],
+      "elapsed_seconds": 0.639
+    },
+    {
+      "name": "invoice_join_integrity",
+      "sql": "SELECT COUNT(*) joined_lines,\nCOUNT(DISTINCT l.doc_entry || ':' || l.line_num) unique_lines,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id) extraction_mismatches,\nCOUNT(*) FILTER(WHERE d.source_as_of IS DISTINCT FROM l.source_as_of) as_of_mismatches,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE try_cast(l.line_total AS DECIMAL(38,6)) IS NULL) invalid_amounts\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV' AND doc_date>='2026-09-01' AND doc_date<'2026-10-01') d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry WHERE d.canceled='N' ",
+      "parameters": [],
+      "rows": [
+        {
+          "joined_lines": 65163,
+          "unique_lines": 65163,
+          "extraction_mismatches": 0,
+          "as_of_mismatches": 0,
+          "currency_mismatches": 0,
+          "invalid_amounts": 0
+        }
+      ],
+      "elapsed_seconds": 0.849
+    },
+    {
+      "name": "invoice_reconciliation",
+      "sql": "WITH totals AS (\nSELECT d.doc_entry,d.currency,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOUNT(l.line_num) lines,COUNT(DISTINCT x.product_business_type) categories,\nCOALESCE(SUM(CAST(l.line_total AS DECIMAL(38,6))),0) line_amount\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV' AND doc_date>='2026-09-01' AND doc_date<'2026-10-01') d LEFT JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\nWHERE d.canceled='N' GROUP BY 1,2,3)\nSELECT currency,COUNT(*) documents,SUM(lines) lines,SUM(header_amount) header_amount,SUM(line_amount) line_amount,\nSUM(header_amount-line_amount) residual,SUM(ABS(header_amount-line_amount)) absolute_residual,\nMAX(ABS(header_amount-line_amount)) max_absolute_residual,\nCOUNT(*) FILTER(WHERE ABS(header_amount-line_amount)<=0.01) reconciled_within_cent,\nCOUNT(*) FILTER(WHERE ABS(header_amount-line_amount)>0.01) unexplained_documents,\nCOUNT(*) FILTER(WHERE lines=0) documents_without_lines,\nCOUNT(*) FILTER(WHERE categories>1) multicategory_documents\nFROM totals GROUP BY 1",
+      "parameters": [],
+      "rows": [
+        {
+          "currency": "BS",
+          "documents": 30301,
+          "lines": 65163,
+          "header_amount": "8891439.790000",
+          "line_amount": "8048691.580000",
+          "residual": "842748.210000",
+          "absolute_residual": "897070.850000",
+          "max_absolute_residual": "15926.730000",
+          "reconciled_within_cent": 872,
+          "unexplained_documents": 29429,
+          "documents_without_lines": 0,
+          "multicategory_documents": 8282
+        }
+      ],
+      "elapsed_seconds": 1.411
+    },
+    {
+      "name": "invoice_category_observations",
+      "sql": "SELECT d.currency header_currency,l.currency line_currency,\nx.product_business_type,x.status,x.classification_basis,\nCOUNT(*) lines,COUNT(DISTINCT l.item_code) products,COUNT(DISTINCT d.doc_entry) documents,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) recorded_line_total,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified_lines,\nCOUNT(*) FILTER(WHERE l.item_code IS NULL OR l.item_code='') no_item_code\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV' AND doc_date>='2026-09-01' AND doc_date<'2026-10-01') d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\nWHERE d.canceled='N' GROUP BY ALL ORDER BY 1,2,3,4,5",
+      "parameters": [],
+      "rows": [
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "SUPPORTED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 121,
+          "products": 3,
+          "documents": 119,
+          "recorded_line_total": "12561.660000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 20968,
+          "products": 214,
+          "documents": 14394,
+          "recorded_line_total": "2502055.480000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "LAB_FINISHED_PRODUCT",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 18541,
+          "products": 278,
+          "documents": 10694,
+          "recorded_line_total": "2679208.660000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "OTHER_INPUT",
+          "status": "SUPPORTED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 581,
+          "products": 65,
+          "documents": 456,
+          "recorded_line_total": "31278.870000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "PACKAGING",
+          "status": "PROVISIONAL",
+          "classification_basis": "NAME_BASED",
+          "lines": 1535,
+          "products": 227,
+          "documents": 1174,
+          "recorded_line_total": "167796.820000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "PACKAGING",
+          "status": "SUPPORTED",
+          "classification_basis": "COMBINED",
+          "lines": 234,
+          "products": 7,
+          "documents": 225,
+          "recorded_line_total": "24790.610000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "PACKAGING",
+          "status": "VALIDATED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 104,
+          "products": 16,
+          "documents": 100,
+          "recorded_line_total": "21122.980000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "RAW_MATERIAL",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 526,
+          "products": 34,
+          "documents": 495,
+          "recorded_line_total": "839582.630000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "SERVICE",
+          "status": "VALIDATED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 189,
+          "products": 7,
+          "documents": 189,
+          "recorded_line_total": "46099.380000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "TRADED_PRODUCT",
+          "status": "SUPPORTED",
+          "classification_basis": "COMBINED",
+          "lines": 22364,
+          "products": 3317,
+          "documents": 12240,
+          "recorded_line_total": "1724194.490000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        }
+      ],
+      "elapsed_seconds": 0.726
+    },
+    {
+      "name": "credit_headers",
+      "sql": "SELECT canceled,currency,COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,\nMIN(doc_date) first_date,MAX(doc_date) last_date,MIN(source_as_of) source_as_of_min,MAX(source_as_of) source_as_of_max,\nSUM(CAST(doc_total AS DECIMAL(38,6))) doc_total,\nCOUNT(*) FILTER(WHERE try_cast(doc_total AS DECIMAL(38,6)) IS NULL) invalid_amounts\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN' AND doc_date>='2026-09-01' AND doc_date<'2026-10-01') GROUP BY ALL ORDER BY 1,2",
+      "parameters": [],
+      "rows": [
+        {
+          "canceled": "N",
+          "currency": "BS",
+          "documents": 224,
+          "unique_documents": 224,
+          "first_date": "2026-09-01T00:00:00",
+          "last_date": "2026-09-23T00:00:00",
+          "source_as_of_min": "2026-09-24T12:59:42.721586+00:00",
+          "source_as_of_max": "2026-09-24T12:59:42.721586+00:00",
+          "doc_total": "328670.240000",
+          "invalid_amounts": 0
+        }
+      ],
+      "elapsed_seconds": 0.236
+    },
+    {
+      "name": "credit_join_integrity",
+      "sql": "SELECT COUNT(*) joined_lines,\nCOUNT(DISTINCT l.doc_entry || ':' || l.line_num) unique_lines,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id) extraction_mismatches,\nCOUNT(*) FILTER(WHERE d.source_as_of IS DISTINCT FROM l.source_as_of) as_of_mismatches,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE try_cast(l.line_total AS DECIMAL(38,6)) IS NULL) invalid_amounts\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN' AND doc_date>='2026-09-01' AND doc_date<'2026-10-01') d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry WHERE d.canceled='N' ",
+      "parameters": [],
+      "rows": [
+        {
+          "joined_lines": 1071,
+          "unique_lines": 1071,
+          "extraction_mismatches": 0,
+          "as_of_mismatches": 0,
+          "currency_mismatches": 0,
+          "invalid_amounts": 0
+        }
+      ],
+      "elapsed_seconds": 0.249
+    },
+    {
+      "name": "credit_reconciliation",
+      "sql": "WITH totals AS (\nSELECT d.doc_entry,d.currency,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOUNT(l.line_num) lines,COUNT(DISTINCT x.product_business_type) categories,\nCOALESCE(SUM(CAST(l.line_total AS DECIMAL(38,6))),0) line_amount\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN' AND doc_date>='2026-09-01' AND doc_date<'2026-10-01') d LEFT JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\nWHERE d.canceled='N' GROUP BY 1,2,3)\nSELECT currency,COUNT(*) documents,SUM(lines) lines,SUM(header_amount) header_amount,SUM(line_amount) line_amount,\nSUM(header_amount-line_amount) residual,SUM(ABS(header_amount-line_amount)) absolute_residual,\nMAX(ABS(header_amount-line_amount)) max_absolute_residual,\nCOUNT(*) FILTER(WHERE ABS(header_amount-line_amount)<=0.01) reconciled_within_cent,\nCOUNT(*) FILTER(WHERE ABS(header_amount-line_amount)>0.01) unexplained_documents,\nCOUNT(*) FILTER(WHERE lines=0) documents_without_lines,\nCOUNT(*) FILTER(WHERE categories>1) multicategory_documents\nFROM totals GROUP BY 1",
+      "parameters": [],
+      "rows": [
+        {
+          "currency": "BS",
+          "documents": 224,
+          "lines": 1071,
+          "header_amount": "328670.240000",
+          "line_amount": "302320.170000",
+          "residual": "26350.070000",
+          "absolute_residual": "30905.790000",
+          "max_absolute_residual": "4528.770000",
+          "reconciled_within_cent": 22,
+          "unexplained_documents": 202,
+          "documents_without_lines": 0,
+          "multicategory_documents": 121
+        }
+      ],
+      "elapsed_seconds": 0.249
+    },
+    {
+      "name": "credit_category_observations",
+      "sql": "SELECT d.currency header_currency,l.currency line_currency,\nx.product_business_type,x.status,x.classification_basis,\nCOUNT(*) lines,COUNT(DISTINCT l.item_code) products,COUNT(DISTINCT d.doc_entry) documents,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) recorded_line_total,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified_lines,\nCOUNT(*) FILTER(WHERE l.item_code IS NULL OR l.item_code='') no_item_code\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN' AND doc_date>='2026-09-01' AND doc_date<'2026-10-01') d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry LEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\nWHERE d.canceled='N' GROUP BY ALL ORDER BY 1,2,3,4,5",
+      "parameters": [],
+      "rows": [
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "SUPPORTED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 1,
+          "products": 1,
+          "documents": 1,
+          "recorded_line_total": "141.000000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 369,
+          "products": 95,
+          "documents": 142,
+          "recorded_line_total": "88285.950000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "LAB_FINISHED_PRODUCT",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 459,
+          "products": 110,
+          "documents": 132,
+          "recorded_line_total": "159579.520000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "OTHER_INPUT",
+          "status": "SUPPORTED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 5,
+          "products": 5,
+          "documents": 4,
+          "recorded_line_total": "931.690000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "PACKAGING",
+          "status": "PROVISIONAL",
+          "classification_basis": "NAME_BASED",
+          "lines": 35,
+          "products": 25,
+          "documents": 25,
+          "recorded_line_total": "11603.150000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "PACKAGING",
+          "status": "SUPPORTED",
+          "classification_basis": "COMBINED",
+          "lines": 4,
+          "products": 2,
+          "documents": 4,
+          "recorded_line_total": "74.620000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "RAW_MATERIAL",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 8,
+          "products": 6,
+          "documents": 7,
+          "recorded_line_total": "16317.710000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        },
+        {
+          "header_currency": "BS",
+          "line_currency": "BS",
+          "product_business_type": "TRADED_PRODUCT",
+          "status": "SUPPORTED",
+          "classification_basis": "COMBINED",
+          "lines": 190,
+          "products": 153,
+          "documents": 61,
+          "recorded_line_total": "25386.530000",
+          "unclassified_lines": 0,
+          "no_item_code": 0
+        }
+      ],
+      "elapsed_seconds": 0.276
+    },
+    {
+      "name": "credit_base_links",
+      "sql": "SELECT l.base_type,COUNT(*) lines,\nCOUNT(*) FILTER(WHERE i.doc_entry IS NOT NULL) linked_invoice_lines,\nCOUNT(*) FILTER(WHERE i.item_code IS DISTINCT FROM l.item_code) product_mismatches,\nCOUNT(*) FILTER(WHERE h.canceled IS DISTINCT FROM 'N') base_not_active_or_missing,\nMIN(h.doc_date) earliest_base_date,MAX(h.doc_date) latest_base_date,\nCOUNT(*) FILTER(WHERE CAST(l.line_total AS DECIMAL(38,6))<0) negative_line_amounts\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN' AND doc_date>='2026-09-01' AND doc_date<'2026-10-01') d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) i ON l.base_type='13' AND i.source_system=l.source_system AND i.source_table='INV1'\n AND i.doc_entry=l.base_entry AND i.line_num=l.base_line\nLEFT JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) h ON h.source_system=i.source_system AND h.source_table='OINV' AND h.doc_entry=i.doc_entry\nWHERE d.canceled='N' GROUP BY 1 ORDER BY 1",
+      "parameters": [],
+      "rows": [
+        {
+          "base_type": "-1",
+          "lines": 64,
+          "linked_invoice_lines": 0,
+          "product_mismatches": 64,
+          "base_not_active_or_missing": 64,
+          "earliest_base_date": null,
+          "latest_base_date": null,
+          "negative_line_amounts": 0
+        },
+        {
+          "base_type": "13",
+          "lines": 1006,
+          "linked_invoice_lines": 1006,
+          "product_mismatches": 0,
+          "base_not_active_or_missing": 0,
+          "earliest_base_date": "2026-09-01T00:00:00",
+          "latest_base_date": "2026-09-23T00:00:00",
+          "negative_line_amounts": 0
+        },
+        {
+          "base_type": "16",
+          "lines": 1,
+          "linked_invoice_lines": 0,
+          "product_mismatches": 1,
+          "base_not_active_or_missing": 1,
+          "earliest_base_date": null,
+          "latest_base_date": null,
+          "negative_line_amounts": 0
+        }
+      ],
+      "elapsed_seconds": 3.154
+    },
+    {
+      "name": "crosswalk_version_identity",
+      "sql": "SELECT COUNT(*) row_count FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet')",
+      "parameters": [],
+      "rows": [
+        {
+          "row_count": 42147
+        }
+      ],
+      "elapsed_seconds": 0.001
+    }
+  ],
+  "lineage": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 2271.687,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "classification": {
+    "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet",
+    "sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10",
+    "historical": false,
+    "item_namespace": "SAP_HANA",
+    "join": "crosswalk.ItemCode = lines.item_code; only SAP_B1_HANA transactional rows"
+  },
+  "script_sha256": "9640a352c9411eb5514a57a1a8455e92ff428d76d3970713a92ea492dcb4b710"
+}

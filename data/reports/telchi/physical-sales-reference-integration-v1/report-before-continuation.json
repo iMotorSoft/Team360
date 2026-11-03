@@ -1,0 +1,68 @@
+{
+  "status": "PARTIAL_RESOURCE_BLOCKED",
+  "branch": "feature/console-backend-core",
+  "entity": "TELCHI",
+  "domain": "VENTAS",
+  "stage": "DEVELOPMENT",
+  "objective_completed": false,
+  "observed_current": "foundation_38680850adc058b1bb11887632b7b681",
+  "observed_reference": "v2_sales_e02883116f4b4991c396010a",
+  "observed_components": ["credit_memo", "material_supply", "oinm", "oitw", "purchasing", "receivables_collections", "reference", "sales"],
+  "reference_successor": null,
+  "real_candidate_built": false,
+  "published": false,
+  "conversational_dimension_enabled": false,
+  "october_monetary_distribution": null,
+  "classification_line_coverage": null,
+  "shared_atomic_writes": 0,
+  "shared_publication_writes": 0,
+  "hana_connections": 0,
+  "permissions_changed": false,
+  "commits": 0,
+  "pushes": 0,
+  "capture_reused_for_inspection": "reference-v2-foundation-offline-final-r2/report.json",
+  "private_checkpoint": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-sales-integration-20261030-v1",
+  "debug": {
+    "symptom": "Canonical manifest rejects a Reference-only successor of the currently published SALES_FACTS_TRANSITION_V1 envelope.",
+    "reproduction": "New offline regression failed at foundation_manifest.py with Sales facts transition inheritance requires an explicit reader-compatible adapter.",
+    "root_cause": "The manifest adapter and reader dispatch did not support Reference-only inheritance of sealed sales. Removing the rejection alone would make sales and credit-memo relations fall back to historical Atomic tables.",
+    "fix": "Allow only Reference-only inheritance with exact non-Reference components, sales provenance, coverage and pinned snapshot; retain sealed-file dispatch and physical hashing in the canonical reader.",
+    "scope": "Foundation inheritance only; no monetary query, accreditation binding, interpreter or permissions changed.",
+    "residual_risk": "Live successor publication and consumer integration are not accredited. Existing commercial amount reader still binds the preceding Foundation/snapshot and must not be silently relaxed."
+  },
+  "files_changed_by_this_execution": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/foundation_manifest.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/foundation_reader.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_facts_transition.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_physical_sales_reference_inheritance.py"
+  ],
+  "validation": {
+    "regression_before_fix": "1 failed as expected; manifest inheritance rejection reproduced",
+    "inheritance_regressions": "6 passed in 220.02 seconds; pytest-inheritance.xml",
+    "final_dispatch_regression": "1 passed in 0.23 seconds; pytest-dispatch.xml",
+    "evidence_reuse": "The final helper adjustment preserves dispatch for all six fixture manifests (valid sales and Reference successors with dictionary provenance); it additionally routes corrupt direct sales envelopes into fail-closed validation. Those six tests were not repeated under sustained host I/O pressure.",
+    "covered": ["eight components preserved in synthetic manifests", "sealed sales and credit-memo relations", "coverage ledger", "independent Atomic and derivation snapshots", "Reference successor chain", "provenance tampering rejected", "data snapshot tampering rejected", "physical file corruption rejected", "isolated rollback", "corrupt direct sales envelope cannot downgrade dispatch"],
+    "fixture_limits": "Reference compatibility projection is stubbed to isolate inheritance; real fixture sales files, hashing, manifest ancestry and canonical reader are exercised. Component verification is injected for independent Atomic components. No live reader or real Reference successor certified.",
+    "lat_check": "PASS; lat-check.log",
+    "git_diff_check": "PASS",
+    "final_diff_review": "Reviewed task additions, preserving preexisting worktree changes."
+  },
+  "resource_guard": {
+    "HOST_PREFLIGHT": "UNSAFE_FOR_INTENSIVE_IO",
+    "RESOURCE_GUARD": "BLOCKED",
+    "reason": "Sustained 67-84 percent disk I/O wait with 9-10 blocked tasks across observations; no swapping growth and approximately 6.2 GiB available do not remove sustained storage pressure.",
+    "CONCURRENCY_USED": "One sequential pytest process; numerical thread environment limited to one. No xdist or concurrent scans/browsers.",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "deferred": ["real Reference preparation and full projection scans", "real Foundation candidate integrity and publication", "live monetary aggregation and reconciliation", "expanded regressions and conversational accreditation"]
+  },
+  "next_steps": [
+    "Repeat host preflight before intensive I/O; re-resolve CURRENT and compare the frozen private checkpoint.",
+    "Verify accredited capture hashes and prepare_physical_reference using the published commercial Reference and crosswalk, not the older physical candidate. Preserve all 38 new products and 45 customers.",
+    "Validate the real successor against all eight components and the canonical reader, including the new inheritance adapter. Extend the existing durable publication wrapper for Reference-only candidates rather than manually publishing.",
+    "Extend and reaccredit the existing commercial-line business query for physical classification through canonical product identity; keep codes 0, 4, 5, missing and unknown auditable.",
+    "Compute October and comparable September windows from published lines with the existing monetary contract, separate credit notes/header residuals, and record observation dates without asserting historical effectiveness.",
+    "Complete permissions-preserving Luna integration, the nine business queries, real answer formatting, regression gates, exact candidate publication and idempotent recovery checks."
+  ]
+}

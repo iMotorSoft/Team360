@@ -1,0 +1,1046 @@
+{
+  "timestamp_utc": "2026-10-14T17:41:02.482061+00:00",
+  "database_writes": 0,
+  "queries": {
+    "server": "SELECT current_database() AS database,current_schema() AS schema,current_schemas(true) AS schemas,current_user AS role,session_user,inet_server_addr()::text AS address,inet_server_port() AS port,current_setting('server_version') AS version,current_setting('search_path') AS search_path,current_setting('row_security') AS row_security,current_setting('transaction_read_only') AS read_only,pg_is_in_recovery() AS recovery,(pg_control_system()).system_identifier::text AS system_identifier",
+    "role": "SELECT rolname,rolsuper,rolbypassrls,rolcreaterole,rolcreatedb,rolinherit,rolcanlogin FROM pg_roles WHERE rolname=current_user",
+    "membership": "SELECT r.rolname,r.rolsuper,r.rolbypassrls,r.rolcreaterole,r.rolcreatedb,pg_has_role(current_user,r.oid,'USAGE') AS effective_inherited FROM pg_roles r WHERE r.rolname<>current_user AND pg_has_role(current_user,r.oid,'MEMBER') ORDER BY r.rolname",
+    "direct_role_grants": "SELECT r.rolname,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.roleid JOIN pg_roles u ON u.oid=m.member WHERE u.rolname=current_user ORDER BY r.rolname",
+    "extensions": "SELECT extname,extversion FROM pg_extension WHERE extname IN ('vector','pgcrypto') ORDER BY extname",
+    "tables": "SELECT n.nspname AS schema,c.relname AS table_name,pg_get_userbyid(c.relowner) AS owner,c.relrowsecurity,c.relforcerowsecurity,has_table_privilege(current_user,c.oid,'SELECT') AS can_select,has_table_privilege(current_user,c.oid,'INSERT') AS can_insert,has_table_privilege(current_user,c.oid,'UPDATE') AS can_update,has_table_privilege(current_user,c.oid,'DELETE') AS can_delete FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind='r' AND c.relname LIKE 'business_concept%' ORDER BY n.nspname,c.relname",
+    "policies": "SELECT schemaname,tablename,policyname,permissive,roles,cmd,qual,with_check FROM pg_policies WHERE tablename LIKE 'business_concept%' ORDER BY tablename,policyname",
+    "sessions": "SELECT datname,usename,application_name,client_addr::text,state,count(*) AS n FROM pg_stat_activity WHERE backend_type='client backend' GROUP BY 1,2,3,4,5 ORDER BY 1,2,3",
+    "credentials_aggregate": "SELECT count(*) AS enrolled,count(*) FILTER (WHERE NOT disabled) AS enabled FROM console_password_credentials",
+    "login_attempts_aggregate": "SELECT count(*) AS tracked_accounts FROM console_login_attempts",
+    "semantic_aggregate": "SELECT status,count(*) AS n FROM business_concepts GROUP BY status ORDER BY status",
+    "embeddings_aggregate": "SELECT model_alias,model_revision,dimension,count(*) AS n FROM business_concept_embeddings GROUP BY 1,2,3 ORDER BY 1,2,3",
+    "iam_table_privileges": "SELECT c.relname,pg_get_userbyid(c.relowner) AS owner,has_table_privilege(current_user,c.oid,'SELECT') AS can_select,has_table_privilege(current_user,c.oid,'INSERT') AS can_insert,has_table_privilege(current_user,c.oid,'UPDATE') AS can_update,has_table_privilege(current_user,c.oid,'DELETE') AS can_delete FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('console_password_credentials','console_login_attempts','core_events') ORDER BY 1"
+  },
+  "contexts": {
+    "inherited_shell": {
+      "source": "DB_PG_V360_URL",
+      "embedding_configuration_presence": {
+        "TEAM360_SEMANTICS_EMBEDDING_ALIAS": false,
+        "TEAM360_SEMANTICS_EMBEDDING_REVISION": false,
+        "TEAM360_SEMANTICS_EMBEDDING_DIMENSION": false,
+        "TEAM360_SEMANTICS_VECTOR_CALIBRATION": false,
+        "TEAM360_SEMANTICS_VECTOR_MINIMUM_SCORE": false,
+        "TEAM360_SEMANTICS_VECTOR_MINIMUM_MARGIN": false
+      },
+      "target": {
+        "host": "localhost",
+        "port": "5432",
+        "dbname": "team360",
+        "user": "administrator"
+      },
+      "queries": {
+        "server": [
+          {
+            "database": "team360",
+            "schema": "public",
+            "schemas": [
+              "pg_catalog",
+              "public"
+            ],
+            "role": "administrator",
+            "session_user": "administrator",
+            "address": "172.18.0.2/32",
+            "port": 5432,
+            "version": "18.4 (Debian 18.4-1.pgdg13+1)",
+            "search_path": "\"$user\", public",
+            "row_security": "on",
+            "read_only": "on",
+            "recovery": false,
+            "system_identifier": "7630993354699489317"
+          }
+        ],
+        "role": [
+          {
+            "rolname": "administrator",
+            "rolsuper": true,
+            "rolbypassrls": true,
+            "rolcreaterole": true,
+            "rolcreatedb": true,
+            "rolinherit": true,
+            "rolcanlogin": true
+          }
+        ],
+        "membership": [
+          {
+            "rolname": "concilia_app",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "concilia_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "evolution_api",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "litellm",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_checkpoint",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_create_subscription",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_database_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_execute_server_program",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_maintain",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_monitor",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_data",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_settings",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_stats",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_server_files",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_signal_autovacuum_worker",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_signal_backend",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_stat_scan_tables",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_use_reserved_connections",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_write_all_data",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_write_server_files",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "team360_business_semantics_dev_runtime",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "team360_telchi_ducklake",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          }
+        ],
+        "direct_role_grants": [],
+        "extensions": [
+          {
+            "extname": "pgcrypto",
+            "extversion": "1.4"
+          },
+          {
+            "extname": "vector",
+            "extversion": "0.8.2"
+          }
+        ],
+        "tables": [
+          {
+            "schema": "public",
+            "table_name": "business_concept_aliases",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_capability_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_classification_rules",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_embeddings",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_entity_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_observations",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_versions",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concepts",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          }
+        ],
+        "policies": [],
+        "sessions": [
+          {
+            "datname": "litellm",
+            "usename": "litellm",
+            "application_name": "",
+            "client_addr": "172.18.0.1/32",
+            "state": "idle",
+            "n": 3
+          },
+          {
+            "datname": "team360",
+            "usename": "administrator",
+            "application_name": "bs-authenticated-validation-readonly",
+            "client_addr": "172.18.0.1/32",
+            "state": "active",
+            "n": 1
+          }
+        ],
+        "credentials_aggregate": [
+          {
+            "enrolled": 0,
+            "enabled": 0
+          }
+        ],
+        "login_attempts_aggregate": [
+          {
+            "tracked_accounts": 0
+          }
+        ],
+        "semantic_aggregate": [
+          {
+            "status": "proposed",
+            "n": 2
+          },
+          {
+            "status": "published",
+            "n": 9
+          }
+        ],
+        "embeddings_aggregate": [
+          {
+            "model_alias": "openai_text_embedding_3_small",
+            "model_revision": "text-embedding-3-small:1536:v1",
+            "dimension": 1536,
+            "n": 10
+          }
+        ],
+        "iam_table_privileges": [
+          {
+            "relname": "console_login_attempts",
+            "owner": "administrator",
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "relname": "console_password_credentials",
+            "owner": "administrator",
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "relname": "core_events",
+            "owner": "administrator",
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          }
+        ]
+      },
+      "errors": {}
+    },
+    "backend_dev_launcher_override": {
+      "source": "DB_PG_V360_URL",
+      "embedding_configuration_presence": {
+        "TEAM360_SEMANTICS_EMBEDDING_ALIAS": false,
+        "TEAM360_SEMANTICS_EMBEDDING_REVISION": false,
+        "TEAM360_SEMANTICS_EMBEDDING_DIMENSION": false,
+        "TEAM360_SEMANTICS_VECTOR_CALIBRATION": false,
+        "TEAM360_SEMANTICS_VECTOR_MINIMUM_SCORE": false,
+        "TEAM360_SEMANTICS_VECTOR_MINIMUM_MARGIN": false
+      },
+      "target": {
+        "host": "localhost",
+        "port": "5432",
+        "dbname": "team360",
+        "user": "administrator"
+      },
+      "queries": {
+        "server": [
+          {
+            "database": "team360",
+            "schema": "public",
+            "schemas": [
+              "pg_catalog",
+              "public"
+            ],
+            "role": "administrator",
+            "session_user": "administrator",
+            "address": "172.18.0.2/32",
+            "port": 5432,
+            "version": "18.4 (Debian 18.4-1.pgdg13+1)",
+            "search_path": "\"$user\", public",
+            "row_security": "on",
+            "read_only": "on",
+            "recovery": false,
+            "system_identifier": "7630993354699489317"
+          }
+        ],
+        "role": [
+          {
+            "rolname": "administrator",
+            "rolsuper": true,
+            "rolbypassrls": true,
+            "rolcreaterole": true,
+            "rolcreatedb": true,
+            "rolinherit": true,
+            "rolcanlogin": true
+          }
+        ],
+        "membership": [
+          {
+            "rolname": "concilia_app",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "concilia_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "evolution_api",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "litellm",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_checkpoint",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_create_subscription",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_database_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_execute_server_program",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_maintain",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_monitor",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_data",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_settings",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_stats",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_server_files",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_signal_autovacuum_worker",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_signal_backend",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_stat_scan_tables",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_use_reserved_connections",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_write_all_data",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_write_server_files",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "team360_business_semantics_dev_runtime",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "team360_telchi_ducklake",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          }
+        ],
+        "direct_role_grants": [],
+        "extensions": [
+          {
+            "extname": "pgcrypto",
+            "extversion": "1.4"
+          },
+          {
+            "extname": "vector",
+            "extversion": "0.8.2"
+          }
+        ],
+        "tables": [
+          {
+            "schema": "public",
+            "table_name": "business_concept_aliases",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_capability_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_classification_rules",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_embeddings",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_entity_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_observations",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_versions",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concepts",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          }
+        ],
+        "policies": [],
+        "sessions": [
+          {
+            "datname": "litellm",
+            "usename": "litellm",
+            "application_name": "",
+            "client_addr": "172.18.0.1/32",
+            "state": "idle",
+            "n": 3
+          },
+          {
+            "datname": "team360",
+            "usename": "administrator",
+            "application_name": "bs-authenticated-validation-readonly",
+            "client_addr": "172.18.0.1/32",
+            "state": "active",
+            "n": 1
+          }
+        ],
+        "credentials_aggregate": [
+          {
+            "enrolled": 0,
+            "enabled": 0
+          }
+        ],
+        "login_attempts_aggregate": [
+          {
+            "tracked_accounts": 0
+          }
+        ],
+        "semantic_aggregate": [
+          {
+            "status": "proposed",
+            "n": 2
+          },
+          {
+            "status": "published",
+            "n": 9
+          }
+        ],
+        "embeddings_aggregate": [
+          {
+            "model_alias": "openai_text_embedding_3_small",
+            "model_revision": "text-embedding-3-small:1536:v1",
+            "dimension": 1536,
+            "n": 10
+          }
+        ],
+        "iam_table_privileges": [
+          {
+            "relname": "console_login_attempts",
+            "owner": "administrator",
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "relname": "console_password_credentials",
+            "owner": "administrator",
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "relname": "core_events",
+            "owner": "administrator",
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          }
+        ]
+      },
+      "errors": {}
+    },
+    "authenticated_cli_config": {
+      "source": "private issuer.json runtime_dsn",
+      "pin": {
+        "database": "team360",
+        "system_identifier": "7630993354699489317"
+      },
+      "target": {
+        "host": "localhost",
+        "port": "5432",
+        "dbname": "team360",
+        "user": "team360_business_semantics_dev_runtime"
+      },
+      "queries": {
+        "server": [
+          {
+            "database": "team360",
+            "schema": "public",
+            "schemas": [
+              "pg_catalog",
+              "public"
+            ],
+            "role": "team360_business_semantics_dev_runtime",
+            "session_user": "team360_business_semantics_dev_runtime",
+            "address": "172.18.0.2/32",
+            "port": 5432,
+            "version": "18.4 (Debian 18.4-1.pgdg13+1)",
+            "search_path": "\"$user\", public",
+            "row_security": "on",
+            "read_only": "on",
+            "recovery": false,
+            "system_identifier": "7630993354699489317"
+          }
+        ],
+        "role": [
+          {
+            "rolname": "team360_business_semantics_dev_runtime",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "rolinherit": false,
+            "rolcanlogin": true
+          }
+        ],
+        "membership": [],
+        "direct_role_grants": [],
+        "extensions": [
+          {
+            "extname": "pgcrypto",
+            "extversion": "1.4"
+          },
+          {
+            "extname": "vector",
+            "extversion": "0.8.2"
+          }
+        ],
+        "tables": [
+          {
+            "schema": "public",
+            "table_name": "business_concept_aliases",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": false
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_capability_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": false
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_classification_rules",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": false
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_embeddings",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": false
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_entity_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": false
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_observations",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": false
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_versions",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": false
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concepts",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": false
+          }
+        ],
+        "policies": [],
+        "sessions": [
+          {
+            "datname": "team360",
+            "usename": "team360_business_semantics_dev_runtime",
+            "application_name": "bs-authenticated-validation-readonly",
+            "client_addr": "172.18.0.1/32",
+            "state": "active",
+            "n": 1
+          }
+        ],
+        "credentials_aggregate": [
+          {
+            "enrolled": 0,
+            "enabled": 0
+          }
+        ],
+        "login_attempts_aggregate": [
+          {
+            "tracked_accounts": 0
+          }
+        ],
+        "semantic_aggregate": [
+          {
+            "status": "proposed",
+            "n": 2
+          },
+          {
+            "status": "published",
+            "n": 9
+          }
+        ],
+        "embeddings_aggregate": [
+          {
+            "model_alias": "openai_text_embedding_3_small",
+            "model_revision": "text-embedding-3-small:1536:v1",
+            "dimension": 1536,
+            "n": 10
+          }
+        ],
+        "iam_table_privileges": [
+          {
+            "relname": "console_login_attempts",
+            "owner": "administrator",
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": false
+          },
+          {
+            "relname": "console_password_credentials",
+            "owner": "administrator",
+            "can_select": true,
+            "can_insert": false,
+            "can_update": false,
+            "can_delete": false
+          },
+          {
+            "relname": "core_events",
+            "owner": "administrator",
+            "can_select": false,
+            "can_insert": true,
+            "can_update": false,
+            "can_delete": false
+          }
+        ]
+      },
+      "errors": {},
+      "dedicated_role_guard": "PASS"
+    }
+  },
+  "private_session_file_count": 0
+}

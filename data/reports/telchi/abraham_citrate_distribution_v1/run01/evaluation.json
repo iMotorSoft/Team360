@@ -1,0 +1,65 @@
+{
+  "case": "ABRAHAM_002",
+  "branch": "feature/console-backend-core",
+  "head_inspected": "09d2ec7",
+  "status": "DONE_WITH_CONCERNS",
+  "business_resolution": "BLOCKED",
+  "classifications": {
+    "INTENT_PRESERVATION": {"status": "FAIL", "reason": "Product mention and both city labels retained; own distribution and L&S relationship absent from proposed and confirmed state"},
+    "PRODUCT_RESOLUTION": {"status": "PARTIAL_NOT_EXECUTED", "reason": "Search text retained; selected_item_codes empty, product_context null, no product lookup executed"},
+    "GEOGRAPHIC_ATTRIBUTION": {"status": "PARTIAL_BLOCKED", "reason": "Cities represented as branches without validated city/branch/destination mapping"},
+    "DISTRIBUTION_MODEL": {"status": "FAIL", "reason": "No operator/territory relationships and no sell-in/sell-out distinction retained or explained"},
+    "DATA_READINESS": {"status": "PARTIAL_OBSERVED_RECONCILIATION_BLOCKED", "reason": "Pinned invoice/credit lines and distributor account observed; destination, current territorial agreement, physical line UoM, approved net product amount and L&S downstream records not established"},
+    "ANSWER_CORRECTNESS": {"status": "FAIL_AS_BUSINESS_ANSWER", "reason": "No invented numbers, but generic refusal omits distribution relationship and incorrectly suggests missing product text when it is present"}
+  },
+  "execution_safety": {"status": "PASS_IN_OBSERVED_SCOPE", "http_status": 200, "committed": true, "capability_calls": 0, "execution_status": "not_executed", "execution_result": null},
+  "literal_vs_benchmark": "Original question specifies no year, month grain or monetary/quantity choice. 2026 monthly amounts and quantities are analyst evaluation requirements, not literally lost explicit slots.",
+  "root_cause": {
+    "observed_loss_boundary": "interpretation_proposed already lacks L&S and own-vs-third-party distribution",
+    "engine_replay": "Recorded proposal reproduces validated state exactly; no downstream removal demonstrated",
+    "contract_limit": "No LLM-editable structured territory/operator/sales-level/time-grain paths; branch labels are not verified geographies",
+    "immediate_execution_blocker": "SalesCapabilities.availability product branch rejects nonempty branches before product lookup",
+    "response_issue": "Combined missing-text/filter error obscures valid product_search_text and commercial intent",
+    "intrinsic_model_quality": "NOT_ISOLATED: no comparison against an adequate relational contract"
+  },
+  "comparison_with_001": {
+    "source": "data/reports/telchi/abraham_horizontal_pharmacies_v1/closure/report.txt",
+    "evidence_reused_not_reexecuted": true,
+    "shared": "Intent compressed into executable catalog vocabulary; schema validation/committed does not establish business comprehension; blocked execution without full intent preservation",
+    "different": "002 retains product and city labels but loses territory-to-operator relationship and sales level. 001 loses customer count/pharmacy segmentation/month grain and has DMS/channel lineage reconciliation gaps. 002 immediate blocker is filtered product lookup, not the 001 monetary-channel branch.",
+    "same_intrinsic_llm_defect_proven": false
+  },
+  "verified_partial_observations": {
+    "foundation": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot": 1408,
+    "SAP_account": "C010264",
+    "master_name": "L&S S.R.L.",
+    "legacy_candidate": "LYS; ClientCity=Cochabamba; ClientSLPropertyName=Distribuidoras; PriceListName=La Paz Horizontal is NOT geography",
+    "LS_sell_in_documentary_lines": [
+      {"period_month": "2026-02", "item_code": "L03612", "documentary_quantity": "25.000000", "raw_line_total_BS": "1794.380000"},
+      {"period_month": "2026-03", "item_code": "L03612", "documentary_quantity": "100.000000", "raw_line_total_BS": "9091.510000"}
+    ],
+    "LS_target_credit_memo_rows": 0,
+    "quantities_are_certified_physical_units": false,
+    "line_totals_are_certified_net_product_revenue": false,
+    "Cochabamba_sell_out": null,
+    "L_and_S_inventory": null,
+    "L_and_S_downstream_returns": null,
+    "La_Paz_destination_sales": null
+  },
+  "minimal_corrections_proposed_not_implemented": [
+    "Preserve versioned structured business intent separately from executable operation, including each territory/operator/distribution relationship and requested sales level",
+    "Maintain user-provided context as unverified context, separate from source-verified commercial mappings",
+    "Evaluate availability per requirement, retaining blockers and allowing explicitly scoped partial sell-in without claiming market sell-out",
+    "Render full understood request and exact blocker; distinguish unsupported filters from absent search text",
+    "Resolve existing product search by namespace/presentation without dropping geographic intent or granting a filtered sales query",
+    "Keep original-year ambiguity distinct from the independent 2026 verification window"
+  ],
+  "acceptance_candidate": "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/abraham_citrate_distribution_v1/acceptance.json",
+  "no_runtime_change": true,
+  "no_capability_added": true,
+  "sap_write_count": 0,
+  "current_changed": false,
+  "validation": {"focused_tests": "28 passed in 0.35s; characterization and existing guards, not business acceptance PASS", "initial_new_harness_failures": "SQL discovery assumptions/timezone materialization/reserved alias; new test root one parent too high; corrected only new investigation files, original attempts preserved"},
+  "resource_guard": {"host_preflight": "SAFE", "resource_guard": "PASS", "process_concurrency": 1, "duckdb_threads": 2, "duckdb_memory_limit_MB": 768, "unrelated_processes_terminated": 0, "environmental_aborts": 0, "own_processes_left_running": 0}
+}

@@ -1,0 +1,200 @@
+{
+  "reused_currency_evidence": [
+    {
+      "path": "modules/telchi/investigation/validation/balance_sheet_pnl_reconstruction/balance_sheet_pnl_reconstruction_v1.json",
+      "sha256": "90c422c7e187fbe90426495f3f3bfdfc815f29c26ba49af1974a22dbc2297fe9",
+      "generated_at_utc": "2026-09-10T12:37:47.716366+00:00",
+      "source": {
+        "database": "NDB",
+        "schema": "TELCHI",
+        "hana_read_only": true
+      },
+      "company_currency": {
+        "local": "BS",
+        "system": "USD",
+        "multi": "B"
+      },
+      "source_script": "modules/telchi/investigation/validation/balance_sheet_pnl_reconstruction/balance_sheet_pnl_reconstruction_v1.py",
+      "source_script_sha256": "89561d26c24efdfb3cde0044992b963f555c0bc5a358ccd814be565cf8c1be6f",
+      "oadm_sql": [
+        "row = fetch_dicts(cur, 'SELECT \"MainCurncy\" AS LOCAL,\"SysCurrncy\" AS SYSTEM,\"MultiCurr\" AS MULTI FROM TELCHI.\"OADM\"')[0]"
+      ]
+    },
+    {
+      "path": "modules/telchi/investigation/validation/financial_position_cash_flow/financial_position_cash_flow_v1_1.json",
+      "sha256": "0a176f21baea2eebf2f940ebb8943db2b4845b63507404f58d625c429adece7d",
+      "generated_at_utc": "2026-09-10T01:23:16.076294+00:00",
+      "source": {
+        "database": "NDB",
+        "schema": "TELCHI",
+        "hana_read_only": true
+      },
+      "company_currency": {
+        "local": "BS",
+        "system": "USD"
+      },
+      "source_script": "modules/telchi/investigation/validation/financial_position_cash_flow/financial_position_cash_flow_v1_1.py",
+      "source_script_sha256": "c4965429826b4cf654a06cbb7e28bc76fe08dd62a9744efdba5217bb9acfa77e",
+      "oadm_sql": [
+        "row = fetch_dicts(cur, 'SELECT \"MainCurncy\" AS \"LOCAL\", \"SysCurrncy\" AS \"SYSTEM\" FROM TELCHI.\"OADM\"')[0]"
+      ]
+    }
+  ],
+  "price_identity": {
+    "quantity_times_price_exact": 59888,
+    "discount_formula_exact": 58760,
+    "quantity_times_price_within_001": 5185,
+    "discount_formula_within_001": 6321,
+    "quantity_times_price_outside_001": 90,
+    "discount_formula_outside_001": 82
+  },
+  "amount_precision": {
+    "cent_exact": 65163
+  },
+  "category_by_tax_rate": {
+    "13": {
+      "lines": 517,
+      "amount": "794140.13",
+      "registered_tax": "116894.07",
+      "documents": 486,
+      "products": 34
+    },
+    "0": {
+      "lines": 9,
+      "amount": "45442.5",
+      "registered_tax": "0",
+      "documents": 9,
+      "products": 8
+    }
+  },
+  "queries": [
+    "SELECT \"DocEntry\",\"LineNum\",\"ItemCode\",\"Price\",\"PriceBefDi\",\"Quantity\",\"LineDiscPrcnt\",\"LineTotal\",\"LineVatSum\",\"VatPrcnt\",\"TotalFrgn\",\"TotalSumSy\",\"LineRate\" FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-09-01-0000/manual-update-20260924T123403344453Z_sales-2026-09-01-0000_1790253769342567061/part-00000.parquet')",
+    "SELECT \"DocEntry\",\"LineNum\",\"ItemCode\",\"Price\",\"PriceBefDi\",\"Quantity\",\"LineDiscPrcnt\",\"LineTotal\",\"LineVatSum\",\"VatPrcnt\",\"TotalFrgn\",\"TotalSumSy\",\"LineRate\" FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-09-01-0000/manual-update-20260924T132754050866Z_sales-2026-09-01-0000_1790256966424033978/part-00000.parquet')"
+  ],
+  "sap_write_count": 0,
+  "exclusive_partition": {
+    "2_within_001_13": {
+      "documents": 12841,
+      "E": "-17.50820000",
+      "C": "332414.740000",
+      "tax_bridge": "-0.190000"
+    },
+    "1_exact_13": {
+      "documents": 14467,
+      "E": "0E-8",
+      "C": "472447.300000",
+      "tax_bridge": "0.000000"
+    },
+    "4_unresolved": {
+      "documents": 2103,
+      "E": "-137000.79810000",
+      "C": "36363.480000",
+      "tax_bridge": "-112919.990000"
+    },
+    "3_other_registered_tax_treatment": {
+      "documents": 890,
+      "E": "-176120.65640000",
+      "C": "1522.690000",
+      "tax_bridge": "-0.200000"
+    }
+  },
+  "nonzero_tax_verified": 27327,
+  "zero_tax_reconciled": 871,
+  "tax_comparison_crosstab": {
+    "tolerance/line_tax_exact": 12804,
+    "exact/line_tax_exact": 14467,
+    "exception/unresolved": 2103,
+    "exception/line_tax_exact": 862,
+    "tolerance/line_tax_within_001": 37,
+    "exception/line_tax_within_001": 28
+  },
+  "unresolved_signed": {
+    "documents": 2103,
+    "signed": "-112919.990000",
+    "absolute": "113120.030000"
+  },
+  "matched_lines": 65163,
+  "discount_examples": [
+    {
+      "DocEntry": 11499581,
+      "LineNum": 0,
+      "Price": "31.5",
+      "PriceBefDi": "35",
+      "Quantity": "50",
+      "LineDiscPrcnt": "10",
+      "LineTotal": "1575",
+      "discount_formula_residual": "0.0"
+    },
+    {
+      "DocEntry": 11499581,
+      "LineNum": 1,
+      "Price": "27.9",
+      "PriceBefDi": "31",
+      "Quantity": "15",
+      "LineDiscPrcnt": "10",
+      "LineTotal": "418.5",
+      "discount_formula_residual": "0.0"
+    },
+    {
+      "DocEntry": 11499581,
+      "LineNum": 2,
+      "Price": "155.7",
+      "PriceBefDi": "173",
+      "Quantity": "10",
+      "LineDiscPrcnt": "10",
+      "LineTotal": "1557",
+      "discount_formula_residual": "0.0"
+    },
+    {
+      "DocEntry": 11499581,
+      "LineNum": 3,
+      "Price": "33.3",
+      "PriceBefDi": "37",
+      "Quantity": "18",
+      "LineDiscPrcnt": "10",
+      "LineTotal": "599.4",
+      "discount_formula_residual": "0.0"
+    },
+    {
+      "DocEntry": 11499583,
+      "LineNum": 0,
+      "Price": "79.79",
+      "PriceBefDi": "88.6556",
+      "Quantity": "1",
+      "LineDiscPrcnt": "10",
+      "LineTotal": "79.79",
+      "discount_formula_residual": "-0.00004"
+    },
+    {
+      "DocEntry": 11499583,
+      "LineNum": 1,
+      "Price": "3.6",
+      "PriceBefDi": "4",
+      "Quantity": "34",
+      "LineDiscPrcnt": "10",
+      "LineTotal": "122.4",
+      "discount_formula_residual": "0.0"
+    },
+    {
+      "DocEntry": 11499595,
+      "LineNum": 0,
+      "Price": "31.5",
+      "PriceBefDi": "35",
+      "Quantity": "25",
+      "LineDiscPrcnt": "10",
+      "LineTotal": "787.5",
+      "discount_formula_residual": "0.0"
+    },
+    {
+      "DocEntry": 11499595,
+      "LineNum": 1,
+      "Price": "23.176",
+      "PriceBefDi": "25.7511",
+      "Quantity": "5",
+      "LineDiscPrcnt": "10",
+      "LineTotal": "115.88",
+      "discount_formula_residual": "0.00005"
+    }
+  ],
+  "category_tax_formula_warning": "VatSum is recorded line tax; header discount/base attribution unresolved. Never auto-apply /0.87 to category."
+}

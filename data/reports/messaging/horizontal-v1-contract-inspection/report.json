@@ -1,0 +1,71 @@
+{
+  "scope": "Contract-only increment; not a connected MessagingService or Telchi assistant",
+  "branch": "feature/console-backend-core",
+  "head": "09d2ec715a31bb88574d734eacb9f437f008624e",
+  "preexisting_worktree": "Dirty and extensively untracked; all existing files preserved",
+  "TEAM360_MESSAGING_HORIZONTAL_V1": "PARTIAL",
+  "TEAM360_TELCHI_WHATSAPP_ASSISTANT_V1": "BLOCKED",
+  "created_files": [
+    "SrvRestAstroLS_v1/backend/modules/messaging/handlers.py",
+    "SrvRestAstroLS_v1/backend/tests/test_messaging_handlers.py",
+    "data/reports/messaging/horizontal-v1-contract-inspection/report.json"
+  ],
+  "implemented": [
+    "Explicit channel-to-module contract and simple handler registry without business-module imports",
+    "Scoped sender identity resolver port with verified absence distinct from lookup failure",
+    "Restrictive default anonymous policy; explicit module public capability limits",
+    "Provider, instance, receiver, tenant, workspace and correlation boundary checks",
+    "Safe errors; no anonymous downgrade after identity failure"
+  ],
+  "not_implemented": [
+    "Webhook/Service integration and actual Telchi handler registration",
+    "PG verified telephone link resolution and per-operation business permission integration",
+    "Luna adapter, promoted deterministic Engine and current-turn committed execution barrier",
+    "Persistent conversation state and post-claim recovery",
+    "Net-sales capability and business semantics verification",
+    "Real Foundation CURRENT verification and WhatsApp end-to-end delivery"
+  ],
+  "inspection": {
+    "srv05": "Existing ls_iMotorSoft_Srv05.py mounts Evolution opt-in and validates binding/schema at startup; not changed",
+    "normalization": "Evolution mapper accepts direct s.whatsapp.net numeric JIDs; groups and LID unsupported and discarded. Sender is numeric JID local part, not display name",
+    "routing": "MessagingRepository.binding uses communication_channels, workspace slug, alias and provider_instance; existing service still uses DEV tenant setting for Telchi SQL routing",
+    "identity": "Existing service uses authorized_sender allowlist. No verified phone-to-core_users resolver found in inspected runtime/schema; DB deployment was not inspected",
+    "permissions_reuse": "modules/console/repositories.py PermissionConsoleRepository.list_effective_permissions resolves role/profile grants scoped to active user/workspace. Telchi business permission/data scope still needs definition",
+    "public_policy": "No equivalent horizontal anonymous policy observed; new contract defaults empty and transports only explicit limits to handler",
+    "delivery": "Existing claim, outbound intent, acceptance and callback repository methods identified; unchanged. A claim committed before capability failure can still suppress duplicate recovery",
+    "foundation": "Historical publication foundation_afd08d9eca6a725be53cdc3f9d5709c9 is documented, not independently confirmed CURRENT. FoundationReader.resolve_on validates a unique CURRENT and pinned snapshot",
+    "sales": "messaging_sales_query.py is a fixed top-items source-quantity capability, not general net sales. No substitution of quantity for revenue",
+    "llmfit_root": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/LlmFit/benchmarks/telchi/conversation_state_v1",
+    "llmfit_engine": "experimental/state_engine.py process returns rejected original proposal and retained state with committed=false; neither is an executable authorization",
+    "llmfit_downstream": "fallback_ground_truth_v1/downstream_contract_evidence_v1/REPORT.md records PRODUCTIVE_BOUNDARY_NOT_OBSERVABLE; no connected runtime bridge is supplied",
+    "verifier": "Team360 FALSE_SIMPLE_ANALYSIS.md reviewed; deterministic verifier does not certify semantic correctness and no tuned rule or second verifier added"
+  },
+  "tests": {
+    "command": "cd SrvRestAstroLS_v1/backend && uv run --no-sync pytest tests/test_messaging_handlers.py tests/test_messaging_evolution.py tests/test_srv05_evolution_isolation.py -q",
+    "result": "95 passed, 1 existing in-memory diagnosis repository warning",
+    "new_contract_tests": 11,
+    "evidence_type": "Unit doubles and existing focused regression; no live PG identity, Luna, Foundation or WhatsApp proof",
+    "initial_test_attempt": "10 new tests failed to run because pytest-asyncio is not installed. Changed new tests to standard asyncio.run without adding dependencies; repeated full focused selection passed",
+    "diff_check": "git diff --check passed; new untracked source files reviewed directly"
+  },
+  "functionalities": {"ACG": "NOT_IMPLEMENTED", "APD": "FUTURE", "BMD": "NOT_IMPLEMENTED"},
+  "next_steps": [
+    "Confirm authorized verified telephone-link source, tenant/workspace and Telchi operation permission/data scope; if schema is needed, prepare proposal under coordinated migration ownership, never apply implicitly",
+    "Connect this contract into the existing durable Service/webhook rather than a second runtime; move existing Telchi SQL special case out of horizontal Service",
+    "Implement recovery with explicit uncertainty handling before retrying execution or sends",
+    "Promote reusable Engine contract/dependencies into Telchi development, preserving LlmFit provenance and enforcing committed is True for the current turn",
+    "Validate sales metric/date/currency/credit-note/cancellation/branch/horizontal-sale semantics against actual CURRENT",
+    "Obtain explicit authorized channel and recipient for preflight and real conversation"
+  ],
+  "safety": {
+    "existing_files_modified": 0,
+    "Srv01_Flow_Diagnosis_modified": false,
+    "migrations_applied": 0,
+    "external_configuration_changed": false,
+    "models_or_SAP_called": false,
+    "service_processes_created": 0,
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0,
+    "impact": "Contract is not wired; existing runtime remains unchanged"
+  }
+}

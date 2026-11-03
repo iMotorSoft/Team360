@@ -1,0 +1,2437 @@
+{
+  "read_only": true,
+  "sap_accessed": false,
+  "foundation_modified": false,
+  "period": [
+    "2026-09-01",
+    "2026-10-01"
+  ],
+  "materiality": "ABS(header-lines)>0.01",
+  "percentage_denominator": "ABS(DocTotal); zero headers separate",
+  "concentration": "rank ABS(delta); shares of total absolute AND signed net delta",
+  "threads": 1,
+  "memory_limit": "256MB",
+  "queries": [
+    {
+      "name": "classification_integrity",
+      "sql": "SELECT COUNT(*) row_count,\nCOUNT(DISTINCT \"ItemCode\") unique_items,COUNT(*) FILTER(WHERE \"ItemCode\" IS NULL) null_items FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet')",
+      "rows": [
+        {
+          "row_count": 42147,
+          "unique_items": 42147,
+          "null_items": 0
+        }
+      ],
+      "elapsed_seconds": 0.012
+    },
+    {
+      "name": "invoice_publication_integrity",
+      "sql": "SELECT\n(SELECT COUNT(*) FROM (SELECT source_system,doc_entry FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV') GROUP BY ALL HAVING COUNT(*)<>1)) duplicate_header_keys,\n(SELECT COUNT(*) FROM (SELECT source_system,doc_entry,line_num FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') GROUP BY ALL HAVING COUNT(*)<>1)) duplicate_line_keys,\n(SELECT COUNT(*) FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV') WHERE doc_entry IS NULL) null_header_keys,\n(SELECT COUNT(*) FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') WHERE doc_entry IS NULL OR line_num IS NULL) null_line_keys,\n(SELECT COUNT(*) FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l WHERE NOT EXISTS(SELECT 1 FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV') d WHERE d.source_system=l.source_system AND d.doc_entry=l.doc_entry)) orphan_lines_publication",
+      "rows": [
+        {
+          "duplicate_header_keys": 0,
+          "duplicate_line_keys": 0,
+          "null_header_keys": 0,
+          "null_line_keys": 0,
+          "orphan_lines_publication": 0
+        }
+      ],
+      "elapsed_seconds": 0.905
+    },
+    {
+      "name": "invoice_schemas",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')",
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_due_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "tax_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_foreign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "series",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "user_sign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_semantic_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ],
+      "elapsed_seconds": 0.007
+    },
+    {
+      "name": "invoice_line_schema",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1')",
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "whs_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "price",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "attributed_slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ],
+      "elapsed_seconds": 0.007
+    },
+    {
+      "name": "invoice_states",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT canceled,currency,COUNT(*) documents,SUM(lines) lines,\nSUM(header_amount) header_amount,SUM(line_amount) line_amount,SUM(delta) delta,\nCOUNT(*) FILTER(WHERE lines=0) headers_without_lines FROM t GROUP BY ALL ORDER BY 1,2",
+      "rows": [
+        {
+          "canceled": "C",
+          "currency": "BS",
+          "documents": 1,
+          "lines": 3,
+          "header_amount": "87.500000",
+          "line_amount": "76.130000",
+          "delta": "11.370000",
+          "headers_without_lines": 0
+        },
+        {
+          "canceled": "N",
+          "currency": "BS",
+          "documents": 30301,
+          "lines": 65163,
+          "header_amount": "8891439.790000",
+          "line_amount": "8048691.580000",
+          "delta": "842748.210000",
+          "headers_without_lines": 0
+        },
+        {
+          "canceled": "Y",
+          "currency": "BS",
+          "documents": 1,
+          "lines": 3,
+          "header_amount": "87.500000",
+          "line_amount": "76.130000",
+          "delta": "11.370000",
+          "headers_without_lines": 0
+        }
+      ],
+      "elapsed_seconds": 0.801
+    },
+    {
+      "name": "invoice_comparable_integrity",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT currency,COUNT(*) documents,\nSUM(currency_mismatches) currency_mismatches,SUM(lineage_mismatches) lineage_mismatches,\nSUM(unclassified) unclassified_lines,SUM(nonvalidated) nonvalidated_lines,\nSUM(missing_line_amounts) missing_line_amounts,\nCOUNT(*) FILTER(WHERE header_amount IS NULL OR delta IS NULL) missing_document_amounts,\nCOUNT(*) FILTER(WHERE lines<>distinct_lines) duplicate_join_documents,\nCOUNT(*) FILTER(WHERE lines=0) headers_without_lines FROM a GROUP BY currency",
+      "rows": [
+        {
+          "currency": "BS",
+          "documents": 30301,
+          "currency_mismatches": 0,
+          "lineage_mismatches": 0,
+          "unclassified_lines": 0,
+          "nonvalidated_lines": 24835,
+          "missing_line_amounts": 0,
+          "missing_document_amounts": 0,
+          "duplicate_join_documents": 0,
+          "headers_without_lines": 0
+        }
+      ],
+      "elapsed_seconds": 0.855
+    },
+    {
+      "name": "invoice_summary",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT currency,COUNT(*) documents,\nCOUNT(*) FILTER(WHERE abs_delta>0.01) with_difference,\n100.0*COUNT(*) FILTER(WHERE abs_delta>0.01)/COUNT(*) percent_with_difference,\nCOUNT(*) FILTER(WHERE abs_delta<=0.01) without_material_difference,\n100.0*COUNT(*) FILTER(WHERE abs_delta<=0.01)/COUNT(*) percent_without_material_difference,\nSUM(header_amount) header_amount,SUM(line_amount) line_amount,SUM(delta) aggregate_difference,\nSUM(abs_delta) absolute_difference_total,\nCOUNT(*) FILTER(WHERE delta>0.01) positive_documents,COUNT(*) FILTER(WHERE delta< -0.01) negative_documents,\nSUM(delta) FILTER(WHERE delta>0) positive_difference,SUM(delta) FILTER(WHERE delta<0) negative_difference,\nMIN(doc_date) first_date,MAX(doc_date) last_date FROM a GROUP BY currency",
+      "rows": [
+        {
+          "currency": "BS",
+          "documents": 30301,
+          "with_difference": 29429,
+          "percent_with_difference": 97.12220718788159,
+          "without_material_difference": 872,
+          "percent_without_material_difference": 2.877792812118412,
+          "header_amount": "8891439.790000",
+          "line_amount": "8048691.580000",
+          "aggregate_difference": "842748.210000",
+          "absolute_difference_total": "897070.850000",
+          "positive_documents": 28999,
+          "negative_documents": 430,
+          "positive_difference": "869909.530000",
+          "negative_difference": "-27161.320000",
+          "first_date": "2026-09-01T00:00:00",
+          "last_date": "2026-09-24T00:00:00"
+        }
+      ],
+      "elapsed_seconds": 0.792
+    },
+    {
+      "name": "invoice_amount_bands",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT CASE WHEN abs_delta<=0.01 THEN '0: <=0.01'\nWHEN abs_delta<=1 THEN '1: (0.01,1]' WHEN abs_delta<=10 THEN '2: (1,10]'\nWHEN abs_delta<=100 THEN '3: (10,100]' WHEN abs_delta<=1000 THEN '4: (100,1000]'\nELSE '5: >1000' END band,COUNT(*) documents,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "band": "0: <=0.01",
+          "documents": 872,
+          "net_difference": "-0.030000",
+          "absolute_difference": "0.090000"
+        },
+        {
+          "band": "1: (0.01,1]",
+          "documents": 1951,
+          "net_difference": "1138.700000",
+          "absolute_difference": "1149.340000"
+        },
+        {
+          "band": "2: (1,10]",
+          "documents": 15036,
+          "net_difference": "68404.450000",
+          "absolute_difference": "70125.270000"
+        },
+        {
+          "band": "3: (10,100]",
+          "documents": 11135,
+          "net_difference": "314653.640000",
+          "absolute_difference": "330836.740000"
+        },
+        {
+          "band": "4: (100,1000]",
+          "documents": 1223,
+          "net_difference": "255070.150000",
+          "absolute_difference": "278892.990000"
+        },
+        {
+          "band": "5: >1000",
+          "documents": 84,
+          "net_difference": "203481.300000",
+          "absolute_difference": "216066.420000"
+        }
+      ],
+      "elapsed_seconds": 0.949
+    },
+    {
+      "name": "invoice_percent_bands",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT CASE WHEN header_amount=0 THEN '0: zero header'\nWHEN abs_delta<=0.01 THEN '1: immaterial' WHEN abs_percent_of_header<=1 THEN '2: <=1%'\nWHEN abs_percent_of_header<=5 THEN '3: (1,5]%' WHEN abs_percent_of_header<=10 THEN '4: (5,10]%'\nWHEN abs_percent_of_header<=15 THEN '5: (10,15]%' WHEN abs_percent_of_header<=25 THEN '6: (15,25]%'\nELSE '7: >25%' END band,COUNT(*) documents,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "band": "1: immaterial",
+          "documents": 872,
+          "net_difference": "-0.030000",
+          "absolute_difference": "0.090000"
+        },
+        {
+          "band": "3: (1,5]%",
+          "documents": 56,
+          "net_difference": "2435.620000",
+          "absolute_difference": "6833.380000"
+        },
+        {
+          "band": "4: (5,10]%",
+          "documents": 1625,
+          "net_difference": "34209.260000",
+          "absolute_difference": "52190.200000"
+        },
+        {
+          "band": "5: (10,15]%",
+          "documents": 27648,
+          "net_difference": "816278.240000",
+          "absolute_difference": "827672.300000"
+        },
+        {
+          "band": "7: >25%",
+          "documents": 100,
+          "net_difference": "-10174.880000",
+          "absolute_difference": "10374.880000"
+        }
+      ],
+      "elapsed_seconds": 0.901
+    },
+    {
+      "name": "invoice_concentration",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N'), ranked AS (SELECT *,ROW_NUMBER() OVER(ORDER BY abs_delta DESC,doc_entry) rank FROM a)\nSELECT n top_n,SUM(delta) FILTER(WHERE rank<=n) net_contribution,\nSUM(abs_delta) FILTER(WHERE rank<=n) absolute_contribution,\n100*SUM(abs_delta) FILTER(WHERE rank<=n)/NULLIF(SUM(abs_delta),0) percent_absolute,\n100*SUM(delta) FILTER(WHERE rank<=n)/NULLIF(SUM(delta),0) percent_net\nFROM ranked CROSS JOIN (VALUES(10),(50),(100)) limits(n) GROUP BY n ORDER BY n",
+      "rows": [
+        {
+          "top_n": 10,
+          "net_contribution": "73081.980000",
+          "absolute_contribution": "73081.980000",
+          "percent_absolute": 8.146734452468275,
+          "percent_net": 8.671864162132128
+        },
+        {
+          "top_n": 50,
+          "net_contribution": "164759.280000",
+          "absolute_contribution": "172275.220000",
+          "percent_absolute": 19.204193291979113,
+          "percent_net": 19.55023790557799
+        },
+        {
+          "top_n": 100,
+          "net_contribution": "218032.540000",
+          "absolute_contribution": "230617.660000",
+          "percent_absolute": 25.707853510121303,
+          "percent_net": 25.871611166044485
+        }
+      ],
+      "elapsed_seconds": 0.87
+    },
+    {
+      "name": "invoice_category_multiplicity",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT categories>1 multicategory,COUNT(*) documents,\nCOUNT(*) FILTER(WHERE abs_delta>0.01) with_difference,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "multicategory": false,
+          "documents": 22019,
+          "with_difference": 21420,
+          "net_difference": "436214.400000",
+          "absolute_difference": "467381.180000"
+        },
+        {
+          "multicategory": true,
+          "documents": 8282,
+          "with_difference": 8009,
+          "net_difference": "406533.810000",
+          "absolute_difference": "429689.670000"
+        }
+      ],
+      "elapsed_seconds": 0.923
+    },
+    {
+      "name": "invoice_daily",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT SUBSTR(doc_date,1,10) document_day,COUNT(*) documents,\nCOUNT(*) FILTER(WHERE abs_delta>0.01) with_difference,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "document_day": "2026-09-01",
+          "documents": 1637,
+          "with_difference": 1567,
+          "net_difference": "50552.360000",
+          "absolute_difference": "54299.460000"
+        },
+        {
+          "document_day": "2026-09-02",
+          "documents": 1722,
+          "with_difference": 1652,
+          "net_difference": "46816.620000",
+          "absolute_difference": "48946.180000"
+        },
+        {
+          "document_day": "2026-09-03",
+          "documents": 1561,
+          "with_difference": 1527,
+          "net_difference": "37946.630000",
+          "absolute_difference": "40484.470000"
+        },
+        {
+          "document_day": "2026-09-04",
+          "documents": 1535,
+          "with_difference": 1509,
+          "net_difference": "44359.730000",
+          "absolute_difference": "45692.730000"
+        },
+        {
+          "document_day": "2026-09-05",
+          "documents": 1194,
+          "with_difference": 1189,
+          "net_difference": "36086.790000",
+          "absolute_difference": "43585.430000"
+        },
+        {
+          "document_day": "2026-09-06",
+          "documents": 265,
+          "with_difference": 265,
+          "net_difference": "2321.080000",
+          "absolute_difference": "2451.400000"
+        },
+        {
+          "document_day": "2026-09-07",
+          "documents": 1622,
+          "with_difference": 1604,
+          "net_difference": "47254.720000",
+          "absolute_difference": "48851.380000"
+        },
+        {
+          "document_day": "2026-09-08",
+          "documents": 1769,
+          "with_difference": 1682,
+          "net_difference": "50386.080000",
+          "absolute_difference": "52577.580000"
+        },
+        {
+          "document_day": "2026-09-09",
+          "documents": 1643,
+          "with_difference": 1572,
+          "net_difference": "42437.540000",
+          "absolute_difference": "45117.700000"
+        },
+        {
+          "document_day": "2026-09-10",
+          "documents": 1577,
+          "with_difference": 1526,
+          "net_difference": "35669.020000",
+          "absolute_difference": "37345.200000"
+        },
+        {
+          "document_day": "2026-09-11",
+          "documents": 1473,
+          "with_difference": 1449,
+          "net_difference": "44051.520000",
+          "absolute_difference": "48764.680000"
+        },
+        {
+          "document_day": "2026-09-12",
+          "documents": 823,
+          "with_difference": 821,
+          "net_difference": "17255.300000",
+          "absolute_difference": "17577.460000"
+        },
+        {
+          "document_day": "2026-09-13",
+          "documents": 274,
+          "with_difference": 274,
+          "net_difference": "3151.760000",
+          "absolute_difference": "3151.760000"
+        },
+        {
+          "document_day": "2026-09-14",
+          "documents": 1541,
+          "with_difference": 1528,
+          "net_difference": "45697.440000",
+          "absolute_difference": "51954.920000"
+        },
+        {
+          "document_day": "2026-09-15",
+          "documents": 1621,
+          "with_difference": 1552,
+          "net_difference": "57992.580000",
+          "absolute_difference": "61818.660000"
+        },
+        {
+          "document_day": "2026-09-16",
+          "documents": 1692,
+          "with_difference": 1595,
+          "net_difference": "63929.960000",
+          "absolute_difference": "69787.360000"
+        },
+        {
+          "document_day": "2026-09-17",
+          "documents": 1472,
+          "with_difference": 1437,
+          "net_difference": "34649.320000",
+          "absolute_difference": "35362.480000"
+        },
+        {
+          "document_day": "2026-09-18",
+          "documents": 1377,
+          "with_difference": 1359,
+          "net_difference": "40048.670000",
+          "absolute_difference": "40745.210000"
+        },
+        {
+          "document_day": "2026-09-19",
+          "documents": 1135,
+          "with_difference": 1125,
+          "net_difference": "22920.350000",
+          "absolute_difference": "23274.470000"
+        },
+        {
+          "document_day": "2026-09-20",
+          "documents": 203,
+          "with_difference": 203,
+          "net_difference": "1739.600000",
+          "absolute_difference": "1739.600000"
+        },
+        {
+          "document_day": "2026-09-21",
+          "documents": 1310,
+          "with_difference": 1290,
+          "net_difference": "26295.120000",
+          "absolute_difference": "26601.680000"
+        },
+        {
+          "document_day": "2026-09-22",
+          "documents": 1270,
+          "with_difference": 1186,
+          "net_difference": "45424.640000",
+          "absolute_difference": "47941.680000"
+        },
+        {
+          "document_day": "2026-09-23",
+          "documents": 1573,
+          "with_difference": 1505,
+          "net_difference": "45644.850000",
+          "absolute_difference": "48882.830000"
+        },
+        {
+          "document_day": "2026-09-24",
+          "documents": 12,
+          "with_difference": 12,
+          "net_difference": "116.530000",
+          "absolute_difference": "116.530000"
+        }
+      ],
+      "elapsed_seconds": 1.02
+    },
+    {
+      "name": "invoice_customer_concentration",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N'), customers AS (\nSELECT card_code,COUNT(*) documents,SUM(delta) net_difference,SUM(abs_delta) absolute_difference\nFROM a GROUP BY card_code) SELECT ROW_NUMBER() OVER(ORDER BY absolute_difference DESC,card_code) customer_rank,\ndocuments,net_difference,absolute_difference FROM customers ORDER BY customer_rank LIMIT 10",
+      "rows": [
+        {
+          "customer_rank": 1,
+          "documents": 7782,
+          "net_difference": "123487.580000",
+          "absolute_difference": "123528.700000"
+        },
+        {
+          "customer_rank": 2,
+          "documents": 9985,
+          "net_difference": "114398.430000",
+          "absolute_difference": "114400.250000"
+        },
+        {
+          "customer_rank": 3,
+          "documents": 3375,
+          "net_difference": "63495.470000",
+          "absolute_difference": "63502.450000"
+        },
+        {
+          "customer_rank": 4,
+          "documents": 3486,
+          "net_difference": "35300.950000",
+          "absolute_difference": "35335.950000"
+        },
+        {
+          "customer_rank": 5,
+          "documents": 5,
+          "net_difference": "18459.390000",
+          "absolute_difference": "25132.290000"
+        },
+        {
+          "customer_rank": 6,
+          "documents": 8,
+          "net_difference": "20314.830000",
+          "absolute_difference": "20314.830000"
+        },
+        {
+          "customer_rank": 7,
+          "documents": 186,
+          "net_difference": "13521.660000",
+          "absolute_difference": "13521.660000"
+        },
+        {
+          "customer_rank": 8,
+          "documents": 1,
+          "net_difference": "12285.000000",
+          "absolute_difference": "12285.000000"
+        },
+        {
+          "customer_rank": 9,
+          "documents": 3,
+          "net_difference": "11765.010000",
+          "absolute_difference": "11765.010000"
+        },
+        {
+          "customer_rank": 10,
+          "documents": 4,
+          "net_difference": "8904.000000",
+          "absolute_difference": "8904.000000"
+        }
+      ],
+      "elapsed_seconds": 1.092
+    },
+    {
+      "name": "invoice_channel_status",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT sales_channel_semantic_status,COUNT(*) documents\nFROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "sales_channel_semantic_status": "CONFIRMED",
+          "documents": 2235
+        },
+        {
+          "sales_channel_semantic_status": "SUPPORTED",
+          "documents": 25977
+        },
+        {
+          "sales_channel_semantic_status": null,
+          "documents": 2089
+        }
+      ],
+      "elapsed_seconds": 0.273
+    },
+    {
+      "name": "invoice_channel",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT sales_channel_code,sales_channel_semantic_status,COUNT(*) documents,\nCOUNT(*) FILTER(WHERE abs_delta>0.01) with_difference,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a WHERE sales_channel_semantic_status='CONFIRMED'\nGROUP BY 1,2 ORDER BY 1",
+      "rows": [
+        {
+          "sales_channel_code": "HORIZONTAL",
+          "sales_channel_semantic_status": "CONFIRMED",
+          "documents": 2235,
+          "with_difference": 2235,
+          "net_difference": "199712.180000",
+          "absolute_difference": "199712.180000"
+        }
+      ],
+      "elapsed_seconds": 0.703
+    },
+    {
+      "name": "invoice_percentage_patterns",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT ROUND(100*delta/NULLIF(header_amount,0),2) signed_percent_of_header,\nCOUNT(*) documents,SUM(delta) net_difference FROM a WHERE abs_delta>0.01\nGROUP BY 1 ORDER BY documents DESC,signed_percent_of_header LIMIT 15",
+      "rows": [
+        {
+          "signed_percent_of_header": 13.0,
+          "documents": 20794,
+          "net_difference": "783740.720000"
+        },
+        {
+          "signed_percent_of_header": 12.99,
+          "documents": 2057,
+          "net_difference": "14388.180000"
+        },
+        {
+          "signed_percent_of_header": 13.01,
+          "documents": 1141,
+          "net_difference": "5091.720000"
+        },
+        {
+          "signed_percent_of_header": 8.42,
+          "documents": 902,
+          "net_difference": "25756.690000"
+        },
+        {
+          "signed_percent_of_header": 12.98,
+          "documents": 719,
+          "net_difference": "2059.660000"
+        },
+        {
+          "signed_percent_of_header": 12.97,
+          "documents": 445,
+          "net_difference": "881.420000"
+        },
+        {
+          "signed_percent_of_header": 12.96,
+          "documents": 426,
+          "net_difference": "623.110000"
+        },
+        {
+          "signed_percent_of_header": 13.02,
+          "documents": 389,
+          "net_difference": "803.250000"
+        },
+        {
+          "signed_percent_of_header": -11.11,
+          "documents": 223,
+          "net_difference": "-5458.000000"
+        },
+        {
+          "signed_percent_of_header": 8.43,
+          "documents": 200,
+          "net_difference": "1496.940000"
+        },
+        {
+          "signed_percent_of_header": 13.03,
+          "documents": 164,
+          "net_difference": "210.900000"
+        },
+        {
+          "signed_percent_of_header": 12.95,
+          "documents": 144,
+          "net_difference": "155.780000"
+        },
+        {
+          "signed_percent_of_header": 12.89,
+          "documents": 138,
+          "net_difference": "78.650000"
+        },
+        {
+          "signed_percent_of_header": 13.04,
+          "documents": 137,
+          "net_difference": "126.490000"
+        },
+        {
+          "signed_percent_of_header": 12.93,
+          "documents": 102,
+          "net_difference": "80.230000"
+        }
+      ],
+      "elapsed_seconds": 0.913
+    },
+    {
+      "name": "invoice_top_documents",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT source_system,source_table,doc_entry,\nSUBSTR(doc_date,1,10) doc_date,currency,header_amount,line_amount,delta,lines,categories,\nraw_extraction_id,source_as_of FROM a ORDER BY abs_delta DESC,doc_entry LIMIT 10",
+      "rows": [
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11522279",
+          "doc_date": "2026-09-16",
+          "currency": "BS",
+          "header_amount": "122513.300000",
+          "line_amount": "106586.570000",
+          "delta": "15926.730000",
+          "lines": 26,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11520705",
+          "doc_date": "2026-09-15",
+          "currency": "BS",
+          "header_amount": "94500.000000",
+          "line_amount": "82215.000000",
+          "delta": "12285.000000",
+          "lines": 1,
+          "categories": 1,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11520513",
+          "doc_date": "2026-09-15",
+          "currency": "BS",
+          "header_amount": "55500.000000",
+          "line_amount": "48285.000000",
+          "delta": "7215.000000",
+          "lines": 1,
+          "categories": 1,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11507897",
+          "doc_date": "2026-09-05",
+          "currency": "BS",
+          "header_amount": "51000.000000",
+          "line_amount": "44370.000000",
+          "delta": "6630.000000",
+          "lines": 1,
+          "categories": 1,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11500413",
+          "doc_date": "2026-09-01",
+          "currency": "BS",
+          "header_amount": "48250.000000",
+          "line_amount": "41977.500000",
+          "delta": "6272.500000",
+          "lines": 2,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11510203",
+          "doc_date": "2026-09-07",
+          "currency": "BS",
+          "header_amount": "42523.000000",
+          "line_amount": "36995.010000",
+          "delta": "5527.990000",
+          "lines": 1,
+          "categories": 1,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11500648",
+          "doc_date": "2026-09-01",
+          "currency": "BS",
+          "header_amount": "40558.450000",
+          "line_amount": "35285.850000",
+          "delta": "5272.600000",
+          "lines": 20,
+          "categories": 3,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11525670",
+          "doc_date": "2026-09-18",
+          "currency": "BS",
+          "header_amount": "58425.000000",
+          "line_amount": "53505.000000",
+          "delta": "4920.000000",
+          "lines": 1,
+          "categories": 1,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11519675",
+          "doc_date": "2026-09-14",
+          "currency": "BS",
+          "header_amount": "34836.700000",
+          "line_amount": "30307.930000",
+          "delta": "4528.770000",
+          "lines": 19,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "doc_entry": "11507917",
+          "doc_date": "2026-09-05",
+          "currency": "BS",
+          "header_amount": "34641.500000",
+          "line_amount": "30138.110000",
+          "delta": "4503.390000",
+          "lines": 16,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        }
+      ],
+      "elapsed_seconds": 0.904
+    },
+    {
+      "name": "invoice_classification_quality",
+      "sql": "SELECT x.product_business_type,x.status,\nx.classification_basis,COUNT(*) lines FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV') d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l\nON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code WHERE d.canceled='N'\nAND d.doc_date>='2026-09-01' AND d.doc_date<'2026-10-01' GROUP BY ALL ORDER BY 1,2,3",
+      "rows": [
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "SUPPORTED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 121
+        },
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 20968
+        },
+        {
+          "product_business_type": "LAB_FINISHED_PRODUCT",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 18541
+        },
+        {
+          "product_business_type": "OTHER_INPUT",
+          "status": "SUPPORTED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 581
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "PROVISIONAL",
+          "classification_basis": "NAME_BASED",
+          "lines": 1535
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "SUPPORTED",
+          "classification_basis": "COMBINED",
+          "lines": 234
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "VALIDATED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 104
+        },
+        {
+          "product_business_type": "RAW_MATERIAL",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 526
+        },
+        {
+          "product_business_type": "SERVICE",
+          "status": "VALIDATED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 189
+        },
+        {
+          "product_business_type": "TRADED_PRODUCT",
+          "status": "SUPPORTED",
+          "classification_basis": "COMBINED",
+          "lines": 22364
+        }
+      ],
+      "elapsed_seconds": 0.209
+    },
+    {
+      "name": "invoice_raw_material_observation",
+      "sql": "SELECT d.currency,COUNT(*) lines,\nCOUNT(DISTINCT l.item_code) products,COUNT(DISTINCT d.doc_entry) documents,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) recorded_line_amount,\nMIN(d.doc_date) first_date,MAX(d.doc_date) last_date\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='OINV') d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='INV1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nJOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\nWHERE d.canceled='N' AND d.doc_date>='2026-09-01' AND d.doc_date<'2026-10-01'\nAND x.product_business_type='RAW_MATERIAL' AND x.status='VALIDATED' GROUP BY 1",
+      "rows": [
+        {
+          "currency": "BS",
+          "lines": 526,
+          "products": 34,
+          "documents": 495,
+          "recorded_line_amount": "839582.630000",
+          "first_date": "2026-09-01T00:00:00",
+          "last_date": "2026-09-24T00:00:00"
+        }
+      ],
+      "elapsed_seconds": 0.264
+    },
+    {
+      "name": "credit_publication_integrity",
+      "sql": "SELECT\n(SELECT COUNT(*) FROM (SELECT source_system,doc_entry FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN') GROUP BY ALL HAVING COUNT(*)<>1)) duplicate_header_keys,\n(SELECT COUNT(*) FROM (SELECT source_system,doc_entry,line_num FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') GROUP BY ALL HAVING COUNT(*)<>1)) duplicate_line_keys,\n(SELECT COUNT(*) FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN') WHERE doc_entry IS NULL) null_header_keys,\n(SELECT COUNT(*) FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') WHERE doc_entry IS NULL OR line_num IS NULL) null_line_keys,\n(SELECT COUNT(*) FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l WHERE NOT EXISTS(SELECT 1 FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN') d WHERE d.source_system=l.source_system AND d.doc_entry=l.doc_entry)) orphan_lines_publication",
+      "rows": [
+        {
+          "duplicate_header_keys": 0,
+          "duplicate_line_keys": 0,
+          "null_header_keys": 0,
+          "null_line_keys": 0,
+          "orphan_lines_publication": 0
+        }
+      ],
+      "elapsed_seconds": 0.191
+    },
+    {
+      "name": "credit_schemas",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')",
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "create_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "update_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_foreign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "series",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "user_sign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_semantic_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ],
+      "elapsed_seconds": 0.005
+    },
+    {
+      "name": "credit_line_schema",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1')",
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "whs_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_total_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_total_foreign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "attributed_slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "base_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "base_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "base_line",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ],
+      "elapsed_seconds": 0.004
+    },
+    {
+      "name": "credit_states",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT canceled,currency,COUNT(*) documents,SUM(lines) lines,\nSUM(header_amount) header_amount,SUM(line_amount) line_amount,SUM(delta) delta,\nCOUNT(*) FILTER(WHERE lines=0) headers_without_lines FROM t GROUP BY ALL ORDER BY 1,2",
+      "rows": [
+        {
+          "canceled": "N",
+          "currency": "BS",
+          "documents": 224,
+          "lines": 1071,
+          "header_amount": "328670.240000",
+          "line_amount": "302320.170000",
+          "delta": "26350.070000",
+          "headers_without_lines": 0
+        }
+      ],
+      "elapsed_seconds": 0.135
+    },
+    {
+      "name": "credit_comparable_integrity",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT currency,COUNT(*) documents,\nSUM(currency_mismatches) currency_mismatches,SUM(lineage_mismatches) lineage_mismatches,\nSUM(unclassified) unclassified_lines,SUM(nonvalidated) nonvalidated_lines,\nSUM(missing_line_amounts) missing_line_amounts,\nCOUNT(*) FILTER(WHERE header_amount IS NULL OR delta IS NULL) missing_document_amounts,\nCOUNT(*) FILTER(WHERE lines<>distinct_lines) duplicate_join_documents,\nCOUNT(*) FILTER(WHERE lines=0) headers_without_lines FROM a GROUP BY currency",
+      "rows": [
+        {
+          "currency": "BS",
+          "documents": 224,
+          "currency_mismatches": 0,
+          "lineage_mismatches": 0,
+          "unclassified_lines": 0,
+          "nonvalidated_lines": 235,
+          "missing_line_amounts": 0,
+          "missing_document_amounts": 0,
+          "duplicate_join_documents": 0,
+          "headers_without_lines": 0
+        }
+      ],
+      "elapsed_seconds": 0.142
+    },
+    {
+      "name": "credit_summary",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT currency,COUNT(*) documents,\nCOUNT(*) FILTER(WHERE abs_delta>0.01) with_difference,\n100.0*COUNT(*) FILTER(WHERE abs_delta>0.01)/COUNT(*) percent_with_difference,\nCOUNT(*) FILTER(WHERE abs_delta<=0.01) without_material_difference,\n100.0*COUNT(*) FILTER(WHERE abs_delta<=0.01)/COUNT(*) percent_without_material_difference,\nSUM(header_amount) header_amount,SUM(line_amount) line_amount,SUM(delta) aggregate_difference,\nSUM(abs_delta) absolute_difference_total,\nCOUNT(*) FILTER(WHERE delta>0.01) positive_documents,COUNT(*) FILTER(WHERE delta< -0.01) negative_documents,\nSUM(delta) FILTER(WHERE delta>0) positive_difference,SUM(delta) FILTER(WHERE delta<0) negative_difference,\nMIN(doc_date) first_date,MAX(doc_date) last_date FROM a GROUP BY currency",
+      "rows": [
+        {
+          "currency": "BS",
+          "documents": 224,
+          "with_difference": 202,
+          "percent_with_difference": 90.17857142857143,
+          "without_material_difference": 22,
+          "percent_without_material_difference": 9.821428571428571,
+          "header_amount": "328670.240000",
+          "line_amount": "302320.170000",
+          "aggregate_difference": "26350.070000",
+          "absolute_difference_total": "30905.790000",
+          "positive_documents": 200,
+          "negative_documents": 2,
+          "positive_difference": "28627.930000",
+          "negative_difference": "-2277.860000",
+          "first_date": "2026-09-01T00:00:00",
+          "last_date": "2026-09-23T00:00:00"
+        }
+      ],
+      "elapsed_seconds": 0.169
+    },
+    {
+      "name": "credit_amount_bands",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT CASE WHEN abs_delta<=0.01 THEN '0: <=0.01'\nWHEN abs_delta<=1 THEN '1: (0.01,1]' WHEN abs_delta<=10 THEN '2: (1,10]'\nWHEN abs_delta<=100 THEN '3: (10,100]' WHEN abs_delta<=1000 THEN '4: (100,1000]'\nELSE '5: >1000' END band,COUNT(*) documents,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "band": "0: <=0.01",
+          "documents": 22,
+          "net_difference": "0.000000",
+          "absolute_difference": "0.000000"
+        },
+        {
+          "band": "1: (0.01,1]",
+          "documents": 1,
+          "net_difference": "0.970000",
+          "absolute_difference": "0.970000"
+        },
+        {
+          "band": "2: (1,10]",
+          "documents": 33,
+          "net_difference": "157.830000",
+          "absolute_difference": "157.830000"
+        },
+        {
+          "band": "3: (10,100]",
+          "documents": 116,
+          "net_difference": "5142.540000",
+          "absolute_difference": "5142.540000"
+        },
+        {
+          "band": "4: (100,1000]",
+          "documents": 47,
+          "net_difference": "10072.620000",
+          "absolute_difference": "10324.620000"
+        },
+        {
+          "band": "5: >1000",
+          "documents": 5,
+          "net_difference": "10976.110000",
+          "absolute_difference": "15279.830000"
+        }
+      ],
+      "elapsed_seconds": 0.153
+    },
+    {
+      "name": "credit_percent_bands",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT CASE WHEN header_amount=0 THEN '0: zero header'\nWHEN abs_delta<=0.01 THEN '1: immaterial' WHEN abs_percent_of_header<=1 THEN '2: <=1%'\nWHEN abs_percent_of_header<=5 THEN '3: (1,5]%' WHEN abs_percent_of_header<=10 THEN '4: (5,10]%'\nWHEN abs_percent_of_header<=15 THEN '5: (10,15]%' WHEN abs_percent_of_header<=25 THEN '6: (15,25]%'\nELSE '7: >25%' END band,COUNT(*) documents,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "band": "1: immaterial",
+          "documents": 22,
+          "net_difference": "0.000000",
+          "absolute_difference": "0.000000"
+        },
+        {
+          "band": "3: (1,5]%",
+          "documents": 2,
+          "net_difference": "492.580000",
+          "absolute_difference": "492.580000"
+        },
+        {
+          "band": "4: (5,10]%",
+          "documents": 8,
+          "net_difference": "-2077.150000",
+          "absolute_difference": "2478.570000"
+        },
+        {
+          "band": "5: (10,15]%",
+          "documents": 191,
+          "net_difference": "27834.640000",
+          "absolute_difference": "27834.640000"
+        },
+        {
+          "band": "7: >25%",
+          "documents": 1,
+          "net_difference": "100.000000",
+          "absolute_difference": "100.000000"
+        }
+      ],
+      "elapsed_seconds": 0.136
+    },
+    {
+      "name": "credit_concentration",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N'), ranked AS (SELECT *,ROW_NUMBER() OVER(ORDER BY abs_delta DESC,doc_entry) rank FROM a)\nSELECT n top_n,SUM(delta) FILTER(WHERE rank<=n) net_contribution,\nSUM(abs_delta) FILTER(WHERE rank<=n) absolute_contribution,\n100*SUM(abs_delta) FILTER(WHERE rank<=n)/NULLIF(SUM(abs_delta),0) percent_absolute,\n100*SUM(delta) FILTER(WHERE rank<=n)/NULLIF(SUM(delta),0) percent_net\nFROM ranked CROSS JOIN (VALUES(10),(50),(100)) limits(n) GROUP BY n ORDER BY n",
+      "rows": [
+        {
+          "top_n": 10,
+          "net_contribution": "13533.320000",
+          "absolute_contribution": "17837.040000",
+          "percent_absolute": 57.71423412894477,
+          "percent_net": 51.35971175788148
+        },
+        {
+          "top_n": 50,
+          "net_contribution": "20846.520000",
+          "absolute_contribution": "25402.240000",
+          "percent_absolute": 82.19249532207395,
+          "percent_net": 79.11371772446904
+        },
+        {
+          "top_n": 100,
+          "net_contribution": "24328.410000",
+          "absolute_contribution": "28884.130000",
+          "percent_absolute": 93.45863671499741,
+          "percent_net": 92.32768641601332
+        }
+      ],
+      "elapsed_seconds": 0.139
+    },
+    {
+      "name": "credit_category_multiplicity",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT categories>1 multicategory,COUNT(*) documents,\nCOUNT(*) FILTER(WHERE abs_delta>0.01) with_difference,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "multicategory": false,
+          "documents": 103,
+          "with_difference": 89,
+          "net_difference": "8450.020000",
+          "absolute_difference": "8702.020000"
+        },
+        {
+          "multicategory": true,
+          "documents": 121,
+          "with_difference": 113,
+          "net_difference": "17900.050000",
+          "absolute_difference": "22203.770000"
+        }
+      ],
+      "elapsed_seconds": 0.147
+    },
+    {
+      "name": "credit_daily",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT SUBSTR(doc_date,1,10) document_day,COUNT(*) documents,\nCOUNT(*) FILTER(WHERE abs_delta>0.01) with_difference,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "document_day": "2026-09-01",
+          "documents": 14,
+          "with_difference": 12,
+          "net_difference": "1071.970000",
+          "absolute_difference": "1071.970000"
+        },
+        {
+          "document_day": "2026-09-02",
+          "documents": 14,
+          "with_difference": 10,
+          "net_difference": "3233.110000",
+          "absolute_difference": "3233.110000"
+        },
+        {
+          "document_day": "2026-09-03",
+          "documents": 8,
+          "with_difference": 6,
+          "net_difference": "380.110000",
+          "absolute_difference": "380.110000"
+        },
+        {
+          "document_day": "2026-09-04",
+          "documents": 8,
+          "with_difference": 7,
+          "net_difference": "861.520000",
+          "absolute_difference": "861.520000"
+        },
+        {
+          "document_day": "2026-09-05",
+          "documents": 2,
+          "with_difference": 2,
+          "net_difference": "-1745.610000",
+          "absolute_difference": "2558.110000"
+        },
+        {
+          "document_day": "2026-09-07",
+          "documents": 6,
+          "with_difference": 6,
+          "net_difference": "327.030000",
+          "absolute_difference": "327.030000"
+        },
+        {
+          "document_day": "2026-09-08",
+          "documents": 14,
+          "with_difference": 11,
+          "net_difference": "2718.490000",
+          "absolute_difference": "2718.490000"
+        },
+        {
+          "document_day": "2026-09-09",
+          "documents": 17,
+          "with_difference": 15,
+          "net_difference": "811.490000",
+          "absolute_difference": "811.490000"
+        },
+        {
+          "document_day": "2026-09-10",
+          "documents": 19,
+          "with_difference": 17,
+          "net_difference": "1447.460000",
+          "absolute_difference": "1447.460000"
+        },
+        {
+          "document_day": "2026-09-11",
+          "documents": 15,
+          "with_difference": 15,
+          "net_difference": "1770.520000",
+          "absolute_difference": "1770.520000"
+        },
+        {
+          "document_day": "2026-09-12",
+          "documents": 6,
+          "with_difference": 6,
+          "net_difference": "356.790000",
+          "absolute_difference": "356.790000"
+        },
+        {
+          "document_day": "2026-09-14",
+          "documents": 12,
+          "with_difference": 12,
+          "net_difference": "4881.070000",
+          "absolute_difference": "4881.070000"
+        },
+        {
+          "document_day": "2026-09-15",
+          "documents": 12,
+          "with_difference": 12,
+          "net_difference": "457.020000",
+          "absolute_difference": "457.020000"
+        },
+        {
+          "document_day": "2026-09-16",
+          "documents": 18,
+          "with_difference": 15,
+          "net_difference": "2049.780000",
+          "absolute_difference": "2049.780000"
+        },
+        {
+          "document_day": "2026-09-17",
+          "documents": 14,
+          "with_difference": 14,
+          "net_difference": "4679.220000",
+          "absolute_difference": "4679.220000"
+        },
+        {
+          "document_day": "2026-09-18",
+          "documents": 10,
+          "with_difference": 7,
+          "net_difference": "423.280000",
+          "absolute_difference": "423.280000"
+        },
+        {
+          "document_day": "2026-09-19",
+          "documents": 5,
+          "with_difference": 5,
+          "net_difference": "128.370000",
+          "absolute_difference": "128.370000"
+        },
+        {
+          "document_day": "2026-09-21",
+          "documents": 6,
+          "with_difference": 6,
+          "net_difference": "249.610000",
+          "absolute_difference": "249.610000"
+        },
+        {
+          "document_day": "2026-09-22",
+          "documents": 6,
+          "with_difference": 6,
+          "net_difference": "231.010000",
+          "absolute_difference": "231.010000"
+        },
+        {
+          "document_day": "2026-09-23",
+          "documents": 18,
+          "with_difference": 18,
+          "net_difference": "2017.830000",
+          "absolute_difference": "2269.830000"
+        }
+      ],
+      "elapsed_seconds": 0.148
+    },
+    {
+      "name": "credit_customer_concentration",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N'), customers AS (\nSELECT card_code,COUNT(*) documents,SUM(delta) net_difference,SUM(abs_delta) absolute_difference\nFROM a GROUP BY card_code) SELECT ROW_NUMBER() OVER(ORDER BY absolute_difference DESC,card_code) customer_rank,\ndocuments,net_difference,absolute_difference FROM customers ORDER BY customer_rank LIMIT 10",
+      "rows": [
+        {
+          "customer_rank": 1,
+          "documents": 2,
+          "net_difference": "8675.470000",
+          "absolute_difference": "8675.470000"
+        },
+        {
+          "customer_rank": 2,
+          "documents": 1,
+          "net_difference": "2593.500000",
+          "absolute_difference": "2593.500000"
+        },
+        {
+          "customer_rank": 3,
+          "documents": 1,
+          "net_difference": "-2151.860000",
+          "absolute_difference": "2151.860000"
+        },
+        {
+          "customer_rank": 4,
+          "documents": 3,
+          "net_difference": "2144.000000",
+          "absolute_difference": "2144.000000"
+        },
+        {
+          "customer_rank": 5,
+          "documents": 22,
+          "net_difference": "1160.510000",
+          "absolute_difference": "1160.510000"
+        },
+        {
+          "customer_rank": 6,
+          "documents": 25,
+          "net_difference": "939.360000",
+          "absolute_difference": "939.360000"
+        },
+        {
+          "customer_rank": 7,
+          "documents": 21,
+          "net_difference": "755.670000",
+          "absolute_difference": "755.670000"
+        },
+        {
+          "customer_rank": 8,
+          "documents": 1,
+          "net_difference": "720.980000",
+          "absolute_difference": "720.980000"
+        },
+        {
+          "customer_rank": 9,
+          "documents": 2,
+          "net_difference": "683.920000",
+          "absolute_difference": "683.920000"
+        },
+        {
+          "customer_rank": 10,
+          "documents": 3,
+          "net_difference": "526.500000",
+          "absolute_difference": "526.500000"
+        }
+      ],
+      "elapsed_seconds": 0.209
+    },
+    {
+      "name": "credit_channel_status",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT sales_channel_semantic_status,COUNT(*) documents\nFROM a GROUP BY 1 ORDER BY 1",
+      "rows": [
+        {
+          "sales_channel_semantic_status": "CONFIRMED",
+          "documents": 108
+        },
+        {
+          "sales_channel_semantic_status": "SUPPORTED",
+          "documents": 80
+        },
+        {
+          "sales_channel_semantic_status": null,
+          "documents": 36
+        }
+      ],
+      "elapsed_seconds": 0.144
+    },
+    {
+      "name": "credit_channel",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT sales_channel_code,sales_channel_semantic_status,COUNT(*) documents,\nCOUNT(*) FILTER(WHERE abs_delta>0.01) with_difference,SUM(delta) net_difference,\nSUM(abs_delta) absolute_difference FROM a WHERE sales_channel_semantic_status='CONFIRMED'\nGROUP BY 1,2 ORDER BY 1",
+      "rows": [
+        {
+          "sales_channel_code": "HORIZONTAL",
+          "sales_channel_semantic_status": "CONFIRMED",
+          "documents": 108,
+          "with_difference": 108,
+          "net_difference": "10172.560000",
+          "absolute_difference": "10172.560000"
+        }
+      ],
+      "elapsed_seconds": 0.168
+    },
+    {
+      "name": "credit_percentage_patterns",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT ROUND(100*delta/NULLIF(header_amount,0),2) signed_percent_of_header,\nCOUNT(*) documents,SUM(delta) net_difference FROM a WHERE abs_delta>0.01\nGROUP BY 1 ORDER BY documents DESC,signed_percent_of_header LIMIT 15",
+      "rows": [
+        {
+          "signed_percent_of_header": 13.0,
+          "documents": 176,
+          "net_difference": "27752.870000"
+        },
+        {
+          "signed_percent_of_header": 12.99,
+          "documents": 9,
+          "net_difference": "66.710000"
+        },
+        {
+          "signed_percent_of_header": 8.42,
+          "documents": 5,
+          "net_difference": "194.660000"
+        },
+        {
+          "signed_percent_of_header": 12.98,
+          "documents": 2,
+          "net_difference": "5.360000"
+        },
+        {
+          "signed_percent_of_header": -6.47,
+          "documents": 1,
+          "net_difference": "-2151.860000"
+        },
+        {
+          "signed_percent_of_header": -5.26,
+          "documents": 1,
+          "net_difference": "-126.000000"
+        },
+        {
+          "signed_percent_of_header": 1.14,
+          "documents": 1,
+          "net_difference": "442.250000"
+        },
+        {
+          "signed_percent_of_header": 3.33,
+          "documents": 1,
+          "net_difference": "50.330000"
+        },
+        {
+          "signed_percent_of_header": 8.43,
+          "documents": 1,
+          "net_difference": "6.050000"
+        },
+        {
+          "signed_percent_of_header": 12.93,
+          "documents": 1,
+          "net_difference": "0.970000"
+        },
+        {
+          "signed_percent_of_header": 12.96,
+          "documents": 1,
+          "net_difference": "1.620000"
+        },
+        {
+          "signed_percent_of_header": 12.97,
+          "documents": 1,
+          "net_difference": "2.530000"
+        },
+        {
+          "signed_percent_of_header": 13.01,
+          "documents": 1,
+          "net_difference": "4.580000"
+        },
+        {
+          "signed_percent_of_header": 48.19,
+          "documents": 1,
+          "net_difference": "100.000000"
+        }
+      ],
+      "elapsed_seconds": 0.364
+    },
+    {
+      "name": "credit_top_documents",
+      "sql": "WITH d AS (SELECT * FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN')\nWHERE doc_date>='2026-09-01' AND doc_date<'2026-10-01'),\nlt AS (SELECT l.source_system,l.doc_entry,COUNT(*) lines,\nCOUNT(DISTINCT l.line_num) distinct_lines,\nCOUNT(*) FILTER(WHERE l.line_total IS NULL) missing_line_amounts,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) line_amount,\nCOUNT(DISTINCT x.product_business_type) categories,\nCOUNT(*) FILTER(WHERE x.\"ItemCode\" IS NULL) unclassified,\nCOUNT(*) FILTER(WHERE x.status IS DISTINCT FROM 'VALIDATED') nonvalidated,\nCOUNT(*) FILTER(WHERE d.currency IS DISTINCT FROM l.currency) currency_mismatches,\nCOUNT(*) FILTER(WHERE d.raw_extraction_id IS DISTINCT FROM l.raw_extraction_id\n OR d.source_as_of IS DISTINCT FROM l.source_as_of) lineage_mismatches\nFROM d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code GROUP BY 1,2),\nt AS (SELECT d.*,CAST(d.doc_total AS DECIMAL(38,6)) header_amount,\nCOALESCE(lt.lines,0) lines,lt.distinct_lines,lt.missing_line_amounts,lt.line_amount,lt.categories,\nlt.unclassified,lt.nonvalidated,lt.currency_mismatches,lt.lineage_mismatches,\nCAST(d.doc_total AS DECIMAL(38,6))-lt.line_amount delta\nFROM d LEFT JOIN lt ON d.source_system=lt.source_system AND d.doc_entry=lt.doc_entry),\na AS (SELECT *,ABS(delta) abs_delta,\n100*ABS(delta)/NULLIF(ABS(header_amount),0) abs_percent_of_header FROM t WHERE canceled='N') SELECT source_system,source_table,doc_entry,\nSUBSTR(doc_date,1,10) doc_date,currency,header_amount,line_amount,delta,lines,categories,\nraw_extraction_id,source_as_of FROM a ORDER BY abs_delta DESC,doc_entry LIMIT 10",
+      "rows": [
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21411",
+          "doc_date": "2026-09-14",
+          "currency": "BS",
+          "header_amount": "34836.700000",
+          "line_amount": "30307.930000",
+          "delta": "4528.770000",
+          "lines": 19,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21494",
+          "doc_date": "2026-09-17",
+          "currency": "BS",
+          "header_amount": "31897.700000",
+          "line_amount": "27751.000000",
+          "delta": "4146.700000",
+          "lines": 18,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21169",
+          "doc_date": "2026-09-02",
+          "currency": "BS",
+          "header_amount": "19950.000000",
+          "line_amount": "17356.500000",
+          "delta": "2593.500000",
+          "lines": 1,
+          "categories": 1,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21212",
+          "doc_date": "2026-09-05",
+          "currency": "BS",
+          "header_amount": "33241.040000",
+          "line_amount": "35392.900000",
+          "delta": "-2151.860000",
+          "lines": 20,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21480",
+          "doc_date": "2026-09-08",
+          "currency": "BS",
+          "header_amount": "14300.000000",
+          "line_amount": "12441.000000",
+          "delta": "1859.000000",
+          "lines": 2,
+          "categories": 1,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21493",
+          "doc_date": "2026-09-23",
+          "currency": "BS",
+          "header_amount": "5546.000000",
+          "line_amount": "4825.020000",
+          "delta": "720.980000",
+          "lines": 7,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21389",
+          "doc_date": "2026-09-16",
+          "currency": "BS",
+          "header_amount": "3857.980000",
+          "line_amount": "3356.440000",
+          "delta": "501.540000",
+          "lines": 4,
+          "categories": 1,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21400",
+          "doc_date": "2026-09-16",
+          "currency": "BS",
+          "header_amount": "3740.000000",
+          "line_amount": "3253.810000",
+          "delta": "486.190000",
+          "lines": 14,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21226",
+          "doc_date": "2026-09-01",
+          "currency": "BS",
+          "header_amount": "38918.700000",
+          "line_amount": "38476.450000",
+          "delta": "442.250000",
+          "lines": 50,
+          "categories": 2,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "doc_entry": "21331",
+          "doc_date": "2026-09-05",
+          "currency": "BS",
+          "header_amount": "3125.000000",
+          "line_amount": "2718.750000",
+          "delta": "406.250000",
+          "lines": 1,
+          "categories": 1,
+          "raw_extraction_id": "manual-update-20260924T123403344453Z_changed",
+          "source_as_of": "2026-09-24T12:59:42.721586+00:00"
+        }
+      ],
+      "elapsed_seconds": 0.28
+    },
+    {
+      "name": "credit_classification_quality",
+      "sql": "SELECT x.product_business_type,x.status,\nx.classification_basis,COUNT(*) lines FROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN') d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l\nON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nLEFT JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code WHERE d.canceled='N'\nAND d.doc_date>='2026-09-01' AND d.doc_date<'2026-10-01' GROUP BY ALL ORDER BY 1,2,3",
+      "rows": [
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "SUPPORTED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 1
+        },
+        {
+          "product_business_type": "FRACTIONATED_PRODUCT",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 369
+        },
+        {
+          "product_business_type": "LAB_FINISHED_PRODUCT",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 459
+        },
+        {
+          "product_business_type": "OTHER_INPUT",
+          "status": "SUPPORTED",
+          "classification_basis": "ITEM_GROUP",
+          "lines": 5
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "PROVISIONAL",
+          "classification_basis": "NAME_BASED",
+          "lines": 35
+        },
+        {
+          "product_business_type": "PACKAGING",
+          "status": "SUPPORTED",
+          "classification_basis": "COMBINED",
+          "lines": 4
+        },
+        {
+          "product_business_type": "RAW_MATERIAL",
+          "status": "VALIDATED",
+          "classification_basis": "COMBINED",
+          "lines": 8
+        },
+        {
+          "product_business_type": "TRADED_PRODUCT",
+          "status": "SUPPORTED",
+          "classification_basis": "COMBINED",
+          "lines": 190
+        }
+      ],
+      "elapsed_seconds": 0.151
+    },
+    {
+      "name": "credit_raw_material_observation",
+      "sql": "SELECT d.currency,COUNT(*) lines,\nCOUNT(DISTINCT l.item_code) products,COUNT(DISTINCT d.doc_entry) documents,\nSUM(CAST(l.line_total AS DECIMAL(38,6))) recorded_line_amount,\nMIN(d.doc_date) first_date,MAX(d.doc_date) last_date\nFROM (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='ORIN') d JOIN (SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE source_system='SAP_B1_HANA' AND source_table='RIN1') l ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\nJOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet') x ON x.\"ItemCode\"=l.item_code\nWHERE d.canceled='N' AND d.doc_date>='2026-09-01' AND d.doc_date<'2026-10-01'\nAND x.product_business_type='RAW_MATERIAL' AND x.status='VALIDATED' GROUP BY 1",
+      "rows": [
+        {
+          "currency": "BS",
+          "lines": 8,
+          "products": 6,
+          "documents": 7,
+          "recorded_line_amount": "16317.710000",
+          "first_date": "2026-09-02T00:00:00",
+          "last_date": "2026-09-11T00:00:00"
+        }
+      ],
+      "elapsed_seconds": 0.158
+    }
+  ],
+  "lineage": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 1886.261,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "crosswalk": {
+    "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet",
+    "sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10"
+  },
+  "script_sha256": "6a615e9e0f00583c605efc1d960ec0b0078a1cfeddab2021cba0fe618cb6d91b"
+}

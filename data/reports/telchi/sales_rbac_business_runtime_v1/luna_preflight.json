@@ -1,0 +1,89 @@
+{
+  "timestamp": "2026-10-12T22:21:18.605697+00:00",
+  "model": "gpt-5.6-luna",
+  "reasoning": "medium",
+  "provider": "OpenAI direct",
+  "simulated": [
+    "identity",
+    "business permission",
+    "PG persistence",
+    "transport"
+  ],
+  "whatsapp_e2e": false,
+  "fallback": false,
+  "turns": [
+    {
+      "user_message": "¿Cuánto vendimos en septiembre?",
+      "classification": "DIRECT_UNAVAILABLE",
+      "interpretation": {
+        "intent": "NEW_QUERY",
+        "action": "ASK",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/metric": "sales.net_amount",
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": null,
+            "/temporal_reference": null
+          },
+          "unset": []
+        },
+        "clarification": {
+          "slot": "period",
+          "question": "¿De qué año es septiembre?"
+        }
+      },
+      "committed": true,
+      "decision": "DIRECT_UNAVAILABLE",
+      "confirmed_state": {
+        "metric": null,
+        "period": null,
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": {
+          "spec": {
+            "slot": "period",
+            "question": "¿De qué año es septiembre?"
+          },
+          "proposed": {
+            "schema_version": 2,
+            "requested_metrics": [
+              "sales.net_amount"
+            ],
+            "entity_mention": null,
+            "temporal_reference": null,
+            "metric": "sales.net_amount",
+            "period": null,
+            "branches": [],
+            "sales_channel": null,
+            "comparison": null,
+            "reference": null,
+            "pending": null
+          },
+          "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3",
+          "source_turn_id": "probe-0"
+        }
+      },
+      "execution_status": "not_executed",
+      "timings": {
+        "interpretation_ms": 4475.535462996049,
+        "state_engine_ms": 0.2614479963085614,
+        "capability_ms": 0.0,
+        "response_format_ms": 0.0,
+        "total_processing_ms": 4475.896706004278
+      }
+    }
+  ],
+  "foundation": null,
+  "controlled_capability_calls": 0,
+  "luna_metadata": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  }
+}

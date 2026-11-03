@@ -1,0 +1,365 @@
+{
+  "timestamp": "2026-11-02T17:03:10.645380+00:00",
+  "source_sha256": "92c866f1634f706901a391591c55660092568879ad2527682d6d490076102f12",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "preparation_ms": 0.08766199971432798,
+    "response_bytes": 6617,
+    "duration_ms": 5455.892,
+    "attempts": 1
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿Qué período querés consultar?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuánto stock tenemos del producto con código SAP E00003 por depósito?",
+      "text": "Stock observado por depósito:\nE00003 · depósito 01: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMD: existencia 0E-12, comprometido 2.000000000000, disponible -2.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMK: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-DEV: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-EXT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-KIT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MAG: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MEI: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MKT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-SAL: existencia 14.000000000000, comprometido 0E-12, disponible 14.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nObservación fuente: 2026-11-01T17:43:38.461000 a 2026-11-01T17:46:05.375000.\nControles: unknown_unit_positions=0\nMostradas 10 de 73 filas; 63 omitidas del mensaje. No es un ranking global entre unidades.\nDepósitos no son sucursales. Disponible = existencia menos comprometido; pedidos de compra no incluidos.\nUnidades desconocidas no se infieren ni se suman. Posiciones ausentes no acreditan stock cero.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "f6db13dd-92b5-40da-bd0e-4d850d3dc506",
+      "thread_id": "639e5ac3-799a-4cb0-9cc5-de7eacd17962",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 63592.559833999985,
+          "state_engine_ms": 1.2134290000176406,
+          "interpretation_ms": 5804.050777000157,
+          "response_format_ms": 0.03356000070198206,
+          "total_processing_ms": 69441.86526999966
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "business_scope": {
+          "domain": "inventory",
+          "metric": "inventory.stock_by_warehouse",
+          "coverage": {
+            "kind": "STOCK_SNAPSHOT",
+            "source_as_of": "2026-11-01T17:43:38.461000+00:00",
+            "source_scope": {
+              "kind": "CURRENT_STOCK_STATEMENT_SNAPSHOT",
+              "branch": "ONLY_ACCREDITED_REFERENCE_CROSSWALKS",
+              "limitation": "SAP statement observation; not simultaneous with other domains",
+              "history_rebuilt": false
+            },
+            "absence_is_zero": false,
+            "requested_period": {},
+            "observation_started_at": "2026-11-01T17:43:38.461000",
+            "observation_finished_at": "2026-11-01T17:46:05.375000",
+            "complete_business_history": false
+          },
+          "datasets": [
+            "inventory_balance"
+          ],
+          "universe": "CAPTURED_NATIVE_OBSERVATIONS"
+        },
+        "contract_error": null,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "inventory.stock_by_warehouse",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "product_target": "E00003",
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "inventory.stock_by_warehouse"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "inventory.stock_by_warehouse",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "product_target": "E00003",
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "inventory.stock_by_warehouse"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "rows": [
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "01",
+              "on_hand_qty": "0E-12",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "0E-12",
+              "committed_qty": "0E-12"
+            },
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "2A-AMD",
+              "on_hand_qty": "0E-12",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "-2.000000000000",
+              "committed_qty": "2.000000000000"
+            },
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "2A-AMK",
+              "on_hand_qty": "0E-12",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "0E-12",
+              "committed_qty": "0E-12"
+            },
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "2A-DEV",
+              "on_hand_qty": "0E-12",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "0E-12",
+              "committed_qty": "0E-12"
+            },
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "2A-EXT",
+              "on_hand_qty": "0E-12",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "0E-12",
+              "committed_qty": "0E-12"
+            },
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "2A-KIT",
+              "on_hand_qty": "0E-12",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "0E-12",
+              "committed_qty": "0E-12"
+            },
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "2A-MAG",
+              "on_hand_qty": "0E-12",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "0E-12",
+              "committed_qty": "0E-12"
+            },
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "2A-MEI",
+              "on_hand_qty": "0E-12",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "0E-12",
+              "committed_qty": "0E-12"
+            },
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "2A-MKT",
+              "on_hand_qty": "0E-12",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "0E-12",
+              "committed_qty": "0E-12"
+            },
+            {
+              "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+              "item_code": "E00003",
+              "warehouse": "2A-SAL",
+              "on_hand_qty": "14.000000000000",
+              "stock_as_of": "2026-11-01T17:43:38.461000+00:00",
+              "available_qty": "14.000000000000",
+              "committed_qty": "0E-12"
+            }
+          ],
+          "label": "Stock observado por depósito",
+          "metric": "inventory.stock_by_warehouse",
+          "source": {
+            "datasets": {
+              "inventory_balance": "oitw_26775585ee26d41a5d5532d3"
+            },
+            "updated_at": "2026-11-01T17:50:16.749000+00:00",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+            "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+          },
+          "summary": null,
+          "timings": {
+            "serialization_ms": 0.15752600029372843,
+            "planning_and_sql_ms": 23.623322000275948,
+            "foundation_resolution_ms": 63051.572
+          },
+          "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+          "controls": {
+            "unknown_unit_positions": 0
+          },
+          "coverage": {
+            "kind": "STOCK_SNAPSHOT",
+            "source_as_of": "2026-11-01T17:43:38.461000+00:00",
+            "source_scope": {
+              "kind": "CURRENT_STOCK_STATEMENT_SNAPSHOT",
+              "branch": "ONLY_ACCREDITED_REFERENCE_CROSSWALKS",
+              "limitation": "SAP statement observation; not simultaneous with other domains",
+              "history_rebuilt": false
+            },
+            "absence_is_zero": false,
+            "requested_period": {},
+            "observation_started_at": "2026-11-01T17:43:38.461000",
+            "observation_finished_at": "2026-11-01T17:46:05.375000",
+            "complete_business_history": false
+          },
+          "read_only": true,
+          "capability": "inventory.stock_by_warehouse.v1",
+          "parameters": {
+            "limit": 10,
+            "item_code": "E00003"
+          },
+          "total_rows": 73,
+          "limitations": [
+            "Depósitos no son sucursales. Disponible = existencia menos comprometido; pedidos de compra no incluidos.",
+            "Unidades desconocidas no se infieren ni se suman. Posiciones ausentes no acreditan stock cero."
+          ],
+          "omitted_rows": 63,
+          "sap_accessed": false
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Stock observado por depósito:\nE00003 · depósito 01: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMD: existencia 0E-12, comprometido 2.000000000000, disponible -2.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMK: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-DEV: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-EXT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-KIT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MAG: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MEI: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MKT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-SAL: existencia 14.000000000000, comprometido 0E-12, disponible 14.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nObservación fuente: 2026-11-01T17:43:38.461000 a 2026-11-01T17:46:05.375000.\nControles: unknown_unit_positions=0\nMostradas 10 de 73 filas; 63 omitidas del mensaje. No es un ranking global entre unidades.\nDepósitos no son sucursales. Disponible = existencia menos comprometido; pedidos de compra no incluidos.\nUnidades desconocidas no se infieren ni se suman. Posiciones ausentes no acreditan stock cero.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.inventory.stock_by_warehouse.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "inventory.stock_by_warehouse",
+              "/entity_mention": null,
+              "/product_target": "E00003",
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "inventory.stock_by_warehouse"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.1473990005251835,
+        "response_bytes": 7277,
+        "duration_ms": 5797.703,
+        "attempts": 1
+      },
+      "elapsed_ms": 69959.18434899977,
+      "request_trace": {
+        "schema": "telchi-pre-sql-profile-v1",
+        "clock": "perf_counter_ns",
+        "spans": [
+          {
+            "label": "authorization_initial",
+            "start_ms": 474.426517,
+            "end_ms": 475.195849,
+            "duration_ms": 0.769332
+          },
+          {
+            "label": "authorization_transaction_revalidation",
+            "start_ms": 479.259735,
+            "end_ms": 486.914409,
+            "duration_ms": 7.654674
+          },
+          {
+            "label": "model_inference_response",
+            "start_ms": 527.836229,
+            "end_ms": 6284.498429,
+            "duration_ms": 5756.6622
+          },
+          {
+            "label": "interpretation_result_parse",
+            "start_ms": 6285.301315,
+            "end_ms": 6285.394865,
+            "duration_ms": 0.09355
+          },
+          {
+            "label": "conversation_audit_save",
+            "start_ms": 69928.811785,
+            "end_ms": 69931.587808,
+            "duration_ms": 2.776023
+          }
+        ],
+        "total_ms": 70024.469087
+      }
+    }
+  ],
+  "budgets": {
+    "worker_seconds": 180,
+    "turn_seconds": 240,
+    "model_seconds": 20,
+    "model_attempts": 1,
+    "production_changed": false
+  }
+}

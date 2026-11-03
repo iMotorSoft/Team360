@@ -1,0 +1,24 @@
+[
+  {
+    "source_concept": "Historical production and resolved internal inventory issues",
+    "required_fields": [
+      "OIGE/IGE1: DocEntry, LineNum, ItemCode, DocDate, CANCELED, BaseType, BaseEntry, BaseLine, Quantity, unitMsr, NumPerMsr",
+      "OWOR: DocEntry, ItemCode, Status, dates",
+      "Resolved issue purpose independent of warehouse names"
+    ],
+    "business_purpose": "Positive consumption and temporal coverage; absence alone cannot prove exclusivity",
+    "expected_coverage": "2022-03-31 through Foundation END, aligned with materialized invoices; verify actual source availability",
+    "target_foundation_semantic": "commercial_purpose",
+    "implementation_authorized": false
+  },
+  {
+    "source_concept": "Current source-native credit memo quantity conversion",
+    "required_fields": [
+      "ORIN/RIN1 document/line keys, ItemCode, Quantity, unitMsr, NumPerMsr, UomCode/UomEntry, InvQty, BaseType/BaseEntry/BaseLine, CANCELED, UpdateDate/UpdateTS"
+    ],
+    "business_purpose": "Exact conversion of the residual credit lines, with partial/total reversal validation",
+    "expected_coverage": "110 residual products, 236 credit memo lines; exact CREDIT_MEMO keys in uom_matrix, 2026-01-01..2026-09-24",
+    "target_foundation_semantic": "product_sales_uom",
+    "implementation_authorized": false
+  }
+]

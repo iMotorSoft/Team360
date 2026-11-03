@@ -120,7 +120,15 @@ El runner exige tests de regresión antes de construir el candidato, verifica fu
 
 ## Estado y próximo gate
 
-La implementación está lista para una promoción independiente, con revisión del candidate ID, gold hash, dependencias pinneadas y parity posterior al cambio explícitamente autorizado de CURRENT.
+La implementación conserva su candidato aprobado, pero el precheck de promoción del 2026-10-01 bloqueó su publicación por incompatibilidad con el lector productivo de Receivables & Collections. CURRENT no fue modificado.
+
+El gate `TELCHI_PURCHASING_FOUNDATION_PROMOTION_AND_CLOSURE_V1_BLOCKED` verificó el candidato exacto en `READY_TO_COMMIT`, su manifiesto aprobado y gold/parity sin diferencias. El CURRENT vigente sigue siendo `foundation_d222a203801cc84e9a14164d26aa67a0`, con siete componentes; purchasing todavía no está productivo.
+
+`receivables_collections_foundation.resolve_current` delega en `_resolve`, que exige `candidate_kind=RECEIVABLES_COLLECTIONS_FOUNDATION_EXTENSION_V1` y exactamente los siete componentes de ese contrato. El candidato aprobado declara `PURCHASING_FOUNDATION_V1` y ocho componentes. Aplicar ese lector al candidato produce `ReceivablesComponentError: Receivables Foundation manifest kind is missing or wrong`; aun superado ese primer control, el conjunto de componentes incumple su contrato.
+
+La promoción no se intentó y no requirió rollback. No se modificaron lógica, schemas, datasets, gold cases ni el candidato. Resolver la compatibilidad requiere volver al gate de implementación y validar los consumidores antes de autorizar otra promoción. No hay evidencia post-promoción ni smoke de purchasing productivo.
+
+Evidencia del bloqueo: `/media/issajar/DEVELOP/Projects/iMotorSoft/ai/evidence/telchi/TELCHI_PURCHASING_FOUNDATION_PROMOTION_AND_CLOSURE_V1/`. Las restricciones de coverage, UNKNOWN, UNRESOLVED, OUT_OF_COVERAGE y devoluciones sin crosswalk del candidato permanecen intactas.
 
 ```text
 FOUNDATION_CURRENT_MODIFIED=NO

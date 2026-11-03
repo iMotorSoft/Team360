@@ -1,0 +1,866 @@
+{
+  "verdict": "PARTIAL",
+  "scope": "real backend; simulated outbound; NOT external WhatsApp",
+  "receiver": "durable-local-c9f3fd2902484589aa361328f22bf2fb",
+  "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+  "user_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+  "instance": "team360-meta-dev",
+  "source_sha256": "efaf38dd5ecf487f630465ac9cbd9fef910817c97bf29f9a34ca1914f51034a8",
+  "whatsapp_sent": 0,
+  "turns": [
+    {
+      "index": 0,
+      "question": "¿Cuántas facturas de proveedores activas registramos en octubre de 2026 y cuál es su importe?",
+      "ingress": "queued",
+      "ingress_ms": 102.9,
+      "total_seconds": 69.67,
+      "duplicates": 10,
+      "outbound_logical": 1,
+      "classification": "DIRECT_AVAILABLE",
+      "decision": "EXECUTE",
+      "execution_status": "executed",
+      "capability_calls": 1,
+      "analysis_context_id": "964ffab7-4183-4a9e-894e-4f80db8d2e22",
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "purchasing.invoiced_amount",
+        "period": {
+          "start": "2026-10-01",
+          "end_exclusive": "2026-11-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "physical_focus": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "purchasing.invoiced_amount"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.08830399929138366,
+        "response_bytes": 10642,
+        "duration_ms": 8968.255,
+        "attempts": 1
+      },
+      "response_sha256": "071403a60e7733db512eccf6053aa8f16abc88c49c7ee87837b0d48207284dbc",
+      "response_length": 1018,
+      "options": true,
+      "job": {
+        "error": null,
+        "state": "OUTBOUND_ACCEPTED",
+        "attempts": 1,
+        "updated_at": "2026-11-02T18:51:55.66807+00:00",
+        "transitions": [
+          {
+            "at": "2026-11-02T18:50:48.061856+00:00",
+            "state": "RUNNING"
+          },
+          {
+            "at": "2026-11-02T18:51:55.604017+00:00",
+            "state": "OUTBOUND_PENDING"
+          },
+          {
+            "at": "2026-11-02T18:51:55.668128+00:00",
+            "state": "OUTBOUND_ACCEPTED"
+          }
+        ]
+      },
+      "outbound_status": "completed",
+      "transport_status": null,
+      "control_evidence": {
+        "metric": "purchasing.invoiced_amount",
+        "summary": {
+          "amount": "4026474.580000000000",
+          "currency": "BS",
+          "documents": 605
+        },
+        "controls": {
+          "excluded_nonactive_documents": 48,
+          "excluded_other_currency_documents": 0
+        },
+        "source": {
+          "datasets": {
+            "ap_invoice": "0999e81c5e1cdf75dea5ba52f75a53f38ab13f334cf7d191b0ded6f654d7a7e7"
+          },
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+        },
+        "coverage": {
+          "kind": "BOUNDED_OBSERVATION",
+          "dataset_rows": 7190,
+          "source_scope": {
+            "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+            "start": "2026-01-01",
+            "limitation": "No claim of modifications outside this business-date scope; no CDC",
+            "end_exclusive": "2026-11-02",
+            "absent_optional_fields": []
+          },
+          "declared_start": "2026-01-01",
+          "absence_is_zero": false,
+          "requested_period": {
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "last_observed_date": "2026-10-31 00:00:00",
+          "first_observed_date": "2026-01-01 00:00:00",
+          "declared_end_exclusive": "2026-11-02",
+          "observation_started_at": "2026-11-01T17:47:42.978000",
+          "observation_finished_at": "2026-11-01T17:47:50.867000",
+          "complete_business_history": false,
+          "requested_outside_capture": false
+        }
+      }
+    },
+    {
+      "index": 1,
+      "question": "Continuar",
+      "ingress": "queued",
+      "ingress_ms": 18.9,
+      "total_seconds": 0.38,
+      "duplicates": 10,
+      "outbound_logical": 1,
+      "classification": "NEEDS_CLARIFICATION",
+      "decision": "CONTINUE",
+      "execution_status": "not_executed",
+      "capability_calls": 0,
+      "analysis_context_id": "964ffab7-4183-4a9e-894e-4f80db8d2e22",
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "purchasing.invoiced_amount",
+        "period": {
+          "start": "2026-10-01",
+          "end_exclusive": "2026-11-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "physical_focus": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "purchasing.invoiced_amount"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.08830399929138366,
+        "response_bytes": 10642,
+        "duration_ms": 8968.255,
+        "attempts": 1
+      },
+      "response_sha256": "4881cd84e4f29609921fe46a1a8d758430c48d423f65701dc8470cc1b94fd6a4",
+      "response_length": 63,
+      "options": false,
+      "job": {
+        "error": null,
+        "state": "OUTBOUND_ACCEPTED",
+        "attempts": 1,
+        "updated_at": "2026-11-02T18:51:56.050588+00:00",
+        "transitions": [
+          {
+            "at": "2026-11-02T18:51:55.864839+00:00",
+            "state": "RUNNING"
+          },
+          {
+            "at": "2026-11-02T18:51:55.98309+00:00",
+            "state": "OUTBOUND_PENDING"
+          },
+          {
+            "at": "2026-11-02T18:51:56.050608+00:00",
+            "state": "OUTBOUND_ACCEPTED"
+          }
+        ]
+      },
+      "outbound_status": "completed",
+      "transport_status": null,
+      "control_evidence": {}
+    },
+    {
+      "index": 2,
+      "question": "¿Y cuáles fueron los cinco principales proveedores?",
+      "ingress": "queued",
+      "ingress_ms": 19.02,
+      "total_seconds": 64.84,
+      "duplicates": 10,
+      "outbound_logical": 1,
+      "classification": "DIRECT_AVAILABLE",
+      "decision": "EXECUTE",
+      "execution_status": "executed",
+      "capability_calls": 1,
+      "analysis_context_id": "964ffab7-4183-4a9e-894e-4f80db8d2e22",
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "purchasing.invoiced_amount",
+        "period": {
+          "start": "2026-10-01",
+          "end_exclusive": "2026-11-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "physical_focus": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "purchasing.invoiced_amount"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.7234509994304972,
+        "response_bytes": 7259,
+        "duration_ms": 6342.448,
+        "attempts": 1
+      },
+      "response_sha256": "071403a60e7733db512eccf6053aa8f16abc88c49c7ee87837b0d48207284dbc",
+      "response_length": 1018,
+      "options": true,
+      "job": {
+        "error": null,
+        "state": "OUTBOUND_ACCEPTED",
+        "attempts": 1,
+        "updated_at": "2026-11-02T18:53:00.885023+00:00",
+        "transitions": [
+          {
+            "at": "2026-11-02T18:51:56.225244+00:00",
+            "state": "RUNNING"
+          },
+          {
+            "at": "2026-11-02T18:53:00.776135+00:00",
+            "state": "OUTBOUND_PENDING"
+          },
+          {
+            "at": "2026-11-02T18:53:00.885187+00:00",
+            "state": "OUTBOUND_ACCEPTED"
+          }
+        ]
+      },
+      "outbound_status": "completed",
+      "transport_status": null,
+      "control_evidence": {
+        "metric": "purchasing.invoiced_amount",
+        "summary": {
+          "amount": "4026474.580000000000",
+          "currency": "BS",
+          "documents": 605
+        },
+        "controls": {
+          "excluded_nonactive_documents": 48,
+          "excluded_other_currency_documents": 0
+        },
+        "source": {
+          "datasets": {
+            "ap_invoice": "0999e81c5e1cdf75dea5ba52f75a53f38ab13f334cf7d191b0ded6f654d7a7e7"
+          },
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+        },
+        "coverage": {
+          "kind": "BOUNDED_OBSERVATION",
+          "dataset_rows": 7190,
+          "source_scope": {
+            "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+            "start": "2026-01-01",
+            "limitation": "No claim of modifications outside this business-date scope; no CDC",
+            "end_exclusive": "2026-11-02",
+            "absent_optional_fields": []
+          },
+          "declared_start": "2026-01-01",
+          "absence_is_zero": false,
+          "requested_period": {
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "last_observed_date": "2026-10-31 00:00:00",
+          "first_observed_date": "2026-01-01 00:00:00",
+          "declared_end_exclusive": "2026-11-02",
+          "observation_started_at": "2026-11-01T17:47:42.978000",
+          "observation_finished_at": "2026-11-01T17:47:50.867000",
+          "complete_business_history": false,
+          "requested_outside_capture": false
+        }
+      }
+    },
+    {
+      "index": 3,
+      "question": "Nueva consulta",
+      "ingress": "queued",
+      "ingress_ms": 40.75,
+      "total_seconds": 0.4,
+      "duplicates": 10,
+      "outbound_logical": 1,
+      "classification": "NEEDS_CLARIFICATION",
+      "decision": "NEW_QUERY",
+      "execution_status": "not_executed",
+      "capability_calls": 0,
+      "analysis_context_id": "19ee0f14-b7af-4cff-9d24-648c41d0232b",
+      "confirmed_state": {
+        "metric": null,
+        "period": null,
+        "pending": null,
+        "branches": [],
+        "reference": null,
+        "comparison": null,
+        "sales_channel": null
+      },
+      "model": null,
+      "response_sha256": "9fedc45a7fa9181cf37f2abbea996fe83657a91a88f86a4a460473ec1bcceb5c",
+      "response_length": 51,
+      "options": false,
+      "job": {
+        "error": null,
+        "state": "OUTBOUND_ACCEPTED",
+        "attempts": 1,
+        "updated_at": "2026-11-02T18:53:06.004241+00:00",
+        "transitions": [
+          {
+            "at": "2026-11-02T18:53:05.815508+00:00",
+            "state": "RUNNING"
+          },
+          {
+            "at": "2026-11-02T18:53:05.904197+00:00",
+            "state": "OUTBOUND_PENDING"
+          },
+          {
+            "at": "2026-11-02T18:53:06.004299+00:00",
+            "state": "OUTBOUND_ACCEPTED"
+          }
+        ]
+      },
+      "outbound_status": "completed",
+      "transport_status": null,
+      "control_evidence": {}
+    },
+    {
+      "index": 4,
+      "question": "¿Cuánto stock tenemos del producto con código SAP E00003 por depósito?",
+      "ingress": "queued",
+      "ingress_ms": 33.13,
+      "total_seconds": 63.09,
+      "duplicates": 10,
+      "outbound_logical": 1,
+      "classification": "DIRECT_AVAILABLE",
+      "decision": "EXECUTE",
+      "execution_status": "executed",
+      "capability_calls": 1,
+      "analysis_context_id": "cfb0bd7b-b96e-4f4f-ba9e-67b9f2b2e99f",
+      "confirmed_state": {
+        "metric": "inventory.stock_by_warehouse",
+        "period": null,
+        "pending": null,
+        "branches": [],
+        "reference": null,
+        "comparison": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "product_target": "E00003",
+        "schema_version": 2,
+        "product_context": null,
+        "requested_metrics": [
+          "inventory.stock_by_warehouse"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": []
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.10974600081681274,
+        "response_bytes": 6573,
+        "duration_ms": 4766.595,
+        "attempts": 1
+      },
+      "response_sha256": "5f7e5f48e16ab91d592faafb004bfa708f80950ed0a401b75aa9ae4da68e8c54",
+      "response_length": 2401,
+      "options": true,
+      "job": {
+        "error": null,
+        "state": "OUTBOUND_ACCEPTED",
+        "attempts": 1,
+        "updated_at": "2026-11-02T18:54:09.095636+00:00",
+        "transitions": [
+          {
+            "at": "2026-11-02T18:53:06.228441+00:00",
+            "state": "RUNNING"
+          },
+          {
+            "at": "2026-11-02T18:54:08.981375+00:00",
+            "state": "OUTBOUND_PENDING"
+          },
+          {
+            "at": "2026-11-02T18:54:09.09578+00:00",
+            "state": "OUTBOUND_ACCEPTED"
+          }
+        ]
+      },
+      "outbound_status": "completed",
+      "transport_status": null,
+      "control_evidence": {
+        "metric": "inventory.stock_by_warehouse",
+        "summary": null,
+        "controls": {
+          "unknown_unit_positions": 0
+        },
+        "source": {
+          "datasets": {
+            "inventory_balance": "oitw_26775585ee26d41a5d5532d3"
+          },
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+        },
+        "coverage": {
+          "kind": "STOCK_SNAPSHOT",
+          "source_as_of": "2026-11-01T17:43:38.461000+00:00",
+          "source_scope": {
+            "kind": "CURRENT_STOCK_STATEMENT_SNAPSHOT",
+            "branch": "ONLY_ACCREDITED_REFERENCE_CROSSWALKS",
+            "limitation": "SAP statement observation; not simultaneous with other domains",
+            "history_rebuilt": false
+          },
+          "absence_is_zero": false,
+          "requested_period": {},
+          "observation_started_at": "2026-11-01T17:43:38.461000",
+          "observation_finished_at": "2026-11-01T17:46:05.375000",
+          "complete_business_history": false
+        }
+      }
+    },
+    {
+      "index": 5,
+      "question": "¿Cuántas líneas de consumo de producción registramos en octubre de 2026?",
+      "ingress": "queued",
+      "ingress_ms": 21.6,
+      "total_seconds": 65.56,
+      "duplicates": 10,
+      "outbound_logical": 1,
+      "classification": "DIRECT_AVAILABLE",
+      "decision": "EXECUTE",
+      "execution_status": "executed",
+      "capability_calls": 1,
+      "analysis_context_id": "93838885-5243-4539-9c2b-b374f83fe408",
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "production.consumption",
+        "period": {
+          "start": "2026-10-01",
+          "end_exclusive": "2026-11-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "physical_focus": null,
+        "product_target": null,
+        "schema_version": 2,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "production.consumption"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": []
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.2674019997357391,
+        "response_bytes": 8428,
+        "duration_ms": 7727.231,
+        "attempts": 1
+      },
+      "response_sha256": "8886c9c1e6f08f60c7aa38e6c1371bbc4492c89ca71391c40e49636d9947c25b",
+      "response_length": 1871,
+      "options": true,
+      "job": {
+        "error": null,
+        "state": "OUTBOUND_ACCEPTED",
+        "attempts": 1,
+        "updated_at": "2026-11-02T18:55:14.664067+00:00",
+        "transitions": [
+          {
+            "at": "2026-11-02T18:54:09.394133+00:00",
+            "state": "RUNNING"
+          },
+          {
+            "at": "2026-11-02T18:55:14.599025+00:00",
+            "state": "OUTBOUND_PENDING"
+          },
+          {
+            "at": "2026-11-02T18:55:14.664151+00:00",
+            "state": "OUTBOUND_ACCEPTED"
+          }
+        ]
+      },
+      "outbound_status": "completed",
+      "transport_status": null,
+      "control_evidence": {
+        "metric": "production.consumption",
+        "summary": null,
+        "controls": {
+          "period_source_lines": 4814,
+          "included_issue_lines": 3974,
+          "unknown_native_identity_lines_affected": 0
+        },
+        "source": {
+          "datasets": {
+            "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+            "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7",
+            "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33"
+          },
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+        },
+        "coverage": {
+          "kind": "BOUNDED_OBSERVATION",
+          "dataset_rows": 41808,
+          "source_scope": {
+            "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+            "start": "2026-01-01",
+            "limitation": "No claim of modifications outside this business-date scope; no CDC",
+            "end_exclusive": "2026-11-02",
+            "absent_optional_fields": []
+          },
+          "declared_start": "2026-01-01",
+          "absence_is_zero": false,
+          "requested_period": {
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "last_observed_date": "2026-10-31 00:00:00",
+          "first_observed_date": "2026-01-05 00:00:00",
+          "declared_end_exclusive": "2026-11-02",
+          "observation_started_at": "2026-11-01T17:46:37.892000",
+          "observation_finished_at": "2026-11-01T17:46:53.281000",
+          "complete_business_history": false,
+          "requested_outside_capture": false
+        }
+      }
+    },
+    {
+      "index": 6,
+      "question": "¿Cuántos pagos activos registramos en octubre de 2026 y cuál es su importe?",
+      "ingress": "queued",
+      "ingress_ms": 32.83,
+      "total_seconds": 65.75,
+      "duplicates": 10,
+      "outbound_logical": 1,
+      "classification": "DIRECT_AVAILABLE",
+      "decision": "EXECUTE",
+      "execution_status": "executed",
+      "capability_calls": 1,
+      "analysis_context_id": "a924820a-33ff-4244-b081-38fdf7bbbfa3",
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "collections.received_amount",
+        "period": {
+          "start": "2026-10-01",
+          "end_exclusive": "2026-11-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "physical_focus": null,
+        "product_target": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "collections.received_amount"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": []
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.12668899944401346,
+        "response_bytes": 8874,
+        "duration_ms": 7619.15,
+        "attempts": 1
+      },
+      "response_sha256": "c349bf7fef45cb57cebc4a43de01958fe5f2906db79daee8278b05f8993e33e9",
+      "response_length": 708,
+      "options": true,
+      "job": {
+        "error": null,
+        "state": "OUTBOUND_ACCEPTED",
+        "attempts": 1,
+        "updated_at": "2026-11-02T18:56:25.058202+00:00",
+        "transitions": [
+          {
+            "at": "2026-11-02T18:55:19.517144+00:00",
+            "state": "RUNNING"
+          },
+          {
+            "at": "2026-11-02T18:56:24.981121+00:00",
+            "state": "OUTBOUND_PENDING"
+          },
+          {
+            "at": "2026-11-02T18:56:25.058278+00:00",
+            "state": "OUTBOUND_ACCEPTED"
+          }
+        ]
+      },
+      "outbound_status": "completed",
+      "transport_status": null,
+      "control_evidence": {
+        "metric": "collections.received_amount",
+        "summary": null,
+        "controls": {
+          "excluded_nonactive_payments": 311,
+          "excluded_other_currency_payments": 0
+        },
+        "source": {
+          "datasets": {
+            "collection_payment": "7f239cc3701c6ca888a8c23d824d3cc06913dfc12af6ab6a12e745426c580ee0"
+          },
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+        },
+        "coverage": {
+          "kind": "BOUNDED_OBSERVATION",
+          "dataset_rows": 50687,
+          "source_scope": {
+            "kind": "BOUNDED_OVERLAP_PLUS_GAP",
+            "start": "2026-09-21",
+            "limitation": "Historical balances/payments before overlap NOT refreshed; aging not accredited by this capture",
+            "end_exclusive": "2026-11-02"
+          },
+          "declared_start": "2026-09-21",
+          "absence_is_zero": false,
+          "requested_period": {
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "last_observed_date": "2026-11-01 00:00:00",
+          "first_observed_date": "2026-09-21 00:00:00",
+          "declared_end_exclusive": "2026-11-02",
+          "observation_started_at": "2026-11-01T17:48:30.543000",
+          "observation_finished_at": "2026-11-01T17:48:54.816000",
+          "complete_business_history": false,
+          "requested_outside_capture": false
+        }
+      }
+    },
+    {
+      "index": 7,
+      "question": "¿Cuántas líneas elegibles de consumo de materiales se registraron en octubre de 2026?",
+      "ingress": "queued",
+      "ingress_ms": 28.8,
+      "total_seconds": 66.39,
+      "duplicates": 10,
+      "outbound_logical": 1,
+      "classification": "DIRECT_AVAILABLE",
+      "decision": "EXECUTE",
+      "execution_status": "executed",
+      "capability_calls": 1,
+      "analysis_context_id": "0a05b16d-8e79-4d51-8514-224bbe85fde2",
+      "confirmed_state": {
+        "limit": 10,
+        "metric": "material_supply.consumption",
+        "period": {
+          "start": "2026-10-01",
+          "end_exclusive": "2026-11-01"
+        },
+        "pending": null,
+        "branches": [],
+        "group_by": null,
+        "reference": null,
+        "comparison": null,
+        "period_mode": null,
+        "breakdown_by": null,
+        "sales_channel": null,
+        "entity_mention": null,
+        "physical_focus": null,
+        "product_target": null,
+        "ranking_detail": null,
+        "schema_version": 2,
+        "customer_target": null,
+        "product_context": null,
+        "business_category": null,
+        "requested_metrics": [
+          "material_supply.consumption"
+        ],
+        "temporal_reference": null,
+        "product_search_text": null,
+        "selected_item_codes": [],
+        "ranking_target_item_code": null
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.08961900130088907,
+        "response_bytes": 8924,
+        "duration_ms": 8250.953,
+        "attempts": 1
+      },
+      "response_sha256": "dc9b0a37b7971f8463a6568d9f4e2facf52634476b7e361363d58cfbc8b2d62b",
+      "response_length": 1873,
+      "options": true,
+      "job": {
+        "error": null,
+        "state": "OUTBOUND_ACCEPTED",
+        "attempts": 1,
+        "updated_at": "2026-11-02T18:57:31.400267+00:00",
+        "transitions": [
+          {
+            "at": "2026-11-02T18:56:25.278233+00:00",
+            "state": "RUNNING"
+          },
+          {
+            "at": "2026-11-02T18:57:31.3117+00:00",
+            "state": "OUTBOUND_PENDING"
+          },
+          {
+            "at": "2026-11-02T18:57:31.400483+00:00",
+            "state": "OUTBOUND_ACCEPTED"
+          }
+        ]
+      },
+      "outbound_status": "completed",
+      "transport_status": null,
+      "control_evidence": {
+        "metric": "material_supply.consumption",
+        "summary": null,
+        "controls": {
+          "period_source_lines": 4814,
+          "included_issue_lines": 2297,
+          "unknown_native_identity_lines_affected": 0
+        },
+        "source": {
+          "datasets": {
+            "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+            "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7",
+            "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33"
+          },
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+        },
+        "coverage": {
+          "kind": "BOUNDED_OBSERVATION",
+          "dataset_rows": 41808,
+          "source_scope": {
+            "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+            "start": "2026-01-01",
+            "limitation": "No claim of modifications outside this business-date scope; no CDC",
+            "end_exclusive": "2026-11-02",
+            "absent_optional_fields": []
+          },
+          "declared_start": "2026-01-01",
+          "absence_is_zero": false,
+          "requested_period": {
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "last_observed_date": "2026-10-31 00:00:00",
+          "first_observed_date": "2026-01-05 00:00:00",
+          "declared_end_exclusive": "2026-11-02",
+          "observation_started_at": "2026-11-01T17:46:37.892000",
+          "observation_finished_at": "2026-11-01T17:46:53.281000",
+          "complete_business_history": false,
+          "requested_outside_capture": false
+        }
+      }
+    }
+  ],
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "preparation_ms": 0.07273899973370135,
+    "response_bytes": 7068,
+    "duration_ms": 11625.149,
+    "attempts": 1
+  },
+  "backend_probe_completed": true
+}

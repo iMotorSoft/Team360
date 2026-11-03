@@ -1,0 +1,23 @@
+{
+  "before": {
+    "source": "data/reports/team360-promotion-readiness/20261009T130833Z/surface-audit.json",
+    "environment": "production",
+    "dev_adapter_status": 201,
+    "bootstrap_anonymous_status": 201,
+    "bootstrap_token_usable_me_status": 200,
+    "gupshup_unsigned_empty_status": 200,
+    "classification": "EXPOSURE_RISK / BLOCKING"
+  },
+  "after": {
+    "source": "production-like-probe.json",
+    "environment": "production",
+    "dev_adapter_status": 404,
+    "bootstrap_anonymous_status": 404,
+    "gupshup_missing_auth_config_status": 503,
+    "gupshup_invalid_credential_status": 401,
+    "gupshup_valid_synthetic_ignored_status": 200,
+    "flow_unauthenticated_status": 401,
+    "openapi_operations": 28,
+    "classification": "TECHNICAL_DEFECT_CLOSED / EXTERNAL_EVIDENCE_DEGRADED"
+  }
+}

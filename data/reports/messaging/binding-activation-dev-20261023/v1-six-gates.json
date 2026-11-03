@@ -1,0 +1,35 @@
+{
+  "branch": "feature/console-backend-core",
+  "SIX_GATES": "VALID",
+  "GATE_FAILURES": [],
+  "CURRENT_CODE_FINGERPRINT": "VALID",
+  "CURRENT_PILOT_CONTRACT": "VALID",
+  "REAL_SECURITY_BOUNDARIES": "PASS",
+  "DEV_GATE_POLICY": "change_based_v1",
+  "READY_FOR_MANUAL_START": "YES",
+  "source_sha256": "d1a74b21df8c4986d2cfd52cf576c3bdef5f87e37369059e0fbd5ec72d44ac10",
+  "approval_sha256": "f548d798c479d976e532098eaac170864ca30024b53769bec93dd5b9349cf8c5",
+  "configuration_sha256": "812509adb4ab97492aae8d60f0a9c39bda1a3bf2e7c3fff53e0ad42788814846",
+  "manifest_sha256": "b43d3ec4c6bab8f12047b8b7d619733b0ee14d170e93eda9050bbde0ae719cf3",
+  "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/six-gates-20261103T012153474289Z/final-accreditation.json",
+  "artifact_sha256": "1ebcff59d34823ec29e51685546ee92966fe7a2478c9363ebf52dd665d933cbd",
+  "validations": {
+    "command": "pytest tests/test_messaging_binding_administration.py tests/test_messaging_single_owner_dev.py tests/test_srv05_evolution_isolation.py tests/test_telchi_transport_dev.py modules/telchi/assistant/tests/test_dev_gate_policy.py modules/telchi/assistant/tests/test_whatsapp_operational_contract.py -q",
+    "exit_code": 0,
+    "result": [
+      "108 passed, 1 warning in 7.80s"
+    ],
+    "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/six-gates-20261103T012153474289Z/focused-tests.txt",
+    "sha256": "54c7564d12a38de1887a03d6b4aeac487563590a100d4473af1a265bc50a92c1"
+  },
+  "lifecycle": "STOPPED",
+  "whatsapp_sends": 0,
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "impact": "Evidence/private manifest only; no runtime, security policy, grants, bindings, webhook, credentials or Foundation changes.",
+  "limits": "Not WhatsApp E2E; recording egress certifies logical intent only. No provider outage induced. Manual start remains separate.",
+  "next_step": "Manual operator start, then the presidential conversation on WhatsApp; no automatic start performed.",
+  "renewal_scope": "V1 private registry; one reused six-guarantee probe, not a broad business suite",
+  "legacy_control_unchanged": true,
+  "v1_source_manifest_sha256": "d1a74b21df8c4986d2cfd52cf576c3bdef5f87e37369059e0fbd5ec72d44ac10"
+}

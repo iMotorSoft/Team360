@@ -1,0 +1,187 @@
+{
+  "case": "ABRAHAM_002",
+  "question": "Venta de Citrato de magnesio en la paz y cochabamba, en la paz distribucion propia y en conchabamba lo hace L&S",
+  "timestamp": "2026-10-15T14:13:07.923300+00:00",
+  "preflight": {
+    "postgres": true,
+    "model": {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true
+    },
+    "milvus_litellm": "NOT_APPLICABLE: direct OpenAI Responses; no retrieval/proxy"
+  },
+  "assistant_hashes_before": {
+    "__init__.py": "5e077f893f781a8f0265be4655c1af245513755552ffe4e72d87fea64129b386",
+    "capabilities.py": "08013cc0a0784ff8a0083f36c870508d0ab9b0ebbe180212564a4bc0bc3f9c0a",
+    "composition.py": "41e3bf569751e320820a03b20e8edbd03bee4b7877fc0e9e281f0499bf64e26a",
+    "dev_runtime_http.py": "8dbec24c3aa80515fb8b32c9b28b42b0f1a6c9c68c289fe9382ce987099a2e3d",
+    "handler.py": "f0d44268aa94d32298c0906b181667d42a7248c0053c3bde11d97bbbb7419d4e",
+    "luna.py": "e3f77ba5c3c55c9a7551325d53e4f16d5f519ef6013b1e5545b7e1567e93f9ec",
+    "repository.py": "4f67619b45f4920cdc2e24c79dcacc7075a9a7c618e1c130498fe21d9207a523",
+    "state_engine.py": "ffe0cc4b8bcfba714d59b0aed840a3be66cbe2d471f206b974a8ba1d132d6a0b",
+    "whatsapp_dev.py": "f7dc488d2f95f6da800a7abe404bd2ceb1514111284b49cebd70f80c7c95501f",
+    "whatsapp_dev_evidence.py": "2ca74e2b236d65e479c443b177068acf90840a60b34d48093fb6aedfb22f03ef",
+    "whatsapp_dev_repository.py": "a75d351d47dc9d148fd15b334b4fe6b8280273681a006cbd18cbffcea86dfa1e"
+  },
+  "whatsapp_sent": false,
+  "host_preflight": "SAFE: load 2.22/8 CPUs, MemAvailable 5226 MB, swap 8 MB; sequential HTTP, 2 internal threads",
+  "own_processes_left_running": 0,
+  "server_pid": 86299,
+  "turn": {
+    "curl": [
+      "curl",
+      "-sS",
+      "-X",
+      "POST",
+      "http://127.0.0.1:49507/api/telchi/assistant/dev/turn",
+      "-H",
+      "content-type: application/json",
+      "-H",
+      "x-team360-dev-token: <redacted>",
+      "-H",
+      "accept: application/json",
+      "--max-time",
+      "180",
+      "--write-out",
+      "\\n%{http_code}",
+      "--data-binary",
+      "{\"text\": <censored>, \"conversation\": \"abraham002-7c9026614e581854\"}"
+    ],
+    "http_status": "200",
+    "elapsed_ms": 11667.25,
+    "response": {
+      "ok": true,
+      "text": "Entendí que pedís líneas de ventas por producto. La búsqueda de productos necesita texto y no admite esos filtros.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "abraham002-7c9026614e581854",
+      "conversation_id": "af49c1e5-9b7d-4665-ab01-fac1547a8666",
+      "correlation_id": "9646f268-17d2-4a12-a5c9-a821d4de92dc",
+      "elapsed_ms": 11622.35,
+      "audit": {
+        "bmd": {
+          "category": "CAPABILITY_MISSING"
+        },
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.715813999704551,
+          "interpretation_ms": 11287.56008900018,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 11288.64620099921
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.by_products",
+          "period": null,
+          "pending": null,
+          "branches": [
+            "La Paz",
+            "Cochabamba"
+          ],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.by_products"
+          ],
+          "temporal_reference": null,
+          "product_search_text": "Citrato de magnesio",
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.by_products",
+          "period": null,
+          "pending": null,
+          "branches": [
+            "La Paz",
+            "Cochabamba"
+          ],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.by_products"
+          ],
+          "temporal_reference": null,
+          "product_search_text": "Citrato de magnesio",
+          "selected_item_codes": []
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Entendí que pedís líneas de ventas por producto. La búsqueda de productos necesita texto y no admite esos filtros.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.by_products",
+              "/branches": [
+                "La Paz",
+                "Cochabamba"
+              ],
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.by_products"
+              ],
+              "/temporal_reference": null,
+              "/product_search_text": "Citrato de magnesio",
+              "/selected_item_codes": []
+            },
+            "unset": [
+              "/period",
+              "/comparison",
+              "/reference",
+              "/sales_channel"
+            ]
+          },
+          "clarification": null
+        }
+      }
+    }
+  },
+  "server_reaped": true,
+  "assistant_hashes_after": {
+    "__init__.py": "5e077f893f781a8f0265be4655c1af245513755552ffe4e72d87fea64129b386",
+    "capabilities.py": "08013cc0a0784ff8a0083f36c870508d0ab9b0ebbe180212564a4bc0bc3f9c0a",
+    "composition.py": "41e3bf569751e320820a03b20e8edbd03bee4b7877fc0e9e281f0499bf64e26a",
+    "dev_runtime_http.py": "8dbec24c3aa80515fb8b32c9b28b42b0f1a6c9c68c289fe9382ce987099a2e3d",
+    "handler.py": "f0d44268aa94d32298c0906b181667d42a7248c0053c3bde11d97bbbb7419d4e",
+    "luna.py": "e3f77ba5c3c55c9a7551325d53e4f16d5f519ef6013b1e5545b7e1567e93f9ec",
+    "repository.py": "4f67619b45f4920cdc2e24c79dcacc7075a9a7c618e1c130498fe21d9207a523",
+    "state_engine.py": "ffe0cc4b8bcfba714d59b0aed840a3be66cbe2d471f206b974a8ba1d132d6a0b",
+    "whatsapp_dev.py": "f7dc488d2f95f6da800a7abe404bd2ceb1514111284b49cebd70f80c7c95501f",
+    "whatsapp_dev_evidence.py": "2ca74e2b236d65e479c443b177068acf90840a60b34d48093fb6aedfb22f03ef",
+    "whatsapp_dev_repository.py": "a75d351d47dc9d148fd15b334b4fe6b8280273681a006cbd18cbffcea86dfa1e"
+  },
+  "assistant_sources_unchanged": true
+}

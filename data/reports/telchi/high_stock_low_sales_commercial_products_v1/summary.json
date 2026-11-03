@@ -1,0 +1,474 @@
+{
+  "PRODUCT_SCOPE": "ItemCode starts with L: explicit user business definition; purpose filtering still mandatory",
+  "BRAND_BUSINESS_DEFINITION": "Litel per user; not Foundation-materialized",
+  "GATE": "TELCHI_HIGH_STOCK_LOW_SALES_COMMERCIAL_PRODUCTS_V1_DEGRADED",
+  "FOUNDATION_CURRENT": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "SALES_PERIOD": "2026-01-01..2026-09-24",
+  "STOCK_AS_OF": "2026-09-24",
+  "AVERAGE_DAILY_SALES_PERIOD": "2026-01-01..2026-09-23",
+  "PERIOD_CALENDAR_DAYS": 266,
+  "STOCK_BASIS": "ON_HAND_MINUS_COMMITTED; inbound orders excluded",
+  "COMMERCIAL_UNIVERSE_COUNT": 1376,
+  "EXCLUDED_NON_SELLABLE_COUNT": 1688,
+  "ZERO_SALES_WITH_STOCK_COUNT": 112,
+  "HIGH_STOCK_LOW_SALES_COUNT": 293,
+  "POSITIVE_SALES_WITH_COMPARABLE_STOCK_COUNT": 376,
+  "UOM_UNRESOLVED": 468,
+  "COMMERCIAL_CLASSIFICATION_UNRESOLVED": 720,
+  "UNRESOLVED_PURPOSE_WITH_AVAILABLE_STOCK_COUNT": 301,
+  "PRODUCTIVE_DATA_QUERY_MS": 7095.462,
+  "PRODUCTIVE_POSTPROCESS_MS": 8.374,
+  "PRODUCTIVE_END_TO_END_MS": 7103.836,
+  "LATENCY_SCOPE": "Prepared pinned connection; data SQL and deterministic ranking; excludes connection/foundation resolution, discovery, hashes, checks, persistence, LLM",
+  "FOUNDATION_RESOLUTION_MS_EXCLUDED": 2279.99,
+  "FOUNDATION_IMPROVEMENT_CANDIDATES": "Commercial purpose for mixed-use inputs; inventory UoM labels and per-line sales/credit UoM+conversion+quantity_inventory; brand-product assignment; net line amounts vs document discounts; availability/cut contract",
+  "SAP_ACCESSED": "NO",
+  "SAP_QUERY_COUNT": 0,
+  "SAP_WRITE_COUNT": 0,
+  "HOST_PREFLIGHT": "SAFE",
+  "RESOURCE_GUARD": "PASS",
+  "CONCURRENCY_USED": 2,
+  "UNRELATED_PROCESSES_TERMINATED": 0,
+  "ENVIRONMENTAL_ABORTS": 0,
+  "OWN_PROCESSES_LEFT_RUNNING": 0,
+  "checks": {
+    "stock_duplicate_keys": 0,
+    "sales_document_duplicate_keys": 0,
+    "sales_line_duplicate_keys": 0,
+    "credit_document_duplicate_keys": 0,
+    "credit_line_duplicate_keys": 0,
+    "reference_product_duplicate_keys": 0,
+    "raw_lineage_duplicate_keys": 0,
+    "invoice_fanout_delta": 0,
+    "stock_source_cut": [
+      "2026-09-24T13:53:07.952772+00:00",
+      "2026-09-24T13:53:07.952772+00:00"
+    ],
+    "sales_cancel_status": [
+      {
+        "canceled": "C",
+        "documents": 7
+      },
+      {
+        "canceled": "N",
+        "documents": 330428
+      },
+      {
+        "canceled": "Y",
+        "documents": 7
+      }
+    ],
+    "credit_cancel_status": [
+      {
+        "canceled": "C",
+        "documents": 1
+      },
+      {
+        "canceled": "N",
+        "documents": 2213
+      },
+      {
+        "canceled": "Y",
+        "documents": 1
+      }
+    ],
+    "raw_invalid_uom_lines": 0,
+    "positive_stock_missing_reference": 0
+  },
+  "foundation_access": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 2279.99,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "lineage": [
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-01-01-0000/manual-update-20260924T123403344453Z_sales-2026-01-01-0000_1790253426388202847/manifest.json",
+      "file_hashes": [
+        "7df71b8458358ba5b62e9a64352e8fd1d7c6060e2c44c8aa575185118174ad0e"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-01-01-0000/manual-update-20260924T123403344453Z_sales-2026-01-01-0000_1790253426388202847/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-01-01-0000/manual-update-20260924T132754050866Z_sales-2026-01-01-0000_1790256654694022884/manifest.json",
+      "file_hashes": [
+        "7df71b8458358ba5b62e9a64352e8fd1d7c6060e2c44c8aa575185118174ad0e"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-01-01-0000/manual-update-20260924T132754050866Z_sales-2026-01-01-0000_1790256654694022884/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-02-01-0000/manual-update-20260924T123403344453Z_sales-2026-02-01-0000_1790253476092193514/manifest.json",
+      "file_hashes": [
+        "db2323f01d60ae6b871ebbc8555c5e103ba6e2ebba380918143220e3ec56f48a"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-02-01-0000/manual-update-20260924T123403344453Z_sales-2026-02-01-0000_1790253476092193514/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-02-01-0000/manual-update-20260924T132754050866Z_sales-2026-02-01-0000_1790256690234845915/manifest.json",
+      "file_hashes": [
+        "db2323f01d60ae6b871ebbc8555c5e103ba6e2ebba380918143220e3ec56f48a"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-02-01-0000/manual-update-20260924T132754050866Z_sales-2026-02-01-0000_1790256690234845915/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-03-01-0000/manual-update-20260924T123403344453Z_sales-2026-03-01-0000_1790253517822968255/manifest.json",
+      "file_hashes": [
+        "5797543988b38e9dfcc7aa8411d72972617091d2b755a272889f9eb4a215865d"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-03-01-0000/manual-update-20260924T123403344453Z_sales-2026-03-01-0000_1790253517822968255/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-03-01-0000/manual-update-20260924T132754050866Z_sales-2026-03-01-0000_1790256723719864338/manifest.json",
+      "file_hashes": [
+        "5797543988b38e9dfcc7aa8411d72972617091d2b755a272889f9eb4a215865d"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-03-01-0000/manual-update-20260924T132754050866Z_sales-2026-03-01-0000_1790256723719864338/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-04-01-0000/manual-update-20260924T123403344453Z_sales-2026-04-01-0000_1790253565323999615/manifest.json",
+      "file_hashes": [
+        "e5cf9adea358a71d8a91c3370009e509751a3d582dc896aa2628c2be5f94b639"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-04-01-0000/manual-update-20260924T123403344453Z_sales-2026-04-01-0000_1790253565323999615/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-04-01-0000/manual-update-20260924T132754050866Z_sales-2026-04-01-0000_1790256765972002937/manifest.json",
+      "file_hashes": [
+        "e5cf9adea358a71d8a91c3370009e509751a3d582dc896aa2628c2be5f94b639"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-04-01-0000/manual-update-20260924T132754050866Z_sales-2026-04-01-0000_1790256765972002937/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-05-01-0000/manual-update-20260924T123403344453Z_sales-2026-05-01-0000_1790253611684775837/manifest.json",
+      "file_hashes": [
+        "24ffa73605127dc7a2daf06a1fa31503cca97558dff87b77da63663be07cc4bf"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-05-01-0000/manual-update-20260924T123403344453Z_sales-2026-05-01-0000_1790253611684775837/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-05-01-0000/manual-update-20260924T132754050866Z_sales-2026-05-01-0000_1790256809193383902/manifest.json",
+      "file_hashes": [
+        "24ffa73605127dc7a2daf06a1fa31503cca97558dff87b77da63663be07cc4bf"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-05-01-0000/manual-update-20260924T132754050866Z_sales-2026-05-01-0000_1790256809193383902/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-06-01-0000/manual-update-20260924T123403344453Z_sales-2026-06-01-0000_1790253647396980065/manifest.json",
+      "file_hashes": [
+        "810bb6816babc42deab203b7e61ea8d8e7fc1ad99d35eb586fac365426fde783"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-06-01-0000/manual-update-20260924T123403344453Z_sales-2026-06-01-0000_1790253647396980065/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-06-01-0000/manual-update-20260924T132754050866Z_sales-2026-06-01-0000_1790256849292593119/manifest.json",
+      "file_hashes": [
+        "810bb6816babc42deab203b7e61ea8d8e7fc1ad99d35eb586fac365426fde783"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-06-01-0000/manual-update-20260924T132754050866Z_sales-2026-06-01-0000_1790256849292593119/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-06-01-0001/manual-update-20260924T123403344453Z_sales-2026-06-01-0001_1790253673306401642/manifest.json",
+      "file_hashes": [
+        "5969a9ec71505143c6298de678ac976e0afaab5517c0c9025a4abf268b97ac9e"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-06-01-0001/manual-update-20260924T123403344453Z_sales-2026-06-01-0001_1790253673306401642/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-06-01-0001/manual-update-20260924T132754050866Z_sales-2026-06-01-0001_1790256873932795353/manifest.json",
+      "file_hashes": [
+        "5969a9ec71505143c6298de678ac976e0afaab5517c0c9025a4abf268b97ac9e"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-06-01-0001/manual-update-20260924T132754050866Z_sales-2026-06-01-0001_1790256873932795353/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-07-01-0000/manual-update-20260924T123403344453Z_sales-2026-07-01-0000_1790253686994536817/manifest.json",
+      "file_hashes": [
+        "363522e5e0057121efae6f89b402646491c5e9d35cd5e08a484ab869fb4c3647"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-07-01-0000/manual-update-20260924T123403344453Z_sales-2026-07-01-0000_1790253686994536817/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-07-01-0000/manual-update-20260924T132754050866Z_sales-2026-07-01-0000_1790256888829900589/manifest.json",
+      "file_hashes": [
+        "363522e5e0057121efae6f89b402646491c5e9d35cd5e08a484ab869fb4c3647"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-07-01-0000/manual-update-20260924T132754050866Z_sales-2026-07-01-0000_1790256888829900589/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-07-01-0001/manual-update-20260924T123403344453Z_sales-2026-07-01-0001_1790253715527708573/manifest.json",
+      "file_hashes": [
+        "0e2edbb116d70f79afb1d8d7b14fd75790dfb292628a0d4bad99f30a01c857e6"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-07-01-0001/manual-update-20260924T123403344453Z_sales-2026-07-01-0001_1790253715527708573/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-07-01-0001/manual-update-20260924T132754050866Z_sales-2026-07-01-0001_1790256914358892763/manifest.json",
+      "file_hashes": [
+        "0e2edbb116d70f79afb1d8d7b14fd75790dfb292628a0d4bad99f30a01c857e6"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-07-01-0001/manual-update-20260924T132754050866Z_sales-2026-07-01-0001_1790256914358892763/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-08-01-0000/manual-update-20260924T123403344453Z_sales-2026-08-01-0000_1790253733334448262/manifest.json",
+      "file_hashes": [
+        "3cdd6445f35592e19db80007e7433537795b12d7051c86bd6b2c34614642207a"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-08-01-0000/manual-update-20260924T123403344453Z_sales-2026-08-01-0000_1790253733334448262/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-08-01-0000/manual-update-20260924T132754050866Z_sales-2026-08-01-0000_1790256930549649717/manifest.json",
+      "file_hashes": [
+        "3cdd6445f35592e19db80007e7433537795b12d7051c86bd6b2c34614642207a"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-08-01-0000/manual-update-20260924T132754050866Z_sales-2026-08-01-0000_1790256930549649717/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T123403344453Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-09-01-0000/manual-update-20260924T123403344453Z_sales-2026-09-01-0000_1790253769342567061/manifest.json",
+      "file_hashes": [
+        "137f75ba412665875a50e91c764d72fbe60654de96d7aa4a971b840015dd8b4e"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-09-01-0000/manual-update-20260924T123403344453Z_sales-2026-09-01-0000_1790253769342567061/part-00000.parquet"
+      ]
+    },
+    {
+      "atomic_extraction_id": "manual-update-20260924T132754050866Z_changed",
+      "manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-09-01-0000/manual-update-20260924T132754050866Z_sales-2026-09-01-0000_1790256966424033978/manifest.json",
+      "file_hashes": [
+        "51ad4418d518ed76226124f15e778c0f2472e3779e2ccc153a324e75b9b06e2e"
+      ],
+      "files": [
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MANUAL_SINGLE_RUN_UPDATE_V1/sales-2026-09-01-0000/manual-update-20260924T132754050866Z_sales-2026-09-01-0000_1790256966424033978/part-00000.parquet"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "item_code": "L00759",
+      "canonical_product_id": "product_736d2fc313b66a4235e8182b",
+      "product_name": "PULVERIZADOR TIPO PERFUME TELCHI LITEL",
+      "sap_sell_item": "N",
+      "sap_invnt_item": "Y",
+      "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+      "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+      "active": true,
+      "business_class": "PACKAGING",
+      "class_status": "VALIDATED",
+      "classification_basis": "ITEM_GROUP",
+      "classification_evidence": "ItmsGrpCod=130: MAT. ACONDICIONADO",
+      "stock_on_hand": "284975.000000",
+      "committed": "0.000000",
+      "stock_available": "284975.000000",
+      "warehouses_with_stock": 1,
+      "invoice_qty": "0.000000",
+      "invoice_inventory_qty": "0E-12",
+      "sale_documents": 0,
+      "sale_days": 0,
+      "last_sale": null,
+      "invoice_line_amount": "0.000000",
+      "currencies": null,
+      "currency": null,
+      "invoice_lines": 0,
+      "raw_matched_lines": 0,
+      "invalid_uom_lines": 0,
+      "invoice_uom_count": null,
+      "invoice_uom": null,
+      "credit_qty": "0.000000",
+      "credit_lines": 0,
+      "credit_documents": 0,
+      "credit_line_amount": "0.000000",
+      "historical_invoice_lines": 0,
+      "uom": "UNI",
+      "historical_last_sale": null,
+      "net_quantity_native_unvalidated": "0.000000",
+      "net_line_amount_bob": null,
+      "commercial_decision": "EXCLUDED_EXPLICIT_NON_SELLABLE_OR_NON_INVENTORIABLE"
+    },
+    {
+      "item_code": "L00761",
+      "canonical_product_id": "product_7b873effddbef8f07022b931",
+      "product_name": "TAPA PET MOD 1 TELCHI LITEL",
+      "sap_sell_item": "N",
+      "sap_invnt_item": "Y",
+      "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+      "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+      "active": true,
+      "business_class": "PACKAGING",
+      "class_status": "VALIDATED",
+      "classification_basis": "ITEM_GROUP",
+      "classification_evidence": "ItmsGrpCod=130: MAT. ACONDICIONADO",
+      "stock_on_hand": "237631.000000",
+      "committed": "0.000000",
+      "stock_available": "237631.000000",
+      "warehouses_with_stock": 2,
+      "invoice_qty": "0.000000",
+      "invoice_inventory_qty": "0E-12",
+      "sale_documents": 0,
+      "sale_days": 0,
+      "last_sale": null,
+      "invoice_line_amount": "0.000000",
+      "currencies": null,
+      "currency": null,
+      "invoice_lines": 0,
+      "raw_matched_lines": 0,
+      "invalid_uom_lines": 0,
+      "invoice_uom_count": null,
+      "invoice_uom": null,
+      "credit_qty": "0.000000",
+      "credit_lines": 0,
+      "credit_documents": 0,
+      "credit_line_amount": "0.000000",
+      "historical_invoice_lines": 0,
+      "uom": "UNI",
+      "historical_last_sale": null,
+      "net_quantity_native_unvalidated": "0.000000",
+      "net_line_amount_bob": null,
+      "commercial_decision": "EXCLUDED_EXPLICIT_NON_SELLABLE_OR_NON_INVENTORIABLE"
+    },
+    {
+      "item_code": "L02475",
+      "canonical_product_id": "product_557a0644fb04cd8eb7731ed8",
+      "product_name": "CAPSULAS VACIAS DE COLOR 500mgr. x unidad",
+      "sap_sell_item": "Y",
+      "sap_invnt_item": "Y",
+      "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+      "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+      "active": true,
+      "business_class": "RAW_MATERIAL",
+      "class_status": "VALIDATED",
+      "classification_basis": "COMBINED",
+      "classification_evidence": "BOM component and input/bulk group 129: INSUMO",
+      "stock_on_hand": "314431.000000",
+      "committed": "200.000000",
+      "stock_available": "314231.000000",
+      "warehouses_with_stock": 4,
+      "invoice_qty": "0.000000",
+      "invoice_inventory_qty": "0E-12",
+      "sale_documents": 0,
+      "sale_days": 0,
+      "last_sale": null,
+      "invoice_line_amount": "0.000000",
+      "currencies": null,
+      "currency": null,
+      "invoice_lines": 0,
+      "raw_matched_lines": 0,
+      "invalid_uom_lines": 0,
+      "invoice_uom_count": null,
+      "invoice_uom": null,
+      "credit_qty": "0.000000",
+      "credit_lines": 0,
+      "credit_documents": 0,
+      "credit_line_amount": "0.000000",
+      "historical_invoice_lines": 0,
+      "uom": "UNI",
+      "historical_last_sale": null,
+      "net_quantity_native_unvalidated": "0.000000",
+      "net_line_amount_bob": null,
+      "commercial_decision": "UNRESOLVED_PURPOSE_SELL_FLAG_WITHOUT_COMMERCIAL_EVIDENCE"
+    }
+  ],
+  "ranking_rule": "Available stock>0; certified commercial universe; compatible inventory quantities; ratio DESC, last sale ASC, sale_days ASC, ItemCode ASC. No weighting score.",
+  "thresholds": {
+    "VERY_HIGH_COVERAGE": ">=730 historical coverage days",
+    "HIGH_COVERAGE": "365..729.999",
+    "LOW_ROTATION": "180..364.999"
+  },
+  "brand_dimension_count": 0,
+  "limitations": [
+    "Incomplete conservative commercial universe; mixed-use inputs with no observed commercial invoices remain unresolved, not excluded non-sellable",
+    "Credit-bearing items lack quantity-unit proof and are withheld from both lists",
+    "Stock available definition is an analytic on_hand-minus-committed rule; on_hand retained separately",
+    "Zero list stock ordering compares quantities in different UoMs, not economic capital",
+    "Line amounts are invoice minus credit line totals, not proven net of header discount/tax effects",
+    "Brand attribution Litel is user-provided; Foundation brand dimension is empty",
+    "Source cutoff is intraday 2026-09-24; daily-sales numerator and denominator exclude the partial 2026-09-24; 266 fully closed calendar days; not forecast"
+  ]
+}

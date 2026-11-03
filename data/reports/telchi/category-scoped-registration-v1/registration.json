@@ -1,0 +1,54 @@
+{
+  "mode": "APPLIED",
+  "backup": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/category-registration-20261020T130631424516Z/before.json",
+  "backup_sha256": "bc86cddde11676bb6cbdc3db5ff12108a1f3d469477bb1ae27365ab49db085de",
+  "idempotent": true,
+  "changed": true,
+  "run_id": "b6ddfa1f-4a92-4639-adde-f5a0e6961743",
+  "created": [
+    {
+      "table": "core_permissions",
+      "row": {
+        "id": "f0db303f-75a5-4adf-be8a-397d13bdaf15",
+        "permission_code": "telchi.sales.category_line_amount.read.v1",
+        "display_name": "Telchi category commercial line amount read V1",
+        "description": "Active BS commercial invoice lines by accredited business category and bounded period; line discount included, no line VAT, credit notes, global adjustments, net billing or collections.",
+        "category": "business",
+        "created_at_utc": "2026-10-20 13:06:31.229168+00:00"
+      }
+    },
+    {
+      "table": "core_workspace_capabilities",
+      "row": {
+        "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "module": "telchi",
+        "capability_code": "sales.category_line_amount.v1",
+        "permission_id": "f0db303f-75a5-4adf-be8a-397d13bdaf15",
+        "enabled": true
+      }
+    }
+  ],
+  "before": [
+    "telchi.products.search.read.v1",
+    "telchi.sales.by_products.read.v1",
+    "telchi.sales.coverage.read.v1",
+    "telchi.sales.invoice_amount.read.v1",
+    "telchi.sales.invoice_lines.read.v1",
+    "telchi.sales.latest_documents.read.v1",
+    "telchi.sales.period_billed_amount.read.v1",
+    "telchi.sales.source_quantity.read.v1"
+  ],
+  "effective": [
+    "telchi.products.search.read.v1",
+    "telchi.sales.by_products.read.v1",
+    "telchi.sales.category_line_amount.read.v1",
+    "telchi.sales.coverage.read.v1",
+    "telchi.sales.invoice_amount.read.v1",
+    "telchi.sales.invoice_lines.read.v1",
+    "telchi.sales.latest_documents.read.v1",
+    "telchi.sales.period_billed_amount.read.v1",
+    "telchi.sales.source_quantity.read.v1"
+  ],
+  "assignments_created": 0,
+  "full_access_changed": false
+}

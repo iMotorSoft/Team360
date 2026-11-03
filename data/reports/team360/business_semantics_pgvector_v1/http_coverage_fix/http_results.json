@@ -1,0 +1,684 @@
+{
+  "run_id": "cf4744e3",
+  "turns": [
+    {
+      "case": "R04",
+      "question": "¿Cuál es la última fecha de ventas registrada?",
+      "http_status": 200,
+      "ok": true,
+      "text": "Último mes con facturas activas registradas por fecha documental: 2026-09. Última fecha: 2026-09-24T00:00:00. Documentos: 330429. No certifica último mes completo ni cobertura de ventas netas.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "cf4744e3-R04",
+      "conversation_id": "2c6c2ac8-3782-4446-bf36-84dfd26ccc91",
+      "correlation_id": "bd96d7bf-8a48-4f7b-9723-6144ea4f45e6",
+      "elapsed_ms": 7717.87,
+      "audit": {
+        "bmd": null,
+        "timings": {
+          "capability_ms": 2090.4810880001605,
+          "state_engine_ms": 0.29085599999234546,
+          "interpretation_ms": 5435.337560999869,
+          "response_format_ms": 0.007407000339298975,
+          "total_processing_ms": 7534.112510999876
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.coverage",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.coverage"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.coverage",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.coverage"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "SELECT MIN(doc_date) AS first_date,MAX(doc_date) AS last_date,COUNT(*) AS documents\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND doc_date IS NOT NULL",
+          "rows": [
+            {
+              "documents": 330429,
+              "last_date": "2026-09-24T00:00:00",
+              "first_date": "2022-03-31T00:00:00",
+              "latest_month_with_rows": "2026-09",
+              "complete_month_certified": false
+            }
+          ],
+          "grain": "invoice_header",
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "read_only": true,
+          "capability": "sales.coverage.v1",
+          "limitations": "Active invoices (N), by DocDate, not entry timestamp; excludes credit memos. Not net sales. Completeness not certified.",
+          "sap_accessed": false,
+          "document_type": "OINV",
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N"
+          ],
+          "sql_duration_ms": 71.35082900003908
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Último mes con facturas activas registradas por fecha documental: 2026-09. Última fecha: 2026-09-24T00:00:00. Documentos: 330429. No certifica último mes completo ni cobertura de ventas netas.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "business_semantics": {
+          "status": "candidate",
+          "ranking": {
+            "margin": 0.015657137238062058,
+            "top_score": 0.4483432857923604,
+            "minimum_score": 0.4,
+            "calibration_id": "DEV-nine-concepts-evaluation",
+            "minimum_margin": 0.05,
+            "vector_eligible": false
+          },
+          "timings": {
+            "text_ms": 3.613951000261295,
+            "exact_ms": 3.240377999645716,
+            "vector_ms": 8.468693000395433,
+            "embedding_ms": 614.5099489995118
+          },
+          "concepts": [
+            {
+              "match": "vector",
+              "score": 0.4483432857923604,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuáles son los vendedores corporativos?",
+                "¿Cuánto vendió la Dra. Luz?",
+                "Mostrame las ventas de Selva Rojas"
+              ],
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802",
+              "definition": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.seller_classification",
+              "canonical_name": "Clasificación comercial de vendedores",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "salespersons",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones.",
+                  "No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.4326861485542983,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "dame ventas perdidas",
+                "Mostrame las ventas perdidas",
+                "ventas perdidas"
+              ],
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46",
+              "definition": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas.",
+              "module_code": "telchi",
+              "concept_type": "ANALYTICAL_INTENT",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.lost_opportunities",
+              "canonical_name": "Ventas perdidas",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "sales_opportunities",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada.",
+                  "Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas.",
+                  "Clasificación definitiva necesita evidencia empresarial adicional."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.40397005669391184,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Compará ventas corporativas y horizontales",
+                "¿Cuánto vendió el canal corporativo en mayo?",
+                "venta corporativa",
+                "ventas corporativas"
+              ],
+              "version": 2,
+              "concept_id": "3ff75681-41dc-4af9-a6dd-de771bb4b862",
+              "definition": "Modalidad comercial corporativa de Telchi. La reconstrucción histórica distingue canal comercial del cliente y categoría corporativa del vendedor: no son equivalentes.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.corporate_channel",
+              "canonical_name": "Venta corporativa",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Investigación: regla legacy PriceTypeCode + ClientSegmentationCode; luego OCRD.U_CANAL_VENTAS para canal del cliente y OSLP.U_CATVENDEDOR para vendedor.",
+                  "No sumar canales 2 y 3 ni proyectar clasificación actual a toda la historia. Vigencia y excepciones pendientes de acreditación runtime."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": true,
+          "context_concepts": [],
+          "interpretation_concepts": []
+        },
+        "required_permission": "telchi.sales.coverage.read.v1",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/limit": 1,
+              "/metric": "sales.latest_documents",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "business_contract_proposal": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.coverage",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.coverage"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "NEW_CONVERSATION",
+      "question": "Dame ventas de farmacia",
+      "http_status": 200,
+      "ok": true,
+      "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "cf4744e3-new",
+      "conversation_id": "9e3c1b8d-9212-4e10-8c85-7c14f36f4ff4",
+      "correlation_id": "b35790ba-c81f-4f8d-bd9c-c6fe83d0137e",
+      "elapsed_ms": 7731.75,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.421792999986792,
+          "interpretation_ms": 7690.752609999436,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 7691.618322000068
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés consultar el importe, las cantidades o ambas? "
+            },
+            "proposed": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "source_turn_id": "b35790ba-c81f-4f8d-bd9c-c6fe83d0137e",
+            "base_state_hash": "4725d068dcb78c87ba7116a83eaaf7cabebd7a78056d051d56ceeeeb87eab847"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés consultar el importe, las cantidades o ambas? "
+            },
+            "proposed": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "source_turn_id": "b35790ba-c81f-4f8d-bd9c-c6fe83d0137e",
+            "base_state_hash": "4725d068dcb78c87ba7116a83eaaf7cabebd7a78056d051d56ceeeeb87eab847"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "ranking": {
+            "calibration_id": "DEV-nine-concepts-evaluation",
+            "vector_eligible": false
+          },
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.7422330001863884,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Dame ventas de farmacia",
+                "ventas de farmacia",
+                "ventas en sucursales farmacia"
+              ],
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66",
+              "definition": "Ventas realizadas en sucursales que Telchi clasifica como farmacias.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.pharmacy_branches",
+              "canonical_name": "Ventas de farmacia",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "branches",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No son productos farmacéuticos ni ventas a clientes farmacias.",
+                  "Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false,
+          "context_concepts": [],
+          "interpretation_concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Dame ventas de farmacia",
+                "ventas de farmacia",
+                "ventas en sucursales farmacia"
+              ],
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66",
+              "definition": "Ventas realizadas en sucursales que Telchi clasifica como farmacias.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.pharmacy_branches",
+              "canonical_name": "Ventas de farmacia",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "branches",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No son productos farmacéuticos ni ventas a clientes farmacias.",
+                  "Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ]
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "ASK",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/entity_mention": null,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": {
+            "slot": "metric",
+            "question": "¿Querés consultar el importe, las cantidades o ambas? "
+          }
+        }
+      }
+    },
+    {
+      "case": "AFTER_RESTART",
+      "question": "Dame ventas de farmacia",
+      "http_status": 200,
+      "ok": true,
+      "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "cf4744e3-after-restart",
+      "conversation_id": "b6582798-cc3a-4526-99c4-d68c214ba19c",
+      "correlation_id": "4d818f9c-e7e8-4d6e-b642-db63ee56d669",
+      "elapsed_ms": 5164.6,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.17372899947076803,
+          "interpretation_ms": 5082.482943999821,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5082.7935320003235
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "ranking": {
+            "calibration_id": "DEV-nine-concepts-evaluation",
+            "vector_eligible": false
+          },
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 3.493548999358609,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Dame ventas de farmacia",
+                "ventas de farmacia",
+                "ventas en sucursales farmacia"
+              ],
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66",
+              "definition": "Ventas realizadas en sucursales que Telchi clasifica como farmacias.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.pharmacy_branches",
+              "canonical_name": "Ventas de farmacia",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "branches",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No son productos farmacéuticos ni ventas a clientes farmacias.",
+                  "Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false,
+          "context_concepts": [],
+          "interpretation_concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Dame ventas de farmacia",
+                "ventas de farmacia",
+                "ventas en sucursales farmacia"
+              ],
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66",
+              "definition": "Ventas realizadas en sucursales que Telchi clasifica como farmacias.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.pharmacy_branches",
+              "canonical_name": "Ventas de farmacia",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "branches",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No son productos farmacéuticos ni ventas a clientes farmacias.",
+                  "Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ]
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    }
+  ],
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "restart_completed": true
+}

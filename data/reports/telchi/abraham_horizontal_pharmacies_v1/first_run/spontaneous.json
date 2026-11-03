@@ -1,0 +1,149 @@
+{
+  "question": "¿Cuántos clientes tenemos en horizontal, principalmente las farmacias, y cuánto se les vende por mes?",
+  "timestamp": "2026-10-15T13:52:21.437807+00:00",
+  "assistant_modified": false,
+  "whatsapp_sent": false,
+  "scope": "existing DEV HTTP adapter, approved pilot binding; new conversation",
+  "preflight": {
+    "postgres": true,
+    "model": {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true
+    },
+    "fallback": false,
+    "milvus_litellm": "not used by this direct OpenAI assistant"
+  },
+  "own_processes_left_running": 0,
+  "server_pid": 78699,
+  "turn": {
+    "curl": [
+      "curl",
+      "-sS",
+      "-X",
+      "POST",
+      "http://127.0.0.1:50795/api/telchi/assistant/dev/turn",
+      "-H",
+      "content-type: application/json",
+      "-H",
+      "x-team360-dev-token: <redacted>",
+      "-H",
+      "accept: application/json",
+      "--max-time",
+      "180",
+      "--write-out",
+      "\\n%{http_code}",
+      "--data-binary",
+      "{\"text\": <censored>, \"conversation\": \"abraham-274d96530a889ecb\"}"
+    ],
+    "http_status": "200",
+    "elapsed_ms": 9430.51,
+    "response": {
+      "ok": true,
+      "text": "Entendí que pedís importe de ventas. El importe documental no admite filtros de entidad, sucursal, canal ni comparación no acreditados. No es un problema con la fecha elegida.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "abraham-274d96530a889ecb",
+      "conversation_id": "56c1a25f-64dc-4127-96b9-e5c6920d2cc0",
+      "correlation_id": "35d4ab94-0c92-455a-8119-f7b7b1f07611",
+      "elapsed_ms": 9355.96,
+      "audit": {
+        "bmd": {
+          "category": "MAPPING_MISSING"
+        },
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.6710710003972054,
+          "interpretation_ms": 7926.656801999343,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 7928.24306699913
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": "HORIZONTAL",
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": "HORIZONTAL",
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas. El importe documental no admite filtros de entidad, sucursal, canal ni comparación no acreditados. No es un problema con la fecha elegida.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": "HORIZONTAL",
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    }
+  },
+  "server_reaped": true
+}

@@ -1,0 +1,56 @@
+{
+  "branch": "feature/console-backend-core",
+  "REAL_TURN_AUDITED": "YES",
+  "real_event_id": "17d76815-23cf-4f12-bc5c-5225b8d73f0c",
+  "real_thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+  "ROOT_CAUSE": "An empty percentages mapping was used as denominator accreditation in handler and formatter. With medications unclassified the numerator is absent, but the authorized compatible base is verified.",
+  "DENOMINATOR_PRESERVED": "PASS",
+  "MEDICATIONS_CLASSIFICATION_WARNING": "PASS",
+  "FALSE_UNAVAILABILITY_REMOVED": "PASS",
+  "BUSINESS_ANSWER_FIRST": "PASS",
+  "CONVERSATION_REGRESSION": "PASS",
+  "conversation_turns": 8,
+  "BIZ01": "PASS",
+  "biz01_correct": "10/10",
+  "TESTS": "788 passed, 4 skipped in 44.11s",
+  "SIX_GATES": "VALID",
+  "RUNTIME_STATE": "STOPPED",
+  "WHATSAPP_E2E": "NOT_RUN",
+  "READY_FOR_MANUAL_START": "YES",
+  "real_turn_replay": "Composición de ventas globales — septiembre de 2026.\n\nMedicamentos: clasificación no acreditada; no los equiparo con productos terminados. Todavía no puedo determinar su porcentaje: falta identificar qué importe de estas ventas corresponde a medicamentos.\n\nBase: Bs 8.048.691,58 de líneas comerciales activas BS del mismo período, sin filtros de cliente o producto. No es facturación documental con impuestos.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nPuedo ampliar los importes acreditados por producto.",
+  "audit_comparison": "Real and synthetic cases agree: verified denominator, empty components/percentages; no classification inferred. Luna proposed EXPLAIN/ANALYSIS_UNAVAILABLE; business contract committed September/MEDICATIONS correctly. Failure occurred after execution, not in period retention.",
+  "scope_extension": "Repository read is necessary for requested explanation follow-ups. It loads only a bounded same-owner/same-conversation/exact-state prior authorized composition, strips unneeded product breakdown, revalidates permissions and never executes from EXPLAIN.",
+  "files_modified": {
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/assistant/commercial_continuity.py": "d7be9336abc9922532d808402b8a46ecd2f4e9b78f5fce0d43fd365e41b28836",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py": "302b24e9dd16b5a91133a798b490dad90b7ae88b12025ed49583cb7841302cd1",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py": "161b7150d74edc6cd5a83ed9ada18edd57adec69f1da29ca6efda79c0b53e823",
+    "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_commercial_continuity_v2.py": "67b7a65984869f900d744023df58200e162e389b073c8e29b2bb0a6f0d0fdc22"
+  },
+  "evidence": [
+    "real-turn.json",
+    "conversation.json",
+    "biz01.json",
+    "six-gates.json"
+  ],
+  "limitations": [
+    "Provider request body was not retained; exact user text, persisted pre-turn scope, Luna proposal, committed state, capability result and prepared response were audited.",
+    "One live attempt failed the pre-existing missing-period model preflight before conversation execution; rerun passed. Earlier conversation runs exposed raw category-label and explanation-continuity defects now covered by regression tests.",
+    "Four opt-in tests skipped; no WhatsApp delivery certification or provider-outage induction.",
+    "Classifications remain current, not historical; September observed coverage ends September 24, not a certified monthly close."
+  ],
+  "operations": {
+    "whatsapp_sends": 0,
+    "runtime_sessions_started": 0,
+    "operational_grants_changed": 0,
+    "foundation_changes": 0,
+    "credential_changes": 0,
+    "unrelated_processes_terminated": 0,
+    "gate_reaccreditation": "Six fresh real probes; isolated pg_temp authorization fixtures, forced rollback; normal preflight valid. Versioned private manifest published with backup by existing procedure, not an artificial hash edit."
+  },
+  "HOST_PREFLIGHT": "SAFE",
+  "RESOURCE_GUARD": "PASS",
+  "CONCURRENCY_USED": "One sequential runner; gate PG pool max 3, only two concurrent claims of one event; no browsers.",
+  "ENVIRONMENTAL_ABORTS": 0,
+  "OWN_PROCESSES_LEFT_RUNNING": 0,
+  "next_step": "Owner manual start and targeted WhatsApp check only; no automatic start."
+}

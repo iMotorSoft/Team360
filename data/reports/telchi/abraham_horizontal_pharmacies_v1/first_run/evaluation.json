@@ -1,0 +1,37 @@
+{
+  "result": "BLOCKED",
+  "interpretation": "PARTIAL: preserves horizontal but drops customer counts and pharmacy subtotal; no explicit DMS grounding in answer",
+  "safety": "Correct refusal, no fabricated figures or source substitution",
+  "assistant_exact_response": "Entendí que pedís importe de ventas. El importe documental no admite filtros de entidad, sucursal, canal ni comparación no acreditados. No es un problema con la fecha elegida.",
+  "assistant_capability_calls": 0,
+  "independent_status": "PARTIAL, conditional Foundation series-based horizontal aggregates, not reconciled DMS truth",
+  "distinct_buying_customer_codes": 4004,
+  "registered_horizontal_customer_count": null,
+  "horizontal_pharmacy_customer_count": null,
+  "horizontal_pharmacy_monthly_amounts": null,
+  "jan_september_full_month_average": null,
+  "jan_august_observed_proxy_average_BS": "1687116.616250",
+  "jan_august_average_limitation": "8 calendar-finished months; arithmetic mean of available snapshot rows, not a certified complete/reconciled business average",
+  "validation": {
+    "targeted_tests": "37 passed in 0.80s",
+    "command": "uv run pytest modules/telchi/datalake/tests/test_executive_sales.py modules/telchi/assistant/tests/test_rejected_execution_guard.py modules/telchi/assistant/tests/test_sales_monetary.py -q",
+    "evidence_consistency_checks": "PASS: nine observed months, invoice counts, monetary subtraction, no execution, horizontal retained, CURRENT unchanged, own server reaped",
+    "initial_probe_script_errors": "Two local DuckDB parser errors in investigative SQL aliases (month, rows), fixed before successful independent run; no runtime changes"
+  },
+  "host": {
+    "preflight": "SAFE",
+    "threads": 2,
+    "memory_limit": "1GB per investigative DuckDB session",
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0
+  },
+  "hashes": {
+    "modules/telchi/investigation/validation/abraham_horizontal_pharmacies_v1/spontaneous_probe.py": "2e9152a78a68cc46557a982b19dfa18a3c117a50f86d6f66f544d17bea88c327",
+    "modules/telchi/investigation/validation/abraham_horizontal_pharmacies_v1/independent_probe.py": "9437aa6def0129ce49bb25caf8d4e1c85884ddef092c2b6c7690aa83f3301344",
+    "modules/telchi/assistant/luna.py": "e3f77ba5c3c55c9a7551325d53e4f16d5f519ef6013b1e5545b7e1567e93f9ec",
+    "modules/telchi/assistant/handler.py": "f0d44268aa94d32298c0906b181667d42a7248c0053c3bde11d97bbbb7419d4e",
+    "modules/telchi/assistant/state_engine.py": "ffe0cc4b8bcfba714d59b0aed840a3be66cbe2d471f206b974a8ba1d132d6a0b",
+    "modules/telchi/assistant/capabilities.py": "08013cc0a0784ff8a0083f36c870508d0ab9b0ebbe180212564a4bc0bc3f9c0a",
+    "modules/telchi/assistant/composition.py": "41e3bf569751e320820a03b20e8edbd03bee4b7877fc0e9e281f0499bf64e26a"
+  }
+}

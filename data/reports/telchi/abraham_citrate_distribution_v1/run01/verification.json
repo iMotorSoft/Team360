@@ -1,0 +1,2163 @@
+{
+  "timestamp": "2026-10-15T14:15:53.984282+00:00",
+  "sap_accessed": false,
+  "read_only": true,
+  "queries": [
+    {
+      "name": "uom_dictionary",
+      "sql": "SELECT source_system,source_native_id,unit_of_measure_id,code,name FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/units_of_measure/part-00000.parquet')",
+      "error": "Binder Error: Referenced column \"source_system\" not found in FROM clause!\nCandidate bindings: \"source_as_of\", \"status\"\n\nLINE 1: SELECT source_system,source_native_id,unit_of_measure_id,code,name...\n               ^"
+    },
+    {
+      "name": "business_locations_dictionary",
+      "sql": "SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/business_locations/part-00000.parquet')",
+      "rows": [
+        {
+          "business_location_code": "SEGUNDO_ANILLO",
+          "business_location_name": "Segundo Anillo",
+          "status": "VALIDATED",
+          "mapping_source": "BUSINESS_CONFIRMED",
+          "source_as_of": "2026-09-24 09:03:11.919356-03"
+        },
+        {
+          "business_location_code": "UNKNOWN",
+          "business_location_name": "Unknown",
+          "status": "UNKNOWN",
+          "mapping_source": "NO_EXPLICIT_EVIDENCE",
+          "source_as_of": "2026-09-24 09:03:11.919356-03"
+        }
+      ]
+    },
+    {
+      "name": "operating_model_dictionary",
+      "sql": "SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/operating_model/part-00000.parquet')",
+      "rows": [
+        {
+          "operating_model_id": "operating_model_95566266a699b473975607b5",
+          "code": "MANUFACTURED",
+          "name": "Manufactured",
+          "description": null,
+          "active": true,
+          "valid_from": null,
+          "valid_to": null,
+          "source": "TELCHI_DATALAKE_PRODUCT_AND_OPERATING_MODEL_CONTRACT_V2",
+          "confidence": "0.800000",
+          "status": "PROVISIONAL",
+          "semantic_version": "2.0.0"
+        },
+        {
+          "operating_model_id": "operating_model_8008d78f216b16390d1caca1",
+          "code": "FRACTIONATED",
+          "name": "Fractionated",
+          "description": null,
+          "active": true,
+          "valid_from": null,
+          "valid_to": null,
+          "source": "TELCHI_DATALAKE_PRODUCT_AND_OPERATING_MODEL_CONTRACT_V2",
+          "confidence": "0.800000",
+          "status": "PROVISIONAL",
+          "semantic_version": "2.0.0"
+        },
+        {
+          "operating_model_id": "operating_model_79fb6e4600ee0ad20feff3fe",
+          "code": "REPACKAGED",
+          "name": "Repackaged",
+          "description": null,
+          "active": true,
+          "valid_from": null,
+          "valid_to": null,
+          "source": "TELCHI_DATALAKE_PRODUCT_AND_OPERATING_MODEL_CONTRACT_V2",
+          "confidence": "0.800000",
+          "status": "PROVISIONAL",
+          "semantic_version": "2.0.0"
+        },
+        {
+          "operating_model_id": "operating_model_a8bc6036dfb72e478cd807a2",
+          "code": "PURCHASED_FOR_RESALE",
+          "name": "Purchased For Resale",
+          "description": null,
+          "active": true,
+          "valid_from": null,
+          "valid_to": null,
+          "source": "TELCHI_DATALAKE_PRODUCT_AND_OPERATING_MODEL_CONTRACT_V2",
+          "confidence": "0.800000",
+          "status": "PROVISIONAL",
+          "semantic_version": "2.0.0"
+        },
+        {
+          "operating_model_id": "operating_model_b354314e04666d09c9980915",
+          "code": "CONTRACT_MANUFACTURING",
+          "name": "Contract Manufacturing",
+          "description": null,
+          "active": true,
+          "valid_from": null,
+          "valid_to": null,
+          "source": "TELCHI_DATALAKE_PRODUCT_AND_OPERATING_MODEL_CONTRACT_V2",
+          "confidence": "0.800000",
+          "status": "PROVISIONAL",
+          "semantic_version": "2.0.0"
+        },
+        {
+          "operating_model_id": "operating_model_ba4abd4f5537d03925f18376",
+          "code": "WHITE_LABEL",
+          "name": "White Label",
+          "description": null,
+          "active": true,
+          "valid_from": null,
+          "valid_to": null,
+          "source": "TELCHI_DATALAKE_PRODUCT_AND_OPERATING_MODEL_CONTRACT_V2",
+          "confidence": "0.800000",
+          "status": "PROVISIONAL",
+          "semantic_version": "2.0.0"
+        }
+      ]
+    },
+    {
+      "name": "entity_alias_dictionary",
+      "sql": "SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/entity_alias/part-00000.parquet')",
+      "error": "Invalid Input Error: Required module 'pytz' failed to import, due to the following Python exception:\nModuleNotFoundError: No module named 'pytz'"
+    },
+    {
+      "name": "warehouse_metadata",
+      "sql": "SELECT source_system,code,name,sap_branch_office_id,sap_warehouse_dms FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/warehouses/part-00000.parquet') WHERE source_system='SAP_HANA'",
+      "rows": [
+        {
+          "source_system": "SAP_HANA",
+          "code": "01",
+          "name": "Transito entre almacenes SAP",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-AMD",
+          "name": "Almacén Medicamentos 2A",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-AMK",
+          "name": "Almacén  TelchiMarket 2A",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-DAN",
+          "name": "Almacén de Dañados Salon 2do Anillo",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-DEV",
+          "name": "Almacén transitorio de devoluciones MED",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-EXT",
+          "name": "Almacén Externo 2A",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-KIT",
+          "name": "Almacén transformaciones KIT 2A",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-MAG",
+          "name": "Almacén Magistral",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-MEI",
+          "name": "Almacén Material de Escritorio e Insumos",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-MKT",
+          "name": "Almacén Marketing 2A",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-SAL",
+          "name": "Almacén Salón 2A",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-SMK",
+          "name": "Almacén TelchiMarket Salon 2A",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "2A-TRAN",
+          "name": "Almacén transitorio de Bajas Salones",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "ALM-CON",
+          "name": "Almacén Contingencia Telchi",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "ALM-IMP",
+          "name": "Almacén de Importación",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "BE-DT1",
+          "name": "Almacén Distribucion Beni - Terbol",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "CBBA-DT1",
+          "name": "Almacén Distribucion Cochabamba - Terbol",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "CHQ-DT1",
+          "name": "Almacén Distribucion Chuquisaca - Terbol",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "CM-AMD",
+          "name": "Almacén Medicamentos Casa Matriz",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "CM-DAN",
+          "name": "Almacén de Dañados Salón Centro",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "CM-SAL",
+          "name": "Almacén Salón Casa Matriz",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "DMS-DEV",
+          "name": "Almacén Devoluciones DMS",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "6"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "DMS-PROF",
+          "name": "Almacén Proformas DMS",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "6"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "DV-SAL",
+          "name": "Almacen Salon Doble Via la Guardia",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-A1",
+          "name": "Almacén Transitorio Activos Fijos",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-C1",
+          "name": "Almacén Control de Calidad",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D0",
+          "name": "Almacen Picking (Despacho)",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D1",
+          "name": "Almacen Movil  4702 GIP",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D10",
+          "name": "Almacen Movil 2725-PRC",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D11",
+          "name": "Almacen  Móvil 5268 FRR",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D12",
+          "name": "Almacen  Móvil Tienda",
+          "sap_branch_office_id": "03",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D2",
+          "name": "Almacen Movil 4702 GKT",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D3",
+          "name": "Almacen Movil  5260 PSF",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D4",
+          "name": "Almacen Movil Ruta 2904 ILA",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D5",
+          "name": "Almacen Movil Ruta 5260 IHY",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D6",
+          "name": "Almacen Movil Provincia 3872 XRI",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D7",
+          "name": "Almacen Movil Provincia 1245 XLN",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D8",
+          "name": "Almacen Movil 5687 SPE",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-D9",
+          "name": "Almacen Movil 4438 ZHG",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-DAN",
+          "name": "Almacén de Dañados LAB",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-DES",
+          "name": "Almacén Despacho Laboratorio.",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-IMP",
+          "name": "Almacén de Importación",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-M1",
+          "name": "Almacén Materia Prima",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-P1",
+          "name": "Almacén Productos en Proceso AGEMED",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-P2",
+          "name": "Almacén Productos en Proceso SENASAG",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-P3",
+          "name": "Almacén de Etiquetado",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-P4",
+          "name": "Almacén de Reacondicionado",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-P5",
+          "name": "Almacén Productos en Retención",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-T1",
+          "name": "Almacén Producto Terminado AGEMED",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-T2",
+          "name": "Almacén Producto Terminado SENASAG",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-T3",
+          "name": "Almacén Producto Terminado INDUSTRIAL",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-T4",
+          "name": "Almacén Producto Terminado MAGISTRAL",
+          "sap_branch_office_id": "01",
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-T5",
+          "name": "Almacén en Consignación",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-T6",
+          "name": "Almacén de Entregas Parciales",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-T7",
+          "name": "Almacén de Productos Dañados",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-T8",
+          "name": "Almacén Productos Vencidos",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-TRAN",
+          "name": "Almacén transitorio de Bajas Salones-Lab",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LAB-VMP",
+          "name": "Almacen Ventas Materia Prima LAB",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LPZ-D1",
+          "name": "Almacen Movil 5592-EBI",
+          "sap_branch_office_id": "02",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LPZ-D2",
+          "name": "Almacen Movil 600-KCI",
+          "sap_branch_office_id": "02",
+          "sap_warehouse_dms": "3"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LPZ-DAN",
+          "name": "Almacén de Dañados La Paz",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LPZ-DT1",
+          "name": "Almacén Distribucion La Paz - Terbol",
+          "sap_branch_office_id": "02",
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "LPZ-T1",
+          "name": "Almacén Producto Terminado AGEMED",
+          "sap_branch_office_id": "02",
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "MAG-M1",
+          "name": "Almacén Prod. a Granel Procesadora Magistral",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "MAG-P1",
+          "name": "Almacén de Proceso Magistral",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "MAG-T1",
+          "name": "Almacén Producto Terminado Proc. Magistral",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "NTG-T1",
+          "name": "Almacén Producto Terminado NorteGas",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "OR-DT1",
+          "name": "Almacén Distribucion Oruro - Terbol",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "PO-DT1",
+          "name": "Almacén Distribucion Potosi - Terbol",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "RC-SAL",
+          "name": "Almacén Salón Roca y Coronado",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "SAA-DAN",
+          "name": "Almacén Productos Dañados Saavedra",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "SAA-M1",
+          "name": "Almacén Prod. a Granel Procesadora Saavedra",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "SAA-P1",
+          "name": "Almacén de Proceso Saavedra",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "SAA-T1",
+          "name": "Almacén Producto Terminado Proc. Saavedra",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "SAA-T2",
+          "name": "Almacén de Reacondicionado  Saavedra",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "SAA-T3",
+          "name": "Almacén de Reacondicionado  Saavedra",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "SAL-TRS",
+          "name": "Almacén Transitorio Salones",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "SAP-R1",
+          "name": "Almacén transito SAP - R1",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "SCZ-DT1",
+          "name": "Almacén Distribucion Santa Cruz - Terbol",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "TJ-DT1",
+          "name": "Almacén Distribucion Tarija - Terbol",
+          "sap_branch_office_id": "02",
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "UR-SAL",
+          "name": "Almacén Salón Urubo",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        },
+        {
+          "source_system": "SAP_HANA",
+          "code": "VI-SAL",
+          "name": "Almacén Salón Villa 1ro de Mayo",
+          "sap_branch_office_id": null,
+          "sap_warehouse_dms": "1"
+        }
+      ]
+    },
+    {
+      "name": "customer_branch_completeness",
+      "sql": "SELECT source_system,COUNT(*) row_count,COUNT(branch_id) with_branch FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet') GROUP BY 1",
+      "rows": [
+        {
+          "source_system": "LEGACY_DS",
+          "row_count": 11512,
+          "with_branch": 0
+        },
+        {
+          "source_system": "LEGACY_DS0",
+          "row_count": 10580,
+          "with_branch": 0
+        },
+        {
+          "source_system": "SAP_HANA",
+          "row_count": 12979,
+          "with_branch": 0
+        }
+      ]
+    },
+    {
+      "name": "DS_clientSB1.parq_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS/clientSB1.parq')",
+      "rows": [
+        {
+          "column_name": "ClientCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientType",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientGroupCode",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientCity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ListNum",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "PriceListName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientSLPropertyCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientSLPropertyName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "__index_level_0__",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "DS_LS_legacy_candidate",
+      "sql": "SELECT \"ClientCode\",\"ClientName\",\"ClientGroupCode\",\"ClientCity\",\"PriceListName\",\"ClientSLPropertyCode\",\"ClientSLPropertyName\" FROM read_parquet('/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS/clientSB1.parq') WHERE ClientCode='C010264'",
+      "rows": [
+        {
+          "ClientCode": "C010264",
+          "ClientName": "LYS",
+          "ClientGroupCode": 104,
+          "ClientCity": "Cochabamba",
+          "PriceListName": "La Paz Horizontal",
+          "ClientSLPropertyCode": "7",
+          "ClientSLPropertyName": "Distribuidoras"
+        }
+      ]
+    },
+    {
+      "name": "DS_productSB1.parq_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS/productSB1.parq')",
+      "rows": [
+        {
+          "column_name": "ItemCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ItemName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "u_codactive",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "MatrizE",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "LastPurPrc",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "LastPurCur",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "LastPurDat",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "OnHand",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ItmsGrpCod",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "Grupo",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "InvntryUom",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "FirmCode",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "Linea",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "frozenFor",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "U_FormaFarmac",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "SubGrupo",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ItemUN",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "FFName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "SLPropertyCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "SLPropertyName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CostoUAvg60",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "__index_level_0__",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "DS0_clientSB1.parq_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS0/clientSB1.parq')",
+      "rows": [
+        {
+          "column_name": "ClientCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientType",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientGroupCode",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientCity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ListNum",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "PriceListName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientSLPropertyCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ClientSLPropertyName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "__index_level_0__",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "DS0_LS_legacy_candidate",
+      "sql": "SELECT \"ClientCode\",\"ClientName\",\"ClientGroupCode\",\"ClientCity\",\"PriceListName\",\"ClientSLPropertyCode\",\"ClientSLPropertyName\" FROM read_parquet('/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS0/clientSB1.parq') WHERE ClientCode='C010264'",
+      "rows": [
+        {
+          "ClientCode": "C010264",
+          "ClientName": "LYS",
+          "ClientGroupCode": 104,
+          "ClientCity": "Cochabamba",
+          "PriceListName": "La Paz Horizontal",
+          "ClientSLPropertyCode": "7",
+          "ClientSLPropertyName": "Distribuidoras"
+        }
+      ]
+    },
+    {
+      "name": "DS0_productSB1.parq_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS0/productSB1.parq')",
+      "rows": [
+        {
+          "column_name": "ItemCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ItemName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "u_codactive",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "MatrizE",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "LastPurPrc",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "LastPurCur",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "LastPurDat",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "OnHand",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ItmsGrpCod",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "Grupo",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "InvntryUom",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "FirmCode",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "Linea",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "frozenFor",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "U_FormaFarmac",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "SubGrupo",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ItemUN",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "FFName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "SLPropertyCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "SLPropertyName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CostoUAvg60",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "__index_level_0__",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "sales_duplicate_documents",
+      "sql": "SELECT source_system,doc_entry,COUNT(*) n FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) GROUP BY ALL HAVING COUNT(*)>1 LIMIT 5",
+      "rows": []
+    },
+    {
+      "name": "sales_duplicate_target_lines",
+      "sql": "SELECT source_system,doc_entry,line_num,COUNT(*) n FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) WHERE item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657') GROUP BY ALL HAVING COUNT(*)>1 LIMIT 5",
+      "rows": []
+    },
+    {
+      "name": "sales_orphan_target_lines",
+      "sql": "SELECT COUNT(*) orphans FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l LEFT JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry WHERE l.item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657') AND d.doc_entry IS NULL",
+      "rows": [
+        {
+          "orphans": 0
+        }
+      ]
+    },
+    {
+      "name": "sales_target_profile",
+      "sql": "SELECT l.item_code,COUNT(*) line_count,COUNT(DISTINCT d.doc_entry) documents,\n                COUNT(DISTINCT d.card_code) buyers,MIN(d.doc_date) first_date,MAX(d.doc_date) last_date,\n                d.currency document_currency,l.currency line_currency,\n                SUM(TRY_CAST(l.quantity AS DECIMAL(38,6))) documentary_quantity,\n                COUNT(*) FILTER(WHERE TRY_CAST(l.quantity AS DECIMAL(38,6)) IS NULL) invalid_quantity,\n                SUM(TRY_CAST(l.line_total AS DECIMAL(38,6))) raw_line_total,\n                COUNT(*) FILTER(WHERE TRY_CAST(l.line_total AS DECIMAL(38,6)) IS NULL) invalid_line_total,\n                COUNT(*) FILTER(WHERE TRY_CAST(l.line_total AS DECIMAL(38,6))<>0) nonzero_line_total\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657')\n                AND d.doc_date>='2026-01-01' AND d.doc_date<'2027-01-01' AND d.canceled='N'  GROUP BY ALL ORDER BY l.item_code",
+      "rows": [
+        {
+          "item_code": "L03432",
+          "line_count": 82,
+          "documents": 82,
+          "buyers": 23,
+          "first_date": "2026-01-12T00:00:00",
+          "last_date": "2026-09-23T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "189.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "22291.150000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 82
+        },
+        {
+          "item_code": "L03612",
+          "line_count": 7965,
+          "documents": 7954,
+          "buyers": 692,
+          "first_date": "2026-01-01T00:00:00",
+          "last_date": "2026-09-23T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "11598.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "1020613.770000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 7965
+        },
+        {
+          "item_code": "M07010",
+          "line_count": 634,
+          "documents": 634,
+          "buyers": 20,
+          "first_date": "2026-01-02T00:00:00",
+          "last_date": "2026-09-22T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "690.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "105873.380000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 634
+        },
+        {
+          "item_code": "M07871",
+          "line_count": 44,
+          "documents": 44,
+          "buyers": 5,
+          "first_date": "2026-01-17T00:00:00",
+          "last_date": "2026-09-14T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "47.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "8568.680000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 44
+        },
+        {
+          "item_code": "M08237",
+          "line_count": 8,
+          "documents": 8,
+          "buyers": 4,
+          "first_date": "2026-02-07T00:00:00",
+          "last_date": "2026-09-17T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "8.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "1747.680000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 8
+        },
+        {
+          "item_code": "M08239",
+          "line_count": 22,
+          "documents": 22,
+          "buyers": 6,
+          "first_date": "2026-01-02T00:00:00",
+          "last_date": "2026-06-08T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "22.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "4334.600000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 22
+        },
+        {
+          "item_code": "M08657",
+          "line_count": 60,
+          "documents": 60,
+          "buyers": 4,
+          "first_date": "2026-05-28T00:00:00",
+          "last_date": "2026-09-23T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "479.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "1814.450000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 60
+        }
+      ]
+    },
+    {
+      "name": "sales_LS_monthly",
+      "sql": "SELECT SUBSTR(d.doc_date,1,7) month,l.item_code,\n                COUNT(*) line_count,COUNT(DISTINCT d.doc_entry) documents,COUNT(DISTINCT d.card_code) buyers,\n                MIN(d.doc_date) first_date,MAX(d.doc_date) last_date,d.currency document_currency,l.currency line_currency,\n                SUM(TRY_CAST(l.quantity AS DECIMAL(38,6))) documentary_quantity,\n                SUM(TRY_CAST(l.line_total AS DECIMAL(38,6))) raw_line_total\n                FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657')\n                AND d.doc_date>='2026-01-01' AND d.doc_date<'2027-01-01' AND d.canceled='N'  AND d.card_code='C010264' GROUP BY ALL ORDER BY month,l.item_code",
+      "error": "Parser Error: syntax error at or near \"month\"\n\nLINE 1: SELECT SUBSTR(d.doc_date,1,7) month,l.item_code,\n                                      ^"
+    },
+    {
+      "name": "sales_warehouse_profile_not_destination",
+      "sql": "SELECT l.item_code,l.whs_code,COUNT(*) lines,\n                COUNT(DISTINCT d.card_code) buyer_codes,MAX(d.doc_date) last_date FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) d ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657')\n                AND d.doc_date>='2026-01-01' AND d.doc_date<'2027-01-01' AND d.canceled='N' \n                GROUP BY ALL ORDER BY l.item_code,l.whs_code",
+      "rows": [
+        {
+          "item_code": "L03432",
+          "whs_code": "2A-SAL",
+          "lines": 21,
+          "buyer_codes": 2,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "CM-SAL",
+          "lines": 24,
+          "buyer_codes": 3,
+          "last_date": "2026-09-22T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "DMS-PROF",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-03-09T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LAB-D1",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-06-15T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LAB-D3",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-07-03T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LAB-D8",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-03-27T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LAB-D9",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-01-14T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LAB-T1",
+          "lines": 5,
+          "buyer_codes": 4,
+          "last_date": "2026-08-24T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LAB-T2",
+          "lines": 4,
+          "buyer_codes": 1,
+          "last_date": "2026-08-29T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LAB-T3",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-02-02T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LAB-T4",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-08-24T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LPZ-D1",
+          "lines": 2,
+          "buyer_codes": 2,
+          "last_date": "2026-05-09T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LPZ-D2",
+          "lines": 14,
+          "buyer_codes": 9,
+          "last_date": "2026-08-26T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "LPZ-T1",
+          "lines": 4,
+          "buyer_codes": 1,
+          "last_date": "2026-08-31T00:00:00"
+        },
+        {
+          "item_code": "L03432",
+          "whs_code": "RC-SAL",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-09-03T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "01",
+          "lines": 2,
+          "buyer_codes": 2,
+          "last_date": "2026-08-14T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "2A-SAL",
+          "lines": 1923,
+          "buyer_codes": 58,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "CM-SAL",
+          "lines": 3018,
+          "buyer_codes": 28,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "DMS-PROF",
+          "lines": 98,
+          "buyer_codes": 59,
+          "last_date": "2026-09-15T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D1",
+          "lines": 54,
+          "buyer_codes": 48,
+          "last_date": "2026-09-02T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D10",
+          "lines": 141,
+          "buyer_codes": 96,
+          "last_date": "2026-09-22T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D2",
+          "lines": 71,
+          "buyer_codes": 56,
+          "last_date": "2026-09-18T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D3",
+          "lines": 71,
+          "buyer_codes": 53,
+          "last_date": "2026-09-12T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D4",
+          "lines": 58,
+          "buyer_codes": 45,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D5",
+          "lines": 57,
+          "buyer_codes": 49,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D6",
+          "lines": 80,
+          "buyer_codes": 50,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D7",
+          "lines": 113,
+          "buyer_codes": 91,
+          "last_date": "2026-09-22T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D8",
+          "lines": 61,
+          "buyer_codes": 52,
+          "last_date": "2026-09-22T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D9",
+          "lines": 11,
+          "buyer_codes": 10,
+          "last_date": "2026-07-01T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-T1",
+          "lines": 61,
+          "buyer_codes": 37,
+          "last_date": "2026-09-19T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-T2",
+          "lines": 38,
+          "buyer_codes": 29,
+          "last_date": "2026-09-09T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-T3",
+          "lines": 10,
+          "buyer_codes": 6,
+          "last_date": "2026-06-08T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-T4",
+          "lines": 4,
+          "buyer_codes": 4,
+          "last_date": "2026-05-06T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LPZ-D1",
+          "lines": 66,
+          "buyer_codes": 38,
+          "last_date": "2026-09-22T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 106,
+          "buyer_codes": 57,
+          "last_date": "2026-09-21T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LPZ-T1",
+          "lines": 7,
+          "buyer_codes": 7,
+          "last_date": "2026-08-28T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "RC-SAL",
+          "lines": 997,
+          "buyer_codes": 18,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "VI-SAL",
+          "lines": 918,
+          "buyer_codes": 20,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "M07010",
+          "whs_code": "2A-AMD",
+          "lines": 3,
+          "buyer_codes": 2,
+          "last_date": "2026-07-27T00:00:00"
+        },
+        {
+          "item_code": "M07010",
+          "whs_code": "2A-SAL",
+          "lines": 194,
+          "buyer_codes": 8,
+          "last_date": "2026-09-21T00:00:00"
+        },
+        {
+          "item_code": "M07010",
+          "whs_code": "CM-SAL",
+          "lines": 308,
+          "buyer_codes": 3,
+          "last_date": "2026-09-22T00:00:00"
+        },
+        {
+          "item_code": "M07010",
+          "whs_code": "RC-SAL",
+          "lines": 71,
+          "buyer_codes": 4,
+          "last_date": "2026-09-01T00:00:00"
+        },
+        {
+          "item_code": "M07010",
+          "whs_code": "VI-SAL",
+          "lines": 58,
+          "buyer_codes": 4,
+          "last_date": "2026-09-09T00:00:00"
+        },
+        {
+          "item_code": "M07871",
+          "whs_code": "2A-SAL",
+          "lines": 6,
+          "buyer_codes": 2,
+          "last_date": "2026-08-08T00:00:00"
+        },
+        {
+          "item_code": "M07871",
+          "whs_code": "CM-SAL",
+          "lines": 26,
+          "buyer_codes": 1,
+          "last_date": "2026-09-14T00:00:00"
+        },
+        {
+          "item_code": "M07871",
+          "whs_code": "RC-SAL",
+          "lines": 5,
+          "buyer_codes": 1,
+          "last_date": "2026-09-01T00:00:00"
+        },
+        {
+          "item_code": "M07871",
+          "whs_code": "VI-SAL",
+          "lines": 7,
+          "buyer_codes": 1,
+          "last_date": "2026-07-18T00:00:00"
+        },
+        {
+          "item_code": "M08237",
+          "whs_code": "2A-SAL",
+          "lines": 2,
+          "buyer_codes": 1,
+          "last_date": "2026-09-09T00:00:00"
+        },
+        {
+          "item_code": "M08237",
+          "whs_code": "CM-SAL",
+          "lines": 3,
+          "buyer_codes": 1,
+          "last_date": "2026-09-17T00:00:00"
+        },
+        {
+          "item_code": "M08237",
+          "whs_code": "RC-SAL",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-05-09T00:00:00"
+        },
+        {
+          "item_code": "M08237",
+          "whs_code": "VI-SAL",
+          "lines": 2,
+          "buyer_codes": 1,
+          "last_date": "2026-05-30T00:00:00"
+        },
+        {
+          "item_code": "M08239",
+          "whs_code": "2A-SAL",
+          "lines": 2,
+          "buyer_codes": 1,
+          "last_date": "2026-05-30T00:00:00"
+        },
+        {
+          "item_code": "M08239",
+          "whs_code": "CM-SAL",
+          "lines": 9,
+          "buyer_codes": 2,
+          "last_date": "2026-05-30T00:00:00"
+        },
+        {
+          "item_code": "M08239",
+          "whs_code": "RC-SAL",
+          "lines": 3,
+          "buyer_codes": 1,
+          "last_date": "2026-06-08T00:00:00"
+        },
+        {
+          "item_code": "M08239",
+          "whs_code": "VI-SAL",
+          "lines": 8,
+          "buyer_codes": 2,
+          "last_date": "2026-06-02T00:00:00"
+        },
+        {
+          "item_code": "M08657",
+          "whs_code": "2A-SAL",
+          "lines": 9,
+          "buyer_codes": 1,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "M08657",
+          "whs_code": "CM-SAL",
+          "lines": 30,
+          "buyer_codes": 1,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "M08657",
+          "whs_code": "RC-SAL",
+          "lines": 4,
+          "buyer_codes": 1,
+          "last_date": "2026-09-09T00:00:00"
+        },
+        {
+          "item_code": "M08657",
+          "whs_code": "VI-SAL",
+          "lines": 17,
+          "buyer_codes": 1,
+          "last_date": "2026-08-15T00:00:00"
+        }
+      ]
+    },
+    {
+      "name": "credit_memo_duplicate_documents",
+      "sql": "SELECT source_system,doc_entry,COUNT(*) n FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) GROUP BY ALL HAVING COUNT(*)>1 LIMIT 5",
+      "rows": []
+    },
+    {
+      "name": "credit_memo_duplicate_target_lines",
+      "sql": "SELECT source_system,doc_entry,line_num,COUNT(*) n FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) WHERE item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657') GROUP BY ALL HAVING COUNT(*)>1 LIMIT 5",
+      "rows": []
+    },
+    {
+      "name": "credit_memo_orphan_target_lines",
+      "sql": "SELECT COUNT(*) orphans FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) l LEFT JOIN (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) d ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry WHERE l.item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657') AND d.doc_entry IS NULL",
+      "rows": [
+        {
+          "orphans": 0
+        }
+      ]
+    },
+    {
+      "name": "credit_memo_target_profile",
+      "sql": "SELECT l.item_code,COUNT(*) line_count,COUNT(DISTINCT d.doc_entry) documents,\n                COUNT(DISTINCT d.card_code) buyers,MIN(d.doc_date) first_date,MAX(d.doc_date) last_date,\n                d.currency document_currency,l.currency line_currency,\n                SUM(TRY_CAST(l.quantity AS DECIMAL(38,6))) documentary_quantity,\n                COUNT(*) FILTER(WHERE TRY_CAST(l.quantity AS DECIMAL(38,6)) IS NULL) invalid_quantity,\n                SUM(TRY_CAST(l.line_total AS DECIMAL(38,6))) raw_line_total,\n                COUNT(*) FILTER(WHERE TRY_CAST(l.line_total AS DECIMAL(38,6)) IS NULL) invalid_line_total,\n                COUNT(*) FILTER(WHERE TRY_CAST(l.line_total AS DECIMAL(38,6))<>0) nonzero_line_total\n                FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) d ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657')\n                AND d.doc_date>='2026-01-01' AND d.doc_date<'2027-01-01' AND d.canceled='N'  GROUP BY ALL ORDER BY l.item_code",
+      "rows": [
+        {
+          "item_code": "L03432",
+          "line_count": 1,
+          "documents": 1,
+          "buyers": 1,
+          "first_date": "2026-03-09T00:00:00",
+          "last_date": "2026-03-09T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "20.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "2227.200000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 1
+        },
+        {
+          "item_code": "L03612",
+          "line_count": 66,
+          "documents": 66,
+          "buyers": 36,
+          "first_date": "2026-01-29T00:00:00",
+          "last_date": "2026-09-23T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "226.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "18288.830000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 66
+        },
+        {
+          "item_code": "M07010",
+          "line_count": 3,
+          "documents": 3,
+          "buyers": 2,
+          "first_date": "2026-02-10T00:00:00",
+          "last_date": "2026-06-29T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "3.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "460.670000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 3
+        },
+        {
+          "item_code": "M08657",
+          "line_count": 1,
+          "documents": 1,
+          "buyers": 1,
+          "first_date": "2026-08-25T00:00:00",
+          "last_date": "2026-08-25T00:00:00",
+          "document_currency": "BS",
+          "line_currency": "BS",
+          "documentary_quantity": "25.000000",
+          "invalid_quantity": 0,
+          "raw_line_total": "90.920000",
+          "invalid_line_total": 0,
+          "nonzero_line_total": 1
+        }
+      ]
+    },
+    {
+      "name": "credit_memo_LS_monthly",
+      "sql": "SELECT SUBSTR(d.doc_date,1,7) month,l.item_code,\n                COUNT(*) line_count,COUNT(DISTINCT d.doc_entry) documents,COUNT(DISTINCT d.card_code) buyers,\n                MIN(d.doc_date) first_date,MAX(d.doc_date) last_date,d.currency document_currency,l.currency line_currency,\n                SUM(TRY_CAST(l.quantity AS DECIMAL(38,6))) documentary_quantity,\n                SUM(TRY_CAST(l.line_total AS DECIMAL(38,6))) raw_line_total\n                FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) d ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657')\n                AND d.doc_date>='2026-01-01' AND d.doc_date<'2027-01-01' AND d.canceled='N'  AND d.card_code='C010264' GROUP BY ALL ORDER BY month,l.item_code",
+      "error": "Parser Error: syntax error at or near \"month\"\n\nLINE 1: SELECT SUBSTR(d.doc_date,1,7) month,l.item_code,\n                                      ^"
+    },
+    {
+      "name": "credit_memo_warehouse_profile_not_destination",
+      "sql": "SELECT l.item_code,l.whs_code,COUNT(*) lines,\n                COUNT(DISTINCT d.card_code) buyer_codes,MAX(d.doc_date) last_date FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) d ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657')\n                AND d.doc_date>='2026-01-01' AND d.doc_date<'2027-01-01' AND d.canceled='N' \n                GROUP BY ALL ORDER BY l.item_code,l.whs_code",
+      "rows": [
+        {
+          "item_code": "L03432",
+          "whs_code": "LAB-T2",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-03-09T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "2A-SAL",
+          "lines": 8,
+          "buyer_codes": 1,
+          "last_date": "2026-09-22T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "CM-SAL",
+          "lines": 11,
+          "buyer_codes": 3,
+          "last_date": "2026-09-12T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "DMS-PROF",
+          "lines": 2,
+          "buyer_codes": 1,
+          "last_date": "2026-08-27T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D1",
+          "lines": 2,
+          "buyer_codes": 2,
+          "last_date": "2026-02-14T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D10",
+          "lines": 2,
+          "buyer_codes": 2,
+          "last_date": "2026-09-04T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D2",
+          "lines": 6,
+          "buyer_codes": 5,
+          "last_date": "2026-09-11T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D3",
+          "lines": 5,
+          "buyer_codes": 5,
+          "last_date": "2026-08-18T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D4",
+          "lines": 4,
+          "buyer_codes": 2,
+          "last_date": "2026-06-11T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D5",
+          "lines": 3,
+          "buyer_codes": 3,
+          "last_date": "2026-09-23T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D6",
+          "lines": 2,
+          "buyer_codes": 2,
+          "last_date": "2026-08-11T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D7",
+          "lines": 2,
+          "buyer_codes": 2,
+          "last_date": "2026-05-13T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D8",
+          "lines": 5,
+          "buyer_codes": 5,
+          "last_date": "2026-09-22T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LAB-D9",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-05-08T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "LPZ-D2",
+          "lines": 3,
+          "buyer_codes": 3,
+          "last_date": "2026-08-18T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "RC-SAL",
+          "lines": 5,
+          "buyer_codes": 1,
+          "last_date": "2026-08-29T00:00:00"
+        },
+        {
+          "item_code": "L03612",
+          "whs_code": "VI-SAL",
+          "lines": 5,
+          "buyer_codes": 1,
+          "last_date": "2026-08-20T00:00:00"
+        },
+        {
+          "item_code": "M07010",
+          "whs_code": "2A-SAL",
+          "lines": 2,
+          "buyer_codes": 1,
+          "last_date": "2026-06-29T00:00:00"
+        },
+        {
+          "item_code": "M07010",
+          "whs_code": "CM-SAL",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-02-10T00:00:00"
+        },
+        {
+          "item_code": "M08657",
+          "whs_code": "CM-SAL",
+          "lines": 1,
+          "buyer_codes": 1,
+          "last_date": "2026-08-25T00:00:00"
+        }
+      ]
+    },
+    {
+      "name": "LS_credit_base_link_profile",
+      "sql": "SELECT l.item_code,l.base_type,COUNT(*) lines,\n                    COUNT(l.base_entry) with_base_entry,COUNT(l.base_line) with_base_line FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408)) l JOIN (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) d ON d.source_system=l.source_system AND d.doc_entry=l.doc_entry\n                WHERE l.source_system='SAP_B1_HANA' AND l.item_code IN ('L03332','L03432','L03612','M07010','L03618','L03651','L03652','L03653','L03659','L03756','M07871','M08237','M08239','M08657')\n                AND d.doc_date>='2026-01-01' AND d.doc_date<'2027-01-01' AND d.canceled='N' \n                    AND d.card_code='C010264' GROUP BY ALL",
+      "rows": []
+    },
+    {
+      "name": "LS_all_product_document_coverage",
+      "sql": "SELECT MIN(doc_date) first_date,MAX(doc_date) last_date,\n            COUNT(*) active_documents,COUNT(DISTINCT card_code) buyer_codes FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\n            WHERE card_code='C010264' AND canceled='N' AND doc_date>='2026-01-01' AND doc_date<'2027-01-01' ",
+      "rows": [
+        {
+          "first_date": "2026-01-20T00:00:00",
+          "last_date": "2026-09-22T00:00:00",
+          "active_documents": 52,
+          "buyer_codes": 1
+        }
+      ]
+    }
+  ],
+  "source_fingerprints": [
+    {
+      "path": "/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS/clientSB1.parq",
+      "size": 368537,
+      "sha256": "ed83b666724b451c727ebf853070259e866ce93ec38600e9b994c55794cd059d",
+      "mtime": 1716559888.487987
+    },
+    {
+      "path": "/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS/productSB1.parq",
+      "size": 658120,
+      "sha256": "109c65dea82332a47d4c18f7839a90c22369f9dafa6d4d86de994f23342b4a66",
+      "mtime": 1717679213.958857
+    },
+    {
+      "path": "/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS0/clientSB1.parq",
+      "size": 368537,
+      "sha256": "ed83b666724b451c727ebf853070259e866ce93ec38600e9b994c55794cd059d",
+      "mtime": 1716559888.4879878
+    },
+    {
+      "path": "/media/issajar/DEVELOP/Projects/telchi/Insiding/DataScience/DS0/productSB1.parq",
+      "size": 658120,
+      "sha256": "109c65dea82332a47d4c18f7839a90c22369f9dafa6d4d86de994f23342b4a66",
+      "mtime": 1717679213.9588578
+    }
+  ],
+  "threads": 2,
+  "limits": [
+    "No geographic assignment from warehouse",
+    "No physical unit or conversion factor on lines",
+    "LineTotal is raw documentary observation, not approved net invoicing",
+    "L&S account candidate is not proof of exclusive Cochabamba distribution",
+    "No sell-out, inventory or returns ledger from L&S was supplied"
+  ],
+  "foundation": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 1490.374,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "publication_unchanged": true
+}

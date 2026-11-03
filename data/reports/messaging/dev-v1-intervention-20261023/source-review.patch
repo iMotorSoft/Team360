@@ -1,0 +1,1321 @@
+--- current/ls_iMotorSoft_Srv05.py
++++ v1/ls_iMotorSoft_Srv05.py
+@@ -27,17 +27,32 @@
+                 if horizontal and binding.receiver_context != settings.recipient:
+                     raise ValueError('Runtime/channel receiver mismatch')
+             await MessagingRepository().validate_transport_schema(conn)
++        if binding is None:
++            raise ValueError('Srv05 V1 binding required')
++        if (settings.messaging.dispatch_mode == 'horizontal_v1'
++                and binding.module not in (app.state.messaging_handlers or {})):
++            raise ValueError('Approved module handler required')
++        await app.state.transport_v1.start(get_pool(), binding)
+         if settings.messaging.dispatch_mode == 'horizontal_v1':
+             from modules.messaging.webhooks.evolution_whatsapp import build_service
+             from modules.messaging.identity import PhoneIdentityRepository
+             async with transaction(get_pool()) as conn:
+                 await PhoneIdentityRepository().validate_schema(conn)
+-            await build_service(settings.messaging, settings.evolution,
+-                                handlers=app.state.messaging_handlers)
++            # Validate dispatcher even with admission closed. Provider selection
++            # is fixed by composition, not by a request or environment fallback.
++            if app.state.transport_v1.admission_open:
++                await build_service(settings.messaging, settings.evolution,
++                                    handlers=app.state.messaging_handlers,
++                                    transport_runtime=app.state.transport_v1)
+     except Exception:
++        await app.state.transport_v1.stop()
+         # Litestar's lifespan exit stack runs the base shutdown hooks even
+         # when startup fails. Keep resource ownership in that single lifecycle.
+         raise RuntimeError('Srv05 Evolution binding/schema unavailable') from None
++
++
++async def _stop_transport_v1(app: Litestar) -> None:
++    await app.state.transport_v1.stop()
+ 
+ 
+ def create_app(*, messaging_handlers=None) -> Litestar:
+@@ -49,12 +64,16 @@
+     from types import MappingProxyType
+     settings = Srv05Settings.from_env()
+     registrations = dict(messaging_handlers or {})
++    runtime = None
++    if settings.evolution_enabled:
++        from modules.messaging.transport_runtime import TransportRuntime
++        runtime = TransportRuntime.from_env(settings.evolution)
+     if settings.evolution_enabled and settings.messaging.dispatch_mode == 'horizontal_v1':
+         from modules.messaging.handlers import HandlerRegistration
+         if any(
+             not isinstance(name, str) or not name.strip()
+             or not isinstance(registration, HandlerRegistration)
+-            or registration.environment != 'dev'
++            or registration.environment != runtime.document['scope']['environment']
+             or not callable(getattr(registration.handler, 'handle', None))
+             for name, registration in registrations.items()
+         ):
+@@ -67,7 +86,9 @@
+     application.state.srv05_settings = settings
+     application.state.messaging_handlers = MappingProxyType(registrations) if registrations else None
+     if settings.evolution_enabled:
++        application.state.transport_v1 = runtime
+         application.on_startup.insert(1, _validate_evolution_binding)
++        application.on_shutdown.insert(0, _stop_transport_v1)
+     return application
+ 
+ 
+--- current/modules/messaging/service.py
++++ v1/modules/messaging/service.py
+@@ -99,14 +99,20 @@
+         decision = guard_outbound(reply)
+         async with aspan('messaging_outbound_intent_persistence'), transaction(self.pool) as conn:
+             outbound_id = await self.repository.intent(conn, self.binding, claimed, event, decision.text, timings)
+-        # Durable intent precedes I/O. Never retry it on duplicates or restart.
++        # Legacy and horizontal paths share the same durable pre-I/O fence.
++        async with transaction(self.pool) as conn:
++            await self._check_transport_binding(conn)
++            started = await self.repository.begin_send(conn, self.binding, outbound_id)
++        if not started:
++            return 'duplicate'
++        send, identity_args = await self._sender_for_intent(outbound_id, event.sender, decision.text)
+         def dispatch():
+             timings['t4_ms'] = epoch_ms()
+             if trace is not None:
+                 timings['pre_sql_profile']['pre_send_ms'] = (time.perf_counter_ns()-trace.origin)/1e6
+             if audit is not None:
+                 audit['timings']['t5_ms'] = timings['t4_ms']
+-            return self.sender.send_text(destination=event.sender, text=decision.text)
++            return send(destination=event.sender, text=decision.text, **identity_args)
+         receipt, error = None, None
+         try:
+             receipt = await asyncio.to_thread(dispatch)
+@@ -175,15 +181,37 @@
+                                           intent['payload_jsonb']['text'],
+                                           intent['payload_jsonb']['timings'], retry=retry)
+ 
++    async def _check_transport_binding(self, conn):
++        check = getattr(self.sender, 'check_transport_binding', None)
++        if callable(check):
++            await check(conn, self.binding)
++
++    async def _sender_for_intent(self, outbound_id, destination, text):
++        # Preserve existing sender port consumers. Evolution explicitly opts in;
++        # a V1 rejection/missing response never falls back to send_text.
++        send_intent = getattr(self.sender, 'send_intent', None)
++        if not callable(send_intent):
++            return self.sender.send_text, {}
++        async with transaction(self.pool) as conn:
++            identity = await self.repository.send_identity(conn, self.binding, outbound_id)
++        extra = {}
++        prepare = getattr(self.sender, 'prepare_transport', None)
++        if callable(prepare):
++            extra = await prepare(pool=self.pool, binding=self.binding, identity=identity,
++                                  destination=destination, text=text)
++        return send_intent, {'identity': identity, **extra}
++
+     async def _send_horizontal(self, outbound_id, destination, text, timings, *, retry=False):
+         async with transaction(self.pool) as conn:
++            await self._check_transport_binding(conn)
+             started = await self.repository.begin_send(conn, self.binding, outbound_id, retry=retry)
+         if not started:
+             return 'duplicate'
++        send, identity_args = await self._sender_for_intent(outbound_id, destination, text)
+         receipt, error = None, None
+         timings['t4_ms'] = epoch_ms()
+         try:
+-            receipt = await asyncio.to_thread(self.sender.send_text, destination=destination, text=text)
++            receipt = await asyncio.to_thread(send, destination=destination, text=text, **identity_args)
+             if receipt is None:
+                 error = MessagingSendError('provider_empty_receipt', uncertain=True)
+         except MessagingSendError as exc:
+--- current/modules/messaging/transport_runtime.py
++++ v1/modules/messaging/transport_runtime.py
+@@ -0,0 +1,170 @@
++"""Srv05-owned V1 sender and private callback lifecycle, admission closed by default.
++
++Laboratory and DEV trust/credential profiles are disjoint. Changing TEAM360_ENV
++cannot widen a trust root or permit legacy/global credentials.
++"""
++import asyncio
++import base64
++import json
++import os
++from pathlib import Path
++import socket
++import stat
++import struct
++
++from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
++from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
++import uvicorn
++
++from .providers.evolution.bound_provider import BoundEvolutionProvider
++from .transport_app import create_transport_app
++from .transport_callbacks import TransportCallbackReceiver
++from .transport_profile import trust_profile
++
++
++def private_document(path):
++    path = Path(path)
++    if not path.is_absolute() or path.resolve() != path:
++        raise ValueError('Absolute private configuration required')
++    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
++    try:
++        info = os.fstat(fd)
++        parent = path.parent.stat()
++        if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
++                or stat.S_IMODE(info.st_mode) != 0o600 or info.st_size > 65536 or info.st_nlink != 1
++                or parent.st_uid != os.getuid() or stat.S_IMODE(parent.st_mode) != 0o700):
++            raise ValueError('Private configuration permissions invalid')
++        with os.fdopen(fd, 'rb', closefd=False) as stream:
++            return json.load(stream)
++    finally:
++        os.close(fd)
++
++
++class PeerIdentity:
++    """Authenticate the local UDS peer before HTTP/body/signature processing."""
++    def __init__(self, app, uid):
++        self.app, self.uid = app, uid
++
++    async def __call__(self, scope, receive, send):
++        # Populated by our protocol, never by an HTTP header.
++        if scope.get('type') == 'http' and scope.get('transport_peer_uid') != self.uid:
++            await send({'type': 'http.response.start', 'status': 403, 'headers': []})
++            await send({'type': 'http.response.body', 'body': b''})
++            return
++        await self.app(scope, receive, send)
++
++
++from uvicorn.protocols.http.h11_impl import H11Protocol
++
++
++class PrivateProtocol(H11Protocol):
++    def connection_made(self, transport):
++        peer = transport.get_extra_info('socket')
++        try:
++            _, uid, _ = struct.unpack('3i', peer.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
++        except (OSError, AttributeError):
++            transport.close()
++            return
++        # app_state is copied into each request scope by H11Protocol.
++        self.app_state = {**self.app_state, 'peer_uid': uid}
++        super().connection_made(transport)
++
++
++class PrivateApplication:
++    def __init__(self, app, uid):
++        self.app, self.uid = app, uid
++
++    async def __call__(self, scope, receive, send):
++        scope['transport_peer_uid'] = scope.get('state', {}).get('peer_uid')
++        await PeerIdentity(self.app, self.uid)(scope, receive, send)
++
++
++class TransportRuntime:
++    def __init__(self, config, document):
++        if (set(document) != {'version', 'scope', 'revision', 'trust', 'signer', 'socket', 'admission_open'}
++                or type(document['version']) is not int or document['version'] != 1 or type(document['revision']) is not int
++                or document['revision'] < 1 or type(document['admission_open']) is not bool):
++            raise ValueError('Invalid transport runtime configuration')
++        trust = document['trust']
++        trust_profile(trust)
++        signer = Ed25519PrivateKey.from_private_bytes(base64.b64decode(document['signer'], validate=True))
++        public = base64.b64encode(signer.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)).decode()
++        if public != trust['targets']['team360']['public_key']:
++            raise ValueError('Transport signing identity mismatch')
++        self.provider = BoundEvolutionProvider(config, scope=document['scope'], revision=document['revision'],
++                                               trust=trust, signer=signer, admission_check=self.sender)
++        self.document, self.server, self.task, self.sock = document, None, None, None
++        self.admission_open = False
++        self.path = Path(document['socket'])
++        if not self.path.is_absolute() or self.path.parent.resolve() != self.path.parent:
++            raise ValueError('Private callback path required')
++        parent = self.path.parent.stat()
++        if parent.st_uid != os.getuid() or stat.S_IMODE(parent.st_mode) != 0o700:
++            raise ValueError('Private callback parent required')
++
++    @classmethod
++    def from_env(cls, config):
++        path = os.environ.get('TEAM360_TRANSPORT_V1_CONFIG', '')
++        if not path:
++            raise ValueError('V1 runtime configuration required; legacy fallback forbidden')
++        return cls(config, private_document(path))
++
++    def sender(self):
++        if not self.admission_open or not self.task or self.task.done():
++            raise ValueError('V1 admission closed')
++        return self.provider
++
++    def close_admission(self):
++        # Non-destructive rollback: retain the V1 callback/reconciliation process.
++        self.admission_open = False
++
++    async def start(self, pool, binding):
++        from modules.db.transaction import transaction
++        if self.task is not None:
++            raise ValueError('V1 runtime already started')
++        async with transaction(pool) as conn:
++            await self.provider.check_transport_binding(conn, binding, require_active=self.document['admission_open'])
++        receiver = TransportCallbackReceiver(trust=self.document['trust'], scope=self.document['scope'], binding=binding)
++        app = create_transport_app(pool, {self.document['scope']['binding_id']: receiver})
++        # Never unlink a preexisting socket: it may belong to another process.
++        self.inode = None
++        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
++        try:
++            self.sock.bind(str(self.path))
++            self.inode = self.path.stat().st_ino
++            os.chmod(self.path, 0o600)
++            self.sock.listen(16)
++            self.server = uvicorn.Server(uvicorn.Config(PrivateApplication(app, os.getuid()),
++                http=PrivateProtocol, lifespan='off', access_log=False, log_level='error', limit_concurrency=8))
++            self.task = asyncio.create_task(self.server.serve(sockets=[self.sock]))
++            for _ in range(200):
++                if self.task.done():
++                    await self.task
++                    raise RuntimeError('Private callback stopped during startup')
++                if self.server.started:
++                    self.admission_open = self.document['admission_open']
++                    return
++                await asyncio.sleep(.01)
++            raise RuntimeError('Private callback startup timeout')
++        except BaseException:
++            await self.stop()
++            raise
++
++    async def stop(self):
++        self.close_admission()
++        if self.server:
++            self.server.should_exit = True
++        if self.task:
++            try:
++                await asyncio.wait_for(asyncio.gather(self.task, return_exceptions=True), 10)
++            except asyncio.TimeoutError:
++                self.task.cancel()
++                await asyncio.gather(self.task, return_exceptions=True)
++        if self.sock:
++            self.sock.close()
++        if getattr(self, 'inode', None) is not None and self.path.exists():
++            info = self.path.lstat()
++            if stat.S_ISSOCK(info.st_mode) and info.st_ino == self.inode:
++                self.path.unlink()
++        self.inode = None
++        self.task = None
+--- current/modules/messaging/handlers.py
++++ v1/modules/messaging/handlers.py
+@@ -91,7 +91,7 @@
+     def __init__(self, *, channels: tuple[ChannelContext, ...],
+                  handlers: dict[str, HandlerRegistration], identities: IdentityResolver,
+                  environment: str = 'dev'):
+-        if environment not in {'dev', 'pro'}:
++        if environment not in {'dev', 'pro', 'laboratory'}:
+             raise ValueError('Invalid runtime environment')
+         self.environment = environment
+         self._channels = {c.channel_id: c for c in channels}
+--- current/modules/messaging/repository.py
++++ v1/modules/messaging/repository.py
+@@ -7,6 +7,7 @@
+ from psycopg.types.json import Jsonb
+ 
+ from .domain.delivery import DeliveryEvent
++from .domain.egress import OutboundIdentity, validate_egress
+ from .domain.messages import InboundMessage
+ 
+ 
+@@ -151,13 +152,24 @@
+         return str(row['id'])
+ 
+     async def finish(self, conn, outbound_id, *, receipt=None, error=None, timings):
++        evidence = getattr(receipt if receipt else error, 'egress', None)
++        if evidence is not None:
++            row = await (await conn.execute(
++                'SELECT payload_jsonb FROM message_events WHERE id=%s FOR UPDATE',
++                (outbound_id,))).fetchone()
++            context = row['payload_jsonb']['outbound_identity']
++            evidence = validate_egress(evidence, OutboundIdentity(**context))
++            if receipt and (evidence['acceptance'] != 'ACCEPTED'
++                            or evidence['provider_message_id'] != receipt.external_message_id):
++                raise ValueError('Receipt contradicts egress')
+         await conn.execute("""
+             UPDATE message_events SET provider_message_id=%s,status=%s,transport_status=%s,
+                 payload_jsonb=payload_jsonb || %s WHERE id=%s
+             """, (receipt.external_message_id if receipt else None,
+                   'completed' if receipt else 'failed',
+                   None if receipt else ('unknown' if error.uncertain else 'failed'),
+-                  Jsonb({'initial_result': 'accepted' if receipt else error.code, 'timings': timings}), outbound_id))
++                  Jsonb({'initial_result': 'accepted' if receipt else error.code, 'timings': timings,
++                         **({'egress': evidence} if evidence is not None else {})}), outbound_id))
+         if receipt:
+             row = await (await conn.execute(
+                 'SELECT provider_id,provider_instance,provider_message_id FROM message_events WHERE id=%s',
+@@ -226,18 +238,40 @@
+             """, (binding.channel_id, binding.storage_instance, message.external_message_id))).fetchone()
+ 
+     async def begin_send(self, conn, binding, outbound_id, *, retry=False):
+-        # Commit before network I/O. A crash after this boundary is uncertain:
+-        # no provider exactly-once key exists, so it must not be auto-retried.
+-        row = await (await conn.execute("""
+-            UPDATE message_events SET status='pending', transport_status=NULL,
+-                payload_jsonb=payload_jsonb || jsonb_build_object('initial_result','sending')
+-            WHERE id=%s AND channel_id=%s AND provider_instance=%s
++        # A reserved attempt is committed BEFORE I/O. A crash even before the
++        # call is conservatively UNKNOWN, never permission to auto-retry.
++        identity = OutboundIdentity(str(outbound_id), str(uuid4()), str(binding.workspace_id),
++                                    str(binding.channel_id), binding.provider_instance)
++        row = await (await conn.execute("""
++            UPDATE message_events SET status='pending', transport_status='unknown',
++                payload_jsonb=(payload_jsonb - 'egress' - 'transport_delegation') || jsonb_build_object(
++                    'initial_result','sending', 'outbound_identity',%s::jsonb,
++                    'attempt_history', COALESCE(payload_jsonb->'attempt_history','[]'::jsonb) ||
++                        CASE WHEN payload_jsonb ? 'outbound_identity' THEN
++                            jsonb_build_array(jsonb_build_object('identity',payload_jsonb->'outbound_identity',
++                                'egress',payload_jsonb->'egress') ||
++                                CASE WHEN payload_jsonb ? 'transport_delegation' THEN
++                                    jsonb_build_object('transport_delegation',payload_jsonb->'transport_delegation')
++                                ELSE '{}'::jsonb END) ELSE '[]'::jsonb END)
++            WHERE id=%s AND workspace_id=%s AND channel_id=%s AND provider_instance=%s
+               AND direction='outbound' AND event_type='message'
+               AND ((status='pending' AND payload_jsonb->>'initial_result'='dispatch_intent')
+                    OR (%s AND status='failed' AND transport_status='failed'))
+             RETURNING id
+-            """, (outbound_id, binding.channel_id, binding.storage_instance, retry))).fetchone()
++            """, (Jsonb({k: v for k, v in identity.wire().items() if k != 'version'}),
++                  outbound_id, binding.workspace_id, binding.channel_id, binding.storage_instance, retry))).fetchone()
+         return row is not None
++
++    async def send_identity(self, conn, binding, outbound_id):
++        row = await (await conn.execute('''
++            SELECT payload_jsonb->'outbound_identity' AS identity FROM message_events
++            WHERE id=%s AND workspace_id=%s AND channel_id=%s AND provider_instance=%s
++                AND direction='outbound' AND event_type='message'
++            ''', (outbound_id, binding.workspace_id, binding.channel_id,
++                  binding.storage_instance))).fetchone()
++        if not row or not row['identity']:
++            raise ValueError('Outbound execution fence missing')
++        return OutboundIdentity(**row['identity'])
+ 
+     async def evidence(self, conn, binding):
+         return await (await conn.execute("""
+--- current/modules/messaging/transport_profile.py
++++ v1/modules/messaging/transport_profile.py
+@@ -0,0 +1,20 @@
++"""Explicit trust/credential classes. Environment variables never widen trust."""
++import hashlib
++import re
++
++
++def trust_profile(trust):
++    if trust.get('version') != 1:
++        raise ValueError('Invalid transport trust')
++    if trust.get('laboratory_only') is True and trust.get('profile', 'laboratory') == 'laboratory':
++        return 'laboratory'
++    if trust.get('laboratory_only') is False and trust.get('profile') == 'dev':
++        return 'dev'
++    raise ValueError('Invalid transport trust profile')
++
++
++def credential_verifier(secret, profile):
++    prefix, domain = {'laboratory': ('t360labv1_', 'lab'), 'dev': ('t360devv1_', 'dev')}[profile]
++    if not isinstance(secret, str) or not re.fullmatch(prefix+r'[A-Za-z0-9_-]{43}', secret):
++        raise ValueError('Binding credential class mismatch')
++    return hashlib.sha256(('team360.transport.'+domain+'.v1\x00'+secret).encode()).hexdigest()
+--- current/modules/messaging/transport_repository.py
++++ v1/modules/messaging/transport_repository.py
+@@ -0,0 +1,91 @@
++"""Trusted transport delegation queries; caller owns async transactions."""
++import hashlib
++import json
++from psycopg.types.json import Jsonb
++
++
++def canonical(value):
++    return json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode()
++
++
++class TransportRepository:
++    async def targets(self, conn):
++        rows = await (await conn.execute('SELECT side,target_id::text,epoch::text FROM ot_target')).fetchall()
++        return {r['side']:{'id':r['target_id'],'epoch':r['epoch']} for r in rows}
++
++    async def binding_revision(self, conn, scope, revision, binding, *, require_active=True):
++        # A closed-admission reconciler needs historical reads, not catalog
++        # mutation/locking privileges. Active sending retains the inventory lock.
++        query = "SELECT scope FROM ot_inventory WHERE side='team360' AND binding_id=%s"
++        if require_active:
++            query += ' FOR UPDATE'
++        row = await (await conn.execute(query, (scope['binding_id'],))).fetchone()
++        if not row or row['scope'] != scope:
++            raise ValueError('Transport inventory mismatch')
++        row = await (await conn.execute("SELECT * FROM ot_revision WHERE side='team360' AND binding_id=%s AND revision=%s",
++                                      (scope['binding_id'], revision))).fetchone()
++        if not row or row['scope'] != scope or (require_active and row['state'] != 'active'):
++            raise ValueError('Transport revision inactive')
++        expected = dict(workspace_id=binding.workspace_id, channel_id=binding.channel_id,
++                        provider_id=binding.provider_id, instance_name=binding.provider_instance,
++                        environment=binding.environment, tenant_id=binding.tenant_id,
++                        module=binding.module, receiver_context=binding.receiver_context)
++        if any(scope.get(k) != v for k, v in expected.items()):
++            raise ValueError('Transport binding mismatch')
++        return row
++
++    async def admission(self, conn, scope, revision, identity, binding):
++        row = await self.binding_revision(conn, scope, revision, binding)
++        event = await (await conn.execute('''SELECT payload_jsonb FROM message_events WHERE id=%s
++            AND workspace_id=%s AND channel_id=%s AND provider_instance=%s
++            AND direction='outbound' AND event_type='message' ''',
++            (identity.outbound_intent_id, binding.workspace_id, binding.channel_id, binding.storage_instance))).fetchone()
++        if not event or event['payload_jsonb'].get('outbound_identity') != {k:v for k,v in identity.wire().items() if k != 'version'}:
++            raise ValueError('Transport intent not reserved')
++        delegation = {'binding_id':scope['binding_id'], 'revision':revision, 'scope_hash':hashlib.sha256(canonical(scope)).hexdigest()}
++        previous = event['payload_jsonb'].get('transport_delegation')
++        if previous is not None and previous != delegation:
++            raise ValueError('Attempt already accredited to another revision')
++        await conn.execute("UPDATE message_events SET payload_jsonb=payload_jsonb || jsonb_build_object('transport_delegation',%s::jsonb) WHERE id=%s",
++                           (Jsonb(delegation), identity.outbound_intent_id))
++        targets = await (await conn.execute('SELECT side,target_id::text,epoch::text FROM ot_target')).fetchall()
++        return row, {r['side']: {'id':r['target_id'], 'epoch':r['epoch']} for r in targets}
++
++    async def callback_context(self, conn, payload, binding):
++        scope = payload['scope']
++        row = await (await conn.execute("SELECT scope FROM ot_revision WHERE side='team360' AND binding_id=%s AND revision=%s",
++                                      (scope['binding_id'], payload['revision']))).fetchone()
++        if not row or row['scope'] != scope:
++            raise ValueError('Historical transport revision mismatch')
++        identity = await (await conn.execute('''SELECT provider_message_id,payload_jsonb FROM message_events
++            WHERE id=%s AND workspace_id=%s AND channel_id=%s AND provider_instance=%s
++                AND direction='outbound' AND event_type='message' ''',
++            (payload['outbound_intent_id'], binding.workspace_id, binding.channel_id, binding.storage_instance))).fetchone()
++        if not identity:
++            raise ValueError('Callback intent not found')
++        document = identity['payload_jsonb']
++        attempts = [{'identity': document.get('outbound_identity', {}), 'egress':document.get('egress'),
++                     'transport_delegation':document.get('transport_delegation')}, *document.get('attempt_history', [])]
++        expected = {'binding_id':scope['binding_id'], 'revision':payload['revision'],
++                    'scope_hash':hashlib.sha256(canonical(scope)).hexdigest()}
++        matches = [a for a in attempts if a.get('identity', {}).get('transport_attempt_id') == payload['transport_attempt_id']]
++        if len(matches) != 1:
++            raise ValueError('Callback attempt not found')
++        stored = matches[0]['identity']
++        known_meta = (matches[0].get('egress') or {}).get('provider_message_id')
++        if known_meta is not None and known_meta != payload['provider_message_id']:
++            raise ValueError('Callback Meta identity mismatch')
++        if (stored.get('outbound_intent_id') != payload['outbound_intent_id'] or stored.get('workspace_id') != scope['workspace_id'] or stored.get('channel_id') != scope['channel_id'] or
++                stored.get('provider_instance') != scope['instance_name'] or matches[0].get('transport_delegation') != expected):
++            raise ValueError('Callback intent context mismatch')
++        fingerprint = hashlib.sha256(canonical(payload)).hexdigest()
++        old = await (await conn.execute('SELECT envelope_hash FROM ot_received_callback WHERE event_id=%s',
++                                      (payload['event_id'],))).fetchone()
++        if old:
++            if old['envelope_hash'] != fingerprint:
++                raise ValueError('Callback replay conflict')
++            return False
++        row = await (await conn.execute('''INSERT INTO ot_received_callback(event_id,envelope_hash,payload)
++            VALUES (%s,%s,%s) ON CONFLICT(event_id) DO NOTHING RETURNING event_id''',
++            (payload['event_id'], fingerprint, Jsonb(payload)))).fetchone()
++        return bool(row)
+--- current/modules/messaging/transport_app.py
++++ v1/modules/messaging/transport_app.py
+@@ -0,0 +1,21 @@
++"""Explicit isolated callback app factory. Never mounted by Srv01/Srv05 implicitly."""
++from litestar import Litestar, Request, post
++from litestar.exceptions import NotAuthorizedException
++
++
++def create_transport_app(pool, receivers):
++    # receivers is a trusted historical binding registry, not a caller-selected URL.
++    @post('/transport/v1/callbacks/{binding_id:str}', status_code=200)
++    async def callback(binding_id: str, request: Request) -> dict:
++        try:
++            if int(request.headers.get('content-length', '0')) > 65536:
++                raise ValueError('Body too large')
++            raw = await request.body()
++            if len(raw) > 65536:
++                raise ValueError('Body too large')
++            receiver = receivers[binding_id]
++            outcome = await receiver.receive(pool, await request.json())
++            return {'status':outcome}
++        except Exception:
++            raise NotAuthorizedException('Transport callback denied') from None
++    return Litestar(route_handlers=[callback], debug=False)
+--- current/modules/messaging/transport_callbacks.py
++++ v1/modules/messaging/transport_callbacks.py
+@@ -0,0 +1,54 @@
++"""Authenticated V1 callback consumer; merges into the existing messaging ledger."""
++import base64
++from datetime import datetime, timezone
++import re
++
++from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
++
++from modules.db.transaction import transaction
++from .domain.delivery import DeliveryEvent
++from .repository import MessagingRepository
++from .transport_repository import TransportRepository, canonical
++
++
++class TransportCallbackReceiver:
++    def __init__(self, *, trust, scope, binding):
++        self.trust, self.scope, self.binding = trust, scope, binding
++
++    async def receive(self, pool, envelope):
++        if not isinstance(envelope, dict) or set(envelope) != {'payload','signature'}:
++            raise ValueError('Invalid callback envelope')
++        p = envelope['payload']
++        required = {'version','event_id','scope','revision','outbound_intent_id','transport_attempt_id',
++                    'provider_message_id','status','provider_timestamp','code','targets'}
++        if not isinstance(p, dict) or set(p) != required:
++            raise ValueError('Invalid callback fields')
++        try:
++            key = Ed25519PublicKey.from_public_bytes(base64.b64decode(self.trust['targets']['evolution']['public_key'], validate=True))
++            key.verify(base64.b64decode(envelope['signature'], validate=True),
++                       b'team360.transport.callback.v1\x00'+canonical(p))
++        except Exception:
++            raise ValueError('Invalid callback signature') from None
++        targets = {s:{k:v[k] for k in ('id','epoch')} for s,v in self.trust['targets'].items()}
++        if (type(p['version']) is not int or p['version'] != 1 or type(p['revision']) is not int or p['revision'] < 1
++                or p['scope'] != self.scope or p['targets'] != targets
++                or p['status'] not in {'sent','delivered','read','failed'}
++                or not isinstance(p['event_id'], str) or not re.fullmatch('[0-9a-f]{64}', p['event_id'])
++                or not isinstance(p['provider_message_id'], str) or not re.fullmatch(r'wamid\.[A-Za-z0-9+/=_-]{1,506}', p['provider_message_id'])):
++            raise ValueError('Callback context mismatch')
++        if p['code'] is not None and (type(p['code']) is not int or p['code'] < 0):
++            raise ValueError('Invalid callback code')
++        if not isinstance(p['provider_timestamp'], str) or not re.fullmatch('[0-9]{1,12}', p['provider_timestamp']):
++            raise ValueError('Invalid callback timestamp')
++        when = datetime.fromtimestamp(int(p['provider_timestamp']), timezone.utc)
++        async with transaction(pool) as conn:
++            if await TransportRepository().targets(conn) != targets:
++                raise ValueError('Callback target epoch mismatch')
++            # Same lock protects concurrent duplicate validation and the existing merge.
++            await MessagingRepository().lock_receipt(conn, self.binding.provider_id,
++                self.binding.storage_instance, p['provider_message_id'])
++            if not await TransportRepository().callback_context(conn, p, self.binding):
++                return 'duplicate'
++            event = DeliveryEvent('evolution', self.binding.provider_instance, p['provider_message_id'], p['status'], when)
++            await MessagingRepository().delivery(conn, self.binding, event)
++        return 'applied'
+--- current/modules/messaging/domain/egress.py
++++ v1/modules/messaging/domain/egress.py
+@@ -0,0 +1,57 @@
++"""Durable outbound identity. Wire scope is correlation, NEVER authorization."""
++from dataclasses import asdict, dataclass
++from uuid import UUID
++import re
++
++
++@dataclass(frozen=True, slots=True)
++class OutboundIdentity:
++    outbound_intent_id: str
++    transport_attempt_id: str
++    workspace_id: str
++    channel_id: str
++    provider_instance: str
++
++    def __post_init__(self):
++        for key in ('outbound_intent_id', 'transport_attempt_id', 'workspace_id', 'channel_id'):
++            value = getattr(self, key)
++            if str(UUID(value)) != value:
++                raise ValueError('Noncanonical outbound identity')
++        if (not isinstance(self.provider_instance, str) or not self.provider_instance
++                or len(self.provider_instance) > 256):
++            raise ValueError('Invalid provider instance')
++
++    def wire(self):
++        return {'version': 1, **asdict(self)}
++
++
++def validate_egress(value, identity: OutboundIdentity):
++    """Allowlist evidence; reject mismatched identity and impossible conclusions.
++
++    ACCEPTED concerns Graph acceptance, not recipient delivery. HTTP error status
++    at the Evolution boundary does not negate a genuine Meta acceptance.
++    """
++    if (not isinstance(value, dict) or type(value.get('version')) is not int
++            or any(value.get(k) != v for k, v in identity.wire().items())):
++        raise ValueError('Mismatched egress identity')
++    state = value.get('acceptance')
++    if not isinstance(state, str) or state not in {'UNKNOWN', 'ACCEPTED', 'REJECTED'}:
++        raise ValueError('Invalid acceptance')
++    message_id = value.get('provider_message_id')
++    if message_id is not None and (not isinstance(message_id, str)
++            or not re.fullmatch(r'wamid\.[A-Za-z0-9+/=_-]{1,506}', message_id)):
++        raise ValueError('Invalid Meta ID')
++    if (state == 'ACCEPTED' and not message_id) or (state == 'REJECTED' and message_id):
++        raise ValueError('Contradictory egress evidence')
++    if value.get('automatic_retry') is not False or value.get('durable') is not True:
++        raise ValueError('Missing durable execution fence')
++    result = {**identity.wire(), 'acceptance': state, 'provider_message_id': message_id,
++              'automatic_retry': False, 'durable': True}
++    for key in ('http_status', 'graph_code', 'graph_subcode'):
++        item = value.get(key)
++        if item is not None:
++            if type(item) is not int or item < 0 or (key == 'http_status' and not 100 <= item <= 599):
++                raise ValueError('Invalid numeric diagnostic')
++            result[key] = item
++    # Never retain provider response, exception text, headers, numbers or body.
++    return result
+--- current/modules/messaging/domain/delivery.py
++++ v1/modules/messaging/domain/delivery.py
+@@ -6,10 +6,11 @@
+ class MessagingSendError(RuntimeError):
+     """Sanitized failure: uncertain outcomes must never be automatically retried."""
+ 
+-    def __init__(self, code: str, *, uncertain: bool = False):
++    def __init__(self, code: str, *, uncertain: bool = False, egress=None):
+         super().__init__(code)
+         self.code = code
+         self.uncertain = uncertain
++        self.egress = egress
+ 
+ 
+ @dataclass(frozen=True, slots=True)
+@@ -19,4 +20,3 @@
+     external_message_id: str
+     status: str
+     received_at: datetime
+-
+--- current/modules/messaging/domain/messages.py
++++ v1/modules/messaging/domain/messages.py
+@@ -34,3 +34,4 @@
+ 
+     external_message_id: str
+     external_thread_id: str
++    egress: Mapping[str, Any] | None = None
+--- current/modules/messaging/webhooks/evolution_whatsapp.py
++++ v1/modules/messaging/webhooks/evolution_whatsapp.py
+@@ -20,13 +20,18 @@
+ from modules.messaging.profile_trace import enabled, span, aspan
+ 
+ 
+-async def build_service(settings, config, *, handlers=None):
++async def build_service(settings, config, *, handlers=None, transport_runtime=None):
+     repository = MessagingRepository()
+     pool = get_pool()
+     async with aspan('messaging_binding_lookup'), transaction(pool) as conn:
+         binding = await repository.binding(conn, workspace_slug=settings.workspace_slug,
+                                            channel_alias=settings.channel_alias,
+                                            provider='evolution', instance=config.instance)
++    if binding is None:
++        raise ValueError('Messaging binding unavailable')
++    # Srv05 supplies its already-accredited lifecycle runtime. Standalone legacy
++    # fixtures remain separate; an enabled Srv05 can never reach that branch.
++    sender = transport_runtime.sender() if transport_runtime is not None else EvolutionProvider(config)
+     horizontal = getattr(settings, 'dispatch_mode', 'legacy') == 'horizontal_v1'
+     if horizontal != (binding.environment is not None):
+         raise ValueError('Runtime/channel dispatcher mismatch')
+@@ -43,16 +48,17 @@
+             channels=(ChannelContext(binding.channel_id, 'evolution', config.instance,
+                                      binding.receiver_context, binding.tenant_id,
+                                      binding.workspace_id, binding.module, binding.environment),),
+-            handlers=registrations, identities=PostgresPhoneIdentityResolver(pool), environment='dev')
++            handlers=registrations, identities=PostgresPhoneIdentityResolver(pool),
++            environment=(transport_runtime.document['scope']['environment'] if transport_runtime else 'dev'))
+         return MessagingService(pool=pool, repository=repository, binding=binding,
+-                                sender=EvolutionProvider(config), authorized_sender='', dispatcher=dispatcher)
++                                sender=sender, authorized_sender='', dispatcher=dispatcher)
+     capability = None
+     if settings.telchi_tenant == 'telchi':
+         from modules.messaging.telchi_sql import TelchiSqlAdapter
+         with span('messaging_capability_resolution'):
+             capability = TelchiSqlAdapter()
+     return MessagingService(pool=pool, repository=repository, binding=binding,
+-                            sender=EvolutionProvider(config), authorized_sender=settings.authorized_sender,
++                            sender=sender, authorized_sender=settings.authorized_sender,
+                             telchi_capability=capability, tenant=settings.telchi_tenant)
+ 
+ 
+@@ -105,8 +111,14 @@
+             return {'ok': True, 'results': {'ignored': 1}}
+         try:
+             handlers = getattr(request.app.state, 'messaging_handlers', None)
+-            service = (await build_service(settings, config) if handlers is None else
+-                       await build_service(settings, config, handlers=handlers))
++            if composition is not None:
++                runtime = getattr(request.app.state, 'transport_v1', None)
++                if runtime is None:
++                    raise ValueError('Srv05 V1 runtime unavailable')
++                service = await build_service(settings, config, handlers=handlers, transport_runtime=runtime)
++            else:
++                service = (await build_service(settings, config) if handlers is None else
++                           await build_service(settings, config, handlers=handlers))
+             results = Counter()
+             for event in events:
+                 results[await service.process(event, t0_ms=t0, t1_ms=t1)] += 1
+--- current/modules/messaging/providers/evolution/provider.py
++++ v1/modules/messaging/providers/evolution/provider.py
+@@ -6,6 +6,7 @@
+ import httpx
+ 
+ from modules.messaging.domain.delivery import MessagingSendError
++from modules.messaging.domain.egress import OutboundIdentity, validate_egress
+ from modules.messaging.domain.messages import OutboundMessageReceipt
+ from .config import EvolutionConfig
+ 
+@@ -57,6 +58,37 @@
+         self._config = config
+         self._transport = transport
+ 
++    def send_intent(self, *, destination: str, text: str,
++                    identity: OutboundIdentity) -> OutboundMessageReceipt:
++        """V1 never falls back to the identity-less legacy request."""
++        if identity.provider_instance != self._config.instance:
++            raise MessagingSendError('provider_instance_mismatch')
++        if not re.fullmatch(r'[1-9][0-9]{6,14}', destination) or not text:
++            raise MessagingSendError('invalid_destination_or_text')
++        if len(text) > META_TEXT_LIMIT:
++            raise MessagingSendError('provider_text_too_long')
++        try:
++            with httpx.Client(timeout=self._config.timeout, transport=self._transport,
++                              trust_env=False, follow_redirects=False) as client:
++                response = client.post(
++                    f'{self._config.base_url}/message/sendText/{self._config.instance}',
++                    headers={'apikey': self._config.api_key},
++                    json={'number': destination, 'text': text, 'team360_egress': identity.wire()},
++                )
++        except httpx.HTTPError:
++            # Even a disconnected response must not cause a new attempt.
++            raise MessagingSendError('provider_transport_unknown', uncertain=True) from None
++        try:
++            payload = response.json()
++            evidence = validate_egress(payload['egress'], identity)
++        except (ValueError, KeyError, TypeError):
++            raise MessagingSendError('provider_egress_invalid', uncertain=True) from None
++        if evidence['acceptance'] == 'ACCEPTED':
++            return OutboundMessageReceipt(evidence['provider_message_id'], destination, evidence)
++        raise MessagingSendError(
++            'provider_rejected' if evidence['acceptance'] == 'REJECTED' else 'provider_unknown',
++            uncertain=evidence['acceptance'] == 'UNKNOWN', egress=evidence)
++
+     def send_text(self, *, destination: str, text: str) -> OutboundMessageReceipt:
+         if not re.fullmatch(r"[1-9][0-9]{6,14}", destination) or not text:
+             raise MessagingSendError("invalid_destination_or_text")
+--- current/modules/messaging/providers/evolution/bound_provider.py
++++ v1/modules/messaging/providers/evolution/bound_provider.py
+@@ -0,0 +1,78 @@
++"""Lab candidate: binding-credential adapter, never a legacy fallback."""
++import base64
++import hashlib
++import re
++import time
++
++import httpx
++
++from modules.db.transaction import transaction
++from modules.messaging.domain.delivery import MessagingSendError
++from modules.messaging.domain.egress import validate_egress
++from modules.messaging.domain.messages import OutboundMessageReceipt
++from modules.messaging.transport_repository import TransportRepository, canonical
++from modules.messaging.transport_profile import trust_profile, credential_verifier
++
++
++class BoundEvolutionProvider:
++    def __init__(self, config, *, scope, revision, trust, signer, transport=None, admission_check=None):
++        self.config, self.scope, self.revision = config, scope, revision
++        self.trust, self.signer, self.transport = trust, signer, transport
++        self.admission_check = admission_check
++        self.profile = trust_profile(trust)
++        if scope['environment'] != self.profile:
++            raise ValueError('Transport scope/profile mismatch')
++        self.verifier = credential_verifier(config.api_key, self.profile)
++
++    async def check_transport_binding(self, conn, binding, *, require_active=True):
++        row = await TransportRepository().binding_revision(conn, self.scope, self.revision, binding, require_active=require_active)
++        targets = await TransportRepository().targets(conn)
++        expected = {s:{k:v[k] for k in ('id','epoch')} for s,v in self.trust['targets'].items()}
++        verifier = self.verifier
++        if (targets != expected or row['credential_hash'] != verifier or
++                row['prepared_receipt'].get('payload', {}).get('target') != expected['team360']):
++            raise ValueError('Transport accreditation mismatch')
++
++    async def prepare_transport(self, *, pool, binding, identity, destination, text):
++        if self.admission_check:
++            self.admission_check()
++        async with transaction(pool) as conn:
++            row, targets = await TransportRepository().admission(conn, self.scope, self.revision, identity, binding)
++            expected_targets = {s:{k:v[k] for k in ('id','epoch')} for s,v in self.trust['targets'].items()}
++            verifier = self.verifier
++            if (targets != expected_targets or row['credential_hash'] != verifier or
++                    row['prepared_receipt'].get('payload', {}).get('target') != expected_targets['team360']):
++                raise ValueError('Transport accreditation mismatch')
++            now = int(time.time())
++            payload = dict(version=1, scope=self.scope, revision=self.revision,
++                activation_id=str(row['activation_id']), targets=targets, identity=identity.wire(),
++                envelope_hash=hashlib.sha256((destination+'\x00'+text).encode()).hexdigest(),
++                issued_at=now, expires_at=now+60)
++            sig = base64.b64encode(self.signer.sign(b'team360.transport.admission.v1\x00'+canonical(payload))).decode()
++        return {'authorization': {'payload':payload,'signature':sig}}
++
++    def send_text(self, **kwargs):
++        raise MessagingSendError('binding_transport_requires_intent')
++
++    def send_intent(self, *, destination, text, identity, authorization):
++        if self.admission_check:
++            self.admission_check()
++        if (identity.provider_instance != self.scope['instance_name'] or
++                not re.fullmatch(r'[1-9][0-9]{6,14}', destination) or not 0 < len(text) <= 4096):
++            raise MessagingSendError('binding_transport_invalid_request')
++        try:
++            with httpx.Client(timeout=self.config.timeout, transport=self.transport,
++                              trust_env=False, follow_redirects=False) as client:
++                response = client.post(f'{self.config.base_url}/transport/v1/instances/{self.scope["instance_id"]}/sendText',
++                    headers={'apikey':self.config.api_key}, json={'number':destination,'text':text,
++                    'team360_egress':identity.wire(),'authorization':authorization})
++        except httpx.HTTPError:
++            raise MessagingSendError('binding_transport_unknown', uncertain=True) from None
++        try:
++            evidence = validate_egress(response.json()['egress'], identity)
++        except (KeyError, ValueError, TypeError):
++            raise MessagingSendError('binding_transport_invalid_evidence', uncertain=True) from None
++        if evidence['acceptance'] == 'ACCEPTED':
++            return OutboundMessageReceipt(evidence['provider_message_id'], destination, evidence)
++        raise MessagingSendError('binding_transport_not_accepted',
++            uncertain=evidence['acceptance'] == 'UNKNOWN', egress=evidence)
+--- current/tests/test_messaging_evolution.py
++++ v1/tests/test_messaging_evolution.py
+@@ -199,6 +199,7 @@
+             seen.add(message.external_message_id)
+             return {'id':'inbound','thread_id':'thread'}
+         async def intent(self,*args): return 'outbound'
++        async def begin_send(self,*args,**kwargs): return True
+         async def lock_receipt(self,*args): pass
+         async def finish(self,*args,**kwargs): assert kwargs['receipt'].external_message_id=='sent'
+     class Sender:
+--- current/tests/test_messaging_durable_egress.py
++++ v1/tests/test_messaging_durable_egress.py
+@@ -0,0 +1,298 @@
++"""Team360 half-contract tests. No Evolution/Meta delivery claim."""
++import asyncio
++from datetime import datetime, timezone
++import json
++import os
++from pathlib import Path
++import subprocess
++import sys
++from uuid import uuid4
++
++import httpx
++import pytest
++
++from modules.messaging.domain.delivery import DeliveryEvent, MessagingSendError
++from modules.messaging.domain.egress import OutboundIdentity, validate_egress
++from modules.messaging.providers.evolution.config import EvolutionConfig
++from modules.messaging.providers.evolution.provider import EvolutionProvider
++
++
++def identity():
++    return OutboundIdentity(*(str(uuid4()) for _ in range(4)), 'isolated-instance')
++
++
++def evidence(context, **overrides):
++    return {**context.wire(), 'acceptance': 'ACCEPTED', 'provider_message_id': 'wamid.fixture',
++            'automatic_retry': False, 'durable': True, **overrides}
++
++
++@pytest.mark.parametrize('key,value', [
++    ('version', 2), ('version', True), ('outbound_intent_id', str(uuid4())),
++    ('transport_attempt_id', str(uuid4())), ('workspace_id', str(uuid4())),
++    ('channel_id', str(uuid4())), ('provider_instance', 'other-instance'),
++    ('acceptance', 'DELIVERED'), ('provider_message_id', None),
++    ('provider_message_id', 'invented'), ('automatic_retry', True),
++    ('durable', False), ('http_status', True), ('http_status', 600),
++    ('graph_code', '131030'),
++])
++def test_reject_invalid_or_mismatched_evidence(key, value):
++    context = identity()
++    with pytest.raises(ValueError):
++        validate_egress(evidence(context, **{key: value}), context)
++
++
++def test_allowlist_excludes_sensitive_payload():
++    context = identity()
++    result = validate_egress(evidence(context, body='secret', headers={'token': 'secret'}), context)
++    assert 'secret' not in repr(result)
++
++
++@pytest.mark.parametrize('status', [201, 500])
++def test_acceptance_is_not_http_status_or_delivery(status):
++    context = identity()
++    def wire(request):
++        assert json.loads(request.content)['team360_egress'] == context.wire()
++        return httpx.Response(status, json={'egress': evidence(context)})
++    sender = EvolutionProvider(EvolutionConfig('http://fixture.invalid', context.provider_instance,
++                               'synthetic-key'), transport=httpx.MockTransport(wire))
++    receipt = sender.send_intent(identity=context, destination='15550000001', text='fixture')
++    assert receipt.external_message_id == 'wamid.fixture'
++    assert receipt.egress['acceptance'] == 'ACCEPTED'
++    assert 'delivery_status' not in receipt.egress
++
++
++def test_missing_contract_never_falls_back_to_legacy():
++    context = identity()
++    calls = []
++    def wire(request):
++        calls.append(request)
++        return httpx.Response(201, json={'key': {'id': 'wamid.fixture', 'fromMe': True}})
++    sender = EvolutionProvider(EvolutionConfig('http://fixture.invalid', context.provider_instance,
++                               'synthetic-key'), transport=httpx.MockTransport(wire))
++    with pytest.raises(MessagingSendError) as error:
++        sender.send_intent(identity=context, destination='15550000001', text='fixture')
++    assert error.value.uncertain and len(calls) == 1
++
++
++# Only the explicitly named disposable cluster is allowed. No inherited DB env.
++SOCKET = Path(__file__).resolve().parents[3] / 'pgsocket'
++EXPECTED_LAB = 'dev-promotion-v1'
++
++
++@pytest.fixture(scope='module')
++def isolated_db():
++    if os.getenv('TEAM360_DURABLE_ISOLATED_TEST') != '1':
++        pytest.skip('explicit disposable PostgreSQL opt-in required')
++    import psycopg
++    assert SOCKET.parent.name == EXPECTED_LAB
++    assert (SOCKET / '.s.PGSQL.5432').exists()
++    alias = Path(os.environ['TEAM360_DURABLE_SOCKET_ALIAS'])
++    assert alias.is_symlink() and alias.resolve() == SOCKET
++    assert str(alias).startswith('/tmp/t360-egress-')
++    dsn = f'host={alias} dbname=postgres user=postgres connect_timeout=3'
++    with psycopg.connect(dsn, autocommit=True) as conn:
++        address, directory, version = conn.execute(
++            "SELECT inet_server_addr(), current_setting('data_directory'), version()").fetchone()
++        assert address is None and directory == '/var/lib/postgresql/18/docker'
++        conn.execute('CREATE DATABASE team360_durable_fixture')
++    dsn = f'host={alias} dbname=team360_durable_fixture user=postgres connect_timeout=3'
++    backend = Path(__file__).resolve().parents[1]
++    with psycopg.connect(dsn, autocommit=True) as conn:
++        for migration in ('001_team360_core_schema.sql', '026_team360_messaging_transport_v1.sql'):
++            conn.execute((backend / 'db/migrations' / migration).read_text())
++    yield dsn
++    with psycopg.connect(f'host={alias} dbname=postgres user=postgres', autocommit=True) as conn:
++        conn.execute('DROP DATABASE team360_durable_fixture')
++
++
++async def seed(dsn, tmp_path):
++    from psycopg.rows import dict_row
++    from psycopg_pool import AsyncConnectionPool
++    from modules.db.transaction import transaction
++    from modules.messaging.domain.messages import InboundMessage
++    from modules.messaging.repository import MessagingRepository
++    repo = MessagingRepository()
++    async with AsyncConnectionPool(dsn, min_size=1, max_size=2, kwargs={'row_factory': dict_row},
++                                   open=False) as pool:
++        async with transaction(pool) as conn:
++            workspace = 'durable-' + uuid4().hex
++            await conn.execute("INSERT INTO core_workspaces(slug,display_name) VALUES (%s,'Isolated fixture')",
++                               (workspace,))
++            binding = await repo.provision_dev_channel(conn, workspace_slug=workspace,
++                        channel_alias='fixture', provider='evolution', instance='isolated-'+uuid4().hex)
++            event = InboundMessage('evolution', 'whatsapp', uuid4().hex, '', '15550000001',
++                ('fixture-receiver',), '', 'team360 ping 01', datetime.now(timezone.utc),
++                {'provider_instance': binding.provider_instance})
++            claimed = await repo.claim(conn, binding, event, {})
++            outbound = await repo.intent(conn, binding, claimed, event, 'synthetic', {})
++            assert await repo.intent(conn, binding, claimed, event, 'synthetic', {}) == outbound
++    from dataclasses import asdict
++    config = {'dsn': dsn, 'binding': asdict(binding), 'outbound_id': outbound,
++              'calls': str(tmp_path / 'calls.jsonl'), 'meta_id': 'wamid.'+uuid4().hex}
++    path = tmp_path / 'worker.json'
++    path.write_text(json.dumps(config))
++    return config, path
++
++
++def worker(path, mode):
++    env = {k: v for k, v in os.environ.items() if not k.startswith(('PG', 'TEAM360_', 'META_', 'DATABASE'))}
++    env.update(PYTHONPATH=str(Path(__file__).resolve().parents[1]), PYTHONDONTWRITEBYTECODE='1')
++    return subprocess.Popen([sys.executable, str(Path(__file__).with_name('durable_egress_worker.py')),
++                             str(path), mode], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
++
++
++def collect(child):
++    try:
++        stdout, stderr = child.communicate(timeout=15)
++    except subprocess.TimeoutExpired:
++        child.kill()  # This function created this exact child; no shared processes.
++        child.communicate()
++        raise
++    return child.returncode, stdout, stderr
++
++
++async def rows(config):
++    import psycopg
++    from psycopg.rows import dict_row
++    async with await psycopg.AsyncConnection.connect(config['dsn'], row_factory=dict_row) as conn:
++        return await (await conn.execute('SELECT * FROM message_events WHERE id=%s',
++                                         (config['outbound_id'],))).fetchone()
++
++
++@pytest.mark.parametrize('mode,exit_code,acceptance,calls', [
++    ('accepted', 0, 'ACCEPTED', 1), ('accepted_http500', 0, 'ACCEPTED', 1),
++    ('rejected', 0, 'REJECTED', 1), ('unknown', 0, 'UNKNOWN', 1),
++    ('no_id', 0, None, 1), ('timeout', 0, None, 1),
++    ('before_io', 71, None, 0), ('during_io', 72, None, 1),
++    ('after_acceptance', 73, None, 1), ('persist_fail', 1, None, 1),
++    ('early_callback', 0, 'ACCEPTED', 1),
++])
++def test_real_process_restart_never_resends(isolated_db, tmp_path, mode, exit_code, acceptance, calls):
++    config, path = asyncio.run(seed(isolated_db, tmp_path))
++    code, stdout, stderr = collect(worker(path, mode))
++    assert code == exit_code, stderr
++    row = asyncio.run(rows(config))
++    payload = row['payload_jsonb']
++    assert payload['outbound_identity']['outbound_intent_id'] == config['outbound_id']
++    if acceptance:
++        assert payload['egress']['acceptance'] == acceptance
++        assert 'discard_secret' not in repr(payload)
++    else:
++        assert row['transport_status'] == 'unknown'
++    if mode == 'early_callback':
++        assert row['transport_status'] == 'delivered'
++    before = Path(config['calls']).read_text().splitlines() if Path(config['calls']).exists() else []
++    assert len(before) == calls
++    # A fresh OS process reconstructs provider, service, repository and pool.
++    code, stdout, stderr = collect(worker(path, 'accepted'))
++    assert code == 0 and stdout.strip() == 'duplicate', stderr
++    after = Path(config['calls']).read_text().splitlines() if Path(config['calls']).exists() else []
++    assert before == after
++    assert asyncio.run(rows(config))['payload_jsonb'] == payload
++
++
++def test_two_processes_same_identity_one_execution(isolated_db, tmp_path):
++    config, path = asyncio.run(seed(isolated_db, tmp_path))
++    children = [worker(path, 'accepted'), worker(path, 'accepted')]
++    results = [collect(child) for child in children]
++    assert all(code == 0 for code, _, _ in results), results
++    assert sorted(stdout.strip() for _, stdout, _ in results) == ['accepted', 'duplicate']
++    assert len(Path(config['calls']).read_text().splitlines()) == 1
++
++
++def test_team360_failure_before_execution_fence_sends_nothing(isolated_db, tmp_path):
++    config, path = asyncio.run(seed(isolated_db, tmp_path))
++    code, _, stderr = collect(worker(path, 'pre_fence_persist_fail'))
++    assert code == 1 and 'DivisionByZero' in stderr
++    assert not Path(config['calls']).exists()
++    row = asyncio.run(rows(config))
++    assert row['payload_jsonb']['initial_result'] == 'dispatch_intent'
++    assert 'outbound_identity' not in row['payload_jsonb']
++
++
++def test_only_explicit_retry_of_confirmed_rejection_allocates_new_attempt(isolated_db, tmp_path):
++    import psycopg
++    from psycopg.rows import dict_row
++    from modules.messaging.repository import ChannelBinding, MessagingRepository
++    config, path = asyncio.run(seed(isolated_db, tmp_path))
++    assert collect(worker(path, 'rejected'))[0] == 0
++    previous = asyncio.run(rows(config))['payload_jsonb']
++    async def retry():
++        async with await psycopg.AsyncConnection.connect(isolated_db, row_factory=dict_row) as conn:
++            repo = MessagingRepository()
++            binding = ChannelBinding(**config['binding'])
++            assert not await repo.begin_send(conn, binding, config['outbound_id'])
++            assert await repo.begin_send(conn, binding, config['outbound_id'], retry=True)
++            assert not await repo.begin_send(conn, binding, config['outbound_id'], retry=True)
++    asyncio.run(retry())
++    current = asyncio.run(rows(config))['payload_jsonb']
++    assert current['outbound_identity']['outbound_intent_id'] == config['outbound_id']
++    assert current['outbound_identity']['transport_attempt_id'] != previous['outbound_identity']['transport_attempt_id']
++    assert current['attempt_history'] == [{'identity': previous['outbound_identity'], 'egress': previous['egress']}]
++    assert 'egress' not in current
++    # The test reserves, but does not execute, the separately authorized attempt.
++    assert len(Path(config['calls']).read_text().splitlines()) == 1
++
++
++def test_unknown_and_unmappable_callback_remain_unknown_and_orphaned(isolated_db, tmp_path):
++    import psycopg
++    from psycopg.rows import dict_row
++    from modules.messaging.repository import ChannelBinding, MessagingRepository
++    config, path = asyncio.run(seed(isolated_db, tmp_path))
++    assert collect(worker(path, 'timeout'))[0] == 0
++    async def callback():
++        async with await psycopg.AsyncConnection.connect(isolated_db, row_factory=dict_row) as conn:
++            repo = MessagingRepository()
++            binding = ChannelBinding(**config['binding'])
++            assert not await repo.begin_send(conn, binding, config['outbound_id'], retry=True)
++            await repo.delivery(conn, binding, DeliveryEvent('evolution', binding.provider_instance,
++                config['meta_id'], 'delivered', datetime.now(timezone.utc)))
++            orphan = await (await conn.execute("SELECT thread_id FROM message_events WHERE "
++                "channel_id=%s AND provider_message_id=%s AND event_type='status'",
++                (binding.channel_id, config['meta_id']))).fetchone()
++            assert orphan['thread_id'] is None
++    asyncio.run(callback())
++    assert collect(worker(path, 'accepted'))[1].strip() == 'duplicate'
++    assert asyncio.run(rows(config))['transport_status'] == 'unknown'
++
++
++def test_late_orphan_duplicate_callback_scope(isolated_db, tmp_path):
++    from dataclasses import replace
++    import psycopg
++    from psycopg.rows import dict_row
++    from modules.messaging.repository import ChannelBinding, MessagingRepository
++    config, path = asyncio.run(seed(isolated_db, tmp_path))
++    binding = ChannelBinding(**config['binding'])
++    repo = MessagingRepository()
++    async def callbacks():
++        async with await psycopg.AsyncConnection.connect(isolated_db, row_factory=dict_row) as conn:
++            event = DeliveryEvent('evolution', binding.provider_instance, config['meta_id'], 'read',
++                                  datetime.now(timezone.utc))
++            await repo.delivery(conn, binding, event)
++            await repo.delivery(conn, binding, event)
++            statuses = await (await conn.execute("SELECT * FROM message_events WHERE channel_id=%s "
++                "AND event_type='status'", (binding.channel_id,))).fetchall()
++            assert len(statuses) == 1 and statuses[0]['thread_id'] is None
++            for wrong in (replace(binding, workspace_id=str(uuid4())),
++                          replace(binding, channel_id=str(uuid4())),
++                          replace(binding, provider_instance='wrong-instance')):
++                assert not await repo.begin_send(conn, wrong, config['outbound_id'])
++                with pytest.raises(ValueError):
++                    await repo.send_identity(conn, wrong, config['outbound_id'])
++    asyncio.run(callbacks())
++    code, _, stderr = collect(worker(path, 'accepted'))
++    assert code == 0, stderr
++    assert asyncio.run(rows(config))['transport_status'] == 'read'
++    async def late():
++        async with await psycopg.AsyncConnection.connect(isolated_db, row_factory=dict_row) as conn:
++            await repo.delivery(conn, binding, DeliveryEvent('evolution', binding.provider_instance,
++                config['meta_id'], 'sent', datetime.now(timezone.utc)))
++            orphan = DeliveryEvent('evolution', binding.provider_instance, 'wamid.unmapped',
++                                   'delivered', datetime.now(timezone.utc))
++            await repo.delivery(conn, binding, orphan)
++            # Unknown exact Meta identity remains orphan; no guessing.
++            orphan_row = await (await conn.execute("SELECT thread_id FROM message_events WHERE "
++                "channel_id=%s AND provider_message_id='wamid.unmapped'", (binding.channel_id,))).fetchone()
++            assert orphan_row['thread_id'] is None
++    asyncio.run(late())
++    assert asyncio.run(rows(config))['transport_status'] == 'read'
+--- current/tests/test_messaging_horizontal_runtime.py
++++ v1/tests/test_messaging_horizontal_runtime.py
+@@ -385,9 +385,12 @@
+ @run_async
+ async def test_repository_sql_uses_scoped_transport_key():
+     repository = MessagingRepository()
+-    binding = ChannelBinding('w', 'c', 'p', 'instance', 'dev')
+-    conn = RowsConnection([{'id': 'outbound'}])
+-    assert await repository.begin_send(conn, binding, 'outbound')
+-    assert conn.queries[-1][1] == ('outbound', 'c', binding.storage_instance, False)
++    from uuid import uuid4
++    workspace, channel, outbound = (str(uuid4()) for _ in range(3))
++    binding = ChannelBinding(workspace, channel, 'p', 'instance', 'dev')
++    conn = RowsConnection([{'id': outbound}])
++    assert await repository.begin_send(conn, binding, outbound)
++    assert conn.queries[-1][1][1:] == (outbound, workspace, channel, binding.storage_instance, False)
++    assert conn.queries[-1][1][0].obj['outbound_intent_id'] == outbound
+     await repository.recoverable_intent(conn, binding, SimpleNamespace(external_message_id='inbound'))
+-    assert conn.queries[-1][1] == ('c', binding.storage_instance, 'inbound')
++    assert conn.queries[-1][1] == (channel, binding.storage_instance, 'inbound')
+--- current/tests/test_srv05_horizontal_composition.py
++++ v1/tests/test_srv05_horizontal_composition.py
+@@ -44,9 +44,10 @@
+             app.state.messaging_handlers['other'] = HandlerRegistration(Handler())
+         build.assert_awaited_once_with(app.state.srv05_settings.messaging,
+                                       app.state.srv05_settings.evolution,
+-                                      handlers=app.state.messaging_handlers)
++                                      handlers=app.state.messaging_handlers,
++                                      transport_runtime=app.state.transport_v1)
+         schema.assert_awaited_once()
+-    assert events == ['open', 'binding', 'schema', 'start', 'stop', 'close']
++    assert events == ['open', 'binding', 'schema', 'v1_start', 'start', 'v1_stop', 'stop', 'close']
+ 
+ 
+ @pytest.mark.parametrize('registrations', [{'telchi': object()},
+@@ -105,7 +106,7 @@
+     store, sender = Store(), Sender()
+     store.binding = AsyncMock(return_value=binding)
+     monkeypatch.setattr(webhook, 'MessagingRepository', lambda: store)
+-    monkeypatch.setattr(webhook, 'EvolutionProvider', lambda config: sender)
++    monkeypatch.setattr(webhook, 'EvolutionProvider', lambda config: pytest.fail('Legacy fallback forbidden'))
+     monkeypatch.setattr(webhook, 'transaction', transaction_double)
+     monkeypatch.setattr(webhook, 'get_pool', lambda: object())
+     monkeypatch.setattr(service_module, 'transaction', transaction_double)
+@@ -113,6 +114,7 @@
+     # Telchi's existing contract admits authenticated identities without a base grant.
+     registrations['telchi'] = HandlerRegistration(Handler())
+     app = srv.create_app(messaging_handlers=registrations)
++    app.state.transport_v1.provider = sender
+     body = payload()
+     body['instance'] = 'test-instance'
+     with TestClient(app) as client:
+--- current/tests/test_srv05_evolution_isolation.py
++++ v1/tests/test_srv05_evolution_isolation.py
+@@ -58,7 +58,7 @@
+                       'AUTOMATION_DIAGNOSIS_REPOSITORY': 'memory'})
+ 
+ 
+-def test_srv05_on_import_has_no_network_workers_or_pool_open():
++def test_srv05_on_without_v1_aborts_without_network_workers_or_pool_open():
+     _check('''
+         import asyncio, socket, subprocess
+         from unittest.mock import patch
+@@ -66,10 +66,12 @@
+         with patch.object(socket.socket, 'connect', forbidden), \\
+              patch.object(subprocess, 'Popen', forbidden), \\
+              patch.object(asyncio, 'create_task', forbidden):
+-            import ls_iMotorSoft_Srv05 as new
+-            import ls_iMotorSoft_Srv01 as old
+-            assert '/webhooks/messaging/evolution/whatsapp' in {r.path for r in new.app.routes}
+-            assert '/webhooks/messaging/evolution/whatsapp' not in {r.path for r in old.app.routes}
++            try:
++                import ls_iMotorSoft_Srv05
++            except ValueError as error:
++                assert 'V1 runtime configuration required' in str(error)
++            else:
++                raise AssertionError('Legacy-only configuration must fail closed')
+             from modules.db.pool import get_pool
+             assert get_pool().closed
+             from modules.flow.scheduler import get_scheduler
+@@ -119,6 +121,12 @@
+         events.append('binding')
+         assert kwargs == {'workspace_slug': 'test-workspace', 'channel_alias': 'test-channel',
+                           'provider': 'evolution', 'instance': 'test-instance'}
++        from modules.messaging.repository import ChannelBinding
++        import os
++        if os.getenv('TEAM360_MESSAGING_DISPATCH_MODE') == 'horizontal_v1':
++            return ChannelBinding('workspace', 'channel', 'provider', 'test-instance',
++                'dev', 'telchi', 'tenant', os.getenv('META_TEAM360_PHONE_NUMBER_ID', ''))
++        return ChannelBinding('workspace', 'channel', 'provider', 'test-instance')
+     async def schema(*args): events.append('schema')
+     @asynccontextmanager
+     async def tx(_): yield object()
+@@ -130,6 +138,24 @@
+     monkeypatch.setattr(transaction_module, 'transaction', tx)
+     monkeypatch.setattr(MessagingRepository, 'binding', binding)
+     monkeypatch.setattr(MessagingRepository, 'validate_transport_schema', schema)
++    from modules.messaging.transport_runtime import TransportRuntime
++    class FixtureRuntime:
++        document = {'scope': {'environment': 'dev'}}
++        admission_open = True
++        running = False
++        def __init__(self):
++            from test_messaging_horizontal_runtime import Sender
++            self.provider = Sender()
++        def sender(self):
++            return self.provider
++        async def start(self, pool, binding):
++            self.running = True
++            events.append('v1_start')
++        async def stop(self):
++            if self.running:
++                events.append('v1_stop')
++                self.running = False
++    monkeypatch.setattr(TransportRuntime, 'from_env', lambda config: FixtureRuntime())
+     for k, v in ENV.items(): monkeypatch.setenv(k, v)
+     return srv, old, events
+ 
+@@ -156,8 +182,8 @@
+         monkeypatch.setenv('TEAM360_ENV', 'production')
+         assert client.post(PATH, json={}, headers=headers).status_code == 503
+     build.assert_not_called()
+-    assert events == ['open', 'binding', 'schema', 'start', 'stop', 'close']
+-    assert len(app.on_shutdown) == 2  # no Evolution worker/client to stop
++    assert events == ['open', 'binding', 'schema', 'v1_start', 'start', 'v1_stop', 'stop', 'close']
++    assert len(app.on_shutdown) == 3  # V1 closes before baseline pool shutdown
+ 
+ 
+ @pytest.mark.parametrize('check', ['binding', 'validate_transport_schema'])
+@@ -191,6 +217,9 @@
+             seen.add(message.external_message_id)
+             return {'id': 'inbound', 'thread_id': 'thread'}
+         async def intent(self, *args): return 'outbound'
++        async def begin_send(self, conn, binding, outbound_id, *, retry=False):
++            assert outbound_id == 'outbound' and retry is False
++            return True
+         async def lock_receipt(self, *args): pass
+         async def finish(self, *args, **kwargs): assert kwargs['receipt'].external_message_id == 'sent'
+     class Sender:

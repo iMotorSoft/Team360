@@ -1,0 +1,4328 @@
+{
+  "run_id": "8c345a01",
+  "turns": [
+    {
+      "case": "S01",
+      "question": "Dame ventas de farmacia",
+      "http_status": 200,
+      "ok": true,
+      "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-S01",
+      "conversation_id": "be753d6a-4ccf-45eb-af1a-0833d0495700",
+      "correlation_id": "63444d51-1977-4a82-bd5d-b06107d914ba",
+      "elapsed_ms": 6987.05,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.22817199987912318,
+          "interpretation_ms": 6932.561264000469,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 6932.985199000541
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "farmacia",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "farmacia",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 3.158192000228155,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Dame ventas de farmacia",
+                "ventas de farmacia",
+                "ventas en sucursales farmacia"
+              ],
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66",
+              "definition": "Ventas realizadas en sucursales que Telchi clasifica como farmacias.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.pharmacy_branches",
+              "canonical_name": "Ventas de farmacia",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "branches",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No son productos farmacéuticos ni ventas a clientes farmacias.",
+                  "Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/entity_mention": {
+                "text": "farmacia",
+                "type": null
+              },
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/period",
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference"
+            ]
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "S02",
+      "question": "¿Cuánto le vendimos a menona?",
+      "http_status": 200,
+      "ok": true,
+      "text": "Ventas a clientes incluidos por Telchi en su segmento comercial denominado menona. No buscar productos menona. La pertenencia debe constar en información comercial autorizada. No inferir religión o comunidad a partir de nombres, apellidos o domicilios. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-S02",
+      "conversation_id": "3e5ba710-453a-4336-a847-a5bd5dccaf73",
+      "correlation_id": "5e974088-c889-4770-bb33-bf94bc754050",
+      "elapsed_ms": 5975.39,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.35157900038029766,
+          "interpretation_ms": 5942.076540000016,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5942.721820999395
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "menona",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "5d090ae0-d1a7-4778-8622-c5d09fcdcc78"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "menona",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "5d090ae0-d1a7-4778-8622-c5d09fcdcc78"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Ventas a clientes incluidos por Telchi en su segmento comercial denominado menona. No buscar productos menona. La pertenencia debe constar en información comercial autorizada. No inferir religión o comunidad a partir de nombres, apellidos o domicilios. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.6634369994790177,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuánto le vendimos a menona?",
+                "dame ventas de menona",
+                "ventas de menona"
+              ],
+              "version": 1,
+              "concept_id": "5d090ae0-d1a7-4778-8622-c5d09fcdcc78",
+              "definition": "Ventas a clientes incluidos por Telchi en su segmento comercial denominado menona.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.menona_customers",
+              "canonical_name": "Ventas de menona",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "customers",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No buscar productos menona. La pertenencia debe constar en información comercial autorizada.",
+                  "No inferir religión o comunidad a partir de nombres, apellidos o domicilios."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": {
+                "text": "menona",
+                "type": null
+              },
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "S03",
+      "question": "¿Qué hay que importar?",
+      "http_status": 200,
+      "ok": true,
+      "text": "Evaluar qué materias primas, productos u otros artículos convendría importar para satisfacer las necesidades operativas y comerciales de Telchi. Factores potenciales: stock, demanda, consumo de producción, OC abiertas, lead time, cobertura y clasificación de abastecimiento. No existe fórmula aprobada ni capability de recomendación. Stock bajo por sí solo no justifica importar. No generar órdenes de compra. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-S03",
+      "conversation_id": "f267784f-89cb-4ae6-8896-e4efa5244318",
+      "correlation_id": "16593355-739d-467c-8af9-560ed98ba8e6",
+      "elapsed_ms": 4482.79,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.1699960002952139,
+          "interpretation_ms": 4419.500813000013,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4419.816728999649
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "94b077a3-5b01-4a3a-8c88-7cc766741b6b"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "94b077a3-5b01-4a3a-8c88-7cc766741b6b"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Evaluar qué materias primas, productos u otros artículos convendría importar para satisfacer las necesidades operativas y comerciales de Telchi. Factores potenciales: stock, demanda, consumo de producción, OC abiertas, lead time, cobertura y clasificación de abastecimiento. No existe fórmula aprobada ni capability de recomendación. Stock bajo por sí solo no justifica importar. No generar órdenes de compra. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.8521809997764649,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "qué conviene importar",
+                "¿Qué hay que importar?",
+                "recomendaciones de importación"
+              ],
+              "version": 1,
+              "concept_id": "94b077a3-5b01-4a3a-8c88-7cc766741b6b",
+              "definition": "Evaluar qué materias primas, productos u otros artículos convendría importar para satisfacer las necesidades operativas y comerciales de Telchi.",
+              "module_code": "telchi",
+              "concept_type": "ANALYTICAL_INTENT",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.procurement.import_recommendations",
+              "canonical_name": "Qué hay que importar",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "supply_analysis",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Factores potenciales: stock, demanda, consumo de producción, OC abiertas, lead time, cobertura y clasificación de abastecimiento.",
+                  "No existe fórmula aprobada ni capability de recomendación. Stock bajo por sí solo no justifica importar. No generar órdenes de compra."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "ANALYSIS_UNAVAILABLE",
+          "intent": "EXPLAIN",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "S04",
+      "question": "Dame las deudas",
+      "http_status": 200,
+      "ok": true,
+      "text": "La deuda pendiente de clientes incluye deuda vencida y deuda corriente aún no vencida: deuda pendiente = deuda vencida + deuda corriente, ambos saldos abiertos a la misma fecha de corte y alcance. No equivale a morosidad. No confundir cuentas por cobrar con cuentas por pagar. Si el contexto no distingue deudas de clientes y deudas a proveedores, solicitar aclaración. Reutilizar contratos Receivables & Collections; no inventar saldos. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-S04",
+      "conversation_id": "45bc047a-649e-490f-9542-498c69b40779",
+      "correlation_id": "b3c32aaf-271c-405b-bda0-7c7f7d8f5894",
+      "elapsed_ms": 4658.21,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.19406600040383637,
+          "interpretation_ms": 4596.931840999787,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4597.269321000567
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "7aea01ba-1f15-45e3-87fa-0d98b9b9e0cc"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "7aea01ba-1f15-45e3-87fa-0d98b9b9e0cc"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "La deuda pendiente de clientes incluye deuda vencida y deuda corriente aún no vencida: deuda pendiente = deuda vencida + deuda corriente, ambos saldos abiertos a la misma fecha de corte y alcance. No equivale a morosidad. No confundir cuentas por cobrar con cuentas por pagar. Si el contexto no distingue deudas de clientes y deudas a proveedores, solicitar aclaración. Reutilizar contratos Receivables & Collections; no inventar saldos. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.9142339997415547,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "cuánto nos deben",
+                "cuentas por cobrar pendientes",
+                "dame las deudas",
+                "deuda pendiente"
+              ],
+              "version": 1,
+              "concept_id": "7aea01ba-1f15-45e3-87fa-0d98b9b9e0cc",
+              "definition": "La deuda pendiente de clientes incluye deuda vencida y deuda corriente aún no vencida: deuda pendiente = deuda vencida + deuda corriente, ambos saldos abiertos a la misma fecha de corte y alcance.",
+              "module_code": "telchi",
+              "concept_type": "COMPOSITE_METRIC",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.receivables.outstanding",
+              "canonical_name": "Deuda pendiente",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "receivables",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No equivale a morosidad. No confundir cuentas por cobrar con cuentas por pagar.",
+                  "Si el contexto no distingue deudas de clientes y deudas a proveedores, solicitar aclaración.",
+                  "Reutilizar contratos Receivables & Collections; no inventar saldos."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "S05",
+      "question": "Mostrame las ventas perdidas",
+      "http_status": 200,
+      "ok": true,
+      "text": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas. Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada. Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas. Clasificación definitiva necesita evidencia empresarial adicional. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-S05",
+      "conversation_id": "f76b3753-e857-44f3-8ea5-5b6be75118cf",
+      "correlation_id": "35f8f8f9-6448-4037-a4ab-59cc93b05052",
+      "elapsed_ms": 4945.89,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.19282399989606347,
+          "interpretation_ms": 4896.45920500061,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4896.792651000396
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas. Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada. Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas. Clasificación definitiva necesita evidencia empresarial adicional. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.8301169993719668,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "dame ventas perdidas",
+                "Mostrame las ventas perdidas",
+                "ventas perdidas"
+              ],
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46",
+              "definition": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas.",
+              "module_code": "telchi",
+              "concept_type": "ANALYTICAL_INTENT",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.lost_opportunities",
+              "canonical_name": "Ventas perdidas",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "sales_opportunities",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada.",
+                  "Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas.",
+                  "Clasificación definitiva necesita evidencia empresarial adicional."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null,
+              "/product_search_text": null,
+              "/selected_item_codes": []
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "S06",
+      "question": "¿Qué negocios presupuestamos y no se concretaron?",
+      "http_status": 200,
+      "ok": true,
+      "text": "Entendí la consulta. Esta consulta todavía no está disponible.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-S06",
+      "conversation_id": "653481c2-af96-48c3-a079-03a02cfa5b88",
+      "correlation_id": "d910ba86-6bca-4e45-82a9-aae6271aa62f",
+      "elapsed_ms": 4809.01,
+      "audit": {
+        "bmd": {
+          "category": "CAPABILITY_MISSING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.17792899961932562,
+          "interpretation_ms": 4744.570279000072,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4744.849727999281
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Entendí la consulta. Esta consulta todavía no está disponible.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "candidate",
+          "timings": {
+            "text_ms": 2.8607839994947426,
+            "exact_ms": 1.9612659998529125,
+            "vector_ms": 7.81529599953501,
+            "embedding_ms": 509.0928489998987
+          },
+          "concepts": [
+            {
+              "match": "vector",
+              "score": 0.4427837407696136,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "dame ventas perdidas",
+                "Mostrame las ventas perdidas",
+                "ventas perdidas"
+              ],
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46",
+              "definition": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas.",
+              "module_code": "telchi",
+              "concept_type": "ANALYTICAL_INTENT",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.lost_opportunities",
+              "canonical_name": "Ventas perdidas",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "sales_opportunities",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada.",
+                  "Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas.",
+                  "Clasificación definitiva necesita evidencia empresarial adicional."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.37996855991600276,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "cuánto nos deben",
+                "cuentas por cobrar pendientes",
+                "dame las deudas",
+                "deuda pendiente"
+              ],
+              "version": 1,
+              "concept_id": "7aea01ba-1f15-45e3-87fa-0d98b9b9e0cc",
+              "definition": "La deuda pendiente de clientes incluye deuda vencida y deuda corriente aún no vencida: deuda pendiente = deuda vencida + deuda corriente, ambos saldos abiertos a la misma fecha de corte y alcance.",
+              "module_code": "telchi",
+              "concept_type": "COMPOSITE_METRIC",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.receivables.outstanding",
+              "canonical_name": "Deuda pendiente",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "receivables",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No equivale a morosidad. No confundir cuentas por cobrar con cuentas por pagar.",
+                  "Si el contexto no distingue deudas de clientes y deudas a proveedores, solicitar aclaración.",
+                  "Reutilizar contratos Receivables & Collections; no inventar saldos."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.35899973909352945,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuánto vendió el canal corporativo en mayo?",
+                "venta corporativa",
+                "ventas corporativas"
+              ],
+              "version": 1,
+              "concept_id": "3ff75681-41dc-4af9-a6dd-de771bb4b862",
+              "definition": "Modalidad comercial corporativa de Telchi. La reconstrucción histórica distingue canal comercial del cliente y categoría corporativa del vendedor: no son equivalentes.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.corporate_channel",
+              "canonical_name": "Venta corporativa",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Investigación: regla legacy PriceTypeCode + ClientSegmentationCode; luego OCRD.U_CANAL_VENTAS para canal del cliente y OSLP.U_CATVENDEDOR para vendedor.",
+                  "No sumar canales 2 y 3 ni proyectar clasificación actual a toda la historia. Vigencia y excepciones pendientes de acreditación runtime."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": true
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "A01",
+      "question": "Dame las ventas horizontales de septiembre",
+      "http_status": 200,
+      "ok": true,
+      "text": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle. Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes. No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-A01",
+      "conversation_id": "0c871ee9-814d-405b-94cb-9d888c662d2f",
+      "correlation_id": "8a369a3d-1f65-466d-a404-37777a57e2bc",
+      "elapsed_ms": 5668.95,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.18509399978938745,
+          "interpretation_ms": 5593.1834749999325,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5593.539341999531
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": "HORIZONTAL",
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": "HORIZONTAL",
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle. Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes. No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.4377259994944325,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Compará ventas corporativas y horizontales",
+                "Dame las ventas horizontales de septiembre",
+                "venta horizontal",
+                "ventas horizontales"
+              ],
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c",
+              "definition": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.horizontal_channel",
+              "canonical_name": "Venta horizontal",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [
+                  {
+                    "source": "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/corporate_sales/CORPORATE_SALES_FINAL_REPORT.md",
+                    "valid_to": null,
+                    "rule_code": "legacy-price-segment-channel",
+                    "valid_from": null,
+                    "description": "Historical per-sale rule used PriceTypeCode=11 for HORIZONTAL. Other PriceTypeCode and customer segmentation rules classified other channels.",
+                    "limitations": [
+                      "Era-specific legacy rule, not approved current mapping. DMS origin alone is insufficient."
+                    ],
+                    "input_fields": [
+                      "TSSale.PriceTypeCode",
+                      "ClientSegmentationCode"
+                    ],
+                    "validation_status": "historical_evidence"
+                  }
+                ],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes.",
+                  "No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": "HORIZONTAL",
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "A02",
+      "question": "¿Cuánto vendió el canal corporativo en mayo?",
+      "http_status": 200,
+      "ok": true,
+      "text": "Modalidad comercial corporativa de Telchi. La reconstrucción histórica distingue canal comercial del cliente y categoría corporativa del vendedor: no son equivalentes. Investigación: regla legacy PriceTypeCode + ClientSegmentationCode; luego OCRD.U_CANAL_VENTAS para canal del cliente y OSLP.U_CATVENDEDOR para vendedor. No sumar canales 2 y 3 ni proyectar clasificación actual a toda la historia. Vigencia y excepciones pendientes de acreditación runtime. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-A02",
+      "conversation_id": "ac462b9a-ec83-45b1-8089-85f24feed08e",
+      "correlation_id": "153cb774-70f5-4141-b9fb-2b447337f098",
+      "elapsed_ms": 5741.94,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.16486299955431605,
+          "interpretation_ms": 5676.882093000131,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5677.185010000358
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "canal corporativo",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "3ff75681-41dc-4af9-a6dd-de771bb4b862"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "canal corporativo",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "3ff75681-41dc-4af9-a6dd-de771bb4b862"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Modalidad comercial corporativa de Telchi. La reconstrucción histórica distingue canal comercial del cliente y categoría corporativa del vendedor: no son equivalentes. Investigación: regla legacy PriceTypeCode + ClientSegmentationCode; luego OCRD.U_CANAL_VENTAS para canal del cliente y OSLP.U_CATVENDEDOR para vendedor. No sumar canales 2 y 3 ni proyectar clasificación actual a toda la historia. Vigencia y excepciones pendientes de acreditación runtime. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.3262630000099307,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuánto vendió el canal corporativo en mayo?",
+                "venta corporativa",
+                "ventas corporativas"
+              ],
+              "version": 1,
+              "concept_id": "3ff75681-41dc-4af9-a6dd-de771bb4b862",
+              "definition": "Modalidad comercial corporativa de Telchi. La reconstrucción histórica distingue canal comercial del cliente y categoría corporativa del vendedor: no son equivalentes.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.corporate_channel",
+              "canonical_name": "Venta corporativa",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [
+                  {
+                    "source": "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/corporate_sales/CHANNEL_RULE_FINAL_REPORT.md",
+                    "valid_to": null,
+                    "rule_code": "customer-channel-versus-seller-category",
+                    "valid_from": null,
+                    "description": "Research CHANNEL-RULE-001 identifies customer OCRD.U_CANAL_VENTAS as commercial channel; seller OSLP.U_CATVENDEDOR is independent.",
+                    "limitations": [
+                      "Historical follow-up CHANNEL_HISTORY_FINAL_REPORT corrects claimed 2022-2026 stability: channel bulk-loaded in 2026; no individual change history.",
+                      "Current Foundation customers do not publish U_CANAL_VENTAS; channels reference dataset absent. Do not group channel 2 and 3. No executable classification rule."
+                    ],
+                    "input_fields": [
+                      "OCRD.CardCode",
+                      "OCRD.U_CANAL_VENTAS",
+                      "OINV.CardCode",
+                      "OINV.SlpCode",
+                      "OSLP.SlpCode",
+                      "OSLP.U_CATVENDEDOR"
+                    ],
+                    "validation_status": "historical_evidence"
+                  }
+                ],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Investigación: regla legacy PriceTypeCode + ClientSegmentationCode; luego OCRD.U_CANAL_VENTAS para canal del cliente y OSLP.U_CATVENDEDOR para vendedor.",
+                  "No sumar canales 2 y 3 ni proyectar clasificación actual a toda la historia. Vigencia y excepciones pendientes de acreditación runtime."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": {
+                "text": "canal corporativo",
+                "type": null
+              },
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "A03",
+      "question": "Mostrame las ventas de Selva Rojas",
+      "http_status": 200,
+      "ok": true,
+      "text": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente. Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones. No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-A03",
+      "conversation_id": "e0ea8ae0-0fdf-479e-882b-c78ff6683ccb",
+      "correlation_id": "b065046e-c7ce-4b50-8cb1-f3a9b64f5eb6",
+      "elapsed_ms": 5397.43,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.22206499943422386,
+          "interpretation_ms": 5350.756786000602,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5351.136384000711
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "Selva Rojas",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "Selva Rojas",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente. Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones. No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.3100229998599389,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuáles son los vendedores corporativos?",
+                "¿Cuánto vendió la Dra. Luz?",
+                "Mostrame las ventas de Selva Rojas"
+              ],
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802",
+              "definition": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.seller_classification",
+              "canonical_name": "Clasificación comercial de vendedores",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [
+                  {
+                    "source": "channel_foundation_evidence.json:CURRENT-1408",
+                    "valid_to": null,
+                    "rule_code": "document-seller-customer-relations",
+                    "valid_from": null,
+                    "description": "Foundation sales_document.slp_code links SAP OSLP.SlpCode; card_code links OCRD.CardCode. Reference namespace SAP_HANA differs from atomic SAP_B1_HANA and requires an explicit crosswalk.",
+                    "limitations": [
+                      "Verified fields and snapshot examples only; seller-client assignment master not published in customers.",
+                      "Source system is lineage, not proof of DMS/Retail One document origin or business channel. Validity and exceptions remain pending."
+                    ],
+                    "input_fields": [
+                      "sales_document.slp_code",
+                      "sales_document.card_code",
+                      "sales_document.source_system",
+                      "salespersons.source_native_id",
+                      "customers.source_native_id"
+                    ],
+                    "validation_status": "historical_evidence"
+                  }
+                ],
+                "entities": [
+                  {
+                    "evidence": {
+                      "warning": "Luz Guzman is NOT automatically the owner reference Dra. Luz; seller category is not document channel",
+                      "validity": "snapshot_only; no proven effective interval",
+                      "category_code": "2",
+                      "reference_version": "v2_reference_closure_2088d5885204313a",
+                      "source_extracted_at": "2026-09-24 09:03:11.919356-03",
+                      "foundation_entity_id": "salesperson_570cdbc532c60880c82015f7",
+                      "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+                    },
+                    "valid_to": null,
+                    "entity_key": "13",
+                    "valid_from": null,
+                    "entity_type": "salesperson",
+                    "entity_label": "Luz Guzman",
+                    "relationship": "snapshot_seller_category_corporate",
+                    "source_namespace": "SAP_HANA.OSLP",
+                    "validation_status": "source_verified"
+                  },
+                  {
+                    "evidence": {
+                      "warning": "Luz Guzman is NOT automatically the owner reference Dra. Luz; seller category is not document channel",
+                      "validity": "snapshot_only; no proven effective interval",
+                      "category_code": "2",
+                      "reference_version": "v2_reference_closure_2088d5885204313a",
+                      "source_extracted_at": "2026-09-24 09:03:11.919356-03",
+                      "foundation_entity_id": "salesperson_63670834455a669575a65f5d",
+                      "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+                    },
+                    "valid_to": null,
+                    "entity_key": "11",
+                    "valid_from": null,
+                    "entity_type": "salesperson",
+                    "entity_label": "Selva Rojas Jaimes",
+                    "relationship": "snapshot_seller_category_corporate",
+                    "source_namespace": "SAP_HANA.OSLP",
+                    "validation_status": "source_verified"
+                  }
+                ]
+              },
+              "operational_context": {
+                "dimension": "salespersons",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones.",
+                  "No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": {
+                "text": "Selva Rojas",
+                "type": null
+              },
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null,
+              "/product_search_text": null,
+              "/selected_item_codes": []
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "A04",
+      "question": "¿Cuánto vendió la Dra. Luz?",
+      "http_status": 200,
+      "ok": true,
+      "text": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente. Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones. No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-A04",
+      "conversation_id": "ad83c053-0c60-4b03-9791-df609ef58bd3",
+      "correlation_id": "e2111409-0224-437b-8fb6-42560cf4c47e",
+      "elapsed_ms": 5012.38,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.18282800010638312,
+          "interpretation_ms": 4979.187525999805,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4979.524237000078
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "¿Cuánto vendió la Dra. Luz?",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "¿Cuánto vendió la Dra. Luz?",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente. Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones. No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.9979220005552634,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuáles son los vendedores corporativos?",
+                "¿Cuánto vendió la Dra. Luz?",
+                "Mostrame las ventas de Selva Rojas"
+              ],
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802",
+              "definition": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.seller_classification",
+              "canonical_name": "Clasificación comercial de vendedores",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [
+                  {
+                    "source": "channel_foundation_evidence.json:CURRENT-1408",
+                    "valid_to": null,
+                    "rule_code": "document-seller-customer-relations",
+                    "valid_from": null,
+                    "description": "Foundation sales_document.slp_code links SAP OSLP.SlpCode; card_code links OCRD.CardCode. Reference namespace SAP_HANA differs from atomic SAP_B1_HANA and requires an explicit crosswalk.",
+                    "limitations": [
+                      "Verified fields and snapshot examples only; seller-client assignment master not published in customers.",
+                      "Source system is lineage, not proof of DMS/Retail One document origin or business channel. Validity and exceptions remain pending."
+                    ],
+                    "input_fields": [
+                      "sales_document.slp_code",
+                      "sales_document.card_code",
+                      "sales_document.source_system",
+                      "salespersons.source_native_id",
+                      "customers.source_native_id"
+                    ],
+                    "validation_status": "historical_evidence"
+                  }
+                ],
+                "entities": [
+                  {
+                    "evidence": {
+                      "warning": "Luz Guzman is NOT automatically the owner reference Dra. Luz; seller category is not document channel",
+                      "validity": "snapshot_only; no proven effective interval",
+                      "category_code": "2",
+                      "reference_version": "v2_reference_closure_2088d5885204313a",
+                      "source_extracted_at": "2026-09-24 09:03:11.919356-03",
+                      "foundation_entity_id": "salesperson_570cdbc532c60880c82015f7",
+                      "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+                    },
+                    "valid_to": null,
+                    "entity_key": "13",
+                    "valid_from": null,
+                    "entity_type": "salesperson",
+                    "entity_label": "Luz Guzman",
+                    "relationship": "snapshot_seller_category_corporate",
+                    "source_namespace": "SAP_HANA.OSLP",
+                    "validation_status": "source_verified"
+                  },
+                  {
+                    "evidence": {
+                      "warning": "Luz Guzman is NOT automatically the owner reference Dra. Luz; seller category is not document channel",
+                      "validity": "snapshot_only; no proven effective interval",
+                      "category_code": "2",
+                      "reference_version": "v2_reference_closure_2088d5885204313a",
+                      "source_extracted_at": "2026-09-24 09:03:11.919356-03",
+                      "foundation_entity_id": "salesperson_63670834455a669575a65f5d",
+                      "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+                    },
+                    "valid_to": null,
+                    "entity_key": "11",
+                    "valid_from": null,
+                    "entity_type": "salesperson",
+                    "entity_label": "Selva Rojas Jaimes",
+                    "relationship": "snapshot_seller_category_corporate",
+                    "source_namespace": "SAP_HANA.OSLP",
+                    "validation_status": "source_verified"
+                  }
+                ]
+              },
+              "operational_context": {
+                "dimension": "salespersons",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones.",
+                  "No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": {
+                "text": "¿Cuánto vendió la Dra. Luz?",
+                "type": null
+              },
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "A05",
+      "question": "¿Cuáles son los vendedores corporativos?",
+      "http_status": 200,
+      "ok": true,
+      "text": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente. Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones. No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-A05",
+      "conversation_id": "814d20d6-424f-453e-b4d3-e3ea04a14323",
+      "correlation_id": "d1a4280b-70cb-4338-a136-d07f9e8895de",
+      "elapsed_ms": 4210.99,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.18258300042361952,
+          "interpretation_ms": 4112.5234339997405,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 4112.863043999823
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente. Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones. No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 2.67146500027593,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuáles son los vendedores corporativos?",
+                "¿Cuánto vendió la Dra. Luz?",
+                "Mostrame las ventas de Selva Rojas"
+              ],
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802",
+              "definition": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.seller_classification",
+              "canonical_name": "Clasificación comercial de vendedores",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [
+                  {
+                    "source": "channel_foundation_evidence.json:CURRENT-1408",
+                    "valid_to": null,
+                    "rule_code": "document-seller-customer-relations",
+                    "valid_from": null,
+                    "description": "Foundation sales_document.slp_code links SAP OSLP.SlpCode; card_code links OCRD.CardCode. Reference namespace SAP_HANA differs from atomic SAP_B1_HANA and requires an explicit crosswalk.",
+                    "limitations": [
+                      "Verified fields and snapshot examples only; seller-client assignment master not published in customers.",
+                      "Source system is lineage, not proof of DMS/Retail One document origin or business channel. Validity and exceptions remain pending."
+                    ],
+                    "input_fields": [
+                      "sales_document.slp_code",
+                      "sales_document.card_code",
+                      "sales_document.source_system",
+                      "salespersons.source_native_id",
+                      "customers.source_native_id"
+                    ],
+                    "validation_status": "historical_evidence"
+                  }
+                ],
+                "entities": [
+                  {
+                    "evidence": {
+                      "warning": "Luz Guzman is NOT automatically the owner reference Dra. Luz; seller category is not document channel",
+                      "validity": "snapshot_only; no proven effective interval",
+                      "category_code": "2",
+                      "reference_version": "v2_reference_closure_2088d5885204313a",
+                      "source_extracted_at": "2026-09-24 09:03:11.919356-03",
+                      "foundation_entity_id": "salesperson_570cdbc532c60880c82015f7",
+                      "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+                    },
+                    "valid_to": null,
+                    "entity_key": "13",
+                    "valid_from": null,
+                    "entity_type": "salesperson",
+                    "entity_label": "Luz Guzman",
+                    "relationship": "snapshot_seller_category_corporate",
+                    "source_namespace": "SAP_HANA.OSLP",
+                    "validation_status": "source_verified"
+                  },
+                  {
+                    "evidence": {
+                      "warning": "Luz Guzman is NOT automatically the owner reference Dra. Luz; seller category is not document channel",
+                      "validity": "snapshot_only; no proven effective interval",
+                      "category_code": "2",
+                      "reference_version": "v2_reference_closure_2088d5885204313a",
+                      "source_extracted_at": "2026-09-24 09:03:11.919356-03",
+                      "foundation_entity_id": "salesperson_63670834455a669575a65f5d",
+                      "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+                    },
+                    "valid_to": null,
+                    "entity_key": "11",
+                    "valid_from": null,
+                    "entity_type": "salesperson",
+                    "entity_label": "Selva Rojas Jaimes",
+                    "relationship": "snapshot_seller_category_corporate",
+                    "source_namespace": "SAP_HANA.OSLP",
+                    "validation_status": "source_verified"
+                  }
+                ]
+              },
+              "operational_context": {
+                "dimension": "salespersons",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones.",
+                  "No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "A06",
+      "question": "Compará ventas corporativas y horizontales",
+      "http_status": 200,
+      "ok": true,
+      "text": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle. Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes. No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-A06",
+      "conversation_id": "a58b6d76-2115-4d1d-b1a3-87818f407002",
+      "correlation_id": "678033d1-619c-4c7d-9303-3811e96f35ee",
+      "elapsed_ms": 6247.3,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.6671799992545857,
+          "interpretation_ms": 6210.036727999977,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 6211.346731000049
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle. Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes. No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.4438689995586174,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Compará ventas corporativas y horizontales",
+                "Dame las ventas horizontales de septiembre",
+                "venta horizontal",
+                "ventas horizontales"
+              ],
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c",
+              "definition": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.horizontal_channel",
+              "canonical_name": "Venta horizontal",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [
+                  {
+                    "source": "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/corporate_sales/CORPORATE_SALES_FINAL_REPORT.md",
+                    "valid_to": null,
+                    "rule_code": "legacy-price-segment-channel",
+                    "valid_from": null,
+                    "description": "Historical per-sale rule used PriceTypeCode=11 for HORIZONTAL. Other PriceTypeCode and customer segmentation rules classified other channels.",
+                    "limitations": [
+                      "Era-specific legacy rule, not approved current mapping. DMS origin alone is insufficient."
+                    ],
+                    "input_fields": [
+                      "TSSale.PriceTypeCode",
+                      "ClientSegmentationCode"
+                    ],
+                    "validation_status": "historical_evidence"
+                  }
+                ],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes.",
+                  "No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "COMPARE",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "S07",
+      "question": "Dame ventas de Calenta",
+      "http_status": 200,
+      "ok": true,
+      "text": "¿Querés consultar el importe vendido, las cantidades vendidas o ambas?",
+      "classification": "NEEDS_CLARIFICATION",
+      "conversation_key": "8c345a01-S07",
+      "conversation_id": "f9525a31-5175-4f2c-88a4-1f2b3bc13627",
+      "correlation_id": "4d8cef99-dfe0-4027-8569-bbbfe6d41dec",
+      "elapsed_ms": 6552.07,
+      "audit": {
+        "bmd": null,
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.4415969997353386,
+          "interpretation_ms": 6462.412715000028,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 6463.182073000098
+        },
+        "decision": "ASK",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés consultar el importe vendido, las cantidades vendidas o ambas?"
+            },
+            "proposed": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "source_turn_id": "4d8cef99-dfe0-4027-8569-bbbfe6d41dec",
+            "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés consultar el importe vendido, las cantidades vendidas o ambas?"
+            },
+            "proposed": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "source_turn_id": "4d8cef99-dfe0-4027-8569-bbbfe6d41dec",
+            "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "¿Querés consultar el importe vendido, las cantidades vendidas o ambas?",
+          "classification": "NEEDS_CLARIFICATION"
+        },
+        "business_semantics": {
+          "status": "candidate",
+          "timings": {
+            "text_ms": 1.2875219999841647,
+            "exact_ms": 1.0167609998461558,
+            "vector_ms": 4.387415999190125,
+            "embedding_ms": 495.807682999839
+          },
+          "concepts": [
+            {
+              "match": "vector",
+              "score": 0.4390499696147607,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuánto le vendimos a menona?",
+                "dame ventas de menona",
+                "ventas de menona"
+              ],
+              "version": 1,
+              "concept_id": "5d090ae0-d1a7-4778-8622-c5d09fcdcc78",
+              "definition": "Ventas a clientes incluidos por Telchi en su segmento comercial denominado menona.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.menona_customers",
+              "canonical_name": "Ventas de menona",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "customers",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No buscar productos menona. La pertenencia debe constar en información comercial autorizada.",
+                  "No inferir religión o comunidad a partir de nombres, apellidos o domicilios."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.43317343469521163,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Dame ventas de farmacia",
+                "ventas de farmacia",
+                "ventas en sucursales farmacia"
+              ],
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66",
+              "definition": "Ventas realizadas en sucursales que Telchi clasifica como farmacias.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.pharmacy_branches",
+              "canonical_name": "Ventas de farmacia",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "branches",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No son productos farmacéuticos ni ventas a clientes farmacias.",
+                  "Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.40609697813533674,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "dame ventas perdidas",
+                "Mostrame las ventas perdidas",
+                "ventas perdidas"
+              ],
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46",
+              "definition": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas.",
+              "module_code": "telchi",
+              "concept_type": "ANALYTICAL_INTENT",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.lost_opportunities",
+              "canonical_name": "Ventas perdidas",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "sales_opportunities",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada.",
+                  "Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas.",
+                  "Clasificación definitiva necesita evidencia empresarial adicional."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": true
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "ASK",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/entity_mention": {
+                "text": "Calenta",
+                "type": null
+              },
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": {
+            "slot": "metric",
+            "question": "¿Querés consultar el importe vendido, las cantidades vendidas o ambas?"
+          }
+        }
+      }
+    },
+    {
+      "case": "S08",
+      "question": "Dame el indicador empresarial ZXQ903718",
+      "http_status": 200,
+      "ok": true,
+      "text": "Entendí la consulta. Esta consulta todavía no está disponible.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-S08",
+      "conversation_id": "f22b2c40-45b3-43bd-b812-f298dde396ee",
+      "correlation_id": "e976554c-328a-4afe-a21d-b2272b757e52",
+      "elapsed_ms": 5997.4,
+      "audit": {
+        "bmd": {
+          "category": "CAPABILITY_MISSING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.41896600032487186,
+          "interpretation_ms": 5925.832337999964,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5926.4176369997585
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Entendí la consulta. Esta consulta todavía no está disponible.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "candidate",
+          "timings": {
+            "text_ms": 1.194896000015433,
+            "exact_ms": 1.3806999995722435,
+            "vector_ms": 6.474140000136686,
+            "embedding_ms": 546.6448480001418
+          },
+          "concepts": [
+            {
+              "match": "vector",
+              "score": 0.40724984615714854,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "dame ventas perdidas",
+                "Mostrame las ventas perdidas",
+                "ventas perdidas"
+              ],
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46",
+              "definition": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas.",
+              "module_code": "telchi",
+              "concept_type": "ANALYTICAL_INTENT",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.lost_opportunities",
+              "canonical_name": "Ventas perdidas",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "sales_opportunities",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada.",
+                  "Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas.",
+                  "Clasificación definitiva necesita evidencia empresarial adicional."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.4062434042095763,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuáles son los vendedores corporativos?",
+                "¿Cuánto vendió la Dra. Luz?",
+                "Mostrame las ventas de Selva Rojas"
+              ],
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802",
+              "definition": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.seller_classification",
+              "canonical_name": "Clasificación comercial de vendedores",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "salespersons",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones.",
+                  "No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.4008591459883696,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Compará ventas corporativas y horizontales",
+                "Dame las ventas horizontales de septiembre",
+                "venta horizontal",
+                "ventas horizontales"
+              ],
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c",
+              "definition": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.horizontal_channel",
+              "canonical_name": "Venta horizontal",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes.",
+                  "No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": true
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "R01",
+      "question": "Ventas de mayo de 2026",
+      "http_status": 200,
+      "ok": true,
+      "text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "8c345a01-R01",
+      "conversation_id": "6641b8c4-ebd7-4bf1-abb7-dac2fb1cbab3",
+      "correlation_id": "edc84dbb-d24c-40f5-84af-c7502db040ca",
+      "elapsed_ms": 8833.19,
+      "audit": {
+        "bmd": null,
+        "timings": {
+          "capability_ms": 2347.5136379993273,
+          "state_engine_ms": 0.7555100000899984,
+          "interpretation_ms": 6383.76542900005,
+          "response_format_ms": 0.019220000467612408,
+          "total_processing_ms": 8736.72919099954
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+          "rows": [
+            {
+              "net_amount": "8552079.190000",
+              "credit_count": 245,
+              "billed_amount": "8761459.220000",
+              "credit_amount": "209380.030000",
+              "invoice_count": 36242,
+              "unique_credits": 245,
+              "unique_invoices": 36242,
+              "credit_amount_count": 245,
+              "invoice_amount_count": 36242
+            }
+          ],
+          "grain": "document_header",
+          "period": {
+            "currency": "BS",
+            "date_from": "2026-05-01",
+            "date_to_exclusive": "2026-06-01"
+          },
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "currency": "BS",
+          "read_only": true,
+          "capability": "sales.period_billed_amount.v1",
+          "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+          "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+          "sap_accessed": false,
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-05-01",
+            "2026-06-01",
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-05-01",
+            "2026-06-01"
+          ],
+          "sql_duration_ms": 290.7665810007529,
+          "requested_metrics": [
+            "sales.net_amount"
+          ]
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Ventas netas documentales: Bs 8,552,079.19. Facturación válida: Bs 8,761,459.22; notas de crédito: Bs 209,380.03. Período [2026-05-01, 2026-06-01). 36242 facturas y 245 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "business_semantics": {
+          "status": "candidate",
+          "timings": {
+            "text_ms": 1.131539000198245,
+            "exact_ms": 0.9894630002236227,
+            "vector_ms": 5.5725270003677,
+            "embedding_ms": 556.3387940001121
+          },
+          "concepts": [
+            {
+              "match": "vector",
+              "score": 0.38392247517205336,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuánto vendió el canal corporativo en mayo?",
+                "venta corporativa",
+                "ventas corporativas"
+              ],
+              "version": 1,
+              "concept_id": "3ff75681-41dc-4af9-a6dd-de771bb4b862",
+              "definition": "Modalidad comercial corporativa de Telchi. La reconstrucción histórica distingue canal comercial del cliente y categoría corporativa del vendedor: no son equivalentes.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.corporate_channel",
+              "canonical_name": "Venta corporativa",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Investigación: regla legacy PriceTypeCode + ClientSegmentationCode; luego OCRD.U_CANAL_VENTAS para canal del cliente y OSLP.U_CATVENDEDOR para vendedor.",
+                  "No sumar canales 2 y 3 ni proyectar clasificación actual a toda la historia. Vigencia y excepciones pendientes de acreditación runtime."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.3545950930320352,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Compará ventas corporativas y horizontales",
+                "Dame las ventas horizontales de septiembre",
+                "venta horizontal",
+                "ventas horizontales"
+              ],
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c",
+              "definition": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.horizontal_channel",
+              "canonical_name": "Venta horizontal",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes.",
+                  "No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.3530056611632133,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuánto le vendimos a menona?",
+                "dame ventas de menona",
+                "ventas de menona"
+              ],
+              "version": 1,
+              "concept_id": "5d090ae0-d1a7-4778-8622-c5d09fcdcc78",
+              "definition": "Ventas a clientes incluidos por Telchi en su segmento comercial denominado menona.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.menona_customers",
+              "canonical_name": "Ventas de menona",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "customers",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No buscar productos menona. La pertenencia debe constar en información comercial autorizada.",
+                  "No inferir religión o comunidad a partir de nombres, apellidos o domicilios."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": true
+        },
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference",
+              "/product_search_text",
+              "/selected_item_codes"
+            ]
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "R02",
+      "question": "Ventas de junio de 2026",
+      "http_status": 200,
+      "ok": true,
+      "text": "Ventas netas documentales: Bs 9,763,493.67. Facturación válida: Bs 10,033,501.02; notas de crédito: Bs 270,007.35. Período [2026-06-01, 2026-07-01). 35360 facturas y 261 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "8c345a01-R02",
+      "conversation_id": "ae0e5189-74e8-44ea-81f6-a1ea08410a97",
+      "correlation_id": "9bbead6e-6282-4520-a1ed-9aeeef78e4c9",
+      "elapsed_ms": 6671.0,
+      "audit": {
+        "bmd": null,
+        "timings": {
+          "capability_ms": 2392.9522839998754,
+          "state_engine_ms": 0.32211300003837096,
+          "interpretation_ms": 4211.412733999168,
+          "response_format_ms": 0.03591699987737229,
+          "total_processing_ms": 6606.221468000513
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-06-01",
+            "end_exclusive": "2026-07-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-06-01",
+            "end_exclusive": "2026-07-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<?\n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+          "rows": [
+            {
+              "net_amount": "9763493.670000",
+              "credit_count": 261,
+              "billed_amount": "10033501.020000",
+              "credit_amount": "270007.350000",
+              "invoice_count": 35360,
+              "unique_credits": 261,
+              "unique_invoices": 35360,
+              "credit_amount_count": 261,
+              "invoice_amount_count": 35360
+            }
+          ],
+          "grain": "document_header",
+          "period": {
+            "currency": "BS",
+            "date_from": "2026-06-01",
+            "date_to_exclusive": "2026-07-01"
+          },
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "currency": "BS",
+          "read_only": true,
+          "capability": "sales.period_billed_amount.v1",
+          "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+          "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+          "sap_accessed": false,
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-06-01",
+            "2026-07-01",
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-06-01",
+            "2026-07-01"
+          ],
+          "sql_duration_ms": 309.7914289992332,
+          "requested_metrics": [
+            "sales.net_amount"
+          ]
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Ventas netas documentales: Bs 9,763,493.67. Facturación válida: Bs 10,033,501.02; notas de crédito: Bs 270,007.35. Período [2026-06-01, 2026-07-01). 35360 facturas y 261 notas de crédito activas. DocTotal de cabecera, por DocDate; incluye el tratamiento SAP de impuestos y descuentos. Excluye anuladas; no son cobros. Cobertura histórica completa no certificada. Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "business_semantics": {
+          "status": "candidate",
+          "timings": {
+            "text_ms": 1.0701629998948192,
+            "exact_ms": 1.1892779994013836,
+            "vector_ms": 4.693259000305261,
+            "embedding_ms": 593.2875779999449
+          },
+          "concepts": [
+            {
+              "match": "vector",
+              "score": 0.3811879195839809,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuánto vendió el canal corporativo en mayo?",
+                "venta corporativa",
+                "ventas corporativas"
+              ],
+              "version": 1,
+              "concept_id": "3ff75681-41dc-4af9-a6dd-de771bb4b862",
+              "definition": "Modalidad comercial corporativa de Telchi. La reconstrucción histórica distingue canal comercial del cliente y categoría corporativa del vendedor: no son equivalentes.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.corporate_channel",
+              "canonical_name": "Venta corporativa",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Investigación: regla legacy PriceTypeCode + ClientSegmentationCode; luego OCRD.U_CANAL_VENTAS para canal del cliente y OSLP.U_CATVENDEDOR para vendedor.",
+                  "No sumar canales 2 y 3 ni proyectar clasificación actual a toda la historia. Vigencia y excepciones pendientes de acreditación runtime."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.37697047501619585,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Compará ventas corporativas y horizontales",
+                "Dame las ventas horizontales de septiembre",
+                "venta horizontal",
+                "ventas horizontales"
+              ],
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c",
+              "definition": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.horizontal_channel",
+              "canonical_name": "Venta horizontal",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes.",
+                  "No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.36162840091990545,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuánto le vendimos a menona?",
+                "dame ventas de menona",
+                "ventas de menona"
+              ],
+              "version": 1,
+              "concept_id": "5d090ae0-d1a7-4778-8622-c5d09fcdcc78",
+              "definition": "Ventas a clientes incluidos por Telchi en su segmento comercial denominado menona.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.menona_customers",
+              "canonical_name": "Ventas de menona",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "customers",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No buscar productos menona. La pertenencia debe constar en información comercial autorizada.",
+                  "No inferir religión o comunidad a partir de nombres, apellidos o domicilios."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": true
+        },
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-06-01",
+                "end_exclusive": "2026-07-01"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference"
+            ]
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "R03",
+      "question": "Dame las últimas 10 facturas de venta registradas",
+      "http_status": 200,
+      "ok": true,
+      "text": "Últimas facturas activas por fecha documental (no instante de ingreso):\n2026-09-24 · OINV DocEntry 11532517 · DocNum 260192728 · N\n2026-09-24 · OINV DocEntry 11532516 · DocNum 260192727 · N\n2026-09-24 · OINV DocEntry 11532515 · DocNum 260192726 · N\n2026-09-24 · OINV DocEntry 11532514 · DocNum 260192725 · N\n2026-09-24 · OINV DocEntry 11532513 · DocNum 260739131 · N\n2026-09-24 · OINV DocEntry 11532512 · DocNum 260192724 · N\n2026-09-24 · OINV DocEntry 11532511 · DocNum 260192723 · N\n2026-09-24 · OINV DocEntry 11532510 · DocNum 260192722 · N\n2026-09-24 · OINV DocEntry 11532509 · DocNum 260192721 · N\n2026-09-24 · OINV DocEntry 11532508 · DocNum 260739130 · N\nOrden: DocDate descendente, DocEntry descendente. Excluye anuladas y notas de crédito. No es venta neta.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "8c345a01-R03",
+      "conversation_id": "10dbfbab-d046-4c5e-a2dd-4a0e2a69c617",
+      "correlation_id": "b1137f5c-0329-42c3-b462-45be655d7a01",
+      "elapsed_ms": 7111.97,
+      "audit": {
+        "bmd": null,
+        "timings": {
+          "capability_ms": 2212.374125999304,
+          "state_engine_ms": 0.24338000002899207,
+          "interpretation_ms": 4847.975394000059,
+          "response_format_ms": 0.01630500082683284,
+          "total_processing_ms": 7062.591476999842
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "limit": 10,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "limit": 10,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "SELECT source_system,doc_entry,doc_num,doc_date,canceled\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\nWHERE source_system=? AND canceled=? AND doc_date IS NOT NULL\nORDER BY doc_date DESC,CAST(doc_entry AS BIGINT) DESC,doc_entry DESC LIMIT ?",
+          "rows": [
+            {
+              "doc_num": "260192728",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532517",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192727",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532516",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192726",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532515",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192725",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532514",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260739131",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532513",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192724",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532512",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192723",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532511",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192722",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532510",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192721",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532509",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260739130",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532508",
+              "source_system": "SAP_B1_HANA"
+            }
+          ],
+          "grain": "invoice_header",
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "read_only": true,
+          "capability": "sales.latest_documents.v1",
+          "limitations": "Active invoices (N), by DocDate, not entry timestamp; excludes credit memos. Not net sales. Completeness not certified.",
+          "sap_accessed": false,
+          "document_type": "OINV",
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N",
+            10
+          ],
+          "sql_duration_ms": 148.60105299976567
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Últimas facturas activas por fecha documental (no instante de ingreso):\n2026-09-24 · OINV DocEntry 11532517 · DocNum 260192728 · N\n2026-09-24 · OINV DocEntry 11532516 · DocNum 260192727 · N\n2026-09-24 · OINV DocEntry 11532515 · DocNum 260192726 · N\n2026-09-24 · OINV DocEntry 11532514 · DocNum 260192725 · N\n2026-09-24 · OINV DocEntry 11532513 · DocNum 260739131 · N\n2026-09-24 · OINV DocEntry 11532512 · DocNum 260192724 · N\n2026-09-24 · OINV DocEntry 11532511 · DocNum 260192723 · N\n2026-09-24 · OINV DocEntry 11532510 · DocNum 260192722 · N\n2026-09-24 · OINV DocEntry 11532509 · DocNum 260192721 · N\n2026-09-24 · OINV DocEntry 11532508 · DocNum 260739130 · N\nOrden: DocDate descendente, DocEntry descendente. Excluye anuladas y notas de crédito. No es venta neta.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "business_semantics": {
+          "status": "candidate",
+          "timings": {
+            "text_ms": 1.33744899994781,
+            "exact_ms": 0.9647890001360793,
+            "vector_ms": 6.147928999780561,
+            "embedding_ms": 603.8623479998932
+          },
+          "concepts": [
+            {
+              "match": "vector",
+              "score": 0.49193229167835506,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "dame ventas perdidas",
+                "Mostrame las ventas perdidas",
+                "ventas perdidas"
+              ],
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46",
+              "definition": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas.",
+              "module_code": "telchi",
+              "concept_type": "ANALYTICAL_INTENT",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.lost_opportunities",
+              "canonical_name": "Ventas perdidas",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "sales_opportunities",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada.",
+                  "Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas.",
+                  "Clasificación definitiva necesita evidencia empresarial adicional."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.4752947917433462,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuáles son los vendedores corporativos?",
+                "¿Cuánto vendió la Dra. Luz?",
+                "Mostrame las ventas de Selva Rojas"
+              ],
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802",
+              "definition": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.seller_classification",
+              "canonical_name": "Clasificación comercial de vendedores",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "salespersons",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones.",
+                  "No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.43914346930420145,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Compará ventas corporativas y horizontales",
+                "Dame las ventas horizontales de septiembre",
+                "venta horizontal",
+                "ventas horizontales"
+              ],
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c",
+              "definition": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.horizontal_channel",
+              "canonical_name": "Venta horizontal",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes.",
+                  "No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": true
+        },
+        "required_permission": "telchi.sales.latest_documents.read.v1",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/limit": 10,
+              "/metric": "sales.latest_documents",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "R04",
+      "question": "¿Cuál es la última fecha de ventas registrada?",
+      "http_status": 200,
+      "ok": true,
+      "text": "Último mes con facturas activas registradas por fecha documental: 2026-09. Última fecha: 2026-09-24T00:00:00. Documentos: 330429. No certifica último mes completo ni cobertura de ventas netas.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "8c345a01-R04",
+      "conversation_id": "1beb8a60-aefe-4918-ba8e-e05ddb458136",
+      "correlation_id": "144ef88a-f2fe-41c9-b147-94f3bd91c138",
+      "elapsed_ms": 8846.68,
+      "audit": {
+        "bmd": null,
+        "timings": {
+          "capability_ms": 2300.993802999983,
+          "state_engine_ms": 0.16482000046380563,
+          "interpretation_ms": 6516.442905999611,
+          "response_format_ms": 0.007265000022016466,
+          "total_processing_ms": 8818.941169999562
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.coverage",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.coverage"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.coverage",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.coverage"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "SELECT MIN(doc_date) AS first_date,MAX(doc_date) AS last_date,COUNT(*) AS documents\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND doc_date IS NOT NULL",
+          "rows": [
+            {
+              "documents": 330429,
+              "last_date": "2026-09-24T00:00:00",
+              "first_date": "2022-03-31T00:00:00",
+              "latest_month_with_rows": "2026-09",
+              "complete_month_certified": false
+            }
+          ],
+          "grain": "invoice_header",
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "read_only": true,
+          "capability": "sales.coverage.v1",
+          "limitations": "Active invoices (N), by DocDate, not entry timestamp; excludes credit memos. Not net sales. Completeness not certified.",
+          "sap_accessed": false,
+          "document_type": "OINV",
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N"
+          ],
+          "sql_duration_ms": 69.61854500059417
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Último mes con facturas activas registradas por fecha documental: 2026-09. Última fecha: 2026-09-24T00:00:00. Documentos: 330429. No certifica último mes completo ni cobertura de ventas netas.\nFoundation foundation_afd08d9eca6a725be53cdc3f9d5709c9, snapshot 1408.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "business_semantics": {
+          "status": "candidate",
+          "timings": {
+            "text_ms": 0.9806139996726415,
+            "exact_ms": 0.9123680001721368,
+            "vector_ms": 4.719026000202575,
+            "embedding_ms": 504.18994600022415
+          },
+          "concepts": [
+            {
+              "match": "vector",
+              "score": 0.4483432857923604,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuáles son los vendedores corporativos?",
+                "¿Cuánto vendió la Dra. Luz?",
+                "Mostrame las ventas de Selva Rojas"
+              ],
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802",
+              "definition": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.seller_classification",
+              "canonical_name": "Clasificación comercial de vendedores",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "salespersons",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones.",
+                  "No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.4326861485542983,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "dame ventas perdidas",
+                "Mostrame las ventas perdidas",
+                "ventas perdidas"
+              ],
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46",
+              "definition": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas.",
+              "module_code": "telchi",
+              "concept_type": "ANALYTICAL_INTENT",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.lost_opportunities",
+              "canonical_name": "Ventas perdidas",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "sales_opportunities",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada.",
+                  "Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas.",
+                  "Clasificación definitiva necesita evidencia empresarial adicional."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.40211742236973413,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Compará ventas corporativas y horizontales",
+                "Dame las ventas horizontales de septiembre",
+                "venta horizontal",
+                "ventas horizontales"
+              ],
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c",
+              "definition": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.horizontal_channel",
+              "canonical_name": "Venta horizontal",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes.",
+                  "No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": true
+        },
+        "required_permission": "telchi.sales.coverage.read.v1",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/limit": 10,
+              "/metric": "sales.latest_documents",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "/temporal_reference": null,
+              "/product_search_text": null,
+              "/selected_item_codes": []
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "business_contract_proposal": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.coverage",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.coverage"
+              ],
+              "/temporal_reference": null,
+              "/product_search_text": null,
+              "/selected_item_codes": []
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "R05",
+      "question": "Top 10 por cantidad documental del 1 de enero al 15 de septiembre de 2026, sin filtros",
+      "http_status": 200,
+      "ok": true,
+      "text": "Top 10 por cantidad documental, 01/01–15/09/2026:\nL00505: 557199.0000000000\nL02467: 200000.0000000000\nM05970: 133931.0000000000\nL01698: 116567.0000000000\nL01003: 115269.0000000000\nL01613: 108791.0000000000\nL02837: 101919.0000000000\nL00003: 98511.0000000000\nM05239: 94065.0000000000\nM05486: 93144.0000000000\nUnidades originales por producto, no comparables entre productos. Sin descontar notas de crédito ni anulaciones; no es facturación ni venta neta. Cobertura histórica completa no certificada. Actualización: 2026-09-28T18:18:35.264000. Fuente: Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "8c345a01-R05",
+      "conversation_id": "cd86860c-5150-4686-ae29-fbcf1b88fec6",
+      "correlation_id": "91ef1748-a124-40b0-9e38-e58d72c0594d",
+      "elapsed_ms": 12872.85,
+      "audit": {
+        "bmd": null,
+        "timings": {
+          "capability_ms": 5109.736215999874,
+          "state_engine_ms": 0.2326519997950527,
+          "interpretation_ms": 7710.70931200029,
+          "response_format_ms": 0.012321999747655354,
+          "total_processing_ms": 12821.490841999548
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "limit": 10,
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.source_top_items"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "limit": 10,
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.source_top_items"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "rows": [
+            {
+              "quantity": "557199.0000000000",
+              "item_code": "L00505"
+            },
+            {
+              "quantity": "200000.0000000000",
+              "item_code": "L02467"
+            },
+            {
+              "quantity": "133931.0000000000",
+              "item_code": "M05970"
+            },
+            {
+              "quantity": "116567.0000000000",
+              "item_code": "L01698"
+            },
+            {
+              "quantity": "115269.0000000000",
+              "item_code": "L01003"
+            },
+            {
+              "quantity": "108791.0000000000",
+              "item_code": "L01613"
+            },
+            {
+              "quantity": "101919.0000000000",
+              "item_code": "L02837"
+            },
+            {
+              "quantity": "98511.0000000000",
+              "item_code": "L00003"
+            },
+            {
+              "quantity": "94065.0000000000",
+              "item_code": "M05239"
+            },
+            {
+              "quantity": "93144.0000000000",
+              "item_code": "M05486"
+            }
+          ],
+          "units": "source_document_units_per_item; not comparable across items",
+          "metric": "source_document_quantity_by_item",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "coverage": "fixed_query_window; historical completeness not certified",
+          "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+          "parameters": {
+            "limit": 10,
+            "metric": "sales.source_top_items",
+            "period": {
+              "start": "2026-01-01",
+              "end_exclusive": "2026-09-16"
+            },
+            "pending": null,
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null,
+            "entity_mention": null,
+            "schema_version": 2,
+            "product_context": null,
+            "requested_metrics": [
+              "sales.source_top_items"
+            ],
+            "temporal_reference": null,
+            "product_search_text": null,
+            "selected_item_codes": []
+          },
+          "limitations": "Invoices only, no cancellation filter or credit subtraction; not net sales or revenue."
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Top 10 por cantidad documental, 01/01–15/09/2026:\nL00505: 557199.0000000000\nL02467: 200000.0000000000\nM05970: 133931.0000000000\nL01698: 116567.0000000000\nL01003: 115269.0000000000\nL01613: 108791.0000000000\nL02837: 101919.0000000000\nL00003: 98511.0000000000\nM05239: 94065.0000000000\nM05486: 93144.0000000000\nUnidades originales por producto, no comparables entre productos. Sin descontar notas de crédito ni anulaciones; no es facturación ni venta neta. Cobertura histórica completa no certificada. Actualización: 2026-09-28T18:18:35.264000. Fuente: Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "business_semantics": {
+          "status": "candidate",
+          "timings": {
+            "text_ms": 1.2244210001881584,
+            "exact_ms": 1.180668999950285,
+            "vector_ms": 4.995739999685611,
+            "embedding_ms": 565.1873050001086
+          },
+          "concepts": [
+            {
+              "match": "vector",
+              "score": 0.2748159440287281,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "¿Cuáles son los vendedores corporativos?",
+                "¿Cuánto vendió la Dra. Luz?",
+                "Mostrame las ventas de Selva Rojas"
+              ],
+              "version": 1,
+              "concept_id": "f555872a-5e99-4827-9cf2-111476211802",
+              "definition": "Clasificación empresarial de vendedores y consulta de sus ventas. La categoría del vendedor no determina por sí sola el canal comercial de cada documento o cliente.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.seller_classification",
+              "canonical_name": "Clasificación comercial de vendedores",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "salespersons",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Resolver identidad real del vendedor y documentos relacionados con vigencia y excepciones.",
+                  "No inventar IDs ni importes. Evidencia de un snapshot no demuestra clasificación histórica de todas las operaciones."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.26556354543353033,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Compará ventas corporativas y horizontales",
+                "Dame las ventas horizontales de septiembre",
+                "venta horizontal",
+                "ventas horizontales"
+              ],
+              "version": 1,
+              "concept_id": "2aae79f1-9284-4c84-9659-f1fd6bf3126c",
+              "definition": "En Telchi, en general, ventas de vendedores que operan mediante DMS, habitualmente ventas de calle.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.horizontal_channel",
+              "canonical_name": "Venta horizontal",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "commercial_channel",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Origen DMS por sí solo no determina canal. Clasificación de vendedor, cliente y documento son dimensiones diferentes.",
+                  "No hay filtro de canal horizontal habilitado para consultas generales. No inventar período o importes."
+                ],
+                "capability_status": "pending"
+              }
+            },
+            {
+              "match": "vector",
+              "score": 0.2404074812292517,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "dame ventas perdidas",
+                "Mostrame las ventas perdidas",
+                "ventas perdidas"
+              ],
+              "version": 1,
+              "concept_id": "c57375d7-530b-4cbd-a739-6d014347eb46",
+              "definition": "Listado de oportunidades comerciales no concretadas que el área de ventas prepara para dirección usando información de vendedores. Una lógica histórica es presupuestos o cotizaciones no transformados en ventas.",
+              "module_code": "telchi",
+              "concept_type": "ANALYTICAL_INTENT",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.lost_opportunities",
+              "canonical_name": "Ventas perdidas",
+              "approval_status": "published",
+              "capability_links": [],
+              "operational_context": {
+                "dimension": "sales_opportunities",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "Una cotización sin factura no demuestra pérdida definitiva: distinguir pendiente, no convertida, conversión parcial y pérdida confirmada.",
+                  "Cliente desde presupuesto cuando exista relación. Productos, cantidades, importes, vendedor, fechas y evidencia de estado; no inventar causas.",
+                  "Clasificación definitiva necesita evidencia empresarial adicional."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": true
+        },
+        "required_permission": "telchi.sales.source_quantity.read.v1",
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/limit": 10,
+              "/metric": "sales.source_top_items",
+              "/period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.source_top_items"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/product_search_text",
+              "/selected_item_codes"
+            ]
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "NEW_CONVERSATION",
+      "question": "Dame ventas de farmacia",
+      "http_status": 200,
+      "ok": true,
+      "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-new",
+      "conversation_id": "171a457e-bd50-404b-96dd-47ba30adea88",
+      "correlation_id": "a9f9b1d9-e5ca-4cfe-aec5-d2c5b0a12d65",
+      "elapsed_ms": 5656.21,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.6459630003519123,
+          "interpretation_ms": 5576.75278700026,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5577.784648000488
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 1.0297750004610862,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Dame ventas de farmacia",
+                "ventas de farmacia",
+                "ventas en sucursales farmacia"
+              ],
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66",
+              "definition": "Ventas realizadas en sucursales que Telchi clasifica como farmacias.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.pharmacy_branches",
+              "canonical_name": "Ventas de farmacia",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "branches",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No son productos farmacéuticos ni ventas a clientes farmacias.",
+                  "Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      }
+    },
+    {
+      "case": "AFTER_RESTART",
+      "question": "Dame ventas de farmacia",
+      "http_status": 200,
+      "ok": true,
+      "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "conversation_key": "8c345a01-after-restart",
+      "conversation_id": "4833ed7f-0276-4352-a683-dfcd7fdb24a0",
+      "correlation_id": "63c7a5d4-841e-47b6-928f-d2a6be3c857d",
+      "elapsed_ms": 5564.12,
+      "audit": {
+        "bmd": {
+          "category": "KNOWN_CONCEPT_CAPABILITY_PENDING"
+        },
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.4586400000334834,
+          "interpretation_ms": 5445.491628999662,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 5446.445937000135
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": null,
+          "period": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés el importe vendido, las cantidades vendidas o ambas?"
+            },
+            "proposed": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "source_turn_id": "63c7a5d4-841e-47b6-928f-d2a6be3c857d",
+            "base_state_hash": "4725d068dcb78c87ba7116a83eaaf7cabebd7a78056d051d56ceeeeb87eab847"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "validated_state": {
+          "metric": null,
+          "period": null,
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés el importe vendido, las cantidades vendidas o ambas?"
+            },
+            "proposed": {
+              "metric": null,
+              "period": null,
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": null,
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "source_turn_id": "63c7a5d4-841e-47b6-928f-d2a6be3c857d",
+            "base_state_hash": "4725d068dcb78c87ba7116a83eaaf7cabebd7a78056d051d56ceeeeb87eab847"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "semantic_references": [
+            {
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66"
+            }
+          ]
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Ventas realizadas en sucursales que Telchi clasifica como farmacias. No son productos farmacéuticos ni ventas a clientes farmacias. Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales. Conozco esta definición empresarial, pero su operación todavía no está habilitada. No se consultó Foundation ni se calcularon resultados.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "business_semantics": {
+          "status": "resolved",
+          "timings": {
+            "text_ms": 0.0,
+            "exact_ms": 9.214804000293952,
+            "vector_ms": 0.0,
+            "embedding_ms": 0.0
+          },
+          "concepts": [
+            {
+              "match": "alias",
+              "score": 1.0,
+              "source": "project-owner:TEAM360-BUSINESS-SEMANTICS-PGVECTOR-V1",
+              "aliases": [
+                "Dame ventas de farmacia",
+                "ventas de farmacia",
+                "ventas en sucursales farmacia"
+              ],
+              "version": 1,
+              "concept_id": "0bfeacb2-591d-42d9-9f5f-a21a23ce7d66",
+              "definition": "Ventas realizadas en sucursales que Telchi clasifica como farmacias.",
+              "module_code": "telchi",
+              "concept_type": "ENTITY_SCOPE",
+              "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "semantic_code": "telchi.sales.pharmacy_branches",
+              "canonical_name": "Ventas de farmacia",
+              "approval_status": "published",
+              "capability_links": [],
+              "related_evidence": {
+                "rules": [],
+                "entities": []
+              },
+              "operational_context": {
+                "dimension": "branches",
+                "validation": "business_meaning_confirmed",
+                "limitations": [
+                  "No son productos farmacéuticos ni ventas a clientes farmacias.",
+                  "Clasificación de sucursales → IDs reales → documentos comerciales. No inventar sucursales."
+                ],
+                "capability_status": "pending"
+              }
+            }
+          ],
+          "degraded": null,
+          "ambiguous": false
+        },
+        "required_permission": null,
+        "interpretation_proposed": {
+          "action": "ASK",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": {
+            "slot": "metric",
+            "question": "¿Querés el importe vendido, las cantidades vendidas o ambas?"
+          }
+        }
+      }
+    }
+  ],
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "restart_completed": true
+}

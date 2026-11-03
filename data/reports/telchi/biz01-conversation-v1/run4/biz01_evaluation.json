@@ -1,0 +1,347 @@
+{
+  "run_id": "20261021T132558Z",
+  "scenario": "BIZ01",
+  "conversation": "biz01:20261021T132558Z",
+  "turns": [
+    {
+      "turn": 1,
+      "question": "¿Cuánto facturamos en septiembre?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.period_billed_amount.v1",
+      "scope": {
+        "category": null,
+        "product": null,
+        "customer": null,
+        "group_by": null,
+        "periods": [],
+        "period_mode": null,
+        "breakdown": null,
+        "focus_product": null,
+        "focus_customer": null
+      },
+      "reconciliation": null,
+      "required_permission": "telchi.sales.period_billed_amount.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "monthly_billing ejecutado y acreditado"
+      ],
+      "response": "Facturación registrada: Bs 8.891.439,79, del 1 de septiembre de 2026 al 30 de septiembre de 2026. Neto documental tras notas de crédito: Bs 8.562.769,55. Facturas activas en BS, con impuestos y descuentos; excluye anuladas y otras monedas. No equivale a cobros ni a saldo pendiente; cobertura histórica completa no certificada. El período solicitado termina después de la actualización disponible: no es un cierre mensual completo. Información actualizada al 28 de septiembre de 2026."
+    },
+    {
+      "turn": 2,
+      "question": "¿Y cuánto corresponde a productos terminados de laboratorio?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.category_line_amount.v1",
+      "scope": {
+        "category": "LAB_FINISHED_PRODUCT",
+        "product": null,
+        "customer": null,
+        "group_by": null,
+        "periods": [],
+        "period_mode": null,
+        "breakdown": null,
+        "focus_product": null,
+        "focus_customer": null
+      },
+      "reconciliation": null,
+      "required_permission": "telchi.sales.category_line_amount.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "category_lines ejecutado y acreditado"
+      ],
+      "response": "Registramos Bs 2.679.208,66 en importe registrado en líneas comerciales de producto terminado de laboratorio, septiembre de 2026. Corresponde a 278 productos, 18541 líneas y 10694 facturas. La cobertura documental observada va del 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica el período completo. No incluye IVA de línea ni descuenta notas de crédito. Los descuentos propios ya están reflejados; no incorpora ajustes globales ni otros componentes de cabecera. Clasificación actual, no histórica."
+    },
+    {
+      "turn": 3,
+      "question": "¿Cuáles fueron los cinco productos con mayor importe vendido?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.product_line_amount_ranking.v1",
+      "scope": {
+        "category": "LAB_FINISHED_PRODUCT",
+        "product": null,
+        "customer": null,
+        "group_by": null,
+        "periods": [],
+        "period_mode": null,
+        "breakdown": null,
+        "focus_product": null,
+        "focus_customer": null
+      },
+      "reconciliation": "0.000000",
+      "required_permission": "telchi.sales.product_line_amount_ranking.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "ranking ejecutado y acreditado"
+      ],
+      "response": "Los 5 productos terminados con mayor importe vendido en septiembre de 2026\n\n1. L03281 · MINOXITEL 5% LOCION - HOMBRE x 100 mL. — Bs 259.922,61\n2. L03402 · COLAGENO HIDROLIZADO GRANULADO PREMIUM SABOR ACAI x 300g — Bs 193.755,33\n3. L01612 · LOCION POVIDINE LITEL 10% x 1L. — Bs 127.578,78\n4. L01613 · LOCION POVIDINE LITEL 10% x 120mL. — Bs 102.772,04\n5. L01001 · ALCOHOL 70% x 1L. — Bs 100.764,02\n\nImportes sin IVA, antes de notas de crédito. Datos disponibles hasta el 24 de septiembre de 2026. Descuentos de línea incluidos; sin ajustes globales. No son precios unitarios ni un cierre mensual completo."
+    },
+    {
+      "turn": 4,
+      "question": "¿En qué puesto estuvo L03281 en julio y agosto?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.product_line_amount_ranking.v1",
+      "scope": {
+        "category": "LAB_FINISHED_PRODUCT",
+        "product": null,
+        "customer": null,
+        "group_by": null,
+        "periods": [],
+        "period_mode": null,
+        "breakdown": null,
+        "focus_product": "L03281",
+        "focus_customer": null
+      },
+      "reconciliation": null,
+      "required_permission": "telchi.sales.product_line_amount_ranking.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "historical_position ejecutado y acreditado"
+      ],
+      "response": "L03281 — MINOXITEL 5% LOCION - HOMBRE x 100 mL.\n\nJulio 2026: puesto 2 entre 283 productos, con Bs 271.255,49.\nAgosto 2026: puesto 1 entre 289 productos, con Bs 314.971,57.\nDiferencia de importe entre ambos períodos: Bs 43.716,08.\n\nProductos de la categoría solicitada, por importe vendido sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual; los datos disponibles no certifican el cierre completo de los períodos."
+    },
+    {
+      "turn": 5,
+      "question": "¿A qué cliente le vendimos más ese producto entre ambos meses?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.commercial_line_amount_by.v1",
+      "scope": {
+        "category": "LAB_FINISHED_PRODUCT",
+        "product": "L03281",
+        "customer": null,
+        "group_by": "card_code",
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "period_mode": "union",
+        "breakdown": null,
+        "focus_product": "L03281",
+        "focus_customer": "C000061"
+      },
+      "reconciliation": "0.000000",
+      "required_permission": "telchi.sales.commercial_line_amount_by.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "customer_ranking ejecutado y acreditado"
+      ],
+      "response": "Cliente facturado en SAP con mayor importe — L03281 · MINOXITEL 5% LOCION - HOMBRE x 100 mL. — julio y agosto de 2026\n\nFARMACORP S.A. (C000061) (en foco) — Bs 115.044,44\nCONTROL TRIBUTARIO (CG2A) — Bs 70.430,77\nCONTROL TRIBUTARIO (CGCM) — Bs 67.772,87\nCONTROL TRIBUTARIO (CGRC) — Bs 34.488,69\nL&S S.R.L. (C010264) — Bs 26.825,57\nSUPER FARMACIA VIRGEN DE COPACABANA (SOLO CONTADO. AUT: MTT) (C007066) — Bs 26.816,86\nCONTROL TRIBUTARIO (CGV1) — Bs 19.885,63\nDISTRIBUIDORA CARLITOS (C000093) — Bs 14.146,22\nDISTRIBUIDORA GLOBUS PHARMA S.R.L.- ORURO (C011368) — Bs 12.832,50\nALMARK (C000001) — Bs 12.201,70\n\nTotal del alcance: Bs 586.227,06 · 2.014 líneas · 2.012 facturas · 468 cuentas facturadas. El desglose reconcilia exactamente con ese total (diferencia Bs 0,00).\n\n«Cliente facturado en SAP» es la cuenta que recibe las líneas de factura (CardCode). No es el comprador final ni un cliente comercial validado: la taxonomía de cliente comercial no está acreditada en la publicación vigente, así que no puedo afirmar cuál es el cliente comercial final. 4 de las 10 cuentas mostradas son cuentas de control tributario de SAP (nombre publicado «CONTROL TRIBUTARIO»), con Bs 192.577,96 en total. No son clientes comerciales; no las depuré porque no hay una taxonomía acreditada que las distinga. Importe registrado en líneas comerciales en BS, sin IVA de línea, antes de notas de crédito y sin ajustes globales: no es facturación documental neta ni monto cobrado. Cobertura documental observada del 1 de julio de 2026 al 31 de agosto de 2026; no certifica el cierre completo del período. Clasificación de producto actual, no histórica."
+    },
+    {
+      "turn": 6,
+      "question": "¿Cuánto compró ese cliente en julio y cuánto en agosto?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.commercial_line_amount_by.v1",
+      "scope": {
+        "category": "LAB_FINISHED_PRODUCT",
+        "product": "L03281",
+        "customer": "C000061",
+        "group_by": "card_code",
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "period_mode": "union",
+        "breakdown": "period",
+        "focus_product": "L03281",
+        "focus_customer": "C000061"
+      },
+      "reconciliation": "0.000000",
+      "required_permission": "telchi.sales.commercial_line_amount_by.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "customer_months ejecutado y acreditado"
+      ],
+      "response": "Compras de FARMACORP S.A. (C000061) — L03281 · MINOXITEL 5% LOCION - HOMBRE x 100 mL. — julio y agosto de 2026\n\nFARMACORP S.A. (C000061) (en foco) — Bs 115.044,44 · julio de 2026: Bs 72.383,99 · agosto de 2026: Bs 42.660,45 · entre julio de 2026 y agosto de 2026 bajó Bs 29.723,54 (-41,06 %)\n\nTotal del alcance: Bs 115.044,44 · 4 líneas · 4 facturas · 1 cuenta facturada. El desglose reconcilia exactamente con ese total (diferencia Bs 0,00).\n\nEsas compras representan el 19,62 % de los Bs 586.227,06 que el mismo alcance registra sin filtrar por cliente.\n\n«Cliente facturado en SAP» es la cuenta que recibe las líneas de factura (CardCode). No es el comprador final ni un cliente comercial validado: la taxonomía de cliente comercial no está acreditada en la publicación vigente, así que no puedo afirmar cuál es el cliente comercial final. Importe registrado en líneas comerciales en BS, sin IVA de línea, antes de notas de crédito y sin ajustes globales: no es facturación documental neta ni monto cobrado. Cobertura documental observada del 9 de julio de 2026 al 22 de agosto de 2026; no certifica el cierre completo del período. Clasificación de producto actual, no histórica."
+    },
+    {
+      "turn": 7,
+      "question": "¿Qué otros productos nos compró durante esos meses?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.commercial_line_amount_by.v1",
+      "scope": {
+        "category": "LAB_FINISHED_PRODUCT",
+        "product": null,
+        "customer": "C000061",
+        "group_by": "sap_product",
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "period_mode": "union",
+        "breakdown": null,
+        "focus_product": "L03281",
+        "focus_customer": "C000061"
+      },
+      "reconciliation": "0.000000",
+      "required_permission": "telchi.sales.commercial_line_amount_by.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "customer_products ejecutado y acreditado"
+      ],
+      "response": "Productos que compró FARMACORP S.A. (C000061) — producto terminado de laboratorio — julio y agosto de 2026\n\nL03281 · MINOXITEL 5% LOCION - HOMBRE x 100 mL. (en foco) — Bs 115.044,44\nL01613 · LOCION POVIDINE LITEL 10% x 120mL. — Bs 52.200,00\nL01003 · ALCOHOL 70% x 120mL. — Bs 14.786,52\nL01612 · LOCION POVIDINE LITEL 10% x 1L. — Bs 12.906,45\nL03658 · CALENTA FORTE  x 250 g. — Bs 11.757,17\nL01343 · TALCO GRANA LITEL FRASCO 100g. — Bs 11.651,04\nL03283 · MINOXITEL 3% LOCION - MUJER x 100 mL. — Bs 10.415,64\nL00068 · AGUA DE ROSAS x 200 mL — Bs 10.410,42\nL01652 · CELINA CREMA REDUCTORA x 250gr. — Bs 8.554,28\nL00070 · PASTA DE AGUA x 200gr. — Bs 8.452,05\n\nTotal del alcance: Bs 312.655,47 · 91 líneas · 9 facturas · 31 productos. El desglose reconcilia exactamente con ese total (diferencia Bs 0,00).\n\n«Cliente facturado en SAP» es la cuenta que recibe las líneas de factura (CardCode). No es el comprador final ni un cliente comercial validado: la taxonomía de cliente comercial no está acreditada en la publicación vigente, así que no puedo afirmar cuál es el cliente comercial final. Importe registrado en líneas comerciales en BS, sin IVA de línea, antes de notas de crédito y sin ajustes globales: no es facturación documental neta ni monto cobrado. Cobertura documental observada del 9 de julio de 2026 al 22 de agosto de 2026; no certifica el cierre completo del período. Clasificación de producto actual, no histórica."
+    },
+    {
+      "turn": 8,
+      "question": "¿Qué porcentaje representa ese cliente sobre las ventas de L03281?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.commercial_line_amount_by.v1",
+      "scope": {
+        "category": "LAB_FINISHED_PRODUCT",
+        "product": "L03281",
+        "customer": "C000061",
+        "group_by": "card_code",
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "period_mode": "union",
+        "breakdown": null,
+        "focus_product": "L03281",
+        "focus_customer": "C000061"
+      },
+      "reconciliation": "0.000000",
+      "required_permission": "telchi.sales.commercial_line_amount_by.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "customer_share ejecutado y acreditado"
+      ],
+      "response": "Compras de FARMACORP S.A. (C000061) — L03281 · MINOXITEL 5% LOCION - HOMBRE x 100 mL. — julio y agosto de 2026\n\nFARMACORP S.A. (C000061) (en foco) — Bs 115.044,44\n\nTotal del alcance: Bs 115.044,44 · 4 líneas · 4 facturas · 1 cuenta facturada. El desglose reconcilia exactamente con ese total (diferencia Bs 0,00).\n\nEsas compras representan el 19,62 % de los Bs 586.227,06 que el mismo alcance registra sin filtrar por cliente.\n\n«Cliente facturado en SAP» es la cuenta que recibe las líneas de factura (CardCode). No es el comprador final ni un cliente comercial validado: la taxonomía de cliente comercial no está acreditada en la publicación vigente, así que no puedo afirmar cuál es el cliente comercial final. Importe registrado en líneas comerciales en BS, sin IVA de línea, antes de notas de crédito y sin ajustes globales: no es facturación documental neta ni monto cobrado. Cobertura documental observada del 9 de julio de 2026 al 22 de agosto de 2026; no certifica el cierre completo del período. Clasificación de producto actual, no histórica."
+    },
+    {
+      "turn": 9,
+      "question": "¿Qué otros clientes importantes compraron ese producto?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.commercial_line_amount_by.v1",
+      "scope": {
+        "category": "LAB_FINISHED_PRODUCT",
+        "product": "L03281",
+        "customer": null,
+        "group_by": "card_code",
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "period_mode": "union",
+        "breakdown": null,
+        "focus_product": "L03281",
+        "focus_customer": "C000061"
+      },
+      "reconciliation": "0.000000",
+      "required_permission": "telchi.sales.commercial_line_amount_by.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "customer_ranking ejecutado y acreditado"
+      ],
+      "response": "Cliente facturado en SAP con mayor importe — L03281 · MINOXITEL 5% LOCION - HOMBRE x 100 mL. — julio y agosto de 2026\n\nFARMACORP S.A. (C000061) (en foco) — Bs 115.044,44\nCONTROL TRIBUTARIO (CG2A) — Bs 70.430,77\nCONTROL TRIBUTARIO (CGCM) — Bs 67.772,87\nCONTROL TRIBUTARIO (CGRC) — Bs 34.488,69\nL&S S.R.L. (C010264) — Bs 26.825,57\nSUPER FARMACIA VIRGEN DE COPACABANA (SOLO CONTADO. AUT: MTT) (C007066) — Bs 26.816,86\nCONTROL TRIBUTARIO (CGV1) — Bs 19.885,63\nDISTRIBUIDORA CARLITOS (C000093) — Bs 14.146,22\nDISTRIBUIDORA GLOBUS PHARMA S.R.L.- ORURO (C011368) — Bs 12.832,50\nALMARK (C000001) — Bs 12.201,70\n\nTotal del alcance: Bs 586.227,06 · 2.014 líneas · 2.012 facturas · 468 cuentas facturadas. El desglose reconcilia exactamente con ese total (diferencia Bs 0,00).\n\n«Cliente facturado en SAP» es la cuenta que recibe las líneas de factura (CardCode). No es el comprador final ni un cliente comercial validado: la taxonomía de cliente comercial no está acreditada en la publicación vigente, así que no puedo afirmar cuál es el cliente comercial final. 4 de las 10 cuentas mostradas son cuentas de control tributario de SAP (nombre publicado «CONTROL TRIBUTARIO»), con Bs 192.577,96 en total. No son clientes comerciales; no las depuré porque no hay una taxonomía acreditada que las distinga. Importe registrado en líneas comerciales en BS, sin IVA de línea, antes de notas de crédito y sin ajustes globales: no es facturación documental neta ni monto cobrado. Cobertura documental observada del 1 de julio de 2026 al 31 de agosto de 2026; no certifica el cierre completo del período. Clasificación de producto actual, no histórica."
+    },
+    {
+      "turn": 10,
+      "question": "¿Qué cambió entre julio y agosto?",
+      "classification": "DIRECT_AVAILABLE",
+      "executed": true,
+      "capability": "sales.commercial_line_amount_by.v1",
+      "scope": {
+        "category": "LAB_FINISHED_PRODUCT",
+        "product": "L03281",
+        "customer": null,
+        "group_by": "card_code",
+        "periods": [
+          {
+            "start": "2026-07-01",
+            "end_exclusive": "2026-08-01"
+          },
+          {
+            "start": "2026-08-01",
+            "end_exclusive": "2026-09-01"
+          }
+        ],
+        "period_mode": "union",
+        "breakdown": "period",
+        "focus_product": "L03281",
+        "focus_customer": "C000061"
+      },
+      "reconciliation": "0.000000",
+      "required_permission": "telchi.sales.commercial_line_amount_by.read.v1",
+      "business_rbac_verified": true,
+      "pass_": true,
+      "failures": [],
+      "findings": [
+        "customer_months ejecutado y acreditado"
+      ],
+      "response": "Cliente facturado en SAP con mayor importe — L03281 · MINOXITEL 5% LOCION - HOMBRE x 100 mL. — julio y agosto de 2026\n\nFARMACORP S.A. (C000061) (en foco) — Bs 115.044,44 · julio de 2026: Bs 72.383,99 · agosto de 2026: Bs 42.660,45 · entre julio de 2026 y agosto de 2026 bajó Bs 29.723,54 (-41,06 %)\nCONTROL TRIBUTARIO (CG2A) — Bs 70.430,77 · julio de 2026: Bs 26.930,84 · agosto de 2026: Bs 43.499,93 · entre julio de 2026 y agosto de 2026 subió Bs 16.569,09 (61,52 %)\nCONTROL TRIBUTARIO (CGCM) — Bs 67.772,87 · julio de 2026: Bs 26.989,55 · agosto de 2026: Bs 40.783,32 · entre julio de 2026 y agosto de 2026 subió Bs 13.793,77 (51,11 %)\nCONTROL TRIBUTARIO (CGRC) — Bs 34.488,69 · julio de 2026: Bs 15.033,77 · agosto de 2026: Bs 19.454,92 · entre julio de 2026 y agosto de 2026 subió Bs 4.421,15 (29,41 %)\nL&S S.R.L. (C010264) — Bs 26.825,57 · julio de 2026: Bs 3.257,27 · agosto de 2026: Bs 23.568,30 · entre julio de 2026 y agosto de 2026 subió Bs 20.311,03 (623,56 %)\nSUPER FARMACIA VIRGEN DE COPACABANA (SOLO CONTADO. AUT: MTT) (C007066) — Bs 26.816,86 · julio de 2026: Bs 11.908,46 · agosto de 2026: Bs 14.908,40 · entre julio de 2026 y agosto de 2026 subió Bs 2.999,94 (25,19 %)\nCONTROL TRIBUTARIO (CGV1) — Bs 19.885,63 · julio de 2026: Bs 8.036,24 · agosto de 2026: Bs 11.849,39 · entre julio de 2026 y agosto de 2026 subió Bs 3.813,15 (47,45 %)\nDISTRIBUIDORA CARLITOS (C000093) — Bs 14.146,22 · julio de 2026: Bs 10.857,61 · agosto de 2026: Bs 3.288,61 · entre julio de 2026 y agosto de 2026 bajó Bs 7.569,00 (-69,71 %)\nDISTRIBUIDORA GLOBUS PHARMA S.R.L.- ORURO (C011368) — Bs 12.832,50 · julio de 2026: Bs 2.053,20 · agosto de 2026: Bs 10.779,30 · entre julio de 2026 y agosto de 2026 subió Bs 8.726,10 (425,00 %)\nALMARK (C000001) — Bs 12.201,70 · julio de 2026: Bs 4.071,59 · agosto de 2026: Bs 8.130,11 · entre julio de 2026 y agosto de 2026 subió Bs 4.058,52 (99,68 %)\n\nTotal del alcance: Bs 586.227,06 · 2.014 líneas · 2.012 facturas · 468 cuentas facturadas. El desglose reconcilia exactamente con ese total (diferencia Bs 0,00).\n\n«Cliente facturado en SAP» es la cuenta que recibe las líneas de factura (CardCode). No es el comprador final ni un cliente comercial validado: la taxonomía de cliente comercial no está acreditada en la publicación vigente, así que no puedo afirmar cuál es el cliente comercial final. 4 de las 10 cuentas mostradas son cuentas de control tributario de SAP (nombre publicado «CONTROL TRIBUTARIO»), con Bs 192.577,96 en total. No son clientes comerciales; no las depuré porque no hay una taxonomía acreditada que las distinga. Importe registrado en líneas comerciales en BS, sin IVA de línea, antes de notas de crédito y sin ajustes globales: no es facturación documental neta ni monto cobrado. Cobertura documental observada del 1 de julio de 2026 al 31 de agosto de 2026; no certifica el cierre completo del período. Clasificación de producto actual, no histórica."
+    }
+  ],
+  "turns_total": 10,
+  "turns_correct": 10,
+  "unjustified_unavailability": 0,
+  "context_loss": 0,
+  "monetary_reconciliation": "PASS",
+  "monetary_reconciliation_values": [
+    "0.000000",
+    "0.000000",
+    "0.000000",
+    "0.000000",
+    "0.000000",
+    "0.000000",
+    "0.000000"
+  ],
+  "authorization": "PASS",
+  "conversation_pass": true
+}

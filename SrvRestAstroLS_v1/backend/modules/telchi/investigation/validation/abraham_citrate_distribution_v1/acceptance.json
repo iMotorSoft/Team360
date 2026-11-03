@@ -1,0 +1,63 @@
+{
+  "id": "ABRAHAM_002",
+  "status": "PERMANENT_ACCEPTANCE_CANDIDATE_NOT_ACTIVATED",
+  "question": "Venta de Citrato de magnesio en la paz y cochabamba, en la paz distribucion propia y en conchabamba lo hace L&S",
+  "stage": "INVESTIGATION",
+  "execution_authority": false,
+  "independent_from": "ABRAHAM_001",
+  "literal_requirements": {
+    "product_mention": "Citrato de magnesio",
+    "geographies": ["La Paz", "Cochabamba"],
+    "relationships": [
+      {"territory": "La Paz", "operator": "Telchi", "distribution": "own", "evidence": "user_context_pending_data_verification"},
+      {"territory": "Cochabamba", "operator": "L&S", "distribution": "third_party", "evidence": "user_context_pending_current_territorial_verification"}
+    ],
+    "period": null,
+    "metrics_explicit": [],
+    "time_grain_explicit": null
+  },
+  "analysis_requirements": {
+    "metrics_to_attempt_without_forcing_choice": ["monetary_amount", "quantity_by_presentation"],
+    "time_grain": "month",
+    "independent_verification_window": {"start": "2026-01-01", "end_exclusive": "2027-01-01"},
+    "window_is_not_in_original_question": true,
+    "sales_levels": ["Telchi_to_distributor_sell_in", "distributor_to_market_sell_out"],
+    "buyers": "distinct_accounts_per_segment_and_month_not_end_consumers",
+    "product_resolution": "namespace_and_code_no_automatic_blending_of_variants",
+    "quantity": "no_sum_across_SKUs_or_physical_units_without_validated_conversion",
+    "monetary": "credit_memos_cancellations_currency_tax_discounts_explicit",
+    "geography": "commercial_destination_not_warehouse_or_price_list"
+  },
+  "candidate_accounts": [
+    {"namespace": "SAP_HANA", "code": "C010264", "name": "L&S S.R.L.", "identity": "observed_unique_SAP_master_candidate", "territory": "historical_Cochabamba_not_current_exclusivity"}
+  ],
+  "primary_product_candidates": [
+    {"namespace": "SAP_HANA", "code": "L03332", "presentation": "USP x Kg", "catalog_unit": "KG"},
+    {"namespace": "SAP_HANA", "code": "L03432", "presentation": "x 1 Kg", "catalog_unit": "BOLSA"},
+    {"namespace": "SAP_HANA", "code": "L03612", "presentation": "400 mg x 100 capsulas", "catalog_unit": "FCO"},
+    {"namespace": "SAP_HANA", "code": "M07010", "presentation": "500 mg x 100 caps. #MAINES", "catalog_unit": "FCO"}
+  ],
+  "related_candidates_not_automatically_included": {
+    "production_or_packaging": ["L03618", "L03651", "L03652", "L03653", "L03659", "L03756"],
+    "complex_or_combination": ["M07871", "M08237", "M08239", "M08657"],
+    "legacy_only_combination": [{"namespace": "LEGACY_DS0", "code": "5933005"}]
+  },
+  "acceptance_rules": [
+    "Preserve all original product, territories and operator relationships even when execution is blocked",
+    "Never present all L&S purchases as Cochabamba final sales",
+    "Never present LPZ warehouse sales as proven La Paz customer destination",
+    "If only sell-in is available, offer that scoped partial result with limitations and no claim of full resolution",
+    "Do not ask units versus bolivianos as an immediate forced choice",
+    "Do not infer a business year from the evaluation window",
+    "Do not certify physical units from catalog metadata without line UoM and factor",
+    "No invented manufacturer, amount, SKU crosswalk, sell-out, distributor inventory or returns",
+    "Absent rows outside certified coverage are unknown, not zero"
+  ],
+  "followups_not_executed": [
+    {"text": "Compará mes por mes de 2026", "expected": "keep_product_territories_and_both_distribution_relationships"},
+    {"text": "Primero mostrame cuánto le vendimos a L&S", "expected": "sell_in_only_keep_market_sales_unknown"},
+    {"text": "¿Eso es lo que vendieron en Cochabamba?", "expected": "no_sell_in_is_not_sell_out"},
+    {"text": "Sumá todos los magnesios", "expected": "do_not_blend_products_units_or_strengths_without_resolution"},
+    {"text": "Nueva consulta: facturación de mayo de 2026", "expected": "clear_product_territory_and_distribution_context"}
+  ]
+}

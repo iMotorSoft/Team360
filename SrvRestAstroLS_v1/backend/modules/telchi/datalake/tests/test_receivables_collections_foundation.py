@@ -268,3 +268,150 @@ def test_comparator_v3_non_analytical_metadata_does_not_change_hash():
     pinned = analytical_payload(amount=Decimal("4263720.23"), reader_mode="PINNED")
     productive = analytical_payload(amount=Decimal("4263720.2300"), reader_mode="PRODUCTIVE")
     assert analytical_result_hash_v3(pinned) == analytical_result_hash_v3(productive)
+
+
+def extensible_base(store):
+    original = base(store)
+    candidate = create_candidate(store, base_publication=original, base_snapshot_id=84,
+                                 component=component(), update_run_id="rc-base", candidate_created_at="created")
+    mark_ready(store, candidate.foundation_publication_id)
+    store.logical_commit(candidate.foundation_publication_id)
+    return store.get(candidate.foundation_publication_id)
+
+
+def extension(store, original, *, name="independent", legacy=False):
+    from copy import deepcopy
+    from modules.telchi.datalake.foundation_manifest import EXTENSIBLE_KIND
+    candidate = prepare_candidate(store, update_run_id="extend-" + name, reference_version=original.reference_version)
+    manifest = deepcopy(original.manifest)
+    stable = {"contract_version": "1.0.0", "schema_version": "1.0.0", "dataset_hashes": {"extra_data": "a" * 64},
+              "source_provenance": {"sealed": "capture-v1"},
+              "dependencies": {"foundation_publication_id": original.foundation_publication_id,
+                               "base_snapshot_id": 84, "reference_version": original.reference_version,
+                               "components_hash": canonical_hash(original.manifest["components"])}}
+    sha = canonical_hash(stable)
+    extra = {"name": name, "publication_id": name + "_" + sha[:24], "component_fingerprint": sha,
+             "content_identity": sha, "stable_contract": stable,
+             "datasets": {"extra_data": {"logical_hash": "a" * 64, "row_count": 1,
+                                         "file_references": ["sealed.parquet"], "file_hashes": ["b" * 64]}}}
+    manifest.update(foundation_publication_id=candidate.foundation_publication_id,
+                    candidate_kind="PURCHASING_FOUNDATION_V1" if legacy else EXTENSIBLE_KIND,
+                    manifest_schema_version="1.0.0")
+    manifest["purchasing_base_publication_id" if legacy else "base_foundation_publication_id"] = original.foundation_publication_id
+    manifest["components"][name] = extra
+    store.update_components(candidate.foundation_publication_id, original.components,
+                            source_as_of=original.source_as_of, manifest=manifest)
+    return store.get(candidate.foundation_publication_id)
+
+
+def replace_manifest(store, publication):
+    with store.connection_factory() as db:
+        db.execute("UPDATE ops.foundation_publications_v1 SET manifest_json=? WHERE foundation_publication_id=?",
+                   [json.dumps(publication.manifest), publication.foundation_publication_id])
+
+
+@pytest.mark.parametrize("name,legacy", [("purchasing", True), ("future_component", False)])
+def test_independent_addition_preserves_required_contract(store, name, legacy):
+    original = extensible_base(store)
+    before = resolve_current(store)
+    added = extension(store, original, name=name, legacy=legacy)
+    after = validate_pinned_candidate(store, added.foundation_publication_id)
+    assert after.component_versions == before.component_versions
+    assert after.component == before.component
+    assert after.snapshot_id == before.snapshot_id
+    assert name not in after.component_versions
+    assert store.current_pointer() == original.foundation_publication_id
+
+
+@pytest.mark.parametrize("mutation", [
+    "missing_required", "wrong_id", "wrong_fingerprint", "wrong_kind", "wrong_schema", "duplicate",
+    "invalid_extra", "version_mixing", "snapshot_mixing", "missing_provenance", "missing_base",
+    "extra_hash", "foundation_id", "required_schema", "extra_schema", "missing_stable_field",
+])
+def test_extensible_negative_matrix(store, mutation):
+    original = extensible_base(store)
+    added = extension(store, original)
+    m = added.manifest
+    c = m["components"]
+    if mutation == "missing_required": del c["sales"]
+    elif mutation == "wrong_id": c["receivables_collections"]["publication_id"] = "wrong"
+    elif mutation == "wrong_fingerprint": c["receivables_collections"]["component_fingerprint"] = "bad"
+    elif mutation == "wrong_kind": m["candidate_kind"] = "UNKNOWN_FOUNDATION_V1"
+    elif mutation == "wrong_schema": m["manifest_schema_version"] = "2.0.0"
+    elif mutation == "duplicate": c["alias"] = dict(c["receivables_collections"])
+    elif mutation == "invalid_extra": c["independent"] = None
+    elif mutation == "version_mixing": c["sales"]["publication_id"] = "other-publication"
+    elif mutation == "snapshot_mixing": m["base_snapshot_id"] = 85
+    elif mutation == "missing_provenance": del c["independent"]["stable_contract"]["source_provenance"]
+    elif mutation == "missing_base": m["base_foundation_publication_id"] = "absent"
+    elif mutation == "extra_hash": c["independent"]["datasets"]["extra_data"]["logical_hash"] = "bad"
+    elif mutation == "foundation_id": m["foundation_publication_id"] = "other"
+    elif mutation == "required_schema": c["receivables_collections"]["derivation_version"] = "2.0.0"
+    elif mutation == "extra_schema": c["independent"]["stable_contract"]["schema_version"] = "2.0.0"
+    elif mutation == "missing_stable_field": del c["receivables_collections"]["aging_config_version"]
+    replace_manifest(store, added)
+    with pytest.raises(ReceivablesComponentError):
+        validate_pinned_candidate(store, added.foundation_publication_id)
+    assert store.current_pointer() == original.foundation_publication_id
+
+
+def test_two_successive_independent_additions_and_material_consumer(store):
+    from modules.telchi.datalake.material_supply_candidate import resolve_current_material_supply
+    original = extensible_base(store)
+    first = extension(store, original, name="future_one")
+    mark_ready(store, first.foundation_publication_id)
+    store.logical_commit(first.foundation_publication_id)
+    second = extension(store, store.get(first.foundation_publication_id), name="future_two")
+    pinned = validate_pinned_candidate(store, second.foundation_publication_id)
+    assert len(pinned.manifest["components"]) == 9
+    assert len(pinned.component_versions) == 7
+    mark_ready(store, second.foundation_publication_id)
+    store.logical_commit(second.foundation_publication_id)
+    assert resolve_current(store).component == original.manifest["components"][COMPONENT_NAME]
+    material = resolve_current_material_supply(store)
+    assert len(material.component_versions) == 6
+    assert material.snapshot_id == 84
+
+
+def test_legacy_additions_without_extension_provenance_fail(store):
+    original = extensible_base(store)
+    added = extension(store, original)
+    added.manifest["candidate_kind"] = "RECEIVABLES_COLLECTIONS_FOUNDATION_V1"
+    replace_manifest(store, added)
+    with pytest.raises(ReceivablesComponentError, match="extension envelope"):
+        validate_pinned_candidate(store, added.foundation_publication_id)
+
+
+def test_duplicate_json_logical_key_is_rejected_before_resolution(store):
+    original = extensible_base(store)
+    manifest_json = json.dumps(original.manifest)
+    duplicate_json = manifest_json.replace('"components": {', '"components": {"sales": {"name": "sales", "publication_id": "shadow"},', 1)
+    with store.connection_factory() as db:
+        db.execute("UPDATE ops.foundation_publications_v1 SET manifest_json=? WHERE foundation_publication_id=?",
+                   [duplicate_json, original.foundation_publication_id])
+    with pytest.raises(ReceivablesComponentError, match="identity mismatch"):
+        resolve_current(store)
+
+
+@pytest.mark.parametrize("mutation", ["dataset_structure", "dataset_schema", "schema_version", "publication_id", "fingerprint", "stable_field"])
+def test_legacy_required_contract_remains_strict(store, mutation):
+    original = extensible_base(store)
+    c = original.manifest['components'][COMPONENT_NAME]
+    if mutation == 'dataset_structure': c['datasets'] = list(DATASET_NAMES)
+    elif mutation == 'dataset_schema': c['datasets'][DATASET_NAMES[0]]['ducklake_schema'] = 'atomic'
+    elif mutation == 'schema_version': c['derivation_version'] = '2.0.0'
+    elif mutation == 'publication_id': c['publication_id'] = 'other'
+    elif mutation == 'fingerprint': c['component_fingerprint'] = 'bad'
+    elif mutation == 'stable_field': del c['aging_config_version']
+    replace_manifest(store, original)
+    with pytest.raises(ReceivablesComponentError):
+        resolve_current(store)
+
+
+def test_unhashable_manifest_kind_fails_with_contract_error(store):
+    original = extensible_base(store)
+    added = extension(store, original)
+    added.manifest['candidate_kind'] = ['corrupt']
+    replace_manifest(store, added)
+    with pytest.raises(ReceivablesComponentError, match='kind'):
+        validate_pinned_candidate(store, added.foundation_publication_id)

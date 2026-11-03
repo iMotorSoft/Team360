@@ -88,7 +88,8 @@ def _backend_debug_enabled() -> bool:
     return value in {"1", "true", "yes", "on", "debug", "development"}
 
 
-def create_app() -> Litestar:
+def create_app(*, extra_route_handlers: tuple = ()) -> Litestar:
+    """Legacy composition; extensions are explicit inputs, never env-discovered."""
     return Litestar(
         route_handlers=[
             health,
@@ -109,6 +110,7 @@ def create_app() -> Litestar:
             console_me,
             GupshupWhatsAppWebhookController,
             *get_module_route_handlers(),
+            *extra_route_handlers,
         ],
         on_startup=[_open_db_pool, _start_flow_scheduler],
         on_shutdown=[_stop_flow_scheduler, _close_db_pool],

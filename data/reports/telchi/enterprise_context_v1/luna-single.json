@@ -1,0 +1,118 @@
+{
+  "question": "Mostrame las últimas 5 facturas de venta de Telchi.",
+  "enterprise_context": {
+    "source": "authenticated_team360_workspace",
+    "tenant_id": "telchi",
+    "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+    "own_company": {
+      "name": "Telchi",
+      "aliases": []
+    }
+  },
+  "identity_source": "data/reports/telchi/sales_rbac_business_runtime_v1/effective_and_security.json",
+  "identity_source_sha256": "72d8b77c4303aaff3bf115097475f3337d63b720320a2bb788f5ac7fbb591908",
+  "authorization": "Recorded PG-effective evidence; no fresh DB/auth resolution",
+  "foundation_calls": 0,
+  "whatsapp_sent": 0,
+  "real_interpreter_calls": 1,
+  "raw_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "EXECUTE",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.latest_documents",
+        "/period": null,
+        "/branches": [],
+        "/sales_channel": null,
+        "/comparison": null,
+        "/reference": null,
+        "/limit": 5,
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.latest_documents"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": [
+        "/product_search_text",
+        "/selected_item_codes"
+      ]
+    },
+    "clarification": null
+  },
+  "state_engine": {
+    "output": {
+      "intent": "NEW_QUERY",
+      "action": "EXECUTE",
+      "state_delta": {
+        "set": {
+          "/metric": "sales.latest_documents",
+          "/period": null,
+          "/branches": [],
+          "/sales_channel": null,
+          "/comparison": null,
+          "/reference": null,
+          "/limit": 5,
+          "/schema_version": 2,
+          "/requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "/entity_mention": null,
+          "/temporal_reference": null
+        },
+        "unset": [
+          "/product_search_text",
+          "/selected_item_codes"
+        ]
+      },
+      "clarification": null
+    },
+    "state_after": {
+      "schema_version": 2,
+      "requested_metrics": [
+        "sales.latest_documents"
+      ],
+      "entity_mention": null,
+      "temporal_reference": null,
+      "product_search_text": null,
+      "product_context": null,
+      "selected_item_codes": [],
+      "metric": "sales.latest_documents",
+      "period": null,
+      "branches": [],
+      "sales_channel": null,
+      "comparison": null,
+      "reference": null,
+      "pending": null,
+      "limit": 5
+    },
+    "committed": true,
+    "contract_error": null
+  },
+  "availability": {
+    "allowed": true,
+    "reason": null,
+    "category": null
+  },
+  "required_permission": "telchi.sales.latest_documents.read.v1",
+  "metadata": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  },
+  "checks": {
+    "committed": true,
+    "intent": true,
+    "action": true,
+    "metric": true,
+    "limit": true,
+    "no_extra_metrics": true,
+    "no_filters_or_period": true,
+    "capability_available": true,
+    "permission": true
+  },
+  "status": "INTERPRETER_PASS",
+  "elapsed_seconds": 6.813
+}

@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-10-11T16:46:17.924201+00:00",
+  "read_only": true,
+  "config": {
+    "TEAM360_ENV": "development",
+    "TEAM360_SRV05_EVOLUTION_ENABLED": null,
+    "TEAM360_MESSAGING_DEV_ENABLED": "1",
+    "TEAM360_MESSAGING_DISPATCH_MODE": null,
+    "TEAM360_MESSAGING_WORKSPACE_SLUG": "team360_public_site",
+    "TEAM360_MESSAGING_CHANNEL_ALIAS": "evolution-meta-dev",
+    "TEAM360_EVOLUTION_INSTANCE": "team360-meta-dev",
+    "AUTOMATION_DIAGNOSIS_REPOSITORY": null
+  },
+  "luna_credential_present": true,
+  "database_target": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "team360",
+    "dev_exclusivity_attested": false
+  },
+  "database": {
+    "database": "team360",
+    "version": "18.4 (Debian 18.4-1.pgdg13+1)",
+    "read_only": "on"
+  },
+  "schema": [
+    {
+      "tablename": "communication_channels"
+    },
+    {
+      "tablename": "core_permissions"
+    },
+    {
+      "tablename": "core_users"
+    },
+    {
+      "tablename": "whatsapp_number_migration_history"
+    }
+  ],
+  "transport_indexes": [
+    {
+      "indexname": "uq_messaging_transport_message"
+    },
+    {
+      "indexname": "uq_messaging_transport_reply"
+    },
+    {
+      "indexname": "uq_messaging_transport_status"
+    },
+    {
+      "indexname": "uq_messaging_transport_thread"
+    }
+  ],
+  "channel": {
+    "workspace_id": "90ff667c-b96b-4dce-aa9c-694b3b6d63e7",
+    "channel_id": "3cc01e11-da1c-4630-a9c6-ecc2f79220d4",
+    "environment": null,
+    "module": null,
+    "tenant_id": null,
+    "receiver_context": null
+  },
+  "business_permission_candidates": [],
+  "evolution": {},
+  "evolution_error_type": "ConnectError",
+  "meta": {
+    "waba_subscription": {
+      "http_status": 200,
+      "entry_count": 1,
+      "pagination_present": false,
+      "team360_app_subscribed": true
+    },
+    "app_subscription": {
+      "http_status": 200,
+      "entry_count": 0,
+      "pagination_present": false,
+      "whatsapp_active": false
+    }
+  }
+}

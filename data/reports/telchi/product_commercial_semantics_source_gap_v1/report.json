@@ -1,0 +1,122 @@
+{
+  "GATE": "TELCHI_PRODUCT_COMMERCIAL_SEMANTICS_SOURCE_GAP_CLOSURE_V1_DEGRADED",
+  "GATE_A": "TELCHI_PRODUCT_COMMERCIAL_PURPOSE_SOURCE_GAP_V1_DEGRADED",
+  "GATE_B": "TELCHI_PRODUCT_UOM_SOURCE_GAP_V1_DEGRADED",
+  "GATE_C": "TELCHI_PRODUCT_COMMERCIAL_SEMANTICS_CANDIDATE_UPDATE_V1_PASS",
+  "GATE_D": "TELCHI_PRODUCT_COMMERCIAL_SEMANTICS_SOURCE_GAP_VALIDATION_V1_DEGRADED",
+  "GATE_E": "NOT_ATTEMPTED",
+  "CURRENT_FOUNDATION": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "INPUT_CANDIDATE": "foundation_4884512474ec1e8d1d284af1d89ea7ec",
+  "OUTPUT_CANDIDATE": "foundation_fd73cb4b753f41ada7e954badd2ef6f5",
+  "BASELINE_COMMERCIAL_PURPOSE_UNRESOLVED": 720,
+  "FINAL_COMMERCIAL_PURPOSE_UNRESOLVED": 696,
+  "COMMERCIAL_PURPOSE_RESOLVED_FROM_EXISTING_DATA": 24,
+  "COMMERCIAL_ONLY_NEW": 0,
+  "INTERNAL_ONLY_NEW": 0,
+  "MIXED_NEW": 24,
+  "UNKNOWN_REMAINING": 696,
+  "BASELINE_UOM_UNRESOLVED": 114,
+  "FINAL_UOM_UNRESOLVED": 110,
+  "UOM_RESOLVED_EXACT_NEW": 4,
+  "UOM_RESOLVED_SUPPORTED_NEW": 0,
+  "UOM_EXACT_NEW_GRAIN": "4 product inventory units; zero transaction lines, zero new conversion factors",
+  "UOM_RESIDUAL_LINES": 236,
+  "UOM_RESIDUAL_LINE_DOCUMENT_COUNTS": {
+    "CREDIT_MEMO": 236
+  },
+  "UOM_LINEAGE_COUNTS": {
+    "SOURCE_NATIVE_ITEM_MASTER_KEY_EXACT": 4,
+    "EXACT_BASE_INVOICE_PRESENT_CREDIT_UNIT_MISSING": 232,
+    "BASE_INVOICE_NOT_PROVEN": 4
+  },
+  "CREDIT_MEMO_UOM_RESOLUTION_RATE": 96.88,
+  "SOURCE_GAPS_REQUIRING_NEW_INGESTION": 422,
+  "TRUE_BUSINESS_UNKNOWN": 384,
+  "OUT_OF_COVERAGE": 0,
+  "gap_count_grain": "720 purpose-product gaps plus 114 UoM-product gaps; overlapping products count once per semantic gap",
+  "purpose_source_gap_counts": {
+    "RESOLVABLE_FROM_EXISTING_DATALAKE": 24,
+    "REQUIRES_DATALAKE_INGESTION": 312,
+    "TRUE_BUSINESS_UNKNOWN": 384
+  },
+  "uom_line_source_gap_counts": {
+    "RESOLVABLE_FROM_EXISTING_DATALAKE": 4,
+    "REQUIRES_DATALAKE_INGESTION": 236
+  },
+  "purpose_reason_counts": {
+    "POSITIVE_COMMERCE_AND_ACTUAL_PRODUCTION_CONSUMPTION": 24,
+    "MISSING_PRODUCTION_CONSUMPTION": 312,
+    "SELL_ENABLED_INTERNAL_USE_EXCLUSIVE_INTENT_UNPROVEN": 34,
+    "NO_OBSERVED_COMMERCIAL_OR_INTERNAL_USE": 334,
+    "ISOLATED_COMMERCIAL_EVENT_PURPOSE_UNRESOLVED": 16
+  },
+  "source_gap_percentages": {
+    "resolvable_from_existing": 3.3573,
+    "requires_ingestion": 50.5995,
+    "business_unknown": 46.0432
+  },
+  "ANTI_FANOUT": "PASS",
+  "UOM_FALSE_FANOUT": 0,
+  "COMMERCIAL_EVIDENCE_FALSE_FANOUT": 0,
+  "CONSUMER_COMPATIBILITY": "PASS",
+  "BUSINESS_QUERY_REPLAY": "DEGRADED",
+  "PREVIOUS_REPLAY_PRODUCTS": 808,
+  "FINAL_REPLAY_PRODUCTS": 834,
+  "CANDIDATE_STATE": "VALIDATING",
+  "PROMOTION_ELIGIBLE": "NO",
+  "CURRENT_FOUNDATION_CHANGED": "NO",
+  "ATOMIC_PROMOTION": "NO",
+  "HOST_PREFLIGHT": "SAFE",
+  "RESOURCE_GUARD": "PASS",
+  "CONCURRENCY_USED": 2,
+  "UNRELATED_PROCESSES_TERMINATED": 0,
+  "OWN_PROCESSES_LEFT_RUNNING": 0,
+  "SAP_ACCESSED": "NO",
+  "SAP_QUERY_COUNT": 0,
+  "SAP_WRITE_COUNT": 0,
+  "validation_limitations": [
+    "New MIXED evidence spans historical commerce and 2026 production; does not establish contemporaneous commerce. Consumer business-window acceptance still requires validation before promotion.",
+    "UoM residual requires current source-native credit unit/factor; invoice links do not prove credit source unit.",
+    "Technical absence classification cannot guarantee exclusivity or business intent; no automatic promotion."
+  ],
+  "validation_reuse": {
+    "sealed_uom_files_identical": true,
+    "existing_components_identical": true,
+    "source": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/product_commercial_semantics_v1/report.json",
+    "why_valid": "UoM dataset and all eight original components preserved byte for byte; new purpose data validated independently"
+  },
+  "own_failed_attempts": [
+    {
+      "candidate": "foundation_92b9b3c8292080c8adf615f40f7a2a52",
+      "status": "FAILED",
+      "reason": "Prewrite hash omitted rectangular Parquet null fields; corrected before final candidate"
+    }
+  ],
+  "TEST_FAILURES": 0,
+  "GIT_DIFF_CHECK": "PASS",
+  "LAT_CHECK": "PASS",
+  "initial_test_harness_failures_corrected": 1,
+  "validation_tests": {
+    "unique_tests_green": 99,
+    "existing_semantics_reader_publication": 84,
+    "source_gap_final": 15
+  },
+  "validation_commands": [
+    "uv run python -m modules.telchi.investigation.validation.product_commercial_semantics_source_gap_v1.run_gate",
+    "uv run python -m modules.telchi.investigation.validation.product_commercial_semantics_source_gap_v1.inspect_legacy",
+    "uv run pytest modules/telchi/datalake/tests/test_product_commercial_source_gap.py modules/telchi/datalake/tests/test_product_commercial_semantics.py modules/telchi/datalake/tests/test_foundation_reader.py modules/telchi/datalake/tests/test_foundation_publication.py -q",
+    "uv run pytest modules/telchi/datalake/tests/test_product_commercial_source_gap.py -q",
+    "lat check md",
+    "lat check index",
+    "lat check sections",
+    "lat check code-refs",
+    "lat check",
+    "git diff --check"
+  ],
+  "host_observation": "8 cores; available 9.4GB initially and 9.0GB after discovery; swap 151MB unchanged; vmstat zero ongoing swap-in/out; 2 DuckDB threads, 1GB per connection, sequential queries, no browsers or services created",
+  "legacy_metadata": {
+    "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/product_commercial_semantics_source_gap_v1/legacy_metadata.json",
+    "sha256": "a55d06106bba5300dac719538fd73f2a73ec2e0ea67672362098e97bb5b28199"
+  },
+  "final_pinned_verification": "PASS"
+}

@@ -196,6 +196,29 @@ class PermissionConsoleRepository:
                   OR profile.workspace_id = %(workspace_id)s::uuid
               )
               AND profile.status IN ('active', 'testing')
+            UNION
+
+            SELECT permission.permission_code
+            FROM core_users app_user
+            JOIN core_workspaces workspace ON workspace.id = app_user.workspace_id
+            JOIN core_organizations organization ON organization.id = workspace.organization_id
+            JOIN core_module_full_access_grants full_access
+              ON full_access.user_id = app_user.id
+             AND full_access.workspace_id = workspace.id
+             AND full_access.organization_id = organization.id
+             AND full_access.revoked_at_utc IS NULL
+            JOIN core_workspace_capabilities capability
+              ON capability.workspace_id = workspace.id
+             AND capability.module = full_access.module
+             AND capability.enabled
+            JOIN core_permissions permission
+              ON permission.id = capability.permission_id
+             AND split_part(permission.permission_code, '.', 1) = capability.module
+            WHERE app_user.id = %(user_id)s::uuid
+              AND workspace.id = %(workspace_id)s::uuid
+              AND app_user.status IN ('active', 'testing')
+              AND workspace.status IN ('active', 'testing')
+              AND organization.status IN ('active', 'testing')
         ) granted_permissions
         ORDER BY permission_code
     """

@@ -1,0 +1,43 @@
+{
+  "branch": "feature/console-backend-core",
+  "correlation_id": "TELCHI-20261023T190003Z",
+  "LOCAL_FORWARDING": "FAIL",
+  "INBOUND_META": "FAIL",
+  "IDENTITY_RBAC": "FAIL",
+  "TELCHIAI_RESPONSE": "FAIL",
+  "OUTBOUND_V1": "FAIL",
+  "META_MESSAGE_ID": null,
+  "DELIVERY_CALLBACK": "FAIL",
+  "PHONE_RECEIPT": "NOT_CONFIRMED",
+  "OUTBOUND_COUNT": 0,
+  "DUPLICATES": 0,
+  "LEGACY_REPLAY": "NO",
+  "META_CONFIG_CHANGED": "NO",
+  "WHATSAPP_E2E": "FAIL",
+  "classification": "FUNCTIONAL_FAILURE",
+  "not_run": [
+    "real inbound",
+    "business execution",
+    "outbound",
+    "delivery",
+    "phone receipt"
+  ],
+  "blocker": "Evolution POST /webhook/set/team360-meta-dev returns HTTP 500: PostgreSQL 42501 permission denied for table Webhook. GET verifies forwarding remains disabled. No permission changes attempted.",
+  "six_gates": "VALID",
+  "private_backup_directory": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/whatsapp-single-test-20261023T190003Z",
+  "admission_open": false,
+  "forwarding_restored_disabled": true,
+  "evolution_v1_attempts_total": 0,
+  "additional_operational_limit": "Srv05 admission is loaded at startup and currently false. No hot admission control; existing process predates this execution and was not terminated.",
+  "forwarding_write_http": 500,
+  "postgres_error_code": "42501",
+  "postgres_error": "permission denied for table Webhook",
+  "focused_tests": {
+    "command": "uv run pytest tests/test_messaging_single_owner_dev.py tests/test_srv05_evolution_isolation.py -q",
+    "passed": 65,
+    "warnings": 1
+  },
+  "source_files_modified": [],
+  "unrelated_processes_terminated": 0,
+  "own_processes_left_running": 0
+}

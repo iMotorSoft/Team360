@@ -1,0 +1,83 @@
+{
+  "model": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  },
+  "proposal": {
+    "intent": "NEW_QUERY",
+    "action": "EXECUTE",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/period": {
+          "start": "2026-05-01",
+          "end_exclusive": "2026-06-01"
+        },
+        "/schema_version": 2,
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": [
+        "/branches",
+        "/sales_channel",
+        "/comparison",
+        "/reference"
+      ]
+    },
+    "clarification": null
+  },
+  "validated": {
+    "output": {
+      "intent": "NEW_QUERY",
+      "action": "EXECUTE",
+      "state_delta": {
+        "set": {
+          "/metric": "sales.net_amount",
+          "/period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "/schema_version": 2,
+          "/requested_metrics": [
+            "sales.net_amount"
+          ],
+          "/entity_mention": null,
+          "/temporal_reference": null
+        },
+        "unset": [
+          "/branches",
+          "/sales_channel",
+          "/comparison",
+          "/reference"
+        ]
+      },
+      "clarification": null
+    },
+    "state_after": {
+      "schema_version": 2,
+      "requested_metrics": [
+        "sales.net_amount"
+      ],
+      "entity_mention": null,
+      "temporal_reference": null,
+      "metric": "sales.net_amount",
+      "period": {
+        "start": "2026-05-01",
+        "end_exclusive": "2026-06-01"
+      },
+      "branches": [],
+      "sales_channel": null,
+      "comparison": null,
+      "reference": null,
+      "pending": null
+    },
+    "committed": true,
+    "contract_error": null
+  },
+  "no_fallback": true
+}

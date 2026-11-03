@@ -627,8 +627,9 @@ def test_real_postgres_default_admin_no_token_read(monkeypatch):
 
     settings = _settings()
     monkeypatch.setenv("AUTOMATION_DIAGNOSIS_REPOSITORY", "postgres")
-    # MVP default: default_admin mode -> no token required.
-    monkeypatch.delenv("TEAM360_FLOW_ACCESS_MODE", raising=False)
+    # Explicit DEV demo: no token required, never a production default.
+    monkeypatch.setenv("TEAM360_ENV", "development")
+    monkeypatch.setenv("TEAM360_FLOW_ACCESS_MODE", "default_admin")
     set_pool(create_pool(settings))
     try:
         with TestClient(create_app()) as client:

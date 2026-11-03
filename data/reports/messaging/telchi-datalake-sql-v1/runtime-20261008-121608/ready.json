@@ -1,0 +1,38 @@
+{
+  "gate": "TEAM360_MESSAGING_TELCHI_DATALAKE_SQL_V1",
+  "status": "WAITING_HUMAN",
+  "branch": "feature/console-backend-core",
+  "preexisting_changes_preserved": true,
+  "runtime_active": true,
+  "cleanup_pending": true,
+  "bounded_session_seconds": 900,
+  "transport_and_meta_preflight": "PASS",
+  "container_reachability": "PASS",
+  "authorized_sender_telchi_mapping": "explicit DEV env, no phone in report",
+  "unauthorized_replay_no_persistence": true,
+  "sql_preflight": "session/datalake-preflight.json",
+  "whatsapp_n": 0,
+  "llm_requests": 0,
+  "owned_running_handles": {
+    "supervisor": 30877,
+    "session": 30878,
+    "backend": 31080,
+    "tunnel": 28850
+  },
+  "evolution_owned_runtime": "container ID in transport-preflight.json; started and recreated only by current execution; persisted data/volumes retained",
+  "resource_guard": "SAFE: load around 1.5 on 8 CPUs, available RAM about 6.3 GiB, vmstat idle 91%, no meaningful swap pressure",
+  "unrelated_processes_terminated": 0,
+  "validations": "199 tests previously passed; metadata-only readiness bookkeeping fix: 1 probe test passed; git diff --check clean",
+  "changes_this_window": [
+    "Evolution ignored private .env SERVER_URL only",
+    "Team360 app callback subscription to current Quick Tunnel",
+    "new runtime evidence under this directory",
+    "Messaging session readiness bookkeeping"
+  ],
+  "notes": [
+    "Session closes its backend and restores local Evolution webhook on completion or expiry; supervisor then stops its own tunnel and Evolution runtime.",
+    "While WAITING, handles are intentionally running; no cleanup PASS or zero-running claim is made.",
+    "Old historical Evolution evidence and benchmarks were not changed; no SAP/Data Lake mutation."
+  ],
+  "next_action": "Envi\u00e1 \"hola\" desde el WhatsApp autorizado."
+}

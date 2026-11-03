@@ -1,0 +1,167 @@
+{
+  "result": {
+    "capability": "sales.period_billed_amount.v1",
+    "rows": [
+      {
+        "invoice_count": 41078,
+        "unique_invoices": 41078,
+        "billed_amount": "11982896.130000",
+        "credit_count": 280,
+        "unique_credits": 280,
+        "credit_amount": "479145.780000",
+        "net_amount": "11503750.350000",
+        "invoice_amount_count": 41078,
+        "credit_amount_count": 280
+      }
+    ],
+    "period": {
+      "date_from": "2026-10-01",
+      "date_to_exclusive": "2026-11-01",
+      "currency": "BS"
+    },
+    "currency": "BS",
+    "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+    "source": {
+      "publication_id": "foundation_9cd0d1a146308f555733d58fb3fda1ff",
+      "snapshot_id": 1408,
+      "updated_at": "2026-11-01T17:50:16.749000+00:00",
+      "reference_version": "v2_sales_448ae93a960bf7342564a2d0",
+      "sales_cutoff": "2026-11-01T13:55:47.173006+00:00",
+      "coverage_start": "2026-09-01",
+      "coverage_end_exclusive": "2026-11-02"
+    },
+    "read_only": true,
+    "sap_accessed": false,
+    "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-refresh-cycle-v1/sales-refresh-20261101-v1/sales_document.parquet')) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? \n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-refresh-cycle-v1/sales-refresh-20261101-v1/credit_memo_document.parquet')) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? \n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+    "sql_parameters": [
+      "SAP_B1_HANA",
+      "N",
+      "BS",
+      "2026-10-01",
+      "2026-11-01",
+      "SAP_B1_HANA",
+      "N",
+      "BS",
+      "2026-10-01",
+      "2026-11-01"
+    ],
+    "sql_duration_ms": 151.90681400054018,
+    "grain": "document_header",
+    "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified."
+  },
+  "profile": {
+    "schema": "telchi-pre-sql-profile-v1",
+    "clock": "perf_counter_ns",
+    "spans": [
+      {
+        "label": "private_config_read",
+        "start_ms": 12.296709,
+        "end_ms": 12.483866,
+        "duration_ms": 0.187157
+      },
+      {
+        "label": "duckdb_import",
+        "start_ms": 12.731189,
+        "end_ms": 70.504334,
+        "duration_ms": 57.773145
+      },
+      {
+        "label": "duckdb_connect",
+        "start_ms": 70.56013,
+        "end_ms": 83.144503,
+        "duration_ms": 12.584373
+      },
+      {
+        "label": "load_ducklake",
+        "start_ms": 83.167227,
+        "end_ms": 137.959935,
+        "duration_ms": 54.792708
+      },
+      {
+        "label": "load_postgres",
+        "start_ms": 137.991946,
+        "end_ms": 195.160363,
+        "duration_ms": 57.168417
+      },
+      {
+        "label": "attachment_open_including_catalog_session",
+        "start_ms": 195.311843,
+        "end_ms": 237.599259,
+        "duration_ms": 42.287416
+      },
+      {
+        "label": "foundation_current_count",
+        "start_ms": 239.423093,
+        "end_ms": 603.733073,
+        "duration_ms": 364.30998
+      },
+      {
+        "label": "foundation_current_metadata",
+        "start_ms": 603.749099,
+        "end_ms": 839.995301,
+        "duration_ms": 236.246202
+      },
+      {
+        "label": "foundation_publication_get",
+        "start_ms": 840.009151,
+        "end_ms": 868.231762,
+        "duration_ms": 28.222611
+      },
+      {
+        "label": "foundation_manifest_validation",
+        "start_ms": 868.246383,
+        "end_ms": 868.257022,
+        "duration_ms": 0.010639
+      },
+      {
+        "label": "foundation_commit_snapshot_resolution",
+        "start_ms": 868.262655,
+        "end_ms": 1635.556565,
+        "duration_ms": 767.29391
+      },
+      {
+        "label": "foundation_reference_refresh_validation",
+        "start_ms": 1645.94898,
+        "end_ms": 62443.667145,
+        "duration_ms": 60797.718165
+      },
+      {
+        "label": "foundation_sales_facts_physical_validation",
+        "start_ms": 62443.714652,
+        "end_ms": 62539.36079,
+        "duration_ms": 95.646138
+      },
+      {
+        "label": "foundation_component_verification",
+        "start_ms": 62539.375952,
+        "end_ms": 62598.221716,
+        "duration_ms": 58.845764
+      },
+      {
+        "label": "sales_sql_execution",
+        "start_ms": 62718.655562,
+        "end_ms": 62870.361385,
+        "duration_ms": 151.705823
+      },
+      {
+        "label": "sales_fetch",
+        "start_ms": 62870.385099,
+        "end_ms": 62870.551063,
+        "duration_ms": 0.165964
+      },
+      {
+        "label": "attachment_connection_close",
+        "start_ms": 62870.560742,
+        "end_ms": 62897.007391,
+        "duration_ms": 26.446649
+      },
+      {
+        "label": "sales_serialization",
+        "start_ms": 62897.053805,
+        "end_ms": 62897.220937,
+        "duration_ms": 0.167132
+      }
+    ],
+    "total_ms": 62897.418772
+  }
+}

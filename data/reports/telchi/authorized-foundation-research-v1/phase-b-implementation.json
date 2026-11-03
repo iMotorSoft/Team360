@@ -1,0 +1,166 @@
+{
+  "task": "TELCHIAI_AUTHORIZED_FOUNDATION_RESEARCH_V1_PHASE_B",
+  "branch": "feature/console-backend-core",
+  "stage": "DEVELOPMENT",
+  "overall_status": "PARTIAL",
+  "ready_for_phase_c": false,
+  "production_integration_performed": false,
+  "summary": "Implemented an opt-in, backend-issued authorization/catalog seam inside the existing SQL investigator. Dynamic schema discovery and restricted execution are demonstrated with small fixtures, including a previously unknown published reference dataset. This is NOT completion of the requested enterprise research capability: real Console identity binding, approved data policies, live publication coverage, semantic discovery/accreditation and real adaptive research remain pending.",
+  "phase_a": "data/reports/telchi/authorized-foundation-research-v1/phase-a-diagnosis.json",
+  "files_created": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/authorized_foundation.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_authorized_foundation.py",
+    "data/reports/telchi/authorized-foundation-research-v1/phase-b-implementation.json"
+  ],
+  "preexisting_files_modified": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/validator.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/adaptive_research.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/ask.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/ask_verifier.py"
+  ],
+  "ownership": {
+    "scope": "MODULE_LOCAL: Telchi exploratory_sql and this phase's report only",
+    "existing_changes": "Large preexisting tracked/untracked worktree preserved; exploratory_sql itself was already untracked. Git diff does not expose its preexisting baseline. Only the four explicitly listed existing files were edited; two Python files were added.",
+    "shared_components": "Console/Auth, Foundation producers/readers, Messaging, Web, PostgreSQL migrations and global resource guard were read-only dependencies; no edits",
+    "git_operations": "Read-only branch/status/diff checks; no add, commit, push, checkout or other mutating Git operations"
+  },
+  "authorization": {
+    "implemented": [
+      "EffectiveScope is backend-owned identity, organization, workspace, effective permissions and active state; never read from model JSON.",
+      "console_scope calls existing PermissionConsoleRepository.list_effective_permissions after the consuming backend's live identity/organization/workspace validator. It does not expand role names or FULL_ACCESS itself.",
+      "SourcePolicy binds an already-approved permission to an organization/workspace/source and optional column projection. No default policies, registered permissions, grants, role seeds or production configuration were introduced.",
+      "Only whole-dataset policies are supported; partial row policies withhold the entire dataset. Whole-dataset means explicitly approved business access to all rows in that source, not a grant inferred from technical FULL_ACCESS.",
+      "ResearchBinding intersects effective permissions, tenant/workspace and server policy before issuing the catalog. Validator accepts only the actual issued context object, not a by-value copy or caller-edited catalog.",
+      "Live resolver checks occur on authorization, each query validation/execution, view preparation, after execution, before sending observations to Luna, after Luna returns, and before presentation/final save.",
+      "Revocation or identity/workspace changes deny access; backend authorization failure denies rather than using cached permissions. Conversation history and protected report results are scrubbed on revoked session presentation.",
+      "Binding.close invalidates execution and evidence presentation. The binding is process-local; there is no persisted investigation resume implementation.",
+      "Read-only Foundation attachment and exact publication/snapshot equality are checked before creating private authorized projections. Model SQL only reaches those projected logical tables through the existing AST validator."
+    ],
+    "real_integration_limit": "The existing Console resolver is async while the DEV executor authorization port is synchronous. A real backend-owned worker/async bridge and a concrete existing live identity validator are still required. The CLI has NO new login or authenticated Console mode, and remains explicitly supervised-local-uid by default. No actual Presidencia, Abraham or FULL_ACCESS account was impersonated or queried.",
+    "policy_limit": "Changing an approved source/column policy requires closing/reissuing the binding. Dynamic revocation tests cover current identity/effective permission changes, not a persistent policy-version service. No new business grants are approved by this implementation.",
+    "audit": "Reuses investigation reports, context/query digests and result evidence. No new durable Console audit event or database audit integration was implemented."
+  },
+  "dynamic_discovery": {
+    "algorithm": [
+      "open_binding performs the existing host read preflight, resolves the selected publication using FoundationReader, and obtains server-approved source names from current effective scope and policies.",
+      "Enumerates the selected manifest's components/datasets plus FoundationReader's existing contract map. It does not add a new hand-maintained investigator table/column catalog.",
+      "Discovers reference dataset directories inside that publication's immutable reference version, then uses access.reference(dataset). Arbitrary host paths are never model inputs.",
+      "Uses existing access.relation(component,dataset), or product_semantics_relation for the existing semantics component. Unsupported contracts become explicit gaps, not guessed physical paths or direct HANA reads.",
+      "DESCRIBE obtains actual column names, SQL types and nullability. Only safe identifiers and supported scalar types are exposed. The open_binding path filters unauthorized sources before schema queries and gap reporting.",
+      "Intersects discovered columns with approved column policy; physical relations/paths remain private to the binding and are omitted from the model catalog.",
+      "Unknown grain, relationships, currency, units, temporal coverage and business semantics remain explicitly unaccredited. No source identifiers are automatically equated with final buyers, historical classifications, net billing or collections."
+    ],
+    "central_design_test": "test_new_reference_dataset_discovered_without_catalog_entry writes a tiny fixture Parquet for previously_unknown_domain, discovers it and its novel_identifier/new_measure columns through metadata, and builds an authorized catalog without changing any investigator table list.",
+    "not_complete": "This is dynamic structural discovery, not the complete semantic discovery requested. It does not yet import accredited grain, known relationships, coverage, monetary/unit definitions or domain classifications from all available contracts. The default local ask catalog is intentionally unchanged; only Session(authorized_binding=...) uses the new catalog.",
+    "coverage": {
+      "live_inspected": false,
+      "products_and_classifications": "BLOCKED: actual selected publication and semantics not freshly read",
+      "invoices_credit_memos_lines_customers_sellers": "BLOCKED: reader/reference contracts inspected in source, not live coverage",
+      "purchasing": "BLOCKED: no fresh publication/reader-contract accreditation",
+      "inventory_and_warehouses": "BLOCKED: fixture inventory schema only; not real Foundation availability",
+      "production_and_recipes": "BLOCKED: no fresh publication/reader-contract accreditation",
+      "receivables_and_collections": "BLOCKED: existing reader contract inspected, no live publication read",
+      "accounting_and_other_datasets": "BLOCKED: no fresh publication/reader-contract accreditation"
+    }
+  },
+  "sql_and_verification": {
+    "retained": "Existing model gpt-5.6-luna, medium reasoning, no fallback; same adaptive controller, AST regeneration, execution lock, deadline/cancellation, query budgets, FoundationReader and independent verifier. No capability for a specific question was added.",
+    "composition_change": "For issued phase-B contexts only, a validated LIMIT on a derived SELECT/CTE provides a proven output cardinality bound. This enables bounded equijoins without increasing max_join_pairs=10000. A LIMIT outside an oversized join cannot bypass its earlier check. Unbounded joins remain rejected.",
+    "rejection_feedback": "A phase-B join_pair_budget denial is returned as structured observations plus REFORMULATE guidance instead of closing the entire investigation. No larger budget or alternate physical access is granted. Legacy behavior is unchanged.",
+    "verification_limit": "Existing AskRegistry is preserved. Discovered tables deliberately have no accredited grain; their apparent arithmetic cannot be promoted to verified business claims. ask_verifier now explicitly refuses such accreditation with discovered_grain_and_business_semantics_not_accredited. Generic numeric/semantic verification for dynamically discovered sources is NOT implemented.",
+    "business_answer_first": "Existing verified partial-result rendering remains in place. This phase does not produce a newly accredited business answer over the generic authorized catalog; doing so requires real semantic contracts and an independent general verifier. SQL success alone is not reported as business accreditation.",
+    "os_security": "DEV only, not an OS sandbox. No product-grade filesystem/network isolation or enforced process RSS/CPU/scan-byte limit is claimed."
+  },
+  "raw_materials": {
+    "status": "BLOCKED",
+    "reason": "RESOURCE_BLOCKED for live Foundation reads, plus missing approved live identity/data policy and generic semantic reconciliation",
+    "reproduced": false,
+    "external_pi_figures": "Treated only as external references, never hardcoded into SQL, fixture expected results, a capability or a new business answer.",
+    "pending": [
+      "Independently establish raw-material classification and included product codes",
+      "Inspect source currency and incompatible-currency exclusions without labeling an uninspected line USD",
+      "Monthly 2026 aggregation and invoiced-customer attribution",
+      "Line amount excluding tax, cancellation/duplicate treatment and credit-memo reconciliation",
+      "Coverage and independent monetary reconciliation"
+    ]
+  },
+  "general_research": {
+    "status": "PARTIAL",
+    "demonstrated": "Dynamic unknown-dataset schema discovery; generated-by-test SQL, successive allowed queries and bounded CTE equijoin execution under the same AST/authorization path.",
+    "not_demonstrated": "No real Luna-generated investigation in another published domain, no live source observations, and no independently verified general business answer. Fixture SQL is NOT presented as model-generated SQL or as the required generality benchmark.",
+    "benchmark": "Mario's reserved unseen question was not requested or used. Implementation is not declared frozen or ready for that benchmark."
+  },
+  "validation": {
+    "working_directory": "SrvRestAstroLS_v1/backend",
+    "full_focused_command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -m pytest modules/telchi/exploratory_sql/test_authorized_foundation.py modules/telchi/exploratory_sql/test_ask.py modules/telchi/exploratory_sql/test_adaptive_research.py modules/telchi/assistant/tests/test_assistant.py -q -p no:cacheprovider",
+    "full_focused_result": "114 passed in 222.12s. This ran before the final closed-binding/backend-outage hardening. Existing ask/adaptive/controller/assistant regressions were unchanged by that last binding-local hardening.",
+    "final_authorization_command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -m pytest modules/telchi/exploratory_sql/test_authorized_foundation.py -q -p no:cacheprovider",
+    "final_authorization_result": "27 passed in 104.70s on final Python code, including the newly added backend-outage denial test. No claim of a new full 115-test final-digest run.",
+    "other_runs": [
+      "Initial 19-test run: 16 passed, 3 failed. Two fixture failures were an incorrectly targeted resource-preflight mock under pytest's package import namespace; third was use of unavailable pytest-asyncio. Fixed by relative module monkeypatch and asyncio.run. No production guard weakened.",
+      "Corrected initial fixture run: 19 passed in 78.07s",
+      "Intermediate authorized/ask/adaptive run: 69 passed in 211.63s",
+      "Expanded run: 112 passed in 225.26s",
+      "Final hardening targeted run: 3 passed, 24 deselected in 11.03s"
+    ],
+    "diff_check": "git diff --check completed successfully after Python changes; repeated after this report",
+    "markdown_gates": "Not applicable: no Markdown files created or edited in this phase",
+    "actual_external_operations": "No live Foundation reads, PostgreSQL access, SAP access, OpenAI calls, servers, browsers, webhooks, transport delivery, migrations or grants"
+  },
+  "gates": {
+    "PHASE_B_IMPLEMENTED": {"status":"PARTIAL","evidence":"Six Python files implement/test the opt-in seam; final 27 authorization tests pass","tests":"test_authorized_foundation.py plus 114-test focused regression run","limits":"Not a complete authorized business researcher","pending":"Concrete Console binding, approved policies, semantic discovery/verifier and live investigations"},
+    "EXISTING_RBAC_REUSED": {"status":"PARTIAL","evidence":"console_scope invokes existing PermissionConsoleRepository.list_effective_permissions without parallel role expansion","tests":"test_console_resolver_reused_without_role_expansion","limits":"Injected repository fixture, no live Console/PG identity chain","pending":"Backend-owned async/sync bridge and live identity validation"},
+    "AUTHORIZED_CONTEXT_BINDING": {"status":"PASS","evidence":"Issued object seal plus context digest; copied contexts denied; identity/tenant/workspace changes denied","tests":"test_copied_context_or_cross_owner_evidence_not_authority; test_live_identity_and_tenant_changes","limits":"DEV in-process fixtures only, not production identity accreditation","pending":"Real authenticated identity binding"},
+    "FOUNDATION_DYNAMIC_DISCOVERY": {"status":"PASS","evidence":"Reader/manifest enumeration, actual DESCRIBE and previously unknown Parquet reference dataset discovery","tests":"test_dynamic_schemas_and_new_columns; test_new_reference_dataset_discovered_without_catalog_entry","limits":"Structural discovery in fixtures; semantic metadata incomplete; default local ask remains legacy","pending":"Live published discovery and richer accredited metadata"},
+    "FOUNDATION_PUBLISHED_COVERAGE": {"status":"BLOCKED","evidence":"No live Foundation session initiated under sustained host I/O pressure","tests":"No live coverage test; fixture discovery only","limits":"No listed business domain declared published/available from this phase","pending":"Guarded real publication inventory and contract review"},
+    "PRESIDENCIA_BUSINESS_SCOPE": {"status":"PARTIAL","evidence":"Two broad-scope fixture users receive identical catalogs without technical permissions","tests":"test_broad_fixture_shared_scope_not_technical_privilege","limits":"Neither owner nor Abraham real binding accredited; no grants created","pending":"Mario-approved policies and authenticated scope equality evidence"},
+    "FULL_ACCESS_SCOPE_PRESERVED": {"status":"PARTIAL","evidence":"No Console resolver edits; FULL_ACCESS text alone yields empty catalog","tests":"test_full_access_string_does_not_expand_scope; Console adapter contract","limits":"Existing real PostgreSQL scoped expansion not reexecuted","pending":"Live scoped FULL_ACCESS regression with authorized fixtures"},
+    "RESTRICTED_ROLE_ISOLATION": {"status":"PASS","evidence":"Restricted effective-permission fixture exposes commercial source/columns only; other domain withheld","tests":"test_dynamic_schemas_and_new_columns; parameterized test_denials_in_compositions","limits":"Effective-permission fixtures, not all productive profiles","pending":"Approved production role-to-data policy matrix"},
+    "ROW_COLUMN_AUTHORIZATION": {"status":"PARTIAL","evidence":"Hidden columns denied through CTE/subquery; no row-filter compiler means partial row datasets withheld","tests":"test_denials_in_compositions; test_partial_row_scopes_withheld; test_bounded_derived_join_without_raising_budget","limits":"Safe denial, not functional authorized partial-row support","pending":"Accredited row-policy mechanism if partial scopes are required"},
+    "CROSS_TENANT_ISOLATION": {"status":"PASS","evidence":"Source policies include organization/workspace; another workspace cannot reuse them; copied-owner evidence denied","tests":"test_second_workspace_cannot_reuse_source_policy; test_live_identity_and_tenant_changes; test_copied_context_or_cross_owner_evidence_not_authority","limits":"Fixture and in-process boundary only, no PostgreSQL RLS claim","pending":"Real two-tenant authenticated E2E evidence"},
+    "DYNAMIC_REVOCATION": {"status":"PASS","evidence":"Permission/identity revocation denies next SQL and old evidence; revocation during model call scrubs session presentation; backend failure denies stale access","tests":"test_revocation_execution_evidence_resume; test_session_revocation_during_model_call_scrubs_presentation; test_authorization_backend_failure_is_denial_not_stale_access","limits":"Fresh synchronous resolver fixture; persisted resume and policy-version changes not implemented","pending":"Real Console revocation and persistent-reference integration"},
+    "SQL_READONLY_EXECUTION": {"status":"PASS","evidence":"Actual local DuckDB read-only attachment queries, pin checks and AST denials executed","tests":"test_readonly_query_and_authorized_cte; test_denials_in_compositions; test_pinned_snapshot_change_blocks_execution","limits":"No real Foundation query or OS isolation accreditation","pending":"Guarded live Foundation validation"},
+    "ADAPTIVE_RESEARCH": {"status":"PARTIAL","evidence":"Existing controller tests pass; opt-in bounded CTE joins and reformulation feedback added","tests":"test_bounded_derived_join_without_raising_budget; test_adaptive_research.py","limits":"No new live Luna trace; unbounded joins retain conservative ceiling","pending":"Model-chosen multiquery business investigation on published sources"},
+    "INDEPENDENT_VERIFICATION": {"status":"PARTIAL","evidence":"Existing arithmetic/lineage/unsupported-semantics regression tests pass; unknown discovered grain explicitly cannot accredit business claims","tests":"test_ask.py; test_adaptive_research.py; assistant/tests/test_assistant.py","limits":"Generic discovered-source monetary/semantic verifier absent","pending":"General independently checked claims with grain/currency/units/coverage contracts"},
+    "RAW_MATERIALS_RECONCILIATION": {"status":"BLOCKED","evidence":"External Pi amounts not used as oracle; no fresh source query","tests":"Not run against real Foundation","limits":"RESOURCE_BLOCKED and missing live authorized/semantic bindings","pending":"Independent classification, month/customer/currency/credits/coverage reconciliation"},
+    "GENERAL_RESEARCH_CAPABILITY": {"status":"PARTIAL","evidence":"Unknown reference schema discovered with no catalog code addition; composition executes under authorization fixtures","tests":"test_new_reference_dataset_discovered_without_catalog_entry; test_bounded_derived_join_without_raising_budget","limits":"Not the required another-domain Luna-generated and verified business trace","pending":"At least one real compositional investigation in a published authorized domain"},
+    "TELCHIAI_V1_REGRESSION": {"status":"PARTIAL","evidence":"ask, adaptive controller and assistant unit regressions executed successfully in 114-test run","tests":"test_ask.py; test_adaptive_research.py; assistant/tests/test_assistant.py","limits":"Not all assistant, persisted PG or transport E2E tests","pending":"Broader V1 gates before any promotion"},
+    "WHATSAPP_UNCHANGED": {"status":"PASS","evidence":"Only listed Telchi SQL files/report edited; no Messaging/WhatsApp files or channel operations","tests":"Scope/tool-call review; not a WhatsApp E2E claim","limits":"Transport availability not tested","pending":"None for unchanged-source guarantee"},
+    "WEB_UNCHANGED": {"status":"PASS","evidence":"No frontend/Web/router changes, browser or deployment operations","tests":"Scope/tool-call review; not a browser E2E claim","limits":"Web functionality not retested","pending":"None for unchanged-source guarantee"},
+    "READY_FOR_PHASE_C": {"status":"BLOCKED","evidence":"Mandatory live identity, publication coverage, independent raw-material reconciliation and general research evidence absent","tests":"Acceptance matrix review","limits":"DEV opt-in prototype seam only","pending":"Complete remaining phase-B guarantees before freezing for phase C"}
+  },
+  "resources": {
+    "HOST_PREFLIGHT": "UNSAFE for live scans/research; small sequential fixture tests only",
+    "RESOURCE_GUARD": "BLOCKED for real Foundation reads; existing global guard unmodified",
+    "observations": "Initial vmstat: 56-67 percent I/O wait, 10-11 blocked tasks, about 8 GiB available and no meaningful swap pressure. Later samples remained 43-65 percent I/O wait with 8-9 blocked tasks.",
+    "CONCURRENCY_USED": "One pytest runner at a time; no xdist, DuckDB fixture threads=1, BLAS/OMP=1; no model investigators/scans in parallel",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "cleanup": "Each command completed; fixture DuckDB connections close via context managers; executor watcher threads joined. No servers/browsers created. Final ps showed only the preexisting unrelated uv PID 21689; an observed concurrent uv/pytest tree was not touched."
+  },
+  "differences_from_free_pi": [
+    "Luna still chooses SQL and subsequent research steps, but can only query backend-issued source/column projections and pinned publication/snapshot.",
+    "No shell, arbitrary host files, arbitrary SQL functions, physical references, external connections or model-selected authority.",
+    "Derived LIMIT joins are possible within the same budget; large joins and unsupported AST remain restricted, not yet parity with free Pi.",
+    "Only independently verified structured claims may be delivered as accredited; unknown business semantics cannot be inferred from successful SQL.",
+    "Default terminal remains supervised local DEV, not Console Presidencia or real FULL_ACCESS."
+  ],
+  "risks_and_next_steps": [
+    "Do not deploy, configure business grants or freeze for phase C from this report.",
+    "Have Mario approve concrete permission-to-source/column/full-row contracts using existing permissions; no broad source policy is enabled by default.",
+    "Connect the existing authenticated backend's identity/workspace validation and fresh Console effective-permission resolution to the synchronous DEV execution port without a second login system.",
+    "Replace dependence on the reader's private _COMPONENT_TABLES map when Foundation offers a public inventory contract; no Foundation change was made here.",
+    "Add and validate rich semantic metadata and a generic independently reconciled verifier before expecting accredited business answers from new dynamic sources. Current conservative discovered-grain refusal is intentional, not task completion.",
+    "After host stability and normal service preflight, inspect actual publication coverage and run raw materials plus an unrelated model-chosen investigation, preserving complete observations and verification traces.",
+    "Rerun live revocation/evidence ownership and broader V1 regressions, then reconsider phase-C readiness."
+  ],
+  "final_python_sha256": {
+    "authorized_foundation.py": "3c73ad7a9d06277232ce8efdbd3fc2ba81e815364b5c9b5fa801ba7f6f52e94e",
+    "test_authorized_foundation.py": "4448bd1b343a64f99f295565cf0ce1e65261ab97cca7e678f657690e2fd0d9d9",
+    "validator.py": "2c336e10c98df0616dd152855ca048fce8dcc4b5ad67c65c1d6178e2eabfb89a",
+    "adaptive_research.py": "7d35085ba2e5c570aad63e183f80c81fb9ac080f8dd4fecf08cf1bb655701ad7",
+    "ask.py": "23824be4f3c7e9c92c3f9774bce9b5a92a52125e663fc7725636e367487d85fe",
+    "ask_verifier.py": "1068c5541f8f61b18ae44f4ac4ddb6a6e52bac51308608a28719a15605a9221f"
+  }
+}

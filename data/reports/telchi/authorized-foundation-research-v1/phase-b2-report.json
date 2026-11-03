@@ -1,0 +1,155 @@
+{
+  "task": "TELCHIAI_AUTHORIZED_RESEARCH_B2_V1",
+  "branch": "feature/console-backend-core",
+  "stage": "DEVELOPMENT",
+  "overall_status": "PARTIAL",
+  "ready_for_phase_c": false,
+  "production_activation": false,
+  "A_implemented": {
+    "summary": "An opt-in internal backend service connects actual Console PASETO verification and existing async RBAC/session repositories to the preexisting synchronous authorized Foundation investigator. No new public route, login, framework, pool or grant system.",
+    "new_files": [
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/console_bridge.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/console_repository.py",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_console_bridge.py",
+      "data/reports/telchi/authorized-foundation-research-v1/phase-b2-report.json"
+    ],
+    "existing_file_modified": "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/ask.py: authorized sessions no longer clear backend cancellation received during discovery; terminal local cancellation behavior remains unchanged.",
+    "not_implemented_or_activated": [
+      "No existing HTTP/backend runtime is automatically wired to this service. It is an internal consumer interface requiring explicit backend composition.",
+      "No real user's token was obtained, issued, impersonated or used.",
+      "No production source policy, identity or grants were created or modified.",
+      "No generic semantic verifier was added; unknown discovered grain still cannot accredit a business claim.",
+      "No new semantic relationships, universal monetary definitions or question-specific capabilities were introduced."
+    ]
+  },
+  "B_identity_connection": {
+    "entry": "ConsoleResearchService(pool=existing_async_pool, public_keys_by_id=trusted_backend_keys, organization=approved_org_id, workspace=approved_workspace_id, policies=approved_server_contracts, reader=existing_foundation_reader, enabled=True, environment='dev', issuer=existing_issuer).ask(existing_console_bearer_token, question, private_save_sink)",
+    "trust_boundary": "Constructor arguments are trusted backend composition, never request/model fields. ask does not accept user ID, role, organization, workspace or grants. A caller-written ConsolePrincipal is not accepted instead of a signed token.",
+    "checks": [
+      "Existing verify_console_access_token verifies signature, issuer, subject/user_id equality, type and expiry with zero leeway on every resolution.",
+      "A Telchi-local repository reads current user -> workspace -> organization plus active organization membership. Missing/inactive identity, membership, organization or mismatching configured destination deny access.",
+      "Signed workspace claims, when present, must match the backend destination.",
+      "Password-authenticated tokens reuse ConsoleLoginRepository.session_active and require the existing amr=['pwd'] and integer credential_version contract. Disabled/re-enrolled password sessions cannot retain access. Non-password Console tokens retain their existing expiry/identity contract; no new token-revocation registry is invented.",
+      "The backend event loop owns the existing async pool. One worker hosts the unchanged Session/controller; synchronous checks schedule fresh authorization on the backend loop with bounded waits. No cached initial RBAC snapshot is used as ongoing authority.",
+      "Only the final authorized business_answer/clarification fields are presentation fields. Raw model prose and reports are private audit material, not verified business answers.",
+      "The private save sink may receive in-progress evidence; it is explicitly not a streaming response callback. Authorization loss scrubs the latest presentation report, not the historical server audit."
+    ],
+    "audit": "STARTED/completion/BLOCKED events use existing core_events with actor, workspace, investigation UUID and minimal DEV state. Tokens, questions, SQL and commercial values are not added to PG authorization audit. Required audit failures prevent delivery. Repository SQL is implemented but not executed against real PostgreSQL in this window.",
+    "timeouts_and_cleanup": "Authorization and audit each have a 10-second async deadline; worker reauthorization waits at most 10 seconds. SQL/model/host budgets remain existing. Cancellation sets the existing event, waits for worker cleanup and closes its binding, including a cancellation received while discovery was pending. Foundation attachment remains non-preemptible as previously documented."
+  },
+  "C_effective_permissions": {
+    "resolver": "Unmodified PermissionConsoleRepository.list_effective_permissions; existing roles, permission profiles and scoped FULL_ACCESS expansion remain authoritative.",
+    "scope_intersection": "Resolved grants are intersected with enabled core_workspace_capabilities for module telchi and its permission namespace. Technical permissions do not become business access. SourcePolicy then intersects organization, workspace, whole-dataset attestation and approved columns.",
+    "full_access": "No special treatment of the FULL_ACCESS string or Presidencia role. Existing resolver expands only active scoped grants within its organization/workspace/module semantics. This bridge does not duplicate that expansion.",
+    "presidencia": "BLOCKED: Mario and Abraham's actual identities and effective business grants were NOT queried or compared. Equality must not be inferred from the broad-scope fixture or previous reports. No technical permissions were granted to either.",
+    "configuration_probe": {"current_shell_console_enabled": false, "current_shell_explicit_public_key_available": false, "scope": "Current shell only; not an inventory of private configuration or running backend settings."}
+  },
+  "D_dynamic_catalog": {
+    "retained": "The existing open_binding/discover implementation enumerates the pinned Foundation manifest and reader contracts, uses reference() and relation()/product_semantics_relation(), DESCRIBEs authorized schemas, and intersects source/column policies before issuing the model catalog. It does not expose physical paths.",
+    "offline_evidence": "Existing authorization tests freshly passed, including a previously unknown published reference dataset and novel columns, without a new investigator catalog entry.",
+    "live_domains": "NOT_INSPECTED in this window: products, business classifications, commercial lines, documents, invoiced clients, currencies, dates, purchasing, inventory, receivables and other published domains. No real publication inventory or new unsupported-reader gap list is claimed.",
+    "limitations": [
+      "Reader-unsupported datasets remain explicit gaps; no direct physical Foundation paths or SAP/HANA fallback.",
+      "Structural discovery is not semantic accreditation. Dynamically discovered tables currently have no accredited grain/measure contracts or relationships in the issued catalog.",
+      "SourcePolicy is an approved server-side data contract, not evidence that an existing capability permission automatically grants exploratory access to every row/column of its source.",
+      "There are no default broad policies. Concrete permission-to-source/column/whole-row contracts still require approval and composition; this phase does not arbitrarily define pending business policy."
+    ]
+  },
+  "E_restrictions_and_revocation": {
+    "demonstrated": [
+      "Signed identity fixtures, actual PASETO verification and the same Session/AST/executor execute a derived CTE aggregation against a small READ_ONLY DuckDB fixture.",
+      "Under a restricted effective scope the model stub receives sales_line without private_note and without any inventory dataset metadata. A prompt claiming Presidencia cannot expand it.",
+      "Under the broader fixture the identical investigator exposes inventory too; the model stub selects that newly visible source and executes a different aggregation. Actual SQL results are 30 for fixture sales and 7 for fixture inventory. These are synthetic test values, not Telchi business facts.",
+      "Existing tests cover forbidden datasets/columns through direct SQL, CTEs, subqueries, aggregations and joins; copied contexts, tenant/workspace changes, stale snapshots and old observations are denied.",
+      "New service test revokes access after a completed query and completion audit, before return: delivery fails closed and the saved presentation is blank.",
+      "Existing test revokes during the model call and clears session history. Backend authorization outages cannot reuse cached authority.",
+      "Partial-row scopes remain excluded; no unsafe row-policy emulation was introduced."
+    ],
+    "limits": "Identity, permission, session, audit and model ports in these integration tests are fixtures; actual SQL execution and token cryptography are real. This is not a real Luna trace, actual FULL_ACCESS database expansion or productive authorization. In-process SourcePolicy changes require closing/reissuing a binding. Persistent cross-investigation resume remains disabled."
+  },
+  "F_raw_materials": {
+    "status": "BLOCKED",
+    "classification": ["TEMPORARY_RESOURCE_BLOCK", "LIVE_AUTHORIZATION_NOT_ACCREDITED", "BUSINESS_SEMANTICS_NOT_ACCREDITED"],
+    "executed": false,
+    "business_result": null,
+    "reference_pi": "External contrast only; not injected into a Luna prompt or investigator expected result. No agreement or disagreement can be asserted without a completed investigation.",
+    "pending_evidence": ["Discovered datasets", "Actual raw-material classification and membership", "Luna SQL and successive observations", "Available 2026 months and coverage", "Native currencies", "Invoiced customer attribution", "Line billing versus credit memos and collections", "Independent reconciliation", "Differences versus external Pi reference"],
+    "coverage_statement": "No full-2026, currency conversion, client, month or monetary conclusion is made. No fresh accredited commercial figures were obtained."
+  },
+  "G_second_research": {
+    "status": "BLOCKED",
+    "executed": false,
+    "reason": "Foundation guard blocks real research; no approved live identity/source policy or generic discovered-source semantic verification is accredited.",
+    "not_a_substitute": "The broader inventory fixture proves catalog/SQL scope variation, not another-domain real Luna research. Mario's reserved unseen benchmark question was not used."
+  },
+  "H_validation": {
+    "cwd": "SrvRestAstroLS_v1/backend",
+    "commands": [
+      {"command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -m pytest modules/telchi/exploratory_sql/test_console_bridge.py -q -p no:cacheprovider", "result": "14 passed in 52.91s; initial bridge version"},
+      {"command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -m pytest modules/telchi/exploratory_sql/test_console_bridge.py modules/telchi/exploratory_sql/test_authorized_foundation.py modules/telchi/exploratory_sql/test_ask.py modules/telchi/exploratory_sql/test_adaptive_research.py modules/telchi/assistant/tests/test_assistant.py -q -p no:cacheprovider", "result": "130 passed in 368.46s; includes final ask.py cancellation fix. Later edits were bridge-local audit timeout/docstring and bridge tests only."},
+      {"command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -m pytest modules/telchi/exploratory_sql/test_console_bridge.py modules/telchi/exploratory_sql/test_authorized_foundation.py -q -p no:cacheprovider", "result": "43 passed in 161.51s on final Python source; 16 new bridge cases plus 27 existing authorization cases"},
+      {"command": "git diff --check", "result": "PASS after Python changes; repeated at closure"}
+    ],
+    "review": "New bridge/repository/test files reviewed in full; ask.py change is limited to backend cancellation preservation. exploratory_sql was already untracked on arrival, so tracked git diff is not a complete patch listing for these files. Preexisting implementation and phase-B report preserved.",
+    "not_run": ["Real PostgreSQL identity/RBAC/audit integration", "Actual Mario/Abraham scope comparison", "Full assistant suite", "Live Foundation inventory", "Real Luna/OpenAI preflight or research", "WhatsApp/Web E2E"],
+    "markdown_gates": "Not applicable: no Markdown created or modified.",
+    "failures": "No functional test failures in this window. Real research is BLOCKED, not PASS."
+  },
+  "I_scope_and_impact": {
+    "module_local": "Only exploratory_sql and this evidence report edited. Existing Console/Auth, FoundationReader, module grants, global guard, bootstrap, dependencies and routes remain unchanged by this task.",
+    "whatsapp": "UNCHANGED / NOT_RUN; no transport, webhook, restart or message operations",
+    "web": "UNCHANGED / NOT_RUN; no frontend or browser operations",
+    "database": "No real PG connection or writes, migrations, grants or credential operations. The opt-in audit adapter would write only core_events when composed and invoked.",
+    "git": "No commit, push, add, stash, checkout or other mutating Git operation.",
+    "concurrency": "Large preexisting and concurrent checkout preserved. Unrelated uv/pytest processes observed and left untouched."
+  },
+  "J_phase_C_pending": [
+    "Compose the internal service from the existing backend with its trusted public verification configuration, existing pool and designated authenticated identity fixtures; do not activate production or create a new public route.",
+    "Inspect Mario and Abraham's actual effective business grants read-only and compare them without assuming equality or granting technical privilege.",
+    "Approve concrete existing-permission to Foundation source/column/whole-row contracts without arbitrary productive grants; withhold unsafe row-restricted sources.",
+    "Accredit real PG identity/session/RBAC/FULL_ACCESS/audit and a second tenant/workspace chain. Fixture success is insufficient.",
+    "Complete semantic discovery and general independent verification for dynamic sources; current unknown-grain refusal intentionally blocks business accreditation.",
+    "When the unchanged Foundation guard permits it, inspect the pinned publication and execute sequential real Luna Medium raw-materials and another-domain research with full independent reconciliation and coverage/currency limitations.",
+    "Only then reconsider phase B closure and phase C readiness."
+  ],
+  "gates": {
+    "CONSOLE_AUTH_BRIDGE": {"status":"PARTIAL", "evidence":"Internal service implemented; signed-token/worker/actual investigator fixture tests pass", "limit":"Not composed into a running backend or tested with real Console identity"},
+    "EFFECTIVE_RBAC_BINDING": {"status":"PARTIAL", "evidence":"Uses existing PermissionConsoleRepository and enabled workspace capability intersection on every check", "limit":"Real PG RBAC chain not executed"},
+    "PRESIDENCIA_SCOPE_VERIFIED": {"status":"BLOCKED", "evidence":"No actual Mario/Abraham grant comparison", "limit":"Broad-scope fixtures do not establish productive equality"},
+    "FULL_ACCESS_SCOPE_PRESERVED": {"status":"PARTIAL", "evidence":"Existing Console resolver unmodified; no string/role expansion added; FULL_ACCESS-string denial regression passed", "limit":"Actual scoped PG expansion not reaccredited"},
+    "RESTRICTED_ROLE_ISOLATION": {"status":"PASS", "evidence":"Same investigator receives different catalogs and executes actual SQL from visible fixture sources; forbidden-column/composition cases pass", "limit":"Offline fixtures only, not productive role certification or real Luna"},
+    "CROSS_TENANT_ISOLATION": {"status":"PASS", "evidence":"Signed identity workspace/organization mismatch tests plus existing owner/context isolation tests", "limit":"Offline fixtures; real two-tenant PG chain pending"},
+    "DYNAMIC_REVOCATION": {"status":"PASS", "evidence":"Existing query/model/evidence revocation cases and new backend post-audit pre-delivery revocation test", "limit":"Fresh fixture ports; real DB revocation pending"},
+    "EVIDENCE_REAUTHORIZATION": {"status":"PASS", "evidence":"Prior protected results denied after scope change; model-time revocation scrubs history; service reauthorizes after worker and audit", "limit":"In-process evidence only; persistent resume disabled"},
+    "DYNAMIC_FOUNDATION_CATALOG": {"status":"PARTIAL", "evidence":"Existing manifest/reader discovery and unknown-source fixture tests passed unchanged", "limit":"No real publication inventory or new semantic contracts"},
+    "AUTHORIZED_METADATA_VISIBILITY": {"status":"PASS", "evidence":"Restricted model inputs omit private_note and inventory_balance; physical relations absent from catalog", "limit":"Offline catalog fixtures"},
+    "SQL_READONLY": {"status":"PASS", "evidence":"Actual READ_ONLY fixture attachment, allowed CTE aggregation and existing AST/snapshot/write denials", "limit":"No live Foundation execution or OS sandbox claim"},
+    "ADAPTIVE_LUNA_RESEARCH": {"status":"PARTIAL", "evidence":"Existing adaptive controller regression passes; fixed gpt-5.6-luna/medium/no fallback untouched", "limit":"Model stub used for new bridge tests; real Luna not called"},
+    "RAW_MATERIALS_RECONCILIATION": {"status":"BLOCKED", "evidence":"Foundation guard safe=false; no fresh commercial results", "limit":"Also missing approved live authorization and dynamic semantic verification"},
+    "GENERAL_RESEARCH_TEST": {"status":"BLOCKED", "evidence":"No real another-domain investigation", "limit":"Inventory fixture is not the required benchmark"},
+    "INDEPENDENT_VERIFICATION": {"status":"PARTIAL", "evidence":"Existing AskRegistry retained, unknown discovered grain explicitly cannot certify business facts", "limit":"Generic dynamic-source semantic/business verifier absent"},
+    "TELCHIAI_V1_REGRESSION": {"status":"PARTIAL", "evidence":"130-test focused ask/adaptive/assistant/authorization run plus final 43-case authorization run", "limit":"Not full V1 PG/transport or complete assistant regression"},
+    "WHATSAPP_UNCHANGED": {"status":"PASS", "evidence":"No edits or operations in transport/channel scope", "limit":"Not WhatsApp E2E accreditation"},
+    "WEB_UNCHANGED": {"status":"PASS", "evidence":"No frontend/Web/router edits or browser operations", "limit":"Not Web E2E accreditation"},
+    "READY_FOR_PHASE_C": {"status":"BLOCKED", "evidence":"Real identity equality, live catalog, semantic verification and both enterprise investigations missing", "limit":"Phase B remains partial"}
+  },
+  "resources": {
+    "HOST_PREFLIGHT": "UNSAFE_FOR_FOUNDATION_SCANS; small sequential offline tests only",
+    "RESOURCE_GUARD": "BLOCKED for real Foundation research; unchanged",
+    "initial_vmstat": "65-71 percent I/O wait, 8 blocked tasks, about 8 GiB available, no growing swap",
+    "later_vmstat": "66-81 percent I/O wait, 12-13 blocked tasks, about 7.9 GiB available",
+    "actual_foundation_guard_probe": {"safe":false,"io_wait_fraction":0.7715521526253942,"io_wait_samples":[0.7575757575757576,0.8121827411167513,0.7448979591836735],"available_bytes":8228315136,"load_average":[3.923828125,4.41845703125,4.05126953125],"cpu_count":8},
+    "CONCURRENCY_USED": "One pytest command at a time; fixture DuckDB threads=1, OMP/BLAS=1; worker bridge uses backend-loop authorization and one SQL execution at a time",
+    "dev_io_exception_used": false,
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "cleanup": "All synchronous test commands completed; cancellation fixture waits for worker cleanup; bindings and fixture connections close. No server or browser created. Other uv/pytest trees were not created by these direct Python commands and were not touched."
+  },
+  "final_python_sha256": {
+    "console_bridge.py":"015ad4aa9ae512ed46d2eb37cb16d972a68782f5830c37da814a561cd05331a3",
+    "console_repository.py":"11cfb7cf322090892adc1fe18426467af8039efda5621ce906d549fe060bad0f",
+    "test_console_bridge.py":"c35940175ec9004eb700fc78a7687ae5e08f07585d33e00c7e797ed09a5ded2c",
+    "ask.py":"0bdaa56254397be8fa595ef2b18d59ae914b7c53fca3df61b791ef43f2888d16"
+  }
+}

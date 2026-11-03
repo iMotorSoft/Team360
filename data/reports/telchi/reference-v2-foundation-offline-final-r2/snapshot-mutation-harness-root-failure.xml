@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.430" timestamp="2026-10-29T15:44:11.368762-03:00" hostname="ubuntu24"><testcase classname="modules.telchi.datalake.tests.test_reference_refresh_snapshot" name="test_reader_preserves_distinct_commit_and_derivation_snapshots" time="1.139"><failure message="modules.telchi.datalake.foundation_publication.FoundationReaderError: Reference refresh proof is bound to another immutable root">eight = (&lt;modules.telchi.datalake.foundation_publication.FoundationPublicationStore object at 0x7a37e45c99d0&gt;, PosixPath('/tmp...st-16/test_reader_preserves_distinct0/data/reference/_versions/ref-v2'), 'foundation_ae908e1db1cf563b452323957c1c0adf')
+
+    def test_reader_preserves_distinct_commit_and_derivation_snapshots(eight):
+        store, _, new, old_id = eight
+        result = update.publish_reference_only(connector=None, foundation_store=store,
+            reference={'reference_version': 'ref-v2', 'reference_path': str(new)}, base_data_snapshot_id=1408)
+        assert result['status'] == 'COMMITTED'
+        publication = store.current_publication()
+        assert publication.manifest['base_snapshot_id'] == 84
+        assert publication.manifest['reference_data_snapshot_id'] == 1408
+        seen = []
+        access_reader = reader.FoundationReader(snapshot_resolver=lambda *_: 9999,
+            component_verifier=lambda _, __, snapshot: seen.append(snapshot), metadata_catalog='')
+        with store.connection_factory() as db:
+&gt;           access = access_reader.resolve_on(db)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+modules/telchi/datalake/tests/test_reference_refresh_snapshot.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;modules.telchi.datalake.foundation_reader.FoundationReader object at 0x7a37d468d430&gt;
+connection = &lt;_duckdb.DuckDBPyConnection object at 0x7a37e0781970&gt;
+
+&gt;   ???
+E   modules.telchi.datalake.foundation_publication.FoundationReaderError: Reference refresh proof is bound to another immutable root
+
+&lt;offline-baseline-snapshot-mutation&gt;:34: FoundationReaderError</failure></testcase></testsuite></testsuites>

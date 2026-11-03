@@ -1,0 +1,2332 @@
+[
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463754800.6462,
+    "sql_finished_ms": 1791463757639.9915,
+    "sql_duration_ms": 2839.3425159993058,
+    "foundation_resolution_ms": 1637.871,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.015224,
+          "end_ms": 20.748784,
+          "duration_ms": 20.73356
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 20.816798,
+          "end_ms": 21.059228,
+          "duration_ms": 0.24243
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 20.763589,
+          "end_ms": 21.366784,
+          "duration_ms": 0.603195
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 21.378608,
+          "end_ms": 87.509332,
+          "duration_ms": 66.130724
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 87.57621,
+          "end_ms": 101.181629,
+          "duration_ms": 13.605419
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 101.205564,
+          "end_ms": 167.907201,
+          "duration_ms": 66.701637
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 167.928489,
+          "end_ms": 235.222727,
+          "duration_ms": 67.294238
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 235.379002,
+          "end_ms": 283.233254,
+          "duration_ms": 47.854252
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 283.25532,
+          "end_ms": 284.563327,
+          "duration_ms": 1.308007
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 284.577624,
+          "end_ms": 285.220833,
+          "duration_ms": 0.643209
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 285.261351,
+          "end_ms": 765.106399,
+          "duration_ms": 479.845048
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 765.122248,
+          "end_ms": 1001.689636,
+          "duration_ms": 236.567388
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 1001.703222,
+          "end_ms": 1030.274462,
+          "duration_ms": 28.57124
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 1030.298747,
+          "end_ms": 1030.313794,
+          "duration_ms": 0.015047
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 1030.3233,
+          "end_ms": 1793.102753,
+          "duration_ms": 762.779453
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1793.124213,
+          "end_ms": 1923.016352,
+          "duration_ms": 129.892139
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 285.236656,
+          "end_ms": 1923.131017,
+          "duration_ms": 1637.894361
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1923.141798,
+          "end_ms": 1923.157621,
+          "duration_ms": 0.015823
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1923.16537,
+          "end_ms": 4761.410412,
+          "duration_ms": 2838.245042
+        },
+        {
+          "label": "fetch",
+          "start_ms": 4761.434477,
+          "end_ms": 4762.49574,
+          "duration_ms": 1.061263
+        },
+        {
+          "label": "materialization",
+          "start_ms": 4762.512946,
+          "end_ms": 4762.529461,
+          "duration_ms": 0.016515
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 4762.53693,
+          "end_ms": 4771.256891,
+          "duration_ms": 8.719961
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 4771.312918,
+          "end_ms": 4771.508541,
+          "duration_ms": 0.195623
+        }
+      ],
+      "total_ms": 4771.582385,
+      "parent": {
+        "spawn_ms": 0.714334,
+        "worker_entry_ms": 79.185857,
+        "total_ms": 4936.468145,
+        "ipc_exit_decode_residual_ms": 85.69990299999972,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 40770
+      }
+    }
+  },
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463759778.1567,
+    "sql_finished_ms": 1791463762450.5012,
+    "sql_duration_ms": 2672.340974999315,
+    "foundation_resolution_ms": 1666.76,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.015306,
+          "end_ms": 20.155815,
+          "duration_ms": 20.140509
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 20.213916,
+          "end_ms": 20.432528,
+          "duration_ms": 0.218612
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 20.168221,
+          "end_ms": 20.708663,
+          "duration_ms": 0.540442
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 20.719714,
+          "end_ms": 85.309934,
+          "duration_ms": 64.59022
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 85.368864,
+          "end_ms": 100.693072,
+          "duration_ms": 15.324208
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 100.727769,
+          "end_ms": 169.335684,
+          "duration_ms": 68.607915
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 169.358818,
+          "end_ms": 248.561118,
+          "duration_ms": 79.2023
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 248.750804,
+          "end_ms": 291.501394,
+          "duration_ms": 42.75059
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 291.522191,
+          "end_ms": 292.633595,
+          "duration_ms": 1.111404
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 292.645385,
+          "end_ms": 293.249194,
+          "duration_ms": 0.603809
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 293.287457,
+          "end_ms": 773.297302,
+          "duration_ms": 480.009845
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 773.313587,
+          "end_ms": 1001.863115,
+          "duration_ms": 228.549528
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 1001.880636,
+          "end_ms": 1034.854885,
+          "duration_ms": 32.974249
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 1034.876484,
+          "end_ms": 1034.893509,
+          "duration_ms": 0.017025
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 1034.9036,
+          "end_ms": 1807.558897,
+          "duration_ms": 772.655297
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1807.580083,
+          "end_ms": 1959.932382,
+          "duration_ms": 152.352299
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 293.264656,
+          "end_ms": 1960.049266,
+          "duration_ms": 1666.78461
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1960.060067,
+          "end_ms": 1960.081288,
+          "duration_ms": 0.021221
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1960.095007,
+          "end_ms": 4631.268576,
+          "duration_ms": 2671.173569
+        },
+        {
+          "label": "fetch",
+          "start_ms": 4631.290658,
+          "end_ms": 4632.422823,
+          "duration_ms": 1.132165
+        },
+        {
+          "label": "materialization",
+          "start_ms": 4632.436498,
+          "end_ms": 4632.455474,
+          "duration_ms": 0.018976
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 4632.461104,
+          "end_ms": 4642.416239,
+          "duration_ms": 9.955135
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 4642.459722,
+          "end_ms": 4642.547773,
+          "duration_ms": 0.088051
+        }
+      ],
+      "total_ms": 4642.65066,
+      "parent": {
+        "spawn_ms": 0.899208,
+        "worker_entry_ms": 82.653789,
+        "total_ms": 4801.995463,
+        "ipc_exit_decode_residual_ms": 76.691014,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 40937
+      }
+    }
+  },
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463764350.3,
+    "sql_finished_ms": 1791463767101.4998,
+    "sql_duration_ms": 2751.1969369988947,
+    "foundation_resolution_ms": 1472.169,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.014307,
+          "end_ms": 17.654347,
+          "duration_ms": 17.64004
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 17.719721,
+          "end_ms": 18.058459,
+          "duration_ms": 0.338738
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 17.669151,
+          "end_ms": 18.311309,
+          "duration_ms": 0.642158
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 18.321596,
+          "end_ms": 77.754189,
+          "duration_ms": 59.432593
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 77.845689,
+          "end_ms": 97.306401,
+          "duration_ms": 19.460712
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 97.329962,
+          "end_ms": 158.162656,
+          "duration_ms": 60.832694
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 158.201984,
+          "end_ms": 217.536777,
+          "duration_ms": 59.334793
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 217.685077,
+          "end_ms": 260.257013,
+          "duration_ms": 42.571936
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 260.277854,
+          "end_ms": 261.683203,
+          "duration_ms": 1.405349
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 261.694329,
+          "end_ms": 262.321836,
+          "duration_ms": 0.627507
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 262.363702,
+          "end_ms": 646.251977,
+          "duration_ms": 383.888275
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 646.267238,
+          "end_ms": 856.875349,
+          "duration_ms": 210.608111
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 856.889349,
+          "end_ms": 886.15892,
+          "duration_ms": 29.269571
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 886.173056,
+          "end_ms": 886.188718,
+          "duration_ms": 0.015662
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 886.197378,
+          "end_ms": 1612.975418,
+          "duration_ms": 726.77804
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1612.999482,
+          "end_ms": 1734.4185,
+          "duration_ms": 121.419018
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 262.338694,
+          "end_ms": 1734.531067,
+          "duration_ms": 1472.192373
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1734.542054,
+          "end_ms": 1734.557224,
+          "duration_ms": 0.01517
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1734.564856,
+          "end_ms": 4484.35177,
+          "duration_ms": 2749.786914
+        },
+        {
+          "label": "fetch",
+          "start_ms": 4484.377214,
+          "end_ms": 4485.751789,
+          "duration_ms": 1.374575
+        },
+        {
+          "label": "materialization",
+          "start_ms": 4485.765977,
+          "end_ms": 4485.785776,
+          "duration_ms": 0.019799
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 4485.791659,
+          "end_ms": 4493.936379,
+          "duration_ms": 8.14472
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 4493.989632,
+          "end_ms": 4494.166393,
+          "duration_ms": 0.176761
+        }
+      ],
+      "total_ms": 4494.251283,
+      "parent": {
+        "spawn_ms": 0.69541,
+        "worker_entry_ms": 77.321651,
+        "total_ms": 4645.02774,
+        "ipc_exit_decode_residual_ms": 73.45480600000064,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 41119
+      }
+    }
+  },
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463768845.3154,
+    "sql_finished_ms": 1791463771242.514,
+    "sql_duration_ms": 2397.1957590001693,
+    "foundation_resolution_ms": 1360.798,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.015764,
+          "end_ms": 15.7158,
+          "duration_ms": 15.700036
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 15.76288,
+          "end_ms": 15.943716,
+          "duration_ms": 0.180836
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 15.72597,
+          "end_ms": 16.179871,
+          "duration_ms": 0.453901
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 16.188858,
+          "end_ms": 68.711675,
+          "duration_ms": 52.522817
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 68.763138,
+          "end_ms": 80.107461,
+          "duration_ms": 11.344323
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 80.130148,
+          "end_ms": 131.314085,
+          "duration_ms": 51.183937
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 131.337369,
+          "end_ms": 185.333082,
+          "duration_ms": 53.995713
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 185.4821,
+          "end_ms": 226.793083,
+          "duration_ms": 41.310983
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 226.817461,
+          "end_ms": 228.06592,
+          "duration_ms": 1.248459
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 228.077149,
+          "end_ms": 228.65401,
+          "duration_ms": 0.576861
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 228.69173,
+          "end_ms": 590.993501,
+          "duration_ms": 362.301771
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 591.021059,
+          "end_ms": 782.070061,
+          "duration_ms": 191.049002
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 782.082612,
+          "end_ms": 808.331066,
+          "duration_ms": 26.248454
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 808.34456,
+          "end_ms": 808.358151,
+          "duration_ms": 0.013591
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 808.367043,
+          "end_ms": 1479.813456,
+          "duration_ms": 671.446413
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1479.834973,
+          "end_ms": 1589.381109,
+          "duration_ms": 109.546136
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 228.667947,
+          "end_ms": 1589.489209,
+          "duration_ms": 1360.821262
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1589.499253,
+          "end_ms": 1589.513777,
+          "duration_ms": 0.014524
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1589.520964,
+          "end_ms": 3985.514637,
+          "duration_ms": 2395.993673
+        },
+        {
+          "label": "fetch",
+          "start_ms": 3985.539539,
+          "end_ms": 3986.705506,
+          "duration_ms": 1.165967
+        },
+        {
+          "label": "materialization",
+          "start_ms": 3986.721195,
+          "end_ms": 3986.742673,
+          "duration_ms": 0.021478
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 3986.748839,
+          "end_ms": 3995.085861,
+          "duration_ms": 8.337022
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 3995.125292,
+          "end_ms": 3995.193151,
+          "duration_ms": 0.067859
+        }
+      ],
+      "total_ms": 3995.260754,
+      "parent": {
+        "spawn_ms": 0.637088,
+        "worker_entry_ms": 70.953095,
+        "total_ms": 4142.097341,
+        "ipc_exit_decode_residual_ms": 75.88349199999993,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 41290
+      }
+    }
+  },
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463772981.3752,
+    "sql_finished_ms": 1791463775305.4355,
+    "sql_duration_ms": 2324.057711999558,
+    "foundation_resolution_ms": 1354.211,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.012764,
+          "end_ms": 17.007429,
+          "duration_ms": 16.994665
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 17.056549,
+          "end_ms": 17.240862,
+          "duration_ms": 0.184313
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 17.018446,
+          "end_ms": 17.482949,
+          "duration_ms": 0.464503
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 17.491503,
+          "end_ms": 69.329592,
+          "duration_ms": 51.838089
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 69.408485,
+          "end_ms": 81.340403,
+          "duration_ms": 11.931918
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 81.361879,
+          "end_ms": 133.845056,
+          "duration_ms": 52.483177
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 133.867102,
+          "end_ms": 188.800887,
+          "duration_ms": 54.933785
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 188.945857,
+          "end_ms": 224.824669,
+          "duration_ms": 35.878812
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 224.849197,
+          "end_ms": 226.03948,
+          "duration_ms": 1.190283
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 226.050779,
+          "end_ms": 226.706472,
+          "duration_ms": 0.655693
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 226.745134,
+          "end_ms": 581.01086,
+          "duration_ms": 354.265726
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 581.026084,
+          "end_ms": 772.717981,
+          "duration_ms": 191.691897
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 772.731114,
+          "end_ms": 799.623099,
+          "duration_ms": 26.891985
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 799.636669,
+          "end_ms": 799.64652,
+          "duration_ms": 0.009851
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 799.651863,
+          "end_ms": 1467.112942,
+          "duration_ms": 667.461079
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1467.135299,
+          "end_ms": 1580.838792,
+          "duration_ms": 113.703493
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 226.7206,
+          "end_ms": 1580.956089,
+          "duration_ms": 1354.235489
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1580.966613,
+          "end_ms": 1580.982118,
+          "duration_ms": 0.015505
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1580.989225,
+          "end_ms": 3903.802112,
+          "duration_ms": 2322.812887
+        },
+        {
+          "label": "fetch",
+          "start_ms": 3903.827985,
+          "end_ms": 3905.035319,
+          "duration_ms": 1.207334
+        },
+        {
+          "label": "materialization",
+          "start_ms": 3905.051493,
+          "end_ms": 3905.06503,
+          "duration_ms": 0.013537
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 3905.070971,
+          "end_ms": 3914.741512,
+          "duration_ms": 9.670541
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 3914.78,
+          "end_ms": 3914.915531,
+          "duration_ms": 0.135531
+        }
+      ],
+      "total_ms": 3914.987142,
+      "parent": {
+        "spawn_ms": 0.674002,
+        "worker_entry_ms": 71.812836,
+        "total_ms": 4060.151928,
+        "ipc_exit_decode_residual_ms": 73.35195000000022,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 41484
+      }
+    }
+  },
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463777204.6902,
+    "sql_finished_ms": 1791463779660.7825,
+    "sql_duration_ms": 2456.0895020003954,
+    "foundation_resolution_ms": 1515.231,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.016152,
+          "end_ms": 16.110061,
+          "duration_ms": 16.093909
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 16.157109,
+          "end_ms": 16.335755,
+          "duration_ms": 0.178646
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 16.120787,
+          "end_ms": 16.567538,
+          "duration_ms": 0.446751
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 16.576734,
+          "end_ms": 68.985073,
+          "duration_ms": 52.408339
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 69.034952,
+          "end_ms": 80.507914,
+          "duration_ms": 11.472962
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 80.531875,
+          "end_ms": 129.950435,
+          "duration_ms": 49.41856
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 129.973729,
+          "end_ms": 189.196618,
+          "duration_ms": 59.222889
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 189.344597,
+          "end_ms": 226.466007,
+          "duration_ms": 37.12141
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 226.486262,
+          "end_ms": 227.716643,
+          "duration_ms": 1.230381
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 227.728764,
+          "end_ms": 228.286453,
+          "duration_ms": 0.557689
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 228.323141,
+          "end_ms": 584.596234,
+          "duration_ms": 356.273093
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 584.611829,
+          "end_ms": 774.19046,
+          "duration_ms": 189.578631
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 774.204089,
+          "end_ms": 801.451202,
+          "duration_ms": 27.247113
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 801.464406,
+          "end_ms": 801.474117,
+          "duration_ms": 0.009711
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 801.479287,
+          "end_ms": 1618.052779,
+          "duration_ms": 816.573492
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1618.078138,
+          "end_ms": 1743.44296,
+          "duration_ms": 125.364822
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 228.300541,
+          "end_ms": 1743.555788,
+          "duration_ms": 1515.255247
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1743.565819,
+          "end_ms": 1743.581416,
+          "duration_ms": 0.015597
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1743.588858,
+          "end_ms": 4198.289144,
+          "duration_ms": 2454.700286
+        },
+        {
+          "label": "fetch",
+          "start_ms": 4198.316148,
+          "end_ms": 4199.657305,
+          "duration_ms": 1.341157
+        },
+        {
+          "label": "materialization",
+          "start_ms": 4199.684562,
+          "end_ms": 4199.698241,
+          "duration_ms": 0.013679
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 4199.704261,
+          "end_ms": 4209.455734,
+          "duration_ms": 9.751473
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 4209.493358,
+          "end_ms": 4209.560019,
+          "duration_ms": 0.066661
+        }
+      ],
+      "total_ms": 4209.628204,
+      "parent": {
+        "spawn_ms": 0.679212,
+        "worker_entry_ms": 70.535697,
+        "total_ms": 4359.311364,
+        "ipc_exit_decode_residual_ms": 79.14746300000024,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 41651
+      }
+    }
+  },
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463781463.1704,
+    "sql_finished_ms": 1791463783820.9773,
+    "sql_duration_ms": 2357.8041840009973,
+    "foundation_resolution_ms": 1386.757,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.015656,
+          "end_ms": 18.633002,
+          "duration_ms": 18.617346
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 18.705211,
+          "end_ms": 18.941836,
+          "duration_ms": 0.236625
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 18.647795,
+          "end_ms": 19.18449,
+          "duration_ms": 0.536695
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 19.193683,
+          "end_ms": 75.559994,
+          "duration_ms": 56.366311
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 75.609672,
+          "end_ms": 90.600111,
+          "duration_ms": 14.990439
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 90.623327,
+          "end_ms": 142.680889,
+          "duration_ms": 52.057562
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 142.705216,
+          "end_ms": 202.333593,
+          "duration_ms": 59.628377
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 202.487234,
+          "end_ms": 251.490501,
+          "duration_ms": 49.003267
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 251.513633,
+          "end_ms": 252.912675,
+          "duration_ms": 1.399042
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 252.929403,
+          "end_ms": 253.78118,
+          "duration_ms": 0.851777
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 253.826232,
+          "end_ms": 615.39741,
+          "duration_ms": 361.571178
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 615.412885,
+          "end_ms": 827.539547,
+          "duration_ms": 212.126662
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 827.552793,
+          "end_ms": 854.524563,
+          "duration_ms": 26.97177
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 854.537661,
+          "end_ms": 854.547222,
+          "duration_ms": 0.009561
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 854.552158,
+          "end_ms": 1527.246729,
+          "duration_ms": 672.694571
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1527.269145,
+          "end_ms": 1640.471009,
+          "duration_ms": 113.201864
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 253.79892,
+          "end_ms": 1640.579431,
+          "duration_ms": 1386.780511
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1640.589252,
+          "end_ms": 1640.604494,
+          "duration_ms": 0.015242
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1640.611574,
+          "end_ms": 3996.603368,
+          "duration_ms": 2355.991794
+        },
+        {
+          "label": "fetch",
+          "start_ms": 3996.630251,
+          "end_ms": 3998.404998,
+          "duration_ms": 1.774747
+        },
+        {
+          "label": "materialization",
+          "start_ms": 3998.420501,
+          "end_ms": 3998.443288,
+          "duration_ms": 0.022787
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 3998.450602,
+          "end_ms": 4007.087474,
+          "duration_ms": 8.636872
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 4007.126887,
+          "end_ms": 4007.189854,
+          "duration_ms": 0.062967
+        }
+      ],
+      "total_ms": 4007.274049,
+      "parent": {
+        "spawn_ms": 0.636184,
+        "worker_entry_ms": 70.628968,
+        "total_ms": 4151.431256,
+        "ipc_exit_decode_residual_ms": 73.52823899999976,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 41840
+      }
+    }
+  },
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463785546.0723,
+    "sql_finished_ms": 1791463787898.4111,
+    "sql_duration_ms": 2352.336320000177,
+    "foundation_resolution_ms": 1343.531,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.013396,
+          "end_ms": 15.562161,
+          "duration_ms": 15.548765
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 15.607983,
+          "end_ms": 15.782662,
+          "duration_ms": 0.174679
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 15.572398,
+          "end_ms": 16.008327,
+          "duration_ms": 0.435929
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 16.017105,
+          "end_ms": 66.878929,
+          "duration_ms": 50.861824
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 66.929166,
+          "end_ms": 78.256531,
+          "duration_ms": 11.327365
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 78.277699,
+          "end_ms": 127.403205,
+          "duration_ms": 49.125506
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 127.425082,
+          "end_ms": 183.793652,
+          "duration_ms": 56.36857
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 183.940454,
+          "end_ms": 219.95783,
+          "duration_ms": 36.017376
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 219.983665,
+          "end_ms": 221.133656,
+          "duration_ms": 1.149991
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 221.144401,
+          "end_ms": 221.733983,
+          "duration_ms": 0.589582
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 221.772958,
+          "end_ms": 584.456499,
+          "duration_ms": 362.683541
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 584.472399,
+          "end_ms": 774.599431,
+          "duration_ms": 190.127032
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 774.611996,
+          "end_ms": 801.419872,
+          "duration_ms": 26.807876
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 801.432742,
+          "end_ms": 801.442387,
+          "duration_ms": 0.009645
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 801.447665,
+          "end_ms": 1459.379823,
+          "duration_ms": 657.932158
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1459.403526,
+          "end_ms": 1565.193525,
+          "duration_ms": 105.789999
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 221.748696,
+          "end_ms": 1565.303384,
+          "duration_ms": 1343.554688
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1565.31339,
+          "end_ms": 1565.328062,
+          "duration_ms": 0.014672
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1565.335343,
+          "end_ms": 3916.389198,
+          "duration_ms": 2351.053855
+        },
+        {
+          "label": "fetch",
+          "start_ms": 3916.415667,
+          "end_ms": 3917.660746,
+          "duration_ms": 1.245079
+        },
+        {
+          "label": "materialization",
+          "start_ms": 3917.674959,
+          "end_ms": 3917.688203,
+          "duration_ms": 0.013244
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 3917.694322,
+          "end_ms": 3927.924301,
+          "duration_ms": 10.229979
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 3927.961801,
+          "end_ms": 3928.039117,
+          "duration_ms": 0.077316
+        }
+      ],
+      "total_ms": 3928.105419,
+      "parent": {
+        "spawn_ms": 0.705335,
+        "worker_entry_ms": 74.081951,
+        "total_ms": 4076.00935,
+        "ipc_exit_decode_residual_ms": 73.82197999999971,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 42031
+      }
+    }
+  },
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463789856.512,
+    "sql_finished_ms": 1791463792261.891,
+    "sql_duration_ms": 2405.3760089991556,
+    "foundation_resolution_ms": 1565.748,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.012184,
+          "end_ms": 15.412589,
+          "duration_ms": 15.400405
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 15.458336,
+          "end_ms": 15.632363,
+          "duration_ms": 0.174027
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 15.422842,
+          "end_ms": 15.860788,
+          "duration_ms": 0.437946
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 15.869797,
+          "end_ms": 68.945288,
+          "duration_ms": 53.075491
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 68.99842,
+          "end_ms": 80.851018,
+          "duration_ms": 11.852598
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 80.877789,
+          "end_ms": 131.077744,
+          "duration_ms": 50.199955
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 131.101903,
+          "end_ms": 188.79837,
+          "duration_ms": 57.696467
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 188.947299,
+          "end_ms": 233.906949,
+          "duration_ms": 44.95965
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 233.931776,
+          "end_ms": 235.101651,
+          "duration_ms": 1.169875
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 235.112696,
+          "end_ms": 235.655593,
+          "duration_ms": 0.542897
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 235.692111,
+          "end_ms": 721.285168,
+          "duration_ms": 485.593057
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 721.30661,
+          "end_ms": 952.117317,
+          "duration_ms": 230.810707
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 952.130098,
+          "end_ms": 979.795685,
+          "duration_ms": 27.665587
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 979.808916,
+          "end_ms": 979.818621,
+          "duration_ms": 0.009705
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 979.82369,
+          "end_ms": 1684.203374,
+          "duration_ms": 704.379684
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1684.225294,
+          "end_ms": 1801.319905,
+          "duration_ms": 117.094611
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 235.668438,
+          "end_ms": 1801.441559,
+          "duration_ms": 1565.773121
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1801.452425,
+          "end_ms": 1801.46904,
+          "duration_ms": 0.016615
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1801.476627,
+          "end_ms": 4205.610808,
+          "duration_ms": 2404.134181
+        },
+        {
+          "label": "fetch",
+          "start_ms": 4205.636461,
+          "end_ms": 4206.842348,
+          "duration_ms": 1.205887
+        },
+        {
+          "label": "materialization",
+          "start_ms": 4206.85744,
+          "end_ms": 4206.874108,
+          "duration_ms": 0.016668
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 4206.881573,
+          "end_ms": 4216.951111,
+          "duration_ms": 10.069538
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 4216.995125,
+          "end_ms": 4217.134836,
+          "duration_ms": 0.139711
+        }
+      ],
+      "total_ms": 4217.206998,
+      "parent": {
+        "spawn_ms": 0.637789,
+        "worker_entry_ms": 69.695805,
+        "total_ms": 4367.476506,
+        "ipc_exit_decode_residual_ms": 80.57370300000002,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 42198
+      }
+    }
+  },
+  {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+    "executed_sql_hash": "8c70053dd5d85c4c069af5ce2b13ecf12c8784e306afe173d308705e3bcd5f0a",
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "ducklake_snapshot_id": 1408,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "read_only": true,
+    "sap_accessed": false,
+    "sql_started_ms": 1791463794002.99,
+    "sql_finished_ms": 1791463796328.548,
+    "sql_duration_ms": 2325.555555000392,
+    "foundation_resolution_ms": 1352.017,
+    "row_count": 10,
+    "result_hash": "18ce392a6db12fb379fbcecaafbba544b930239d53fff98a4c282713c6d38510",
+    "rows": [
+      {
+        "item_code": "L00505",
+        "lines": 11782,
+        "quantity": "557199.0000000000",
+        "line_total": "759383.9500000000"
+      },
+      {
+        "item_code": "L02467",
+        "lines": 2,
+        "quantity": "200000.0000000000",
+        "line_total": "18280.0000000000"
+      },
+      {
+        "item_code": "M05970",
+        "lines": 928,
+        "quantity": "133931.0000000000",
+        "line_total": "37813.6100000000"
+      },
+      {
+        "item_code": "L01698",
+        "lines": 3354,
+        "quantity": "116567.0000000000",
+        "line_total": "290330.7200000000"
+      },
+      {
+        "item_code": "L01003",
+        "lines": 2324,
+        "quantity": "115269.0000000000",
+        "line_total": "351977.4200000000"
+      },
+      {
+        "item_code": "L01613",
+        "lines": 5808,
+        "quantity": "108791.0000000000",
+        "line_total": "1142555.8000000000"
+      },
+      {
+        "item_code": "L02837",
+        "lines": 5244,
+        "quantity": "101919.0000000000",
+        "line_total": "378595.4600000000"
+      },
+      {
+        "item_code": "L00003",
+        "lines": 2373,
+        "quantity": "98511.0000000000",
+        "line_total": "214459.6200000000"
+      },
+      {
+        "item_code": "M05239",
+        "lines": 715,
+        "quantity": "94065.0000000000",
+        "line_total": "17451.0600000000"
+      },
+      {
+        "item_code": "M05486",
+        "lines": 340,
+        "quantity": "93144.0000000000",
+        "line_total": "20928.7800000000"
+      }
+    ],
+    "profile": {
+      "schema": "telchi-pre-sql-profile-v1",
+      "clock": "perf_counter_ns",
+      "spans": [
+        {
+          "label": "capability_imports",
+          "start_ms": 0.015317,
+          "end_ms": 15.99472,
+          "duration_ms": 15.979403
+        },
+        {
+          "label": "private_config_read",
+          "start_ms": 16.043001,
+          "end_ms": 16.222196,
+          "duration_ms": 0.179195
+        },
+        {
+          "label": "connector_configuration",
+          "start_ms": 16.005424,
+          "end_ms": 16.458637,
+          "duration_ms": 0.453213
+        },
+        {
+          "label": "duckdb_import",
+          "start_ms": 16.467328,
+          "end_ms": 69.134636,
+          "duration_ms": 52.667308
+        },
+        {
+          "label": "duckdb_connect",
+          "start_ms": 69.186393,
+          "end_ms": 80.534225,
+          "duration_ms": 11.347832
+        },
+        {
+          "label": "load_ducklake",
+          "start_ms": 80.555829,
+          "end_ms": 131.370735,
+          "duration_ms": 50.814906
+        },
+        {
+          "label": "load_postgres",
+          "start_ms": 131.396067,
+          "end_ms": 185.785622,
+          "duration_ms": 54.389555
+        },
+        {
+          "label": "attachment_open_including_catalog_session",
+          "start_ms": 185.929874,
+          "end_ms": 221.353709,
+          "duration_ms": 35.423835
+        },
+        {
+          "label": "query_budget_setup",
+          "start_ms": 221.378279,
+          "end_ms": 222.632275,
+          "duration_ms": 1.253996
+        },
+        {
+          "label": "read_only_verification",
+          "start_ms": 222.646261,
+          "end_ms": 223.388806,
+          "duration_ms": 0.742545
+        },
+        {
+          "label": "foundation_current_count",
+          "start_ms": 223.426989,
+          "end_ms": 579.665471,
+          "duration_ms": 356.238482
+        },
+        {
+          "label": "foundation_current_metadata",
+          "start_ms": 579.68129,
+          "end_ms": 769.264791,
+          "duration_ms": 189.583501
+        },
+        {
+          "label": "foundation_publication_get",
+          "start_ms": 769.278207,
+          "end_ms": 797.296785,
+          "duration_ms": 28.018578
+        },
+        {
+          "label": "foundation_manifest_validation",
+          "start_ms": 797.310183,
+          "end_ms": 797.320031,
+          "duration_ms": 0.009848
+        },
+        {
+          "label": "foundation_commit_snapshot_resolution",
+          "start_ms": 797.3251,
+          "end_ms": 1462.264009,
+          "duration_ms": 664.938909
+        },
+        {
+          "label": "foundation_component_verification",
+          "start_ms": 1462.286065,
+          "end_ms": 1575.330485,
+          "duration_ms": 113.04442
+        },
+        {
+          "label": "foundation_resolution",
+          "start_ms": 223.40223,
+          "end_ms": 1575.442658,
+          "duration_ms": 1352.040428
+        },
+        {
+          "label": "query_preparation",
+          "start_ms": 1575.453236,
+          "end_ms": 1575.467961,
+          "duration_ms": 0.014725
+        },
+        {
+          "label": "duckdb_sql_execute",
+          "start_ms": 1575.47501,
+          "end_ms": 3899.729577,
+          "duration_ms": 2324.254567
+        },
+        {
+          "label": "fetch",
+          "start_ms": 3899.756459,
+          "end_ms": 3901.020103,
+          "duration_ms": 1.263644
+        },
+        {
+          "label": "materialization",
+          "start_ms": 3901.035021,
+          "end_ms": 3901.047956,
+          "duration_ms": 0.012935
+        },
+        {
+          "label": "attachment_connection_close",
+          "start_ms": 3901.054004,
+          "end_ms": 3909.973157,
+          "duration_ms": 8.919153
+        },
+        {
+          "label": "result_hash",
+          "start_ms": 3910.012053,
+          "end_ms": 3910.082621,
+          "duration_ms": 0.070568
+        }
+      ],
+      "total_ms": 3910.154174,
+      "parent": {
+        "spawn_ms": 0.682471,
+        "worker_entry_ms": 71.781454,
+        "total_ms": 4057.276398,
+        "ipc_exit_decode_residual_ms": 75.34077000000025,
+        "ipc": "stdout JSON, communicate waits for exit",
+        "worker_pid": 42371
+      }
+    }
+  }
+]

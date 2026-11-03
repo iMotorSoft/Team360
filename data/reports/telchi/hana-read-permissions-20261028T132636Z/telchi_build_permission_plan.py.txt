@@ -1,0 +1,33 @@
+from pathlib import Path
+import json,csv,re,collections
+root=Path('SrvRestAstroLS_v1/backend/modules/telchi')
+refs=json.loads(Path('/tmp/telchi-permission-refs.json').read_text())
+exclude=set('ACTIVE ATOMIC CAST COMP COUNTS DAILY DEP DREF DUMMY DVI INV LINE NATIVE PAY PERDOC RAW REC TOTALS'.split())
+for t in exclude:refs.pop(t,None)
+base={r['table_name']:r for r in csv.DictReader((root/'investigation/validation/sap_knowledge_inventory_v1/sap_tables_inventory.csv').open())}
+cols={}; colrefs={}
+def walk(d,p):
+ if isinstance(d,dict):
+  for t,c in d.items():
+   if t in names and isinstance(c,dict) and isinstance(c.get('columns'),list) and c['columns'] and all(isinstance(x,str) for x in c['columns']):
+    if t not in cols:cols[t]=c['columns'];colrefs[t]=str(p)
+   if t in names and isinstance(c,list) and c and all(isinstance(x,str) and re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*',x) for x in c) and len(c)>2:
+    if t not in cols:cols[t]=c;colrefs[t]=str(p)
+   walk(c,p)
+ elif isinstance(d,list):
+  for v in d:
+   if isinstance(v,(dict,list)):walk(v,p)
+names=set(base)|set(refs)|{'RDN1'}
+# Prefer dedicated physical schema evidence over inventory candidate keys.
+f=root/'investigation/validation/financial_foundation/structure_discovery_v1.json'
+walk(json.loads(f.read_text()),f)
+for p in (root/'investigation').rglob('*.json'):
+ if p.stat().st_size>4_000_000:continue
+ try:walk(json.loads(p.read_text()),p)
+ except (ValueError,RecursionError):pass
+Path('/tmp/telchi-offline-columns.json').write_text(json.dumps({'columns':cols,'sources':colrefs},indent=2))
+print('OBJECTS',len(names),'offline column maps',len(cols))
+for t in sorted(names):
+ if t not in cols:print(t,base.get(t,{}).get('primary_or_candidate_key','?'))
+print('OFFLINE maps:')
+for t,c in sorted(cols.items()):print(t,c[:3],colrefs[t].split('validation/')[-1])

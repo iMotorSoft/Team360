@@ -1,0 +1,106 @@
+{
+  "results": [
+    {
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "modules/telchi/assistant/tests/test_category_line_amount.py",
+        "modules/telchi/assistant/tests/test_business_categories.py",
+        "modules/telchi/assistant/tests/test_conversational_quality.py",
+        "modules/telchi/assistant/tests/test_sales_business_contract.py",
+        "modules/telchi/assistant/tests/test_repository.py",
+        "modules/telchi/assistant/tests/test_pilot_access.py",
+        "modules/telchi/assistant/tests/test_safety.py",
+        "modules/telchi/assistant/tests/test_sales_monetary.py",
+        "modules/telchi/assistant/tests/test_product_sales.py",
+        "modules/telchi/assistant/tests/test_invoice_amount.py",
+        "modules/telchi/assistant/tests/test_rejected_execution_guard.py",
+        "modules/telchi/assistant/tests/test_result_references.py",
+        "modules/telchi/datalake/tests/test_category_line_amount_query.py",
+        "-q"
+      ],
+      "cwd": "SrvRestAstroLS_v1/backend",
+      "exit_code": 0,
+      "output": "warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead\n........................................................................ [ 28%]\n...................s.................................................... [ 56%]\n........................................................................ [ 84%]\n.........................................                                [100%]\n256 passed, 1 skipped in 3.05s\n"
+    },
+    {
+      "command": [
+        "lat",
+        "check",
+        "md"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "Scanned 32 .md\nmd: All links OK\n"
+    },
+    {
+      "command": [
+        "lat",
+        "check",
+        "index"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "index: All directory index files OK\n"
+    },
+    {
+      "command": [
+        "lat",
+        "check",
+        "sections"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "sections: All sections have valid leading paragraphs\n"
+    },
+    {
+      "command": [
+        "lat",
+        "check",
+        "code-refs"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "Scanned 47 .astro, 1 .bak, 4 .css, 156 .csv, 1 .diff, 1 .example, 183 .html, 2 .ico, 27 .js, 509 .json, 14 .jsonl, 7 .mjs, 3 .patch, 1 .pdf, 10 .pid, 27 .png, 1135 .py, 12 .sh, 136 .sql, 6 .stderr, 68 .svelte, 1 .toml, 92 .ts, 162 .txt, 2 .webm, 1 .xlsx, 19 .yaml, 1 .zip, 3 (no ext)\ncode-refs: All references OK\n"
+    },
+    {
+      "command": [
+        "lat",
+        "check"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "output": "Scanned 47 .astro, 1 .bak, 4 .css, 156 .csv, 1 .diff, 1 .example, 183 .html, 2 .ico, 27 .js, 509 .json, 14 .jsonl, 32 .md, 7 .mjs, 3 .patch, 1 .pdf, 10 .pid, 27 .png, 1135 .py, 12 .sh, 136 .sql, 6 .stderr, 68 .svelte, 1 .toml, 92 .ts, 162 .txt, 2 .webm, 1 .xlsx, 19 .yaml, 1 .zip, 3 (no ext) in 2.1s\n\nWarning: No init version recorded \u2014 run lat init to set up agent hooks and configuration.\nAll checks passed\nWarning: No LLM key found \u2014 semantic search (lat search) will not work. Provide a key via LAT_LLM_KEY, LAT_LLM_KEY_FILE, LAT_LLM_KEY_HELPER, or run lat init to configure.\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "source_hashes": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/category_line_amount_query.py": "d62b570e32c925495ca47dfef1cf890f7de84e35efa35f17fdea057c7ddb79c4",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_category_line_amount_query.py": "b61f1f6799decb3a19e5be42a83df5b60721961cbb7d6d8acfa674cdcfaeed65",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/CATEGORY_LINE_AMOUNT_V1.md": "196532afecb4be234c02c5beb98fa3183a1dae9b6804df8ae5765742f296ef0a",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/capabilities.py": "e98eef5678836e6f80726af89d2b8e0dbb9e4d7df98760de1484f3ff9c6b424c",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/business_categories.py": "5312c4947773172c98bbf2bf4aa9bbca3de95671525a09e238e0de9005fcca9d",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py": "6556764252abb1f602f773bbc3dd5219c6f237432957ee79f7100f108cd7b9be",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py": "1f00daee141c5583526985aa17662d6a176f9f1152a786a4032e3a1aa72beb69",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/monetary_comparison.py": "cbc2b3603e8672013d6b11dfc34a644e2064ca853cac76ec0c3d451260e206bc",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py": "c99d01dae1b790f0c4219cd8834f583160db54d41583ce3194de9fcb6ae01118",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md": "71d28f25c8828b79c8295a78d4054488c156b524ed6900bf08a2a711a9c05f2f",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_category_line_amount.py": "6a68bad2a2c61fdf02f658d8e7add30d403313c0c0d18daf485d09c1203b43f4",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_category_line_amount.py": "9c2c9da2bd682cae05ca6203a0ff1ef68ea959d988f5c74176e77dce2074d01e",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_business_categories.py": "f882d06927f32c42677146fb2718e6aa20762c5f56c64cdf363b68ebb64b6336",
+    "SrvRestAstroLS_v1/backend/modules/telchi/status_actual.md": "c70a2422d0a12d7afb87e854bd4c6dd2de18a354cb5c7a491742f7186d78d928"
+  },
+  "postgres_opt_in_final": "34 passed",
+  "real_luna": "luna-r3.json",
+  "six_gates": "STALE"
+}

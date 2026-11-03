@@ -1,0 +1,885 @@
+{
+  "base_target": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "team360"
+  },
+  "dev_override_target": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "team360"
+  },
+  "read_only": true,
+  "server": [
+    {
+      "database": "team360",
+      "role": "administrator",
+      "version": "18.4 (Debian 18.4-1.pgdg13+1)",
+      "read_only": "on"
+    }
+  ],
+  "roles": [
+    {
+      "rolname": "administrator",
+      "rolsuper": true,
+      "rolcanlogin": true,
+      "rolcreatedb": true
+    },
+    {
+      "rolname": "concilia_app",
+      "rolsuper": false,
+      "rolcanlogin": true,
+      "rolcreatedb": false
+    },
+    {
+      "rolname": "concilia_owner",
+      "rolsuper": false,
+      "rolcanlogin": true,
+      "rolcreatedb": false
+    },
+    {
+      "rolname": "evolution_api",
+      "rolsuper": false,
+      "rolcanlogin": true,
+      "rolcreatedb": false
+    },
+    {
+      "rolname": "litellm",
+      "rolsuper": false,
+      "rolcanlogin": true,
+      "rolcreatedb": false
+    },
+    {
+      "rolname": "team360_telchi_ducklake",
+      "rolsuper": false,
+      "rolcanlogin": true,
+      "rolcreatedb": false
+    }
+  ],
+  "sessions": [
+    {
+      "usename": "administrator",
+      "application_name": "telchi-provisioning-readonly",
+      "client_addr": "172.18.0.1/32",
+      "state": "active",
+      "count": 1
+    }
+  ],
+  "columns": [
+    {
+      "table_name": "core_organization_member_roles",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "column_name": "organization_member_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "column_name": "role_code",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'active'::text"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "column_name": "metadata_jsonb",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "column_name": "created_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "column_name": "updated_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_organization_members",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "core_organization_members",
+      "column_name": "organization_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organization_members",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organization_members",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'active'::text"
+    },
+    {
+      "table_name": "core_organization_members",
+      "column_name": "metadata_jsonb",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "table_name": "core_organization_members",
+      "column_name": "created_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_organization_members",
+      "column_name": "updated_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "column_name": "organization_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organization_roles",
+      "column_name": "role_code",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organization_roles",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'active'::text"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "column_name": "metadata_jsonb",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "column_name": "created_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "column_name": "updated_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_organizations",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "core_organizations",
+      "column_name": "organization_code",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organizations",
+      "column_name": "display_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organizations",
+      "column_name": "primary_type",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organizations",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'active'::text"
+    },
+    {
+      "table_name": "core_organizations",
+      "column_name": "parent_organization_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "core_organizations",
+      "column_name": "metadata_jsonb",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "table_name": "core_organizations",
+      "column_name": "created_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_organizations",
+      "column_name": "updated_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_users",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "core_users",
+      "column_name": "workspace_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "core_users",
+      "column_name": "email",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "core_users",
+      "column_name": "display_name",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "core_users",
+      "column_name": "role",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'member'::text"
+    },
+    {
+      "table_name": "core_users",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'active'::text"
+    },
+    {
+      "table_name": "core_users",
+      "column_name": "metadata_jsonb",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "table_name": "core_users",
+      "column_name": "created_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_users",
+      "column_name": "updated_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_workspaces",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "core_workspaces",
+      "column_name": "slug",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_workspaces",
+      "column_name": "display_name",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "core_workspaces",
+      "column_name": "timezone",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'UTC'::text"
+    },
+    {
+      "table_name": "core_workspaces",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": "'active'::text"
+    },
+    {
+      "table_name": "core_workspaces",
+      "column_name": "metadata_jsonb",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "table_name": "core_workspaces",
+      "column_name": "created_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_workspaces",
+      "column_name": "updated_at_utc",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "core_workspaces",
+      "column_name": "organization_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "chk_core_organization_member_roles_status",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'inactive'::text, 'archived'::text])))"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "core_organization_member_roles_created_at_utc_not_null",
+      "definition": "NOT NULL created_at_utc"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "core_organization_member_roles_id_not_null",
+      "definition": "NOT NULL id"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "core_organization_member_roles_metadata_jsonb_not_null",
+      "definition": "NOT NULL metadata_jsonb"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "core_organization_member_roles_organization_member_id_fkey",
+      "definition": "FOREIGN KEY (organization_member_id) REFERENCES core_organization_members(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "core_organization_member_roles_organization_member_id_not_null",
+      "definition": "NOT NULL organization_member_id"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "core_organization_member_roles_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "core_organization_member_roles_role_code_not_null",
+      "definition": "NOT NULL role_code"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "core_organization_member_roles_status_not_null",
+      "definition": "NOT NULL status"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "core_organization_member_roles_updated_at_utc_not_null",
+      "definition": "NOT NULL updated_at_utc"
+    },
+    {
+      "table_name": "core_organization_member_roles",
+      "conname": "uq_core_organization_member_roles_code",
+      "definition": "UNIQUE (organization_member_id, role_code)"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "chk_core_organization_members_status",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'inactive'::text, 'archived'::text])))"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_created_at_utc_not_null",
+      "definition": "NOT NULL created_at_utc"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_id_not_null",
+      "definition": "NOT NULL id"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_metadata_jsonb_not_null",
+      "definition": "NOT NULL metadata_jsonb"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_organization_id_fkey",
+      "definition": "FOREIGN KEY (organization_id) REFERENCES core_organizations(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_organization_id_not_null",
+      "definition": "NOT NULL organization_id"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_status_not_null",
+      "definition": "NOT NULL status"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_updated_at_utc_not_null",
+      "definition": "NOT NULL updated_at_utc"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES core_users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "core_organization_members_user_id_not_null",
+      "definition": "NOT NULL user_id"
+    },
+    {
+      "table_name": "core_organization_members",
+      "conname": "uq_core_organization_members_user",
+      "definition": "UNIQUE (organization_id, user_id)"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "chk_core_organization_roles_status",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'inactive'::text, 'archived'::text])))"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "core_organization_roles_created_at_utc_not_null",
+      "definition": "NOT NULL created_at_utc"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "core_organization_roles_id_not_null",
+      "definition": "NOT NULL id"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "core_organization_roles_metadata_jsonb_not_null",
+      "definition": "NOT NULL metadata_jsonb"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "core_organization_roles_organization_id_fkey",
+      "definition": "FOREIGN KEY (organization_id) REFERENCES core_organizations(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "core_organization_roles_organization_id_not_null",
+      "definition": "NOT NULL organization_id"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "core_organization_roles_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "core_organization_roles_role_code_not_null",
+      "definition": "NOT NULL role_code"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "core_organization_roles_status_not_null",
+      "definition": "NOT NULL status"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "core_organization_roles_updated_at_utc_not_null",
+      "definition": "NOT NULL updated_at_utc"
+    },
+    {
+      "table_name": "core_organization_roles",
+      "conname": "uq_core_organization_roles_code",
+      "definition": "UNIQUE (organization_id, role_code)"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "chk_core_organizations_primary_type",
+      "definition": "CHECK ((primary_type = ANY (ARRAY['platform_owner'::text, 'partner'::text, 'client'::text, 'internal_client'::text, 'demo_client'::text])))"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "chk_core_organizations_status",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'inactive'::text, 'archived'::text])))"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_created_at_utc_not_null",
+      "definition": "NOT NULL created_at_utc"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_display_name_not_null",
+      "definition": "NOT NULL display_name"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_id_not_null",
+      "definition": "NOT NULL id"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_metadata_jsonb_not_null",
+      "definition": "NOT NULL metadata_jsonb"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_organization_code_key",
+      "definition": "UNIQUE (organization_code)"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_organization_code_not_null",
+      "definition": "NOT NULL organization_code"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_parent_organization_id_fkey",
+      "definition": "FOREIGN KEY (parent_organization_id) REFERENCES core_organizations(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_primary_type_not_null",
+      "definition": "NOT NULL primary_type"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_status_not_null",
+      "definition": "NOT NULL status"
+    },
+    {
+      "table_name": "core_organizations",
+      "conname": "core_organizations_updated_at_utc_not_null",
+      "definition": "NOT NULL updated_at_utc"
+    },
+    {
+      "table_name": "core_users",
+      "conname": "chk_core_users_status",
+      "definition": "CHECK ((status = ANY (ARRAY['invited'::text, 'active'::text, 'inactive'::text, 'testing'::text, 'retired'::text, 'archived'::text])))"
+    },
+    {
+      "table_name": "core_users",
+      "conname": "core_users_created_at_utc_not_null",
+      "definition": "NOT NULL created_at_utc"
+    },
+    {
+      "table_name": "core_users",
+      "conname": "core_users_id_not_null",
+      "definition": "NOT NULL id"
+    },
+    {
+      "table_name": "core_users",
+      "conname": "core_users_metadata_jsonb_not_null",
+      "definition": "NOT NULL metadata_jsonb"
+    },
+    {
+      "table_name": "core_users",
+      "conname": "core_users_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "core_users",
+      "conname": "core_users_role_not_null",
+      "definition": "NOT NULL role"
+    },
+    {
+      "table_name": "core_users",
+      "conname": "core_users_status_not_null",
+      "definition": "NOT NULL status"
+    },
+    {
+      "table_name": "core_users",
+      "conname": "core_users_updated_at_utc_not_null",
+      "definition": "NOT NULL updated_at_utc"
+    },
+    {
+      "table_name": "core_users",
+      "conname": "core_users_workspace_id_fkey",
+      "definition": "FOREIGN KEY (workspace_id) REFERENCES core_workspaces(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "chk_core_workspaces_status",
+      "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'inactive'::text, 'testing'::text, 'retired'::text])))"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_created_at_utc_not_null",
+      "definition": "NOT NULL created_at_utc"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_display_name_not_null",
+      "definition": "NOT NULL display_name"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_id_not_null",
+      "definition": "NOT NULL id"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_metadata_jsonb_not_null",
+      "definition": "NOT NULL metadata_jsonb"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_slug_key",
+      "definition": "UNIQUE (slug)"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_slug_not_null",
+      "definition": "NOT NULL slug"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_status_not_null",
+      "definition": "NOT NULL status"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_timezone_not_null",
+      "definition": "NOT NULL timezone"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "core_workspaces_updated_at_utc_not_null",
+      "definition": "NOT NULL updated_at_utc"
+    },
+    {
+      "table_name": "core_workspaces",
+      "conname": "fk_core_workspaces_organization",
+      "definition": "FOREIGN KEY (organization_id) REFERENCES core_organizations(id) ON DELETE SET NULL"
+    }
+  ],
+  "orgs": [
+    {
+      "organization_code": "team360_live",
+      "status": "active"
+    },
+    {
+      "organization_code": "team360_platform",
+      "status": "active"
+    }
+  ],
+  "org_roles": [
+    {
+      "role_code": "client"
+    },
+    {
+      "role_code": "content_owner"
+    },
+    {
+      "role_code": "demo_client"
+    },
+    {
+      "role_code": "internal_client"
+    },
+    {
+      "role_code": "platform_admin"
+    },
+    {
+      "role_code": "platform_owner"
+    },
+    {
+      "role_code": "service_provider"
+    },
+    {
+      "role_code": "technical_operator"
+    }
+  ],
+  "workspaces": [
+    {
+      "slug": "team360_public_site",
+      "status": "active",
+      "metadata_jsonb": {
+        "organization_id": "org_team360",
+        "organization_code": "team360_live",
+        "organization_name": "Team360"
+      }
+    }
+  ],
+  "permission_candidates": [],
+  "user_inventory": [
+    {
+      "slug": "team360_public_site",
+      "role": "member",
+      "status": "active",
+      "n": 2
+    },
+    {
+      "slug": null,
+      "role": "member",
+      "status": "active",
+      "n": 2
+    }
+  ],
+  "organizational_admin_inventory": [
+    {
+      "organization_code": "team360_live",
+      "role_code": "content_admin",
+      "status": "active",
+      "n": 1
+    },
+    {
+      "organization_code": "team360_live",
+      "role_code": "organization_admin",
+      "status": "active",
+      "n": 1
+    },
+    {
+      "organization_code": "team360_live",
+      "role_code": "organization_owner",
+      "status": "active",
+      "n": 1
+    },
+    {
+      "organization_code": "team360_platform",
+      "role_code": "organization_admin",
+      "status": "active",
+      "n": 1
+    },
+    {
+      "organization_code": "team360_platform",
+      "role_code": "organization_owner",
+      "status": "active",
+      "n": 1
+    },
+    {
+      "organization_code": "team360_platform",
+      "role_code": "technical_admin",
+      "status": "active",
+      "n": 1
+    }
+  ],
+  "write_roles": [
+    {
+      "rolname": "administrator",
+      "workspace_insert": true,
+      "user_update": true
+    },
+    {
+      "rolname": "concilia_app",
+      "workspace_insert": false,
+      "user_update": false
+    },
+    {
+      "rolname": "concilia_owner",
+      "workspace_insert": false,
+      "user_update": false
+    },
+    {
+      "rolname": "evolution_api",
+      "workspace_insert": false,
+      "user_update": false
+    },
+    {
+      "rolname": "litellm",
+      "workspace_insert": false,
+      "user_update": false
+    },
+    {
+      "rolname": "team360_telchi_ducklake",
+      "workspace_insert": false,
+      "user_update": false
+    }
+  ],
+  "phone_schema": [
+    {
+      "table_name": null
+    }
+  ]
+}

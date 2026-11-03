@@ -1,0 +1,502 @@
+[
+  {
+    "number": 3,
+    "original_claim": {
+      "metric": "line_amount_bs",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "currency_code": "BS"
+      },
+      "value": "47340.130000"
+    },
+    "supporting_turn": 1,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, currency AS currency_code, count(doc_entry) AS line_count, count(DISTINCT doc_entry) AS document_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_semantic_status, sales_channel_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "currency": "BS"
+    },
+    "metric_expression": "sum(line_total)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "SUM(line_total) is commercial line money BS, not header total, net billing or collections.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "47340.130000",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 4,
+    "original_claim": {
+      "metric": "line_count",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "currency_code": "BS"
+      },
+      "value": "154"
+    },
+    "supporting_turn": 1,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, currency AS currency_code, count(doc_entry) AS line_count, count(DISTINCT doc_entry) AS document_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_semantic_status, sales_channel_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "currency": "BS"
+    },
+    "metric_expression": "count(doc_entry)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "COUNT counts non-null source keys, not distinct documents. Independent key completeness validates it as line_count.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "154",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 5,
+    "original_claim": {
+      "metric": "line_amount_bs",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "item_code": "L03658",
+        "currency_code": "BS"
+      },
+      "value": "19073.180000"
+    },
+    "supporting_turn": 2,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, item_code AS item_code, currency AS currency_code, count(line_num) AS line_count, count(doc_entry) AS document_line_rows, sum(line_total) AS line_amount_bs FROM sales_operation WHERE sales_channel_code IS NULL OR sales_channel_semantic_status IS NULL GROUP BY sales_channel_semantic_status, sales_channel_code, item_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "item_code": "item_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "item_code": "L03658",
+      "currency": "BS"
+    },
+    "metric_expression": "sum(line_total)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "SUM(line_total) is commercial line money BS, not header total, net billing or collections.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "19073.180000",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 6,
+    "original_claim": {
+      "metric": "line_count",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "item_code": "L03658",
+        "currency_code": "BS"
+      },
+      "value": "43"
+    },
+    "supporting_turn": 2,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, item_code AS item_code, currency AS currency_code, count(line_num) AS line_count, count(doc_entry) AS document_line_rows, sum(line_total) AS line_amount_bs FROM sales_operation WHERE sales_channel_code IS NULL OR sales_channel_semantic_status IS NULL GROUP BY sales_channel_semantic_status, sales_channel_code, item_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "item_code": "item_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "item_code": "L03658",
+      "currency": "BS"
+    },
+    "metric_expression": "count(line_num)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "COUNT counts non-null source keys, not distinct documents. Independent key completeness validates it as line_count.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "43",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 7,
+    "original_claim": {
+      "metric": "line_amount_bs",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "item_code": "L02822",
+        "currency_code": "BS"
+      },
+      "value": "18273.590000"
+    },
+    "supporting_turn": 2,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, item_code AS item_code, currency AS currency_code, count(line_num) AS line_count, count(doc_entry) AS document_line_rows, sum(line_total) AS line_amount_bs FROM sales_operation WHERE sales_channel_code IS NULL OR sales_channel_semantic_status IS NULL GROUP BY sales_channel_semantic_status, sales_channel_code, item_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "item_code": "item_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "item_code": "L02822",
+      "currency": "BS"
+    },
+    "metric_expression": "sum(line_total)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "SUM(line_total) is commercial line money BS, not header total, net billing or collections.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "18273.590000",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 8,
+    "original_claim": {
+      "metric": "line_count",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "item_code": "L02822",
+        "currency_code": "BS"
+      },
+      "value": "52"
+    },
+    "supporting_turn": 2,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, item_code AS item_code, currency AS currency_code, count(line_num) AS line_count, count(doc_entry) AS document_line_rows, sum(line_total) AS line_amount_bs FROM sales_operation WHERE sales_channel_code IS NULL OR sales_channel_semantic_status IS NULL GROUP BY sales_channel_semantic_status, sales_channel_code, item_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "item_code": "item_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "item_code": "L02822",
+      "currency": "BS"
+    },
+    "metric_expression": "count(line_num)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "COUNT counts non-null source keys, not distinct documents. Independent key completeness validates it as line_count.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "52",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 9,
+    "original_claim": {
+      "metric": "line_amount_bs",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "item_code": "L03649",
+        "currency_code": "BS"
+      },
+      "value": "5012.860000"
+    },
+    "supporting_turn": 2,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, item_code AS item_code, currency AS currency_code, count(line_num) AS line_count, count(doc_entry) AS document_line_rows, sum(line_total) AS line_amount_bs FROM sales_operation WHERE sales_channel_code IS NULL OR sales_channel_semantic_status IS NULL GROUP BY sales_channel_semantic_status, sales_channel_code, item_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "item_code": "item_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "item_code": "L03649",
+      "currency": "BS"
+    },
+    "metric_expression": "sum(line_total)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "SUM(line_total) is commercial line money BS, not header total, net billing or collections.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "5012.860000",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 10,
+    "original_claim": {
+      "metric": "line_count",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "item_code": "L03649",
+        "currency_code": "BS"
+      },
+      "value": "31"
+    },
+    "supporting_turn": 2,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, item_code AS item_code, currency AS currency_code, count(line_num) AS line_count, count(doc_entry) AS document_line_rows, sum(line_total) AS line_amount_bs FROM sales_operation WHERE sales_channel_code IS NULL OR sales_channel_semantic_status IS NULL GROUP BY sales_channel_semantic_status, sales_channel_code, item_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "item_code": "item_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "item_code": "L03649",
+      "currency": "BS"
+    },
+    "metric_expression": "count(line_num)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "COUNT counts non-null source keys, not distinct documents. Independent key completeness validates it as line_count.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "31",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 11,
+    "original_claim": {
+      "metric": "line_amount_bs",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "item_code": "L02823",
+        "currency_code": "BS"
+      },
+      "value": "4980.500000"
+    },
+    "supporting_turn": 2,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, item_code AS item_code, currency AS currency_code, count(line_num) AS line_count, count(doc_entry) AS document_line_rows, sum(line_total) AS line_amount_bs FROM sales_operation WHERE sales_channel_code IS NULL OR sales_channel_semantic_status IS NULL GROUP BY sales_channel_semantic_status, sales_channel_code, item_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "item_code": "item_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "item_code": "L02823",
+      "currency": "BS"
+    },
+    "metric_expression": "sum(line_total)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "SUM(line_total) is commercial line money BS, not header total, net billing or collections.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "4980.500000",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 12,
+    "original_claim": {
+      "metric": "line_count",
+      "filters": {
+        "channel_status": null,
+        "channel_code": null,
+        "item_code": "L02823",
+        "currency_code": "BS"
+      },
+      "value": "28"
+    },
+    "supporting_turn": 2,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, item_code AS item_code, currency AS currency_code, count(line_num) AS line_count, count(doc_entry) AS document_line_rows, sum(line_total) AS line_amount_bs FROM sales_operation WHERE sales_channel_code IS NULL OR sales_channel_semantic_status IS NULL GROUP BY sales_channel_semantic_status, sales_channel_code, item_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "item_code": "item_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": null,
+      "sales_channel_code": null,
+      "item_code": "L02823",
+      "currency": "BS"
+    },
+    "metric_expression": "count(line_num)",
+    "semantic_limit": "NULL is absence of a published value, not the official code UNCLASSIFIED.",
+    "count_semantics": "COUNT counts non-null source keys, not distinct documents. Independent key completeness validates it as line_count.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "28",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 13,
+    "original_claim": {
+      "metric": "line_amount_bs",
+      "filters": {
+        "channel_status": "CONFIRMED",
+        "channel_code": "HORIZONTAL",
+        "currency_code": "BS"
+      },
+      "value": "85379.310000"
+    },
+    "supporting_turn": 1,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, currency AS currency_code, count(doc_entry) AS line_count, count(DISTINCT doc_entry) AS document_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_semantic_status, sales_channel_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": "CONFIRMED",
+      "sales_channel_code": "HORIZONTAL",
+      "currency": "BS"
+    },
+    "metric_expression": "sum(line_total)",
+    "semantic_limit": "CONFIRMED is the published status, not evidence for classifier causality.",
+    "count_semantics": "SUM(line_total) is commercial line money BS, not header total, net billing or collections.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "85379.310000",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 14,
+    "original_claim": {
+      "metric": "line_count",
+      "filters": {
+        "channel_status": "CONFIRMED",
+        "channel_code": "HORIZONTAL",
+        "currency_code": "BS"
+      },
+      "value": "543"
+    },
+    "supporting_turn": 1,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, currency AS currency_code, count(doc_entry) AS line_count, count(DISTINCT doc_entry) AS document_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_semantic_status, sales_channel_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": "CONFIRMED",
+      "sales_channel_code": "HORIZONTAL",
+      "currency": "BS"
+    },
+    "metric_expression": "count(doc_entry)",
+    "semantic_limit": "CONFIRMED is the published status, not evidence for classifier causality.",
+    "count_semantics": "COUNT counts non-null source keys, not distinct documents. Independent key completeness validates it as line_count.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "543",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 15,
+    "original_claim": {
+      "metric": "line_amount_bs",
+      "filters": {
+        "channel_status": "SUPPORTED",
+        "channel_code": "SALON",
+        "currency_code": "BS"
+      },
+      "value": "47681.370000"
+    },
+    "supporting_turn": 1,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, currency AS currency_code, count(doc_entry) AS line_count, count(DISTINCT doc_entry) AS document_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_semantic_status, sales_channel_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": "SUPPORTED",
+      "sales_channel_code": "SALON",
+      "currency": "BS"
+    },
+    "metric_expression": "sum(line_total)",
+    "semantic_limit": "SUPPORTED is not CONFIRMED; this group cannot be presented as fully confirmed.",
+    "count_semantics": "SUM(line_total) is commercial line money BS, not header total, net billing or collections.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "47681.370000",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  },
+  {
+    "number": 16,
+    "original_claim": {
+      "metric": "line_count",
+      "filters": {
+        "channel_status": "SUPPORTED",
+        "channel_code": "SALON",
+        "currency_code": "BS"
+      },
+      "value": "837"
+    },
+    "supporting_turn": 1,
+    "supporting_sql": "SELECT sales_channel_semantic_status AS channel_status, sales_channel_code AS channel_code, currency AS currency_code, count(doc_entry) AS line_count, count(DISTINCT doc_entry) AS document_count, sum(line_total) AS line_amount_bs FROM sales_operation GROUP BY sales_channel_semantic_status, sales_channel_code, currency ORDER BY line_amount_bs DESC",
+    "aliases": {
+      "channel_status": "sales_channel_semantic_status",
+      "channel_code": "sales_channel_code",
+      "currency_code": "currency"
+    },
+    "real_fields": {
+      "sales_channel_semantic_status": "SUPPORTED",
+      "sales_channel_code": "SALON",
+      "currency": "BS"
+    },
+    "metric_expression": "count(doc_entry)",
+    "semantic_limit": "SUPPORTED is not CONFIRMED; this group cannot be presented as fully confirmed.",
+    "count_semantics": "COUNT counts non-null source keys, not distinct documents. Independent key completeness validates it as line_count.",
+    "rejection": "unsupported_filters",
+    "classification": "STRUCTURAL_ALIAS_BINDING",
+    "numeric_correct": true,
+    "independently_reconstructed_value": "837",
+    "business_interpretation": "Correct only as current published commercial line amount/count for this exact group. No causal claim, official classifier rule, historical completeness or whole-brand scope is accredited.",
+    "provenance_ambiguity": "The same aliases in turn 4 refer to COALESCE calculations, not direct source values. Without result identity this claim cannot distinguish turns 1/2 from turn 4.",
+    "required_behavior": "Reject ambiguous legacy binding, return structured feedback; require issued result/column/group IDs."
+  }
+]

@@ -1,0 +1,4687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A/R Invoice - Rows - SAP B1 SDK Help</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="expand-collapse.css">
+
+<script async src="https://www.sap.com/sharedlibs/globaltop/script-latest.min.js"></script>
+<script src="https://cdn.schemaapp.com/javascript/highlight.js"></script><script src="https://cdn.schemaapp.com/javascript/schemaFunctions.min.js"></script><script>schemaLoad("Acronym/Helpsap", "325UM-NQRHZ-P7T97-M5SY8");</script>
+<meta name="semaphore_tech_ids" content="73554900100700000803,01200615320800000816">
+<meta name="product" content="SAP Business One">
+<meta name="version" content="10.0">
+<meta name="language" content="en-US">
+<meta name="contenthash" content="604e333072020bf58e32fba4348350823eb15adbb3b0e703c63a43368e5781fab47a439f064a2b83b4def5ec524479f4d5348673de86a5b307eb712a82f40187">
+<meta name="contentloio" content="089315d8d0f8475a9fc84fb919b501a3">
+<meta name="created_timestamp" content="2026-08-23 06:53.09">
+<meta name="updated_timestamp" content="2026-05-12 08:09.02">
+<link rel="canonical" href="/doc/089315d8d0f8475a9fc84fb919b501a3/10.0/en-US/SDKHelp/INV1.html">
+
+<script>
+var domain = window.location.origin;
+var adobeScript = "https://www.sap.com/tmgr/ccc66c06b30b/6fef444d50e0/launch-";
+adobeScript += domain.includes("localhost") ? "c29560858f22-development.min.js" : "dec827c65643-staging.min.js";
+window.SAP = window.SAP || {};
+
+window.SAP.global = {
+"trustArc": {
+"domain": "help.sap.com",
+"privacyPolicyLink": `${domain}/docs/privacy`,
+"cookieLink": `${domain}/docs/privacy/cookie-statement`
+},
+"isProd": false,
+"tagManagerUrl": adobeScript,
+"applyConsentNoPageReload": true
+};
+
+window.adobeDataLayer = window.adobeDataLayer || [];
+window.adobeDataLayer.push({
+"event": "globalDL",
+"site": { 
+"name": "help",
+"country": "glo"
+},
+"user": {
+"loginStatus": "no", 
+}
+});
+
+const page = {
+"name": "", 
+"section": location.pathname.slice(1, location.pathname.indexOf("/", 1)), 
+"language": "en", 
+"country": "US", 
+"referrer": "null", 
+"url": location.href, 
+"details": { 
+"productID":  "SAP_BUSINESS_ONE", 
+"deliverableID": "089315d8d0f8475a9fc84fb919b501a3", 
+"topicID": "n/a", 
+"version": "10.0", 
+"machineTranslated": "no", 
+}
+}
+
+const user = { 
+"loginStatus": "no", 
+'type': "visitor"
+}
+
+var runPageViewEvent = function(){
+window.adobeDataLayer.push({
+"event": "pageView",
+"page": page,
+"user": user})
+};
+
+runPageViewEvent();
+
+window.adobeDataLayer.push({
+'event': "stBeaconReady"
+}); 
+
+var onConsentChange = function(event) {
+  if (typeof runPageViewEvent === 'function') {
+    runPageViewEvent();
+  } 
+  window.adobeDataLayer.push({
+    'event': "stBeaconReady"
+  });
+};
+document.addEventListener('setUserConsent', onConsentChange);
+window.addEventListener('message', function(e) {
+  try {
+    var payload = e.data;
+    if (typeof payload === 'string') { payload = JSON.parse(payload); }
+    if (payload && payload.message === 'submit_preferences' && payload.source === 'preference_manager') {
+      onConsentChange();
+    }
+  } catch (err) {
+    console.warn('Consent message parsing failed', err);
+  }
+});
+</script>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <header>
+        <div class="container">
+            <h1>📚 SAP Business One SDK Help</h1>
+            <div class="search-container">
+                <input type="text" id="search" placeholder="Search documentation..." autocomplete="off">
+                <div id="search-results"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb">
+        <div class="container">
+            <a href="index.html">Home</a> › <span>A/R Invoice - Rows</span>
+        </div>
+    </nav>
+
+    <!-- Main Content (preserved from original) -->
+    <main class="container">
+        <article>
+            <body>
+<div id="header" style="width: 100%; position: relative;">
+<table cellspacing="0" style="vertical-align: Center; left: 0px; top: 0px;" width="100%">
+<col style="width: 10%;"/>
+<col style="width: 54.212%;"/>
+<tr style="vertical-align: center;">
+<td class="hcp1" style="width:10%;">
+<p class="HeaderImage"><img alt="" border="0" height="32" src="sap-logo-sdk.png" style="border: none;" width="67"/></p></td>
+<td class="hcp1">
+<p class="HeaderTitle">SAP 
+			 Business One SDK 10.0 - Database Tables Reference</p></td>
+</tr>
+</table>
+<h1>A/R Invoice - Rows</h1>
+</div>
+<p>Table Name: INV1</p>
+<p>Table Description: A/R Invoice - Rows</p>
+<table border="2" bordercolor="#111111" cellspacing="2" class="hcp2" dir="ltr" id="AutoNumber1" style="height:311px;" width="100%">
+<tr>
+<td class="hcp3" height="24" style="width:9%;"><b>Field</b></td>
+<td class="hcp3" height="24" style="width:12%;"><b>Description</b></td>
+<td class="hcp3" height="24" style="width:9%;"><b>Type</b></td>
+<td class="hcp3" height="24" style="width:10%;"><b>Size</b></td>
+<td class="hcp3" height="24" style="width:11%;"><b>Related</b></td>
+<td class="hcp3" height="24" style="width:12%;"><b>Default Value</b></td>
+<td class="hcp3" colspan="2" height="24" style="width:16%;"><b>Constraints</b></td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DocEntry</td>
+<td class="hcp3" height="16" style="width:12%;">Document Internal ID</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OINV.html">OINV</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LineNum</td>
+<td class="hcp3" height="16" style="width:12%;">Row Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TargetType</td>
+<td class="hcp3" height="16" style="width:12%;">Target Document Type</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">-1</td>
+<td class="hcp3" height="16" style="width:8%;">-1</td>
+<td class="hcp3" height="16" style="width:8%;"> </td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">0</td>
+<td class="hcp3" height="16" style="width:8%;"> </td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">14</td>
+<td class="hcp3" height="16" style="width:8%;">A/R Credit Note</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">15</td>
+<td class="hcp3" height="16" style="width:8%;">Delivery</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">165</td>
+<td class="hcp3" height="16" style="width:8%;">A/R Correction Invoice</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">234000031</td>
+<td class="hcp3" height="16" style="width:8%;">A/R Return Request</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TrgetEntry</td>
+<td class="hcp3" height="16" style="width:12%;">Target Document Internal ID</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BaseRef</td>
+<td class="hcp3" height="16" style="width:12%;">Base Document Reference</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">16</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BaseType</td>
+<td class="hcp3" height="16" style="width:12%;">Base Document Type</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">-1</td>
+<td class="hcp3" height="16" style="width:8%;">-1</td>
+<td class="hcp3" height="16" style="width:8%;"> </td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">0</td>
+<td class="hcp3" height="16" style="width:8%;"> </td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">23</td>
+<td class="hcp3" height="16" style="width:8%;">Sales Quotation</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">17</td>
+<td class="hcp3" height="16" style="width:8%;">Sales Order</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">15</td>
+<td class="hcp3" height="16" style="width:8%;">Delivery</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">13</td>
+<td class="hcp3" height="16" style="width:8%;">Invoice</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">67</td>
+<td class="hcp3" height="16" style="width:8%;">Inventory Transfer</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BaseEntry</td>
+<td class="hcp3" height="16" style="width:12%;">Base Document Internal ID</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BaseLine</td>
+<td class="hcp3" height="16" style="width:12%;">Base Row</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LineStatus</td>
+<td class="hcp3" height="16" style="width:12%;">Row Status</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">O</td>
+<td class="hcp3" height="16" style="width:8%;">O</td>
+<td class="hcp3" height="16" style="width:8%;">Open</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">C</td>
+<td class="hcp3" height="16" style="width:8%;">Closed</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ItemCode</td>
+<td class="hcp3" height="16" style="width:12%;">Item No.</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">50</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OITM.html">OITM</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Dscription</td>
+<td class="hcp3" height="16" style="width:12%;">Item/Service Description</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">200</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Quantity</td>
+<td class="hcp3" height="16" style="width:12%;">Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ShipDate</td>
+<td class="hcp3" height="16" style="width:12%;">Row Delivery Date</td>
+<td class="hcp3" height="16" style="width:9%;">Date</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OpenQty</td>
+<td class="hcp3" height="16" style="width:12%;">Remaining Open Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Price</td>
+<td class="hcp3" height="16" style="width:12%;">Price after Discount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Currency</td>
+<td class="hcp3" height="16" style="width:12%;">Price Currency</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">3</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCRN.html">OCRN</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Rate</td>
+<td class="hcp3" height="16" style="width:12%;">Currency Rate</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DiscPrcnt</td>
+<td class="hcp3" height="16" style="width:12%;">Discount % per Row</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LineTotal</td>
+<td class="hcp3" height="16" style="width:12%;">Row Total</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TotalFrgn</td>
+<td class="hcp3" height="16" style="width:12%;">Row Total (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OpenSum</td>
+<td class="hcp3" height="16" style="width:12%;">Open Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OpenSumFC</td>
+<td class="hcp3" height="16" style="width:12%;">Open Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VendorNum</td>
+<td class="hcp3" height="16" style="width:12%;">Vendor Catalog No.</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">50</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">SerialNum</td>
+<td class="hcp3" height="16" style="width:12%;">Serial Number</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">17</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">WhsCode</td>
+<td class="hcp3" height="16" style="width:12%;">Warehouse Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OWHS.html">OWHS</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">SlpCode</td>
+<td class="hcp3" height="16" style="width:12%;">Sales Employee Code</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OSLP.html">OSLP</a></td>
+<td class="hcp3" height="16" style="width:12%;">-1</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Commission</td>
+<td class="hcp3" height="16" style="width:12%;">Commission Percentage</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TreeType</td>
+<td class="hcp3" height="16" style="width:12%;">BOM Type</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Not a BOM</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">A</td>
+<td class="hcp3" height="16" style="width:8%;">Assembly</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">S</td>
+<td class="hcp3" height="16" style="width:8%;">Sales</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">I</td>
+<td class="hcp3" height="16" style="width:8%;">Sales BOM Component</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">P</td>
+<td class="hcp3" height="16" style="width:8%;">Production</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">T</td>
+<td class="hcp3" height="16" style="width:8%;">Template</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">AcctCode</td>
+<td class="hcp3" height="16" style="width:12%;">Account Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">15</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OACT.html">OACT</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxStatus</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Definition</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GrossBuyPr</td>
+<td class="hcp3" height="16" style="width:12%;">Gross Profit Base Price</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PriceBefDi</td>
+<td class="hcp3" height="16" style="width:12%;">Unit Price</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DocDate</td>
+<td class="hcp3" height="16" style="width:12%;">Posting Date</td>
+<td class="hcp3" height="16" style="width:9%;">Date</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Flags</td>
+<td class="hcp3" height="16" style="width:12%;">Flags</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">0</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OpenCreQty</td>
+<td class="hcp3" height="16" style="width:12%;">Credit Memo Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UseBaseUn</td>
+<td class="hcp3" height="16" style="width:12%;">Inventory UoM</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">SubCatNum</td>
+<td class="hcp3" height="16" style="width:12%;">BP Catalog No.</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">50</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OSCN.html">OSCN</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BaseCard</td>
+<td class="hcp3" height="16" style="width:12%;">Base BP Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">15</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCRD.html">OCRD</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TotalSumSy</td>
+<td class="hcp3" height="16" style="width:12%;">Row Total (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OpenSumSys</td>
+<td class="hcp3" height="16" style="width:12%;">Open Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">InvntSttus</td>
+<td class="hcp3" height="16" style="width:12%;">Warehouse Status</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">O</td>
+<td class="hcp3" height="16" style="width:8%;">O</td>
+<td class="hcp3" height="16" style="width:8%;">Open</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">C</td>
+<td class="hcp3" height="16" style="width:8%;">Closed</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OcrCode</td>
+<td class="hcp3" height="16" style="width:12%;">Distribution Rule</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Project</td>
+<td class="hcp3" height="16" style="width:12%;">Project Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OPRJ.html">OPRJ</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CodeBars</td>
+<td class="hcp3" height="16" style="width:12%;">Bar Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">254</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatPrcnt</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Rate per Row</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatGroup</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Definition</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OVTG.html">OVTG</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PriceAfVAT</td>
+<td class="hcp3" height="16" style="width:12%;">Gross Price after Discount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Height1</td>
+<td class="hcp3" height="16" style="width:12%;">Height 1</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Hght1Unit</td>
+<td class="hcp3" height="16" style="width:12%;">Unit of Height 1</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Height2</td>
+<td class="hcp3" height="16" style="width:12%;">Height 2</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Hght2Unit</td>
+<td class="hcp3" height="16" style="width:12%;">Unit of Height 2</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Width1</td>
+<td class="hcp3" height="16" style="width:12%;">Width 1</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Wdth1Unit</td>
+<td class="hcp3" height="16" style="width:12%;">Unit of Width 1</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Width2</td>
+<td class="hcp3" height="16" style="width:12%;">Width 2</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Wdth2Unit</td>
+<td class="hcp3" height="16" style="width:12%;">Unit of Width 2</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Length1</td>
+<td class="hcp3" height="16" style="width:12%;">Length 1</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Len1Unit</td>
+<td class="hcp3" height="16" style="width:12%;">Unit of Length 1</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">length2</td>
+<td class="hcp3" height="16" style="width:12%;">Length 2</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Len2Unit</td>
+<td class="hcp3" height="16" style="width:12%;">Unit of Length 2</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Volume</td>
+<td class="hcp3" height="16" style="width:12%;">Volume</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VolUnit</td>
+<td class="hcp3" height="16" style="width:12%;">Vol. Unit</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Weight1</td>
+<td class="hcp3" height="16" style="width:12%;">Weight 1</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Wght1Unit</td>
+<td class="hcp3" height="16" style="width:12%;">Unit of Weight 1</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Weight2</td>
+<td class="hcp3" height="16" style="width:12%;">Weight 2</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Wght2Unit</td>
+<td class="hcp3" height="16" style="width:12%;">Unit of Weight 2</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Factor1</td>
+<td class="hcp3" height="16" style="width:12%;">Factor 1</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Factor2</td>
+<td class="hcp3" height="16" style="width:12%;">Factor 2</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Factor3</td>
+<td class="hcp3" height="16" style="width:12%;">Factor 3</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Factor4</td>
+<td class="hcp3" height="16" style="width:12%;">Factor 4</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PackQty</td>
+<td class="hcp3" height="16" style="width:12%;">Packing Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UpdInvntry</td>
+<td class="hcp3" height="16" style="width:12%;">Whse Update</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BaseDocNum</td>
+<td class="hcp3" height="16" style="width:12%;">Base Document No.</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BaseAtCard</td>
+<td class="hcp3" height="16" style="width:12%;">Customer/Vendor Base Document</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">200</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">SWW</td>
+<td class="hcp3" height="16" style="width:12%;">Additional Identifier</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">16</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatSum</td>
+<td class="hcp3" height="16" style="width:12%;">Total Tax</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatSumFrgn</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatSumSy</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">FinncPriod</td>
+<td class="hcp3" height="16" style="width:12%;">Posting Period</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OFPR.html">OFPR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ObjType</td>
+<td class="hcp3" height="16" style="width:12%;">Object Type</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="ADP1.html">ADP1</a></td>
+<td class="hcp3" height="16" style="width:12%;">13</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LogInstanc</td>
+<td class="hcp3" height="16" style="width:12%;">Log Instance</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">0</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BlockNum</td>
+<td class="hcp3" height="16" style="width:12%;">Block Number</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">100</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ImportLog</td>
+<td class="hcp3" height="16" style="width:12%;">Import Log</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DedVatSum</td>
+<td class="hcp3" height="16" style="width:12%;">Deductible Tax Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DedVatSumF</td>
+<td class="hcp3" height="16" style="width:12%;">Deductible Tax Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DedVatSumS</td>
+<td class="hcp3" height="16" style="width:12%;">Deductible Tax Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">IsAqcuistn</td>
+<td class="hcp3" height="16" style="width:12%;">Acquisition Tax</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DistribSum</td>
+<td class="hcp3" height="16" style="width:12%;">Distributed Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DstrbSumFC</td>
+<td class="hcp3" height="16" style="width:12%;">Distributed Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DstrbSumSC</td>
+<td class="hcp3" height="16" style="width:12%;">Distributed Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GrssProfit</td>
+<td class="hcp3" height="16" style="width:12%;">Row Gross Profit</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GrssProfSC</td>
+<td class="hcp3" height="16" style="width:12%;">Row Gross Profit (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GrssProfFC</td>
+<td class="hcp3" height="16" style="width:12%;">Row Gross Profit (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VisOrder</td>
+<td class="hcp3" height="16" style="width:12%;">Visual Order</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">INMPrice</td>
+<td class="hcp3" height="16" style="width:12%;">Item's Last Sales Price (OINM)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PoTrgNum</td>
+<td class="hcp3" height="16" style="width:12%;">PO Target No.</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PoTrgEntry</td>
+<td class="hcp3" height="16" style="width:12%;">PO Target Internal ID</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DropShip</td>
+<td class="hcp3" height="16" style="width:12%;">Drop-Ship</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PoLineNum</td>
+<td class="hcp3" height="16" style="width:12%;">PO Target Row No.</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Address</td>
+<td class="hcp3" height="16" style="width:12%;">Address</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">254</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxCode</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OSTC.html">OSTC</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxType</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Type</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Regular Tax</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No Tax</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">U</td>
+<td class="hcp3" height="16" style="width:8%;">Use Tax</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OrigItem</td>
+<td class="hcp3" height="16" style="width:12%;">Original Item</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">50</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OITM.html">OITM</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BackOrdr</td>
+<td class="hcp3" height="16" style="width:12%;">Allow Backorder</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">FreeTxt</td>
+<td class="hcp3" height="16" style="width:12%;">Free Text</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">100</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PickStatus</td>
+<td class="hcp3" height="16" style="width:12%;">Pick Status</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Picked</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Not Picked</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">R</td>
+<td class="hcp3" height="16" style="width:8%;">Released for Picking</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">P</td>
+<td class="hcp3" height="16" style="width:8%;">Partially Picked</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PickOty</td>
+<td class="hcp3" height="16" style="width:12%;">Pick Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PickIdNo</td>
+<td class="hcp3" height="16" style="width:12%;">Pick ID</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TrnsCode</td>
+<td class="hcp3" height="16" style="width:12%;">Shipping Method</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OSHP.html">OSHP</a></td>
+<td class="hcp3" height="16" style="width:12%;">-1</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatAppld</td>
+<td class="hcp3" height="16" style="width:12%;">Applied Tax</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatAppldFC</td>
+<td class="hcp3" height="16" style="width:12%;">Applied Tax (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatAppldSC</td>
+<td class="hcp3" height="16" style="width:12%;">Applied Tax (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BaseQty</td>
+<td class="hcp3" height="16" style="width:12%;">Base Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BaseOpnQty</td>
+<td class="hcp3" height="16" style="width:12%;">Base Open Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatDscntPr</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Discount %</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">WtLiable</td>
+<td class="hcp3" height="16" style="width:12%;">WTax Liable</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DeferrTax</td>
+<td class="hcp3" height="16" style="width:12%;">Deferred Tax</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">EquVatPer</td>
+<td class="hcp3" height="16" style="width:12%;">Equalization Tax %</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">EquVatSum</td>
+<td class="hcp3" height="16" style="width:12%;">Total Equalization Tax</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">EquVatSumF</td>
+<td class="hcp3" height="16" style="width:12%;">Total Equalization Tax (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">EquVatSumS</td>
+<td class="hcp3" height="16" style="width:12%;">Total Equalization Tax (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LineVat</td>
+<td class="hcp3" height="16" style="width:12%;">Net Tax Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LineVatlF</td>
+<td class="hcp3" height="16" style="width:12%;">Net Tax Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LineVatS</td>
+<td class="hcp3" height="16" style="width:12%;">Net Tax Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">unitMsr</td>
+<td class="hcp3" height="16" style="width:12%;">Unit</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">100</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NumPerMsr</td>
+<td class="hcp3" height="16" style="width:12%;">UoM Value</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CEECFlag</td>
+<td class="hcp3" height="16" style="width:12%;">Correction Invoice Was/Should Be</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">S</td>
+<td class="hcp3" height="16" style="width:8%;">W</td>
+<td class="hcp3" height="16" style="width:8%;">Was</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">S</td>
+<td class="hcp3" height="16" style="width:8%;">Should Be</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ToStock</td>
+<td class="hcp3" height="16" style="width:12%;">Corr. Invoice Amt to Inventory</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ToDiff</td>
+<td class="hcp3" height="16" style="width:12%;">Corr. Invoice Amount to Diff.</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ExciseAmt</td>
+<td class="hcp3" height="16" style="width:12%;">Excise Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxPerUnit</td>
+<td class="hcp3" height="16" style="width:12%;">Tax per Unit</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TotInclTax</td>
+<td class="hcp3" height="16" style="width:12%;">Total Including Tax</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CountryOrg</td>
+<td class="hcp3" height="16" style="width:12%;">Country/Region of Origin</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">3</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckDstSum</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Distribution Sum</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ReleasQtty</td>
+<td class="hcp3" height="16" style="width:12%;">Released Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LineType</td>
+<td class="hcp3" height="16" style="width:12%;">Row Type</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">R</td>
+<td class="hcp3" height="16" style="width:8%;">R</td>
+<td class="hcp3" height="16" style="width:8%;">Regular</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TranType</td>
+<td class="hcp3" height="16" style="width:12%;">Transaction Type</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">C</td>
+<td class="hcp3" height="16" style="width:8%;">Complete</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">R</td>
+<td class="hcp3" height="16" style="width:8%;">Reject</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Text</td>
+<td class="hcp3" height="16" style="width:12%;">Text</td>
+<td class="hcp3" height="16" style="width:9%;">Text</td>
+<td class="hcp3" height="16" style="width:10%;">16</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OwnerCode</td>
+<td class="hcp3" height="16" style="width:12%;">Document Owner</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StockPrice</td>
+<td class="hcp3" height="16" style="width:12%;">Item Cost</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ConsumeFCT</td>
+<td class="hcp3" height="16" style="width:12%;">Consumer Sales Forecast</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LstByDsSum</td>
+<td class="hcp3" height="16" style="width:12%;">Last Buy Distribute Sum</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckINMPr</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Inm Price</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LstBINMPr</td>
+<td class="hcp3" height="16" style="width:12%;">Last Buy Inventory Journal Pr.</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckDstFc</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Distribution Sum (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckDstSc</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Distribution Sum (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LstByDsFc</td>
+<td class="hcp3" height="16" style="width:12%;">Last Buy Distribute Sum (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LstByDsSc</td>
+<td class="hcp3" height="16" style="width:12%;">Last Buy Distribute Sum (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StockSum</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Sum</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StockSumFc</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Sum FC</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StockSumSc</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Sum SC</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckSumApp</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Sum Applied</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckAppFc</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Sum Applied FC</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckAppSc</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Sum Applied SC</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ShipToCode</td>
+<td class="hcp3" height="16" style="width:12%;">Ship-to Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">50</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ShipToDesc</td>
+<td class="hcp3" height="16" style="width:12%;">Ship-to Description</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">254</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckAppD</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Distrib. - Applied Sum</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckAppDFC</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Dist. - Applied Sum (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StckAppDSC</td>
+<td class="hcp3" height="16" style="width:12%;">Stock Dist. - Applied Sum (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">BasePrice</td>
+<td class="hcp3" height="16" style="width:12%;">Price for Total Calculation</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">E</td>
+<td class="hcp3" height="16" style="width:8%;">E</td>
+<td class="hcp3" height="16" style="width:8%;">Exclude Tax</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">I</td>
+<td class="hcp3" height="16" style="width:8%;">Include Tax</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GTotal</td>
+<td class="hcp3" height="16" style="width:12%;">Gross Total</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GTotalFC</td>
+<td class="hcp3" height="16" style="width:12%;">Gross Total (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GTotalSC</td>
+<td class="hcp3" height="16" style="width:12%;">Gross Total (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DistribExp</td>
+<td class="hcp3" height="16" style="width:12%;">Distribute Freight Charges</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DescOW</td>
+<td class="hcp3" height="16" style="width:12%;">Description overwritten</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DetailsOW</td>
+<td class="hcp3" height="16" style="width:12%;">Remarks overwritten</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GrossBase</td>
+<td class="hcp3" height="16" style="width:12%;">Base Method for Gross Profit</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatWoDpm</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Before DPM Applied</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatWoDpmFc</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Before DPM Applied (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatWoDpmSc</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Before DPM Applied (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CFOPCode</td>
+<td class="hcp3" height="16" style="width:12%;">CFOP Code for Document</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCFP.html">OCFP</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CSTCode</td>
+<td class="hcp3" height="16" style="width:12%;">CST Code for ICMS</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Usage</td>
+<td class="hcp3" height="16" style="width:12%;">Usage Code for Document</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OUSG.html">OUSG</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxOnly</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Only</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">WtCalced</td>
+<td class="hcp3" height="16" style="width:12%;">Withholding Tax Calculated</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">QtyToShip</td>
+<td class="hcp3" height="16" style="width:12%;">Quantity to Ship</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DelivrdQty</td>
+<td class="hcp3" height="16" style="width:12%;">Delivered Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OrderedQty</td>
+<td class="hcp3" height="16" style="width:12%;">Ordered Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CogsOcrCod</td>
+<td class="hcp3" height="16" style="width:12%;">COGS Distribution Rule Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CiOppLineN</td>
+<td class="hcp3" height="16" style="width:12%;">Row Number of Associated Row</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">-1</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CogsAcct</td>
+<td class="hcp3" height="16" style="width:12%;">COGS Account Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">15</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OACT.html">OACT</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ChgAsmBoMW</td>
+<td class="hcp3" height="16" style="width:12%;">Change Whs for Asm BoM Child</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ActDelDate</td>
+<td class="hcp3" height="16" style="width:12%;">Actual Delivery Date</td>
+<td class="hcp3" height="16" style="width:9%;">Date</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OcrCode2</td>
+<td class="hcp3" height="16" style="width:12%;">Costing Code 2</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OcrCode3</td>
+<td class="hcp3" height="16" style="width:12%;">Costing Code 3</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OcrCode4</td>
+<td class="hcp3" height="16" style="width:12%;">Costing Code 4</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OcrCode5</td>
+<td class="hcp3" height="16" style="width:12%;">Costing Code 5</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxDistSum</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Distributed Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxDistSFC</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Distributed Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxDistSSC</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Distributed Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PostTax</td>
+<td class="hcp3" height="16" style="width:12%;">Post Tax in Price to Stock</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Excisable</td>
+<td class="hcp3" height="16" style="width:12%;">Excisable [Yes/No]</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">AssblValue</td>
+<td class="hcp3" height="16" style="width:12%;">Assessable Value</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RG23APart1</td>
+<td class="hcp3" height="16" style="width:12%;">RG23A Part1 Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RG23APart2</td>
+<td class="hcp3" height="16" style="width:12%;">RG23A Part2 Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RG23CPart1</td>
+<td class="hcp3" height="16" style="width:12%;">RG23C Part1 Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RG23CPart2</td>
+<td class="hcp3" height="16" style="width:12%;">RG23C Part2 Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CogsOcrCo2</td>
+<td class="hcp3" height="16" style="width:12%;">COGS Distribution Rule Code2</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CogsOcrCo3</td>
+<td class="hcp3" height="16" style="width:12%;">COGS Distribution Rule Code3</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CogsOcrCo4</td>
+<td class="hcp3" height="16" style="width:12%;">COGS Distribution Rule Code4</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CogsOcrCo5</td>
+<td class="hcp3" height="16" style="width:12%;">COGS Distribution Rule Code5</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOCR.html">OOCR</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LnExcised</td>
+<td class="hcp3" height="16" style="width:12%;">Line Excised</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">O</td>
+<td class="hcp3" height="16" style="width:8%;">Open</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">C</td>
+<td class="hcp3" height="16" style="width:8%;">Closed</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">P</td>
+<td class="hcp3" height="16" style="width:8%;">Copied to OEI</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LocCode</td>
+<td class="hcp3" height="16" style="width:12%;">Location Code</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OLCT.html">OLCT</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StockValue</td>
+<td class="hcp3" height="16" style="width:12%;">Total COGS Value</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GPTtlBasPr</td>
+<td class="hcp3" height="16" style="width:12%;">Total Base Price for Profit</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">unitMsr2</td>
+<td class="hcp3" height="16" style="width:12%;">Pur/Sal UoM if BaseUnit</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">100</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NumPerMsr2</td>
+<td class="hcp3" height="16" style="width:12%;">Pur/Sal UoM Value if Base Unit</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">SpecPrice</td>
+<td class="hcp3" height="16" style="width:12%;">Price Source Type</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Special Prices for Business Partner</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Manual</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">W</td>
+<td class="hcp3" height="16" style="width:8%;">Active Price List, Discount Groups</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">R</td>
+<td class="hcp3" height="16" style="width:8%;">Active Price List</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">U</td>
+<td class="hcp3" height="16" style="width:8%;">Inactive Price List</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">A</td>
+<td class="hcp3" height="16" style="width:8%;">Blanket Agreement</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">P</td>
+<td class="hcp3" height="16" style="width:8%;">Period and Volume Discounts</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">Q</td>
+<td class="hcp3" height="16" style="width:8%;">Period and Volume Discounts, Discount Groups</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">V</td>
+<td class="hcp3" height="16" style="width:8%;">Inactive Price List, Discount Groups</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">9</td>
+<td class="hcp3" height="16" style="width:8%;">Special Prices for Business Partner</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">!</td>
+<td class="hcp3" height="16" style="width:8%;">Blanket Agreement</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">0</td>
+<td class="hcp3" height="16" style="width:8%;">Period and Volume Discounts</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">1</td>
+<td class="hcp3" height="16" style="width:8%;">Period and Volume Discounts, Discount Groups</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">2</td>
+<td class="hcp3" height="16" style="width:8%;">Active Price List</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">7</td>
+<td class="hcp3" height="16" style="width:8%;">Active Price List, Discount Groups</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">5</td>
+<td class="hcp3" height="16" style="width:8%;">Inactive Price List</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">6</td>
+<td class="hcp3" height="16" style="width:8%;">Inactive Price List, Discount Groups</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CSTfIPI</td>
+<td class="hcp3" height="16" style="width:12%;">CST for IPI Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CSTfPIS</td>
+<td class="hcp3" height="16" style="width:12%;">CST for PIS Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CSTfCOFINS</td>
+<td class="hcp3" height="16" style="width:12%;">CST for COFINS Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ExLineNo</td>
+<td class="hcp3" height="16" style="width:12%;">ExLineNo</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">10</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">isSrvCall</td>
+<td class="hcp3" height="16" style="width:12%;">Created from Service Call</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PQTReqQty</td>
+<td class="hcp3" height="16" style="width:12%;">Pur Quotation: Required Qty</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PQTReqDate</td>
+<td class="hcp3" height="16" style="width:12%;">Pur Quotation: Required Date</td>
+<td class="hcp3" height="16" style="width:9%;">Date</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PcDocType</td>
+<td class="hcp3" height="16" style="width:12%;">Purchase Confirmation Doc Type</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">-1</td>
+<td class="hcp3" height="16" style="width:8%;">-1</td>
+<td class="hcp3" height="16" style="width:8%;">No Type</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">22</td>
+<td class="hcp3" height="16" style="width:8%;">Purchase Order</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">540000006</td>
+<td class="hcp3" height="16" style="width:8%;">Purchase Quotation</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PcQuantity</td>
+<td class="hcp3" height="16" style="width:12%;">Purchase Confirmation Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LinManClsd</td>
+<td class="hcp3" height="16" style="width:12%;">Line Was Closed Manually</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">U</td>
+<td class="hcp3" height="16" style="width:8%;">Unknown</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatGrpSrc</td>
+<td class="hcp3" height="16" style="width:12%;">VAT Group Source</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Not Defined</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">M</td>
+<td class="hcp3" height="16" style="width:8%;">Manually Entered</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">D</td>
+<td class="hcp3" height="16" style="width:8%;">Determined</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NoInvtryMv</td>
+<td class="hcp3" height="16" style="width:12%;">Without Inventory Movement</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ActBaseEnt</td>
+<td class="hcp3" height="16" style="width:12%;">Actual Base Document Entry</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ActBaseLn</td>
+<td class="hcp3" height="16" style="width:12%;">Actual Base Line Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ActBaseNum</td>
+<td class="hcp3" height="16" style="width:12%;">Actual Base Document No.</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OpenRtnQty</td>
+<td class="hcp3" height="16" style="width:12%;">Quantity Open for Return</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">AgrNo</td>
+<td class="hcp3" height="16" style="width:12%;">Agreement No.</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OOAT.html">OOAT</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">AgrLnNum</td>
+<td class="hcp3" height="16" style="width:12%;">Agreement Row Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CredOrigin</td>
+<td class="hcp3" height="16" style="width:12%;">Credit Origin</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OBSI.html">OBSI</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Surpluses</td>
+<td class="hcp3" height="16" style="width:12%;">Surpluses</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DefBreak</td>
+<td class="hcp3" height="16" style="width:12%;">Defect and Breakup</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Shortages</td>
+<td class="hcp3" height="16" style="width:12%;">Shortages</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UomEntry</td>
+<td class="hcp3" height="16" style="width:12%;">UoM Entry</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OUOM.html">OUOM</a></td>
+<td class="hcp3" height="16" style="width:12%;">0</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UomEntry2</td>
+<td class="hcp3" height="16" style="width:12%;">UoM Entry if Base Unit</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OUOM.html">OUOM</a></td>
+<td class="hcp3" height="16" style="width:12%;">0</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UomCode</td>
+<td class="hcp3" height="16" style="width:12%;">UoM Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UomCode2</td>
+<td class="hcp3" height="16" style="width:12%;">UoM Code if Base Unit</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">FromWhsCod</td>
+<td class="hcp3" height="16" style="width:12%;">From Warehouse Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OWHS.html">OWHS</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NeedQty</td>
+<td class="hcp3" height="16" style="width:12%;">Consider Quantity of Items</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PartRetire</td>
+<td class="hcp3" height="16" style="width:12%;">Partial Retirement</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RetireQty</td>
+<td class="hcp3" height="16" style="width:12%;">Retirement Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RetireAPC</td>
+<td class="hcp3" height="16" style="width:12%;">Retirement APC</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RetirAPCFC</td>
+<td class="hcp3" height="16" style="width:12%;">Retirement APC FC</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RetirAPCSC</td>
+<td class="hcp3" height="16" style="width:12%;">Retirement APC SC</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">InvQty</td>
+<td class="hcp3" height="16" style="width:12%;">Quantity - Inventory UoM</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OpenInvQty</td>
+<td class="hcp3" height="16" style="width:12%;">Open Quantity (Inventory UoM)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">EnSetCost</td>
+<td class="hcp3" height="16" style="width:12%;">Enable Set Item Cost in Return</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RetCost</td>
+<td class="hcp3" height="16" style="width:12%;">Return Cost in A/R Return</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">Incoterms</td>
+<td class="hcp3" height="16" style="width:12%;">Incoterms</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="ODCI.html">ODCI</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TransMod</td>
+<td class="hcp3" height="16" style="width:12%;">Transport Mode</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="ODCI.html">ODCI</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LineVendor</td>
+<td class="hcp3" height="16" style="width:12%;">Line Vendor Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">15</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCRD.html">OCRD</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DistribIS</td>
+<td class="hcp3" height="16" style="width:12%;">Distribute Intrastat Freight</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ISDistrb</td>
+<td class="hcp3" height="16" style="width:12%;">Intrastat Distrib. Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ISDistrbFC</td>
+<td class="hcp3" height="16" style="width:12%;">Intrastat Distrib. Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ISDistrbSC</td>
+<td class="hcp3" height="16" style="width:12%;">Intrastat Distrib. Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">IsByPrdct</td>
+<td class="hcp3" height="16" style="width:12%;">Item Is By-Product</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ItemType</td>
+<td class="hcp3" height="16" style="width:12%;">Item Type</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">4</td>
+<td class="hcp3" height="16" style="width:8%;">4</td>
+<td class="hcp3" height="16" style="width:8%;">Item</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PriceEdit</td>
+<td class="hcp3" height="16" style="width:12%;">Price Was Edited by User</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PrntLnNum</td>
+<td class="hcp3" height="16" style="width:12%;">Parent Line Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LinePoPrss</td>
+<td class="hcp3" height="16" style="width:12%;">Line PO Process</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">FreeChrgBP</td>
+<td class="hcp3" height="16" style="width:12%;">Free of Charge (BP)</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxRelev</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Relevant Row</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LegalText</td>
+<td class="hcp3" height="16" style="width:12%;">Legal Text</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">254</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ThirdParty</td>
+<td class="hcp3" height="16" style="width:12%;">Third Party</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LicTradNum</td>
+<td class="hcp3" height="16" style="width:12%;">Federal Tax ID</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">32</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">InvQtyOnly</td>
+<td class="hcp3" height="16" style="width:12%;">Change Qty (Inv. UoM) Only</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UnencReasn</td>
+<td class="hcp3" height="16" style="width:12%;">Reason for Unencumbered ICMS</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ShipFromCo</td>
+<td class="hcp3" height="16" style="width:12%;">Ship-From Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">50</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ShipFromDe</td>
+<td class="hcp3" height="16" style="width:12%;">Ship-From Description</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">254</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">FisrtBin</td>
+<td class="hcp3" height="16" style="width:12%;">First Bin Location</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">228</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">AllocBinC</td>
+<td class="hcp3" height="16" style="width:12%;">Allocated Bin Location Count</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ExpType</td>
+<td class="hcp3" height="16" style="width:12%;">Expense Type</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">4</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OEXD.html">OEXD</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ExpUUID</td>
+<td class="hcp3" height="16" style="width:12%;">Expense UUID</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">50</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ExpOpType</td>
+<td class="hcp3" height="16" style="width:12%;">Expense Operation Type</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">P</td>
+<td class="hcp3" height="16" style="width:8%;">Professional Services</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">R</td>
+<td class="hcp3" height="16" style="width:8%;">Renting Assets</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">O</td>
+<td class="hcp3" height="16" style="width:8%;">Others</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;"> </td>
+<td class="hcp3" height="16" style="width:8%;"> </td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">D</td>
+<td class="hcp3" height="16" style="width:8%;">Disposal of Goods</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">S</td>
+<td class="hcp3" height="16" style="width:8%;">Import of Goods and Services</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">V</td>
+<td class="hcp3" height="16" style="width:8%;">Import by Virtual Transfer</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">G</td>
+<td class="hcp3" height="16" style="width:8%;">Global Operations</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">DIOTNat</td>
+<td class="hcp3" height="16" style="width:12%;">DIOT Nationality</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">3</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCRY.html">OCRY</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">MYFtype</td>
+<td class="hcp3" height="16" style="width:12%;">MYF type</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">2</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">S1</td>
+<td class="hcp3" height="16" style="width:8%;">MYF Wholesale Sales</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">S2</td>
+<td class="hcp3" height="16" style="width:8%;">Retail Sales</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">P1</td>
+<td class="hcp3" height="16" style="width:8%;">MYF Wholesale Purchases</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">P3</td>
+<td class="hcp3" height="16" style="width:8%;">Other Expense Transactions</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">GPBefDisc</td>
+<td class="hcp3" height="16" style="width:12%;">Gross Price</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ReturnRsn</td>
+<td class="hcp3" height="16" style="width:12%;">Return Reason</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">-1</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ReturnAct</td>
+<td class="hcp3" height="16" style="width:12%;">Return Action</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">-1</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StgSeqNum</td>
+<td class="hcp3" height="16" style="width:12%;">Stage Sequence Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StgEntry</td>
+<td class="hcp3" height="16" style="width:12%;">Stage Entry</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="ORST.html">ORST</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StgDesc</td>
+<td class="hcp3" height="16" style="width:12%;">Stage Description</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">100</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ItmTaxType</td>
+<td class="hcp3" height="16" style="width:12%;">Item GST Tax Category</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">2</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3" height="16" style="width:8%;">GR</td>
+<td class="hcp3" height="16" style="width:8%;">GST Regular</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">GN</td>
+<td class="hcp3" height="16" style="width:8%;">GST Nil Rated</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">GE</td>
+<td class="hcp3" height="16" style="width:8%;">GST Exempt</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">NE</td>
+<td class="hcp3" height="16" style="width:8%;">Excisable</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">NN</td>
+<td class="hcp3" height="16" style="width:8%;">Non-GST Non-Excisable</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">SacEntry</td>
+<td class="hcp3" height="16" style="width:12%;">SAC Entry</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OSAC.html">OSAC</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NCMCode</td>
+<td class="hcp3" height="16" style="width:12%;">NCM Code</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="ONCM.html">ONCM</a></td>
+<td class="hcp3" height="16" style="width:12%;">-1</td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">HsnEntry</td>
+<td class="hcp3" height="16" style="width:12%;">HSN Entry</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCHP.html">OCHP</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OriBAbsEnt</td>
+<td class="hcp3" height="16" style="width:12%;">Original Base Document Internal ID</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OriBLinNum</td>
+<td class="hcp3" height="16" style="width:12%;">Original Base Document Line Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OriBDocTyp</td>
+<td class="hcp3" height="16" style="width:12%;">Original Base Document Type</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">IsPrscGood</td>
+<td class="hcp3" height="16" style="width:12%;">Is Prescribed Goods</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">IsCstmAct</td>
+<td class="hcp3" height="16" style="width:12%;">Apply Customer Accounting Tax Rule</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">U</td>
+<td class="hcp3" height="16" style="width:8%;">Use</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">EncryptIV</td>
+<td class="hcp3" height="16" style="width:12%;">Encrypt IV</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">100</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ExtTaxRate</td>
+<td class="hcp3" height="16" style="width:12%;">External Tax Rate</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ExtTaxSum</td>
+<td class="hcp3" height="16" style="width:12%;">External Tax Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">TaxAmtSrc</td>
+<td class="hcp3" height="16" style="width:12%;">Tax Amount Source</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">S</td>
+<td class="hcp3" height="16" style="width:8%;">S</td>
+<td class="hcp3" height="16" style="width:8%;">Internal System Calculation</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">E</td>
+<td class="hcp3" height="16" style="width:8%;">External Calculation</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ExtTaxSumF</td>
+<td class="hcp3" height="16" style="width:12%;">External Tax Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ExtTaxSumS</td>
+<td class="hcp3" height="16" style="width:12%;">External Tax Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">StdItemId</td>
+<td class="hcp3" height="16" style="width:12%;">Standard Item Identification</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OUNCL.html">OUNCL</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CommClass</td>
+<td class="hcp3" height="16" style="width:12%;">Commodity Classification</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OUNCL.html">OUNCL</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatExEntry</td>
+<td class="hcp3" height="16" style="width:12%;">VAT Exemption AbsEntry</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OVEB.html">OVEB</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">VatExLN</td>
+<td class="hcp3" height="16" style="width:12%;">VAT Exemption LineNum</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NatOfTrans</td>
+<td class="hcp3" height="16" style="width:12%;">Nature of Transaction</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="ODCI.html">ODCI</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ISDtCryImp</td>
+<td class="hcp3" height="16" style="width:12%;">Destination Country/Region for Import</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">3</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCRY.html">OCRY</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ISDtRgnImp</td>
+<td class="hcp3" height="16" style="width:12%;">Destination Region for Import</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="ODCI.html">ODCI</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ISOrCryExp</td>
+<td class="hcp3" height="16" style="width:12%;">Country/Region of Origin for Export</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">3</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCRY.html">OCRY</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ISOrRgnExp</td>
+<td class="hcp3" height="16" style="width:12%;">Region of Origin for Export</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="ODCI.html">ODCI</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NVECode</td>
+<td class="hcp3" height="16" style="width:12%;">NVE Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PoNum</td>
+<td class="hcp3" height="16" style="width:12%;">Customer's Purchase Order Number</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PoItmNum</td>
+<td class="hcp3" height="16" style="width:12%;">Customer's Purchase Order Item Number</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">IndEscala</td>
+<td class="hcp3" height="16" style="width:12%;">Indicator for Relevant Scale</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CESTCode</td>
+<td class="hcp3" height="16" style="width:12%;">CEST Code</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCEST.html">OCEST</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CtrSealQty</td>
+<td class="hcp3" height="16" style="width:12%;">Control Seal Quantity</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CNJPMan</td>
+<td class="hcp3" height="16" style="width:12%;">CNPJ of Manufacturer</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">14</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UFFiscBene</td>
+<td class="hcp3" height="16" style="width:12%;">UF Fiscal Benefit Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">10</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CUSplit</td>
+<td class="hcp3" height="16" style="width:12%;">CU Split</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LegalTIMD</td>
+<td class="hcp3" height="16" style="width:12%;">Legal Text from Item Master Data</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">250</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LegalTTCA</td>
+<td class="hcp3" height="16" style="width:12%;">Legal Text from Tax Code Attributes</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">250</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LegalTW</td>
+<td class="hcp3" height="16" style="width:12%;">Legal Text from Warehouse</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">250</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">LegalTCD</td>
+<td class="hcp3" height="16" style="width:12%;">Legal Text from Tax Code Determination</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">250</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RevCharge</td>
+<td class="hcp3" height="16" style="width:12%;">Reverse Charge</td>
+<td class="hcp3" height="16" style="width:9%;">VarChar</td>
+<td class="hcp3" height="16" style="width:10%;">1</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">Y</td>
+<td class="hcp3" height="16" style="width:8%;">Yes</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" height="16" style="width:8%;">N</td>
+<td class="hcp3" height="16" style="width:8%;">No</td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">ListNum</td>
+<td class="hcp3" height="16" style="width:12%;">Price List No.</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">6</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OPLN.html">OPLN</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RecogAmt</td>
+<td class="hcp3" height="16" style="width:12%;">Deducted Tax Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RecogAmtSC</td>
+<td class="hcp3" height="16" style="width:12%;">Deducted Tax Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RecogAmtFC</td>
+<td class="hcp3" height="16" style="width:12%;">Deducted Tax Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RecogVatGr</td>
+<td class="hcp3" height="16" style="width:12%;">Deducted Tax Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">8</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OVTG.html">OVTG</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">RecogVatPr</td>
+<td class="hcp3" height="16" style="width:12%;">Deducted Tax %</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NonDdAmt</td>
+<td class="hcp3" height="16" style="width:12%;">Non-Deductible Amount</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NonDdAmtSC</td>
+<td class="hcp3" height="16" style="width:12%;">Non-Deductible Amount (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NonDdAmtFC</td>
+<td class="hcp3" height="16" style="width:12%;">Non-Deductible Amount (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PPTaxExRe</td>
+<td class="hcp3" height="16" style="width:12%;">Plastic Packaging Tax Exemption Reason</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">2</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OBSI.html">OBSI</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">PlPaWght</td>
+<td class="hcp3" height="16" style="width:12%;">Plastic Packaging Weight</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CUP</td>
+<td class="hcp3" height="16" style="width:12%;">Unique Code of Project</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCUP.html">OCUP</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CIG</td>
+<td class="hcp3" height="16" style="width:12%;">Contract Code Identification</td>
+<td class="hcp3" height="16" style="width:9%;">Int</td>
+<td class="hcp3" height="16" style="width:10%;">11</td>
+<td class="hcp3" height="16" style="width:11%;"><a class="hcp4" href="OCIG.html">OCIG</a></td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OperProfit</td>
+<td class="hcp3" height="16" style="width:12%;">Row Operating Profit</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OperProfFC</td>
+<td class="hcp3" height="16" style="width:12%;">Row Operating Profit (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">OperProfSy</td>
+<td class="hcp3" height="16" style="width:12%;">Row Operating Profit (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NetIncome</td>
+<td class="hcp3" height="16" style="width:12%;">Row Net Income</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NetIncomFC</td>
+<td class="hcp3" height="16" style="width:12%;">Row Net Income (FC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">NetIncomSy</td>
+<td class="hcp3" height="16" style="width:12%;">Row Net Income (SC)</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UoMNum</td>
+<td class="hcp3" height="16" style="width:12%;">UoM Item Per Unit Numerator</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UoMDen</td>
+<td class="hcp3" height="16" style="width:12%;">UoM Item Per Unit Denominator</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UoMNum2</td>
+<td class="hcp3" height="16" style="width:12%;">UoM Item Per Unit Numerator2</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">UoMDen2</td>
+<td class="hcp3" height="16" style="width:12%;">UoM Item Per Unit Denominator2</td>
+<td class="hcp3" height="16" style="width:9%;">Num</td>
+<td class="hcp3" height="16" style="width:10%;">19.6</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CSTfIBS</td>
+<td class="hcp3" height="16" style="width:12%;">CST for IBS Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CSTfCBS</td>
+<td class="hcp3" height="16" style="width:12%;">CST for CBS Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">CSTfIS</td>
+<td class="hcp3" height="16" style="width:12%;">CST for IS Code</td>
+<td class="hcp3" height="16" style="width:9%;">nVarChar</td>
+<td class="hcp3" height="16" style="width:10%;">20</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+<tr>
+<td class="hcp3" height="16" style="width:9%;">EnLicTradN</td>
+<td class="hcp3" height="16" style="width:12%;">Encrypt TAX ID Number</td>
+<td class="hcp3" height="16" style="width:9%;">Text</td>
+<td class="hcp3" height="16" style="width:10%;">16</td>
+<td class="hcp3" height="16" style="width:11%;">-</td>
+<td class="hcp3" height="16" style="width:12%;"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+</tr>
+</table>
+<table align="left" border="2" bordercolor="#111111" cellspacing="2" class="hcp2" dir="ltr" id="AutoNumber2" style="height:64px;" width="68%">
+<tr>
+<td class="hcp3" dir="ltr" height="16" style="width:24%;"><b>Key</b></td>
+<td class="hcp3" dir="ltr" height="16" style="width:22%;"><b>Unique</b></td>
+<td class="hcp3" dir="ltr" height="16" style="width:54%;"><b>Field</b></td>
+</tr>
+<tr>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">PRIMARY</td>
+<td class="hcp3" dir="ltr" height="15" style="width:22%;">Yes</td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">DocEntry</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">LineNum</td>
+</tr>
+<tr>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">STATUS</td>
+<td class="hcp3" dir="ltr" height="15" style="width:22%;">No</td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">LineStatus</td>
+</tr>
+<tr>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">CURRENCY</td>
+<td class="hcp3" dir="ltr" height="15" style="width:22%;">No</td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">Currency</td>
+</tr>
+<tr>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">ACCOUNT</td>
+<td class="hcp3" dir="ltr" height="15" style="width:22%;">No</td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">AcctCode</td>
+</tr>
+<tr>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">BASE_ENTRY</td>
+<td class="hcp3" dir="ltr" height="15" style="width:22%;">No</td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">BaseEntry</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">BaseType</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">BaseLine</td>
+</tr>
+<tr>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">VIS_ORDER</td>
+<td class="hcp3" dir="ltr" height="15" style="width:22%;">No</td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">DocEntry</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">VisOrder</td>
+</tr>
+<tr>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">OWNER_CODE</td>
+<td class="hcp3" dir="ltr" height="15" style="width:22%;">No</td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">OwnerCode</td>
+</tr>
+<tr>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">ITM_WHS_OQ</td>
+<td class="hcp3" dir="ltr" height="15" style="width:22%;">No</td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">ItemCode</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">WhsCode</td>
+</tr>
+<tr>
+<td class="hcp3"> </td>
+<td class="hcp3"> </td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">OpenQty</td>
+</tr>
+<tr>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">PROJECT</td>
+<td class="hcp3" dir="ltr" height="15" style="width:22%;">No</td>
+<td class="hcp3" dir="ltr" height="15" style="width:24%;">Project</td>
+</tr>
+</table>
+</body>
+        </article>
+    </main>
+
+    <script src="search-index.js"></script>
+    <script src="script.js"></script>
+    <script src="expand-collapse.js"></script>
+</body>
+</html>

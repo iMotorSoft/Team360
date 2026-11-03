@@ -1,0 +1,86 @@
+{
+  "verdict": "PASS",
+  "branch": "feature/console-backend-core",
+  "scope": "TELCHI / STOCK_E_INVENTARIOS / INVESTIGATION / SAP_HANA READ_ONLY; capture runner correction only, no production promotion",
+  "recovery": {
+    "source_report": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-capture-control-20261029T000858Z-e19f3ce5/report.json",
+    "source": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-capture-20261029T000858Z-e19f3ce5-b05",
+    "destination": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-capture-recovered-20261029-timeout-v1",
+    "committed_extra_rows": 50,
+    "verified_tmp_extra_rows": 25,
+    "recovered_rows": 75,
+    "unrecoverable_identified_rows": 0,
+    "rows": 5875,
+    "pending": false,
+    "original_preserved": true,
+    "idempotent": true,
+    "sap_queries": 0,
+    "tmp_sha256": "3bed550e9418d0bef545f6c04f221ec1eac85e0262190fc4cecd8de90c33b9d1",
+    "checkpoint_sha256": "eefe8412502783d394b045f84ba5b282efdf8d5be3ce036a011b8bed45fd6509",
+    "evidence_file": "recovery.json"
+  },
+  "timeout": {
+    "cause": "Historical control report documents external harness timeout at 900 seconds; intended global budget was 1800 seconds. Existing capture.run had no global deadline admission checks or cooperative SIGTERM handler. No preserved prior launcher source was located; exact historical harness configuration is supported by its report, not reconstructed.",
+    "global_seconds": 1800,
+    "cleanup_reserve_seconds": 60,
+    "block_admission_seconds": 240,
+    "query_admission_seconds": 73,
+    "external_tool_timeout_seconds": 2400,
+    "signal_behavior": "SIGTERM/SIGINT set stop flag only; current query/persistence completes and verifies; cursor/connection close in finally; no fsync worker or child process",
+    "actual_capture_elapsed_seconds": 962.106414,
+    "note": "The real run completed beyond the former 900-second external limit. Slow or uninterruptible kernel I/O has no absolute bounded cleanup guarantee. External timeout remains a last-resort safety limit."
+  },
+  "validation": {
+    "command": "cd SrvRestAstroLS_v1/backend && UV_OFFLINE=1 uv run --no-sync pytest --import-mode=importlib -q modules/telchi/investigation/validation/controlled_physical_capture_v1/test_capture.py modules/telchi/investigation/validation/controlled_physical_capture_v1/test_persistence.py modules/telchi/investigation/validation/controlled_physical_capture_v1/test_orchestrate.py modules/telchi/datalake/tests/test_physical_reference_offline.py::test_identity_validation_rejects_duplicates_remaps_and_cross_source_merge modules/telchi/datalake/tests/test_reference_update.py::test_duplicate_guard_rejects_source_keys modules/telchi/datalake/tests/test_reference_update.py::test_canonical_id_is_deterministic_and_role_sensitive",
+    "passed": 92,
+    "failed": 0,
+    "seconds": 14.61,
+    "offline_services": "synthetic only; no SAP",
+    "checks": ["budget exhausted before block", "budget exhausted after preparation", "deadline/signal during persistence", "slow persistence", "write/fsync failure", "interrupted complete/truncated tmp", "journal recovery", "cleanup", "duplicates", "idempotence", "sequential validated continuation"],
+    "git_diff_check": "PASS",
+    "final_independent_readback": "6500 unique strictly ordered rows; batch/query hashes valid; no pending journal"
+  },
+  "capture": {
+    "queries_per_block": 5,
+    "rows_per_query": 25,
+    "query_pause_seconds": 10,
+    "block_pause_seconds": 30,
+    "concurrency": 1,
+    "retries": 0,
+    "blocks": [
+      {"block": 1, "queries": 5, "new_rows": 125, "rows": 6000, "sap_max_ms": 352.536, "persistence_max_ms": 5159.826, "integrity": "PASS"},
+      {"block": 2, "queries": 5, "new_rows": 125, "rows": 6125, "sap_max_ms": 499.672, "persistence_max_ms": 4471.545, "integrity": "PASS"},
+      {"block": 3, "queries": 5, "new_rows": 125, "rows": 6250, "sap_max_ms": 179.783, "persistence_max_ms": 2950.651, "integrity": "PASS"},
+      {"block": 4, "queries": 5, "new_rows": 125, "rows": 6375, "sap_max_ms": 175.921, "persistence_max_ms": 3390.848, "integrity": "PASS"},
+      {"block": 5, "queries": 5, "new_rows": 125, "rows": 6500, "sap_max_ms": 212.410, "persistence_max_ms": 4235.627, "integrity": "PASS"}
+    ],
+    "new_rows": 625,
+    "final_rows": 6500,
+    "last_valid_destination": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-capture-physical-capture-control-recovery-timeout-20261029-v1-b05",
+    "checkpoint_sha256": "d60fd3e23732709e4a1dafa8f7b649bc414d005759804bca3948404b3e2911a5",
+    "connections_closed": 5,
+    "cursors_closed": 25,
+    "pending": false,
+    "previous_capture_inventories_unchanged": true,
+    "shared_manifest_hashes_unchanged": true,
+    "private_full_evidence": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-capture-control-recovery-timeout-20261029-v1/final-evidence.json"
+  },
+  "source_files": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/controlled_physical_capture_v1/capture.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/controlled_physical_capture_v1/orchestrate.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/controlled_physical_capture_v1/test_orchestrate.py"
+  ],
+  "resource_guard": {
+    "host_preflight": "BUSY_BUT_SAFE",
+    "concurrency_used": 1,
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0
+  },
+  "restrictions": "No SAP writes, general refresh, Reference update, Foundation publication, CURRENT/facts changes, Podman restart, credential change, commit or deletion of prior captures.",
+  "residual_risks": [
+    "Historical interrupted connection cleanup remains NOT_CERTIFIED; original session evidence preserved, not rewritten.",
+    "Multi-session interval scan is not a transactional snapshot; concurrent SAP master changes may affect global coverage.",
+    "Tests verify requested fsync/rename protocol and content hashes, not physical power-loss durability.",
+    "Further capture requires new authorization; five authorized blocks exhausted."
+  ]
+}

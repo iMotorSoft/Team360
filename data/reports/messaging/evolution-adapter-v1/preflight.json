@@ -1,0 +1,46 @@
+{
+  "unit": "ms",
+  "percentiles": "linear interpolation at (N-1)*p",
+  "inbound": 0,
+  "outbound": 0,
+  "metrics": {
+    "Team360 processing T0\u2192T4": {
+      "n": 0
+    },
+    "Evolution acceptance T4\u2192T5": {
+      "n": 0
+    },
+    "Team360 observable total T0\u2192T6": {
+      "n": 0
+    }
+  },
+  "complete_20_sequential_pairs": false,
+  "violations": [
+    "twenty exact sequential exchanges not complete",
+    "inbound/outbound counts are not 20/20"
+  ],
+  "exchanges": [],
+  "baseline_evolution_ms": {
+    "p50": 2567.4,
+    "p95": 3091.8
+  },
+  "limits": [
+    "Receipt timestamps are Team360 wall-clock milliseconds; negative intervals are rejected.",
+    "T2 is after inbound commit; T4 is inside the thread immediately before sender.send_text.",
+    "T5 is local Evolution HTTP acceptance, not device delivery or Meta Graph acceptance.",
+    "T6 is local delivered callback receipt, not the device timestamp.",
+    "This report alone does not attest human WhatsApp traffic or close the adapter gate."
+  ],
+  "adapter_gate": "BLOCKED",
+  "reason": "canonical backend-dev.sh requires unreachable Milvus at 127.0.0.1:19530",
+  "tests": {
+    "messaging_registry": 169,
+    "relevant_backend_passed": 697,
+    "relevant_backend_skipped": 39
+  },
+  "real_whatsapp_exchanges": 0,
+  "migration_026_applied": true,
+  "evolution_version": "2.3.7",
+  "evolution_instance_state": "open",
+  "evolution_local_webhook_configured": false
+}

@@ -1,0 +1,29 @@
+{
+  "experiment": "TELCHIAI_VS_PI_BLIND_BENCHMARK_V1",
+  "decision": "NOT_READY_ENVIRONMENT_BLOCKED",
+  "question_known": false,
+  "business_investigations_run": 0,
+  "production_state": "PARTIAL_UNCHANGED",
+  "gates": {
+    "TELCHIAI_DIRECT_ASK_READY": {"status": "PARTIAL", "evidence": ["startup.json", "startup.txt", "model-preflight.json", "tests.xml"], "limitation": "CLI/model ready, Foundation unavailable; 19 focused tests pass, not the historical full suite"},
+    "PI_TERMINAL_READY": {"status": "PARTIAL", "evidence": ["pi-auth.json", "pi-help.txt", "configuration.json", "PI_RULES.txt", "RUNBOOK.txt"], "limitation": "Current Pi selected openai-codex/gpt-6.1-sol medium, OAuth ready. Clean future session command specified, not yet launched/accredited; enterprise egress scope pending"},
+    "COMMON_FOUNDATION_BINDING": {"status": "BLOCKED", "evidence": ["foundation-binding.json", "environment-diagnostics.json"], "limitation": "PostgreSQL DuckLake catalog localhost:5432 connection refused; candidate publication foundation_afd08d9eca6a725be53cdc3f9d5709c9 / snapshot 1408 not effectively confirmed. No newer snapshot selected"},
+    "READONLY_AUTHORIZATION": {"status": "PARTIAL", "evidence": ["configuration.json", "PI_RULES.txt", "RUNBOOK.txt"], "limitation": "Supervised DEV authorization for TelchiAI acknowledged, no production RBAC; Pi OAuth recipient/account scope needs explicit confirmation. Read-only connector inspected, not live-attested due to missing catalog"},
+    "MODEL_CONFIGURATION_RECORDED": {"status": "RECORDED", "evidence": ["configuration.json", "model-preflight.json", "pi-auth.json"], "limitation": "TelchiAI direct real response matches gpt-5.6-luna medium; Pi session-selected gpt-6.1-sol medium recorded via PI_* not saved defaults. Pi upstream identity not independently attested"},
+    "SOURCE_FINGERPRINTS_FROZEN": {"status": "PARTIAL_CODE_AND_RULES_FROZEN", "evidence": ["freeze.json", "SHA256SUMS", "worktree-status.txt", "verify_freeze.py"], "limitation": "Tracked/untracked code, contracts/validators, runtime and rules hashed. Foundation manifest and reference Parquet hashes cannot be obtained while catalog unavailable. No enterprise data freeze claimed"},
+    "BENCHMARK_RULES_FROZEN": {"status": "FROZEN", "evidence": ["RUNBOOK.txt", "PI_RULES.txt", "freeze.json"], "limitation": "Operational supervised read-only rules, not an OS sandbox. No question embedded"},
+    "INDEPENDENT_VERIFICATION_READY": {"status": "PROTOCOL_READY_EXECUTION_BLOCKED", "evidence": ["RUNBOOK.txt", "tests.xml"], "limitation": "Reproducible claim ledger/reconciliation protocol defined; no answers to verify and Foundation unavailable. Existing verifier is not universal semantic proof"},
+    "NO_WEB_CHANGES": {"status": "UNCHANGED_BY_THIS_EXECUTION", "evidence": ["worktree-status.txt", "RUNBOOK.txt"], "limitation": "Preexisting frontend work preserved; benchmark artifacts only"},
+    "NO_WHATSAPP_CHANGES": {"status": "UNCHANGED_BY_THIS_EXECUTION", "evidence": ["worktree-status.txt", "RUNBOOK.txt"], "limitation": "No messaging code/configuration/transport edits or sends"},
+    "WAITING_FOR_MARIO_QUESTION": {"status": "BLOCKED_DO_NOT_SEND_QUESTION_YET", "evidence": ["environment-diagnostics.json", "RUNBOOK.txt"], "limitation": "Restore authorized DuckLake availability, confirm Pi egress scope, complete common data freeze, then open two new independent Graphy sessions"}
+  },
+  "resource_guard": {
+    "host_preflight": "BUSY_BUT_SAFE_FOR_FOCUSED_PREPARATION",
+    "observations": "8 cores, approx 8.8 GiB available, swap 0, low load, sustained I/O wait 36-45%; no scans or full suites initiated",
+    "concurrency": "Sequential probes/tests; existing authorized DEV I/O exception only, one DuckDB thread",
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0,
+    "services_started_or_restarted": 0
+  },
+  "benchmark_pass": "NOT_EVALUATED"
+}

@@ -1,0 +1,214 @@
+{
+  "executed_at": "2026-10-12T22:50:36.784489+00:00",
+  "read_only": true,
+  "sap_accessed": false,
+  "foundation_modified": false,
+  "periods": [
+    {
+      "date_from": "2026-05-01",
+      "date_to_exclusive": "2026-06-01",
+      "documents": {
+        "invoices": {
+          "sql": "SELECT source_system,currency,canceled,COUNT(*) documents,\nCOUNT(DISTINCT doc_entry) distinct_documents,\nSUM(CAST(doc_total AS DECIMAL(38,6))) document_total\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_date>=? AND doc_date<?\nGROUP BY source_system,currency,canceled ORDER BY source_system,currency,canceled",
+          "reference_sql": "SELECT source_system,source_table,doc_entry,currency,canceled,doc_date,doc_total\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_date>=? AND doc_date<? ORDER BY source_system,doc_entry",
+          "parameters": [
+            "2026-05-01",
+            "2026-06-01"
+          ],
+          "groups": [
+            {
+              "source_system": "SAP_B1_HANA",
+              "currency": "BS",
+              "canceled": "C",
+              "documents": 2,
+              "distinct_documents": 2,
+              "document_total": "740.220000",
+              "reference_total": "740.22",
+              "difference": "0.000000"
+            },
+            {
+              "source_system": "SAP_B1_HANA",
+              "currency": "BS",
+              "canceled": "N",
+              "documents": 36242,
+              "distinct_documents": 36242,
+              "document_total": "8761459.220000",
+              "reference_total": "8761459.22",
+              "difference": "0.000000"
+            },
+            {
+              "source_system": "SAP_B1_HANA",
+              "currency": "BS",
+              "canceled": "Y",
+              "documents": 2,
+              "distinct_documents": 2,
+              "document_total": "740.220000",
+              "reference_total": "740.22",
+              "difference": "0.000000"
+            }
+          ],
+          "unique_documents": 36246,
+          "document_rows_sha256": "fb4aba9bcd593ded3a0b5d8721a882dc55ca565c1f17cf0a009c1315c9be9da2",
+          "elapsed_ms": 880.0440660052118,
+          "independent_reference": "individual document Decimal sums; no SQL aggregate reuse",
+          "parity": true
+        },
+        "credits": {
+          "sql": "SELECT source_system,currency,canceled,COUNT(*) documents,\nCOUNT(DISTINCT doc_entry) distinct_documents,\nSUM(CAST(doc_total AS DECIMAL(38,6))) document_total\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE doc_date>=? AND doc_date<?\nGROUP BY source_system,currency,canceled ORDER BY source_system,currency,canceled",
+          "reference_sql": "SELECT source_system,source_table,doc_entry,currency,canceled,doc_date,doc_total\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE doc_date>=? AND doc_date<? ORDER BY source_system,doc_entry",
+          "parameters": [
+            "2026-05-01",
+            "2026-06-01"
+          ],
+          "groups": [
+            {
+              "source_system": "SAP_B1_HANA",
+              "currency": "BS",
+              "canceled": "N",
+              "documents": 245,
+              "distinct_documents": 245,
+              "document_total": "209380.030000",
+              "reference_total": "209380.03",
+              "difference": "0.000000"
+            }
+          ],
+          "unique_documents": 245,
+          "document_rows_sha256": "65f455230470b4f8fa4ccaee4581a1919bef9a8b6f59dc1fd1006c3c744e5af4",
+          "elapsed_ms": 181.48988800385268,
+          "independent_reference": "individual document Decimal sums; no SQL aggregate reuse",
+          "parity": true
+        }
+      },
+      "historical_metrics": {
+        "SALES_VALID_GROSS": "8761459.220000",
+        "SALES_CREDIT_NOTES": "209380.030000",
+        "SALES_NET": "8552079.190000",
+        "currency": "BS",
+        "invoice_count": 36242,
+        "credit_count": 245,
+        "semantics": "DocDate; active N document headers; DocTotal; no cash/settlement metric"
+      }
+    },
+    {
+      "date_from": "2026-06-01",
+      "date_to_exclusive": "2026-07-01",
+      "documents": {
+        "invoices": {
+          "sql": "SELECT source_system,currency,canceled,COUNT(*) documents,\nCOUNT(DISTINCT doc_entry) distinct_documents,\nSUM(CAST(doc_total AS DECIMAL(38,6))) document_total\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_date>=? AND doc_date<?\nGROUP BY source_system,currency,canceled ORDER BY source_system,currency,canceled",
+          "reference_sql": "SELECT source_system,source_table,doc_entry,currency,canceled,doc_date,doc_total\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_date>=? AND doc_date<? ORDER BY source_system,doc_entry",
+          "parameters": [
+            "2026-06-01",
+            "2026-07-01"
+          ],
+          "groups": [
+            {
+              "source_system": "SAP_B1_HANA",
+              "currency": "BS",
+              "canceled": "C",
+              "documents": 1,
+              "distinct_documents": 1,
+              "document_total": "231.450000",
+              "reference_total": "231.45",
+              "difference": "0.000000"
+            },
+            {
+              "source_system": "SAP_B1_HANA",
+              "currency": "BS",
+              "canceled": "N",
+              "documents": 35360,
+              "distinct_documents": 35360,
+              "document_total": "10033501.020000",
+              "reference_total": "10033501.02",
+              "difference": "0.000000"
+            },
+            {
+              "source_system": "SAP_B1_HANA",
+              "currency": "BS",
+              "canceled": "Y",
+              "documents": 1,
+              "distinct_documents": 1,
+              "document_total": "231.450000",
+              "reference_total": "231.45",
+              "difference": "0.000000"
+            }
+          ],
+          "unique_documents": 35362,
+          "document_rows_sha256": "94a0eef95a6a383123bc8f55c6b98861e615be376b7e55efceaa2f7a4f2927c6",
+          "elapsed_ms": 781.0765780013753,
+          "independent_reference": "individual document Decimal sums; no SQL aggregate reuse",
+          "parity": true
+        },
+        "credits": {
+          "sql": "SELECT source_system,currency,canceled,COUNT(*) documents,\nCOUNT(DISTINCT doc_entry) distinct_documents,\nSUM(CAST(doc_total AS DECIMAL(38,6))) document_total\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE doc_date>=? AND doc_date<?\nGROUP BY source_system,currency,canceled ORDER BY source_system,currency,canceled",
+          "reference_sql": "SELECT source_system,source_table,doc_entry,currency,canceled,doc_date,doc_total\nFROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE doc_date>=? AND doc_date<? ORDER BY source_system,doc_entry",
+          "parameters": [
+            "2026-06-01",
+            "2026-07-01"
+          ],
+          "groups": [
+            {
+              "source_system": "SAP_B1_HANA",
+              "currency": "BS",
+              "canceled": "N",
+              "documents": 261,
+              "distinct_documents": 261,
+              "document_total": "270007.350000",
+              "reference_total": "270007.35",
+              "difference": "0.000000"
+            }
+          ],
+          "unique_documents": 261,
+          "document_rows_sha256": "a260e4bdd9f6ba8f4f90cfafb8ebfbbd685c0791398a50a15775fc77fb38e089",
+          "elapsed_ms": 137.2379379972699,
+          "independent_reference": "individual document Decimal sums; no SQL aggregate reuse",
+          "parity": true
+        }
+      },
+      "historical_metrics": {
+        "SALES_VALID_GROSS": "10033501.020000",
+        "SALES_CREDIT_NOTES": "270007.350000",
+        "SALES_NET": "9763493.670000",
+        "currency": "BS",
+        "invoice_count": 35360,
+        "credit_count": 261,
+        "semantics": "DocDate; active N document headers; DocTotal; no cash/settlement metric"
+      }
+    }
+  ],
+  "host_preflight": "SAFE",
+  "threads": 2,
+  "memory_limit": "512MB",
+  "binding": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 2556.033,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  }
+}

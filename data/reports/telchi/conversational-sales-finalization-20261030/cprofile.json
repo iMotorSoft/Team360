@@ -1,0 +1,145 @@
+{
+  "result": {
+    "capability": "sales.period_billed_amount.v1",
+    "rows": [
+      {
+        "invoice_count": 36542,
+        "unique_invoices": 36542,
+        "billed_amount": "11079079.770000",
+        "credit_count": 280,
+        "unique_credits": 280,
+        "credit_amount": "488033.530000",
+        "net_amount": "10591046.240000",
+        "invoice_amount_count": 36542,
+        "credit_amount_count": 280
+      }
+    ],
+    "period": {
+      "date_from": "2026-09-01",
+      "date_to_exclusive": "2026-10-01",
+      "currency": "BS"
+    },
+    "currency": "BS",
+    "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+    "source": {
+      "publication_id": "foundation_38680850adc058b1bb11887632b7b681",
+      "snapshot_id": 1408,
+      "updated_at": "2026-10-30T09:01:30.323257+00:00"
+    },
+    "read_only": true,
+    "sap_accessed": false,
+    "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/sales_document.parquet')) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? \n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/credit_memo_document.parquet')) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? \n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+    "sql_parameters": [
+      "SAP_B1_HANA",
+      "N",
+      "BS",
+      "2026-09-01",
+      "2026-10-01",
+      "SAP_B1_HANA",
+      "N",
+      "BS",
+      "2026-09-01",
+      "2026-10-01"
+    ],
+    "sql_duration_ms": 228.2391270127846,
+    "grain": "document_header",
+    "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified."
+  },
+  "trace": {
+    "schema": "telchi-pre-sql-profile-v1",
+    "clock": "perf_counter_ns",
+    "spans": [
+      {
+        "label": "private_config_read",
+        "start_ms": 19.416605,
+        "end_ms": 19.843165,
+        "duration_ms": 0.42656
+      },
+      {
+        "label": "duckdb_import",
+        "start_ms": 20.622691,
+        "end_ms": 95.97328,
+        "duration_ms": 75.350589
+      },
+      {
+        "label": "duckdb_connect",
+        "start_ms": 96.252962,
+        "end_ms": 112.530436,
+        "duration_ms": 16.277474
+      },
+      {
+        "label": "load_ducklake",
+        "start_ms": 112.759543,
+        "end_ms": 189.192757,
+        "duration_ms": 76.433214
+      },
+      {
+        "label": "load_postgres",
+        "start_ms": 189.460293,
+        "end_ms": 267.668718,
+        "duration_ms": 78.208425
+      },
+      {
+        "label": "attachment_open_including_catalog_session",
+        "start_ms": 268.176083,
+        "end_ms": 345.41821,
+        "duration_ms": 77.242127
+      },
+      {
+        "label": "foundation_current_count",
+        "start_ms": 348.28578,
+        "end_ms": 980.091155,
+        "duration_ms": 631.805375
+      },
+      {
+        "label": "foundation_current_metadata",
+        "start_ms": 980.428778,
+        "end_ms": 1237.545417,
+        "duration_ms": 257.116639
+      },
+      {
+        "label": "foundation_publication_get",
+        "start_ms": 1237.895966,
+        "end_ms": 1271.911451,
+        "duration_ms": 34.015485
+      },
+      {
+        "label": "foundation_manifest_validation",
+        "start_ms": 1272.087104,
+        "end_ms": 1272.111214,
+        "duration_ms": 0.02411
+      },
+      {
+        "label": "foundation_commit_snapshot_resolution",
+        "start_ms": 1272.217112,
+        "end_ms": 2126.982133,
+        "duration_ms": 854.765021
+      },
+      {
+        "label": "foundation_sales_facts_validation",
+        "start_ms": 2199.63592,
+        "end_ms": 63446.143492,
+        "duration_ms": 61246.507572
+      },
+      {
+        "label": "foundation_sales_facts_physical_validation",
+        "start_ms": 63446.353378,
+        "end_ms": 65884.984779,
+        "duration_ms": 2438.631401
+      },
+      {
+        "label": "foundation_component_verification",
+        "start_ms": 65885.324251,
+        "end_ms": 65955.831359,
+        "duration_ms": 70.507108
+      },
+      {
+        "label": "attachment_connection_close",
+        "start_ms": 66184.559899,
+        "end_ms": 66213.285478,
+        "duration_ms": 28.725579
+      }
+    ],
+    "total_ms": 66213.952522
+  }
+}

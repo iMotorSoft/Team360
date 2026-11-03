@@ -1,0 +1,298 @@
+{
+  "branch": "feature/console-backend-core",
+  "head": "09d2ec715a31bb88574d734eacb9f437f008624e",
+  "validation": [
+    {
+      "command": [
+        "lat",
+        "check",
+        "md"
+      ],
+      "returncode": 0,
+      "stdout": "Scanned 32 .md\nmd: All links OK\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "lat",
+        "check",
+        "index"
+      ],
+      "returncode": 0,
+      "stdout": "index: All directory index files OK\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "lat",
+        "check",
+        "sections"
+      ],
+      "returncode": 0,
+      "stdout": "sections: All sections have valid leading paragraphs\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "lat",
+        "check",
+        "code-refs"
+      ],
+      "returncode": 0,
+      "stdout": "Scanned 47 .astro, 1 .bak, 2 .css, 124 .csv, 1 .example, 4 .html, 1 .ico, 3 .js, 115 .json, 12 .jsonl, 7 .mjs, 17 .png, 848 .py, 11 .sh, 130 .sql, 68 .svelte, 1 .toml, 91 .ts, 2 .txt, 1 .xlsx, 19 .yaml, 1 .zip, 3 (no ext)\ncode-refs: All references OK\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "lat",
+        "check"
+      ],
+      "returncode": 0,
+      "stdout": "Scanned 47 .astro, 1 .bak, 2 .css, 124 .csv, 1 .example, 4 .html, 1 .ico, 3 .js, 115 .json, 12 .jsonl, 32 .md, 7 .mjs, 17 .png, 848 .py, 11 .sh, 130 .sql, 68 .svelte, 1 .toml, 91 .ts, 2 .txt, 1 .xlsx, 19 .yaml, 1 .zip, 3 (no ext) in 1.3s\n\nWarning: No init version recorded \u2014 run lat init to set up agent hooks and configuration.\nAll checks passed\nWarning: No LLM key found \u2014 semantic search (lat search) will not work. Provide a key via LAT_LLM_KEY, LAT_LLM_KEY_FILE, LAT_LLM_KEY_HELPER, or run lat init to configure.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "owned_files_sha256": {
+    "SrvRestAstroLS_v1/backend/scripts/validate_team360_full_stack.py": "9c76d591c61bc286b391515ac6a519d498eab5770b8b810b681516d7794090c8",
+    "SrvRestAstroLS_v1/backend/scripts/team360_full_gate_repository.py": "e135d05793c35376396d880b05810d3abbb0cea31bebe1f0f4163838b656ebd4",
+    "SrvRestAstroLS_v1/backend/tests/test_team360_full_gate.py": "7ffa5600bf44e71cdef36acb3e4a55492dc486bf2567b15990b835817486c8fe",
+    "SrvRestAstroLS_v1/docs/team360_full_gate_v1.md": "16d587e9bcebb924836bea922238c04431c997020c227031ae764e5c488ad605",
+    "SrvRestAstroLS_v1/docs/status_actual.md": "cd2e4ed2898a4fb7c835fe039c35181aa8b51d375429be03c05a574877f77a32"
+  },
+  "processes": [
+    {
+      "run": "operational-followup-20261007",
+      "pid": 177318,
+      "kind": "structural",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007",
+      "pid": 177321,
+      "kind": "operational",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007",
+      "pid": 177436,
+      "kind": "pytest Srv05",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007",
+      "pid": 177531,
+      "kind": "pytest Core",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007",
+      "pid": 177557,
+      "kind": "pytest Flow",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007",
+      "pid": 177687,
+      "kind": "pytest Diagnosis",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007",
+      "pid": 178250,
+      "kind": "pytest Console",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007",
+      "pid": 178291,
+      "kind": "pytest Messaging",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007",
+      "pid": 178347,
+      "kind": "pytest Harness",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007-r2",
+      "pid": 178476,
+      "kind": "structural",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007-r2",
+      "pid": 178479,
+      "kind": "operational",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007-r2",
+      "pid": 178633,
+      "kind": "pytest Srv05",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007-r2",
+      "pid": 178710,
+      "kind": "pytest Core",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007-r2",
+      "pid": 178739,
+      "kind": "pytest Flow",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007-r2",
+      "pid": 178899,
+      "kind": "pytest Diagnosis",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007-r2",
+      "pid": 179437,
+      "kind": "pytest Console",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007-r2",
+      "pid": 179467,
+      "kind": "pytest Messaging",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-20261007-r2",
+      "pid": 179540,
+      "kind": "pytest Harness",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-final",
+      "pid": 179877,
+      "kind": "structural",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-final",
+      "pid": 179880,
+      "kind": "operational",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-final",
+      "pid": 180019,
+      "kind": "pytest Srv05",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-final",
+      "pid": 180154,
+      "kind": "pytest Core",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-final",
+      "pid": 180164,
+      "kind": "pytest Flow",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-final",
+      "pid": 180297,
+      "kind": "pytest Diagnosis",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-final",
+      "pid": 180758,
+      "kind": "pytest Console",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-final",
+      "pid": 180791,
+      "kind": "pytest Messaging",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    },
+    {
+      "run": "operational-followup-final",
+      "pid": 180888,
+      "kind": "pytest Harness",
+      "returncode": 0,
+      "session_cleanup_verified": true,
+      "pid_still_present": false
+    }
+  ],
+  "remaining_pids": 0,
+  "listeners_3050_7050": "State Recv-Q Send-Q Local Address:Port Peer Address:PortProcess\n",
+  "host_load": [
+    1.86962890625,
+    1.84716796875,
+    1.60888671875
+  ],
+  "memory_snapshot": "               total        used        free      shared  buff/cache   available\nMem:           15871       10271         801         982        5957        5599\nSwap:          30517         822       29695\n"
+}

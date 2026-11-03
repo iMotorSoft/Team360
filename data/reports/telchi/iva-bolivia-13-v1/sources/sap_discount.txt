@@ -1,0 +1,100 @@
+ 
+ 
+ 
+     
+     
+     DiscountPercent Property - SAP B1 SDK Help 
+     
+     
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+ 
+     
+     
+         
+             📚 SAP Business One SDK Help 
+             
+                 
+                  
+             
+         
+     
+
+     
+     
+         
+             Home  ›  DiscountPercent Property 
+         
+     
+
+     
+     
+         
+             
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                        DiscountPercent Property
+                     
+ 
+ 
+ 
+ 
+ See Also  
+                    
+                 
+ 
+ 
+ 
+ 
+  
+ 
+  
+  Description    Sets or returns the discount percentage you specify for a customer, or the discount percentage a supplier specifies for you. 
+ Field name:  Discount .  
+  Property type   Read-write property 
+  Syntax       Visual Basic     Public Property DiscountPercent() As Double      
+  Remarks   You can either set the DiscountPercent property and let the application calculates the  PriceAfterVAT  property accordingly, or set PriceAfterVAT and let the application calculates the DiscountPercent property accordingly. But not both properties at the same script.  SAP Business One automatically completes the value for this property from  PaymentTermsTypes  object (OCTG table) according to the selected payment terms ( PayTermsGrpCode  property). 
+ For business partners defined as type 'Other' (neither a customer nor a supplier) you do not have to set this property. 
+ (For 5% discount set the value 5, not 0.05.)  
+  
+  See Also     Document_Lines Object 
+ |  DiscountPercent Property 
+ 
+ 
+ 
+ 
+    © Copyright 2026 SAP SE or an SAP affiliate company. All rights reserved.   
+ 
+ 
+  
+         
+     
+
+    
+    
+    
+ 
+ 

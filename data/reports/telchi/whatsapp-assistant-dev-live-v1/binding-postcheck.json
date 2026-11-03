@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-10-11T23:29:19.554155+00:00",
+  "pilot_binding_absent": true,
+  "bindings_count": 0,
+  "pilot_permissions": [
+    "telchi.sales.source_quantity.read.v1"
+  ],
+  "pilot_permissions_in_platform": [],
+  "channel_count": 1,
+  "migration_audit_count": 1,
+  "composition": {
+    "handler": "TelchiHandler",
+    "public_capabilities": [],
+    "required_permissions": [
+      "telchi.sales.source_quantity.read.v1"
+    ],
+    "routing": "horizontal_v1",
+    "listener_started": false,
+    "startup_hooks": [
+      "_open_db_pool",
+      "_validate_evolution_binding",
+      "_start_flow_scheduler"
+    ]
+  },
+  "fresh_evolution_inbound_count": 0
+}

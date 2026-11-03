@@ -1,0 +1,89 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+................F.                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_missing_binding_aborts_and_closes_pool_before_scheduler _________
+  + Exception Group Traceback (most recent call last):
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/tests/test_srv05_evolution_isolation.py", line 161, in test_missing_binding_aborts_and_closes_pool_before_scheduler
+  |     with TestClient(srv.create_app()): pass
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/testing/client/sync_client.py", line 90, in __enter__
+  |     stack.enter_context(self.lifespan_handler)
+  |   File "/usr/lib/python3.12/contextlib.py", line 526, in enter_context
+  |     result = _enter(cm)
+  |              ^^^^^^^^^^
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/testing/life_span_handler.py", line 67, in __enter__
+  |     raise exc
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/testing/life_span_handler.py", line 64, in __enter__
+  |     self._ensure_setup(is_safe=True)
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/testing/life_span_handler.py", line 55, in _ensure_setup
+  |     portal.call(self.wait_startup)
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/anyio/from_thread.py", line 334, in call
+  |     return cast(T_Retval, self.start_task_soon(func, *args).result())
+  |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/usr/lib/python3.12/concurrent/futures/_base.py", line 456, in result
+  |     return self.__get_result()
+  |            ^^^^^^^^^^^^^^^^^^^
+  |   File "/usr/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+  |     raise self._exception
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/anyio/from_thread.py", line 259, in _call_func
+  |     retval = await retval_or_awaitable
+  |              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/testing/life_span_handler.py", line 102, in wait_startup
+  |     await self.receive()
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/testing/life_span_handler.py", line 83, in receive
+  |     self.task.result()
+  |   File "/usr/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+  |     return self.__get_result()
+  |            ^^^^^^^^^^^^^^^^^^^
+  |   File "/usr/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+  |     raise self._exception
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/anyio/from_thread.py", line 259, in _call_func
+  |     retval = await retval_or_awaitable
+  |              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/testing/life_span_handler.py", line 128, in lifespan
+  |     await self.client.app(scope, self.stream_receive.receive, self.stream_send.send)
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/app.py", line 618, in __call__
+  |     await self.asgi_router.lifespan(receive=receive, send=send)  # type: ignore[arg-type]
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/_asgi/asgi_router.py", line 196, in lifespan
+  |     raise e
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/_asgi/asgi_router.py", line 181, in lifespan
+  |     async with self.app.lifespan():
+  |   File "/usr/lib/python3.12/contextlib.py", line 210, in __aenter__
+  |     return await anext(self.gen)
+  |            ^^^^^^^^^^^^^^^^^^^^^
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/app.py", line 645, in lifespan
+  |     async with AsyncExitStack() as exit_stack:
+  |   File "/usr/lib/python3.12/contextlib.py", line 754, in __aexit__
+  |     raise exc_details[1]
+  |   File "/usr/lib/python3.12/contextlib.py", line 737, in __aexit__
+  |     cb_suppress = await cb(*exc_details)
+  |                   ^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/events/emitter.py", line 111, in __aexit__
+  |     await self._exit_stack.__aexit__(exc_type, exc_val, exc_tb)
+  |   File "/usr/lib/python3.12/contextlib.py", line 754, in __aexit__
+  |     raise exc_details[1]
+  |   File "/usr/lib/python3.12/contextlib.py", line 737, in __aexit__
+  |     cb_suppress = await cb(*exc_details)
+  |                   ^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 799, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/app.py", line 657, in lifespan
+    |     await self._call_lifespan_hook(hook)
+    |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/litestar/app.py", line 634, in _call_lifespan_hook
+    |     await ret
+    |   File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/ls_iMotorSoft_Srv05.py", line 29, in _validate_evolution_binding
+    |     raise RuntimeError('Srv05 Evolution binding/schema unavailable') from None
+    | RuntimeError: Srv05 Evolution binding/schema unavailable
+    +------------------------------------
+=============================== warnings summary ===============================
+tests/test_srv05_evolution_isolation.py::test_on_webhook_security_frozen_binding_and_lifecycle
+  /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/routes/diagnosis.py:130: UserWarning: AUTOMATION_DIAGNOSIS_REPOSITORY=memory: conversation state will not survive backend restart.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_srv05_evolution_isolation.py::test_missing_binding_aborts_and_closes_pool_before_scheduler
+1 failed, 17 passed, 1 warning in 10.89s

@@ -1,0 +1,133 @@
+{
+  "timestamp": "2026-10-18T15:47:02.807733+00:00",
+  "model": "gpt-5.6-luna",
+  "reasoning": "medium",
+  "provider": "OpenAI direct",
+  "fallback": false,
+  "rows": "synthetic",
+  "auth": "fixture",
+  "foundation_calls": 0,
+  "whatsapp_sent": 0,
+  "turns": [
+    {
+      "user_message": "¿Cuál es el número de factura de la segunda de esas tres?",
+      "proposal": {
+        "intent": "RESULT_REFERENCE",
+        "action": "SELECT_RESULT",
+        "result_reference": {
+          "result_id": "fixture-three",
+          "ordinal": 2,
+          "field": "doc_num"
+        },
+        "clarification": null
+      },
+      "selected_ordinal": 2,
+      "response": "La segunda factura es la N.º 260192727. Según el resultado anterior (datos al 2026-10-18T00:00:00Z).",
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    },
+    {
+      "user_message": "¿Cuál es su número?",
+      "proposal": {
+        "intent": "RESULT_REFERENCE",
+        "action": "SELECT_RESULT",
+        "result_reference": {
+          "result_id": "fixture-three",
+          "ordinal": null,
+          "field": "doc_num"
+        },
+        "clarification": null
+      },
+      "selected_ordinal": 2,
+      "response": "La segunda factura es la N.º 260192727. Según el resultado anterior (datos al 2026-10-18T00:00:00Z).",
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    },
+    {
+      "user_message": "¿Y la primera?",
+      "proposal": {
+        "intent": "RESULT_REFERENCE",
+        "action": "SELECT_RESULT",
+        "result_reference": {
+          "result_id": "fixture-three",
+          "ordinal": 1,
+          "field": null
+        },
+        "clarification": null
+      },
+      "selected_ordinal": 1,
+      "response": "Factura 1: fecha: 2026-10-17 · DocEntry: 900 · número de factura: 260192728. Sólo dispongo de estos datos de cabecera, no de la factura completa. Según el resultado anterior (datos al 2026-10-18T00:00:00Z).",
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    },
+    {
+      "user_message": "Mostrame solamente esa factura",
+      "proposal": {
+        "intent": "RESULT_REFERENCE",
+        "action": "SELECT_RESULT",
+        "result_reference": {
+          "result_id": "fixture-three",
+          "ordinal": null,
+          "field": null
+        },
+        "clarification": null
+      },
+      "selected_ordinal": 1,
+      "response": "Factura 1: fecha: 2026-10-17 · DocEntry: 900 · número de factura: 260192728. Sólo dispongo de estos datos de cabecera, no de la factura completa. Según el resultado anterior (datos al 2026-10-18T00:00:00Z).",
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    }
+  ],
+  "preflight": {
+    "metadata": {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true
+    },
+    "proposal": {
+      "intent": "NEW_QUERY",
+      "action": "EXECUTE",
+      "state_delta": {
+        "set": {
+          "/metric": "sales.latest_documents",
+          "/limit": 3,
+          "/schema_version": 2,
+          "/requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "/entity_mention": null,
+          "/temporal_reference": null
+        },
+        "unset": [
+          "/period",
+          "/branches",
+          "/sales_channel",
+          "/comparison",
+          "/reference",
+          "/product_search_text",
+          "/selected_item_codes"
+        ]
+      },
+      "clarification": null
+    },
+    "status": "PASS"
+  },
+  "REAL_LUNA_ORDINAL": "PASS"
+}

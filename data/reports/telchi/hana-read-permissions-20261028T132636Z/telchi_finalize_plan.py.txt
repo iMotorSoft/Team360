@@ -1,0 +1,52 @@
+from pathlib import Path
+exec(Path('/tmp/telchi_build_permission_plan.py').read_text().split("print('OBJECTS'")[0])
+import ast
+actual={};planned={}
+for p in root.rglob('*'):
+ if '/investigation/' in str(p) or '/tests/' in str(p) or p.suffix not in {'.py','.sql','.md'}:continue
+ text=p.read_text(errors='replace')
+ for t in names:
+  if re.search(r'(?<![A-Za-z0-9_])'+re.escape(t)+r'(?![A-Za-z0-9_])',text):
+   (actual if p.suffix in {'.py','.sql'} else planned).setdefault(t,[]).append(str(p))
+keys={'OADM':'CreditLimt','OUPT':'AbsId','USR3':'UserLink','USR5':'UserCode','UGR1':'GroupLink','OUGR':'GroupId','USR7':'UserId','CRD1':'CardCode','ACRD':'CardCode','CUFD':'TableID','UFD1':'TableID','NNM1':'Series','OCPR':'CntctCode','OCRN':'CurrCode','OCQG':'GroupCode','OITG':'ItmsTypCod','OMRC':'FirmCode','OOCR':'OcrCode','OPLN':'ListNum','OSPP':'CardCode','OUDO':'Code','UDO1':'Code','HEM6':'empID','DPI1':'DocEntry','DPO1':'DocEntry','ODPI':'DocEntry','ODPO':'DocEntry','ODRF':'DocEntry','OWTQ':'DocEntry','WTQ1':'DocEntry','RDN1':'DocEntry','RPC1':'DocEntry'}
+history={'OJDT':91.859,'JDT1':86.291,'OACT':76.344}
+areas={}
+for area,ts in {
+ 'Ventas y devoluciones':'ORDN RDN1 ODPI DPI1 NNM1',
+ 'Clientes y proveedores':'ACRD CRD1 OCPR OCQG',
+ 'Precios y productos':'OITG OMRC OPLN OSPP',
+ 'Compras y cuentas por pagar':'ODPO DPO1 ORPC RPC1 OIPF',
+ 'Tesorería y bancos':'DPS1 OCRB OBOE OBTF RCT1 RCT3 RCT4 VPM1 VPM3 VPM4 VPM5',
+ 'Contabilidad e impuestos':'AWHT OFPR OOCR OMRV OTAX TAX1 TAX2 WHT1 WHT2 WHT3',
+ 'Usuarios y sucursales':'OBPL OUBR HEM6 OHPS USR7',
+ 'Metadatos y borradores':'CUFD UFD1 OUDO UDO1 ODRF',
+ 'Transferencias y reposición':'OWTQ WTQ1',
+ 'Retail y consignación':'@ASO1_01SUCURSAL @SO1_01CLIENTEALTER @SO1_01CONFIGURACION @SO1_01VENTA @SO1_01VENTADETALLE @UT_ERP_MESSAGE',
+ 'Objetivos de venta':'@OBJ_VENTAS_C @OBJ_VENTAS_L',
+}.items():
+ for t in ts.split():areas[t]=area
+plan=[]
+for t in names:
+ b=base.get(t,{})
+ c=keys.get(t) or (cols[t][0] if t in cols else None)
+ if not c:
+  if t.startswith('@'):c='Code'
+  else:c=re.split(r'[+,]',b['primary_or_candidate_key'])[0]
+ use='ACTUAL' if t in actual or t in history else ('PREVISTO' if t in planned else 'INVESTIGACIÓN')
+ rr=refs.get(t,[])
+ if t=='RDN1':rr=[dict(path=str(root/'investigation/validation/datalake_2026_census_and_coverage_reconciliation_v1/runner.py'),line=903,text='sales_return line=RDN1')]
+ sources=list(dict.fromkeys([r['path']+':'+str(r['line']) for r in rr]))
+ if t in base:sources.insert(0,str(root/'investigation/validation/sap_knowledge_inventory_v1/sap_tables_inventory.csv'))
+ sources=list(dict.fromkeys(actual.get(t,[])+planned.get(t,[])+sources))
+ plan.append(dict(area=areas.get(t,b.get('business_domain','Investigación SAP')),schema='TELCHI',object=t,use=use,column=c,column_evidence=colrefs.get(t,'existing SQL / inventory key; Code convention for SAP UDT'),references=sources,status='PASS HISTÓRICO' if t in history else 'SKIP',duration_ms=history.get(t),historical_evidence='user-provided prior successful probe with current credentials' if t in history else None))
+for t,c in {'TABLES':'TABLE_NAME','TABLE_COLUMNS':'COLUMN_NAME','VIEWS':'VIEW_NAME','OBJECT_DEPENDENCIES':'BASE_OBJECT_NAME','PROCEDURES':'PROCEDURE_NAME'}.items():
+ rr=[]
+ for p in root.rglob('*.py'):
+  text=p.read_text(errors='replace')
+  if re.search(r'SYS[".]+"?'+t+r'\b',text):rr.append(str(p))
+ plan.append(dict(area='Metadatos SAP',schema='SYS',object=t,use='ACTUAL' if t=='TABLE_COLUMNS' else 'INVESTIGACIÓN',column=c,column_evidence='existing SYS catalog SQL',references=rr,status='SKIP',duration_ms=None,historical_evidence=None))
+plan.sort(key=lambda r:({'ACTUAL':0,'PREVISTO':1,'INVESTIGACIÓN':2}[r['use']],r['schema']!='TELCHI',r['object']))
+Path('/tmp/telchi-permission-plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2))
+print('PLAN',len(plan),collections.Counter(r['use'] for r in plan))
+print('ACTUAL',', '.join(r['object'] for r in plan if r['use']=='ACTUAL'))
+print('PREVISTO',', '.join(r['object'] for r in plan if r['use']=='PREVISTO'))

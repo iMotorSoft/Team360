@@ -1,0 +1,42 @@
+{
+  "environment": "production",
+  "scope": "official synthetic repositories and fresh keys; no real identity/tenant, no lifespan",
+  "surfaces": {
+    "console_bootstrap": {
+      "unauthenticated_status": 201,
+      "ephemeral_valid_token_issued": true,
+      "me_with_issued_token": 200,
+      "me_without_token": 401,
+      "classification": "EXPOSURE_RISK",
+      "blocking": true,
+      "condition": "If enabled and reachable without authenticated upstream boundary, caller-supplied identity can mint a token. No upstream boundary is established by this app."
+    },
+    "diagnosis_dev": {
+      "production_env_status": 201,
+      "classification": "EXPOSURE_RISK",
+      "blocking": true,
+      "condition": "DEV naming is not an environment/identity guard; actual production-env Srv05 mounts and executes fake adapter."
+    },
+    "gupshup": {
+      "unsigned_empty_status": 200,
+      "classification": "EXPOSURE_RISK",
+      "condition": "Source has no signature/env gate before inbound claim and Flow bridge. No inbound mutation was attempted."
+    },
+    "flow": {
+      "classification": "AUTH_GUARDED",
+      "evidence": "Full Gate hardening tests: non-DEV default_admin rejected; authenticated default"
+    },
+    "embed": {
+      "classification": "AUTH_GUARDED",
+      "evidence": "HMAC/origin deny, tamper, override tests; real browser HMAC passes"
+    },
+    "evolution": {
+      "classification": "DEV_GUARDED",
+      "evidence": "Disabled consumer 503; real transport NOT_REQUIRED"
+    },
+    "debug_schema_health": {
+      "classification": "CONDITIONAL",
+      "evidence": "debug default off; OpenAPI and health mounted; ingress policy must be explicit"
+    }
+  }
+}

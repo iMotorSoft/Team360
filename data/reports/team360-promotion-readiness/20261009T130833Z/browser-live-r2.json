@@ -1,0 +1,161 @@
+{
+  "config": {
+    "configFile": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/playwright.config.ts",
+    "rootDir": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/team360-promotion-readiness/20261009T130833Z/browser-live-r2-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "srv05-safe-runtime.spec.ts",
+      "file": "srv05-safe-runtime.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Srv05 opt-in safe runtime",
+          "file": "srv05-safe-runtime.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "home: real API, HMAC where applicable, response and second turn",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13147,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-09T13:20:21.189Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "safe-runtime",
+                          "contentType": "application/json",
+                          "body": "eyJzdXJmYWNlIjoiaG9tZSIsInNlc3Npb24iOiJmdWxsX2dhdGVfZTlhMTIyOTUyMjhiNDEwZGE3MzdmZDdhMDY3NGRlNmQiLCJjb3VudHMiOlsxLDJdLCJ0dXJuQ291bnQiOjIsImF1dGhDb3VudCI6MCwiZXJyb3JzIjpbXSwic2VydmVyRXJyb3JzIjpbXX0="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b531eea9adc854908aab-c254f3bb7cc887e7cf4a",
+              "file": "srv05-safe-runtime.spec.ts",
+              "line": 9,
+              "column": 5
+            },
+            {
+              "title": "mamamia: real API, HMAC where applicable, response and second turn",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10551,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-09T13:20:34.451Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "safe-runtime",
+                          "contentType": "application/json",
+                          "body": "eyJzdXJmYWNlIjoibWFtYW1pYSIsInNlc3Npb24iOiJmdWxsX2dhdGVfZjliZjE4NTFjMDljNDJhOGE0NDNlZmZiOTJhYTRhMmUiLCJjb3VudHMiOlsxLDJdLCJ0dXJuQ291bnQiOjIsImF1dGhDb3VudCI6MiwiZXJyb3JzIjpbXSwic2VydmVyRXJyb3JzIjpbXX0="
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b531eea9adc854908aab-2589e868f049e90a930e",
+              "file": "srv05-safe-runtime.spec.ts",
+              "line": 9,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-09T13:20:20.400Z",
+    "duration": 24781.788,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

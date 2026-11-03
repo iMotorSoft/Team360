@@ -1,0 +1,62 @@
+{
+  "branch": "feature/console-backend-core",
+  "RESULT_REFERENCE_PIPELINE": "PASS",
+  "REVOCATION_BETWEEN_TURNS": "PASS",
+  "SIX_GATES": "VALID",
+  "CURRENT_FINGERPRINT": "VALID",
+  "RUNTIME_BOOTSTRAP": "RESOLVED",
+  "META_CALLBACK": "UNKNOWN",
+  "READY_FOR_MANUAL_START": "YES",
+  "source_sha256": "71ea1cb702490715a5e677d48c1e6066cf3de719d82e65c2b983104b93573d19",
+  "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/result-reference-pipeline-20261018T160912942287Z/accreditation.json",
+  "artifact_sha256": "724c872dbce3c1602447192e47077d7d55eae018429f75994df6b8095c16578e",
+  "manifest_sha256": "26a530176c7684b3282c8f67810e834e7465adfdeadce4a87282eb9acac44713",
+  "technical_expires_at": "2026-10-18T19:14:27.874593+00:00",
+  "technical_expiration": "Preserved existing value; not added or extended",
+  "preflight": "PREFLIGHT_PASS: normal gate_evidence and preflight, no bypass",
+  "runtime": "STOPPED",
+  "revocation_scope": "Real PostgreSQL and Console resolver on committed session-local copies of actual pilot RBAC joins. No operational permission/access changed. Both new and cached result reuse denied.",
+  "external_connectivity": "Separate from six gate contracts. Meta not queried; no MATCH inferred. Container ingress check remains part of existing manual startup.",
+  "runner_sha256": "3fa1394bbba134d232ec1570c608b97cee54437a3e6468c04e28c94484c3e19a",
+  "services_started_or_stopped": 0,
+  "whatsapp_sent": 0,
+  "own_processes_left_running": 0,
+  "impact": "New evidence and private gate manifest only; existing code/worktree/operational rows and records preserved.",
+  "prior_harness_aborts": [
+    {
+      "reason": "Progress file exclusive-create conflict",
+      "runtime_defect": false
+    },
+    {
+      "reason": "SELECT FOR UPDATE attempted inside READ ONLY",
+      "runtime_defect": false
+    }
+  ],
+  "manual_action": "SrvRestAstroLS_v1/scripts/telchi/telchiai-dev.sh start",
+  "files_created": ["validate.py", "publish.py", "result.json", "closure.json"],
+  "files_directory": "data/reports/telchi/result-reference-pipeline-v1/",
+  "private_changes": "New immutable accreditation and previous-manifest backup; existing gates manifest atomically replaced only after all conditions passed. No prior evidence or operational events deleted.",
+  "final_review": {
+    "focused_test_command": "cd SrvRestAstroLS_v1/backend && OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 .venv/bin/python -m pytest modules/telchi/assistant/tests/test_result_references.py -q",
+    "focused_test_result": "20 passed in 0.34s",
+    "full_suites_repeated": false,
+    "runtime_status_command": "SrvRestAstroLS_v1/scripts/telchi/telchiai-dev.sh status",
+    "runtime_status_result": "STOPPED; gates VALID; approval VALID; Evolution READY; PostgreSQL READY; webhook INTERNAL; no review reasons",
+    "diff_review": "Only the four new evidence files belong to this execution. Existing tracked/untracked worktree preserved; no runtime or Markdown edits.",
+    "git_diff_check": "PASS",
+    "syntax_json_and_untracked_whitespace": "PASS"
+  },
+  "resource_guard": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": "One runner, one PG connection, numeric thread budget 2; two simultaneous duplicate retries of a completed selection; no listeners or browsers",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "ENVIRONMENTAL_ABORTS": 0
+  },
+  "meta_manual_verification": [
+    "Open the EXISTING Team360 Meta app in Meta for Developers, WhatsApp > Configuration (or Webhooks > WhatsApp Business Account). Do not create a new app or edit/save configuration.",
+    "Compare the displayed callback URL to the existing Cloudflare public URL in lab/evolution-api/data/cloudflared.url plus /webhook/meta (existing authority: lab/evolution-api/lat.md/meta-team360.md). Confirm the same Team360 app/WABA/phone-number asset and messages subscription.",
+    "Exact URL/asset/subscription match -> MATCH; discrepancy -> MISMATCH; no access -> UNKNOWN. Do not press Test, send a message or change subscriptions to accredit the pipeline gates."
+  ]
+}

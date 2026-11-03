@@ -4,8 +4,8 @@ Flow exposes finite CLI operations, the read-only executive audit query and
 the sector configuration management API. Access is resolved centrally through
 ``_require_flow_actor``:
 
-- default_admin mode (MVP): no token is required; every visitor is the
-  implicit ``administrator`` with all Flow capabilities.
+- explicit default_admin mode in explicit DEV only: no token is required;
+  every visitor is the synthetic administrator with all Flow capabilities.
 - authenticated mode: the console PASETO token is verified and the persistent
   capabilities are enforced fail-closed:
 
@@ -44,6 +44,8 @@ from modules.security.paseto_tokens import get_dev_public_keys_by_id, paseto_con
 
 from .access_mode import (
     AUTHENTICATED_MODE,
+    DEFAULT_ADMIN_MODE,
+    FlowAccessConfigurationError,
     FLOW_CONFIGURATION_READ,
     FLOW_CONFIGURATION_WRITE,
     FLOW_EXECUTIVE_READ,
@@ -172,10 +174,17 @@ async def _require_flow_actor(
     Flow capability. In authenticated mode the token is verified and the
     requested capability is enforced before any data access.
     """
-    mode = flow_access_mode()
+    try:
+        mode = flow_access_mode()
+        if mode == DEFAULT_ADMIN_MODE:
+            if capability not in _FLOW_CAPABILITIES:
+                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Forbidden")
+            return default_admin_actor()
+    except FlowAccessConfigurationError as exc:
+        raise HTTPException(status_code=503, detail="Invalid Flow access configuration") from exc
+    if capability not in _FLOW_CAPABILITIES:
+        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Forbidden")
     if mode == AUTHENTICATED_MODE:
-        if capability not in _FLOW_CAPABILITIES:
-            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Forbidden")
         user_id = _authenticate(request)
         pool = get_pool()
         if capability in {FLOW_CONFIGURATION_READ, FLOW_CONFIGURATION_WRITE}:
@@ -199,8 +208,8 @@ async def _require_flow_actor(
             user_id=user_id,
             capabilities=frozenset({capability}),
         )
-    # default_admin (and any future permissive mode): implicit administrator.
-    return default_admin_actor()
+    # Defense in depth: no future/unknown mode may implicitly grant privileges.
+    raise HTTPException(status_code=503, detail="Invalid Flow access configuration")
 
 
 @get("/api/team360-flow/executive/{request_id:str}")

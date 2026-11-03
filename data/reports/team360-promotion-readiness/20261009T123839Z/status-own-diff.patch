@@ -1,0 +1,44 @@
+--- preexisting-status
++++ readiness-status
+@@ -40,22 +40,23 @@
+ - Sin lifecycle selectivo ni preflight operacional en el resolver: sus declaraciones no prueban credenciales, conectividad, contexto DB, permisos efectivos ni health. El Full Gate separado sí aporta preflight real fechado.
+ - Srv05 sigue delegando baseline Srv01 donde corresponde. Producción no se declara migrada mientras continúe usando Srv01; el último comando productivo documentado usa Srv01.
+ - Full Gate vigente: `TEAM360_FULL_GATE_DEGRADED`; Structural PASS (28 operaciones). Revalidación del 09/10: 951 PASS / 3 skips en suite principal; backend operacional controlado PASS en garantías ejecutadas, incluidos post-close, lifespan con fixture segura y conversación/embed API. PostgreSQL/Milvus/LiteLLM READY en esa corrida, no disponibilidad actual inferida. [Gate y límites](team360_full_gate_v1.md#revalidación-2026-10-09).
+-- Srv05 promoción: **NOT YET DECLARED**. Flow hardening, Diagnosis post-close y aislamiento de tests están cerrados; no son bloqueos vigentes. Full Gate conserva DEGRADED hasta evaluación explícita de promoción/readiness; la reconciliación documental no constituye una nueva corrida operacional.
++- Srv05 promoción: **NO REALIZADA**; readiness del 09/10 **BLOCKED** (`TEAM360_SRV05_PROMOTION_READINESS_BLOCKED`). Structural/backend controlado PASS revalidados; defecto reproducible del wheel (entrypoints Srv05/Srv01 y globalVar ausentes) bloquea el criterio de packaging. Browser, identidad/RBAC DB, segundo tenant autorizado y control destino de automatización siguen NOT_TESTED bloqueantes. Flow/Diagnosis cerrados no se reabren. [Matriz, comandos y evidencia](../../data/reports/team360-promotion-readiness/20261009T123839Z/report.md). Full Gate conserva DEGRADED; sin deploy ni reemplazo Srv01.
+ 
+ ### Evidencia pendiente de promoción Srv05
+ 
+-La clasificación separa garantías no ejecutadas de defectos y requisitos condicionales. No se convierte falta de evidencia en fallo funcional; el alcance definitivo requiere una ventana de readiness.
++La clasificación vigente incorpora la ventana de readiness del 09/10. Separa garantías no ejecutadas de defectos y requisitos condicionales; falta de evidencia no significa fallo funcional.
+ 
+ | Garantía / condición | Clasificación vigente | Evidencia pendiente / límite |
+ | --- | --- | --- |
+-| Browser/frontend E2E | NOT_TESTED | check/build y E2E reproducible Srv05: páginas, loader/assets/CORS y montaje; los cierres productivos previos no certifican esta composición |
+-| Identidad/RBAC real contra DB | NOT_TESTED | Console con identidad/entitlements reales autorizados y aislamiento entre dos tenants reales; fixture y tenant inexistente ya cubiertos |
+-| LiteLLM upstream/fallback interno | NOT_TESTED | auditoría del provider/routing interno; sin fallback runtime/adapter en garantías ejecutadas no prueba ausencia de fallback del proxy |
+-| Lifecycle con automatización activa | NOT_TESTED | startup/shutdown y scheduler real PASS con fixture automation=false; falta automatización/delivery seguros, no activar la DB actual sin autorización |
++| Browser/frontend E2E | NOT_TESTED / BLOCKING_FOR_PROMOTION | check/build DEV PASS del 09/10; E2E Srv05 pendiente por launcher con scheduler DB-enabled sin override seguro. Assets/CORS/montaje no certificados |
++| Identidad/RBAC real contra DB | NOT_TESTED / BLOCKING_FOR_PROMOTION | Sin test user/token ni segundo tenant oficialmente autorizado identificados; seed de administradores reales no autoriza impersonación. Fixture y tenant inexistente ya cubiertos |
++| LiteLLM upstream/fallback interno | READY en alcance auditado | GET autenticados model/info y router/settings: upstreams OpenAI generación/embeddings, fallbacks activos vacíos y config read-only concordante. Falla upstream viva NOT_TESTED / NON_BLOCKING con contratos adapter PASS; no audita un proxy destino distinto |
++| Lifecycle con automatización activa | NOT_TESTED / BLOCKING_FOR_PROMOTION | ASGI controlado revalidado PASS; DB automation=true y scheduler confirm_send=True. Requiere control destino automation=false verificable o sandbox autorizado; no exigir delivery real fuera de alcance |
+ | Gmail/DWD y outbound Gupshup/Flow | CONDITIONAL | probe y delivery NOT_TESTED; sólo con cuenta/sandbox/target autorizados y si el alcance los exige |
+ | Evolution | NOT_REQUIRED | consumidor deshabilitado en configuración medida; health/transporte NOT_TESTED, CONDITIONAL si se habilita |
+ | Superficies DEV expuestas | CONDITIONAL | adapter Diagnosis físicamente montado y webhook Gupshup DEV sin firma: riesgos preexistentes que requieren decisión explícita de exposición/controles de promoción, no nuevos defectos demostrados por los 14 fallos |
+ | SAP/HANA y API Telchi | NOT_REQUIRED | no forman parte del servidor global medido; sin promoción implícita |
++| Packaging wheel | DEFECT / BLOCKING_FOR_PROMOTION | uv build PASS, pero wheel omite Srv05/Srv01/globalVar; import aislado sin editable source falla ModuleNotFoundError. Sin fix en esta ventana |
+ 
+ No queda un **DEFECT** Diagnosis abierto por post-close ni por los 14 fallos. Los riesgos de exposición y los NOT_TESTED anteriores no quedan resueltos por este cierre.
+ 
+@@ -99,9 +100,9 @@
+ 
+ ## Próximos pasos y límites de validación
+ 
+-Antes de una corrida real consultar el [preflight](../../lat.md/service-preflight-methodology.md). Esta normalización valida documentos, no servicios, deployment ni capacidades nuevas.
++Antes de una corrida real consultar el [preflight](../../lat.md/service-preflight-methodology.md). La normalización previa fue documental; readiness del 09/10 aporta medición controlada nueva, no deployment ni capacidades nuevas.
+ 
+-- Srv05: siguiente ventana recomendada `GLOBAL / SRV05_PROMOTION_READINESS`, con E2E seguro y evaluación explícita de pendientes/controles anteriores. Structural ya PASS; no reabrir Diagnosis ni inferir promoción del perfil `full` o de este cierre documental.
++- Srv05: readiness medida y BLOCKED; siguiente ventana separada para packaging válido, identidades/segundo tenant autorizados y launcher/runtime seguro oficial antes de E2E. Resolver exposición y automatización del destino. No reabrir Diagnosis ni inferir promoción del perfil `full`.
+ - Telchi: promoción del candidate únicamente mediante gate explícito; gaps fuente/UoM y business unknown conservan sus límites.
+ - Messaging: cerrar baseline formal Evolution con sesión conforme; producción exige hardening y autorización propios.
+ - Flow/Console: RBAC enterprise, scheduler multiworker y migraciones/despliegue pendientes mediante ventanas específicas; hardening `default_admin` ya cerrado.

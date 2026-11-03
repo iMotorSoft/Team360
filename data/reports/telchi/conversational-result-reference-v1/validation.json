@@ -1,0 +1,86 @@
+{
+  "branch": "feature/console-backend-core",
+  "head": "09d2ec7",
+  "stage": "DEVELOPMENT",
+  "scope": "Conversational Result References V1; no deployment or channel activation",
+  "CONVERSATIONAL_RESULT_REFERENCE": "PASS",
+  "REAL_LUNA_ORDINAL": "PASS",
+  "RESULT_RETRIEVAL": "PASS",
+  "DETERMINISTIC_SELECTION": "PASS",
+  "FOUNDATION_CALLS_ON_SELECTION": 0,
+  "RBAC_REVALIDATION": "PASS",
+  "TENANT_ISOLATION": "PASS",
+  "REGRESSION_5_3_SECOND": "PASS",
+  "READY_FOR_WHATSAPP": "NO",
+  "evidence_scope": {
+    "luna": "Real OpenAI direct gpt-5.6-luna, medium, completed/model/reasoning verified, no fallback; descriptors only; luna-medium.json",
+    "repository": "Actual ConversationRepository and PostgresConversationStore, real PostgreSQL commits on session-local temporary tables, pool max_size=1; no operational rows changed",
+    "business_rows": "Synthetic fixtures including expected DocNum 260192727; the audited WhatsApp event was not replayed or independently re-audited",
+    "rbac": "Authorization call boundaries, revocation before interpretation, during interpretation, and on cached selection verified with controlled authorization port. Real Console authorization of the pilot identity was not reaccredited",
+    "isolation": "Owner and conversation validation plus SQL conversation/channel/workspace/environment scoping; controlled identities, not newly provisioned real tenants",
+    "delivery": "Prepared response order only; not proof of delivery/read on WhatsApp"
+  },
+  "commands": [
+    {
+      "cwd": "SrvRestAstroLS_v1/backend",
+      "command": "TEAM360_RESULT_REFERENCE_POSTGRES_TEST=1 OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 uv run pytest modules/telchi/assistant/tests tests/test_telchi_assistant_srv05.py -q",
+      "result": "357 passed in 14.52s; one existing Diagnosis in-memory repository configuration warning; uv dev-dependencies deprecation warning"
+    },
+    {
+      "cwd": "SrvRestAstroLS_v1/backend",
+      "command": "uv run python -m modules.telchi.assistant.tests.live_result_reference --output ../../data/reports/telchi/conversational-result-reference-v1/luna-medium.json",
+      "result": "PASS; real provider preflight and four reference turns; source prompt/adapter unchanged after this probe"
+    },
+    {
+      "command": "lat check md; lat check index; lat check sections; lat check code-refs; lat check",
+      "result": "All PASS; LAT init/key warnings do not affect these deterministic validation gates"
+    },
+    {
+      "command": "git diff --check; per-file git diff --no-index --check /dev/null <affected-file>",
+      "result": "PASS, including untracked implementation files"
+    }
+  ],
+  "source_sha256": {
+    "handler.py": "d0fd2fd1ead36e2797a4169e021bcbc3155bb2f1d0d833392a5a96b3c194ef29",
+    "luna.py": "fa76ee13a1fb05fcacce0a9e28535bc611374a4d800d3f5be6b6dcb837ad3204",
+    "repository.py": "cc47dea5e3ed481f87ace70b7bc2564a98c8fa5db0530854bf9a20168ab9a988",
+    "result_references.py": "e95371178bd6c8949cd92efed169ea2c0a025a0ffbc1e159614ef60b28ee8e49"
+  },
+  "activation_guarantees": {
+    "http_auth": "Implementation unchanged; no new live HTTP gate run or renewal claimed",
+    "identity_tenant_isolation": "Affected by result retrieval; controlled negative tests and real PG fixture PASS; authorized runtime evidence pending",
+    "business_authorization": "Affected by result reuse/cache; revocation contracts PASS; live pilot Console RBAC reaccreditation pending",
+    "durable_idempotency": "Messaging fence and delivery unchanged; repository/cache regression PASS; no new live ingress/concurrency guarantee claimed",
+    "assistant_foundation": "Affected by selection branch; deterministic projection and zero extra calls PASS with real repository and synthetic results; full live business pipeline pending",
+    "model_no_fallback": "Affected prompt; focal real interpreter PASS, medium/model verified; runtime-wide gate registry not renewed"
+  },
+  "risks_and_next_step": [
+    "One currently referencable list per conversation. Ambiguous references require clarification; no general memory or cross-topic disambiguation claim.",
+    "Reports containing multiple displayed lists are excluded until each list has explicit presentation identity.",
+    "Historical results always carry a prior-publication date warning; no new expiry or grants introduced.",
+    "Current runtime source fingerprints changed. Do not treat prior gate registry as current or ready for WhatsApp. Reaccredit affected authorized runtime guarantees without automatically sending WhatsApp or renewing unrelated guarantees.",
+    "No Foundation, commercial SQL, business-data, capability, permission, transport or infrastructure changes; only conversational audit SQL was extended. No restart, commit or push. Existing worktree changes preserved."
+  ],
+  "files_changed": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/result_references.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_result_references.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_result_references_postgres.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_result_reference.py"
+  ],
+  "blast_radius": "Eight module-local source/doc/test files are needed to connect the interpreter contract, audited repository retrieval, deterministic selection, handler authorization, regression tests, real PG persistence and real semantic probe. No global/shared implementation edited.",
+  "resource_guard": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": "one sequential pytest process or one provider request; numeric thread budget 2; PG fixture pool max_size=1",
+    "observations": "8 cores; initial load 4.53 and later 1.71; available RAM approximately 5.5 GB; swap approximately 1.1 GB stable, no sustained swap activity in sampled interval",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "SERVICES_RESTARTED": 0,
+    "WHATSAPP_SENT": 0
+  }
+}

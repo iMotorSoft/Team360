@@ -1,0 +1,938 @@
+{
+  "status": "PASS",
+  "generated_at": "2026-10-20T13:10:25.512075+00:00",
+  "source_sha256": "cb61aa5c13b2d7fa61e6f2216743e31097a32f8073c34a0ca1ce81cb2e3fbc8d",
+  "approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+  "configuration_sha256": "03b838b681e407ea08d1f3a19cdd86be521ae5de8dd33dd33881bba1503c6556",
+  "observations": {
+    "identity_tenant_isolation": {
+      "status": "PASS",
+      "actual_pilot_binding": true,
+      "actual_nonprivileged_user": "73d09264-8be2-4402-8023-0142a5f26730",
+      "actual_foreign_user": "67a1b108-7c65-4c80-bbca-ffc42891949c",
+      "negative_axes": [
+        "tenant",
+        "workspace",
+        "module",
+        "user"
+      ]
+    },
+    "business_authorization": {
+      "status": "PASS",
+      "actual_catalog": true,
+      "pilot_full_access": true,
+      "ordinary_and_foreign_effective_permissions_unchanged": true,
+      "full_access_records_unchanged": true,
+      "individual_assignments_created": 0,
+      "registration_idempotent": true,
+      "registration_audit_verified": true,
+      "revocation": "Actual capability disablement in rollback; stale identity denied; restored; FULL_ACCESS untouched"
+    },
+    "http_auth": {
+      "status": "PASS",
+      "actual_asgi_route": "/api/telchi/assistant/dev/turn",
+      "cases": [
+        {
+          "case": "absent",
+          "status": 401
+        },
+        {
+          "case": "invalid",
+          "status": 401
+        },
+        {
+          "case": "authenticated_bad_json",
+          "status": 400
+        }
+      ],
+      "token_logged": false,
+      "listener": false
+    },
+    "assistant_foundation": {
+      "status": "PASS",
+      "real_authenticated_turns": 4,
+      "raw_material": "839582.63",
+      "second_category": "2679208.66",
+      "counts": [
+        34,
+        526,
+        495
+      ],
+      "contextual_comparison": true,
+      "previous_operation": "sales.latest_documents.v1",
+      "partial_through": "2026-09-24",
+      "credit_notes_excluded": true
+    },
+    "durable_idempotency": {
+      "status": "PASS",
+      "previous_real_evidence": {
+        "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/conversational-reaccreditation-20261019T235317034083Z/accreditation.json",
+        "kind": "real",
+        "observations": [
+          "durable_idempotency"
+        ],
+        "sha256": "49da7afb4930b25479967036e5b78aa9b0f64728254c61423ada456717912473",
+        "status": "PASS"
+      },
+      "previous_generated_at": "2026-10-19T23:53:17.034269+00:00",
+      "reuse_reason": "No changes to Messaging claim/fence, PG conversation storage or dispatch; category registry increment only.",
+      "current_category_committed_cache_replay": true,
+      "current_stale_identity_reauthorization": true
+    },
+    "model_no_fallback": {
+      "status": "PASS",
+      "metadata": [
+        {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true
+        },
+        {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true
+        }
+      ],
+      "adapter": "OpenAI direct; no proxy/retry/redirect/fallback"
+    }
+  },
+  "turns": [
+    {
+      "ok": true,
+      "text": "Registramos Bs 839.582,63 en importe registrado en líneas comerciales de materia prima, septiembre de 2026. Corresponde a 34 productos, 526 líneas y 495 facturas. La cobertura documental observada va del 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica el período completo. No incluye IVA de línea ni descuenta notas de crédito. Los descuentos propios ya están reflejados; no incorpora ajustes globales ni otros componentes de cabecera. Clasificación actual, no histórica.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "category-941f5e76d2a44787a7ef9898514e1aed",
+      "conversation_id": "b933d66f-96e6-4fe7-8ca6-d931646e54f8",
+      "correlation_id": "c0000126-33d7-4fac-b5ee-4e7f3d603cc2",
+      "elapsed_ms": 32995.88,
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 26033.980837000854,
+          "state_engine_ms": 0.2504330004740041,
+          "interpretation_ms": 5168.31330199966,
+          "response_format_ms": 0.05220200000621844,
+          "total_processing_ms": 31211.571411000477
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "contract_error": null,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "RAW_MATERIAL",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "RAW_MATERIAL",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "rows": [
+            {
+              "amount": "839582.630000",
+              "last_date": "2026-09-24T00:00:00",
+              "first_date": "2026-09-01T00:00:00",
+              "line_count": 526,
+              "product_count": 34,
+              "document_count": 495
+            }
+          ],
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "coverage": {
+            "complete": false,
+            "last_date": "2026-09-24T00:00:00",
+            "first_date": "2026-09-01T00:00:00"
+          },
+          "currency": "BS",
+          "read_only": true,
+          "capability": "sales.category_line_amount.v1",
+          "definition": "commercial_active_invoice_line_amount_excluding_line_tax_v1",
+          "parameters": {
+            "category": "RAW_MATERIAL",
+            "currency": "BS",
+            "date_from": "2026-09-01",
+            "date_to_exclusive": "2026-10-01"
+          },
+          "limitations": [
+            "Sin IVA de línea; descuentos propios ya reflejados en el importe.",
+            "No descuenta notas de crédito ni incorpora ajustes globales u otros componentes de cabecera.",
+            "Clasificación actual, no histórica. Cobertura completa del período no certificada.",
+            "No es facturación documental neta ni monto cobrado. Las diferencias con cabeceras no son íntegramente IVA."
+          ],
+          "sap_accessed": false,
+          "classification": {
+            "sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10",
+            "version": "v2_product_business_type_f9c1130d852ccb61",
+            "reference": "v2_reference_closure_2088d5885204313a",
+            "quality_lines": {
+              "VALIDATED": 526
+            }
+          }
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Registramos Bs 839.582,63 en importe registrado en líneas comerciales de materia prima, septiembre de 2026. Corresponde a 34 productos, 526 líneas y 495 facturas. La cobertura documental observada va del 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica el período completo. No incluye IVA de línea ni descuenta notas de crédito. Los descuentos propios ya están reflejados; no incorpora ajustes globales ni otros componentes de cabecera. Clasificación actual, no histórica.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.sales.category_line_amount.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/entity_mention": {
+                "text": "RAW_MATERIAL",
+                "type": null
+              },
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference",
+              "/product_search_text",
+              "/selected_item_codes"
+            ]
+          },
+          "clarification": null
+        }
+      },
+      "question": "¿Cuánto vendimos de materia prima en septiembre?",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    },
+    {
+      "ok": true,
+      "text": "Registramos Bs 2.679.208,66 en importe registrado en líneas comerciales de producto terminado de laboratorio, septiembre de 2026. Corresponde a 278 productos, 18541 líneas y 10694 facturas. La cobertura documental observada va del 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica el período completo. No incluye IVA de línea ni descuenta notas de crédito. Los descuentos propios ya están reflejados; no incorpora ajustes globales ni otros componentes de cabecera. Clasificación actual, no histórica.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "category-941f5e76d2a44787a7ef9898514e1aed",
+      "conversation_id": "b933d66f-96e6-4fe7-8ca6-d931646e54f8",
+      "correlation_id": "0ef329e3-579c-4081-b666-40616ce7e4f0",
+      "elapsed_ms": 10193.52,
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 5189.769356999022,
+          "state_engine_ms": 0.24446700081171002,
+          "interpretation_ms": 4283.5864659991785,
+          "response_format_ms": 0.04994899973098654,
+          "total_processing_ms": 9484.16009399989
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "contract_error": null,
+        "previous_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "RAW_MATERIAL",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "LAB_FINISHED_PRODUCT",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "LAB_FINISHED_PRODUCT",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "rows": [
+            {
+              "amount": "2679208.660000",
+              "last_date": "2026-09-24T00:00:00",
+              "first_date": "2026-09-01T00:00:00",
+              "line_count": 18541,
+              "product_count": 278,
+              "document_count": 10694
+            }
+          ],
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "coverage": {
+            "complete": false,
+            "last_date": "2026-09-24T00:00:00",
+            "first_date": "2026-09-01T00:00:00"
+          },
+          "currency": "BS",
+          "read_only": true,
+          "capability": "sales.category_line_amount.v1",
+          "definition": "commercial_active_invoice_line_amount_excluding_line_tax_v1",
+          "parameters": {
+            "category": "LAB_FINISHED_PRODUCT",
+            "currency": "BS",
+            "date_from": "2026-09-01",
+            "date_to_exclusive": "2026-10-01"
+          },
+          "limitations": [
+            "Sin IVA de línea; descuentos propios ya reflejados en el importe.",
+            "No descuenta notas de crédito ni incorpora ajustes globales u otros componentes de cabecera.",
+            "Clasificación actual, no histórica. Cobertura completa del período no certificada.",
+            "No es facturación documental neta ni monto cobrado. Las diferencias con cabeceras no son íntegramente IVA."
+          ],
+          "sap_accessed": false,
+          "classification": {
+            "sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10",
+            "version": "v2_product_business_type_f9c1130d852ccb61",
+            "reference": "v2_reference_closure_2088d5885204313a",
+            "quality_lines": {
+              "VALIDATED": 18541
+            }
+          }
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Registramos Bs 2.679.208,66 en importe registrado en líneas comerciales de producto terminado de laboratorio, septiembre de 2026. Corresponde a 278 productos, 18541 líneas y 10694 facturas. La cobertura documental observada va del 1 de septiembre de 2026 al 24 de septiembre de 2026; no certifica el período completo. No incluye IVA de línea ni descuenta notas de crédito. Los descuentos propios ya están reflejados; no incorpora ajustes globales ni otros componentes de cabecera. Clasificación actual, no histórica.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.sales.category_line_amount.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "REFINE",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/entity_mention": {
+                "text": "LAB_FINISHED_PRODUCT",
+                "type": null
+              },
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/product_search_text",
+              "/selected_item_codes"
+            ]
+          },
+          "clarification": null
+        }
+      },
+      "question": "¿Y de productos terminados?",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    },
+    {
+      "ok": true,
+      "text": "Producto terminado de laboratorio registró más importe de líneas comerciales, con una diferencia de Bs 1.839.626,03. Período: septiembre de 2026. Cobertura documental observada hasta 24 de septiembre de 2026; período completo no certificado. Comparación de resultados consultados, sin IVA de línea ni descuento de notas de crédito; no es neto ni cobros.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "category-941f5e76d2a44787a7ef9898514e1aed",
+      "conversation_id": "b933d66f-96e6-4fe7-8ca6-d931646e54f8",
+      "correlation_id": "44f22bf5-5b06-4002-a4bd-ce64d60ac3c3",
+      "elapsed_ms": 4353.9,
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.0,
+          "interpretation_ms": 3700.662728999305,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 3705.7731000004424
+        },
+        "decision": "LOCAL_CALCULATION",
+        "committed": false,
+        "previous_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "LAB_FINISHED_PRODUCT",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "LAB_FINISHED_PRODUCT",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": null,
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Producto terminado de laboratorio registró más importe de líneas comerciales, con una diferencia de Bs 1.839.626,03. Período: septiembre de 2026. Cobertura documental observada hasta 24 de septiembre de 2026; período completo no certificado. Comparación de resultados consultados, sin IVA de línea ni descuento de notas de crédito; no es neto ni cobros.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.sales.category_line_amount.read.v1",
+        "monetary_calculation": {
+          "mode": "difference",
+          "target": {
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "LAB_FINISHED_PRODUCT",
+                "type": null
+              },
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "amount": "2679208.660000",
+            "metric": "category_line_amount",
+            "period": {
+              "date_from": "2026-09-01",
+              "date_to_exclusive": "2026-10-01"
+            },
+            "source": {
+              "updated_at": "2026-09-28T18:18:35.264000",
+              "snapshot_id": 1408,
+              "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+            },
+            "partial": true,
+            "category": "LAB_FINISHED_PRODUCT",
+            "coverage": {
+              "complete": false,
+              "last_date": "2026-09-24T00:00:00",
+              "first_date": "2026-09-01T00:00:00"
+            },
+            "currency": "BS",
+            "result_id": "0ef329e3-579c-4081-b666-40616ce7e4f0",
+            "capability": "sales.category_line_amount.v1",
+            "definition": "commercial_active_invoice_line_amount_excluding_line_tax_v1",
+            "classification": {
+              "sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10",
+              "version": "v2_product_business_type_f9c1130d852ccb61",
+              "reference": "v2_reference_closure_2088d5885204313a",
+              "quality_lines": {
+                "VALIDATED": 18541
+              }
+            },
+            "required_permission": "telchi.sales.category_line_amount.read.v1"
+          },
+          "formula": "target - baseline",
+          "percent": "219.11196876476589326294185004756470485817459086785",
+          "baseline": {
+            "owner": [
+              "dev",
+              "telchi",
+              "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+              "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+              "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+            ],
+            "state": {
+              "metric": "sales.net_amount",
+              "period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null,
+              "entity_mention": {
+                "text": "RAW_MATERIAL",
+                "type": null
+              },
+              "schema_version": 2,
+              "product_context": null,
+              "requested_metrics": [
+                "sales.net_amount"
+              ],
+              "temporal_reference": null,
+              "product_search_text": null,
+              "selected_item_codes": []
+            },
+            "amount": "839582.630000",
+            "metric": "category_line_amount",
+            "period": {
+              "date_from": "2026-09-01",
+              "date_to_exclusive": "2026-10-01"
+            },
+            "source": {
+              "updated_at": "2026-09-28T18:18:35.264000",
+              "snapshot_id": 1408,
+              "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+            },
+            "partial": true,
+            "category": "RAW_MATERIAL",
+            "coverage": {
+              "complete": false,
+              "last_date": "2026-09-24T00:00:00",
+              "first_date": "2026-09-01T00:00:00"
+            },
+            "currency": "BS",
+            "result_id": "c0000126-33d7-4fac-b5ee-4e7f3d603cc2",
+            "capability": "sales.category_line_amount.v1",
+            "definition": "commercial_active_invoice_line_amount_excluding_line_tax_v1",
+            "classification": {
+              "sha256": "7fcfef912cc8ef46868e03b56f90b61da13c08e951c453abc0483690edc36e10",
+              "version": "v2_product_business_type_f9c1130d852ccb61",
+              "reference": "v2_reference_closure_2088d5885204313a",
+              "quality_lines": {
+                "VALIDATED": 526
+              }
+            },
+            "required_permission": "telchi.sales.category_line_amount.read.v1"
+          },
+          "target_id": "0ef329e3-579c-4081-b666-40616ce7e4f0",
+          "difference": "1839626.030000",
+          "baseline_id": "c0000126-33d7-4fac-b5ee-4e7f3d603cc2"
+        },
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "interpretation_proposed": {
+          "action": "CALCULATE",
+          "intent": "MONETARY_COMPARISON",
+          "comparison": {
+            "mode": "difference",
+            "target_id": "0ef329e3-579c-4081-b666-40616ce7e4f0",
+            "baseline_id": "c0000126-33d7-4fac-b5ee-4e7f3d603cc2"
+          },
+          "clarification": null
+        },
+        "monetary_comparison_pointer": {
+          "target_id": "0ef329e3-579c-4081-b666-40616ce7e4f0",
+          "baseline_id": "c0000126-33d7-4fac-b5ee-4e7f3d603cc2"
+        }
+      },
+      "question": "¿Cuál de esas categorías vendió más?",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    },
+    {
+      "ok": true,
+      "text": "Últimas facturas activas por fecha documental (no instante de ingreso):\n1. Factura N.º 260192728 · fecha 2026-09-24\n2. Factura N.º 260192727 · fecha 2026-09-24\n3. Factura N.º 260192726 · fecha 2026-09-24\n4. Factura N.º 260192725 · fecha 2026-09-24\n5. Factura N.º 260739131 · fecha 2026-09-24\nOrdenadas de más reciente a más antigua. Excluye anuladas y notas de crédito. No es venta neta.\nInformación actualizada al 28 de septiembre de 2026; puede no reflejar cambios posteriores.",
+      "classification": "DIRECT_AVAILABLE",
+      "conversation_key": "category-941f5e76d2a44787a7ef9898514e1aed",
+      "conversation_id": "b933d66f-96e6-4fe7-8ca6-d931646e54f8",
+      "correlation_id": "a76b32e1-2dd4-4f1f-91ff-085dc5cd1476",
+      "elapsed_ms": 8881.14,
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 3002.711006000027,
+          "state_engine_ms": 0.4612220000126399,
+          "interpretation_ms": 5112.454415999309,
+          "response_format_ms": 0.027542000680114143,
+          "total_processing_ms": 8119.552621999901
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "contract_error": null,
+        "previous_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "LAB_FINISHED_PRODUCT",
+            "type": null
+          },
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "confirmed_state": {
+          "limit": 5,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "limit": 5,
+          "metric": "sales.latest_documents",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "sales.latest_documents"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "SELECT source_system,doc_entry,doc_num,doc_date,canceled\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\nWHERE source_system=? AND canceled=? AND doc_date IS NOT NULL\nORDER BY doc_date DESC,CAST(doc_entry AS BIGINT) DESC,doc_entry DESC LIMIT ?",
+          "rows": [
+            {
+              "doc_num": "260192728",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532517",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192727",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532516",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192726",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532515",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260192725",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532514",
+              "source_system": "SAP_B1_HANA"
+            },
+            {
+              "doc_num": "260739131",
+              "canceled": "N",
+              "doc_date": "2026-09-24T00:00:00",
+              "doc_entry": "11532513",
+              "source_system": "SAP_B1_HANA"
+            }
+          ],
+          "grain": "invoice_header",
+          "source": {
+            "updated_at": "2026-09-28T18:18:35.264000",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+          },
+          "read_only": true,
+          "capability": "sales.latest_documents.v1",
+          "limitations": "Active invoices (N), by DocDate, not entry timestamp; excludes credit memos. Not net sales. Completeness not certified.",
+          "sap_accessed": false,
+          "document_type": "OINV",
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N",
+            5
+          ],
+          "sql_duration_ms": 271.92619900051795
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Últimas facturas activas por fecha documental (no instante de ingreso):\n1. Factura N.º 260192728 · fecha 2026-09-24\n2. Factura N.º 260192727 · fecha 2026-09-24\n3. Factura N.º 260192726 · fecha 2026-09-24\n4. Factura N.º 260192725 · fecha 2026-09-24\n5. Factura N.º 260739131 · fecha 2026-09-24\nOrdenadas de más reciente a más antigua. Excluye anuladas y notas de crédito. No es venta neta.\nInformación actualizada al 28 de septiembre de 2026; puede no reflejar cambios posteriores.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.sales.latest_documents.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/limit": 5,
+              "/metric": "sales.latest_documents",
+              "/period": null,
+              "/branches": [],
+              "/reference": null,
+              "/comparison": null,
+              "/sales_channel": null,
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.latest_documents"
+              ],
+              "/temporal_reference": null,
+              "/product_search_text": null,
+              "/selected_item_codes": []
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      },
+      "question": "Mostrame las últimas cinco facturas.",
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    }
+  ],
+  "registration_sha256": "d8469874533b30c1aa17f57b6ad0da51128436f85c7c9ca39b948291629d8abd",
+  "backup_sha256": "bc86cddde11676bb6cbdc3db5ff12108a1f3d469477bb1ae27365ab49db085de",
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "authentication": "Real token-authenticated DEV HTTP route over in-process ASGI; existing approved phone/Console identity. Not human login or WhatsApp ingress.",
+  "limits": "Manual DEV readiness, not WhatsApp delivery or complete month certification.",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  },
+  "pool_closed": true
+}

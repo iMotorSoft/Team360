@@ -1,10 +1,10 @@
 # Status actual - lat.md
 
-Este tablero resume el estado vigente de la arquitectura viva de Team360 y enlaza las fuentes operativas que conservan evidencia detallada.
+Registro compacto de mantenimiento LAT, no otro estado técnico GLOBAL. El único tablero vigente es [SrvRestAstroLS_v1/docs/status_actual.md](../SrvRestAstroLS_v1/docs/status_actual.md), con navegación a autoridades locales.
 
 Objetivo: `arquitectura-viva`
 
-Última actualización: 2026-08-14.
+Última actualización: 2026-10-06 (normalización documental; fronteras Evolution y seguridad compartida preservadas).
 
 ## Estado vigente
 
@@ -19,12 +19,40 @@ Team360 mantiene una arquitectura funcional separada por fronteras explícitas d
 - Playwright + Chromium es el gate E2E reproducible; Browser MCP es diagnóstico exploratorio.
 - El Diagnosticador embebible conserva el backend como autoridad de tenant, scope, origin y permisos.
 - La orquestación global define `MODULE_LOCAL`, `SHARED`, `GLOBAL` y el overlay `PRODUCTION_PROTECTED`, con edición local concurrente y ventanas exclusivas para Git y cambios transversales.
-- El module registry backend está implementado y Flow está registrado una sola vez; su export `ROUTE_HANDLERS` permanece vacío mientras no existan APIs HTTP propias del módulo.
+- El module registry backend está implementado y monta Flow una sola vez desde `ROUTE_HANDLERS` en `routes.py`; la afirmación histórica de export vacío ya no describe el módulo vigente.
 - El coordinador Python y su inventario JSON continúan pendientes.
 
 ## Cambios recientes
 
 Esta sección conserva únicamente decisiones recientes que siguen afectando el estado vigente; la evidencia diaria vive fuera de LAT.
+
+### Autoridad operativa
+
+[[team360-operational-authority-policy]] fija que la instrucción directa del owner autoriza la operación y que ningún agente agrega aprobaciones, jerarquías administrativas ni bloqueos nuevos sin decisión explícita.
+
+- Origen: un agente convirtió `authorized_by` en condición para publicar la Foundation de ventas de Telchi; el requisito no tenía decisión del owner y detuvo la promoción ya autorizada.
+- Corrección: se retiró el carácter bloqueante, se conservó la auditoría automática del journal y se mantuvieron CAS, hashes, locks, recuperación y rollback. [[team360-global-orchestration]] conserva las reglas de ownership.
+
+### Jerarquía documental y GLOBAL
+
+[[lat-documentation-policy]] fija un solo estado técnico GLOBAL; [[team360-global-orchestration]] define lectura abierta y un writer GLOBAL coordinado, sin locks complejos.
+
+- AGENTS define trabajo y ownership; LAT conserva invariantes; el tablero técnico enlaza autoridades locales y estas enlazan contratos/reportes.
+- Una ventana documental no autoriza código, infraestructura, Git ni producción. Los agentes locales pueden continuar sin alterar condiciones GLOBAL; procesos activos no prueban ownership.
+- Estados nuevos usan `status_actual.md` en minúsculas; Telchi conserva CONTEXT como autoridad de arquitectura, roots y etapas.
+- El cuerpo íntegro del tablero anterior, incluidos cambios preexistentes, se conserva en el [histórico de normalización](../SrvRestAstroLS_v1/docs/status_historico_hasta_normalizacion_2026-10-06.md). Cierres/reportes existentes no se reescriben.
+- Srv05: `full` es inventario registrado, no Full Team360 Gate. Compatibilidad/modelado estático no implican lifecycle selectivo, preflight operacional ni migración productiva; consultar el tablero técnico para estado y evidencia.
+
+### Frontera Evolution / Team360 Messaging
+
+[[team360-platform#Team360 Platform#WhatsApp transport boundary]] fija la separación entre transporte WhatsApp y autoridad conversacional de Team360.
+
+- Adapter Team360 y latencia fija: PASS con veinte pares WhatsApp reales, delivery/read, deduplicación y recuperación; conversación en tablas core, transporte Evolution sin inteligencia.
+- El bloque Meta de `globalVar.py` consume exclusivamente `META_TEAM360_*`, sin fallback a otros proyectos; tests aislados cubren coexistencia, ausencias y configuración legacy-only.
+- Gates `TEAM360_MESSAGING_EVOLUTION_ADAPTER_V1` y `TEAM360_MESSAGING_FIXED_RESPONSE_LATENCY_V1`: PASS. [[team360-platform#Team360 Platform#WhatsApp transport boundary#Messaging-only DEV bootstrap]] evita dependencias ajenas sin alterar normal; runtime temporal cerrado, evidencia y benchmark separados en status técnico.
+- [[team360-platform#Team360 Platform#WhatsApp transport boundary#Fixed response conversation ownership]] define idempotencia persistida y ausencia de reintentos automáticos en resultados inciertos.
+- La medición observable de veinte respuestas es GOOD; el gate formal del benchmark sigue PENDING por desgloses ausentes y un intento fuera de orden ignorado.
+- Detalles y evidencia en [status técnico canónico](../SrvRestAstroLS_v1/docs/status_actual.md) y [Messaging README](../SrvRestAstroLS_v1/backend/modules/messaging/README.md), sin duplicar el reporte aquí.
 
 ### Ownership modular y concurrencia
 
@@ -104,11 +132,11 @@ Estas referencias definen las invariantes que deben consultarse antes de cambiar
 - Deploy backend: [[team360-backend-rsync-deploy-policy]].
 - Deploy frontend: [[team360-frontend-rsync-deploy-policy]].
 
-## Validación vigente
+## Referencia de validación del cambio de alias
 
-Los gates recientes confirman el cambio de alias y las fronteras principales; no sustituyen el preflight requerido para futuras corridas reales.
+Esta tabla conserva resultados fechados del cierre del alias, no disponibilidad actual ni evidencia de esta normalización. El estado técnico y los límites vigentes se consultan en el tablero GLOBAL.
 
-| Validación | Resultado vigente |
+| Validación | Resultado de aquel cierre |
 | --- | --- |
 | Backend focalizado LiteLLM/diagnosis | 166 PASS |
 | Lab preflight de modelos | 10 PASS |
@@ -122,8 +150,8 @@ Los gates recientes confirman el cambio de alias y las fronteras principales; no
 
 Este archivo debe permanecer compacto y describir estado actual, no acumular fases históricas ni duplicar evidencia operativa.
 
-- Registrar evidencia diaria en `SrvRestAstroLS_v1/docs/status_actual.md`.
-- Conservar historia congelada en `SrvRestAstroLS_v1/docs/status_historico_hasta_2026-06-28.md` y Git.
+- Registrar en el tablero GLOBAL solo estado vigente + decisión + límite + enlace; evidencia diaria en reports/fases propios.
+- Conservar historia congelada en los históricos enlazados desde el tablero técnico y en Git.
 - Mantener aquí únicamente invariantes activas, cambios recientes relevantes y enlaces canónicos.
 - Actualizar este tablero cuando cambie un documento de `lat.md/`.
 - Ejecutar `lat check` y `git diff --check` antes de cerrar cambios LAT.
@@ -132,7 +160,7 @@ Este archivo debe permanecer compacto y describir estado actual, no acumular fas
 
 Las fuentes siguientes contienen el tablero técnico detallado y las instrucciones de colaboración que complementan esta vista arquitectónica.
 
-- `SrvRestAstroLS_v1/docs/status_actual.md`
-- `AGENTS.md`
-- `.agents/skills/team360-project/SKILL.md`
+- [Estado técnico GLOBAL y autoridades locales](../SrvRestAstroLS_v1/docs/status_actual.md).
+- [AGENTS](../AGENTS.md).
+- [Skill Team360](../.agents/skills/team360-project/SKILL.md).
 - [[team360-knowledge-map]]

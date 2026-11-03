@@ -1,0 +1,155 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+___________________________ test_pg18_seed_contracts ___________________________
+
+    @pytest.mark.skipif(not DSN, reason='explicit disposable PG18 required')
+    def test_pg18_seed_contracts():
+        p = urlparse(DSN)
+        assert p.hostname == '127.0.0.1' and p.port not in (None, 5432)
+        assert p.path == '/telchi_provisioning_disposable'
+    
+        async def exercise():
+            async with await psycopg.AsyncConnection.connect(DSN, autocommit=True, row_factory=dict_row) as conn:
+                version = await (await conn.execute('SHOW server_version_num')).fetchone()
+                assert version['server_version_num'].startswith('18')
+                for filename in ('001_team360_core_schema.sql', '002_team360_rbac_packages_workers_knowledge.sql'):
+                    await conn.execute((Path('db/migrations') / filename).read_text())
+                # Read-only pg_dump of actual operational organization schema, no rows/PII.
+                ddl = '\n'.join(line for line in (ROOT / 'organization_schema_pg18.sql').read_text().splitlines() if not line.startswith('\\'))
+                await conn.execute(ddl)
+                await conn.execute('ALTER TABLE core_workspaces ADD COLUMN organization_id uuid REFERENCES core_organizations(id) ON DELETE SET NULL')
+                await conn.execute(Path('db/migrations/027_team360_messaging_phone_bindings.sql').read_text())
+                repo = ProvisioningRepository()
+                seed = Seed(str(uuid4()), str(uuid4()))
+                # 1 initial scaffold; 2 idempotency; 3/4 mismatched org/workspace.
+                async with conn.transaction():
+                    initial = await repo.provision(conn, seed)
+                assert len(initial['created']) == 2
+                async with conn.transaction():
+                    assert not (await repo.provision(conn, seed))['created']
+                for bad in (replace(seed, organization_id=str(uuid4())), replace(seed, workspace_id=str(uuid4()))):
+                    with pytest.raises(Conflict):
+                        async with conn.transaction():
+                            await repo.provision(conn, bad)
+                # Existing synthetic test identities only; seed cannot create any user.
+                admin, pilot, outsider, other = [str(uuid4()) for _ in range(4)]
+                await conn.execute("INSERT INTO core_workspaces(id,slug,display_name) VALUES (%s,'other','Other tenant')", (other,))
+                for ident, workspace in ((admin, seed.workspace_id), (pilot, seed.workspace_id), (outsider, other)):
+                    await conn.execute('INSERT INTO core_users(id,workspace_id) VALUES (%s,%s)', (ident, workspace))
+                grants = replace(seed, stage='grants', admin_id=admin, pilot_id=pilot)
+                with pytest.raises(Conflict):
+                    async with conn.transaction():
+                        await repo.provision(conn, replace(grants, pilot_id=outsider))
+                async with conn.transaction():
+                    assigned = await repo.provision(conn, grants)
+                async with conn.transaction():
+                    assert not (await repo.provision(conn, grants))['created']
+                # 5 existing admin reuse; 6 denied admin without explicit commercial grant.
+                permissions = PermissionConsoleRepository()
+                assert not await permissions.list_effective_permissions(conn, seed.workspace_id, admin)
+                # 7 commercial grant; 9 workspace isolation.
+                assert PERMISSION in await permissions.list_effective_permissions(conn, seed.workspace_id, pilot)
+                assert not await permissions.list_effective_permissions(conn, other, pilot)
+                assert not await permissions.list_effective_permissions(conn, seed.workspace_id, outsider)
+                count = await (await conn.execute('SELECT count(*) AS n FROM core_users')).fetchone()
+                assert count['n'] == 3
+                # Channel uses existing horizontal metadata contract, no assistant installation.
+                await conn.execute("INSERT INTO communication_providers(code,display_name) VALUES ('evolution','Test provider')")
+                channel_seed = replace(grants, provider_instance='synthetic-instance', receiver_context='synthetic-receiver')
+                async with conn.transaction():
+                    channel_result = await repo.provision(conn, channel_seed)
+                binding = await MessagingRepository().binding(conn, workspace_slug='telchi_dev', channel_alias='telchi_whatsapp_dev', provider='evolution', instance='synthetic-instance')
+                assert binding.environment == 'dev' and binding.tenant_id == 'telchi' and binding.module == 'telchi'
+                channel = ChannelContext(binding.channel_id, 'evolution', 'synthetic-instance', 'synthetic-receiver', 'telchi', seed.workspace_id, 'telchi')
+                phone = PhoneIdentityRepository()
+                await phone.validate_schema(conn)
+                assert await phone.resolve(conn, channel, '15550000001') is None
+                await conn.execute("""INSERT INTO messaging_phone_bindings(environment,provider,sender_identity,tenant_id,workspace_id,user_id,
+                    verification_status,verified_at_utc,verification_ref,actor_user_id)
+                    VALUES ('dev','evolution','15550000001','telchi',%s,%s,'verified',now(),'synthetic-consent',%s)""", (seed.workspace_id, pilot, admin))
+                identity = await phone.resolve(conn, channel, '15550000001')
+                assert identity.permissions == frozenset({PERMISSION})
+                assert await phone.resolve(conn, replace(channel, environment='pro'), '15550000001') is None
+                # 8 revocation immediately visible; do not duplicate permissions in binding.
+                link = next(i for i in assigned['created'] if i['table'] == 'core_user_roles')
+                await conn.execute('DELETE FROM core_user_roles WHERE id=%s', (link['row']['id'],))
+                assert not (await phone.resolve(conn, channel, '15550000001')).permissions
+                await conn.execute("UPDATE messaging_phone_bindings SET verification_status='revoked',revoked_at_utc=now()")
+                with pytest.raises(InvalidPhoneBinding):
+                    await phone.resolve(conn, channel, '15550000001')
+                # Restore only own exact test link to exercise safe rollback snapshots.
+                row = link['row']
+                await conn.execute('INSERT INTO core_user_roles(id,user_id,role_id,created_at_utc) VALUES (%s,%s,%s,%s)', tuple(row[k] for k in ('id','user_id','role_id','created_at_utc')))
+                # 10 rollback grants preserves identities/scaffold/phone tombstone/audit.
+                async with conn.transaction():
+                    await repo.rollback(conn, assigned['run_id'])
+                async with conn.transaction():
+                    await repo.rollback(conn, assigned['run_id'])
+                assert not await permissions.list_effective_permissions(conn, seed.workspace_id, pilot)
+                assert (await (await conn.execute('SELECT count(*) AS n FROM core_users')).fetchone())['n'] == 3
+                with pytest.raises(Conflict, match='surviving dependency'):
+                    async with conn.transaction():
+                        await repo.rollback(conn, initial['run_id'])
+                # A newly edited channel cannot be erased by rollback.
+                await conn.execute("UPDATE communication_channels SET display_name='Changed by operator'")
+                with pytest.raises(Conflict, match='changed'):
+                    async with conn.transaction():
+                        await repo.rollback(conn, channel_result['run_id'])
+                # Dedicated transaction-only scaffold fully rolls back when untouched.
+                # Existing scaffold is protected by test users/bindings; separate schema reset not needed.
+                audit = await (await conn.execute("SELECT count(*) AS n FROM core_events WHERE event_name='telchi.provisioning.rolled_back'")).fetchone()
+                assert audit['n'] == 1
+>       asyncio.run(exercise())
+
+modules/telchi/provisioning/tests/test_provisioning_pg18.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+modules/telchi/provisioning/tests/test_provisioning_pg18.py:47: in exercise
+    await conn.execute('ALTER TABLE core_workspaces ADD COLUMN organization_id uuid REFERENCES core_organizations(id) ON DELETE SET NULL')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.AsyncConnection [BAD] at 0x7a53dfdc4b90>
+query = 'ALTER TABLE core_workspaces ADD COLUMN organization_id uuid REFERENCES core_organizations(id) ON DELETE SET NULL'
+params = None
+
+    async def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> AsyncCursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query"
+                        " doesn't support parameters"
+                    )
+                return await cur.execute(query, prepare=prepare)
+            else:
+                return await cur.execute(query, params, prepare=prepare)
+    
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedTable: relation "core_workspaces" does not exist
+
+.venv/lib/python3.12/site-packages/psycopg/connection_async.py:327: UndefinedTable
+=========================== short test summary info ============================
+FAILED modules/telchi/provisioning/tests/test_provisioning_pg18.py::test_pg18_seed_contracts
+1 failed, 1 passed in 1.64s

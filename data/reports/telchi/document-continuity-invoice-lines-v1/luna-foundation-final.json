@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-10-19T00:17:22.719991+00:00",
+  "identity": "fixture",
+  "rbac": "fixture",
+  "persistence": "real repository serialization, in-memory SQL port",
+  "foundation": "real read-only CURRENT pinned 1408",
+  "whatsapp_sent": 0,
+  "runtime_replaced": false,
+  "turns": [
+    {
+      "question": "Me podés decir cuáles son los productos de esta factura",
+      "classification": "DIRECT_AVAILABLE",
+      "text": "Factura N.º 260192728\n\nProductos:\n1. AGUA DESIONIZADA GRANEL x L. (L00003) — cantidad documental 10.\nLa unidad nativa de cada línea no está publicada; no infiero unidades del nombre. Las descripciones corresponden al catálogo publicado, no al texto histórico de la factura. Datos al 2026-09-28T18:18:35.264000; pueden no reflejar cambios posteriores.",
+      "proposal": {
+        "intent": "DOCUMENT_REFERENCE",
+        "action": "READ_LINES",
+        "result_reference": {
+          "result_id": "invoice-result",
+          "ordinal": null,
+          "field": null
+        },
+        "clarification": null
+      },
+      "capability_calls": 1,
+      "result": {
+        "capability": "sales.invoice_lines.v1",
+        "parameters": {
+          "source_system": "SAP_B1_HANA",
+          "document_type": "OINV",
+          "doc_entry": "11532517",
+          "doc_num": "260192728",
+          "doc_date": "2026-09-24T00:00:00",
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot_id": 1408
+        },
+        "document": {
+          "source_system": "SAP_B1_HANA",
+          "document_type": "OINV",
+          "doc_entry": "11532517",
+          "doc_num": "260192728",
+          "doc_date": "2026-09-24T00:00:00"
+        },
+        "rows": [
+          {
+            "line_num": 0,
+            "item_code": "L00003",
+            "quantity": "10",
+            "source_as_of": "2026-09-24T13:53:07.952772+00:00",
+            "description": "AGUA DESIONIZADA GRANEL x L.",
+            "unit": null,
+            "description_source": "Foundation reference.products SAP_HANA"
+          }
+        ],
+        "read_only": true,
+        "sap_accessed": false,
+        "source": {
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+          "snapshot_id": 1408,
+          "updated_at": "2026-09-28T18:18:35.264000"
+        },
+        "limitations": "Active OINV only, INV1 in original order. Catalog description, not historical invoice wording. Native line UoM is not published. Documentary quantities only, no conversions, totals or amounts."
+      },
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    },
+    {
+      "question": "¿Qué cantidad tiene?",
+      "classification": "DIRECT_AVAILABLE",
+      "text": "Factura N.º 260192728. Cantidad documental del elemento 1: 10. La unidad nativa de la línea no está publicada; no infiero una unidad del nombre del producto. Según el resultado anterior (datos al 2026-09-28T18:18:35.264000).",
+      "proposal": {
+        "intent": "RESULT_REFERENCE",
+        "action": "SELECT_RESULT",
+        "result_reference": {
+          "result_id": "live-1",
+          "ordinal": null,
+          "field": "quantity"
+        },
+        "clarification": null
+      },
+      "capability_calls": 0,
+      "result": null,
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    },
+    {
+      "question": "¿Y el primero?",
+      "classification": "DIRECT_AVAILABLE",
+      "text": "Factura N.º 260192728. Producto 1: código: L00003 · descripción de catálogo: AGUA DESIONIZADA GRANEL x L. · cantidad documental: 10. La unidad nativa de la línea no está publicada; no infiero una unidad del nombre del producto. Según el resultado anterior (datos al 2026-09-28T18:18:35.264000).",
+      "proposal": {
+        "intent": "RESULT_REFERENCE",
+        "action": "SELECT_RESULT",
+        "result_reference": {
+          "result_id": "live-1",
+          "ordinal": 1,
+          "field": null
+        },
+        "clarification": null
+      },
+      "capability_calls": 0,
+      "result": null,
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    },
+    {
+      "question": "Volvamos a la factura",
+      "classification": "DIRECT_AVAILABLE",
+      "text": "Factura N.º 260192728. Fecha: 2026-09-24. Datos al 2026-09-28T18:18:35.264000.",
+      "proposal": {
+        "intent": "DOCUMENT_REFERENCE",
+        "action": "SELECT_DOCUMENT",
+        "result_reference": {
+          "result_id": "invoice-result",
+          "ordinal": null,
+          "field": null
+        },
+        "clarification": null
+      },
+      "capability_calls": 0,
+      "result": null,
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      }
+    }
+  ],
+  "preflight": {
+    "metadata": {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true
+    },
+    "proposal": {
+      "intent": "DOCUMENT_REFERENCE",
+      "action": "SELECT_DOCUMENT",
+      "result_reference": {
+        "result_id": "invoice-result",
+        "ordinal": null,
+        "field": "doc_date"
+      },
+      "clarification": null
+    }
+  },
+  "second_product_descriptor_only": {
+    "intent": "RESULT_REFERENCE",
+    "action": "SELECT_RESULT",
+    "result_reference": {
+      "result_id": "two-row-descriptor",
+      "ordinal": 2,
+      "field": "quantity"
+    },
+    "clarification": null
+  },
+  "LUNA_REAL_INTERPRETATION": "PASS"
+}

@@ -1,0 +1,119 @@
+{
+  "status": "BLOCKED",
+  "branch": "feature/console-backend-core",
+  "scope": "TELCHI / VENTAS / existing extraction and conditional production publication",
+  "ownership": "User-assigned sales operation only; preexisting worktree preserved; no existing source files edited",
+  "requested_business_cutoff_inclusive": "2026-10-29",
+  "extraction_cutoff": null,
+  "observed_at_utc": "2026-10-30T01:08:29.210621+00:00",
+  "local_host_date_at_start": "2026-10-29T22:06:48-03:00",
+  "current_before": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "current_after": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "reader_snapshot": 1408,
+  "manifest_base_snapshot": 1322,
+  "manifest_sha256": "c54765640aa7a6ef215053c73839d1e073ceff39ad07ff9708839156590235ba",
+  "manifest_hash_serialization": "json.dumps(manifest,sort_keys=True,default=str,separators=(',',':')) UTF-8",
+  "reference_version_unchanged": "v2_reference_closure_2088d5885204313a",
+  "logical_components": ["credit_memo", "material_supply", "oinm", "oitw", "purchasing", "receivables_collections", "reference", "sales"],
+  "components_preserved": 8,
+  "metadata_component_count_caveat": "Legacy metadata reports 5; canonical logical manifest has 8. No metadata repair attempted.",
+  "published_coverage": {
+    "sales_document": {"min_doc_date": "2022-03-31", "max_doc_date": "2026-09-24", "documents": 330443},
+    "credit_memo_document": {"min_doc_date": "2026-01-01", "max_doc_date": "2026-09-23", "documents": 2215},
+    "october_invoice_rows": 0,
+    "october_credit_memo_rows": 0,
+    "warning": "No October coverage is not evidence of zero October business sales. Bounds do not certify gap-free coverage."
+  },
+  "hana_preflight": {
+    "status": "PASS",
+    "purpose": "Connectivity only; no operational table extraction",
+    "adapter": "modules.telchi.datalake.source.HanaReadOnlySource with connect_factory",
+    "configuration": "Existing hana_config; no credentials copied or logged",
+    "timeout_precedent": "investigation/validation/iva_bolivia_13_v1/hana_probe.py connection limits; operational_universe_v2/transport.py cursor timeout API. Connectivity-only budgets, not accredited sales extraction budgets.",
+    "tcp_timeout_seconds": 5,
+    "connect_timeout_ms": 8000,
+    "communication_timeout_ms": 15000,
+    "cursor_query_timeout_seconds": 3,
+    "query": "SELECT CURRENT_TIMESTAMP AS \"source_time\" FROM DUMMY",
+    "query_sha256": "3fa69a8e9b9e8583808ff6512630d31e1b7515e642983142c0023e7f16bd31c6",
+    "query_duration_ms": 632.819,
+    "total_elapsed_seconds": 0.796,
+    "query_count": 1,
+    "rows": 1,
+    "source_time_without_timezone": "2026-10-29T21:07:31.627000",
+    "source_timezone": "NOT_VERIFIED",
+    "finished_at_utc": "2026-10-30T01:07:31.809904+00:00",
+    "cursor_and_connection_closed": true,
+    "retries": 0,
+    "sap_write_count": 0
+  },
+  "checkpoint_review": {
+    "live_foundation_lock": "COMPLETED; no ACTIVE lock in foundation_run_lock_v1",
+    "last_lock_run": "temporal-purpose-final-validation-20261002T105435815511Z",
+    "historical_manual_update_run": "manual-update-20260924T132754050866Z",
+    "historical_current_state_source_as_of": "2026-09-24T13:53:07.952772+00:00",
+    "historical_run_plan": "62/62 segments, scope 2026-01-01 through 2026-09-22; historical run_plan differs from later current_state and is not a usable incremental checkpoint",
+    "valid_sales_incremental_cursor": "NOT_ESTABLISHED",
+    "external_extraction_absence": "NOT_FULLY_ESTABLISHED; live Foundation lock is clear, not a universal HANA session proof",
+    "new_checkpoint": null
+  },
+  "blockers": [
+    {
+      "id": "NO_ACCREDITED_SALES_ONLY_INCREMENTAL_PATH",
+      "evidence": "datalake/UPDATE_README.md; update.py extracted_specs and run_update",
+      "detail": "Existing update rereads all 2026, plans Sales, Credit Memo, OINM and OITW, and resets shared staging. No sales-only incremental CLI or accredited bounded late-change reconciliation policy was found in the reviewed operational path. Running it would violate no historical full extraction and unrelated-dataset restrictions. DocDate-only capture cannot be asserted to cover later modifications."
+    },
+    {
+      "id": "SALES_DRIVER_TIMEOUT_NOT_ENFORCED",
+      "evidence": "datalake/source.py HanaReadOnlySource._connect/_execute; update.py run_extraction",
+      "detail": "Default sales connection sets neither connect/communication timeouts nor cursor query timeout; guard checkpoint is after extract and verify and cannot interrupt a blocked driver call. Connectivity-only factory does not accredit a sales extraction budget."
+    },
+    {
+      "id": "SEALED_COMPONENT_REVALIDATION_REQUIRED",
+      "evidence": "datalake/update.py commit_foundation",
+      "detail": "Current has material_supply, purchasing and receivables_collections sealed extras. Existing commit path explicitly raises SEALED_COMPONENT_REVALIDATION_REQUIRED when facts change with those extras. The reviewed publisher cannot promote a sales delta while preserving all eight contracts without component-specific revalidation. No bypass attempted."
+    }
+  ],
+  "documents_extracted": 0,
+  "lines_extracted": 0,
+  "documents_reconciled": 0,
+  "credit_memos_extracted": 0,
+  "sales_extraction_queries": 0,
+  "block_pauses": "NOT_APPLICABLE: extraction not started",
+  "candidate": "NOT_CREATED",
+  "publication": "NOT_ATTEMPTED",
+  "telchiai_consumption": "Canonical Foundation reader still resolves prior publication; October answers unavailable from that publication. No conversational E2E claimed.",
+  "commercial_acceptance": {
+    "questions_1_through_7": "NOT_ANSWERABLE_FOR_OCTOBER_FROM_PUBLISHED_DATA",
+    "october_sales_amount": null,
+    "warning": "Do not report zero sales, net sales, rankings, credit memo amounts or September/October comparison from absent October coverage. October remains partial."
+  },
+  "host": {
+    "assessment": "BUSY_BUT_SAFE for bounded sequential preflight and focused tests",
+    "logical_cpus": 8,
+    "load_1_5_15": [1.04, 0.85, 0.54],
+    "available_memory_mb": 5817,
+    "swap_used_mb": 57,
+    "swap_growth_observed": false,
+    "disk_available_gb": 418,
+    "io_wait_percent_samples": [57, 54],
+    "io_wait_alone_not_used_as_blocker": true,
+    "hana_concurrency": 1,
+    "duckdb_query_threads": 1,
+    "duckdb_query_memory_limit": "768MB",
+    "resource_guard": "PASS for workloads performed; no extraction/promotion guard PASS claimed",
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0,
+    "environmental_aborts": 0
+  },
+  "validation": {
+    "canonical_reader": "PASS; CURRENT re-resolved after preflight, snapshot unchanged",
+    "focused_tests_command": "cd SrvRestAstroLS_v1/backend && uv run pytest -q modules/telchi/datalake/tests/test_update_publication_boundary.py modules/telchi/datalake/tests/test_reference_refresh_snapshot.py",
+    "focused_tests": "18 passed in 3.65s",
+    "lat_check": "PASS; warnings: no init version and no LLM key",
+    "git_diff_check": "PASS",
+    "extraction_reconciliation_publication_permissions_gates": "NOT_RUN: no extraction/candidate/publication",
+    "scope": "No production PASS and no accreditation of a sales-only pipeline inferred from offline tests"
+  },
+  "next_step": "Assign a narrowly scoped development change to accredit sales-only bounded extraction with durable resume, effective driver budgets and a contractual late-change reconciliation policy; separately accredit sealed-component dependency revalidation for sales-only promotion. Preserve existing source edits and do not weaken gates, copy manifests as proof, or switch Reference. HANA connectivity is available; safety-contract gaps, not connectivity or accounting close, blocked this run."
+}

@@ -1,0 +1,98 @@
+import csv,json,time,os,sys
+from pathlib import Path
+from datetime import datetime,timezone
+from collections import Counter
+from hdbcli import dbapi
+from modules.telchi.datalake.source import hana_config
+
+plan=json.loads(Path('/tmp/telchi-permission-plan.json').read_text())
+stamp=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+repo=Path.cwd().parents[1]
+out=repo/'data/reports/telchi'/('hana-read-permissions-'+stamp)
+out.mkdir(parents=True,exist_ok=False)
+control=Path('/tmp')/('telchi-hana-permissions-'+stamp);control.mkdir()
+Path('/tmp/telchi-hana-permissions-current').write_text(str(control))
+(control/'output').write_text(str(out))
+conn=cur=None
+attempted=0;aborted=None;closed=False
+started=datetime.now(timezone.utc).isoformat()
+
+def save():
+ (out/'matrix.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2))
+ fields=['area','schema','object','use','status','duration_ms','column','error_code','reason']
+ with (out/'matrix.csv').open('w') as f:
+  w=csv.DictWriter(f,fieldnames=fields,extrasaction='ignore');w.writeheader();w.writerows(plan)
+ counts=Counter(r['status'] for r in plan)
+ summary=dict(started_at_utc=started,updated_at_utc=datetime.now(timezone.utc).isoformat(),identified=len(plan),business_objects=139,metadata_objects=5,attempted_current=attempted,counts=dict(counts),current_query_duration_ms=round(sum(r['duration_ms'] or 0 for r in plan if r['status']!='PASS HISTÓRICO'),3),historical_duration_ms=254.494,aborted=aborted,connection_closed=closed,connections_opened=1 if conn else 0,concurrency=1,pause_seconds=1,slow_stop_threshold_ms=2000,sap_write_count=0,retries=0,business_data_recorded=False,host_preflight='BUSY_BUT_SAFE')
+ (out/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2))
+
+try:
+ cfg=hana_config()
+ # Resolve TELCHI references against the configured effective company schema.
+ for r in plan:
+  if r['schema']=='TELCHI':r['schema']=cfg['schema']
+ save()
+ conn=dbapi.connect(address=cfg['host'],port=int(cfg['port']),user=cfg['user'],password=cfg['password'],currentSchema=cfg['schema'],encrypt='false')
+ print('CONNECTED; output='+str(out),flush=True)
+ pending=[r for r in plan if r['status']!='PASS HISTÓRICO']
+ for block_start in range(0,len(pending),10):
+  block=1+block_start//10
+  blockrows=pending[block_start:block_start+10]
+  for r in blockrows:
+   if attempted:time.sleep(1)
+   if (control/'stop').exists():aborted='operator_stop';break
+   quoted=lambda s:'"'+s.replace('"','""')+'"'
+   sql=f'SELECT TOP 1 {quoted(r["column"])} FROM {quoted(r["schema"])}.{quoted(r["object"])}'
+   r['sql']=sql
+   t=time.perf_counter();attempted+=1
+   try:
+    cur=conn.cursor()
+    cur.execute(sql)
+    empty=cur.fetchone() is None
+    r['status']='PASS VACÍO' if empty else 'PASS'
+   except dbapi.Error as e:
+    code=e.args[0] if e.args and isinstance(e.args[0],int) else None
+    # Do not persist server messages: they can contain session/configuration values.
+    r['error_code']=code
+    r['status']='DENIED' if code==258 else 'NOT FOUND' if code==259 else 'ERROR'
+    r['reason']={258:'explicit insufficient privilege',259:'invalid table name: absent or inaccessible; existence not inferred',260:'invalid column name; permission outcome not established'}.get(code,'technical SAP error; stopped without diagnostics')
+    if r['status']=='ERROR' and code!=260:aborted='technical_error'
+    elif not conn.isconnected():aborted='session_unstable'
+   finally:
+    r['duration_ms']=round((time.perf_counter()-t)*1000,3)
+    if cur is not None:
+     try:cur.close()
+     except Exception:aborted='cursor_close_error'
+     cur=None
+   print(r['schema']+'.'+r['object']+' '+r['status']+' '+str(r['duration_ms'])+' ms',flush=True)
+   save()
+   if r['duration_ms']>2000:aborted='abnormal_latency';break
+   if aborted:break
+  save()
+  print('BLOCK',block,'REVIEW',dict(Counter(r['status'] for r in blockrows)),flush=True)
+  if aborted:break
+  if block_start+10<len(pending):
+   (control/'waiting').write_text(str(block))
+   # Human agent reviews timing/error log before releasing each next block.
+   deadline=time.monotonic()+180
+   while not (control/('continue-'+str(block))).exists():
+    if (control/'stop').exists():aborted='operator_stop';break
+    if time.monotonic()>deadline:aborted='review_wait_expired';break
+    time.sleep(.25)
+   if aborted:break
+   (control/'waiting').unlink(missing_ok=True)
+except Exception as e:
+ aborted='connection_or_environment_error'
+ print('ABORT '+type(e).__name__+' (details suppressed)',flush=True)
+finally:
+ if cur is not None:
+  try:cur.close()
+  except Exception:pass
+ if conn is not None:
+  try:conn.close();closed=True
+  except Exception:aborted='connection_close_error'
+ for r in plan:
+  if r['status']=='SKIP':r['reason']='not executed: '+str(aborted or 'pending')
+ save()
+ (control/'done').write_text(aborted or 'complete')
+ print('FINISHED',aborted or 'complete','CLOSED',closed,flush=True)

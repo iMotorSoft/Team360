@@ -1,0 +1,183 @@
+PRESERVACIÓN DE INTENCIÓN COMPUESTA V1 — EXPERIMENTO OFFLINE EJECUTADO
+Decisión: REVISE. NO PROMOTE. No éxito general, no cambio de modelo ni runtime.
+Rama: feature/console-backend-core.
+
+1. Alcance y arquitectura
+ENTITY=TELCHI; DOMAIN=VENTAS/CLIENTES con corpus multidominio de regresión;
+STAGE=INVESTIGATION; SOURCES=baselines preservados + corpus LlmFit;
+OUTPUTS=contrato experimental, harness aislado, evidencia numérica.
+
+Source: SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/compound_intent_v1/
+Nuevos archivos: __init__.py, contract.py, run.py, evaluate.py,
+test_contract.py, test_evaluate.py. No archivos preexistentes editados.
+
+El wrapper separa requested_business_intent de executable_capability_plan.
+La primera contiene métricas, dimensiones, filtros, scope, tiempo, comparación,
+referencias, segmentos, granularidades, geografías, relaciones, afirmaciones y
+requisitos no resueltos. Es JSON inerte, sin autoridad SQL ni permisos.
+Las relaciones/claims aceptadas llevan USER_ASSERTED_UNVERIFIED, turno fuente y
+una cita literal comprobada contra el mensaje original. No son hechos certificados.
+La propuesta ejecutable original NO se modifica desde el sidecar.
+
+Mismo LunaInterpreter, modelo gpt-5.6-luna, reasoning medium, OpenAI directo,
+store=false, sin fallback, retries=0. El transporte offline reemplaza solamente
+el prompt de la llamada adicional y captura tokens, latencia y hash de request.
+No se incorpora otro modelo. State Engine y catálogo actuales sin cambios se
+reutilizan para Abraham/controles. No se ejecuta ninguna consulta ni transporte.
+
+El State Engine nativo NO incorpora los campos nuevos: se conservan en el wrapper,
+no dentro de SalesState. La prueba demuestra almacenamiento lateral y bloqueo;
+NO demuestra una integración nativa ni autoriza promoverla.
+
+2. Diseño reproducible y cobertura
+26 conversaciones / 104 turnos del dataset existente:
+LlmFit/benchmarks/telchi/conversation_state_v1/dataset.json.
+Baseline completo preservado:
+LlmFit/benchmarks/telchi/conversation_state_v1/hybrid_router_validation/LUNA_ONLY/turns.jsonl.
+Modelo del baseline: gpt-5.6-luna, confirmado por su RUN_MANIFEST.
+Se reutilizan estados/resultados originales, sin reconsultar el baseline LlmFit.
+El sidecar usa solo mensajes, su intención previa y catálogo, nunca gold.
+
+Abraham 001/002 reutilizan interpretation_proposed y confirmed_state originales,
+sin repetir diagnóstico ni HTTP/DB. Controles: 6 conversaciones / 8 turnos,
+con baseline Luna actual medido y State Engine real sin ejecución.
+Total evaluado: 114 turnos. Una muestra por turno; no significancia estadística.
+
+El catálogo LlmFit es más amplio y NO equivale al catálogo operativo Telchi.
+Para LlmFit se evalúa retención conservadora de elegibilidad del plan congelado:
+solo retener si TODA la intención está representada. No agrega autorizaciones.
+Para Abraham/simple se usa process + SalesCapabilities.availability actuales.
+No equiparar estos dos brazos ni declarar precisión SQL productiva.
+
+3. Abraham — revisión semántica explícita, NO independiente
+                             Baseline       Candidato
+001 requisitos revisados       3/9             8/9
+002 requisitos revisados       1/7             7/7
+Relaciones distribución        0/2             2/2
+Planes habilitados             0/2             0/2
+
+001 recupera conteo de clientes, foco farmacias, canal horizontal y mes,
+además de ventas y gaps de clasificación/definición monetaria.
+Error restante: no conserva explícitamente la ambigüedad de población:
+clientes registrados vs compradores distintos del período o de cada mes.
+002 conserva producto, ambas ciudades como GEOGRAFÍA (no sucursal inventada),
+y producto → distribución propia → La Paz / producto → L&S → Cochabamba.
+Ambas relaciones quedan USER_ASSERTED_UNVERIFIED con evidencia literal.
+
+Los checks y evidencia están en evaluation.json:abraham_semantic_review.
+La lectura manual 001 está ligada al fingerprint exacto del output revisado.
+También se publica el score estructural crudo: 3/17 → 14/17 átomos.
+Este último penaliza farmacias/pharmacies y distribution/distribución; no confundir
+una traducción con pérdida semántica. Ninguna equivalencia modifica outputs ni planes.
+
+4. Corpus LlmFit completo — NO extrapolar Abraham
+Métrica estructural exacta          Baseline          Candidato
+Requisitos preservados             853/883           723/883
+Recall micro                       96,60%            81,88%
+Precisión micro                     97,93%            83,39%
+Turnos exactos                      96/104           12/104
+Regresiones de turnos antes exactos                    86/96
+
+Scorer sin LLM juez. Átomos por path/valor; listas como pertenencia, no orden.
+Las relaciones completas se evalúan aparte; el micro-score no prueba sus enlaces.
+Gold existente es assistant-authored, no revisado independientemente; describe
+estado aceptado, no necesariamente TODO lo solicitado en ASK/blocked turns.
+Por eso no certifica exhaustividad de requisitos no ejecutables.
+
+71 outputs usan end en vez de end_exclusive. Solo como diagnóstico del scorer,
+renombrar esa clave en time.periods eleva candidato a 791/883 y 35/104 exactos.
+SIGUE por debajo del baseline: el deterioro no se explica solo por esa clave.
+No se reparan outputs, no se usa esta normalización en el guard.
+Otros errores: pérdida de dimensiones/continuidad, filtros/referencias distintos,
+selección incorrecta de métricas y representación irregular de contexto de medida.
+IDs y missing/unexpected por turno: errors_and_regressions.json.
+
+5. Controles simples actuales
+Requisitos estructurales             22/22 → 12/22
+Turnos exactos                        8/8 → 2/8
+Regresiones de intención              6/8
+Planes antes habilitados              7/8 → 0/8
+
+El guard conservador evita ejecución indebida, pero sobrebloquea todos los
+controles habilitados. NO es una mejora aceptable aunque cierre por seguridad.
+
+6. Precisión del plan y fail-closed (elegibilidad, NO SQL ejecutado)
+LlmFit vs acción gold EXECUTE:
+Baseline TP=80 FP=0 FN=3 TN=21; precisión=100%, recall=96,39%.
+Candidato TP=6 FP=0 FN=77 TN=21; precisión=100%, recall=7,23%.
+La precisión 6/6 NO representa éxito: pierde 74 planes antes habilitados.
+Controles actuales: baseline TP=7 FP=0; candidato TP=0 FP=0 FN=7;
+precisión candidata INDEFINIDA, no 100% por vacuidad.
+Abraham: ambos quedan bloqueados, 0 ejecuciones.
+Nuevas autorizaciones=0 por construcción del guard. No se prueban SQL ni RBAC real.
+
+7. Llamadas, latencia y costo
+Una llamada EXTRA al mismo LLM por turno: +104 corpus, +2 Abraham, +8 controles.
+Corpus histórico baseline=104 llamadas; candidato estimado baseline+sidecar=208.
+Tokens corpus baseline: input=409026, output=20780.
+Tokens extra corpus: input=292958, output=44880, total=337838.
+Tokens corpus candidato combinado: input=701984, output=65660, total=767644.
+Tokens extra medidos Abraham=6946; controles=22938.
+Total extra medido/checkpointed=367722 tokens.
+
+Overhead adicional corpus: p50=4,646 s; p95=8,937 s.
+Baseline corpus interpretación p50=2,866 s.
+Candidato serial estimado p50=7,413 s; suma por muestra, NO E2E medido.
+Controles overhead p50=5,200 s; p95=7,832 s.
+Abraham overhead p50=12,712 s; p95=15,161 s (solo dos muestras).
+Percentiles nearest-rank; evaluación principal en evaluation.json.
+
+USD real: UNKNOWN. API/baseline retornan tokens pero cost=null; no tarifa
+verificada de este alias. No se inventa precio. Además hubo solicitudes de cola
+sin checkpoint al abortar inicialmente: el total facturado exacto es UNKNOWN,
+no cero. Los tokens publicados son de llamadas completadas preservadas.
+
+8. Fallo del harness, corrección y reanudación
+La primera ejecución terminó los 104 turnos LlmFit y luego falló:
+AttributeError porque measure_context era str y el guard esperaba dict.
+Clasificación: FUNCTIONAL_FAILURE del harness experimental, NO ambiental ni runtime.
+Se preservan execution.log, manifest.initial.json y snapshots de source previos.
+Se corrigió el guard para bloquear shapes no soportadas sin crash/ejecución,
+se añadieron tests de strings/listas y checkpoints por llamada en la reanudación.
+Se retomaron los 104 rows sin nueva extracción del corpus. Ejecución final completa:
+114 rows, 0 errores proveedor observados y 0 rechazos atómicos del sidecar.
+Esto NO significa que los JSON internos sean canónicos: esa validación es deuda V1.
+
+9. Validación y recursos
+Comandos desde SrvRestAstroLS_v1/backend:
+uv run python -m modules.telchi.investigation.validation.compound_intent_v1.run \
+  --llmfit /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/LlmFit \
+  --output ../../data/reports/telchi/compound_intent_v1/run01
+uv run python -m modules.telchi.investigation.validation.compound_intent_v1.evaluate \
+  --llmfit /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/LlmFit \
+  --output ../../data/reports/telchi/compound_intent_v1/run01
+uv run pytest modules/telchi/investigation/validation/compound_intent_v1 \
+  modules/telchi/assistant/tests/test_assistant.py \
+  modules/telchi/assistant/tests/test_rejected_execution_guard.py \
+  modules/telchi/assistant/tests/test_v2_independent_query.py -q
+Resultado final: 74 passed (tests.log). Corrección de forma maliciosa/fallo cerrado,
+no mutación de estado/propuesta, desconocidos sin commit, claims sin certificación,
+provenance, controles simples y scorer/replay cubiertos.
+git diff --check: sin errores; whitespace de nuevos .py revisado también.
+Revisión final de los nuevos archivos realizada. Sin Markdown modificado.
+
+HOST_PREFLIGHT=SAFE; RESOURCE_GUARD=PASS; CONCURRENCY_USED=2 requests,
+secuencial dentro de cada conversación. 8 CPUs, load ~2–3, RAM disponible ~5–6 GB,
+CPU idle ~78–87%, swap ~19 MB estable, sin swap-in/out sostenido.
+UNRELATED_PROCESSES_TERMINATED=0; ENVIRONMENTAL_ABORTS=0.
+OWN_PROCESSES_LEFT_RUNNING=0: PIDs iniciales 97300/97304 y resume 99690/99693
+comprobados ausentes tras finalizar; sin servidores, browsers ni workers propios.
+
+10. Impacto, decisión y siguiente paso
+Hashes de assistant/*.py y datalake/*.py sin cambios (manifest/evaluation).
+Foundation, SQL productivo, catálogo, Evolution, WhatsApp y runtime intactos.
+No commit, push, deploy, acceso SAP/DB ni promoción. Baselines preservados.
+La evidencia principal es evaluation.json; results.json es el resumen inicial
+del runner, anterior al análisis de elegibilidad LlmFit y percentiles finales.
+
+REVISE: la dirección recupera intención en Abraham, pero V1 perjudica el corpus,
+cuesta otra llamada y falla el requisito de no regresión/precisión útil del plan.
+Próxima revisión offline: schema canónico tipado con períodos end_exclusive,
+semántica explícita de update/retención y cobertura intención→plan validada;
+gold de SOLICITUDES no ejecutables revisado por negocio, y tarifa verificable.
+No cambiar automáticamente de modelo. No promover sin autorización posterior.

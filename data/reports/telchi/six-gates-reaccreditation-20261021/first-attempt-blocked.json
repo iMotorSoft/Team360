@@ -1,0 +1,46 @@
+{
+  "status": "BLOCKED",
+  "error_class": "AssertionError",
+  "gates_proven_before_block": [
+    "http_auth",
+    "identity_tenant_isolation",
+    "business_authorization",
+    "durable_idempotency",
+    "model_no_fallback",
+    "assistant_foundation"
+  ],
+  "message": {
+    "results": [
+      "execution_uncertain",
+      "accepted",
+      "duplicate"
+    ],
+    "handler_calls": 1,
+    "capability_calls": 1,
+    "recording_egress_calls": 1,
+    "inbound_count": 1,
+    "outbound_count": 1,
+    "audit": {
+      "classification": "DIRECT_AVAILABLE",
+      "decision": "EXECUTE",
+      "committed": true,
+      "execution_status": "executed",
+      "capability_calls": 1,
+      "interpretation_proposed": true,
+      "required_permission": "telchi.sales.source_quantity.read.v1",
+      "response_prepared": true
+    }
+  },
+  "model_metadata": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "duration_ms": 8339.861,
+    "attempts": 1
+  },
+  "root_cause": "focused test subprocess inherited runner umask 077; the permission-negative fixture created 0700 instead of 0755",
+  "correction": "focused tests now run with umask 022 (same correction as dev-gate-policy-v1); runner umask and artifacts remain 077/0600",
+  "manifest_changed": false,
+  "whatsapp_sends": 0
+}

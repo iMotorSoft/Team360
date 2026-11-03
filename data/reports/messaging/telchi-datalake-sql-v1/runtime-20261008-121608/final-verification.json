@@ -1,0 +1,53 @@
+{
+  "gate": "TEAM360_MESSAGING_TELCHI_DATALAKE_SQL_V1",
+  "status": "PASS",
+  "branch": "feature/console-backend-core",
+  "verified_at": "2026-10-08T12:22:07.555955+00:00",
+  "verification": "Independent real Team360 PostgreSQL read after bounded session closed; user confirms first WhatsApp response received",
+  "checks": {
+    "inbound_hola": true,
+    "tenant_telchi": true,
+    "sql_success": true,
+    "read_only": true,
+    "no_sap": true,
+    "one_reply": true,
+    "provider_id_persisted": true,
+    "delivered_recorded": true,
+    "read_recorded": true,
+    "same_thread": true,
+    "duplicate_replay": true,
+    "unauthorized_rejected": true,
+    "same_result_hash": true
+  },
+  "real_samples": 1,
+  "persisted_sql_inbounds_since_session_start": 1,
+  "query_capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+  "query_hash": "9fa09dae2aedb5f38d90e0d006a4babcfcca10f4de6fb225e6904ffd72928070",
+  "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "response_text": "Telchi \u2014 Top 5 por cantidad fuente\n01/01/2026\u201315/09/2026\n\n1. L00505 \u2014 557.199\n2. L02467 \u2014 200.000\n3. M05970 \u2014 133.931\n4. L01698 \u2014 116.567\n5. L01003 \u2014 115.269\n\nCantidad registrada; no netea devoluciones ni convierte UoM.\nFuente: Telchi Data Lake",
+  "durations_ms": {
+    "pre_sql": 1930.7099609375,
+    "sql_datalake": 2397.564208984375,
+    "formatting_until_send": 110.361083984375,
+    "team360_until_send": 4438.63525390625,
+    "evolution_accept": 1894.927001953125,
+    "total_observable": 8485.7998046875
+  },
+  "evidence": "session/evidence.json",
+  "session": "session/session.json",
+  "second_hola_no_response_reason": "Session target was count=1. After delivery and duplicate replay, own backend was closed and local webhook restored; supervisor intentionally stopped own tunnel and Evolution. Runtime was not configured to remain active for a second/new message.",
+  "cleanup": {
+    "backend_closed": true,
+    "local_webhook_restored": true,
+    "supervisor_closed": true,
+    "own_tunnel_stopped": true,
+    "own_evolution_stopped": true
+  },
+  "tests_reused": "199 passed for unchanged trigger, adapter, service, repository and real Data Lake query; later metadata-only readiness fix passed its probe test",
+  "no_ia": true,
+  "no_data_lake_or_sap_writes": true,
+  "ten_message_benchmark": "NOT_RUN",
+  "baseline_comparison": "SQL itself adds 2397.56 ms in this sample. Pre-SQL includes attachment/Foundation resolution; no unmatched percentile subtraction.",
+  "next_step": "Stop here and show result/query/latencies. A separate count=10 session is needed for the ten sequential human messages; no IA.",
+  "git": "No stage/commit. Preexisting changes preserved."
+}

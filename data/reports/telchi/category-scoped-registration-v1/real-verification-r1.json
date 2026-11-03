@@ -1,0 +1,67 @@
+{
+  "status": "IN_PROGRESS",
+  "generated_at": "2026-10-20T13:09:09.247686+00:00",
+  "source_sha256": "cb61aa5c13b2d7fa61e6f2216743e31097a32f8073c34a0ca1ce81cb2e3fbc8d",
+  "approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+  "configuration_sha256": "03b838b681e407ea08d1f3a19cdd86be521ae5de8dd33dd33881bba1503c6556",
+  "observations": {
+    "identity_tenant_isolation": {
+      "status": "PASS",
+      "actual_pilot_binding": true,
+      "actual_nonprivileged_user": "73d09264-8be2-4402-8023-0142a5f26730",
+      "actual_foreign_user": "67a1b108-7c65-4c80-bbca-ffc42891949c",
+      "negative_axes": [
+        "tenant",
+        "workspace",
+        "module",
+        "user"
+      ]
+    },
+    "business_authorization": {
+      "status": "PASS",
+      "actual_catalog": true,
+      "pilot_full_access": true,
+      "ordinary_and_foreign_effective_permissions_unchanged": true,
+      "full_access_records_unchanged": true,
+      "individual_assignments_created": 0,
+      "registration_idempotent": true,
+      "registration_audit_verified": true,
+      "revocation": "Actual capability disablement in rollback; stale identity denied; restored; FULL_ACCESS untouched"
+    },
+    "http_auth": {
+      "status": "PASS",
+      "actual_asgi_route": "/api/telchi/assistant/dev/turn",
+      "cases": [
+        {
+          "case": "absent",
+          "status": 401
+        },
+        {
+          "case": "invalid",
+          "status": 401
+        },
+        {
+          "case": "authenticated_bad_json",
+          "status": 400
+        }
+      ],
+      "token_logged": false,
+      "listener": false
+    }
+  },
+  "turns": [],
+  "registration_sha256": "d8469874533b30c1aa17f57b6ad0da51128436f85c7c9ca39b948291629d8abd",
+  "backup_sha256": "bc86cddde11676bb6cbdc3db5ff12108a1f3d469477bb1ae27365ab49db085de",
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "authentication": "Real token-authenticated DEV HTTP route over in-process ASGI; existing approved phone/Console identity. Not human login or WhatsApp ingress.",
+  "limits": "Manual DEV readiness, not WhatsApp delivery or complete month certification.",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true
+  },
+  "pool_closed": true
+}

@@ -282,7 +282,7 @@ class PromptPolicy:
         if is_diagnose and sd:
             parts.append("")
             parts.append(format_structured_diagnosis_for_prompt(sd))
-            if continuation_active and status == "completed":
+            if continuation_active and status == "completed" and not mem.get("_runtime_diagnose"):
                 options = mem.get("_continuation_options", [])
                 opts_text = ""
                 if options:
@@ -298,7 +298,9 @@ class PromptPolicy:
                     "\nInstrucciones para esta respuesta (ACCIÓN: POST-DIAGNÓSTICO - CONTINUACIÓN):\n"
                     "- El diagnóstico ya fue completado. El usuario quiere seguir explorando.\n"
                     "- Usá el diagnóstico estructurado como fuente de verdad.\n"
-                    "- Hacé UNA pregunta concreta sobre el próximo paso que le interesa al usuario.\n"
+                    "- Respondé la consulta actual sobre el próximo paso; no reabras la entrevista.\n"
+                    "- Preguntá solo si el usuario pide explorar un detalle aún no confirmado.\n"
+                    "- La aprobación humana ya registrada sigue vigente; no pidas confirmarla otra vez.\n"
                     f"{chosen_text}"
                     f"{opts_text}"
                     "- No repetir el diagnóstico completo.\n"

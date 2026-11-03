@@ -1,0 +1,330 @@
+{
+  "timestamp": "2026-10-11T15:54:19.954365+00:00",
+  "model": "gpt-5.6-luna",
+  "reasoning": "medium",
+  "provider": "OpenAI direct",
+  "simulated": [
+    "identity",
+    "business permission",
+    "PG persistence",
+    "transport"
+  ],
+  "whatsapp_e2e": false,
+  "fallback": false,
+  "turns": [
+    {
+      "user_message": "¿Cuánto vendimos en septiembre?",
+      "classification": "NEEDS_CLARIFICATION",
+      "interpretation": {
+        "intent": "NEW_QUERY",
+        "action": "ASK",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.net_amount"
+          },
+          "unset": []
+        },
+        "clarification": {
+          "slot": "period",
+          "question": "¿De qué año querés consultar las ventas de septiembre?"
+        }
+      },
+      "committed": true,
+      "decision": "ASK",
+      "confirmed_state": {
+        "metric": null,
+        "period": null,
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": {
+          "spec": {
+            "slot": "period",
+            "question": "¿De qué año querés consultar las ventas de septiembre?"
+          },
+          "proposed": {
+            "metric": "sales.net_amount",
+            "period": null,
+            "branches": [],
+            "sales_channel": null,
+            "comparison": null,
+            "reference": null,
+            "pending": null
+          },
+          "base_state_hash": "97e82989aabd470186cd5d29a60001de9229365a1d20ae265f320b7bd12c7bf3",
+          "source_turn_id": "probe-0"
+        }
+      },
+      "execution_status": "not_executed",
+      "timings": {
+        "interpretation_ms": 3587.439856000856,
+        "state_engine_ms": 0.13146200217306614,
+        "capability_ms": 0.0,
+        "response_format_ms": 0.0,
+        "total_processing_ms": 3587.6264449980226
+      }
+    },
+    {
+      "user_message": "De 2026.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "interpretation": {
+        "intent": "ANSWER_CLARIFICATION",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "metric": "sales.net_amount",
+            "period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            }
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "committed": true,
+      "decision": "DIRECT_UNAVAILABLE",
+      "confirmed_state": {
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "execution_status": "not_executed",
+      "timings": {
+        "interpretation_ms": 3648.58194000044,
+        "state_engine_ms": 0.1439379993826151,
+        "capability_ms": 0.0,
+        "response_format_ms": 0.0,
+        "total_processing_ms": 3648.776286998327
+      }
+    },
+    {
+      "user_message": "¿Y en Saavedra?",
+      "classification": "DIRECT_UNAVAILABLE",
+      "interpretation": {
+        "intent": "REFINE",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/branches": [
+              "Saavedra"
+            ]
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "committed": true,
+      "decision": "DIRECT_UNAVAILABLE",
+      "confirmed_state": {
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "branches": [
+          "Saavedra"
+        ],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "execution_status": "not_executed",
+      "timings": {
+        "interpretation_ms": 2247.578810998675,
+        "state_engine_ms": 0.11473999984445982,
+        "capability_ms": 0.0,
+        "response_format_ms": 0.0,
+        "total_processing_ms": 2247.7718939990154
+      }
+    },
+    {
+      "user_message": "Comparalo con agosto.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "interpretation": {
+        "intent": "COMPARE",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/comparison": {
+              "start": "2026-08-01",
+              "end_exclusive": "2026-09-01"
+            }
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "committed": true,
+      "decision": "DIRECT_UNAVAILABLE",
+      "confirmed_state": {
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "branches": [
+          "Saavedra"
+        ],
+        "sales_channel": null,
+        "comparison": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "reference": null,
+        "pending": null
+      },
+      "execution_status": "not_executed",
+      "timings": {
+        "interpretation_ms": 2403.999059999478,
+        "state_engine_ms": 0.08356599937542342,
+        "capability_ms": 0.0,
+        "response_format_ms": 0.0,
+        "total_processing_ms": 2404.1279120028776
+      }
+    },
+    {
+      "user_message": "Ahora solamente venta horizontal.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "interpretation": {
+        "intent": "REFINE",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/sales_channel": "HORIZONTAL"
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "committed": true,
+      "decision": "DIRECT_UNAVAILABLE",
+      "confirmed_state": {
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "branches": [
+          "Saavedra"
+        ],
+        "sales_channel": "HORIZONTAL",
+        "comparison": {
+          "start": "2026-08-01",
+          "end_exclusive": "2026-09-01"
+        },
+        "reference": null,
+        "pending": null
+      },
+      "execution_status": "not_executed",
+      "timings": {
+        "interpretation_ms": 2760.303130999091,
+        "state_engine_ms": 0.09016499825520441,
+        "capability_ms": 0.0,
+        "response_format_ms": 0.0,
+        "total_processing_ms": 2760.4439400020055
+      }
+    },
+    {
+      "user_message": "Quitá la restricción de sucursal y de canal y la comparación.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "interpretation": {
+        "intent": "REFINE",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {},
+          "unset": [
+            "/branches",
+            "/sales_channel",
+            "/comparison"
+          ]
+        },
+        "clarification": null
+      },
+      "committed": true,
+      "decision": "DIRECT_UNAVAILABLE",
+      "confirmed_state": {
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "execution_status": "not_executed",
+      "timings": {
+        "interpretation_ms": 2353.7224600004265,
+        "state_engine_ms": 0.0967779997154139,
+        "capability_ms": 0.0,
+        "response_format_ms": 0.0,
+        "total_processing_ms": 2353.8684179984557
+      }
+    },
+    {
+      "user_message": "Nueva consulta independiente: top 10 productos por cantidad documental del 1 de enero al 15 de septiembre de 2026, sin filtros.",
+      "classification": "DIRECT_AVAILABLE",
+      "interpretation": {
+        "intent": "NEW_QUERY",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/metric": "sales.source_top_items",
+            "/period": {
+              "start": "2026-01-01",
+              "end_exclusive": "2026-09-16"
+            }
+          },
+          "unset": [
+            "/branches",
+            "/sales_channel",
+            "/comparison",
+            "/reference"
+          ]
+        },
+        "clarification": null
+      },
+      "committed": true,
+      "decision": "EXECUTE",
+      "confirmed_state": {
+        "metric": "sales.source_top_items",
+        "period": {
+          "start": "2026-01-01",
+          "end_exclusive": "2026-09-16"
+        },
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "execution_status": "executed",
+      "timings": {
+        "interpretation_ms": 4302.029909998964,
+        "state_engine_ms": 0.11993600128334947,
+        "capability_ms": 0.02801400114549324,
+        "response_format_ms": 0.00683599864714779,
+        "total_processing_ms": 4302.240848999645
+      }
+    }
+  ],
+  "foundation": null,
+  "controlled_capability_calls": 1,
+  "luna_metadata": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct"
+  }
+}

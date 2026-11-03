@@ -1,0 +1,150 @@
+{
+  "conversation": "restart-continuity:20261012T141534Z",
+  "transport": "curl",
+  "turns": [
+    {
+      "phase": "before-restart",
+      "user": "dame las ultimas ventas de calenta",
+      "summary": {
+        "http_ok": true,
+        "classification": "NEEDS_CLARIFICATION",
+        "committed": true,
+        "decision": "ASK",
+        "execution_status": "not_executed",
+        "bmd_category": null,
+        "metrics": [],
+        "metric": null,
+        "entity": "calenta",
+        "temporal_reference": null,
+        "period": null,
+        "response_text": "¿Querés consultar el importe vendido, las cantidades vendidas o ambas?"
+      }
+    },
+    {
+      "phase": "before-restart",
+      "user": "las dos",
+      "summary": {
+        "http_ok": true,
+        "classification": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "bmd_category": "METRIC_MISSING",
+        "metrics": [
+          "sales.net_amount",
+          "sales.source_top_items"
+        ],
+        "metric": "sales.net_amount",
+        "entity": "calenta",
+        "temporal_reference": null,
+        "period": null,
+        "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades."
+      }
+    },
+    {
+      "phase": "after-restart",
+      "user": "primero dame el importe de las ventas del mes",
+      "summary": {
+        "http_ok": true,
+        "classification": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "bmd_category": "METRIC_MISSING",
+        "metrics": [
+          "sales.net_amount",
+          "sales.source_top_items"
+        ],
+        "metric": "sales.net_amount",
+        "entity": "calenta",
+        "temporal_reference": null,
+        "period": null,
+        "response_text": "Entendí que pedís importe de ventas, luego cantidades documentales por producto para «calenta» (tipo de entidad pendiente de resolución). La consulta de importes de ventas todavía no tiene una capability aprobada. No puedo reemplazarla por cantidades."
+      }
+    }
+  ],
+  "after_stop": {
+    "thread_id": "5c4934bd-cbd9-4479-9c2b-26e99685f14f",
+    "state": {
+      "metric": "sales.net_amount",
+      "period": null,
+      "pending": null,
+      "branches": [],
+      "reference": null,
+      "comparison": null,
+      "sales_channel": null,
+      "entity_mention": {
+        "text": "calenta",
+        "type": null
+      },
+      "schema_version": 2,
+      "requested_metrics": [
+        "sales.net_amount",
+        "sales.source_top_items"
+      ],
+      "temporal_reference": null
+    },
+    "inbound_events": 2,
+    "executed_turns": 0
+  },
+  "after_restart": {
+    "thread_id": "5c4934bd-cbd9-4479-9c2b-26e99685f14f",
+    "state": {
+      "metric": "sales.net_amount",
+      "period": null,
+      "pending": {
+        "spec": {
+          "slot": "period",
+          "question": "¿De qué mes y año querés consultar las ventas?"
+        },
+        "proposed": {
+          "metric": "sales.net_amount",
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": {
+            "text": "calenta",
+            "type": null
+          },
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount",
+            "sales.source_top_items"
+          ],
+          "temporal_reference": null
+        },
+        "source_turn_id": "b1ed03bb-b049-45aa-8b51-c4da957183b6",
+        "base_state_hash": "1da3b00eadf2927b6ba1ac9cbfe441031f770b88af6a5fd313dcbb7ed01ca6b4"
+      },
+      "branches": [],
+      "reference": null,
+      "comparison": null,
+      "sales_channel": null,
+      "entity_mention": {
+        "text": "calenta",
+        "type": null
+      },
+      "schema_version": 2,
+      "requested_metrics": [
+        "sales.net_amount",
+        "sales.source_top_items"
+      ],
+      "temporal_reference": null
+    },
+    "inbound_events": 3,
+    "executed_turns": 0
+  },
+  "checks": {
+    "thread_recovered": true,
+    "committed": true,
+    "entity_preserved": true,
+    "metrics_preserved": true,
+    "not_executed": true,
+    "no_duplicate_execution": true,
+    "inbound_events": 3
+  },
+  "passed": true
+}

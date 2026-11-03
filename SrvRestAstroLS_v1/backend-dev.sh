@@ -70,10 +70,6 @@ _require_command() {
   fi
 }
 
-for command_name in timeout curl ss sed grep ps kill sleep; do
-  _require_command "$command_name"
-done
-
 # ---- Local overrides -------------------------------------------------------
 
 LOCAL_ENV_FILE="$SCRIPT_DIR/.env.backend-dev.local"
@@ -86,6 +82,60 @@ if [[ -f "$LOCAL_ENV_FILE" ]]; then
   source "$LOCAL_ENV_FILE"
   set +a
 fi
+
+# ---- Explicit DEV profile -------------------------------------------------
+# Normal remains the default, with its existing production-like preflights.
+DEV_PROFILE="${TEAM360_DEV_PROFILE:-normal}"
+
+if [[ "$DEV_PROFILE" == "messaging-only" ]]; then
+  _require_command ss
+  [[ "${TEAM360_ENV:-development}" == "development" || "${TEAM360_ENV:-development}" == "dev" ]] \
+    || _die "messaging-only is restricted to DEV"
+  [[ "$BACKEND_PORT" =~ ^[0-9]+$ ]] \
+    && (( 10#$BACKEND_PORT > 0 && 10#$BACKEND_PORT <= 65535 )) \
+    || _die "invalid Messaging backend port"
+
+  # Never terminate a pre-existing listener in this isolated profile.
+  [[ -z "$(ss -H -ltn "sport = :${BACKEND_PORT}")" ]] \
+    || _die "Messaging port ${BACKEND_PORT} is occupied; choose a free port"
+
+  MESSAGING_PYTHON="$SCRIPT_DIR/backend/.venv/bin/python"
+  UVICORN="$SCRIPT_DIR/backend/.venv/bin/uvicorn"
+  [[ -x "$MESSAGING_PYTHON" && -x "$UVICORN" ]] \
+    || _die "backend Python/uvicorn environment is missing"
+
+  export TEAM360_DEV_PROFILE=messaging-only
+  export PYTHONPATH="$SCRIPT_DIR/backend${PYTHONPATH:+:$PYTHONPATH}"
+  _log "messaging-only preflight (configuration and real Team360 PostgreSQL)"
+  "$MESSAGING_PYTHON" -m modules.messaging.dev_app --preflight \
+    || _die "Messaging dependencies are unavailable; backend not started"
+
+  _log "Profile: messaging-only; no Flow, LLM, LiteLLM, Milvus or Telchi bootstrap"
+  _log "Listening: http://${BACKEND_HOST}:${BACKEND_PORT}"
+  exec "$UVICORN" modules.messaging.dev_app:app \
+    --host "$BACKEND_HOST" --port "$BACKEND_PORT" --no-access-log --log-level warning
+elif [[ "$DEV_PROFILE" == "srv05-e2e" ]]; then
+  # Test-only launcher; normal defaults/entrypoint below remain unchanged.
+  _require_command ss
+  [[ "${TEAM360_ENV:-}" == "development" || "${TEAM360_ENV:-}" == "dev" ]] \
+    || _die "srv05-e2e requires explicit DEV"
+  [[ "$BACKEND_HOST" == "127.0.0.1" ]] || _die "srv05-e2e is loopback-only"
+  [[ "$BACKEND_PORT" =~ ^[0-9]+$ ]] \
+    && (( 10#$BACKEND_PORT > 0 && 10#$BACKEND_PORT <= 65535 )) \
+    || _die "invalid E2E backend port"
+  [[ -n "${TEAM360_E2E_EVIDENCE:-}" ]] || _die "srv05-e2e requires evidence output"
+  [[ -z "$(ss -H -ltn "sport = :${BACKEND_PORT}")" ]] \
+    || _die "E2E port occupied; no existing process will be terminated"
+  export TEAM360_BACKEND_HOST="$BACKEND_HOST" TEAM360_BACKEND_PORT="$BACKEND_PORT"
+  _log "TEST ONLY Srv05; scheduler delivery forbidden; pool read-only"
+  exec "$SCRIPT_DIR/backend/.venv/bin/python" "$SCRIPT_DIR/backend/scripts/srv05_e2e_runtime.py"
+elif [[ "$DEV_PROFILE" != "normal" ]]; then
+  _die "unknown TEAM360_DEV_PROFILE; use normal, messaging-only or srv05-e2e"
+fi
+
+for command_name in timeout curl ss sed grep ps kill sleep; do
+  _require_command "$command_name"
+done
 
 # ---- Production-like defaults ---------------------------------------------
 #

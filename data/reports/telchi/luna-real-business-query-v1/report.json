@@ -1,0 +1,107 @@
+{
+  "task": "TELCHIAI_LUNA_REAL_BUSINESS_QUERY_V1",
+  "branch": "feature/console-backend-core",
+  "business_result": "INDEPENDENTLY_VERIFIED_WITH_SCOPE_LIMITATIONS",
+  "researcher_controller_status": "BLOCKED: observation_byte_budget after Luna had produced its final business answer; dynamic-source claims were not accredited by the built-in grain verifier",
+  "identity": "Supervised local DEV test identity; NOT authenticated Presidency or Console",
+  "question": "Durante 2026, ¿en qué mes vendimos más materias primas y cuál fue el cliente al que más le vendimos en ese mes?",
+  "answer": {
+    "month": "2026-08",
+    "amount_bs": "853568.45",
+    "customer_name": "NUTRI-MIX S.R.L.",
+    "customer_code": "C012100",
+    "customer_amount_bs": "139200.00",
+    "coverage_from": "2026-01-01",
+    "coverage_through": "2026-09-24",
+    "incomplete_periods": "September partial; October-December absent. Published rows do not independently certify completeness of earlier months."
+  },
+  "model": {"name":"gpt-5.6-luna","reasoning":"medium","provider":"OpenAI Responses direct","fallback":false,"store":false},
+  "foundation": {
+    "publication":"foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot":"1408",
+    "reference_version":"v2_reference_closure_2088d5885204313a",
+    "read_only":true,
+    "current_modified":false,
+    "snapshot_changed":false
+  },
+  "sources_and_classification": {
+    "sales":"Pinned active SAP_B1_HANA OINV/INV1 sales_document/sales_line",
+    "customers":"Published ref_customers, source_system SAP_HANA; SAP billed CardCode/name, not DMS final buyer",
+    "structural_source":"material_supply.material_supply_status, exactly the file/hash sealed in the pinned manifest; physical ItemCode exposed generically as item_code",
+    "product_master":"Published ref_products SAP_HANA sap_itms_grp_cod and sap_item_name",
+    "business_authority":"Existing product_business_classification.py TELCHI_PRODUCT_BUSINESS_CLASSIFICATION_V1, PBT-006; not a new capability or invented classification rule",
+    "business_rule":"Structural BOM component plus canonical input/bulk item-group evidence, excluding packaging under the existing precedence rules",
+    "structural_items":1040,
+    "business_raw_material_items":306,
+    "structural_items_excluded_from_business_category":734,
+    "coverage_limit":"Business classification is current and limited to the published structural-reference universe; no claim of complete historical commercial classification for all SAP products"
+  },
+  "independent_verification": {
+    "evidence":"independent.json",
+    "queries":12,
+    "method":"Separate unaggregated raw rows, Python Decimal monthly/customer/SKU totals, independent SAP-group/packaging classification check and customer-reference lookup; not a rerun of Luna SUM queries",
+    "unique_line_keys_all_currencies":4735,
+    "duplicate_line_keys":0,
+    "duplicate_headers":0,
+    "duplicate_sap_customer_codes":0,
+    "classification_conflicts":0,
+    "winning_month_bs_lines":501,
+    "winning_month_bs_documents":476,
+    "monthly_customer_and_sku_reconciliation":"Exact; zero difference",
+    "excluded_currency":{"USD":"698.25","month":"2026-08","lines":1},
+    "physical_quantities_summed":false,
+    "credit_memos_and_collections":"Excluded; commercial invoice-line amounts, not net invoicing or collections"
+  },
+  "corrections_and_attempts": [
+    "Initial discovery reproduced 33 readable sources and 13 unsupported published file-backed datasets. A generic manifest/hash/root-validated read projection exposes those datasets without changing Foundation production or grants.",
+    "Generic discovery now preserves CamelCase physical columns through a snake_case logical projection; compact catalog encoding preserves all columns/types/constraints within existing budgets.",
+    "Early attempts hit catalog/observation byte limits and SQL projection issues; all available attempts are retained. Two owned runs were interrupted; no unrelated process was terminated.",
+    "A structural-only run incorrectly treated the legacy BOM-leaf flag as business raw-material classification and found June/GRANOS. Independent classification review identified this semantic mismatch. That run and its independent recalculation are retained as structural-only-* and are NOT the business answer.",
+    "The final fresh Luna run used the existing canonical business classifier. No Pi figures, winner month, customer or earlier-run numeric results were supplied in its question, prompt or conversation.",
+    "The built-in verifier still does not accredit dynamic-source grain; its repair loop eventually exhausted the unchanged 32 KiB observation budget. No guard was weakened to force PASS. The final model answer was verified independently afterwards."
+  ],
+  "comparison_after_investigation": {
+    "pi_reference_month":"2026-08",
+    "pi_reference_amount_bs":"853568.45",
+    "pi_reference_customer":"NUTRI-MIX S.R.L.",
+    "pi_reference_customer_amount_bs":"139200.00",
+    "result":"Exact match for month, amount, customer and customer amount; not a proof of universal classification completeness"
+  },
+  "resources": {
+    "total_task_wall_seconds_at_final_freeze":1343.5852687358856,
+    "final_investigation_seconds":56.09424302599655,
+    "independent_verification_seconds":6.945076071002404,
+    "final_research_model_calls":7,
+    "additional_model_preflight":"Successful separate minimal real call; preserved in luna.json",
+    "peak_research_process_rss_kib":253992,
+    "duckdb_threads":1,
+    "concurrency":1,
+    "duckdb_memory_limit_bytes":536870912,
+    "spill_bytes":0,
+    "query_seconds_limit":120,
+    "phase_seconds_limit":900,
+    "observation_bytes_limit":32768,
+    "host":"BUSY_BUT_SAFE under the existing explicitly authorized DEV I/O-only exception; about 7 GiB available and no meaningful swap growth",
+    "unrelated_processes_terminated":0,
+    "own_processes_left_running":0,
+    "cost":"Not estimated without accredited pricing"
+  },
+  "files_changed": [
+    "backend/modules/telchi/exploratory_sql/authorized_foundation.py",
+    "backend/modules/telchi/exploratory_sql/adaptive_research.py",
+    "backend/modules/telchi/exploratory_sql/test_authorized_foundation.py",
+    "backend/modules/telchi/exploratory_sql/test_adaptive_research.py",
+    "backend/modules/telchi/investigation/validation/luna_real_business_query_v1/run.py",
+    "backend/modules/telchi/investigation/validation/luna_real_business_query_v1/verify.py",
+    "data/reports/telchi/luna-real-business-query-v1/"
+  ],
+  "validation": [
+    "56 focused authorization/adaptive tests passed before the final compact-dictionary refinement; see tests-final-2.log",
+    "Final focused discovery/compact-catalog regressions plus existing business-classification tests: 14 passed; targeted-final-business.log",
+    "git diff --check passed",
+    "Real Luna investigation and twelve-query independent Foundation verification completed their recorded scopes; no overall researcher-controller PASS claimed"
+  ],
+  "untouched":"WhatsApp, Web, SAP/HANA, productive Foundation, CURRENT, grants, shared services and preexisting unrelated changes. No commit or push.",
+  "next_step":"Resolve dynamic-source verification/observation compaction before claiming an end-to-end autonomous-controller PASS; extend classification/temporal evidence only with separate authorization.",
+  "reproduction":"From SrvRestAstroLS_v1/backend, with the already-authorized credential in the environment, use a NEW TELCHI_BUSINESS_EVIDENCE_ROOT: TEAM360_ENV=development OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 TELCHI_BUSINESS_EVIDENCE_ROOT=<new-directory> .venv/bin/python modules/telchi/investigation/validation/luna_real_business_query_v1/run.py ; then run verify.py with the same output root. Existing evidence is not overwritten. No services need to be started."
+}

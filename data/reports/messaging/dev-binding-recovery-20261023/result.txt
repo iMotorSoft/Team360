@@ -1,0 +1,48 @@
+TEAM360 / TELCHIAI — DEV BINDING RECOVERY
+Branch: feature/console-backend-core
+Context: ENTITY=TELCHI; DOMAIN=USUARIOS_ROLES_Y_PERMISOS (channel identity/routing); STAGE=DEVELOPMENT; SOURCES=existing DEV PostgreSQL and accredited V1 artifacts; OUTPUT=operational diagnosis.
+
+FINDING
+Two channel records, not two demonstrated operational consumers. team360-meta-dev is the shared physical Evolution INSTANCE NAME, not a second channel alias.
+Owner confirms this is the Telchi development installation and no other operational clients use it. This supersedes the earlier inference that two database references alone prove competing consumers.
+
+DEV database team360 at server 172.18.0.2:5432:
+- communication_channels 3cc01e11-da1c-4630-a9c6-ecc2f79220d4, workspace team360_public_site, alias evolution-meta-dev, created 2026-10-06 14:42:12 UTC. Historical adapter/fixed-response/SQL tests documented in Messaging README. Last event 2026-10-08 17:27:05 UTC; 164 events, one thread, including real inbound/outbound/delivery history. OBSOLETE as current Telchi operational routing, NOT disposable history.
+- communication_channels 489e6f2c-8bac-4805-99ba-7dbe4d48c10e, workspace telchi_dev (3fb026a1-a4ba-44b3-b65b-fab452df7fc9), alias telchi_whatsapp_dev, created 2026-10-11 23:23:22 UTC. horizontal_v1, dev/telchi. 1,335 events, 379 threads; last event 2026-10-22 19:39:19 UTC.
+- Existing MessagingRepository.binding was called against actual PostgreSQL in READ ONLY mode: exact workspace+alias+provider+instance selects the Telchi channel successfully while both records remain present. No ambiguous instance-only channel selection in this method. Persisted status=testing does not demonstrate a running consumer.
+- No DB cleanup is necessary to resolve selection. No record deactivated/deleted. No backup taken because no database mutation was needed or performed.
+
+CURRENT EXECUTION OBSERVATIONS
+Evolution container evolution-api is Created, not running; image remains the original statusfix1 digest. Local 18180/18181 listeners absent. No locally running consumer established on those endpoints. Intended operational consumer is TelchiAI per owner, historical adapter is not an independent operational client. This is not a global remote process inventory.
+Existing Evolution database evolution_api: same single instance 0234646c-458c-4808-a6ea-a0d264cc999b / team360-meta-dev, 252 persisted messages; local webhook disabled. No Meta calls or changes, no Cloudflare changes, no service start/restart/replacement.
+All five legacy records remain present, including real UNKNOWN aedf9f66-0a34-4d3a-91d1-60a567d358bc. No replay, reclassification or idempotency/audit mutation. Four probe records also retained.
+
+ACTUAL V1 BLOCKERS (NOT A BINDING CLEANUP PROBLEM)
+Accredited V1 exists in ai/lab/evolution-api/data/dev-promotion-v1; 427 PASS / 1 skip reused, not rerun. The main checkout still lacks bound_provider.py and transport_runtime.py and its Srv05 entrypoint differs from that accredited copy. Both active DEV databases currently lack ot_* tables. Thus V1 is NOT installed/operational in the existing installation.
+The already-reviewed closed-review-packet.json identifies exactly three additive migrations, their hashes, the existing-instance binding, private UDS callback and candidate image 5a25df47f4bb71764d2fd033f07428e5be0cbc010b33d05851a5166e89f4b175. Its former 'other_consumer' wording is historical; two channel rows do NOT establish a live competing consumer. No new instance, workspace, number or Meta integration is needed. No legacy consumer suspension is justified.
+Required next authorized window: integrate only the accredited V1 source delta into Srv05/Messaging, reserve candidate migration 032, provision DEV-only V1 technical identities/trust/roles, capture and verify backups of the two DEV databases and existing configuration/store before DDL, apply the three reviewed additive migrations, configure private callback/UID mount and select V1 in Srv05, and update the existing Evolution service to the accredited compatible image without changing Meta-facing settings or history. Keep admission closed until checks pass. No fallback legacy, automatic migration launcher, unknown replay or business RBAC changes.
+These are active migration/component/credential changes explicitly excluded from the present authorization; none executed. Backup restore verification also needs an explicitly approved isolated verification target; none created.
+Recipient and real send remain separately unauthorized. Existing Meta route reachability needs verification during activation, not alteration of subscriptions or credentials. No real WhatsApp test has been run.
+
+VALIDATION
+- Bounded READ ONLY PostgreSQL inventories and exact repository binding selection: PASS; transactions rolled back and connections closed.
+- pytest tests/test_messaging_horizontal_runtime.py -k 'binding_incomplete_or_wrong_environment or persistent_environment_and_channel_keys_disjoint or production_handler_registration' -q: 5 passed, 38 deselected, 0.66s. Deterministic tests; no external delivery.
+- Existing check-closed-packet.py: consistency PASS, three SQL hashes and probe evidence checked. Its activation BLOCKED and Meta routing UNKNOWN are explicit limits, not test failures.
+- git diff --check: PASS. Reviewed preexisting diff stat; no source files edited. One initial read-only catalog query had a psycopg percent-placeholder error, corrected with parameterized query; no mutation occurred.
+- Markdown/LAT checks not applicable: no Markdown edited.
+- Only own output: inventory.json, binding-selection.json, v1-readiness.json, focused-tests.txt and this result.txt in this directory. No commit/push. No production/transversal runtime impact. No persistent processes created.
+
+EVOLUTION_EXISTING_PRESERVED=YES
+META_CONFIG_PRESERVED=YES
+ACTIVE_CONSUMERS=none running locally on existing transport endpoints; TelchiAI is the intended DEV consumer, owner-confirmed
+SECOND_BINDING=OBSOLETE
+BINDING_CONFLICT_RESOLVED=YES
+POSTGRES_CLEANUP_REQUIRED=NO
+POSTGRES_CLEANUP_PERFORMED=NO
+REAL_HISTORY_PRESERVED=YES
+LEGACY_UNKNOWN_PRESERVED=YES
+V1_INTEGRATION_READY=NO
+WHATSAPP_TEST_READY=NO
+BLOCKERS=V1 code/image not installed in existing runtime; three additive migrations absent; operational V1 identities/config/private callback not provisioned; target backup/restore not verified
+OWNER_APPROVAL_REQUIRED=bounded SHARED/GLOBAL DEV source+DB+service window and V1 technical credential provisioning; separate recipient/send authorization later
+NEXT_ACTION=authorize the bounded V1 installation window on existing team360/evolution_api DEV and existing Evolution instance; no binding cleanup or Meta changes

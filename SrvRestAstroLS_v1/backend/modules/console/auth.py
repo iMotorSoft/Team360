@@ -61,6 +61,8 @@ def verify_console_access_token(
     user_id = payload.get("user_id")
     if not user_id:
         raise ConsoleAuthError("Missing user_id claim")
+    if sub != f"user:{user_id}":
+        raise ConsoleAuthError("Subject and user_id must match")
 
     return ConsolePrincipal(
         user_id=str(user_id),

@@ -213,6 +213,7 @@ Las políticas se aplican después de resolver entidad, dominio, etapa, fuentes 
 - `PROMOTION_REQUIRED`: obligatorio para pasar a Development desde conocimiento investigado y para habilitar Production.
 - `DATA_ROOT_DATA_ONLY`: ningún Python, SQL fuente, test, Markdown fuente, `.venv`, `.env` o secreto en `DATA_ROOT`.
 - `LEGACY_READ_ONLY`: DS/DS0 se consultan sin desarrollar nuevas capacidades allí.
+- `SHARED_HOST_SAFETY`: aplicar siempre la sección 19, incluso si el prompt solo pide ejecutar un gate; complementar la política global de `AGENTS.md` sin sustituir guards existentes.
 
 ## 14. Multi-agent authority
 
@@ -228,7 +229,7 @@ PI / CODEX CLI / OPENCODE / OMP / OTHER
 
 `CONTEXT.md` es `SOURCE_OF_TRUTH`. Las configuraciones particulares no deben duplicar reglas funcionales Telchi; solo pueden actuar como adaptadores mínimos.
 
-La futura regla raíz de `AGENTS.md`, aún no implementada, deberá indicar en forma breve que una tarea Telchi carga este archivo antes de elegir paths, ejecutar scripts o escribir, y luego resuelve dominio, etapa, fuentes y outputs. Telchi queda en investigation salvo Development o Production explícitos.
+La regla raíz de `AGENTS.md` ya exige cargar este archivo antes de elegir paths, ejecutar scripts o escribir, y resolver dominio, etapa, fuentes y outputs. Telchi queda en investigation salvo Development o Production explícitos.
 
 ## 15. Documentation authority
 
@@ -238,7 +239,7 @@ La jerarquía evita duplicación entre contrato, introducción, operación inves
 | ---: | --- | --- |
 | 1 | `backend/modules/telchi/CONTEXT.md` | Autoridad única del modelo, arquitectura, límites y roots actuales |
 | 2 | `backend/modules/telchi/CONTEXT_ROUTING_DESIGN.md` | Nota de diseño subordinada y transición desde el modelo sustituido |
-| 3 | `backend/modules/telchi/README.md` | Introducción y estado del módulo |
+| 3 | `backend/modules/telchi/README.md` y `status_actual.md` | Introducción y estado local; no sustituyen CONTEXT |
 | 4 | `backend/modules/telchi/investigation/README.md` | Operación de investigation |
 | 5 | `investigation/LAT.md`, `DECISIONS.md`, `STATUS_ACTUAL.md` y reportes | Evidencia o historia; no autoridad actual |
 | 6 | `SrvRestAstroLS_v1/docs/status_actual.md` | Estado global de Team360 |
@@ -275,4 +276,79 @@ Antes de elegir paths o escribir, se debe resolver el contexto conceptual y apli
 
 Este gate alinea documentación; no implementa routing, endpoints ni runtime y no modifica SAP, Data Root, Private Root o Legacy Root.
 
-El módulo y su árbol de investigation existen. No existe todavía API Telchi formal, `routes.py`, scheduler, frontend, resolver automático ni wiring de contexto en `AGENTS.md`. SAP/HANA permanece read-only con `SAP_WRITE_COUNT=0`.
+El módulo y su árbol de investigation existen; `AGENTS.md` ya carga este contexto. API formal, `routes.py`, scheduler y resolver automático no se declaran implementados. El [estado local](status_actual.md) distingue Foundation, candidatos y frontend en trabajo sin gate/deploy. SAP/HANA permanece read-only con `SAP_WRITE_COUNT=0`.
+
+## 19. Shared development host safety
+
+Esta política operativa aplica automáticamente en todas las etapas Telchi: Data Lake, Foundation, investigations, business analysis, tests, scans, materialización, lineage, parity/gold, UI y promociones.
+
+### 19.1. Preflight y concurrencia adaptativa
+
+El guard protege la capacidad compartida y permite aprovechar recursos libres. Sigue `USE AVAILABLE CAPACITY, DO NOT DESTABILIZE THE HOST` y `CORRECTNESS > HOST STABILITY > SPEED` de `AGENTS.md`.
+
+- Una consulta SQL pequeña no necesita ceremonia; un test local necesita un contexto rápido. Suites grandes (por ejemplo 200+ tests), scans grandes, Chromium, benchmarks y operaciones largas requieren guard explícito; toda promoción Foundation exige preflight.
+- Antes de carga intensiva, observar sin modificar el host load relativo a cores disponibles, CPU aproximada, `MemAvailable`, swap usada y su crecimiento, procesos pesados y runners activos. Para scans/materialización, incluir disco y espacio temporal.
+- En Linux pueden usarse `uptime`, `nproc`, `free -m`, `vmstat 1 3` y `ps -eo pid,ppid,comm,pcpu,pmem,rss --sort=-pcpu`. Evitar exponer argumentos o entornos con secretos. Si faltan métricas, no asumir host libre: completar observación o diferir carga pesada.
+- Evaluar señales conjuntamente y repetir observación cuando haya dudas o durante una ejecución larga, entre segmentos. No decidir solo por `load > N` o `RAM < X`; un pico corto o swap histórica estable no equivalen por sí solos a peligro.
+- `SAFE`: capacidad libre permite concurrencia moderada. `BUSY_BUT_SAFE`: reducir workers y threads; con carga alta, focalizar/secuenciar. `UNSAFE`: presión sostenida, swap creciente, agotamiento inminente o degradación visible impiden iniciar carga intensiva.
+- Elegir presupuesto conservador según capacidad real y memoria estimada por worker; sumar pools, threads DuckDB/numéricos, browsers y procesos hijos. No fijar un número universal ni imponer single-thread siempre; escalar progresivamente con observación.
+- El guard existente en `runtime/resource_guard.py` conserva sus límites y `SAFE_ABORT`: esta política complementa su preflight y checks continuos, no autoriza ignorarlos ni elevar límites para obtener PASS. Un aborto del guard impide confiar candidatos o avanzar watermarks.
+
+### 19.2. Orden y evidencia reutilizable
+
+La ejecución comienza por la garantía más barata y solo amplía el alcance cuando la tarea lo necesita. No lanzar todas las validaciones simultáneamente.
+
+1. Inspección barata de contexto, diff y evidencia disponible.
+2. Validaciones estáticas.
+3. Tests focalizados.
+4. Consulta o scan necesario y acotado.
+5. Parity/gold focalizado.
+6. Suite ampliada solo si agrega una garantía necesaria.
+7. Chromium/UI solo cuando corresponde al comportamiento afectado.
+
+Reutilizar tests PASS, hashes, parity/gold, candidate validation y artefactos cuando correspondan al código, inputs, configuración y garantía actuales. Registrar origen y por qué siguen válidos; recencia sola no basta. Reejecutar lo invalidado por el cambio, sin repetir suites caras por ritual.
+
+### 19.3. Pytest, DuckDB y PostgreSQL
+
+Tests y consultas comparten el presupuesto del host. Las decisiones de concurrencia se toman antes de iniciar cada workload relevante.
+
+- Pytest: comenzar con paths focalizados; no usar automáticamente `pytest -n auto` ni equivalentes de todos los cores. Si paralelizar es necesario y está disponible, elegir `-n <N>` conservador tras preflight y registrar N en ejecuciones relevantes. Evitar suites masivas simultáneas o repetidas sin evidencia invalidada.
+- DuckDB/Parquet: elegir threads razonables, por ejemplo `PRAGMA threads=<N>` en la conexión propia, reducirlos con host ocupado y ajustar memoria/temp según capacidad. No hardcodear 1 universalmente ni ejecutar múltiples scans grandes simultáneos.
+- Acotar particiones, columnas y fechas; evitar leer todo Data Lake si un scan focalizado resuelve la pregunta. Reutilizar resultados/materializaciones productivos válidos y capacidad existente de Foundation antes de repetir discovery; respetar permisos y validez, sin modificar esos artefactos para ahorrar trabajo.
+- PostgreSQL: consultas acotadas y conexiones/concurrencia limitadas de la tarea; respetar pools y política DB vigentes. No reconfigurar ni reiniciar el servidor compartido para obtener capacidad.
+
+### 19.4. Browsers y ownership de procesos
+
+La atribución de procesos pertenece a la ejecución actual; compartir nombre, puerto o repositorio no prueba ownership.
+
+- Antes de crear runners, workers, Chromium o servidores temporales, conservar baseline y registrar handles/PID, identidad de inicio y relación de hijos propios. Reutilizar servicios disponibles; no cerrar browsers existentes.
+- Evitar múltiples instancias de Chromium simultáneas salvo necesidad real y presupuesto demostrado. Cerrar contexts/browsers propios al terminar, también ante fallo o interrupción controlada.
+- NO terminar procesos que la ejecución actual no haya creado. Prohibidos `killall`, `pkill` genérico y matar backend/frontend, PostgreSQL, browsers, IDE u otros agentes ajenos; no reiniciar servicios para liberar recursos.
+- Cleanup: cerrar primero mediante su lifecycle; verificar hijos y workers propios, incluidos pytest, scripts y servidores temporales. Antes de señalizar, comprobar identidad y ownership para evitar PID reutilizados. Si hay dudas, dejar intacto y reportar atribución pendiente.
+- Ante presión, no iniciar carga nueva; reducir próximos segmentos y concurrencia, preservar evidencia/checkpoints y detener solo workers propios si es seguro. No acumular runners ni hacer retry intensivo para conseguir PASS.
+
+### 19.5. Foundation promotions y estados
+
+Toda promoción Foundation requiere resource preflight antes de iniciar y comprobación de condiciones antes del commit. Estabilidad del host, atomicidad, integridad y rollback preceden a velocidad.
+
+- `BLOCKED_HOST` es el motivo de host inseguro del estado `RESOURCE_BLOCKED`; es válido para un gate de promoción y nunca equivale a PASS ni a promoción completada. No iniciar promoción bajo presión.
+- Si aparece presión durante una promoción, usar el protocolo existente de safe abort/rollback y preservar atomicidad; no matar procesos a mitad del commit ni inventar una recuperación que deje estado parcial. Reanudar solo tras nueva evaluación y verificar estado/checkpoints.
+- `FUNCTIONAL_FAILURE`: test, lógica o gate falla con defecto funcional demostrado.
+- `RESOURCE_BLOCKED`: ejecución diferida o detenida de forma segura por recursos; no es test failure.
+- `ENVIRONMENTAL_ABORT`: interrupción por recursos/entorno sin defecto funcional demostrado. Conservar logs, salida y evidencia para diagnosticar; no atribuir automáticamente cualquier fallo al ambiente ni modificar lógica para ocultarlo.
+- Reportar separadamente fallos funcionales, bloqueos y abortos ambientales; evidencia previa no demuestra PASS de una ejecución abortada.
+
+### 19.6. Reporte y cierre del guard
+
+Gates, promociones, suites grandes, benchmarks y operaciones largas reportan la evaluación y el presupuesto real; consultas triviales no necesitan esta salida.
+
+```text
+HOST_PREFLIGHT=<SAFE|BUSY_BUT_SAFE|UNSAFE>
+RESOURCE_GUARD=<PASS|BLOCKED>
+CONCURRENCY_USED=<N>
+UNRELATED_PROCESSES_TERMINATED=0
+ENVIRONMENTAL_ABORTS=<N>
+OWN_PROCESSES_LEFT_RUNNING=<N>
+```
+
+Explicar N (workers, threads por conexión e instancias browser según corresponda), señales observadas y cambios de presupuesto. `RESOURCE_GUARD=PASS` describe seguridad de recursos, no éxito funcional. Cleanup verificado debe dar `OWN_PROCESSES_LEFT_RUNNING=0`; si no se confirma, declarar cantidad conocida o `UNKNOWN` y motivo, nunca inventar cero. Preservar procesos ajenos y no declarar PASS del guard mientras queden procesos propios sin resolver.

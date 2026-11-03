@@ -1,0 +1,606 @@
+{
+  "unit": "ms",
+  "percentiles": "linear interpolation at (N-1)*p",
+  "scope": "exact fixed-response commands team360 ping 01..20; valid repeated/out-of-order commands remain violations",
+  "observed_inbound": 23,
+  "non_test_inbound": 3,
+  "non_test_outbound": 0,
+  "non_test_records": [
+    {
+      "provider_message_id_hash": "0464e5db0a9a9cf38175908daf71da27102135a2e122e79b5aae6e42b3b7fc6c",
+      "text_hash": "e633f4fc79badea1dc5db970cf397c8248bac47cc3acf9915ba60b5d76b0e88f",
+      "text_length": 4,
+      "received_at": "2026-10-06T17:19:00.582441+00:00"
+    },
+    {
+      "provider_message_id_hash": "c72118457117ee1ce3f02479db4728b7de5b98c989ce1bd49ad845608f0c4a43",
+      "text_hash": "507fa095982b2cc7535db8ac0e1840657d2017bbf0ebf9da52b2b7c5702dc14e",
+      "text_length": 7,
+      "received_at": "2026-10-06T17:19:16.318281+00:00"
+    },
+    {
+      "provider_message_id_hash": "26e69fa9a02653daa41bf1ce3e7c504bd54e803edaf2737f169fd534143f66d9",
+      "text_hash": "b74a30631607b9ddd061a2a88c4ad79031712b0c5dd9ffb26b37df13bca0289b",
+      "text_length": 15,
+      "received_at": "2026-10-06T17:23:47.666919+00:00"
+    }
+  ],
+  "inbound": 20,
+  "outbound": 20,
+  "metrics": {
+    "Team360 processing T0\u2192T4": {
+      "n": 20,
+      "min": 27.32421875,
+      "mean": 69.279443359375,
+      "p50": 56.37353515625,
+      "p90": 134.26518554687502,
+      "p95": 146.0376708984375,
+      "max": 169.441162109375
+    },
+    "Evolution acceptance T4\u2192T5": {
+      "n": 20,
+      "min": 662.26220703125,
+      "mean": 833.5372680664062,
+      "p50": 807.44384765625,
+      "p90": 1056.8878173828125,
+      "p95": 1117.1864013671875,
+      "max": 1133.971435546875
+    },
+    "Team360 observable total T0\u2192T6": {
+      "n": 20,
+      "min": 2155.2216796875,
+      "mean": 2569.2469482421875,
+      "p50": 2516.855712890625,
+      "p90": 2881.8894775390627,
+      "p95": 2972.9769287109375,
+      "max": 2998.46875
+    }
+  },
+  "complete_20_sequential_pairs": true,
+  "violations": [],
+  "exchanges": [
+    {
+      "text": "team360 ping 01",
+      "reply": "TEAM360 PONG 01",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307208000.4043,
+        "t1_ms": 1791307208000.5654,
+        "t2_ms": 1791307208022.4788,
+        "t3_ms": 1791307208022.4912,
+        "t4_ms": 1791307208034.412,
+        "t5_ms": 1791307209150.715,
+        "t6_ms": 1791307210998.873
+      }
+    },
+    {
+      "text": "team360 ping 02",
+      "reply": "TEAM360 PONG 02",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307221178.8347,
+        "t1_ms": 1791307221179.351,
+        "t2_ms": 1791307221206.4326,
+        "t3_ms": 1791307221206.4675,
+        "t4_ms": 1791307221228.8433,
+        "t5_ms": 1791307222036.2034,
+        "t6_ms": 1791307223567.369
+      }
+    },
+    {
+      "text": "team360 ping 03",
+      "reply": "TEAM360 PONG 03",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307232577.5276,
+        "t1_ms": 1791307232577.7815,
+        "t2_ms": 1791307232594.964,
+        "t3_ms": 1791307232594.9753,
+        "t4_ms": 1791307232606.2432,
+        "t5_ms": 1791307233315.5415,
+        "t6_ms": 1791307235079.7131
+      }
+    },
+    {
+      "text": "team360 ping 04",
+      "reply": "TEAM360 PONG 04",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307244798.565,
+        "t1_ms": 1791307244799.0986,
+        "t2_ms": 1791307244845.7554,
+        "t3_ms": 1791307244845.779,
+        "t4_ms": 1791307244856.946,
+        "t5_ms": 1791307245628.7725,
+        "t6_ms": 1791307247249.023
+      }
+    },
+    {
+      "text": "team360 ping 05",
+      "reply": "TEAM360 PONG 05",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307252766.6907,
+        "t1_ms": 1791307252767.2722,
+        "t2_ms": 1791307252866.4275,
+        "t3_ms": 1791307252866.463,
+        "t4_ms": 1791307252877.7976,
+        "t5_ms": 1791307253685.3252,
+        "t6_ms": 1791307255394.646
+      }
+    },
+    {
+      "text": "team360 ping 06",
+      "reply": "TEAM360 PONG 06",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307262192.9353,
+        "t1_ms": 1791307262193.6614,
+        "t2_ms": 1791307262265.9067,
+        "t3_ms": 1791307262265.943,
+        "t4_ms": 1791307262290.9697,
+        "t5_ms": 1791307263063.7512,
+        "t6_ms": 1791307264724.4612
+      }
+    },
+    {
+      "text": "team360 ping 07",
+      "reply": "TEAM360 PONG 07",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307270890.3896,
+        "t1_ms": 1791307270890.6514,
+        "t2_ms": 1791307270940.057,
+        "t3_ms": 1791307270940.0715,
+        "t4_ms": 1791307270951.4746,
+        "t5_ms": 1791307271772.588,
+        "t6_ms": 1791307273862.025
+      }
+    },
+    {
+      "text": "team360 ping 08",
+      "reply": "TEAM360 PONG 08",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307279492.4043,
+        "t1_ms": 1791307279493.199,
+        "t2_ms": 1791307279508.5415,
+        "t3_ms": 1791307279508.5627,
+        "t4_ms": 1791307279519.7285,
+        "t5_ms": 1791307280181.9907,
+        "t6_ms": 1791307281647.626
+      }
+    },
+    {
+      "text": "team360 ping 09",
+      "reply": "TEAM360 PONG 09",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307285738.6213,
+        "t1_ms": 1791307285739.147,
+        "t2_ms": 1791307285860.6091,
+        "t3_ms": 1791307285860.6553,
+        "t4_ms": 1791307285871.7153,
+        "t5_ms": 1791307286689.9763,
+        "t6_ms": 1791307288606.8079
+      }
+    },
+    {
+      "text": "team360 ping 10",
+      "reply": "TEAM360 PONG 10",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307294753.1125,
+        "t1_ms": 1791307294753.2993,
+        "t2_ms": 1791307294776.6587,
+        "t3_ms": 1791307294776.6704,
+        "t4_ms": 1791307294799.7004,
+        "t5_ms": 1791307295620.473,
+        "t6_ms": 1791307297104.927
+      }
+    },
+    {
+      "text": "team360 ping 11",
+      "reply": "TEAM360 PONG 11",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307303305.1333,
+        "t1_ms": 1791307303305.782,
+        "t2_ms": 1791307303374.7463,
+        "t3_ms": 1791307303374.764,
+        "t4_ms": 1791307303386.2551,
+        "t5_ms": 1791307304436.5413,
+        "t6_ms": 1791307306118.13
+      }
+    },
+    {
+      "text": "team360 ping 12",
+      "reply": "TEAM360 PONG 12",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307312054.4333,
+        "t1_ms": 1791307312055.2183,
+        "t2_ms": 1791307312212.7354,
+        "t3_ms": 1791307312212.7712,
+        "t4_ms": 1791307312223.8745,
+        "t5_ms": 1791307313079.9639,
+        "t6_ms": 1791307314926.351
+      }
+    },
+    {
+      "text": "team360 ping 13",
+      "reply": "TEAM360 PONG 13",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307320534.954,
+        "t1_ms": 1791307320535.179,
+        "t2_ms": 1791307320578.046,
+        "t3_ms": 1791307320578.0588,
+        "t4_ms": 1791307320589.32,
+        "t5_ms": 1791307321283.454,
+        "t6_ms": 1791307322904.156
+      }
+    },
+    {
+      "text": "team360 ping 14",
+      "reply": "TEAM360 PONG 14",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307328855.959,
+        "t1_ms": 1791307328856.7544,
+        "t2_ms": 1791307328876.9336,
+        "t3_ms": 1791307328876.9473,
+        "t4_ms": 1791307328888.2346,
+        "t5_ms": 1791307329767.1257,
+        "t6_ms": 1791307331416.595
+      }
+    },
+    {
+      "text": "team360 ping 15",
+      "reply": "TEAM360 PONG 15",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307337051.6802,
+        "t1_ms": 1791307337052.0269,
+        "t2_ms": 1791307337185.4263,
+        "t3_ms": 1791307337185.4602,
+        "t4_ms": 1791307337196.486,
+        "t5_ms": 1791307337962.7803,
+        "t6_ms": 1791307339358.692
+      }
+    },
+    {
+      "text": "team360 ping 16",
+      "reply": "TEAM360 PONG 16",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307342968.2583,
+        "t1_ms": 1791307342969.009,
+        "t2_ms": 1791307342996.2402,
+        "t3_ms": 1791307342996.2556,
+        "t4_ms": 1791307343007.469,
+        "t5_ms": 1791307344141.4404,
+        "t6_ms": 1791307345747.938
+      }
+    },
+    {
+      "text": "team360 ping 17",
+      "reply": "TEAM360 PONG 17",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307348610.9504,
+        "t1_ms": 1791307348611.6602,
+        "t2_ms": 1791307348664.6042,
+        "t3_ms": 1791307348664.623,
+        "t4_ms": 1791307348675.7605,
+        "t5_ms": 1791307349439.2917,
+        "t6_ms": 1791307350948.897
+      }
+    },
+    {
+      "text": "team360 ping 18",
+      "reply": "TEAM360 PONG 18",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307354946.7087,
+        "t1_ms": 1791307354947.069,
+        "t2_ms": 1791307354966.2117,
+        "t3_ms": 1791307354966.2307,
+        "t4_ms": 1791307354977.529,
+        "t5_ms": 1791307355677.6968,
+        "t6_ms": 1791307357521.877
+      }
+    },
+    {
+      "text": "team360 ping 19",
+      "reply": "TEAM360 PONG 19",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307361188.7231,
+        "t1_ms": 1791307361188.9084,
+        "t2_ms": 1791307361211.5056,
+        "t3_ms": 1791307361211.519,
+        "t4_ms": 1791307361234.7346,
+        "t5_ms": 1791307362193.9946,
+        "t6_ms": 1791307363647.594
+      }
+    },
+    {
+      "text": "team360 ping 20",
+      "reply": "TEAM360 PONG 20",
+      "status": "read",
+      "initial_result": "accepted",
+      "timings": {
+        "t0_ms": 1791307367656.3848,
+        "t1_ms": 1791307367656.9092,
+        "t2_ms": 1791307367719.3738,
+        "t3_ms": 1791307367719.4084,
+        "t4_ms": 1791307367730.7651,
+        "t5_ms": 1791307368491.3794,
+        "t6_ms": 1791307370121.909
+      }
+    }
+  ],
+  "baseline_evolution_ms": {
+    "p50": 2567.4,
+    "p95": 3091.8
+  },
+  "limits": [
+    "Receipt timestamps are Team360 wall-clock milliseconds; negative intervals are rejected.",
+    "T2 is after inbound commit; T4 is inside the thread immediately before sender.send_text.",
+    "T5 is local Evolution HTTP acceptance, not device delivery or Meta Graph acceptance.",
+    "T6 is local delivered callback receipt, not the device timestamp.",
+    "This report alone does not attest human WhatsApp traffic or close the adapter gate."
+  ],
+  "adapter_criteria_verified": true,
+  "human_pairs_verified_against_evolution": 20,
+  "correlation": [
+    {
+      "seq": 1,
+      "inbound_id_hash": "fa2fb7bf96ccd58ad272c3dbe76a207576d7afc8cd45113a70c1ae82d3682c74",
+      "outbound_id_hash": "7059d855cade8a11d3904ff2c11db3601a894ab3e4f4b571ebebb9b696fa1e20",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 2,
+      "inbound_id_hash": "ccb724886797644bd26e557846689f6c4f094be5af95418fdba75d159db4f06e",
+      "outbound_id_hash": "f149c7d4728063fbaf443a959e41d12e7d2373a11fd61fc008585308caa52015",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 3,
+      "inbound_id_hash": "6ade2f17a8fe564ab7be2533b67e027005c55f3045e58c85e2f03ff2ea3b7169",
+      "outbound_id_hash": "4eef27a92843727f1ad5eb85d587f9c8791e70c6962ec03fdd19ceb2aa4a1019",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 4,
+      "inbound_id_hash": "cd60895c98417387719d884c940ace131476dd0acf5665671778c5758cb7951e",
+      "outbound_id_hash": "8c00e37175f27af2e4ec29c6465310bca427681ef8cfeae0e8b475d10d3408bd",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 5,
+      "inbound_id_hash": "f2ffbe2ca5cf7a24c60f03a02e38bdea8388297f36bb78d301c9ff63e3cc8f53",
+      "outbound_id_hash": "37d04b5536818b30445c415a4e3472d682df705f22702cc224c203b68c38046a",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 6,
+      "inbound_id_hash": "b3972edfd6111843f530a253e998cb163250f28cc6cd5a2593adc5730a9edcdc",
+      "outbound_id_hash": "37791d96d7285e152027bc1c9784a76153058a17ff9272051094fc734d892c42",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 7,
+      "inbound_id_hash": "7090ac0f580b2a8ff6e5faf3e4502ebf2ec2128a78a67eed24ab96e5a711e9cf",
+      "outbound_id_hash": "79d7bf3ef605aef602de6a8ffb0b0c91b2daff0456aea74782ad97afd33c4acb",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 8,
+      "inbound_id_hash": "c962617f065e8daaacd49df4fba40b55d40a42f388685a44b92baf9d4f4becff",
+      "outbound_id_hash": "17434db26030c2a425a14940e2862f22f9e414e2899f90663b4f08cf64f0d2a8",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 9,
+      "inbound_id_hash": "01c57c7a65dd36426073f1830b55bac0a9ba8487cf673ef48cc7122627e7c605",
+      "outbound_id_hash": "8b7679f0da55dc7468f885f4ba55a2a011cce4ddbc2d03859222ee824ae526f9",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 10,
+      "inbound_id_hash": "d8075941d55ad46e6790db053dda1264d2212b2b35c97ac99cc209b9a3d03908",
+      "outbound_id_hash": "60c078e05c1ba28b1b5f5088e6bd9aeeab791d2ef9f2a596ea2523ed165f4a25",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 11,
+      "inbound_id_hash": "ddcaad3173113947524275c57dee4f4541de68fd33754accdb8db797d4177806",
+      "outbound_id_hash": "02247a8c960dfa199394dc2d41303caf55f3d4ae1cacbedb8079e1412558a0e7",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 12,
+      "inbound_id_hash": "bf02af0bebc84379caaceef1f1681859169308734dd2ed117eef489fc7017931",
+      "outbound_id_hash": "5ae7ef2278e6868a1346486d752339aa7c75ea016c66246f601c076489ede70f",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 13,
+      "inbound_id_hash": "ad1898625a9b7ca3922b043121fa15026a18534db86db54d51676f9dccf269af",
+      "outbound_id_hash": "2f668e12c01e6b6c09f1a1cb1d220e89ae5b10aa3cf8bb480304b70399644029",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 14,
+      "inbound_id_hash": "7b1eeba62414f07559bc008dc4876e9f2841052cbd1891546870c9c44302170c",
+      "outbound_id_hash": "88da591507731644c69ed0457b97dd2510d56f759ce0d488871059760bbe0df2",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 15,
+      "inbound_id_hash": "d596a242e288e0261d55cd2a217cd3ddecd0aeed5f7244dd8abc6e946409d32f",
+      "outbound_id_hash": "e254de96578a72f1b3f82e1dc52111821b2bff2ae7c5533a8c14910f608436d5",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 16,
+      "inbound_id_hash": "55839ac4d38638d3756cab69f96d61df984c7a026f0b5f4e350acceb497a8c8a",
+      "outbound_id_hash": "9e230b99136e5ff7b0aed272e280ef87c6cad4bf7a60f2f8bc9458a0e9f75685",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 17,
+      "inbound_id_hash": "ac4379160f78e4fe89ddadba256bc0f7e423910f53d7e72b6411bc879e7878c4",
+      "outbound_id_hash": "82ed44fd187938726150cf2aeaa3c61f026adcac44dc4bd41f3ed8216ac17b1b",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 18,
+      "inbound_id_hash": "2dada6b849aeb9d146dc7f2b5a7c29abb90ad0e396b57ee3fd30d37bbd138238",
+      "outbound_id_hash": "a4dba767f406ea3d68da14eca096283429f578cb66fa7126a42822d3ef914438",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 19,
+      "inbound_id_hash": "6d74767dd5ac8d951e3eb4e5514d47c934a706957a0f806f3e781548e8c79b76",
+      "outbound_id_hash": "7f18d1dc317ddc3d5177fbd763b37c4d81dfe854cff4a6f6074db3e2c9c9cfa5",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    },
+    {
+      "seq": 20,
+      "inbound_id_hash": "9c41d95910561c327c9d7e4610883cc7e1d905ac193727ef05a7b5dbceba8c85",
+      "outbound_id_hash": "8bbb8863a159c43c190dc9b58312a6b9f4cd866a0acbe8b48e7a07caad49b769",
+      "statuses": [
+        "delivered",
+        "read",
+        "sent"
+      ]
+    }
+  ],
+  "conversation_count": 1,
+  "duplicate_live_replays": 20,
+  "post_restart_duplicate_replay": true,
+  "duplicate_new_core_rows": 0,
+  "duplicate_new_evolution_messages": 0,
+  "unauthorized_live_replay_rejected": true,
+  "empty_text_live_replay_ignored": true,
+  "actual_backend_restart_preserved_all_rows": true,
+  "verification_backend_pids": [
+    122444,
+    122460
+  ],
+  "evolution_webhook_remained_disabled": true,
+  "evolution_container_restart_performed": true,
+  "original_probe_state_preserved": "WAITING_HUMAN_EXPIRED",
+  "original_probe_latency_sha256": "78d28c398b56221e2b3c0830b352fbabe183098682b94254696eb912106ad20f",
+  "probe_errors": [
+    "Original count included three non-routed texts; all remain in PostgreSQL and original evidence.",
+    "Original duplicate probe selected a non-routed greeting without an outbound; live ping replays supersede that failed assertion.",
+    "Original supervisor timed out instead of executing automatic restart; actual launcher restart verified separately."
+  ],
+  "evolution_restart_preserved_team360_rows": true,
+  "evolution_restart_preserved_transport_ids": true,
+  "evolution_restart_instance_open": true,
+  "evolution_restart_started_at_before": "2026-10-06T10:59:22.518905414-03:00",
+  "evolution_restart_started_at_after": "2026-10-06T14:38:03.821650248-03:00",
+  "team360_rows_preserved": 103,
+  "evolution_message_ids_preserved": 91
+}

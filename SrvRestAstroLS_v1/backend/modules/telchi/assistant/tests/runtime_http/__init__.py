@@ -1,0 +1,1 @@
+"""Reproducible Real HTTP battery for the Telchi assistant (DEV-gated)."""

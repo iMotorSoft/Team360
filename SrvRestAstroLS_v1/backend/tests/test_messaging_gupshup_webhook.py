@@ -37,14 +37,47 @@ def _mock_claimer(is_new: bool = True) -> MagicMock:
     return claimer
 
 
+_WEBHOOK_TOKEN = "gupshup-test-token-at-least-32-characters"
+_WEBHOOK_HEADERS = {"x-team360-webhook-token": _WEBHOOK_TOKEN}
+
+
 @pytest.fixture()
-def client():
+def client(monkeypatch):
+    monkeypatch.setenv("TEAM360_MESSAGING_WEBHOOK_TOKEN", _WEBHOOK_TOKEN)
     app = create_app()
     with TestClient(app=app) as c:
+        c.headers.update(_WEBHOOK_HEADERS)
         yield c
 
 
 WEBHOOK_PATH = "/webhooks/messaging/gupshup/whatsapp"
+
+
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_bridge")
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
+def test_webhook_missing_auth_configuration_fails_closed_without_side_effects(
+    mock_get_claimer, mock_get_bridge, monkeypatch
+) -> None:
+    monkeypatch.delenv("TEAM360_MESSAGING_WEBHOOK_TOKEN", raising=False)
+    with TestClient(app=create_app()) as unauthenticated:
+        response = unauthenticated.post(WEBHOOK_PATH, json={"type": "message"})
+    assert response.status_code == 503
+    mock_get_claimer.assert_not_called()
+    mock_get_bridge.assert_not_called()
+
+
+@pytest.mark.parametrize("headers", [{}, {"x-team360-webhook-token": "wrong"}])
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_bridge")
+@patch("modules.messaging.webhooks.gupshup_whatsapp._get_claimer")
+def test_webhook_invalid_credentials_fail_before_side_effects(
+    mock_get_claimer, mock_get_bridge, monkeypatch, headers
+) -> None:
+    monkeypatch.setenv("TEAM360_MESSAGING_WEBHOOK_TOKEN", _WEBHOOK_TOKEN)
+    with TestClient(app=create_app()) as unauthenticated:
+        response = unauthenticated.post(WEBHOOK_PATH, json={"type": "message"}, headers=headers)
+    assert response.status_code == 401
+    mock_get_claimer.assert_not_called()
+    mock_get_bridge.assert_not_called()
 
 
 # ---------------------------------------------------------------------------

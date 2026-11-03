@@ -1,0 +1,114 @@
+{
+  "timestamp": "2026-10-11T23:21:53.104049+00:00",
+  "database": [
+    {
+      "database": "team360",
+      "version": "18.4 (Debian 18.4-1.pgdg13+1)"
+    }
+  ],
+  "workspace": [
+    {
+      "id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "slug": "telchi_dev",
+      "status": "testing",
+      "organization_id": "44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99",
+      "organization_code": "telchi",
+      "organization_status": "active"
+    }
+  ],
+  "users": [
+    {
+      "id": "73d09264-8be2-4402-8023-0142a5f26730",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "email": "admin@telchiai.com",
+      "status": "active",
+      "permissions": []
+    },
+    {
+      "id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "email": "devfull@telchiai.com",
+      "status": "active",
+      "permissions": [
+        "telchi.sales.source_quantity.read.v1"
+      ]
+    }
+  ],
+  "permission_scope": [
+    {
+      "permission_code": "telchi.sales.source_quantity.read.v1",
+      "description": "Only telchi.sales_top_items.source_quantity.20260101_20260915.v1; whole Telchi workspace; Foundation only; source invoice quantities, no revenue, SAP, branches, channels or other capabilities."
+    }
+  ],
+  "migration_objects": [
+    {
+      "phone_table": null,
+      "audit_function": null
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "core_users",
+      "object": "core_users"
+    },
+    {
+      "name": "core_workspaces",
+      "object": "core_workspaces"
+    },
+    {
+      "name": "core_events",
+      "object": "core_events"
+    },
+    {
+      "name": "communication_providers",
+      "object": "communication_providers"
+    }
+  ],
+  "channels": [
+    {
+      "id": "3cc01e11-da1c-4630-a9c6-ecc2f79220d4",
+      "slug": "team360_public_site",
+      "channel_alias": "evolution-meta-dev",
+      "status": "testing",
+      "metadata": {
+        "dev_only": true,
+        "provider_instance": "team360-meta-dev"
+      }
+    }
+  ],
+  "transport_indexes": [
+    {
+      "indexname": "uq_messaging_transport_thread"
+    },
+    {
+      "indexname": "uq_messaging_transport_message"
+    },
+    {
+      "indexname": "uq_messaging_transport_reply"
+    },
+    {
+      "indexname": "uq_messaging_transport_status"
+    }
+  ],
+  "flow_settings": [
+    {
+      "automation_enabled": true
+    }
+  ],
+  "connection": {
+    "status": 200,
+    "state": "open",
+    "instance": "team360-meta-dev"
+  },
+  "webhook": {
+    "enabled": false,
+    "events": [],
+    "url_configured": true
+  },
+  "receiver": {
+    "status": 200,
+    "id_matches": true,
+    "verified": "VERIFIED",
+    "platform": "CLOUD_API"
+  }
+}

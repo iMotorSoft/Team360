@@ -1,0 +1,190 @@
+{
+  "task": "TELCHIAI_DYNAMIC_CLAIM_VERIFICATION_V1",
+  "status": "INCOMPLETE_NOT_READY",
+  "branch": "feature/console-backend-core",
+  "head": "09d2ec715a31bb88574d734eacb9f437f008624e",
+  "recorded_at": "2026-10-28T23:36:58.055928+00:00",
+  "scope": "Partial correction of transport budget and failure diagnostics only. Dynamic grain accreditation is NOT implemented by this change.",
+  "root_cause": {
+    "demonstrated": "ResearchBinding constructs every discovered LogicalTable with grain=(). AskRegistry.register rejects these tables before executing any independent raw control. The six saved audit entries all state discovered_grain_and_business_semantics_not_accredited. Thus the final two SUM claims lack independent populations.",
+    "claims_not_verified": [
+      "Monthly commercial-line amount",
+      "Billed-customer commercial-line amount"
+    ],
+    "missing_evidence": [
+      "Trusted input key/grain contract",
+      "Independent raw population with key uniqueness, currency, provenance and classification dependencies",
+      "Independently verified ranking/completeness dependencies, not just two scalar claims"
+    ],
+    "general_or_specific": "General missing discovered-source grain propagation/accreditation, demonstrated for this projection. Not proof that all dynamic SQL shapes can be accredited.",
+    "independent_success": "The separate verify.py bounded raw reads checked line/document/customer keys, canonical classification, Decimal monthly/customer/SKU reconciliation. independent.json records the aggregates and checks but does not retain those raw populations.",
+    "requested_repair": "Generic feedback called the missing evidence a contradiction and asked Luna to query, revise or withdraw. Luna repeated totals/rankings; this cannot establish a trusted grain contract.",
+    "budget": "The last saved history plus feedback reproduces observation_byte_budget using the exact original pure function. Repeated manifests and feedback column descriptions consume the unchanged 32768-byte transport budget.",
+    "not_claimed": "No attribution to incorrect Luna arithmetic, model failure, Foundation mutation or insufficient global limits."
+  },
+  "correction": {
+    "adaptive_research.py": "Reference a rejected-claim column by its issued descriptor ID when exact metadata equality holds; encode repeated descriptor field names once. Preserve observed values, reasons, required actions and dependencies. Keep final budget guard and existing checks.",
+    "ask_verifier.py": "Surface the actual persisted control failure instead of replacing it with a generic missing-population reason. Never promote the claim.",
+    "claim_evidence.py": "Explain that missing grain/provenance/semantics is not an arithmetic contradiction and repeated aggregates cannot repair it.",
+    "not_done": "No dynamic grain or semantic lineage accreditation added. No automatic verification of the six requested business assertions. No final freeze/readiness."
+  },
+  "replay": {
+    "input": "replay-input.json",
+    "output": "replay-output.json",
+    "original_error": "observation_byte_budget",
+    "original_function_hash_matches_preserved_freeze": true,
+    "input_bytes": 88165,
+    "output_bytes": 31220,
+    "limit": 32768,
+    "new_history_compactions": 3,
+    "limitations": "This is a transport replay, not a new SQL result or independent claim verification. Existing history sample compaction remains explicit; it cannot certify ranking completeness.",
+    "command": "cd SrvRestAstroLS_v1/backend && uv run --no-sync python -c \"import json; from modules.telchi.exploratory_sql.adaptive_research import bounded_payload; from modules.telchi.exploratory_sql.validator import canonical; p=json.load(open('../../data/reports/telchi/dynamic-claim-verification-v1/replay-input.json')); print(len(canonical(bounded_payload(p)).encode()))\""
+  },
+  "states": {
+    "DYNAMIC_GRAIN_VERIFICATION": {
+      "status": "NOT_COMPLETED",
+      "evidence": "Historical luna.json independent_reference_audit; current fail-closed grain check remains unchanged."
+    },
+    "INDEPENDENT_CLAIM_VERIFICATION": {
+      "status": "NOT_COMPLETED",
+      "evidence": "No current automatic replay of raw business claims; independent.json is preserved historical reconciliation only."
+    },
+    "OBSERVATION_BYTE_BUDGET": {
+      "status": "PASS_PRESERVED_PAYLOAD_REPLAY",
+      "evidence": "replay-input.json, replay-output.json, new transport unit tests; no global limit changed."
+    },
+    "NEGATIVE_VERIFICATION_TESTS": {
+      "status": "PASS_EXISTING_SCOPE_NOT_FULL_NEW_MATRIX",
+      "evidence": "focused-tests.log, v1-tests.log include fanout, 100 vs 500 synthetic movement example, currency/grain, denominator, classification, unknown lineage and snapshot tests. No new complete dynamic-negative matrix."
+    },
+    "AUTHORIZED_SQL_REGRESSION": {
+      "status": "PASS_FOCUSED",
+      "evidence": "test_authorized_foundation.py in focused-tests.log."
+    },
+    "TELCHIAI_V1_REGRESSION": {
+      "status": "PASS_FOCUSED",
+      "evidence": "81 + 140 focused tests passed. Whole-directory attempt timed out; no full-suite PASS claimed."
+    },
+    "FOUNDATION_UNCHANGED": {
+      "status": "NO_TASK_WRITES",
+      "evidence": "Only four exploratory_sql source/test paths and this report directory written; no Foundation access in this task. Productive CURRENT not re-read."
+    },
+    "WHATSAPP_UNCHANGED": {
+      "status": "NO_TASK_WRITES_OR_CALLS",
+      "evidence": "changes.patch and source scope; no messaging or service operations."
+    },
+    "WEB_UNCHANGED": {
+      "status": "NO_TASK_WRITES_OR_CALLS",
+      "evidence": "changes.patch and source scope; no frontend/browser operations."
+    },
+    "READY_FOR_NEW_QUESTION": {
+      "status": "NO",
+      "evidence": "Core dynamic accreditation acceptance criterion not met."
+    }
+  },
+  "validation": {
+    "focused": "81 passed in 59.81 s; focused-tests.log",
+    "v1": "140 passed in 73.52 s; v1-tests.log",
+    "whole_directory": "ENVIRONMENTAL_ABORT_TOOL_TIMEOUT: 240 s tool deadline, no test failure demonstrated and no complete result. tests.log retained; no child pytest processes left.",
+    "git_diff_check": "PASS; source paths are preexisting untracked, so own patch reviewed separately in changes.patch.",
+    "terminal": "Existing CLI --help import/parser PASS only. No live model/session preflight run."
+  },
+  "resources": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE_FOR_FOCUSED_OFFLINE_TESTS",
+    "memory_available_mib_range": [
+      6818,
+      7156
+    ],
+    "swap_used_kib": 4120,
+    "swap_growth_observed": 0,
+    "iowait_samples_percent": [
+      78,
+      68,
+      66,
+      53
+    ],
+    "concurrency": 1,
+    "numerical_threads": 1,
+    "duckdb_fixture_threads": 1,
+    "peak_completed_test_rss_kib": 183892,
+    "completed_test_wall_seconds": 133.33,
+    "whole_suite_tool_deadline_seconds": 240,
+    "live_model_calls": 0,
+    "productive_foundation_scans": 0,
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0,
+    "cost": "No model calls; no monetary estimate."
+  },
+  "modified_files": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/adaptive_research.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/ask_verifier.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/claim_evidence.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_dynamic_verification_budget.py"
+  ],
+  "configuration_record_not_final_freeze": {
+    "python": "3.12.3",
+    "duckdb": "1.5.5",
+    "pytest": "9.0.2",
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "fallback": false,
+    "store": false,
+    "model_configuration_changed": false,
+    "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot": "1408",
+    "binding_evidence": "Historical preserved report; no live Foundation resolution performed.",
+    "source_sha256": {
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/__init__.py": "23c82105d92def0e3299626f274ddad65e7b27bbdbfdad0f394182185af8f985",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/adaptive_research.py": "0aec37cb87d5b36247fe43f44b689821b9c70500aec4130ca8f160ef1b23e3fe",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/adaptive_sources.py": "ac26861f1f66e6e610fc2f21b6ed044914fa96e61b56c9a9c451aa326b11b439",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/adaptive_verifier.py": "3cdf597a2f18f393dbc3577e5642e10d85d19452bb1acf68ad7846c3fed82081",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/ask.py": "0bdaa56254397be8fa595ef2b18d59ae914b7c53fca3df61b791ef43f2888d16",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/ask_sources.py": "648f19490245768cc9afb38d9d0ddc09c74465ffde69f7ec2a510409bdc41e02",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/ask_verifier.py": "2cf1f95a9133b9e3b86252d43eb6900eb2ed75255aafd70192ee635736e568b4",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/audit_claims.py": "19d120eb71a11b895fbeb6df25f7453355eb86fd82162768dac8e0731faadc12",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/authorized_foundation.py": "dfb139317b48f5f2d9e28503e15442e06450aab1989f39f5cdc848aa5f1fb204",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/claim_evidence.py": "85953b67b73dfcfaf7873ec67f008bed39c3e3a693f5faf6d877cb92e881f2d7",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/console_bridge.py": "015ad4aa9ae512ed46d2eb37cb16d972a68782f5830c37da814a561cd05331a3",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/console_repository.py": "11cfb7cf322090892adc1fe18426467af8039efda5621ce906d549fe060bad0f",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/contracts.py": "f149a2adf99ecc4720c36644323e24a52799e205627c9bf8dd6f3cf9d7f65712",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/diagnose_claims.py": "ff97858fa95bebdb8d21f056aaa9dd9a8cae29ec98535b684fdee981b51cac1b",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/direct_readonly.py": "587c8f2252fee58dd188c7f1a3a281636b227ebdc99b813ed8bda31e17d12daa",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/evidence.py": "23637db7af213bbb242ef816145b430c1a1a360c4a73826faa1723d083764bd3",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/executor.py": "f01898e04c9a2e4551bcb95a183c7415a7647536f1eec6b954e33c57e73c0f8f",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/foundation.py": "525d8452318f36b9d85db6aecc4977e846e0aae607750327d120b59e9e97077d",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/foundation_control.py": "8b77ec385f56642ce6dd9cc35f83f349604fcd47568caea1c4e0890e06fc9e13",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/foundation_dev.py": "6737fb27fd6a194ed56f4d0403613080993f388eb4f8d3d7eaeba74451673bf8",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/foundation_verifier.py": "17db778239da78b2f63b1f5d2bac96136ec40ab87fba86d8f8483d8972110032",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/live_claim_revision.py": "7afdda6ce92b8e69c3201208b3f0df303058cbfb11de6343d661defcac04a77f",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/research.py": "a48bca4c3ffefcccf8be79751bb418f2f3a03974c05bdf1530b7bf396d3e4042",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/synthetic.py": "58323588a680e708b41e895461c38010f8ea2d136fba47fe162cb624cbd94dbb",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_adaptive_research.py": "0dd6e49eb09d0c54590c8738563563c17cfc66a3ed33a2abeda2f21cbcf7ebb4",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_adaptive_sources.py": "7c048cbd632ec71c3f24d1b434161ec9653c6bb860cb97b87da5fe7c22983fd3",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_ask.py": "a15aa3f42491d9397fed86c0127d89c30d95bd584b2dd9ca73bd6dc3706ba3d3",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_authorized_foundation.py": "870ea5a57994ffabc53772b3abfa57c8a382bf72d3065ee6be4f1a921c28ab8a",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_claim_evidence.py": "193d0b3d55ae99882a860467600e803997b34bc728b3d607fe35d36550381e98",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_claim_model_budget.py": "7d7a90b4776613db2a96c84d8010f0324f6c2d64316ca59d7e44a86d8cf0ec18",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_claim_revision.py": "87c0e4f8562032c9a5cafa981acc0ee2f6f129ad1abf3a769f31b1dc5f74a77c",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_console_bridge.py": "c35940175ec9004eb700fc78a7687ae5e08f07585d33e00c7e797ed09a5ded2c",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_direct_readonly.py": "7a2239b1abafd45557e3e69e80fc7c5fceffc6f74bb5b9b12825630ceb53c85b",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_dynamic_verification_budget.py": "1901b5b525051e7336441dda6743709e8846c497b89d58b86719f6c6fb4d91d3",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_exploratory_sql.py": "d43fd3fd3d1d39fd4b520b58ba5a09c1e9a5aecee4aac37528923fbd077549e5",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_foundation.py": "f3a3b59bb8754fa5f5c99cce5d879cda55df569d008b88a458c9911148c6ce86",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_foundation_dev.py": "0a7d75f696fd55bc7fec8a4b66d728eb25aa97d409db5c1a6d237f6523c13464",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/validator.py": "2c336e10c98df0616dd152855ca048fce8dcc4b5ad67c65c1d6178e2eabfb89a",
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/verifier.py": "8cb2a21836a6b1f5931eb0f8bf00a307c4cd2f9856698e5acf72beb5a57b2340"
+    },
+    "historical_paths_unchanged": {
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/authorized_foundation.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_authorized_foundation.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/exploratory_sql/test_adaptive_research.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/luna_real_business_query_v1/run.py": true,
+      "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/luna_real_business_query_v1/verify.py": true
+    }
+  },
+  "terminal_command": "cd SrvRestAstroLS_v1/backend && TEAM360_ENV=development uv run --no-sync python -m modules.telchi.exploratory_sql.ask --authorize-dev-io-exception",
+  "terminal_command_caution": "Existing READ_ONLY local DEV test identity. Not a readiness certificate and not yet suitable for the requested frozen blind evaluation.",
+  "next_step": "Finish trusted dynamic source-grain/semantic dependency verification in the existing verifier, reconcile bounded raw evidence, add the full requested negative matrix and business-claim replay, then freeze. Do not execute the new question yet.",
+  "commit_or_push": false,
+  "new_question_chosen_or_executed": false
+}

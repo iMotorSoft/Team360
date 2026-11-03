@@ -1,0 +1,330 @@
+{
+  "timestamp": "2026-11-02T17:16:52.250702+00:00",
+  "source_sha256": "906c5e42a81a1c257799ee450ff9e9cf074778cfa986ba7120e3a8173a09da37",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "preparation_ms": 0.10757900054159109,
+    "response_bytes": 7193,
+    "duration_ms": 6121.203,
+    "attempts": 1
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/schema_version": 2,
+        "/metric": "sales.net_amount",
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿Qué período querés consultar?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuántos pagos activos registramos en octubre de 2026 y cuál es su importe?",
+      "text": "Cobros registrados:\nBS 12.180.925,36 · 40077 documentos/pagos\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-09-21, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:48:30.543000 a 2026-11-01T17:48:54.816000.\nControles: excluded_nonactive_payments=311, excluded_other_currency_payments=0\nEventos de pagos publicados, no saldo histórico ni aging global. Pagos y aplicaciones son grains distintos y nunca se suman como ingresos independientes.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "47c05be4-f7fc-4ea6-942b-3be74afb8d03",
+      "thread_id": "7b9c0eee-d96b-41e7-b690-8145b984e804",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 62338.6080809978,
+          "state_engine_ms": 0.7435930001520319,
+          "interpretation_ms": 7153.88256299957,
+          "response_format_ms": 0.03884200123138726,
+          "total_processing_ms": 69528.31621299993
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "business_scope": {
+          "domain": "collections",
+          "metric": "collections.received_amount",
+          "coverage": {
+            "kind": "BOUNDED_OBSERVATION",
+            "dataset_rows": 50687,
+            "source_scope": {
+              "kind": "BOUNDED_OVERLAP_PLUS_GAP",
+              "start": "2026-09-21",
+              "limitation": "Historical balances/payments before overlap NOT refreshed; aging not accredited by this capture",
+              "end_exclusive": "2026-11-02"
+            },
+            "declared_start": "2026-09-21",
+            "absence_is_zero": false,
+            "requested_period": {
+              "date_from": "2026-10-01",
+              "date_to_exclusive": "2026-11-01"
+            },
+            "last_observed_date": "2026-11-01 00:00:00",
+            "first_observed_date": "2026-09-21 00:00:00",
+            "declared_end_exclusive": "2026-11-02",
+            "observation_started_at": "2026-11-01T17:48:30.543000",
+            "observation_finished_at": "2026-11-01T17:48:54.816000",
+            "complete_business_history": false,
+            "requested_outside_capture": false
+          },
+          "datasets": [
+            "collection_payment"
+          ],
+          "universe": "CAPTURED_NATIVE_OBSERVATIONS"
+        },
+        "contract_error": null,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "collections.received_amount",
+          "period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-11-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "collections.received_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "validated_state": {
+          "metric": "collections.received_amount",
+          "period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-11-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "schema_version": 2,
+          "product_context": null,
+          "requested_metrics": [
+            "collections.received_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": []
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "rows": [
+            {
+              "amount": "12180925.360000000000",
+              "currency": "BS",
+              "payments": 40077,
+              "customers": 2763
+            }
+          ],
+          "label": "Cobros registrados",
+          "metric": "collections.received_amount",
+          "source": {
+            "datasets": {
+              "collection_payment": "7f239cc3701c6ca888a8c23d824d3cc06913dfc12af6ab6a12e745426c580ee0"
+            },
+            "updated_at": "2026-11-01T17:50:16.749000+00:00",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+            "reference_version": "v2_sales_448ae93a960bf7342564a2d0"
+          },
+          "summary": null,
+          "timings": {
+            "serialization_ms": 0.16434299868706148,
+            "planning_and_sql_ms": 325.1037260015437,
+            "foundation_resolution_ms": 61524.308
+          },
+          "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+          "controls": {
+            "excluded_nonactive_payments": 311,
+            "excluded_other_currency_payments": 0
+          },
+          "coverage": {
+            "kind": "BOUNDED_OBSERVATION",
+            "dataset_rows": 50687,
+            "source_scope": {
+              "kind": "BOUNDED_OVERLAP_PLUS_GAP",
+              "start": "2026-09-21",
+              "limitation": "Historical balances/payments before overlap NOT refreshed; aging not accredited by this capture",
+              "end_exclusive": "2026-11-02"
+            },
+            "declared_start": "2026-09-21",
+            "absence_is_zero": false,
+            "requested_period": {
+              "date_from": "2026-10-01",
+              "date_to_exclusive": "2026-11-01"
+            },
+            "last_observed_date": "2026-11-01 00:00:00",
+            "first_observed_date": "2026-09-21 00:00:00",
+            "declared_end_exclusive": "2026-11-02",
+            "observation_started_at": "2026-11-01T17:48:30.543000",
+            "observation_finished_at": "2026-11-01T17:48:54.816000",
+            "complete_business_history": false,
+            "requested_outside_capture": false
+          },
+          "read_only": true,
+          "capability": "collections.received_amount.v1",
+          "parameters": {
+            "limit": 10,
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "total_rows": 1,
+          "limitations": [
+            "Eventos de pagos publicados, no saldo histórico ni aging global. Pagos y aplicaciones son grains distintos y nunca se suman como ingresos independientes."
+          ],
+          "omitted_rows": 0,
+          "sap_accessed": false,
+          "sql_evidence": [
+            {
+              "sql": "CREATE OR REPLACE TEMP VIEW op_source AS SELECT * FROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/operational-domains-completion-v1/joint-v1/collection_payment.parquet'))",
+              "parameters": []
+            },
+            {
+              "sql": "SELECT min(\"payment_date\") AS first_observed_date,max(\"payment_date\") AS last_observed_date,count(*) AS dataset_rows FROM op_source",
+              "parameters": []
+            },
+            {
+              "sql": "CREATE OR REPLACE TEMP TABLE op_period AS SELECT * FROM op_source WHERE \"payment_date\">=? AND \"payment_date\"<?",
+              "parameters": [
+                "2026-10-01",
+                "2026-11-01"
+              ]
+            },
+            {
+              "sql": "SELECT 'BS' AS currency,count(*) AS payments,\n                        count(DISTINCT customer_code) AS customers,\n                        sum(cast(payment_total AS DECIMAL(38,12))) AS amount\n                        FROM op_period WHERE cancelled='N' AND currency='BS' HAVING count(*)>0",
+              "parameters": []
+            },
+            {
+              "sql": "SELECT count(*) FILTER(WHERE cancelled<>'N' OR cancelled IS NULL) AS excluded_nonactive_payments,\n                        count(*) FILTER(WHERE cancelled='N' AND (currency<>'BS' OR currency IS NULL)) AS excluded_other_currency_payments FROM op_period",
+              "parameters": []
+            }
+          ]
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Cobros registrados:\nBS 12.180.925,36 · 40077 documentos/pagos\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-09-21, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:48:30.543000 a 2026-11-01T17:48:54.816000.\nControles: excluded_nonactive_payments=311, excluded_other_currency_payments=0\nEventos de pagos publicados, no saldo histórico ni aging global. Pagos y aplicaciones son grains distintos y nunca se suman como ingresos independientes.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.collections.received_amount.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "collections.received_amount",
+              "/period": {
+                "start": "2026-10-01",
+                "end_exclusive": "2026-11-01"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "collections.received_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "preparation_ms": 0.09651599975768477,
+        "response_bytes": 8252,
+        "duration_ms": 7152.877,
+        "attempts": 1
+      },
+      "elapsed_ms": 69819.18466000025,
+      "request_trace": {
+        "schema": "telchi-pre-sql-profile-v1",
+        "clock": "perf_counter_ns",
+        "spans": [
+          {
+            "label": "authorization_initial",
+            "start_ms": 244.952167,
+            "end_ms": 246.269434,
+            "duration_ms": 1.317267
+          },
+          {
+            "label": "authorization_transaction_revalidation",
+            "start_ms": 250.77832,
+            "end_ms": 256.859767,
+            "duration_ms": 6.081447
+          },
+          {
+            "label": "model_inference_response",
+            "start_ms": 299.129028,
+            "end_ms": 7408.90217,
+            "duration_ms": 7109.773142
+          },
+          {
+            "label": "interpretation_result_parse",
+            "start_ms": 7409.757875,
+            "end_ms": 7409.890464,
+            "duration_ms": 0.132589
+          },
+          {
+            "label": "conversation_audit_save",
+            "start_ms": 69785.199169,
+            "end_ms": 69787.900259,
+            "duration_ms": 2.70109
+          }
+        ],
+        "total_ms": 69852.791464
+      }
+    }
+  ],
+  "budgets": {
+    "worker_seconds": 180,
+    "turn_seconds": 240,
+    "model_seconds": 20,
+    "model_attempts": 1,
+    "production_changed": false
+  }
+}

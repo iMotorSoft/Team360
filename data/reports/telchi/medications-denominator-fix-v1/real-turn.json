@@ -1,0 +1,182 @@
+[
+  {
+    "event_id": "17d76815-23cf-4f12-bc5c-5225b8d73f0c",
+    "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+    "audit_sha256": "63cda970af22d904650995f3b830d415714083fdc7716d1e2e092f73dbc196d2",
+    "interpretation_proposed": {
+      "action": "ANALYSIS_UNAVAILABLE",
+      "intent": "EXPLAIN",
+      "state_delta": {
+        "set": {},
+        "unset": []
+      },
+      "clarification": null
+    },
+    "business_contract_proposal": {
+      "action": "EXECUTE",
+      "intent": "NEW_QUERY",
+      "state_delta": {
+        "set": {
+          "/limit": 10,
+          "/metric": "sales.net_amount",
+          "/period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "/periods": null,
+          "/branches": [],
+          "/group_by": null,
+          "/reference": null,
+          "/comparison": null,
+          "/period_mode": null,
+          "/breakdown_by": null,
+          "/sales_channel": null,
+          "/entity_mention": null,
+          "/product_offset": 0,
+          "/product_target": null,
+          "/ranking_detail": null,
+          "/schema_version": 2,
+          "/customer_target": null,
+          "/excluded_product": null,
+          "/business_category": null,
+          "/requested_metrics": [
+            "sales.net_amount"
+          ],
+          "/temporal_reference": null,
+          "/analysis_categories": [
+            "MEDICATIONS"
+          ],
+          "/product_search_text": null,
+          "/selected_item_codes": [],
+          "/ranking_target_item_code": null
+        },
+        "unset": []
+      },
+      "clarification": null
+    },
+    "previous_scope": {
+      "period": {
+        "start": "2026-09-01",
+        "end_exclusive": "2026-10-01"
+      },
+      "analysis_categories": [
+        "LAB_FINISHED_PRODUCT"
+      ]
+    },
+    "confirmed_state": {
+      "limit": 10,
+      "metric": "sales.net_amount",
+      "period": {
+        "start": "2026-09-01",
+        "end_exclusive": "2026-10-01"
+      },
+      "pending": null,
+      "branches": [],
+      "group_by": null,
+      "reference": null,
+      "comparison": null,
+      "period_mode": null,
+      "breakdown_by": null,
+      "sales_channel": null,
+      "entity_mention": null,
+      "product_offset": 0,
+      "product_target": null,
+      "ranking_detail": null,
+      "schema_version": 2,
+      "customer_target": null,
+      "product_context": null,
+      "excluded_product": null,
+      "business_category": null,
+      "requested_metrics": [
+        "sales.net_amount"
+      ],
+      "temporal_reference": null,
+      "analysis_categories": [
+        "MEDICATIONS"
+      ],
+      "product_search_text": null,
+      "selected_item_codes": [],
+      "ranking_target_item_code": null
+    },
+    "category_analysis": {
+      "components": {},
+      "percentages": {},
+      "denominator_status": "NOT_ACCREDITED",
+      "authorization": {
+        "category_permission": "telchi.sales.category_line_amount.read.v1",
+        "denominator_allowed": true,
+        "denominator_permission": "telchi.sales.commercial_line_amount_by.read.v1"
+      },
+      "denominator": {
+        "source": {
+          "updated_at": "2026-09-28T18:18:35.264000",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+        },
+        "parameters": {
+          "limit": 1,
+          "dataset": "commercial_line_amount",
+          "filters": {
+            "category": null,
+            "card_code": null,
+            "item_code": null
+          },
+          "measure": "commercial_active_invoice_line_amount_excluding_line_tax_v1",
+          "periods": null,
+          "currency": "BS",
+          "group_by": "sap_product",
+          "order_by": [
+            [
+              "amount",
+              "desc"
+            ],
+            [
+              "key",
+              "asc"
+            ]
+          ],
+          "date_from": "2026-09-01",
+          "breakdown_by": null,
+          "date_to_exclusive": "2026-10-01"
+        },
+        "total": {
+          "amount": "8048691.580000",
+          "last_date": "2026-09-24T00:00:00",
+          "first_date": "2026-09-01T00:00:00",
+          "line_count": 65163,
+          "product_count": 4168,
+          "customer_count": 2378,
+          "document_count": 30301
+        },
+        "accreditation": "verified",
+        "reconciliation": {
+          "measure": "commercial_active_invoice_line_amount_excluding_line_tax_v1",
+          "group_by": "sap_product",
+          "tolerance": "0",
+          "difference": "0.000000",
+          "line_count": 65163,
+          "group_count": 4168,
+          "document_count": 65134,
+          "universe_amount": "8048691.580000",
+          "breakdown_amount": "8048691.580000",
+          "breakdown_sha256": "8f4af3da56664d036d6fc838bd62b97f3cf8935acd684635df388a93d11df826",
+          "universe_line_count": 65163,
+          "universe_document_count": 30301
+        },
+        "definition": "commercial_active_invoice_line_amount_excluding_line_tax_v1",
+        "coverage": {
+          "complete": false,
+          "last_date": "2026-09-24T00:00:00",
+          "first_date": "2026-09-01T00:00:00"
+        },
+        "currency": "BS",
+        "exceptions": []
+      }
+    },
+    "response_prepared": {
+      "text": "Composición de ventas globales — septiembre de 2026.\n\nMedicamentos: clasificación no acreditada; no los equiparo con productos terminados.\n\nPorcentaje no calculado: falta acreditar un total global de líneas con el mismo universo monetario, moneda y exclusiones. La facturación documental con impuestos no es ese denominador.\n\nImportes sin IVA de línea, antes de notas de crédito y ajustes globales. Clasificación actual, no histórica.\n\nPuedo ampliar los importes acreditados por producto.",
+      "classification": "DIRECT_AVAILABLE"
+    },
+    "execution_status": "executed"
+  }
+]

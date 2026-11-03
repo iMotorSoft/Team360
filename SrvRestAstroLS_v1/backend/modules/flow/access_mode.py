@@ -1,17 +1,9 @@
-"""Team360 Flow access policy (MVP default administrator mode).
+"""Flow HTTP access policy: authenticated by default, explicit DEV demo only.
 
-For the LaMuni MVP, Flow runs without login: every visitor is treated as an
-``administrator`` with full Flow capabilities, resolved centrally here instead
-of per-endpoint. The authenticated mode (PASETO + persistent capabilities)
-remains implemented and reachable via ``TEAM360_FLOW_ACCESS_MODE`` so the
-future activation of authentication is an explicit product decision, not a
-rewrite.
-
-Flow access mode:
-- ``default_admin`` (default for the MVP): no token required; the actor is
-  ``flow-mvp-administrator`` with every Flow capability.
-- ``authenticated``: the existing fail-closed guard (401 without/invalid
-  token, 403 without the explicit capability) is preserved.
+``TEAM360_FLOW_ACCESS_MODE=default_admin`` requires explicit
+``TEAM360_ENV=development`` or ``dev``. It is not a production policy.
+Absent mode uses existing PASETO + persisted capabilities; invalid configuration
+is rejected, never normalized into administrator access.
 """
 
 from __future__ import annotations
@@ -52,16 +44,30 @@ class FlowActor:
         return capability in self.capabilities
 
 
+class FlowAccessConfigurationError(ValueError):
+    """Flow access configuration is unsafe or invalid."""
+
+
 def flow_access_mode() -> str:
-    """Return the current Flow access mode (default_admin by default)."""
-    mode = os.environ.get(FLOW_ACCESS_MODE_ENV, DEFAULT_ADMIN_MODE).strip().lower()
-    if mode in {DEFAULT_ADMIN_MODE, AUTHENTICATED_MODE}:
-        return mode
-    return DEFAULT_ADMIN_MODE
+    """Resolve access policy; do not infer DEV from a default or hostname."""
+    mode = os.environ.get(FLOW_ACCESS_MODE_ENV, AUTHENTICATED_MODE).strip().lower()
+    if mode not in {DEFAULT_ADMIN_MODE, AUTHENTICATED_MODE}:
+        raise FlowAccessConfigurationError("Invalid TEAM360_FLOW_ACCESS_MODE")
+    if mode == DEFAULT_ADMIN_MODE:
+        # TEAM360_ENV is the existing runtime authority. Its global default is
+        # intentionally NOT sufficient to enable privileged demo access.
+        environment = os.environ.get("TEAM360_ENV", "").strip().lower()
+        if environment not in {"development", "dev"}:
+            raise FlowAccessConfigurationError(
+                "Flow default_admin requires explicit TEAM360_ENV=development or dev"
+            )
+    return mode
 
 
 def default_admin_actor() -> FlowActor:
-    """The MVP actor: implicit administrator with all Flow capabilities."""
+    """Create a synthetic administrator only under the explicit DEV policy."""
+    if flow_access_mode() != DEFAULT_ADMIN_MODE:
+        raise FlowAccessConfigurationError("Flow demo administrator is not enabled")
     return FlowActor(
         role="administrator",
         user_id=MVP_ADMIN_USER_ID,

@@ -1,0 +1,4190 @@
+{
+  "queries": [
+    {
+      "probe_id": "sales_coverage",
+      "sql": "SELECT MIN(doc_date) AS first_date,MAX(doc_date) AS last_date,COUNT(*) AS documents,COUNT(DISTINCT source_system) AS source_systems FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))",
+      "params": [],
+      "semantic_basis": "Census runner MIN/MAX; maximum documentary date is not complete-month certification.",
+      "sql_sha256": "0fa368cd7a7b3bc16be1f8905839bcf9838c7f93f76e1912e3b76d021fe56b72",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "first_date": "2022-03-31T00:00:00",
+          "last_date": "2026-09-24T00:00:00",
+          "documents": 330443,
+          "source_systems": 1
+        }
+      ],
+      "elapsed_ms": 34.857
+    },
+    {
+      "probe_id": "sales_months",
+      "sql": "SELECT substr(doc_date,1,7) AS month,COUNT(*) AS documents,MIN(doc_date) AS first_date,MAX(doc_date) AS last_date FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_date>=? GROUP BY 1 ORDER BY 1 DESC LIMIT 12",
+      "params": [
+        "2026-01-01"
+      ],
+      "semantic_basis": "Coverage by document date; rows do not certify completeness.",
+      "sql_sha256": "75358e4049260de97032c7253b6897e1c96a5bc9d6d647cfc7b932bd75658954",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "month": "2026-09",
+          "documents": 30303,
+          "first_date": "2026-09-01T00:00:00",
+          "last_date": "2026-09-24T00:00:00"
+        },
+        {
+          "month": "2026-08",
+          "documents": 36802,
+          "first_date": "2026-08-01T00:00:00",
+          "last_date": "2026-08-31T00:00:00"
+        },
+        {
+          "month": "2026-07",
+          "documents": 38436,
+          "first_date": "2026-07-01T00:00:00",
+          "last_date": "2026-07-31T00:00:00"
+        },
+        {
+          "month": "2026-06",
+          "documents": 35362,
+          "first_date": "2026-06-01T00:00:00",
+          "last_date": "2026-06-30T00:00:00"
+        },
+        {
+          "month": "2026-05",
+          "documents": 36246,
+          "first_date": "2026-05-01T00:00:00",
+          "last_date": "2026-05-31T00:00:00"
+        },
+        {
+          "month": "2026-04",
+          "documents": 38917,
+          "first_date": "2026-04-01T00:00:00",
+          "last_date": "2026-04-30T00:00:00"
+        },
+        {
+          "month": "2026-03",
+          "documents": 40683,
+          "first_date": "2026-03-01T00:00:00",
+          "last_date": "2026-03-31T00:00:00"
+        },
+        {
+          "month": "2026-02",
+          "documents": 34321,
+          "first_date": "2026-02-01T00:00:00",
+          "last_date": "2026-02-28T00:00:00"
+        },
+        {
+          "month": "2026-01",
+          "documents": 39372,
+          "first_date": "2026-01-01T00:00:00",
+          "last_date": "2026-01-31T00:00:00"
+        }
+      ],
+      "elapsed_ms": 44.021
+    },
+    {
+      "probe_id": "latest_sales_documents",
+      "sql": "SELECT source_system,doc_entry,doc_num,doc_date,card_code,currency,doc_total,canceled FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) ORDER BY doc_date DESC,TRY_CAST(doc_entry AS BIGINT) DESC LIMIT 10",
+      "params": [],
+      "semantic_basis": "Historical source sample ORDER BY DocDate DESC, adapted to pinned facts. DocDate is not ingestion chronology.",
+      "sql_sha256": "9b8a061d1749fb6d26a2360ef569a32174ca2f0da9dabf6ef56fe0dd0647b40c",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532517",
+          "doc_num": "260192728",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CG2A",
+          "currency": "BS",
+          "doc_total": "25",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532516",
+          "doc_num": "260192727",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CG2A",
+          "currency": "BS",
+          "doc_total": "284",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532515",
+          "doc_num": "260192726",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CG2A",
+          "currency": "BS",
+          "doc_total": "38",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532514",
+          "doc_num": "260192725",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CG2A",
+          "currency": "BS",
+          "doc_total": "61.97",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532513",
+          "doc_num": "260739131",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CGRC",
+          "currency": "BS",
+          "doc_total": "23",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532512",
+          "doc_num": "260192724",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CG2A",
+          "currency": "BS",
+          "doc_total": "18.13",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532511",
+          "doc_num": "260192723",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CG2A",
+          "currency": "BS",
+          "doc_total": "2.82",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532510",
+          "doc_num": "260192722",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CG2A",
+          "currency": "BS",
+          "doc_total": "23.5",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532509",
+          "doc_num": "260192721",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CG2A",
+          "currency": "BS",
+          "doc_total": "147.4",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532508",
+          "doc_num": "260739130",
+          "doc_date": "2026-09-24T00:00:00",
+          "card_code": "CGRC",
+          "currency": "BS",
+          "doc_total": "214",
+          "canceled": "N"
+        }
+      ],
+      "elapsed_ms": 132.719
+    },
+    {
+      "probe_id": "calenta_products",
+      "sql": "SELECT item_code,source_system,canonical_product_id,product_name,inventory_uom_id,sales_uom_id,sap_sell_item FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet') WHERE upper(product_name) LIKE ? ORDER BY item_code LIMIT 30",
+      "params": [
+        "%CALENTA%"
+      ],
+      "semantic_basis": "Name contains matching identifies candidates, not an approved alias/family resolver.",
+      "sql_sha256": "8bfd3d027ece063c13e9fc5888df6e66652e4a7aa928c393cd3f498d5ef61cf1",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "item_code": "7508214",
+          "source_system": "LEGACY_DS0",
+          "canonical_product_id": "product_7a4060b49de0162196cd0d6a",
+          "product_name": "Horno de Calentamiento Indirecto Mufla",
+          "inventory_uom_id": null,
+          "sales_uom_id": null,
+          "sap_sell_item": null
+        },
+        {
+          "item_code": "G00082",
+          "source_system": "LEGACY_DS",
+          "canonical_product_id": "product_5406be0a37e77e9723f3a407",
+          "product_name": "INCUBADORA DE TUBO DE ENSAYO Y CALENTADOR",
+          "inventory_uom_id": "unit_of_measure_f8bb8aba0f62655598a6658e",
+          "sales_uom_id": null,
+          "sap_sell_item": null
+        },
+        {
+          "item_code": "G00082",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_c00b684d6cfcd53b2a94bdf5",
+          "product_name": "INCUBADORA DE TUBO DE ENSAYO Y CALENTADOR",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L02822",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_c01355844d4a04e756e3d426",
+          "product_name": "CALENTA (POMADA SALICILATO DE METILO) x 250 g.",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L02823",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_2058b9550c8d045285843703",
+          "product_name": "CALENTA (POMADA SALICILATO DE METILO) x 30 g",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L02877",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_53c02537638f3720672e2106",
+          "product_name": "CALENTA x Kg.",
+          "inventory_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "sales_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "sap_sell_item": "N"
+        },
+        {
+          "item_code": "L03035",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_c5b392632b964746307f00f7",
+          "product_name": "CALENTA (MEDIAN GROUP)  x 50 g",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L03648",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_4ef3b41af6a510bd00e57d62",
+          "product_name": "CALENTA FORTE x Kg.",
+          "inventory_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "sales_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "sap_sell_item": "N"
+        },
+        {
+          "item_code": "L03649",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_b3a849a9f81829397835bcfa",
+          "product_name": "CALENTA FORTE x 30 g",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L03650",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_70a4e5edb55198184748f7de",
+          "product_name": "CALENTA FORTE x 50 g",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L03658",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_d02ab393831a50690c22dabc",
+          "product_name": "CALENTA FORTE  x 250 g.",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        }
+      ],
+      "elapsed_ms": 172.012
+    },
+    {
+      "probe_id": "calenta_customers",
+      "sql": "SELECT code,name,source_system FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet') WHERE upper(name) LIKE ? ORDER BY code LIMIT 10",
+      "params": [
+        "%CALENTA%"
+      ],
+      "semantic_basis": "No matches does not prove absence in all historical sources.",
+      "sql_sha256": "1f33693791fb710b2d902972ac0245f523df6f83ca5b2e42c5c951b0ec77d4d7",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [],
+      "elapsed_ms": 20.483
+    },
+    {
+      "probe_id": "may_document_amounts",
+      "sql": "SELECT currency,canceled,COUNT(*) AS documents,SUM(TRY_CAST(doc_total AS DECIMAL(38,6))) AS document_total FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_date>=? AND doc_date<? GROUP BY currency,canceled ORDER BY currency,canceled",
+      "params": [
+        "2026-05-01",
+        "2026-06-01"
+      ],
+      "semantic_basis": "DocTotal by currency/status; not LineTotal, net after credits, cash collected or product attribution.",
+      "sql_sha256": "25823da78800b9fd9148dc2eeca0e4e2d314b1420163c8bba2e1e0fc2644a523",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "currency": "BS",
+          "canceled": "C",
+          "documents": 2,
+          "document_total": "740.220000"
+        },
+        {
+          "currency": "BS",
+          "canceled": "N",
+          "documents": 36242,
+          "document_total": "8761459.220000"
+        },
+        {
+          "currency": "BS",
+          "canceled": "Y",
+          "documents": 2,
+          "document_total": "740.220000"
+        }
+      ],
+      "elapsed_ms": 143.75
+    },
+    {
+      "probe_id": "may_calenta_native_lines",
+      "sql": "SELECT p.item_code,p.product_name,p.sales_uom_id,h.currency,h.canceled,COUNT(*) AS lines,SUM(TRY_CAST(l.quantity AS DECIMAL(38,10))) AS source_quantity,SUM(TRY_CAST(l.line_total AS DECIMAL(38,10))) AS source_line_total FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) h JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON l.source_system=h.source_system AND l.doc_entry=h.doc_entry JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet') p ON p.source_system=l.source_system AND p.item_code=l.item_code WHERE h.doc_date>=? AND h.doc_date<? AND upper(p.product_name) LIKE ? GROUP BY ALL ORDER BY p.item_code,h.currency,h.canceled LIMIT 30",
+      "params": [
+        "2026-05-01",
+        "2026-06-01",
+        "%CALENTA%"
+      ],
+      "semantic_basis": "Registry sales_by_item adapted to bounded period with explicit source keys; quantities remain native, sales UoM is reference and not documentary proof.",
+      "sql_sha256": "ee015edb9917982e448858e95fc8dbb197a0e9fb295db637983bd6a7c80477ea",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [],
+      "elapsed_ms": 148.609
+    },
+    {
+      "probe_id": "purchasing_ap_invoice_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/ap_invoice/full/purchasing_4ab178d62c5f5ba27d7180a8_ap_invoice/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "cc4b909ab5cd3f13428dd9b254a3efa03c041b80e2dfcc867be3211a28e2447d",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "base_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_line",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "comments",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_due_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_at_card",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_per_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "object_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_qty",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "price",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ship_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "snapshot_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_json",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_row_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "tipo_compra",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "unit_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "uom_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 39.791
+    },
+    {
+      "probe_id": "purchasing_ap_invoice_line_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/ap_invoice_line/full/purchasing_4ab178d62c5f5ba27d7180a8_ap_invoice_line/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "73a1e53b442a4be7620ccc8a57c3ee8aff9b6016b795038f1ec77ac387d7396c",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "base_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_line",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "comments",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "conversion_provenance",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "conversion_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_due_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_at_card",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_per_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "object_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_qty",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "price",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ship_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "snapshot_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_json",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_row_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "tipo_compra",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "unit_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "uom_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 26.224
+    },
+    {
+      "probe_id": "purchasing_purchase_inventory_receipt_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_inventory_receipt/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_inventory_receipt/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "34894297f6dc3f23f20f9bb7760eae4d49e0d986d280c33d39199a9072952b34",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "base_qty",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_ref",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_ref_candidate_documents",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_warehouse_location",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "candidate_count",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "card_code_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "collision_detected",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "conversion_provenance",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "direction",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_line_warehouse",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "effective_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "in_qty",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "match_fields",
+          "column_type": "VARCHAR[]",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "movement_date",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "movement_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "out_qty",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "po_key",
+          "column_type": "VARCHAR[]",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "provenance",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "purchasing_doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "purchasing_line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "quantity_match_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "resolution_method",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "resolution_reason",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "resolution_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "root_resolution_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_line_quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_line_uom",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "target_entity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "target_line_key",
+          "column_type": "VARCHAR[]",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "trans_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_mapping_provenance",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_mapping_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_match_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 13.458
+    },
+    {
+      "probe_id": "purchasing_purchase_order_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_order/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_order/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "393eab3567a2062f1090e6af8bf651fff8e983c935a58696a06d4a4b7ae20593",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "base_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_line",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "comments",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_due_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_at_card",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_per_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "object_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_qty",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "price",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ship_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "snapshot_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_json",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_row_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "tipo_compra",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "unit_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "uom_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 27.366
+    },
+    {
+      "probe_id": "purchasing_purchase_order_line_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_order_line/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_order_line/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "07890eaf2b33fdfd141d7f657e589f35ebb16587b44611a560022228de298601",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "base_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_line",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "comments",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "conversion_provenance",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "conversion_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_due_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_at_card",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_per_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "object_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_qty",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "price",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ship_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "snapshot_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_json",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_row_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "tipo_compra",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "unit_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "uom_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 25.461
+    },
+    {
+      "probe_id": "purchasing_purchase_receipt_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_receipt/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_receipt/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "746c14689df05132742a5d4bd0baab55b763dbb6519484cd17abae7f4fec9862",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "base_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_line",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "comments",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_due_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_at_card",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_per_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "object_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_qty",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "price",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ship_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "snapshot_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_json",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_row_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "tipo_compra",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "unit_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "uom_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 16.358
+    },
+    {
+      "probe_id": "purchasing_purchase_receipt_line_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/atomic/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchase_receipt_line/full/purchasing_4ab178d62c5f5ba27d7180a8_purchase_receipt_line/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "1418338212b68a5a41021702fc529efb40992025b968ad6c0112a4c8a9665aed",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "base_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_line",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "comments",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "conversion_provenance",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "conversion_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_due_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_at_card",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "num_per_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "object_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_qty",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "price",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ship_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "snapshot_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_json",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_row_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "tipo_compra",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "unit_msr",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "uom_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 25.104
+    },
+    {
+      "probe_id": "purchasing_purchasing_document_lineage_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/purchasing/_versions/purchasing_4ab178d62c5f5ba27d7180a8/purchasing_document_lineage/full/purchasing_4ab178d62c5f5ba27d7180a8_purchasing_document_lineage/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "e8add3a77b50418879d4c0a8a1406cd5d4531c463acc06e3ce16809673bd4a11",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "base_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_line",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "base_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "edge_resolution_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "effective_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_match_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "lineage_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "path",
+          "column_type": "VARCHAR[][]",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "po_key",
+          "column_type": "VARCHAR[]",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "provenance",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "relation_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "resolution_method",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "resolution_reason",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "resolution_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "snapshot_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_document_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "target_doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "target_document_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "target_line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "uom_match_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 23.485
+    },
+    {
+      "probe_id": "material_supply_material_actual_consumption_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_DERIVATION_V1/material_actual_consumption/full/material-supply-derivation-2026-09-24_material_actual_consumption_full_1790296840828337066/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "4b85adea9a778bf60358b58131746e38dc33ae546bd477a72f666f9afd36bceb",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "actual_consumption_qty",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "consumption_basis",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "window_end",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "window_start",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 9.723
+    },
+    {
+      "probe_id": "material_supply_material_equivalent_demand_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_DERIVATION_V1/material_equivalent_demand/full/material-supply-derivation-2026-09-24_material_equivalent_demand_full_1790296840861255753/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "1a574cdc47529ed91441823464dc661f80af4bdfad954038a1f9826c962d6ccf",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "commercial_daily_equivalent_basis_qty",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "demand_window_end",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "demand_window_start",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "derived_product_raw_material_equivalent",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "direct_raw_material_demand",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "top_contributors",
+          "column_type": "STRUCT(equivalent_qty DOUBLE, item_code VARCHAR)[]",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 1.945
+    },
+    {
+      "probe_id": "material_supply_material_lead_time_profile_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/material_lead_time_profile/full/material-supply-final-1790303719477148466_material_lead_time_profile_full/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "137a1e33cfe75f7fae62cf3cb4397557cac3124831e7a76a6a3ca466104bec2e",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "confidence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "lead_time_basis",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "lineage_coverage",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "p50_days",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "p90_days",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "procurement_origin",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sample_count",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "supplier",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 17.355
+    },
+    {
+      "probe_id": "material_supply_material_supply_status_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/material_supply_status/full/material-supply-final-1790303719477148466_material_supply_status_full/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "3a1c15a947860ecd97fda9ccb16fcfc75ab6dd4c9b8485428585c411222d2fd5",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "ItemCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "actual_daily_consumption",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "commercial_daily_equivalent_demand",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "committed",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "coverage_band",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "coverage_basis",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "coverage_confidence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "coverage_days",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "current_stock",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "global_stock_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "global_stockout",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "global_usable_stock",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "inventory_uom",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "is_raw_material",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_activity_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "lead_time_basis",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "lead_time_confidence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "lead_time_days",
+          "column_type": "BIGINT",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "local_stockout",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "material_class",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "material_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "on_order",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_po_destination",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_po_expected_date",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_po_origin",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_po_qty",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_po_to_saa",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "other_location_stock",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "other_location_usable_stock",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "procurement_profile",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "production_site",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "recent_saa_consumption",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "recent_saa_m1_movement",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "replenishment_gap_days",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "saa_active_bom",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "saa_m1_history",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "saa_production_link",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "saavedra_relevance",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "saavedra_relevance_basis",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "saavedra_relevance_confidence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "TIMESTAMP",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "supply_risk",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "target_warehouse_usable_stock",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 2.199
+    },
+    {
+      "probe_id": "material_supply_open_purchase_pipeline_metadata",
+      "sql": "DESCRIBE SELECT * FROM read_parquet(['/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/business/material_supply/TELCHI_DATALAKE_MATERIAL_SUPPLY_FINALIZATION_V1/open_purchase_pipeline/full/material-supply-final-1790303719477148466_open_purchase_pipeline_full/part-00000.parquet'])",
+      "params": [],
+      "semantic_basis": "Exact sealed manifest file references; schema-only mapping, not validation of business query.",
+      "sql_sha256": "1eaab7312e5f9c775dd12d3b3f2a1b33311fffeb6fae538f2e373a3aca3426b6",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "column_name": "destination_warehouse",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "doc_currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "expected_arrival_source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "expected_date",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "first_receipt_date",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "open_qty_source",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "ordered_qty",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "po_docdate",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "po_docentry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "po_linenum",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "procurement_origin",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "receipt_lineage_confidence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "receipt_lineage_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "received_qty_supported",
+          "column_type": "DOUBLE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "supplier",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ],
+      "elapsed_ms": 11.624
+    },
+    {
+      "probe_id": "published_collections_sample",
+      "sql": "SELECT payment_date,currency,collection_method,effective_amount_local,cancelled,source_as_of FROM (SELECT * FROM telchi.business.\"collection_method_fact\" AT (VERSION => 1322)) ORDER BY payment_date DESC LIMIT 5",
+      "params": [],
+      "semantic_basis": "Published method-component fact. Not invoice payment/application or sum per payment.",
+      "sql_sha256": "997b65c2d27150335de7b4028a0c71fe284fb4db38267cb2e96bb734704980b2",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "payment_date": "2026-09-28",
+          "currency": "BS",
+          "collection_method": "TRANSFER",
+          "effective_amount_local": "2.320000",
+          "cancelled": "N",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        },
+        {
+          "payment_date": "2026-09-28",
+          "currency": "BS",
+          "collection_method": "CASH",
+          "effective_amount_local": "115.000000",
+          "cancelled": "N",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        },
+        {
+          "payment_date": "2026-09-28",
+          "currency": "BS",
+          "collection_method": "CASH",
+          "effective_amount_local": "5.500000",
+          "cancelled": "N",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        },
+        {
+          "payment_date": "2026-09-28",
+          "currency": "BS",
+          "collection_method": "CASH",
+          "effective_amount_local": "7.000000",
+          "cancelled": "N",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        },
+        {
+          "payment_date": "2026-09-28",
+          "currency": "BS",
+          "collection_method": "TRANSFER",
+          "effective_amount_local": "152.000000",
+          "cancelled": "N",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        }
+      ],
+      "elapsed_ms": 319.842
+    },
+    {
+      "probe_id": "published_receivables_sample",
+      "sql": "SELECT document_id,customer_code,currency,open_amount_local,settlement_state,source_as_of FROM (SELECT * FROM telchi.business.\"receivable_settlement_status\" AT (VERSION => 1322)) LIMIT 5",
+      "params": [],
+      "semantic_basis": "Published receivable balances. Historical as-of reconstruction requires separate contract.",
+      "sql_sha256": "f9d8621e2fe513a0165698756d36d1a98816fecdd1e9e7db0c1b274edc13b125",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "document_id": "1152051",
+          "customer_code": "CGCM",
+          "currency": "BS",
+          "open_amount_local": "0.000000",
+          "settlement_state": "FULLY_SETTLED",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        },
+        {
+          "document_id": "1152052",
+          "customer_code": "CGCM",
+          "currency": "BS",
+          "open_amount_local": "0.000000",
+          "settlement_state": "FULLY_SETTLED",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        },
+        {
+          "document_id": "1152053",
+          "customer_code": "CGCM",
+          "currency": "BS",
+          "open_amount_local": "0.000000",
+          "settlement_state": "FULLY_SETTLED",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        },
+        {
+          "document_id": "1152054",
+          "customer_code": "CGV1",
+          "currency": "BS",
+          "open_amount_local": "0.000000",
+          "settlement_state": "FULLY_SETTLED",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        },
+        {
+          "document_id": "1152055",
+          "customer_code": "CGCM",
+          "currency": "BS",
+          "open_amount_local": "0.000000",
+          "settlement_state": "FULLY_SETTLED",
+          "source_as_of": "2026-09-28T18:18:35.264000"
+        }
+      ],
+      "elapsed_ms": 107.311
+    },
+    {
+      "probe_id": "calenta_exact_skus_may",
+      "sql": "SELECT l.item_code,h.currency,h.canceled,COUNT(*) AS lines,SUM(TRY_CAST(l.quantity AS DECIMAL(38,10))) AS native_quantity,SUM(TRY_CAST(l.line_total AS DECIMAL(38,10))) AS native_line_total FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) h JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON l.source_system=h.source_system AND l.doc_entry=h.doc_entry WHERE h.doc_date>=? AND h.doc_date<? AND l.item_code IN ('L02822','L02823','L02877','L03035','L03648','L03649','L03650','L03658') GROUP BY ALL ORDER BY l.item_code,h.currency,h.canceled",
+      "params": [
+        "2026-05-01",
+        "2026-06-01"
+      ],
+      "semantic_basis": "Exact SKU evidence from SAP_HANA Reference. Native Atomic namespace SAP_B1_HANA differs: no blind source_system join to Reference.",
+      "sql_sha256": "ff4dd9e3d17939c1bd6a7a9578149812ce2fd0d3fd0819a9f986730a620954cd",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "item_code": "L02822",
+          "currency": "BS",
+          "canceled": "N",
+          "lines": 570,
+          "native_quantity": "1568.0000000000",
+          "native_line_total": "63287.9600000000"
+        },
+        {
+          "item_code": "L02823",
+          "currency": "BS",
+          "canceled": "N",
+          "lines": 475,
+          "native_quantity": "3472.0000000000",
+          "native_line_total": "24889.6500000000"
+        },
+        {
+          "item_code": "L03649",
+          "currency": "BS",
+          "canceled": "N",
+          "lines": 421,
+          "native_quantity": "2125.0000000000",
+          "native_line_total": "18487.3900000000"
+        },
+        {
+          "item_code": "L03658",
+          "currency": "BS",
+          "canceled": "N",
+          "lines": 425,
+          "native_quantity": "785.0000000000",
+          "native_line_total": "43082.5200000000"
+        }
+      ],
+      "elapsed_ms": 173.612
+    },
+    {
+      "probe_id": "calenta_aliases",
+      "sql": "SELECT entity_type,canonical_id,alias,alias_source,resolution_status FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/entity_alias/part-00000.parquet') WHERE upper(alias) LIKE ? LIMIT 30",
+      "params": [
+        "%CALENTA%"
+      ],
+      "semantic_basis": "Sealed alias candidates: contains match is not one resolved commercial family.",
+      "sql_sha256": "aaf65d0a21e5d53dd7905342b925bff2838f161c40e87360261dbe365930bddd",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_2058b9550c8d045285843703",
+          "alias": "CALENTA (POMADA SALICILATO DE METILO) x 30 g",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_4ef3b41af6a510bd00e57d62",
+          "alias": "CALENTA FORTE x Kg.",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "MAPPED"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_53c02537638f3720672e2106",
+          "alias": "CALENTA x Kg.",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_5406be0a37e77e9723f3a407",
+          "alias": "INCUBADORA DE TUBO DE ENSAYO Y CALENTADOR",
+          "alias_source": "reference.products:LEGACY_DS",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_70a4e5edb55198184748f7de",
+          "alias": "CALENTA FORTE x 50 g",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "MAPPED"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_7a4060b49de0162196cd0d6a",
+          "alias": "Horno de Calentamiento Indirecto Mufla",
+          "alias_source": "reference.products:LEGACY_DS0",
+          "resolution_status": "MAPPED"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_b3a849a9f81829397835bcfa",
+          "alias": "CALENTA FORTE x 30 g",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "MAPPED"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_c00b684d6cfcd53b2a94bdf5",
+          "alias": "INCUBADORA DE TUBO DE ENSAYO Y CALENTADOR",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_c01355844d4a04e756e3d426",
+          "alias": "CALENTA (POMADA SALICILATO DE METILO) x 250 g.",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_c5b392632b964746307f00f7",
+          "alias": "CALENTA (MEDIAN GROUP)  x 50 g",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_d02ab393831a50690c22dabc",
+          "alias": "CALENTA FORTE  x 250 g.",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "MAPPED"
+        }
+      ],
+      "elapsed_ms": 121.8
+    }
+  ],
+  "read_only": true,
+  "sap_accessed": false,
+  "purpose": "Historical portability checks; figures are tied to publication, not current SAP.",
+  "current": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 1752.271,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "reference_schemas": {
+    "salespersons": [
+      {
+        "name": "source_system",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "source_native_id",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "salesperson_id",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "code",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "name",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "valid_from",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "valid_to",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "status",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "branch_id",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_system",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_dataset",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_native_key",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_file",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_snapshot_at",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_extracted_at",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_ingested_at",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_transformation_version",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_semantic_version",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_lineage_quality",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "salesperson_active",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "salesperson_category_code",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "salesperson_category_name",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "is_corporate",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "sap_category_source_label",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ],
+    "units_of_measure": [
+      {
+        "name": "canonical_uom_code",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "canonical_uom_label",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "physical_dimension",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "status",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "mapping_source",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "source_as_of",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ],
+    "entity_alias": [
+      {
+        "name": "entity_type",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "canonical_id",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "alias",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "normalized_alias",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "alias_source",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "priority",
+        "type": "INTEGER",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "active",
+        "type": "BOOLEAN",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "confidence",
+        "type": "DECIMAL(38,12)",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "resolution_status",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_system",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_dataset",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_native_key",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_file",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_source_extracted_at",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_ingested_at",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_transformation_version",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "_semantic_version",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ],
+    "brand": [
+      {
+        "name": "brand_id",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "code",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "name",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "description",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "active",
+        "type": "BOOLEAN",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "valid_from",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "valid_to",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "source",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "confidence",
+        "type": "DECIMAL(10,6)",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "status",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "semantic_version",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ],
+    "portfolio_family": [
+      {
+        "name": "portfolio_family_id",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "code",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "name",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "description",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "active",
+        "type": "BOOLEAN",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "valid_from",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "valid_to",
+        "type": "TIMESTAMP WITH TIME ZONE",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "source",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "confidence",
+        "type": "DECIMAL(10,6)",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "status",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      },
+      {
+        "name": "semantic_version",
+        "type": "VARCHAR",
+        "nullable": "YES",
+        "key": null,
+        "default": null,
+        "extra": null
+      }
+    ]
+  }
+}

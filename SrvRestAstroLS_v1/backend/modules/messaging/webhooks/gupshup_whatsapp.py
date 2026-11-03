@@ -5,14 +5,19 @@ messages to InboundMessage, claims idempotency via PostgreSQL, and for new
 messages connects to the existing Flow intake pipeline.
 
 Security:
-- No signature verification in DEV (Gupshup DEV does not support it).
-- Endpoint exposed only through cloudflare tunnel in DEV.
+- Gupshup signature verification is not documented for this integration.
+- The existing Team360 Messaging webhook token is therefore required before
+  parsing, persistence, or Flow processing. A trusted sender/ingress must set
+  ``x-team360-webhook-token``; missing configuration fails closed.
+- PostgreSQL claiming deduplicates inbound provider message IDs before Flow.
 """
 
 from __future__ import annotations
 
+import hmac
 import json
 import logging
+import os
 import time
 from typing import Any
 
@@ -34,6 +39,19 @@ logger = logging.getLogger(__name__)
 # Lazy-initialized singletons (created on first request)
 _claimer: WhatsAppMessageClaimer | None = None
 _bridge: Any = None  # WhatsAppFlowBridge, typed as Any to avoid import cycle
+_WEBHOOK_TOKEN_ENV = "TEAM360_MESSAGING_WEBHOOK_TOKEN"
+_WEBHOOK_TOKEN_HEADER = "x-team360-webhook-token"
+_MIN_WEBHOOK_TOKEN_LENGTH = 32
+
+
+def _require_webhook_authenticity(request: Request) -> None:
+    """Authenticate the sender/ingress before reading or processing the body."""
+    expected = os.environ.get(_WEBHOOK_TOKEN_ENV, "").strip()
+    if len(expected) < _MIN_WEBHOOK_TOKEN_LENGTH:
+        raise HTTPException(status_code=503, detail="Webhook authentication unavailable")
+    supplied = request.headers.get(_WEBHOOK_TOKEN_HEADER, "")
+    if not hmac.compare_digest(supplied.encode(), expected.encode()):
+        raise HTTPException(status_code=401, detail="Invalid webhook credentials")
 
 
 def _get_claimer() -> WhatsAppMessageClaimer:
@@ -84,7 +102,7 @@ class GupshupWhatsAppWebhookController(Controller):
     path = "/webhooks/messaging/gupshup/whatsapp"
     tags = ["Messaging Webhooks"]
 
-    @post(status_code=200)
+    @post(status_code=200, request_max_body_size=1_048_576)
     async def receive_webhook(self, request: Request) -> dict[str, Any]:
         """Receive and process a Gupshup WhatsApp webhook event.
 
@@ -96,6 +114,7 @@ class GupshupWhatsAppWebhookController(Controller):
         5. If new, connect to Flow intake pipeline
         6. Return HTTP 200 (always, to acknowledge receipt)
         """
+        _require_webhook_authenticity(request)
         received_at_ms = _epoch_ms()
         raw_body = await request.body()
 

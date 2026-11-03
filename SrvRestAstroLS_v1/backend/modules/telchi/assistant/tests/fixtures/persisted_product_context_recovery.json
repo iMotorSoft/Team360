@@ -1,0 +1,21 @@
+{
+  "source": "Second incident 11:58: abandoned search already persisted; no identity, event IDs or user text.",
+  "previous_state_fixture": "product_context_invalidation_audited.json",
+  "previous_state_key": "obsolete_state",
+  "proposal": {
+    "intent": "REFINE",
+    "action": "EXECUTE",
+    "state_delta": {
+      "set": {
+        "/metric": "sales.net_amount",
+        "/period": {"start": "2026-09-01", "end_exclusive": "2026-10-01"},
+        "/entity_mention": {"text": "RAW_MATERIAL", "type": null},
+        "/schema_version": 2,
+        "/requested_metrics": ["sales.net_amount"],
+        "/temporal_reference": null
+      },
+      "unset": []
+    },
+    "clarification": null
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-10-22T13:00:52.591465+00:00",
+  "source_sha256": "caf32f38568f89969f9fe2c785fb976bbd8feced701ea5277e5440403f8f59e3",
+  "runner_sha256": "4b9dffd48e0cef82603a731d9a83bd9c32c7e7bf3e5095c231751c710fd355e1",
+  "SIX_GATES": "INVALID",
+  "AUTHORIZATION_GATE_STRATEGY": "ISOLATED",
+  "GRANTS_MODIFIED": "NO",
+  "RUNTIME_MODIFIED": "NO",
+  "WHATSAPP_E2E": "NOT_RUN",
+  "READY_FOR_MANUAL_START": "NO",
+  "manifest_published": false,
+  "operational_dml": 0,
+  "listeners_created": 0,
+  "host_preflight": "SAFE: 8 CPUs, load 1.51/1.58/1.90, 6991 MiB available; swap 7 MiB, no swap IO; sampled CPU idle 88-89%",
+  "concurrency": "One process, one PostgreSQL connection; no model, scan or browser",
+  "runtime": {
+    "state": "READY",
+    "backend_stopped": false,
+    "webhook_restored": false,
+    "backend_identity_alive": false,
+    "launcher_identity_alive": false,
+    "backup_exists": true,
+    "closure_exists": false
+  },
+  "policy": {
+    "value": "change_based_v1",
+    "schema_version": 2,
+    "expires_at_present": false,
+    "current_source_matches": false
+  },
+  "gates": {
+    "assistant_foundation": "NOT_ACCREDITED",
+    "business_authorization": "NOT_ACCREDITED",
+    "durable_idempotency": "NOT_ACCREDITED",
+    "http_auth": "NOT_ACCREDITED",
+    "identity_tenant_isolation": "NOT_ACCREDITED",
+    "model_no_fallback": "NOT_ACCREDITED"
+  },
+  "postgres_binding_identity": "PASS",
+  "evolution": {
+    "read_only_check": "ENVIRONMENTAL_ABORT",
+    "error_class": "ConnectError"
+  },
+  "isolated_authorization": {
+    "status": "PASS",
+    "real_console_sql": true,
+    "copied_rows_equal_actual_effective_permissions": true,
+    "new_fixture_identity": true,
+    "stale_identity_denied": true,
+    "foreign_tenant_denied": true,
+    "foreign_workspace_denied": true,
+    "fixture_scope": "pg_temp only; forced rollback and connection close",
+    "limitation": "No operational grant revocation; no concurrent real-user revocation claimed"
+  },
+  "temporary_fixtures_removed": true,
+  "operational_effective_permissions_unchanged": true,
+  "pool_closed": true,
+  "runtime_control_unchanged": true,
+  "manifest_unchanged": true,
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "blockers": [
+    "Lifecycle is READY, not STOPPED; registered processes absent; no closure/restoration confirmation.",
+    "Evolution GET unavailable; current webhook restoration cannot be verified.",
+    "Existing change_based_v1 manifest belongs to a different source digest. No partial publication."
+  ],
+  "next_step": "Owner reconciles lifecycle and verifies webhook backup using official runbook in an explicitly authorized window; then repeat read-only preflight and reaccredit six gates using isolated authorization fixtures. Do not start services or restore webhook in this task."
+}

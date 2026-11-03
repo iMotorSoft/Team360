@@ -1,0 +1,77 @@
+{
+  "initial_state": {
+    "branch": "feature/console-backend-core",
+    "head": "09d2ec715a31bb88574d734eacb9f437f008624e",
+    "worktree": "Many preexisting modified/untracked files, preserved; no Git mutations",
+    "contract": "Existing handlers.py and tests retained and extended, not rebuilt"
+  },
+  "states": {
+    "TEAM360_MESSAGING_HORIZONTAL_V1": "PARTIAL",
+    "TEAM360_TELCHI_WHATSAPP_ASSISTANT_V1": "BLOCKED",
+    "DEV_PROD_CHANNEL_ISOLATION": "PARTIAL",
+    "PHONE_IDENTITY_BINDING": "BLOCKED",
+    "MESSAGING_RUNTIME_DISPATCH": "PARTIAL",
+    "MESSAGING_RECOVERY": "PARTIAL"
+  },
+  "architecture": {
+    "runtime": "Existing Srv05 Evolution opt-in DEV gate remains unchanged. Horizontal build_service uses trusted app.state.messaging_handlers registrations. No actual business handler has been registered by this execution.",
+    "activation": "TEAM360_MESSAGING_DISPATCH_MODE=horizontal_v1 must agree with communication_channels.metadata_jsonb.dispatcher=horizontal_v1. Unknown/incomplete/mismatched configurations fail closed; never fall back to legacy SQL.",
+    "channel_metadata_contract": {
+      "dispatcher": "horizontal_v1",
+      "environment": "dev",
+      "dev_only": true,
+      "provider_instance": "Existing approved instance, not invented here",
+      "module": "Existing module registration name",
+      "tenant_id": "Operator-approved tenant scope; no separate core tenant FK was found",
+      "receiver_context": "Approved receiver ID supplied by trusted Srv05 normalization configuration"
+    },
+    "transport_trust": "Shared webhook token authenticates ingress. Payload instance must match configured instance. Receiver is supplied by server configuration, not webhook environment/module fields. This is not independent provider signature verification. Groups/LID are rejected until verified participant/receiver normalization exists.",
+    "environment": "HTTP composition is still DEV-only; channel metadata must explicitly be dev. Dispatcher also checks channel/handler/identity environment. pro follows existing provider_credentials vocabulary; no PROD credentials or transport were enabled.",
+    "persistent_scope": "Horizontal provider_instance storage key is horizontal-v1 plus an unambiguous JSON tuple of environment, provider, provider_id, physical instance, channel, workspace, tenant, module and receiver. Existing 026 unique indexes/queries/locks therefore scope threads, inbound deduplication, outbound intents, delivery and evidence. Physical instance stays in normalized message metadata. Legacy storage keys are unchanged. No new persistence migration is required for this scoped-key approach, but actual PG execution remains unvalidated.",
+    "identity": "Read-only PhoneIdentityRepository expects proposed messaging_phone_bindings table and joins core_users; no table was created, no verification/enrollment procedure was invented. None means confirmed absent binding; invalid/revoked/ambiguous bindings raise InvalidIdentityBinding; DB errors never grant anonymous access.",
+    "permissions": "Reuses PermissionConsoleRepository.list_effective_permissions for the bound active user/workspace. Trusted handler registration must declare a nonempty required_permissions gate in the HTTP builder. Module handlers must still authorize individual sensitive operations; no Telchi/Flow permission codes were invented.",
+    "public_policy": "Defaults to none; public capabilities are explicit handler-registration declarations. Tests use Telchi denial and Flow public information doubles only; no real Flow public capabilities were approved or enabled.",
+    "legacy": "Allowlist, ping, hola and fixed Telchi SQL preserved only in legacy DEV branch. Horizontal mode disallows legacy SQL tenant configuration and bypasses legacy processing.",
+    "delivery": "Result and unique outbound intent commit atomically before sending. Atomic begin_send commits a sending fence before network I/O. Provider acceptance is not confirmed delivery; existing callbacks provide delivery/read status.",
+    "recovery": "Duplicate inbound can resume an unsent durable intent without re-running the handler. Known transport failures require explicit retry=True through service API; no new unauthenticated retry endpoint exists. Sending/unknown outcomes and claim-without-result remain execution-uncertain and require reconciliation. A crash between claim and result commit is deliberately NOT auto-replayed. Recovery uses persisted destination and rejects changed senders. No broker or universal jobs framework.",
+    "exactly_once_limit": "At-most-once handler invocation fence per durable inbound, not universal exactly-once business execution. No transactional coupling with module side effects or provider idempotency guarantee. Crash after send-start or provider acceptance may remain uncertain; no blind resend. No scheduled recovery worker was added. Legacy recovery gap is not claimed closed."
+  },
+  "changed_existing_files": [
+    "SrvRestAstroLS_v1/backend/modules/messaging/handlers.py",
+    "SrvRestAstroLS_v1/backend/modules/messaging/repository.py",
+    "SrvRestAstroLS_v1/backend/modules/messaging/service.py",
+    "SrvRestAstroLS_v1/backend/modules/messaging/settings.py",
+    "SrvRestAstroLS_v1/backend/modules/messaging/webhooks/evolution_whatsapp.py"
+  ],
+  "new_files": [
+    "SrvRestAstroLS_v1/backend/modules/messaging/identity.py",
+    "SrvRestAstroLS_v1/backend/tests/test_messaging_horizontal_runtime.py",
+    "data/reports/messaging/horizontal-v1-runtime-integration/report.json"
+  ],
+  "validation": {
+    "command": "cd SrvRestAstroLS_v1/backend && uv run pytest -q tests/test_messaging_*.py tests/test_srv05_evolution_isolation.py tests/test_srv05_runtime.py tests/test_srv05_compatibility.py tests/test_console_auth.py tests/test_console_repositories_sql_safety.py --ignore=tests/test_messaging_evolution_postgres.py --ignore=tests/test_messaging_telchi_sql_postgres.py",
+    "passed": 346,
+    "skipped": 4,
+    "failed": 0,
+    "warning": "Existing diagnosis in-memory repository default warning; uv deprecation warning",
+    "git_diff_check": "PASS, including explicit no-index whitespace checks for edited untracked Python files",
+    "coverage": ["DEV routing for Telchi/Flow doubles", "PRO channels and registrations unreachable from DEV", "unknown/mismatched channels", "group/LID rejection", "payload environment ignored", "effective permission gate", "unknown/revoked/ambiguous/inactive identity", "tenant/workspace/environment mismatch", "database failure fail-closed", "durable-intent recovery", "no handler replay after claim/result interruption", "known-failure controlled retry", "uncertain-send no retry", "persisted-destination protection", "legacy Messaging/Evolution and Srv05 isolation regression"],
+    "limitations": "New identity/persistence tests use doubles/SQL contract checks. PostgreSQL integration suites explicitly excluded to avoid unauthorized DB writes. No new actual PG18 identity chain, no live WhatsApp, no external channel changes, no PROD gate, no full frontend/browser suite.",
+    "host": "BUSY_BUT_SAFE: 8 cores, load approximately 2.3, available RAM approximately 5.8 GB, swap stable/decreasing, sampled swap-in/out zero. Sequential pytest, no browser/server/scan workloads, no unrelated processes terminated. Test runners exited normally."
+  },
+  "proposed_identity_schema": {
+    "status": "PROPOSAL_ONLY_NOT_A_MIGRATION_NOT_APPLIED",
+    "required_window": "Explicit exclusive GLOBAL window for backend/db/migrations/<new-number>_messaging_phone_bindings.sql plus schema tests. Separate explicit authorization is required to apply it.",
+    "ddl_candidate": "CREATE TABLE messaging_phone_bindings (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), environment text NOT NULL CHECK (environment IN ('dev','pro')), provider text NOT NULL REFERENCES communication_providers(code), sender_identity text NOT NULL CHECK (sender_identity ~ '^[1-9][0-9]{6,14}$'), tenant_id text NOT NULL CHECK (length(trim(tenant_id)) > 0), workspace_id uuid NOT NULL REFERENCES core_workspaces(id), user_id uuid NOT NULL REFERENCES core_users(id), verification_status text NOT NULL CHECK (verification_status IN ('pending','verified','revoked')), verified_at_utc timestamptz, verification_ref text, created_at_utc timestamptz NOT NULL DEFAULT now(), updated_at_utc timestamptz NOT NULL DEFAULT now(), UNIQUE(environment,provider,sender_identity,tenant_id,workspace_id), CHECK (verification_status <> 'verified' OR (verified_at_utc IS NOT NULL AND verification_ref IS NOT NULL AND length(trim(verification_ref)) > 0)));",
+    "approval_requirements": ["Review tenant ownership convention because core_workspaces/core_users have no tenant FK", "DB constraint/trigger or approved operator procedure to enforce user.workspace_id=binding.workspace_id; runtime already rejects mismatch", "Restrict binding mutations to approved identity administration; use core_events for actor/proof/revocation audit", "Approve external proof-of-control workflow before verified enrollment; no verification by receipt of a chat", "Approve real fixture, module permission codes and trusted Srv05 registration", "Test missing schema, uniqueness, revocation and DEV/PROD against PG18 before runtime PASS"]
+  },
+  "blockers": {
+    "code": "Trusted Srv05 startup registration is not installed; changing common composition requires GLOBAL ownership. No real Telchi handler yet.",
+    "pg_schema": "Proposed messaging_phone_bindings does not exist in the inspected migration contracts; no live DB availability/schema was inferred.",
+    "identity": "No authorized verified phone fixture or approved verification procedure",
+    "permissions": "Real module permission mapping and approved identity/tenant fixtures pending",
+    "external_channel": "No live ingress/delivery test; PROD stays disabled; no number/subscription/credential changes",
+    "telchi_data": "Existing sales capability does not certify net invoicing; Luna/State Engine integration remains future and untouched"
+  },
+  "preservation": "No edits to Srv01, Flow, Diagnosis, Telchi, common bootstrap/auth, migrations, LAT or GLOBAL status. No commits, pushes, services started, migrations applied or external configuration changes. Preexisting untracked edited files are not newly attributed to this execution."
+}

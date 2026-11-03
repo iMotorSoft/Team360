@@ -1,0 +1,624 @@
+{
+  "timestamp": "2026-10-30T12:06:54.560092+00:00",
+  "source_sha256": "f906a0969c1c3a282185fbb78e73f8a492f8fe2462c3e38498feb5b0f2f13b8f",
+  "model_preflight": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "duration_ms": 5299.233,
+    "attempts": 1
+  },
+  "missing_period_proposal": {
+    "intent": "NEW_QUERY",
+    "action": "ASK",
+    "state_delta": {
+      "set": {
+        "/schema_version": 2,
+        "/metric": "sales.net_amount",
+        "/requested_metrics": [
+          "sales.net_amount"
+        ],
+        "/entity_mention": null,
+        "/temporal_reference": null
+      },
+      "unset": [
+        "/period",
+        "/branches",
+        "/sales_channel",
+        "/comparison",
+        "/reference",
+        "/product_search_text",
+        "/selected_item_codes",
+        "/business_category",
+        "/product_target",
+        "/customer_target",
+        "/group_by",
+        "/breakdown_by",
+        "/periods",
+        "/period_mode",
+        "/limit",
+        "/ranking_target_item_code",
+        "/ranking_detail"
+      ]
+    },
+    "clarification": {
+      "slot": "period",
+      "question": "¿De qué período querés consultar la facturación?"
+    }
+  },
+  "services_started_or_stopped": 0,
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "identity": "actual approved DEV phone binding and Console resolver",
+  "persistence": "actual PostgreSQL committed DEV audit rows",
+  "foundation": "actual read-only pinned CURRENT",
+  "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+  "turns": [
+    {
+      "question": "¿Cuánto vendimos en septiembre de 2026?",
+      "text": "Facturación registrada: Bs 11.079.079,77, del 1 de septiembre de 2026 al 30 de septiembre de 2026. Neto documental tras notas de crédito: Bs 10.591.046,24. Facturas activas en BS, con impuestos y descuentos; excluye anuladas y otras monedas. No equivale a cobros ni a saldo pendiente; cobertura histórica completa no certificada. Información actualizada al 30 de octubre de 2026.",
+      "classification": "DIRECT_AVAILABLE",
+      "event_id": "3247d79c-8059-402d-928b-68b738f7cb8e",
+      "thread_id": "dc6061da-3751-4a1f-b26a-6e02563df6a1",
+      "audit": {
+        "bmd": null,
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 25495.85156099056,
+          "state_engine_ms": 0.3274670016253367,
+          "interpretation_ms": 5700.268798987963,
+          "response_format_ms": 0.0552970013814047,
+          "total_processing_ms": 31207.358625004417
+        },
+        "decision": "EXECUTE",
+        "committed": true,
+        "business_scope": {
+          "focus": {},
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "dataset": null,
+          "measure": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+          "periods": [
+            {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            }
+          ],
+          "product": null,
+          "category": null,
+          "currency": "BS",
+          "customer": null,
+          "universe": "active_bs_invoice_lines",
+          "breakdown": null,
+          "dimension": null,
+          "comparison": null,
+          "period_mode": null,
+          "accreditation": "verified",
+          "customer_type": null,
+          "customer_label": null,
+          "product_offset": 0,
+          "excluded_product": null
+        },
+        "contract_error": null,
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "group_by": null,
+          "reference": null,
+          "comparison": null,
+          "period_mode": null,
+          "breakdown_by": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "product_target": null,
+          "ranking_detail": null,
+          "schema_version": 2,
+          "customer_target": null,
+          "product_context": null,
+          "business_category": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "ranking_target_item_code": null
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "group_by": null,
+          "reference": null,
+          "comparison": null,
+          "period_mode": null,
+          "breakdown_by": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "product_target": null,
+          "ranking_detail": null,
+          "schema_version": 2,
+          "customer_target": null,
+          "product_context": null,
+          "business_category": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "ranking_target_item_code": null
+        },
+        "capability_calls": 1,
+        "execution_result": {
+          "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/sales_document.parquet')) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? \n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-continuity-recovery-v1.0.0/sales-continuity-candidate-20261029-v1/credit_memo_document.parquet')) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? \n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+          "rows": [
+            {
+              "net_amount": "10591046.240000",
+              "credit_count": 280,
+              "billed_amount": "11079079.770000",
+              "credit_amount": "488033.530000",
+              "invoice_count": 36542,
+              "unique_credits": 280,
+              "unique_invoices": 36542,
+              "credit_amount_count": 280,
+              "invoice_amount_count": 36542
+            }
+          ],
+          "grain": "document_header",
+          "period": {
+            "currency": "BS",
+            "date_from": "2026-09-01",
+            "date_to_exclusive": "2026-10-01"
+          },
+          "source": {
+            "updated_at": "2026-10-30T09:01:30.323257+00:00",
+            "snapshot_id": 1408,
+            "publication_id": "foundation_38680850adc058b1bb11887632b7b681"
+          },
+          "currency": "BS",
+          "read_only": true,
+          "capability": "sales.period_billed_amount.v1",
+          "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+          "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+          "sap_accessed": false,
+          "query_profile": {
+            "clock": "perf_counter_ns",
+            "spans": [
+              {
+                "label": "private_config_read",
+                "end_ms": 20.960584,
+                "start_ms": 20.74682,
+                "duration_ms": 0.213764
+              },
+              {
+                "label": "duckdb_import",
+                "end_ms": 85.490324,
+                "start_ms": 21.245492,
+                "duration_ms": 64.244832
+              },
+              {
+                "label": "duckdb_connect",
+                "end_ms": 99.112092,
+                "start_ms": 85.546163,
+                "duration_ms": 13.565929
+              },
+              {
+                "label": "load_ducklake",
+                "end_ms": 160.221857,
+                "start_ms": 99.135418,
+                "duration_ms": 61.086439
+              },
+              {
+                "label": "load_postgres",
+                "end_ms": 220.342913,
+                "start_ms": 160.243369,
+                "duration_ms": 60.099544
+              },
+              {
+                "label": "attachment_open_including_catalog_session",
+                "end_ms": 320.191703,
+                "start_ms": 220.503339,
+                "duration_ms": 99.688364
+              },
+              {
+                "label": "foundation_current_count",
+                "end_ms": 774.367107,
+                "start_ms": 322.673191,
+                "duration_ms": 451.693916
+              },
+              {
+                "label": "foundation_current_metadata",
+                "end_ms": 1472.559858,
+                "start_ms": 774.383943,
+                "duration_ms": 698.175915
+              },
+              {
+                "label": "foundation_publication_get",
+                "end_ms": 1502.161795,
+                "start_ms": 1472.574224,
+                "duration_ms": 29.587571
+              },
+              {
+                "label": "foundation_manifest_validation",
+                "end_ms": 1502.18766,
+                "start_ms": 1502.177343,
+                "duration_ms": 0.010317
+              },
+              {
+                "label": "foundation_commit_snapshot_resolution",
+                "end_ms": 2371.993966,
+                "start_ms": 1502.19294,
+                "duration_ms": 869.801026
+              },
+              {
+                "label": "foundation_sales_facts_validation",
+                "end_ms": 24784.950027,
+                "start_ms": 2436.283733,
+                "duration_ms": 22348.666294
+              },
+              {
+                "label": "foundation_sales_facts_physical_validation",
+                "end_ms": 24893.773529,
+                "start_ms": 24784.967382,
+                "duration_ms": 108.806147
+              },
+              {
+                "label": "foundation_component_verification",
+                "end_ms": 24964.351859,
+                "start_ms": 24893.788672,
+                "duration_ms": 70.563187
+              },
+              {
+                "label": "sales_sql_execution",
+                "end_ms": 25214.467004,
+                "start_ms": 24964.516443,
+                "duration_ms": 249.950561
+              },
+              {
+                "label": "sales_fetch",
+                "end_ms": 25214.785463,
+                "start_ms": 25214.50001,
+                "duration_ms": 0.285453
+              },
+              {
+                "label": "attachment_connection_close",
+                "end_ms": 25258.122688,
+                "start_ms": 25214.802367,
+                "duration_ms": 43.320321
+              },
+              {
+                "label": "sales_serialization",
+                "end_ms": 25258.41614,
+                "start_ms": 25258.167566,
+                "duration_ms": 0.248574
+              }
+            ],
+            "schema": "telchi-pre-sql-profile-v1",
+            "total_ms": 25258.582474
+          },
+          "sql_parameters": [
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-09-01",
+            "2026-10-01",
+            "SAP_B1_HANA",
+            "N",
+            "BS",
+            "2026-09-01",
+            "2026-10-01"
+          ],
+          "sql_duration_ms": 250.28243999986444,
+          "worker_lifecycle": {
+            "canceled": false,
+            "elapsed_ms": 25495.477678996394,
+            "returned_rows": 1,
+            "worker_reaped": true,
+            "response_bytes": 4565,
+            "timeout_seconds": 90,
+            "deadline_monotonic": 96979.690306364
+          },
+          "requested_metrics": [
+            "sales.net_amount"
+          ]
+        },
+        "execution_status": "executed",
+        "response_prepared": {
+          "text": "Facturación registrada: Bs 11.079.079,77, del 1 de septiembre de 2026 al 30 de septiembre de 2026. Neto documental tras notas de crédito: Bs 10.591.046,24. Facturas activas en BS, con impuestos y descuentos; excluye anuladas y otras monedas. No equivale a cobros ni a saldo pendiente; cobertura histórica completa no certificada. Información actualizada al 30 de octubre de 2026.",
+          "classification": "DIRECT_AVAILABLE"
+        },
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "business_rbac_verified": true,
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference",
+              "/product_search_text",
+              "/selected_item_codes",
+              "/business_category",
+              "/product_target",
+              "/customer_target",
+              "/group_by",
+              "/breakdown_by",
+              "/periods",
+              "/period_mode",
+              "/ranking_target_item_code",
+              "/ranking_detail"
+            ]
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 5696.724,
+        "attempts": 1
+      },
+      "elapsed_ms": 32012.835882997024,
+      "request_trace": {
+        "schema": "telchi-pre-sql-profile-v1",
+        "clock": "perf_counter_ns",
+        "spans": [
+          {
+            "label": "authorization_initial",
+            "start_ms": 703.113952,
+            "end_ms": 703.807329,
+            "duration_ms": 0.693377
+          },
+          {
+            "label": "authorization_transaction_revalidation",
+            "start_ms": 707.014358,
+            "end_ms": 712.352055,
+            "duration_ms": 5.337697
+          },
+          {
+            "label": "conversation_audit_save",
+            "start_ms": 31919.738944,
+            "end_ms": 31996.339596,
+            "duration_ms": 76.600652
+          }
+        ],
+        "total_ms": 32101.443346
+      }
+    },
+    {
+      "question": "¿Cuánto vendimos en octubre de 2026 hasta el día 29?",
+      "text": "Entendí que pedís importe de ventas en del 2026-10-01 al 2026-10-29. Esta consulta todavía no está disponible. Podés reformular la consulta con los datos que ya tenemos, o indicarme el período faltante.",
+      "classification": "DIRECT_UNAVAILABLE",
+      "event_id": "2c9b6dd3-890d-4058-a3ee-29c96be089a1",
+      "thread_id": "dc6061da-3751-4a1f-b26a-6e02563df6a1",
+      "audit": {
+        "bmd": {
+          "category": "CAPABILITY_MISSING"
+        },
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "timings": {
+          "capability_ms": 0.0,
+          "state_engine_ms": 0.25567400734871626,
+          "interpretation_ms": 7597.4882029986475,
+          "response_format_ms": 0.0,
+          "total_processing_ms": 7597.945613000775
+        },
+        "decision": "DIRECT_UNAVAILABLE",
+        "committed": true,
+        "contract_error": null,
+        "previous_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "pending": null,
+          "branches": [],
+          "group_by": null,
+          "reference": null,
+          "comparison": null,
+          "period_mode": null,
+          "breakdown_by": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "product_target": null,
+          "ranking_detail": null,
+          "schema_version": 2,
+          "customer_target": null,
+          "product_context": null,
+          "business_category": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "ranking_target_item_code": null
+        },
+        "confirmed_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-10-30"
+          },
+          "pending": null,
+          "branches": [],
+          "group_by": null,
+          "reference": null,
+          "comparison": null,
+          "period_mode": null,
+          "breakdown_by": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "product_target": null,
+          "ranking_detail": null,
+          "schema_version": 2,
+          "customer_target": null,
+          "product_context": null,
+          "business_category": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "ranking_target_item_code": null
+        },
+        "validated_state": {
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-10-30"
+          },
+          "pending": null,
+          "branches": [],
+          "group_by": null,
+          "reference": null,
+          "comparison": null,
+          "period_mode": null,
+          "breakdown_by": null,
+          "sales_channel": null,
+          "entity_mention": null,
+          "product_target": null,
+          "ranking_detail": null,
+          "schema_version": 2,
+          "customer_target": null,
+          "product_context": null,
+          "business_category": null,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "temporal_reference": null,
+          "product_search_text": null,
+          "selected_item_codes": [],
+          "ranking_target_item_code": null
+        },
+        "capability_calls": 0,
+        "execution_result": null,
+        "execution_status": "not_executed",
+        "response_prepared": {
+          "text": "Entendí que pedís importe de ventas en del 2026-10-01 al 2026-10-29. Esta consulta todavía no está disponible. Podés reformular la consulta con los datos que ya tenemos, o indicarme el período faltante.",
+          "classification": "DIRECT_UNAVAILABLE"
+        },
+        "required_permission": null,
+        "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+        "interpretation_proposed": {
+          "action": "DIRECT_UNAVAILABLE",
+          "intent": "REFINE",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-10-01",
+                "end_exclusive": "2026-10-30"
+              },
+              "/entity_mention": null,
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/temporal_reference": null
+            },
+            "unset": []
+          },
+          "clarification": null
+        }
+      },
+      "model": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true,
+        "duration_ms": 7585.185,
+        "attempts": 1
+      },
+      "elapsed_ms": 7905.940132986871,
+      "request_trace": {
+        "schema": "telchi-pre-sql-profile-v1",
+        "clock": "perf_counter_ns",
+        "spans": [
+          {
+            "label": "authorization_initial",
+            "start_ms": 259.565157,
+            "end_ms": 260.192296,
+            "duration_ms": 0.627139
+          },
+          {
+            "label": "authorization_transaction_revalidation",
+            "start_ms": 262.519281,
+            "end_ms": 267.662548,
+            "duration_ms": 5.143267
+          },
+          {
+            "label": "conversation_audit_save",
+            "start_ms": 7865.636222,
+            "end_ms": 7867.476385,
+            "duration_ms": 1.840163
+          }
+        ],
+        "total_ms": 8025.532584
+      }
+    }
+  ],
+  "diagnostic_budget": {
+    "environment": "DEV",
+    "turn_seconds": 120,
+    "worker_seconds": 90,
+    "model_seconds": 20,
+    "model_attempts": 1,
+    "production_changed": false
+  }
+}

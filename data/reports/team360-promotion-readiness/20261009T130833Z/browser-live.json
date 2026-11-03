@@ -1,0 +1,229 @@
+{
+  "config": {
+    "configFile": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/playwright.config.ts",
+    "rootDir": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/team360-promotion-readiness/20261009T130833Z/browser-live-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "srv05-safe-runtime.spec.ts",
+      "file": "srv05-safe-runtime.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Srv05 opt-in safe runtime",
+          "file": "srv05-safe-runtime.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "home: real API, HMAC where applicable, response and second turn",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 33294,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Perfecto: hoy recibís ~20 consultas de ventas por Gmail por día, mirás stock en el ERP y precios en un Excel, y como el proceso siempre requiere aprobación humana, el objetivo es que el sistema te ayude a **ordenar/armar la respuesta y derivar para que una persona apruebe** (en vez de hacerlo manual).\\n\\nPara avanzar: **cuando llega cada consulta, qué hace la persona antes de aprobar—solo confirma stock/precio, o también arma la cotización/propuesta y define el siguiente paso (turno/venta) ?**', { exact: true })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Perfecto: hoy recibís ~20 consultas de ventas por Gmail por día, mirás stock en el ERP y precios en un Excel, y como el proceso siempre requiere aprobación humana, el objetivo es que el sistema te ayude a **ordenar/armar la respuesta y derivar para que una persona apruebe** (en vez de hacerlo manual).\\n\\nPara avanzar: **cuando llega cada consulta, qué hace la persona antes de aprobar—solo confirma stock/precio, o también arma la cotización/propuesta y define el siguiente paso (turno/venta) ?**', { exact: true })\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Perfecto: hoy recibís ~20 consultas de ventas por Gmail por día, mirás stock en el ERP y precios en un Excel, y como el proceso siempre requiere aprobación humana, el objetivo es que el sistema te ayude a **ordenar/armar la respuesta y derivar para que una persona apruebe** (en vez de hacerlo manual).\\n\\nPara avanzar: **cuando llega cada consulta, qué hace la persona antes de aprobar—solo confirma stock/precio, o también arma la cotización/propuesta y define el siguiente paso (turno/venta) ?**', { exact: true })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Perfecto: hoy recibís ~20 consultas de ventas por Gmail por día, mirás stock en el ERP y precios en un Excel, y como el proceso siempre requiere aprobación humana, el objetivo es que el sistema te ayude a **ordenar/armar la respuesta y derivar para que una persona apruebe** (en vez de hacerlo manual).\\n\\nPara avanzar: **cuando llega cada consulta, qué hace la persona antes de aprobar—solo confirma stock/precio, o también arma la cotización/propuesta y define el siguiente paso (turno/venta) ?**', { exact: true })\u001b[22m\n\n    at /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts:42:78",
+                        "location": {
+                          "file": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts",
+                          "column": 78,
+                          "line": 42
+                        },
+                        "snippet": "  40 |       counts.push(firstBody.turn_count);\n  41 |       await expect(page.getByTestId(\"public-vera-chat-input\")).toBeEnabled({ timeout: 60_000 });\n> 42 |       await expect(page.getByText(firstBody.response_text, { exact: true })).toBeVisible();\n     |                                                                              ^\n  43 |       const second = page.waitForResponse(r => r.url().endsWith(\"/api/diagnosis/turn\") && r.request().method() === \"POST\");\n  44 |       await page.getByTestId(\"public-vera-chat-input\").fill(\"Necesito una orientación inicial, sin ejecutar ninguna acción externa.\");\n  45 |       await page.getByTestId(\"public-vera-chat-submit\").click();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts",
+                            "column": 78,
+                            "line": 42
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Perfecto: hoy recibís ~20 consultas de ventas por Gmail por día, mirás stock en el ERP y precios en un Excel, y como el proceso siempre requiere aprobación humana, el objetivo es que el sistema te ayude a **ordenar/armar la respuesta y derivar para que una persona apruebe** (en vez de hacerlo manual).\\n\\nPara avanzar: **cuando llega cada consulta, qué hace la persona antes de aprobar—solo confirma stock/precio, o también arma la cotización/propuesta y define el siguiente paso (turno/venta) ?**', { exact: true })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Perfecto: hoy recibís ~20 consultas de ventas por Gmail por día, mirás stock en el ERP y precios en un Excel, y como el proceso siempre requiere aprobación humana, el objetivo es que el sistema te ayude a **ordenar/armar la respuesta y derivar para que una persona apruebe** (en vez de hacerlo manual).\\n\\nPara avanzar: **cuando llega cada consulta, qué hace la persona antes de aprobar—solo confirma stock/precio, o también arma la cotización/propuesta y define el siguiente paso (turno/venta) ?**', { exact: true })\u001b[22m\n\n\n  40 |       counts.push(firstBody.turn_count);\n  41 |       await expect(page.getByTestId(\"public-vera-chat-input\")).toBeEnabled({ timeout: 60_000 });\n> 42 |       await expect(page.getByText(firstBody.response_text, { exact: true })).toBeVisible();\n     |                                                                              ^\n  43 |       const second = page.waitForResponse(r => r.url().endsWith(\"/api/diagnosis/turn\") && r.request().method() === \"POST\");\n  44 |       await page.getByTestId(\"public-vera-chat-input\").fill(\"Necesito una orientación inicial, sin ejecutar ninguna acción externa.\");\n  45 |       await page.getByTestId(\"public-vera-chat-submit\").click();\n    at /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts:42:78"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-09T13:18:56.009Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/team360-promotion-readiness/20261009T130833Z/browser-live-artifacts/srv05-safe-runtime-Srv05-o-2ef7f-le-response-and-second-turn-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/team360-promotion-readiness/20261009T130833Z/browser-live-artifacts/srv05-safe-runtime-Srv05-o-2ef7f-le-response-and-second-turn-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/team360-promotion-readiness/20261009T130833Z/browser-live-artifacts/srv05-safe-runtime-Srv05-o-2ef7f-le-response-and-second-turn-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts",
+                        "column": 78,
+                        "line": 42
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "b531eea9adc854908aab-c254f3bb7cc887e7cf4a",
+              "file": "srv05-safe-runtime.spec.ts",
+              "line": 9,
+              "column": 5
+            },
+            {
+              "title": "mamamia: real API, HMAC where applicable, response and second turn",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 15739,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Perfecto: hoy llegan ~20 consultas de ventas por **Gmail**, miran **stock en el ERP** y **precios en un Excel**, y como hay que validar, **siempre termina en aprobación humana** (derivar a una persona).\\n\\nPara armar el diagnóstico del flujo, necesito entender esto: **cuando llega una consulta, qué hace la persona primero y dónde registra el caso (CRM, planilla, correo reenviado, etc.) antes de pedir/confirmar stock y precio?**', { exact: true })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Perfecto: hoy llegan ~20 consultas de ventas por **Gmail**, miran **stock en el ERP** y **precios en un Excel**, y como hay que validar, **siempre termina en aprobación humana** (derivar a una persona).\\n\\nPara armar el diagnóstico del flujo, necesito entender esto: **cuando llega una consulta, qué hace la persona primero y dónde registra el caso (CRM, planilla, correo reenviado, etc.) antes de pedir/confirmar stock y precio?**', { exact: true })\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Perfecto: hoy llegan ~20 consultas de ventas por **Gmail**, miran **stock en el ERP** y **precios en un Excel**, y como hay que validar, **siempre termina en aprobación humana** (derivar a una persona).\\n\\nPara armar el diagnóstico del flujo, necesito entender esto: **cuando llega una consulta, qué hace la persona primero y dónde registra el caso (CRM, planilla, correo reenviado, etc.) antes de pedir/confirmar stock y precio?**', { exact: true })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Perfecto: hoy llegan ~20 consultas de ventas por **Gmail**, miran **stock en el ERP** y **precios en un Excel**, y como hay que validar, **siempre termina en aprobación humana** (derivar a una persona).\\n\\nPara armar el diagnóstico del flujo, necesito entender esto: **cuando llega una consulta, qué hace la persona primero y dónde registra el caso (CRM, planilla, correo reenviado, etc.) antes de pedir/confirmar stock y precio?**', { exact: true })\u001b[22m\n\n    at /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts:42:78",
+                        "location": {
+                          "file": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts",
+                          "column": 78,
+                          "line": 42
+                        },
+                        "snippet": "  40 |       counts.push(firstBody.turn_count);\n  41 |       await expect(page.getByTestId(\"public-vera-chat-input\")).toBeEnabled({ timeout: 60_000 });\n> 42 |       await expect(page.getByText(firstBody.response_text, { exact: true })).toBeVisible();\n     |                                                                              ^\n  43 |       const second = page.waitForResponse(r => r.url().endsWith(\"/api/diagnosis/turn\") && r.request().method() === \"POST\");\n  44 |       await page.getByTestId(\"public-vera-chat-input\").fill(\"Necesito una orientación inicial, sin ejecutar ninguna acción externa.\");\n  45 |       await page.getByTestId(\"public-vera-chat-submit\").click();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts",
+                            "column": 78,
+                            "line": 42
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Perfecto: hoy llegan ~20 consultas de ventas por **Gmail**, miran **stock en el ERP** y **precios en un Excel**, y como hay que validar, **siempre termina en aprobación humana** (derivar a una persona).\\n\\nPara armar el diagnóstico del flujo, necesito entender esto: **cuando llega una consulta, qué hace la persona primero y dónde registra el caso (CRM, planilla, correo reenviado, etc.) antes de pedir/confirmar stock y precio?**', { exact: true })\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Perfecto: hoy llegan ~20 consultas de ventas por **Gmail**, miran **stock en el ERP** y **precios en un Excel**, y como hay que validar, **siempre termina en aprobación humana** (derivar a una persona).\\n\\nPara armar el diagnóstico del flujo, necesito entender esto: **cuando llega una consulta, qué hace la persona primero y dónde registra el caso (CRM, planilla, correo reenviado, etc.) antes de pedir/confirmar stock y precio?**', { exact: true })\u001b[22m\n\n\n  40 |       counts.push(firstBody.turn_count);\n  41 |       await expect(page.getByTestId(\"public-vera-chat-input\")).toBeEnabled({ timeout: 60_000 });\n> 42 |       await expect(page.getByText(firstBody.response_text, { exact: true })).toBeVisible();\n     |                                                                              ^\n  43 |       const second = page.waitForResponse(r => r.url().endsWith(\"/api/diagnosis/turn\") && r.request().method() === \"POST\");\n  44 |       await page.getByTestId(\"public-vera-chat-input\").fill(\"Necesito una orientación inicial, sin ejecutar ninguna acción externa.\");\n  45 |       await page.getByTestId(\"public-vera-chat-submit\").click();\n    at /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts:42:78"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-09T13:19:33.374Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/team360-promotion-readiness/20261009T130833Z/browser-live-artifacts/srv05-safe-runtime-Srv05-o-44acb-le-response-and-second-turn-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/team360-promotion-readiness/20261009T130833Z/browser-live-artifacts/srv05-safe-runtime-Srv05-o-44acb-le-response-and-second-turn-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/team360-promotion-readiness/20261009T130833Z/browser-live-artifacts/srv05-safe-runtime-Srv05-o-44acb-le-response-and-second-turn-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/astro/e2e/srv05-safe-runtime.spec.ts",
+                        "column": 78,
+                        "line": 42
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "b531eea9adc854908aab-2589e868f049e90a930e",
+              "file": "srv05-safe-runtime.spec.ts",
+              "line": 9,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-09T13:18:55.195Z",
+    "duration": 54093.236,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

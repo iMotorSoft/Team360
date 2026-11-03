@@ -1,0 +1,58 @@
+TELCHIAI — ABRAHAM: HORIZONTAL Y FARMACIAS
+Fecha: 2026-10-15. Rama: feature/console-backend-core.
+Contexto: ENTITY=TELCHI; DOMAIN=VENTAS+CLIENTES; STAGE=INVESTIGATION.
+Resultado global: BLOCKED. Interpretación parcial; rechazo seguro, sin cifras inventadas.
+
+FASE 1 — RESPUESTA ESPONTÁNEA
+Pregunta exacta: ¿Cuántos clientes tenemos en horizontal, principalmente las farmacias, y cuánto se les vende por mes?
+Respuesta exacta:
+Entendí que pedís importe de ventas. El importe documental no admite filtros de entidad, sucursal, canal ni comparación no acreditados. No es un problema con la fecha elegida.
+
+Prueba HTTP real sobre MessageDispatcher -> TelchiHandler -> Luna -> State Engine -> catálogo, con binding piloto DEV existente y conversación nueva. Sin WhatsApp ni transporte saliente. No se modificaron prompts, clasificación, motor, catálogo, grants o capacidades. La prueba escribe únicamente conversación/auditoría DEV y evidencia; la verificación empresarial es de solo lectura.
+Preflight: PostgreSQL disponible; llamada mínima aislada OpenAI Responses completada, gpt-5.6-luna, medium, sin fallback; Milvus/LiteLLM no participan en este flujo. No se anticipó la definición DMS ni la respuesta esperada al asistente.
+HTTP 200 en 9430.51 ms NO se toma como PASS funcional.
+Plan propuesto: NEW_QUERY / DIRECT_UNAVAILABLE, metric=sales.net_amount, sales_channel=HORIZONTAL, period=null, requested_metrics=[sales.net_amount], entity_mention=null.
+State Engine committed=true; DIRECT_UNAVAILABLE; MAPPING_MISSING; capability_calls=0; execution_status=not_executed. No hubo consulta empresarial, SQL del modelo ni selección SAP sustituta.
+Límite: usa la composición del harness HTTP DEV existente, no certifica el frontend ni una composición productiva o con semántica externa habilitada. Modelo directo y no proxy.
+
+FASE 2 — VERIFICACIÓN INDEPENDIENTE
+Foundation CURRENT: foundation_afd08d9eca6a725be53cdc3f9d5709c9; snapshot pinned 1408; data_as_of 2026-09-28T18:18:35.264000. CURRENT preservado.
+Fuente: cabeceras SAP OINV/ORIN ya publicadas en Foundation, no suma de datasets SAP+DMS.
+La etiqueta HORIZONTAL existe y fue materializada por el clasificador actual desde 14 series (executive_sales.py). El comentario de origen cita censo NNM1/OUSR DMS; no usa el rubro farmacia. U_ORIGIN no está en el esquema publicado. Por ello estos resultados verifican la etiqueta existente, NO una conciliación independiente de todo DMS ni una validación nueva de las 14 series. SAP/HANA configurado rechaza conexión TCP (ConnectionRefusedError); no se alteró red/VPN/configuración ni se reintentó intensivamente. No se inspeccionó un padrón DMS independiente.
+
+Clientes compradores observados: 4004 CardCode distintos con factura activa etiquetada HORIZONTAL, enero a septiembre disponible. 23615 facturas activas. Identidad local: los 4004 tienen exactamente un registro SAP_HANA en el maestro pinned, sin faltantes ni matches ambiguos. Esto NO certifica identidad entre sistemas DMS-SAP, grupos económicos ni personas jurídicas distintas.
+Registrados del canal horizontal: BLOCKED; no confundir con 12979 clientes del maestro general SAP, ni sumar maestros legacy.
+Farmacias horizontales, compradoras y registradas: BLOCKED. Maestro pinned y OCRD raw inspeccionado no incluyen U_CANAL_VENTAS; customer_business_type distingue comercial/genérico/interno/técnico/etc., no farmacia. No se clasificó por nombre ni se supuso que toda farmacia es horizontal. U_CANAL_VENTAS=1 es sólo una referencia contractual a verificar, no un mapping aplicado.
+
+Importes condicionales en Bs, según etiqueta HORIZONTAL publicada:
+Mes       Compradores  Facturas DocTotal    NC activas       Neto documental
+2026-01   1722         1608795.73           46437.42         1562358.31
+2026-02   1598         1431183.22           42997.48         1388185.74
+2026-03   1772         1749907.45           82001.85         1667905.60
+2026-04   1876         1868159.66           79508.14         1788651.52
+2026-05   1590         1689331.40           109686.99        1579644.41
+2026-06   1804         1792524.84           96137.15         1696387.69
+2026-07   1859         2090114.26           145537.52        1944576.74
+2026-08   1763         1996773.28           127550.36        1869222.92
+2026-09   1564         1536255.18           78250.90         1458004.28
+
+Septiembre ES PARCIAL en estos datos: horizontal hasta 23/09; OINV general hasta 24/09 y ORIN general hasta 23/09. Fecha de publicación no implica cobertura del mes. No hay octubre observado. No se certifican nueve meses completos.
+Promedio aritmético observado enero-agosto: Bs 1687116.62, sujeto a los mismos límites de etiqueta/cobertura/conciliación; no es un promedio empresarial reconciliado. Promedio enero-septiembre de meses completos: BLOCKED, no calculado como tal.
+Ventas mensuales de farmacias: BLOCKED, valores desconocidos, no cero.
+Criterio: DocTotal cabecera de facturas canceled=N menos DocTotal de ORIN canceled=N, por DocDate, moneda BS, DECIMAL. Excluye Y/C de ambos lados. Incluye impuestos incorporados a DocTotal: neto documental, no venta sin impuestos. Devoluciones sólo si están representadas por NC activas. Atribución de NC por canal del documento; no se certificó cruce con factura base, NC registradas en otro canal ni documentos DMS aún no integrados. No se mezclan monedas ni se suman líneas con cabeceras. En las cabeceras del período inspeccionado no hay duplicados de DocEntry dentro de cada tipo documental; no hay unión con otra fuente de ventas.
+
+FASE 3 — DIFERENCIAS Y CAUSAS
+1. Canal comercial: conserva HORIZONTAL y no sustituye por farmacia SAP. Sin embargo, la respuesta no demuestra conocimiento explícito HORIZONTAL=DMS.
+2. Conteo de clientes y subtotal farmacias: se pierden en interpretación; Luna produce únicamente sales.net_amount, sin representación de conteo/segmentación. El catálogo actual no ofrece esas operaciones. No puede atribuirse comprensión completa sólo por reconocer el canal.
+3. Facturación mensual horizontal: no ejecutada; catálogo rechaza filtros de canal no acreditados. Hay datos etiquetados accesibles a investigación, pero eso no equivale a una capability autorizada del asistente.
+4. Farmacias: además de la limitación conversacional, falta clasificación verificable en las fuentes pinned inspeccionadas.
+5. Registrados frente a compradores: el maestro general no prueba membresía DMS; sólo se verificó compradores observados por etiqueta.
+6. Enero-septiembre completo/conciliación: cobertura parcial y HANA inaccesible; no se inventan cierre mensual, equivalencias o importes faltantes.
+Conclusión: rechazo correcto por limitación real, interpretación incompleta. No hay evidencia de cifras falsas o consulta equivocada. BLOCKED global, no PASS; la capacidad de dirección solicitada aún no está disponible end-to-end.
+
+VALIDACIONES Y CIERRE
+37 tests focalizados PASS (test_executive_sales.py, test_rejected_execution_guard.py, test_sales_monetary.py). Checks de evidencia: nueve meses observados, conteo de facturas consistente, neto=facturas-NC, cero capabilities ejecutadas, HORIZONTAL retenido, CURRENT sin cambios y servidor propio cerrado. git diff --check sin errores. Dos errores iniciales de aliases SQL en el runner investigativo fueron corregidos antes de la ejecución independiente válida; no fueron fallos del asistente.
+Host SAFE: 8 cores, ~6 GB disponibles, swap estable sin actividad, load ~1; consultas secuenciales con 2 threads y límite DuckDB 1 GB. Ningún proceso ajeno terminado; servidor temporal propio reaped; procesos propios restantes 0.
+Archivos nuevos: dos runners bajo backend/modules/telchi/investigation/validation/abraham_horizontal_pharmacies_v1/ y evidencia bajo este directorio. Sin archivos preexistentes editados, cambios GLOBAL, despliegue o promoción. Sin nuevos Markdown; no aplica gate documental LAT por cambios Markdown.
+Próximo paso: revisar esta evidencia antes de autorizar cambios. Si se desea cerrar la verificación de datos, obtener acceso read-only HANA/DMS, padrón del canal, clasificación farmacia y conciliación de NC/documentos; no ampliar capacidades en esta tarea.
+Evidencia exacta: spontaneous.json, independent.json (SQL y resultados), foundation_schema.json, evaluation.json (hashes y validaciones), dev-server.log.

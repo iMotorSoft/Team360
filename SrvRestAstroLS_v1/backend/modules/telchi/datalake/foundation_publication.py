@@ -321,6 +321,15 @@ class _ConnectionFactoryProtocol(Protocol):
     def __call__(self) -> Any: ...
 
 
+def _unique_manifest_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate Foundation manifest key: {key}")
+        result[key] = value
+    return result
+
+
 def _row_to_publication(row: tuple[Any, ...]) -> FoundationPublication:
     (
         foundation_publication_id, update_run_id, previous_foundation_publication_id, status,
@@ -339,7 +348,7 @@ def _row_to_publication(row: tuple[Any, ...]) -> FoundationPublication:
     manifest: dict[str, Any] = {}
     if manifest_json:
         try:
-            manifest = json.loads(manifest_json)
+            manifest = json.loads(manifest_json, object_pairs_hook=_unique_manifest_object)
         except (TypeError, ValueError):
             manifest = {}
     return FoundationPublication(
@@ -575,6 +584,8 @@ class FoundationPublicationStore:
                         f"candidate {foundation_publication_id} has {candidate.component_count} components, expected {FOUNDATION_COMPONENT_COUNT}"
                     )
                 previous_id = self._pointer_on_connection(connection)
+                if previous_id != candidate.previous_foundation_publication_id:
+                    raise PublicationBoundaryError("publication compare-and-swap failed: CURRENT changed since preparation")
                 # Pre-commit fault points: the transaction has not yet mutated
                 # anything, so a failure here rolls back to A with no ambiguity.
                 self.inject(CommitFaultPoint.DURING_VALIDATION)

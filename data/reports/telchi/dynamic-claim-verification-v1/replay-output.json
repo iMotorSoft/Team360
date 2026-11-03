@@ -1,0 +1,1900 @@
+{
+  "question": "Durante 2026, ¿en qué mes vendimos más materias primas y cuál fue el cliente al que más le vendimos en ese mes?",
+  "current_date": "2026-10-28",
+  "conversation": [],
+  "catalog": {
+    "dataset": "telchi_authorized_foundation_dev_v1",
+    "organization": "TELCHI",
+    "workspace": "foundation_supervised_dev",
+    "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot": "1408",
+    "tables": [
+      {
+        "name": "credit_memo_document",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_table": 9,
+          "doc_entry": 9,
+          "doc_num": 9,
+          "doc_date": 9,
+          "create_date": 9,
+          "update_date": 9,
+          "doc_status": 9,
+          "canceled": 9,
+          "card_code": 9,
+          "slp_code": 9,
+          "currency": 9,
+          "doc_total": 9,
+          "doc_total_system": 9,
+          "doc_total_foreign": 9,
+          "series": 9,
+          "user_sign": 9,
+          "sales_channel_code": 9,
+          "sales_channel_name": 9,
+          "sales_channel_semantic_status": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "credit_memo_line",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_table": 9,
+          "doc_entry": 9,
+          "line_num": 9,
+          "line_status": 9,
+          "item_code": 9,
+          "whs_code": 9,
+          "quantity": 9,
+          "currency": 9,
+          "line_total": 9,
+          "line_total_system": 9,
+          "line_total_foreign": 9,
+          "slp_code": 9,
+          "attributed_slp_code": 9,
+          "base_type": 9,
+          "base_entry": 9,
+          "base_line": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "material_actual_consumption",
+        "grain": [],
+        "columns": {
+          "actual_consumption_qty": 6,
+          "consumption_basis": 9,
+          "item_code": 9,
+          "window_end": 2,
+          "window_start": 2
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "material_equivalent_demand",
+        "grain": [],
+        "columns": {
+          "commercial_daily_equivalent_basis_qty": 6,
+          "demand_window_end": 2,
+          "demand_window_start": 2,
+          "derived_product_raw_material_equivalent": 6,
+          "direct_raw_material_demand": 6,
+          "item_code": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "material_lead_time_profile",
+        "grain": [],
+        "columns": {
+          "confidence": 9,
+          "item_code": 9,
+          "lead_time_basis": 9,
+          "lineage_coverage": 9,
+          "p50_days": 6,
+          "p90_days": 6,
+          "procurement_origin": 9,
+          "sample_count": 0,
+          "supplier": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "material_supply_status",
+        "grain": [],
+        "columns": {
+          "item_code": 9,
+          "actual_daily_consumption": 6,
+          "commercial_daily_equivalent_demand": 6,
+          "committed": 6,
+          "coverage_band": 9,
+          "coverage_basis": 9,
+          "coverage_confidence": 9,
+          "coverage_days": 6,
+          "current_stock": 6,
+          "global_stock_status": 9,
+          "global_stockout": 1,
+          "global_usable_stock": 6,
+          "inventory_uom": 9,
+          "is_raw_material": 1,
+          "item_activity_status": 9,
+          "lead_time_basis": 9,
+          "lead_time_confidence": 9,
+          "lead_time_days": 0,
+          "local_stockout": 1,
+          "material_class": 9,
+          "material_name": 9,
+          "on_order": 6,
+          "open_po_destination": 9,
+          "open_po_expected_date": 2,
+          "open_po_origin": 9,
+          "open_po_qty": 6,
+          "open_po_to_saa": 1,
+          "other_location_stock": 6,
+          "other_location_usable_stock": 6,
+          "procurement_profile": 9,
+          "production_site": 9,
+          "recent_saa_consumption": 1,
+          "recent_saa_m1_movement": 1,
+          "replenishment_gap_days": 6,
+          "saa_active_bom": 1,
+          "saa_m1_history": 1,
+          "saa_production_link": 1,
+          "saavedra_relevance": 9,
+          "saavedra_relevance_basis": 9,
+          "saavedra_relevance_confidence": 9,
+          "source_as_of": 8,
+          "supply_risk": 9,
+          "target_warehouse_usable_stock": 6,
+          "warehouse": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "open_purchase_pipeline",
+        "grain": [],
+        "columns": {
+          "destination_warehouse": 9,
+          "doc_currency": 9,
+          "expected_arrival_source": 9,
+          "expected_date": 2,
+          "first_receipt_date": 2,
+          "item_code": 9,
+          "open_qty_source": 6,
+          "ordered_qty": 6,
+          "po_docdate": 2,
+          "po_docentry": 9,
+          "po_linenum": 9,
+          "procurement_origin": 9,
+          "receipt_lineage_confidence": 9,
+          "receipt_lineage_status": 9,
+          "received_qty_supported": 6,
+          "supplier": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "inventory_movement",
+        "grain": [],
+        "columns": {
+          "canonical_inventory_movement_id": 9,
+          "source_system": 9,
+          "source_table": 9,
+          "trans_num": 9,
+          "trans_seq": 9,
+          "instance": 9,
+          "trans_type": 9,
+          "doc_entry": 9,
+          "base_ref": 9,
+          "doc_date": 9,
+          "item_code": 9,
+          "warehouse": 9,
+          "in_qty": 9,
+          "out_qty": 9,
+          "movement_qty": 9,
+          "price": 9,
+          "calc_price": 9,
+          "trans_value": 9,
+          "created_by": 9,
+          "app_obj_abs": 9,
+          "app_obj_type": 9,
+          "doc_line_num": 9,
+          "ref1": 9,
+          "ref2": 9,
+          "comments": 9,
+          "jrnl_memo": 9,
+          "doc_due_date": 9,
+          "doc_time": 9,
+          "card_code": 9,
+          "card_name": 9,
+          "dscription": 9,
+          "balance": 9,
+          "slp_code": 9,
+          "user_sign": 9,
+          "appl_obj": 9,
+          "app_obj_line": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "inventory_balance",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_table": 9,
+          "item_code": 9,
+          "whs_code": 9,
+          "on_hand": 9,
+          "is_commited": 9,
+          "on_order": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ap_invoice",
+        "grain": [],
+        "columns": {
+          "base_entry": 9,
+          "base_line": 9,
+          "base_type": 9,
+          "canceled": 9,
+          "card_code": 9,
+          "comments": 9,
+          "currency": 9,
+          "description": 9,
+          "doc_date": 8,
+          "doc_due_date": 8,
+          "doc_entry": 9,
+          "doc_num": 9,
+          "doc_status": 9,
+          "doc_total": 9,
+          "item_code": 9,
+          "line_currency": 9,
+          "line_num": 9,
+          "line_status": 9,
+          "line_total": 9,
+          "num_at_card": 9,
+          "num_per_msr": 9,
+          "object_type": 9,
+          "open_qty": 9,
+          "price": 9,
+          "quantity": 9,
+          "ship_date": 9,
+          "snapshot_id": 9,
+          "source_native_json": 9,
+          "source_row_hash": 9,
+          "source_system": 9,
+          "tipo_compra": 9,
+          "unit_msr": 9,
+          "uom_code": 9,
+          "warehouse_code": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ap_invoice_line",
+        "grain": [],
+        "columns": {
+          "base_entry": 9,
+          "base_line": 9,
+          "base_quantity": 9,
+          "base_type": 9,
+          "canceled": 9,
+          "card_code": 9,
+          "comments": 9,
+          "conversion_provenance": 9,
+          "conversion_status": 9,
+          "currency": 9,
+          "description": 9,
+          "doc_date": 8,
+          "doc_due_date": 9,
+          "doc_entry": 9,
+          "doc_num": 9,
+          "doc_status": 9,
+          "doc_total": 9,
+          "item_code": 9,
+          "line_currency": 9,
+          "line_num": 9,
+          "line_status": 9,
+          "line_total": 9,
+          "num_at_card": 9,
+          "num_per_msr": 9,
+          "object_type": 9,
+          "open_qty": 9,
+          "price": 9,
+          "quantity": 9,
+          "ship_date": 9,
+          "snapshot_id": 9,
+          "source_native_json": 9,
+          "source_row_hash": 9,
+          "source_system": 9,
+          "tipo_compra": 9,
+          "unit_msr": 9,
+          "uom_code": 9,
+          "warehouse_code": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "purchase_inventory_receipt",
+        "grain": [],
+        "columns": {
+          "base_qty": 9,
+          "base_ref": 9,
+          "base_ref_candidate_documents": 0,
+          "business_warehouse_location": 9,
+          "candidate_count": 0,
+          "card_code": 9,
+          "card_code_status": 9,
+          "collision_detected": 1,
+          "conversion_provenance": 9,
+          "direction": 9,
+          "doc_date": 2,
+          "doc_line_num": 9,
+          "doc_line_warehouse": 9,
+          "effective_status": 9,
+          "in_qty": 9,
+          "item_code": 9,
+          "movement_date": 2,
+          "movement_key": 9,
+          "out_qty": 9,
+          "provenance": 9,
+          "purchasing_doc_entry": 9,
+          "purchasing_line_num": 9,
+          "quantity_match_status": 9,
+          "resolution_method": 9,
+          "resolution_reason": 9,
+          "resolution_status": 9,
+          "root_resolution_status": 9,
+          "source_line_quantity": 9,
+          "source_line_uom": 9,
+          "target_entity": 9,
+          "trans_type": 9,
+          "warehouse": 9,
+          "warehouse_mapping_provenance": 9,
+          "warehouse_mapping_status": 9,
+          "warehouse_match_status": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "purchase_order",
+        "grain": [],
+        "columns": {
+          "base_entry": 9,
+          "base_line": 9,
+          "base_type": 9,
+          "canceled": 9,
+          "card_code": 9,
+          "comments": 9,
+          "currency": 9,
+          "description": 9,
+          "doc_date": 8,
+          "doc_due_date": 8,
+          "doc_entry": 9,
+          "doc_num": 9,
+          "doc_status": 9,
+          "doc_total": 9,
+          "item_code": 9,
+          "line_currency": 9,
+          "line_num": 9,
+          "line_status": 9,
+          "line_total": 9,
+          "num_at_card": 9,
+          "num_per_msr": 9,
+          "object_type": 9,
+          "open_qty": 9,
+          "price": 9,
+          "quantity": 9,
+          "ship_date": 9,
+          "snapshot_id": 9,
+          "source_native_json": 9,
+          "source_row_hash": 9,
+          "source_system": 9,
+          "tipo_compra": 9,
+          "unit_msr": 9,
+          "uom_code": 9,
+          "warehouse_code": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "purchase_order_line",
+        "grain": [],
+        "columns": {
+          "base_entry": 9,
+          "base_line": 9,
+          "base_quantity": 9,
+          "base_type": 9,
+          "canceled": 9,
+          "card_code": 9,
+          "comments": 9,
+          "conversion_provenance": 9,
+          "conversion_status": 9,
+          "currency": 9,
+          "description": 9,
+          "doc_date": 8,
+          "doc_due_date": 9,
+          "doc_entry": 9,
+          "doc_num": 9,
+          "doc_status": 9,
+          "doc_total": 9,
+          "item_code": 9,
+          "line_currency": 9,
+          "line_num": 9,
+          "line_status": 9,
+          "line_total": 9,
+          "num_at_card": 9,
+          "num_per_msr": 9,
+          "object_type": 9,
+          "open_qty": 9,
+          "price": 9,
+          "quantity": 9,
+          "ship_date": 8,
+          "snapshot_id": 9,
+          "source_native_json": 9,
+          "source_row_hash": 9,
+          "source_system": 9,
+          "tipo_compra": 9,
+          "unit_msr": 9,
+          "uom_code": 9,
+          "warehouse_code": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "purchase_receipt",
+        "grain": [],
+        "columns": {
+          "base_entry": 9,
+          "base_line": 9,
+          "base_type": 9,
+          "canceled": 9,
+          "card_code": 9,
+          "comments": 9,
+          "currency": 9,
+          "description": 9,
+          "doc_date": 8,
+          "doc_due_date": 8,
+          "doc_entry": 9,
+          "doc_num": 9,
+          "doc_status": 9,
+          "doc_total": 9,
+          "item_code": 9,
+          "line_currency": 9,
+          "line_num": 9,
+          "line_status": 9,
+          "line_total": 9,
+          "num_at_card": 9,
+          "num_per_msr": 9,
+          "object_type": 9,
+          "open_qty": 9,
+          "price": 9,
+          "quantity": 9,
+          "ship_date": 9,
+          "snapshot_id": 9,
+          "source_native_json": 9,
+          "source_row_hash": 9,
+          "source_system": 9,
+          "tipo_compra": 9,
+          "unit_msr": 9,
+          "uom_code": 9,
+          "warehouse_code": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "purchase_receipt_line",
+        "grain": [],
+        "columns": {
+          "base_entry": 9,
+          "base_line": 9,
+          "base_quantity": 9,
+          "base_type": 9,
+          "canceled": 9,
+          "card_code": 9,
+          "comments": 9,
+          "conversion_provenance": 9,
+          "conversion_status": 9,
+          "currency": 9,
+          "description": 9,
+          "doc_date": 8,
+          "doc_due_date": 9,
+          "doc_entry": 9,
+          "doc_num": 9,
+          "doc_status": 9,
+          "doc_total": 9,
+          "item_code": 9,
+          "line_currency": 9,
+          "line_num": 9,
+          "line_status": 9,
+          "line_total": 9,
+          "num_at_card": 9,
+          "num_per_msr": 9,
+          "object_type": 9,
+          "open_qty": 9,
+          "price": 9,
+          "quantity": 9,
+          "ship_date": 9,
+          "snapshot_id": 9,
+          "source_native_json": 9,
+          "source_row_hash": 9,
+          "source_system": 9,
+          "tipo_compra": 9,
+          "unit_msr": 9,
+          "uom_code": 9,
+          "warehouse_code": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "purchasing_document_lineage",
+        "grain": [],
+        "columns": {
+          "base_entry": 9,
+          "base_line": 9,
+          "base_type": 9,
+          "edge_resolution_status": 9,
+          "effective_status": 9,
+          "item_match_status": 9,
+          "lineage_id": 9,
+          "provenance": 9,
+          "relation_type": 9,
+          "resolution_method": 9,
+          "resolution_reason": 9,
+          "resolution_status": 9,
+          "snapshot_id": 9,
+          "source_doc_entry": 9,
+          "source_document_type": 9,
+          "source_line_num": 9,
+          "source_system": 9,
+          "target_doc_entry": 9,
+          "target_document_type": 9,
+          "target_line_num": 9,
+          "uom_match_status": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "collection_method_fact",
+        "grain": [],
+        "columns": {
+          "payment_id": 9,
+          "payment_date": 2,
+          "customer_code": 9,
+          "currency": 9,
+          "collection_method": 9,
+          "source_component_amount": 5,
+          "source_component_foreign": 5,
+          "source_component_system": 5,
+          "source_component_rows": 0,
+          "cancelled": 9,
+          "pay_no_document": 9,
+          "on_account_amount_local": 5,
+          "effective_amount_local": 5,
+          "effective_amount_system": 5,
+          "payment_method_component_count": 0,
+          "is_mixed_payment": 1,
+          "board_currency_basis": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "commercial_term_classification",
+        "grain": [],
+        "columns": {
+          "payment_term_code": 9,
+          "payment_term_name": 9,
+          "pay_due_month": 9,
+          "extra_months": 9,
+          "extra_days": 9,
+          "payment_count": 9,
+          "installment_count": 9,
+          "baseline_date_code": 9,
+          "tolerance_days": 9,
+          "cash_relevant_source": 9,
+          "commercial_term_class": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "receivable_settlement_status",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "document_id": 9,
+          "source_doc_num": 9,
+          "customer_code": 9,
+          "document_date": 2,
+          "due_date": 2,
+          "currency": 9,
+          "document_total_local": 5,
+          "document_total_foreign": 5,
+          "document_total_system": 5,
+          "economic_reduction_local": 5,
+          "economic_reduction_system": 5,
+          "payment_settlement_effect_local": 5,
+          "credit_memo_settlement_effect_local": 5,
+          "internal_reconciliation_effect_local": 5,
+          "multi_source_reconciliation_effect_local": 5,
+          "open_amount_local": 5,
+          "open_amount_system": 5,
+          "settlement_state": 9,
+          "fully_settled_date": 2,
+          "days_document_to_full_settlement": 0,
+          "days_due_to_full_settlement": 0,
+          "payment_term_code": 9,
+          "salesperson_code": 9,
+          "branch_id": 9,
+          "cancelled": 9,
+          "cancel_date": 2,
+          "board_currency_basis": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_branches",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_native_id": 9,
+          "branch_id": 9,
+          "code": 9,
+          "name": 9,
+          "status": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_brand",
+        "grain": [],
+        "columns": {
+          "brand_id": 9,
+          "code": 9,
+          "name": 9,
+          "description": 9,
+          "active": 1,
+          "source": 9,
+          "confidence": 3,
+          "status": 9,
+          "semantic_version": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_business_locations",
+        "grain": [],
+        "columns": {
+          "business_location_code": 9,
+          "business_location_name": 9,
+          "status": 9,
+          "mapping_source": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_business_unit",
+        "grain": [],
+        "columns": {
+          "business_unit_id": 9,
+          "code": 9,
+          "name": 9,
+          "description": 9,
+          "active": 1,
+          "source": 9,
+          "confidence": 3,
+          "status": 9,
+          "semantic_version": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_currencies",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_native_id": 9,
+          "currency_code": 9,
+          "code": 9,
+          "name": 9,
+          "status": 9,
+          "legal_entity_id": 9,
+          "decimal_places": 7
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_customer_business_type",
+        "grain": [],
+        "columns": {
+          "customer_business_type_id": 9,
+          "code": 9,
+          "name": 9,
+          "description": 9,
+          "active": 1,
+          "source": 9,
+          "confidence": 3,
+          "status": 9,
+          "semantic_version": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_customers",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_native_id": 9,
+          "customer_id": 9,
+          "code": 9,
+          "name": 9,
+          "status": 9,
+          "branch_id": 9,
+          "tax_id": 9,
+          "credit_limit": 5,
+          "payment_term_id": 9,
+          "sap_card_type": 9,
+          "sap_group_code": 9,
+          "sap_valid_for": 9,
+          "sap_frozen_for": 9,
+          "sap_update_date": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_document_types",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_native_id": 9,
+          "document_type": 9,
+          "code": 9,
+          "name": 9,
+          "status": 9,
+          "company_id": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_entity_alias",
+        "grain": [],
+        "columns": {
+          "entity_type": 9,
+          "canonical_id": 9,
+          "alias": 9,
+          "normalized_alias": 9,
+          "alias_source": 9,
+          "priority": 7,
+          "active": 1,
+          "confidence": 4,
+          "resolution_status": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_operating_domain",
+        "grain": [],
+        "columns": {
+          "operating_domain_id": 9,
+          "code": 9,
+          "name": 9,
+          "description": 9,
+          "active": 1,
+          "source": 9,
+          "confidence": 3,
+          "status": 9,
+          "semantic_version": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_operating_model",
+        "grain": [],
+        "columns": {
+          "operating_model_id": 9,
+          "code": 9,
+          "name": 9,
+          "description": 9,
+          "active": 1,
+          "source": 9,
+          "confidence": 3,
+          "status": 9,
+          "semantic_version": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_party",
+        "grain": [],
+        "columns": {
+          "party_id": 9,
+          "party_type": 9,
+          "code": 9,
+          "name": 9,
+          "source": 9,
+          "confidence": 3,
+          "status": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_payment_terms",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_native_id": 9,
+          "payment_term_id": 9,
+          "code": 9,
+          "name": 9,
+          "status": 9,
+          "branch_id": 9,
+          "credit_days": 7
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_portfolio_family",
+        "grain": [],
+        "columns": {
+          "portfolio_family_id": 9,
+          "code": 9,
+          "name": 9,
+          "description": 9,
+          "active": 1,
+          "source": 9,
+          "confidence": 3,
+          "status": 9,
+          "semantic_version": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_product_business_type",
+        "grain": [],
+        "columns": {
+          "product_business_type_id": 9,
+          "code": 9,
+          "name": 9,
+          "description": 9,
+          "active": 1,
+          "source": 9,
+          "confidence": 3,
+          "status": 9,
+          "semantic_version": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_production_site",
+        "grain": [],
+        "columns": {
+          "production_site_id": 9,
+          "code": 9,
+          "name": 9,
+          "description": 9,
+          "active": 1,
+          "source": 9,
+          "confidence": 3,
+          "status": 9,
+          "semantic_version": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_products",
+        "grain": [],
+        "columns": {
+          "canonical_product_id": 9,
+          "source_system": 9,
+          "source_native_id": 9,
+          "item_code": 9,
+          "canonical_name": 9,
+          "product_name": 9,
+          "inventory_uom_id": 9,
+          "sales_uom_id": 9,
+          "purchase_uom_id": 9,
+          "active": 1,
+          "status": 9,
+          "sap_item_name": 9,
+          "sap_valid_for": 9,
+          "sap_frozen_for": 9,
+          "sap_invnt_item": 9,
+          "sap_sell_item": 9,
+          "sap_prchse_item": 9,
+          "sap_itms_grp_cod": 9,
+          "sap_update_date": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_sales_channel",
+        "grain": [],
+        "columns": {
+          "sales_channel_id": 9,
+          "code": 9,
+          "name": 9,
+          "description": 9,
+          "active": 1,
+          "source": 9,
+          "confidence": 3,
+          "status": 9,
+          "semantic_version": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_salespersons",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_native_id": 9,
+          "salesperson_id": 9,
+          "code": 9,
+          "name": 9,
+          "status": 9,
+          "branch_id": 9,
+          "salesperson_active": 9,
+          "salesperson_category_code": 9,
+          "salesperson_category_name": 9,
+          "is_corporate": 9,
+          "sap_category_source_label": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_suppliers",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_native_id": 9,
+          "supplier_id": 9,
+          "code": 9,
+          "name": 9,
+          "status": 9,
+          "branch_id": 9,
+          "tax_id": 9,
+          "payment_term_id": 9,
+          "sap_card_type": 9,
+          "sap_group_code": 9,
+          "sap_valid_for": 9,
+          "sap_frozen_for": 9,
+          "sap_update_date": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_units_of_measure",
+        "grain": [],
+        "columns": {
+          "canonical_uom_code": 9,
+          "canonical_uom_label": 9,
+          "physical_dimension": 9,
+          "status": 9,
+          "mapping_source": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_users",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_native_id": 9,
+          "user_id": 9,
+          "code": 9,
+          "name": 9,
+          "status": 9,
+          "organizational_scope": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_warehouse_roles",
+        "grain": [],
+        "columns": {
+          "warehouse_code": 9,
+          "production_site": 9,
+          "warehouse_role": 9,
+          "usable_for_supply_stock": 1,
+          "classification_source": 9,
+          "classification_evidence": 9,
+          "confidence": 9,
+          "valid_from": 9,
+          "valid_to": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "ref_warehouses",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_native_id": 9,
+          "warehouse_id": 9,
+          "code": 9,
+          "name": 9,
+          "status": 9,
+          "warehouse_role_id": 9,
+          "sap_locked": 9,
+          "sap_inactive": 9,
+          "sap_branch_office_id": 9,
+          "sap_type": 9,
+          "sap_warehouse_dms": 9,
+          "sap_update_date": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "sales_document",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_table": 9,
+          "doc_entry": 9,
+          "doc_num": 9,
+          "doc_date": 9,
+          "doc_due_date": 9,
+          "tax_date": 9,
+          "doc_status": 9,
+          "canceled": 9,
+          "currency": 9,
+          "doc_total": 9,
+          "card_code": 9,
+          "source_as_of": 9,
+          "doc_total_system": 9,
+          "doc_total_foreign": 9,
+          "slp_code": 9,
+          "series": 9,
+          "user_sign": 9,
+          "sales_channel_code": 9,
+          "sales_channel_name": 9,
+          "sales_channel_semantic_status": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "sales_line",
+        "grain": [],
+        "columns": {
+          "source_system": 9,
+          "source_table": 9,
+          "doc_entry": 9,
+          "line_num": 9,
+          "item_code": 9,
+          "whs_code": 9,
+          "quantity": 9,
+          "currency": 9,
+          "line_total": 9,
+          "price": 9,
+          "line_status": 9,
+          "source_as_of": 9,
+          "slp_code": 9,
+          "attributed_slp_code": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "product_business_classification",
+        "grain": [],
+        "columns": {
+          "item_code": 9,
+          "product_business_type": 9,
+          "classification_status": 9,
+          "rule_id": 9,
+          "classification_evidence": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      },
+      {
+        "name": "sales_operation",
+        "grain": [],
+        "columns": {
+          "doc_entry": 9,
+          "line_num": 9,
+          "item_code": 9,
+          "line_total": 5,
+          "currency": 9,
+          "doc_date": 9,
+          "doc_month": 9,
+          "card_code": 9,
+          "card_name": 9,
+          "is_raw_material": 1,
+          "material_class": 9,
+          "material_name": 9,
+          "product_business_type": 9,
+          "classification_status": 9,
+          "rule_id": 9,
+          "source_as_of": 9
+        },
+        "semantic_constraints": [
+          0
+        ]
+      }
+    ],
+    "known_relations": [],
+    "synthetic_only": false,
+    "column_type_dictionary": [
+      "BIGINT",
+      "BOOLEAN",
+      "DATE",
+      "DECIMAL(10,6)",
+      "DECIMAL(38,12)",
+      "DECIMAL(38,6)",
+      "DOUBLE",
+      "INTEGER",
+      "TIMESTAMP",
+      "VARCHAR"
+    ],
+    "semantic_constraint_dictionary": [
+      "Published schema; business grain and completeness require independent checks."
+    ]
+  },
+  "observations": [
+    {
+      "turn": 1,
+      "evidence_manifest": {
+        "result_id": "392a5a6fcbd7418184357a34",
+        "query_id": "1790002b2789b3d354b384e939a3befc39a9d4cac1ffcb35fc180b63083a2e2c",
+        "execution_version": "2d293d9f717145749ab0d495",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "dc677d7ee0cbee585bb2c65a",
+            "alias": "doc_month"
+          },
+          {
+            "column_id": "50d1ff3348f1d72380f3cae5",
+            "alias": "currency"
+          },
+          {
+            "column_id": "868fcf076bd4c370a4fc27d5",
+            "alias": "product_business_type"
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "line_count"
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "line_amount"
+          }
+        ],
+        "row_ids": [
+          "68c35a8a3d8c4fc5af3e7284",
+          "5e857c84dd0e4e9394468256",
+          "77dc328fdfa04a20af6b05a9"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_GREATERTHANOREQUALTO \"2026-01\",doc_month COMPARE_LESSTHANOREQUALTO \"2026-12\")",
+        "group_expressions": [
+          "doc_month",
+          "currency",
+          "product_business_type"
+        ],
+        "limitations": [
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW"
+      },
+      "rows": [
+        [
+          "2026-01",
+          "BS",
+          "FRACTIONATED_PRODUCT",
+          842,
+          "85161.830000"
+        ],
+        [
+          "2026-01",
+          "BS",
+          "OTHER_INPUT",
+          54,
+          "6782.540000"
+        ],
+        [
+          "2026-01",
+          "BS",
+          "PACKAGING",
+          829,
+          "61022.000000"
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": true,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed",
+      "history_compacted": true
+    },
+    {
+      "turn": 2,
+      "evidence_manifest": {
+        "result_id": "364e815422144300863544ae",
+        "query_id": "2f07a21dff320b9d33f2cefb59a2ade1a0e40d97084b97723a934e2bba21b006",
+        "execution_version": "da7f58df721b49188a2b4ccd",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "dc677d7ee0cbee585bb2c65a",
+            "alias": "doc_month"
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "line_amount"
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "line_count"
+          }
+        ],
+        "row_ids": [
+          "19b675613d86475298b7f40e",
+          "6a948dde29e04944ab6177de",
+          "3c1b17ff5b8c4edd887afd81"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_GREATERTHANOREQUALTO \"2026-01\",doc_month COMPARE_LESSTHANOREQUALTO \"2026-12\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [
+          "doc_month"
+        ],
+        "limitations": [
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW"
+      },
+      "rows": [
+        [
+          "2026-08",
+          "853568.450000",
+          501
+        ],
+        [
+          "2026-09",
+          "839582.630000",
+          526
+        ],
+        [
+          "2026-01",
+          "836764.380000",
+          564
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": true,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed",
+      "history_compacted": true
+    },
+    {
+      "turn": 3,
+      "evidence_manifest": {
+        "result_id": "3217a26b1a0b465db9a173f7",
+        "query_id": "6ca8e0119975748dee2d634ddc160b078ab73f41fd4218e6333e9ba01f181f5f",
+        "execution_version": "d24aeb3622ba4c66ba490dc5",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "0f8e33657775e57354564c1e",
+            "alias": "card_code"
+          },
+          {
+            "column_id": "1e6594e48181f4ad91e979c8",
+            "alias": "card_name"
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "line_amount"
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "line_count"
+          }
+        ],
+        "row_ids": [
+          "075e8ea546624b29a7c0281c",
+          "7ae14ae6168e421588dca2e1",
+          "46ad053d04ba40d7be329e84"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_EQUAL \"2026-08\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [
+          "card_code",
+          "card_name"
+        ],
+        "limitations": [
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW"
+      },
+      "rows": [
+        [
+          "C012100",
+          "NUTRI-MIX S.R.L.",
+          "139200.000000",
+          2
+        ],
+        [
+          "C005843",
+          "CORPOLAB LTDA",
+          "85956.000000",
+          1
+        ],
+        [
+          "C000340",
+          "CERVECERIA NACIONAL POTOSI LTDA.",
+          "75690.000000",
+          2
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": false,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed"
+    },
+    {
+      "turn": 4,
+      "evidence_manifest": {
+        "result_id": "999a43ea9fd34c55ad5ae1f9",
+        "query_id": "596439ffaa3d50130da20044dafb1ce74fb0cff72c100211848a30cdfb373335",
+        "execution_version": "5d27417d997e43749f80f93e",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "0f8e33657775e57354564c1e",
+            "alias": "card_code"
+          },
+          {
+            "column_id": "1e6594e48181f4ad91e979c8",
+            "alias": "card_name"
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "line_amount"
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "line_count"
+          }
+        ],
+        "row_ids": [
+          "e80cdcfd75dc446ca36f0240"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_EQUAL \"2026-08\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [
+          "card_code",
+          "card_name"
+        ],
+        "limitations": [
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW"
+      },
+      "rows": [
+        [
+          "C012100",
+          "NUTRI-MIX S.R.L.",
+          "139200.000000",
+          2
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": false,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed"
+    },
+    {
+      "status": "INDEPENDENT_VERIFICATION_DISCREPANCY",
+      "rejected_claims": [
+        {
+          "claim": {
+            "kind": "measure",
+            "result_id": "364e815422144300863544ae",
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "row_id": "19b675613d86475298b7f40e",
+            "metric": "line_amount_bs",
+            "value": "853568.450000",
+            "unit": "money",
+            "currency": "BS",
+            "grain": "commercial_line",
+            "classification": "observed",
+            "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+            "snapshot": "1408",
+            "temporal_scope": [
+              "published_rows",
+              "not_complete_calendar"
+            ]
+          },
+          "state": "UNVERIFIED",
+          "match": false,
+          "reason": "independent_raw_population_or_semantics_not_accredited",
+          "required": "Use issued evidence IDs and observed semantics; revise, query, or withdraw. Causality requires accredited mechanism evidence.",
+          "evidence": [
+            {
+              "result_id": "364e815422144300863544ae",
+              "row_id": "19b675613d86475298b7f40e",
+              "observed": "853568.450000",
+              "column_ref": "8c8b1c8acf2617dccf8c134b",
+              "column_alias": "line_amount"
+            }
+          ]
+        },
+        {
+          "claim": {
+            "kind": "measure",
+            "result_id": "999a43ea9fd34c55ad5ae1f9",
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "row_id": "e80cdcfd75dc446ca36f0240",
+            "metric": "line_amount_bs",
+            "value": "139200.000000",
+            "unit": "money",
+            "currency": "BS",
+            "grain": "commercial_line",
+            "classification": "observed",
+            "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+            "snapshot": "1408",
+            "temporal_scope": [
+              "published_rows",
+              "not_complete_calendar"
+            ]
+          },
+          "state": "UNVERIFIED",
+          "match": false,
+          "reason": "independent_raw_population_or_semantics_not_accredited",
+          "required": "Use issued evidence IDs and observed semantics; revise, query, or withdraw. Causality requires accredited mechanism evidence.",
+          "evidence": [
+            {
+              "result_id": "999a43ea9fd34c55ad5ae1f9",
+              "row_id": "e80cdcfd75dc446ca36f0240",
+              "observed": "139200.000000",
+              "column_ref": "8c8b1c8acf2617dccf8c134b",
+              "column_alias": "line_amount"
+            }
+          ]
+        }
+      ],
+      "instruction": "Reconsider the hypothesis using the contradiction. Choose a new query, correct semantics or explicitly withdraw. No expected business answer is supplied."
+    },
+    {
+      "turn": 5,
+      "evidence_manifest": {
+        "result_id": "dd0bf552126241248abd1633",
+        "query_id": "24f8c352f59951ef350f5322972404b2ea728db67c5b28493dcadb7f03cd3bd4",
+        "execution_version": "4a309edb04a741ef886ebef6",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "aggregate_of_authorized_subset",
+        "columns": [
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "total_amount_bs"
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "total_line_count"
+          }
+        ],
+        "row_ids": [
+          "1c98fd6fdaac4332bcd7f0ab"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_EQUAL \"2026-08\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [],
+        "limitations": [
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW"
+      },
+      "rows": [
+        [
+          "853568.450000",
+          501
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": false,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed"
+    },
+    {
+      "turn": 6,
+      "evidence_manifest": {
+        "result_id": "41e4c6b3d1d640d8b9644050",
+        "query_id": "fb28127ec1f462ada4d0d42584f3cb3d19690914c02a96def8a9049df6a1d221",
+        "execution_version": "a13c08d3efb848ba808ac3be",
+        "dataset": "telchi_authorized_foundation_dev_v1",
+        "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot": "1408",
+        "grain": "group_of_source_rows",
+        "columns": [
+          {
+            "column_id": "dc677d7ee0cbee585bb2c65a",
+            "alias": "doc_month"
+          },
+          {
+            "column_id": "8c8b1c8acf2617dccf8c134b",
+            "alias": "total_amount_bs"
+          },
+          {
+            "column_id": "4ebb0a4322bee5d753b4caa3",
+            "alias": "total_line_count"
+          }
+        ],
+        "row_ids": [
+          "062ab3a06a5f428f80b993e4",
+          "a3092c8f6d2648748c3a8639",
+          "0bd32ec50fa6405aa6bed889"
+        ],
+        "relationships": [],
+        "temporal_scope": [
+          "published_rows",
+          "not_complete_calendar"
+        ],
+        "filter_expression": "CONJUNCTION_AND(doc_month COMPARE_GREATERTHANOREQUALTO \"2026-01\",doc_month COMPARE_LESSTHANOREQUALTO \"2026-12\",currency COMPARE_EQUAL \"BS\",product_business_type COMPARE_EQUAL \"RAW_MATERIAL\")",
+        "group_expressions": [
+          "doc_month"
+        ],
+        "limitations": [
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ]
+      },
+      "decision": {
+        "decision": "ALLOW"
+      },
+      "rows": [
+        [
+          "2026-08",
+          "853568.450000",
+          501
+        ],
+        [
+          "2026-09",
+          "839582.630000",
+          526
+        ],
+        [
+          "2026-01",
+          "836764.380000",
+          564
+        ]
+      ],
+      "status": "COMPLETED",
+      "truncated": true,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": "1408",
+      "relationship_checks": [],
+      "independent_check": "UNVERIFIED until scoped material final claims are independently reconstructed",
+      "history_compacted": true
+    }
+  ],
+  "execution_closed": false,
+  "remaining_query_budget": 6,
+  "compact_catalog_protocol": "Column types and constraints are zero-based dictionary indices.",
+  "evidence_limitations": [
+    "Current materialized publication, not certified historical classification.",
+    "Published rows only; complete calendar coverage is not certified.",
+    "Line amounts precede credit memos/global adjustments; not net billing or collections.",
+    "No classifier rule/version or causal mechanism is accredited."
+  ],
+  "evidence_columns": {
+    "dc677d7ee0cbee585bb2c65a": [
+      "dc677d7ee0cbee585bb2c65a",
+      "VARCHAR",
+      "doc_month",
+      [
+        "sales_operation.doc_month"
+      ],
+      "CALCULATION",
+      null,
+      null,
+      "group_dimension",
+      [
+        "doc_month"
+      ],
+      null,
+      null,
+      "DERIVED_NOT_OFFICIAL",
+      []
+    ],
+    "50d1ff3348f1d72380f3cae5": [
+      "50d1ff3348f1d72380f3cae5",
+      "VARCHAR",
+      "currency",
+      [
+        "sales_operation.currency"
+      ],
+      "CALCULATION",
+      null,
+      null,
+      "group_dimension",
+      [
+        "currency"
+      ],
+      null,
+      null,
+      "DERIVED_NOT_OFFICIAL",
+      []
+    ],
+    "868fcf076bd4c370a4fc27d5": [
+      "868fcf076bd4c370a4fc27d5",
+      "VARCHAR",
+      "product_business_type",
+      [
+        "sales_operation.product_business_type"
+      ],
+      "CALCULATION",
+      null,
+      null,
+      "group_dimension",
+      [
+        "product_business_type"
+      ],
+      null,
+      null,
+      "DERIVED_NOT_OFFICIAL",
+      []
+    ],
+    "4ebb0a4322bee5d753b4caa3": [
+      "4ebb0a4322bee5d753b4caa3",
+      "BIGINT",
+      "count(doc_entry)",
+      [
+        "sales_operation.doc_entry"
+      ],
+      "CALCULATION",
+      "line_count",
+      "Count of source commercial lines in the identified result group.",
+      "commercial_line",
+      [
+        "count(doc_entry)"
+      ],
+      "lines",
+      null,
+      "DERIVED_NOT_OFFICIAL",
+      []
+    ],
+    "8c8b1c8acf2617dccf8c134b": [
+      "8c8b1c8acf2617dccf8c134b",
+      "DECIMAL(38,6)",
+      "sum(line_total)",
+      [
+        "sales_operation.line_total"
+      ],
+      "CALCULATION",
+      "line_amount_bs",
+      "Sum of commercial line_total in BS, before credit memos/global adjustments; not header total, net billing or collections.",
+      "commercial_line",
+      [
+        "sum(line_total)"
+      ],
+      "money",
+      "BS",
+      "DERIVED_NOT_OFFICIAL",
+      []
+    ],
+    "0f8e33657775e57354564c1e": [
+      "0f8e33657775e57354564c1e",
+      "VARCHAR",
+      "card_code",
+      [
+        "sales_operation.card_code"
+      ],
+      "CALCULATION",
+      null,
+      null,
+      "group_dimension",
+      [
+        "card_code"
+      ],
+      null,
+      null,
+      "DERIVED_NOT_OFFICIAL",
+      []
+    ],
+    "1e6594e48181f4ad91e979c8": [
+      "1e6594e48181f4ad91e979c8",
+      "VARCHAR",
+      "card_name",
+      [
+        "sales_operation.card_name"
+      ],
+      "CALCULATION",
+      null,
+      null,
+      "group_dimension",
+      [
+        "card_name"
+      ],
+      null,
+      null,
+      "DERIVED_NOT_OFFICIAL",
+      []
+    ]
+  },
+  "compact_evidence_protocol": "evidence_columns values follow evidence_column_fields. column_ref resolves there; column_alias is presentation only.",
+  "evidence_column_fields": [
+    "column_id",
+    "sql_type",
+    "expression",
+    "source_fields",
+    "source_or_calculation",
+    "metric",
+    "metric_definition",
+    "grain",
+    "transformations",
+    "unit",
+    "currency",
+    "classification",
+    "limitations"
+  ]
+}

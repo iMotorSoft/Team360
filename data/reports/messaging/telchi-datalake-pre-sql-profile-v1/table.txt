@@ -1,0 +1,22 @@
+| Component | p50 ms | p95 ms | % pre-send | Classification |
+|---|---:|---:|---:|---|
+| Config/auth/body/normalization/allowlist | 0.300 | 0.416 | 0.01 | REQUIRED |
+| Binding workspace/channel | 3.073 | 4.172 | 0.07 | REQUIRED |
+| Conversation/claim/commit | 14.660 | 23.661 | 0.40 | REQUIRED |
+| Trigger/tenant/capability | 0.013 | 0.017 | 0.00 | REQUIRED |
+| SQL intent persistence | 11.067 | 11.624 | 0.26 | REQUIRED |
+| Worker entry (includes spawn) | 85.669 | 121.826 | 2.08 | ARCHITECTURAL / potentially AVOIDABLE |
+| Imports/configuration | 68.849 | 97.961 | 1.74 | ARCHITECTURAL / potentially AVOIDABLE |
+| DuckDB connection | 11.892 | 14.545 | 0.30 | ARCHITECTURAL |
+| Extension LOAD | 106.910 | 138.692 | 2.66 | ARCHITECTURAL / potentially AVOIDABLE |
+| Attachment + PostgreSQL catalog session | 38.345 | 51.111 | 0.95 | ARCHITECTURAL / REQUIRED |
+| Query budget + readonly check | 1.909 | 2.238 | 0.05 | REQUIRED |
+| Foundation resolution/validation | 1386.003 | 1484.224 | 33.05 | REQUIRED / ARCHITECTURAL |
+| Query preparation | 0.015 | 0.019 | 0.00 | REQUIRED |
+| DuckDB execute (includes planning) | 2336.129 | 2373.605 | 55.26 | DATABASE / potentially AVOIDABLE cast work |
+| Fetch | 1.249 | 1.621 | 0.03 | REQUIRED |
+| Materialization/hash | 0.092 | 0.157 | 0.00 | REQUIRED |
+| Attachment/connection close | 9.807 | 11.795 | 0.23 | REQUIRED / ARCHITECTURAL |
+| IPC/exit/decode residual | 74.136 | 83.179 | 1.78 | ARCHITECTURAL / UNKNOWN internal split |
+| Formatting/result + outbound persistence | 40.753 | 89.953 | 1.11 | REQUIRED / INSTRUMENTATION_ARTIFACT additional JSON |
+| Orchestration/unspanned paired residual | 1.146 | 1.442 | 0.03 | UNKNOWN / INSTRUMENTATION_ARTIFACT |

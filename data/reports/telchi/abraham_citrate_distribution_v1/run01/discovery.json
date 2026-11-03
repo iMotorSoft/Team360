@@ -1,0 +1,4327 @@
+{
+  "timestamp": "2026-10-15T14:14:19.568961+00:00",
+  "read_only": true,
+  "sap_write_count": 0,
+  "queries": [
+    {
+      "name": "sales_document_schema",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))",
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_due_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "tax_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_foreign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "series",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "user_sign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_semantic_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "sales_line_schema",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408))",
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "whs_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "price",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "attributed_slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "credit_memo_document_schema",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408))",
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "create_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "update_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "canceled",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "card_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_total_foreign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "series",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "user_sign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "sales_channel_semantic_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "credit_memo_line_schema",
+      "sql": "DESCRIBE SELECT * FROM (SELECT * FROM telchi.atomic.\"credit_memo_line\" AT (VERSION => 1408))",
+      "rows": [
+        {
+          "column_name": "atomic_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_table",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "doc_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_num",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "whs_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "quantity",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "currency",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_total",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_total_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "line_total_foreign",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "attributed_slp_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "base_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "base_entry",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "base_line",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "raw_extraction_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "reference_manifest_hash",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        },
+        {
+          "column_name": "schema_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": "NULL",
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "branches_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/branches/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "branch_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "brand_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/brand/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "brand_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "business_locations_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/business_locations/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "business_location_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "business_location_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "mapping_source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "business_unit_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/business_unit/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "business_unit_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "currencies_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/currencies/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "currency_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "legal_entity_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "decimal_places",
+          "column_type": "INTEGER",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "customer_business_type_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customer_business_type/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "customer_business_type_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "customers_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "customer_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "branch_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "tax_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "credit_limit",
+          "column_type": "DECIMAL(38,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "payment_term_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_card_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_group_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_valid_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_frozen_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_update_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "document_types_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/document_types/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "document_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "company_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "entity_alias_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/entity_alias/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "entity_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canonical_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "alias",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "normalized_alias",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "alias_source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "priority",
+          "column_type": "INTEGER",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(38,12)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "resolution_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "operating_domain_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/operating_domain/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "operating_domain_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "operating_model_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/operating_model/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "operating_model_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "party_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/party/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "party_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "party_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "payment_terms_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/payment_terms/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "payment_term_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "branch_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "credit_days",
+          "column_type": "INTEGER",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "portfolio_family_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/portfolio_family/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "portfolio_family_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "product_business_type_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/product_business_type/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "product_business_type_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "production_site_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/production_site/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "production_site_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "products_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "canonical_product_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "item_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canonical_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "product_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "inventory_uom_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sales_uom_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "purchase_uom_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_item_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_valid_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_frozen_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_invnt_item",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_sell_item",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_prchse_item",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_itms_grp_cod",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_update_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "sales_channel_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/sales_channel/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "sales_channel_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "salespersons_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/salespersons/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "salesperson_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "branch_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "salesperson_active",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "salesperson_category_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "salesperson_category_name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "is_corporate",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_category_source_label",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "suppliers_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/suppliers/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "supplier_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "branch_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "tax_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "payment_term_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_card_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_group_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_valid_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_frozen_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_update_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "units_of_measure_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/units_of_measure/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "canonical_uom_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "canonical_uom_label",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "physical_dimension",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "mapping_source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "users_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/users/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "user_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "organizational_scope",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "warehouse_roles_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/warehouse_roles/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "warehouse_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "production_site",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_role",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "usable_for_supply_stock",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_evidence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "warehouses_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/warehouses/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "warehouse_role_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_locked",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_inactive",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_branch_office_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_warehouse_dms",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_update_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "product_name_candidates",
+      "sql": "SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet') WHERE upper(name) LIKE '%CITRAT%' OR upper(name) LIKE '%MAGNES%' ORDER BY source_system,item_code",
+      "error": "Binder Error: Referenced column \"name\" not found in FROM clause!\nCandidate bindings: \"active\", \"_semantic_version\", \"sales_uom_id\", \"_ingested_at\", \"sap_sell_item\"\n\nLINE 1: ...2088d5885204313a/products/part-00000.parquet') WHERE upper(name) LIKE '%CITRAT%' OR upper(name) LIKE '%MAGNES%' ORDER...\n                                                                      ^"
+    },
+    {
+      "name": "distributor_name_candidates",
+      "sql": "SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet') WHERE upper(name) LIKE '%L&S%' OR upper(name) LIKE '%L & S%' OR upper(name) LIKE '%L Y S%'",
+      "error": "Invalid Input Error: Required module 'pytz' failed to import, due to the following Python exception:\nModuleNotFoundError: No module named 'pytz'"
+    },
+    {
+      "name": "raw_OCRD_schema:/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/table_extract/sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OCRD.parquet",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/table_extract/sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OCRD.parquet')",
+      "rows": [
+        {
+          "column_name": "CardCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CardName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CardType",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "frozenFor",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "validFor",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "LicTradNum",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CreditLine",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "GroupNum",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "UpdateDate",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_extract_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_observation_sequence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "extraction_date",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "run_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "raw_OCRD_schema:/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/table_extract/sap_master_reference_v1_20260916T121533Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121533Z/OCRD.parquet",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/table_extract/sap_master_reference_v1_20260916T121533Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121533Z/OCRD.parquet')",
+      "rows": [
+        {
+          "column_name": "CardCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CardName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CardType",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "frozenFor",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "validFor",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "LicTradNum",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CreditLine",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "GroupNum",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "UpdateDate",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_extract_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_observation_sequence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "extraction_date",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "run_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "invoices_coverage",
+      "sql": "SELECT source_system,currency,canceled,MIN(doc_date) min_date,MAX(doc_date) max_date,COUNT(*) documents FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_date>='2026-01-01' AND doc_date<'2027-01-01' GROUP BY ALL",
+      "rows": [
+        {
+          "source_system": "SAP_B1_HANA",
+          "currency": "BS",
+          "canceled": "C",
+          "min_date": "2026-01-05T00:00:00",
+          "max_date": "2026-09-12T00:00:00",
+          "documents": 7
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "currency": "BS",
+          "canceled": "N",
+          "min_date": "2026-01-01T00:00:00",
+          "max_date": "2026-09-24T00:00:00",
+          "documents": 330428
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "currency": "BS",
+          "canceled": "Y",
+          "min_date": "2026-01-05T00:00:00",
+          "max_date": "2026-09-12T00:00:00",
+          "documents": 7
+        }
+      ]
+    },
+    {
+      "name": "credit_memos_coverage",
+      "sql": "SELECT source_system,currency,canceled,MIN(doc_date) min_date,MAX(doc_date) max_date,COUNT(*) documents FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE doc_date>='2026-01-01' AND doc_date<'2027-01-01' GROUP BY ALL",
+      "rows": [
+        {
+          "source_system": "SAP_B1_HANA",
+          "currency": "BS",
+          "canceled": "C",
+          "min_date": "2026-01-03T00:00:00",
+          "max_date": "2026-01-03T00:00:00",
+          "documents": 1
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "currency": "BS",
+          "canceled": "N",
+          "min_date": "2026-01-01T00:00:00",
+          "max_date": "2026-09-23T00:00:00",
+          "documents": 2213
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "currency": "BS",
+          "canceled": "Y",
+          "min_date": "2026-01-03T00:00:00",
+          "max_date": "2026-01-03T00:00:00",
+          "documents": 1
+        }
+      ]
+    }
+  ],
+  "threads": 2,
+  "memory_limit": "768MB",
+  "sap_preflight": {
+    "status": "BLOCKED",
+    "error_type": "ConnectionRefusedError",
+    "reason": "Configured HANA unavailable; no live reconciliation; no endpoint or secret recorded"
+  },
+  "foundation": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 1494.863,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "reference_datasets": [
+    "branches",
+    "brand",
+    "business_locations",
+    "business_unit",
+    "currencies",
+    "customer_business_type",
+    "customers",
+    "document_types",
+    "entity_alias",
+    "operating_domain",
+    "operating_model",
+    "party",
+    "payment_terms",
+    "portfolio_family",
+    "product_business_type",
+    "production_site",
+    "products",
+    "sales_channel",
+    "salespersons",
+    "suppliers",
+    "units_of_measure",
+    "users",
+    "warehouse_roles",
+    "warehouses"
+  ],
+  "raw_tables": [
+    "sap_master_reference_v1_20260916T121533Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121533Z/OCRD.parquet",
+    "sap_master_reference_v1_20260916T121533Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121533Z/OITM.parquet",
+    "sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OCRD.parquet",
+    "sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OHEM.parquet",
+    "sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OITB.parquet",
+    "sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OITM.parquet",
+    "sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OSLP.parquet",
+    "sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OUSR.parquet",
+    "sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OWHS.parquet"
+  ],
+  "publication_unchanged": true
+}

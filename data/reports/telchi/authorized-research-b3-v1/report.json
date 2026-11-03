@@ -1,0 +1,147 @@
+{
+  "task": "TELCHIAI_AUTHORIZED_RESEARCH_B3_V1",
+  "branch": "feature/console-backend-core",
+  "date_utc": "2026-10-28",
+  "context": "TELCHI / USUARIOS_ROLES_Y_PERMISOS, VENTAS, TRAZABILIDAD_DOCUMENTAL / INVESTIGATION / PostgreSQL DEV y DATA_LAKE / REPORT / READ_ONLY",
+  "overall_status": "PARTIAL",
+  "decisive_result": "NO ACREDITADO: no se demostró que TelchiAI iguale la investigación de Pi con una identidad empresarial Team360 real. Sí se consultaron realmente identidad/RBAC DEV y publicación/esquemas Foundation. No se sustituyeron las identidades humanas por devfull o un UID local.",
+  "evidence": {
+    "identity": "identity.json",
+    "all_workspace_identity_inventory": "identity-inventory.json",
+    "foundation": "foundation.json",
+    "regression": "regression.txt",
+    "reproduction_root": "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/authorized_research_b3_v1/",
+    "reproduction_cwd": "SrvRestAstroLS_v1/backend",
+    "commands_executed": [
+      "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -m modules.telchi.investigation.validation.authorized_research_b3_v1.probe",
+      "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -m modules.telchi.investigation.validation.authorized_research_b3_v1.foundation_probe",
+      "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -m modules.telchi.investigation.validation.authorized_research_b3_v1.identity_inventory",
+      "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -m pytest modules/telchi/exploratory_sql/test_console_bridge.py modules/telchi/exploratory_sql/test_authorized_foundation.py modules/telchi/assistant/tests/test_assistant.py -q -p no:cacheprovider",
+      "git diff --check"
+    ],
+    "reproduction_note": "Los outputs son exclusivos: no sobrescribirlos. Para repetir, asignar un directorio nuevo en los runners. No contienen credenciales; nombres tipo email se redactaron en el inventario. Dos intentos iniciales del runner administrativo fallaron por escape de % de psycopg y por asumir o.slug en vez de o.display_name; se corrigió exclusivamente el runner nuevo, no código de Telchi. Las transacciones fallidas eran READ_ONLY y se cerraron sin escrituras."
+  },
+  "identity_and_permissions": {
+    "database": "team360 PostgreSQL 18.4 local, transaction_read_only=on",
+    "repositories_used": ["PermissionConsoleRepository.list_effective_permissions", "PermissionConsoleRepository.list_permission_profiles", "ResearchConsoleRepository.identity", "ResearchConsoleRepository.enabled_permissions"],
+    "human_identity_resolution": "BLOCKED: nueve registros core_users inspeccionados en todos los workspaces DEV. Ningún display_name, email o metadata identifica Mario/Abraham; no existe rol cuyo código/nombre contenga Presidencia. Esto no demuestra ausencia de personas en otros sistemas o entornos; demuestra que este DEV no permite identificarlas ni vincularlas de forma acreditada.",
+    "telchi_scope": {"organization": "Telchi", "organization_status": "active", "workspace": "telchi_dev", "workspace_status": "testing"},
+    "observed_accounts": [
+      {"account": "admin", "status": "active", "membership": "active", "assigned_rbac_roles": [], "profiles": [], "effective_permissions": [], "telchi_business_permissions": 0},
+      {"account": "devfull", "status": "active", "membership": "active", "assigned_rbac_roles": ["telchi_source_quantity_reader_v1", "telchi_sales_latest_documents_reader_v1", "telchi_sales_coverage_reader_v1", "telchi_sales_period_billed_amount_reader_v1", "telchi_products_search_reader_v1", "telchi_sales_by_products_reader_v1", "telchi_sales_invoice_lines_reader_v1"], "profiles": [], "scoped_full_access": "telchi / organización Telchi / workspace telchi_dev / no revocado", "telchi_business_permissions": 11},
+      {"account": "dos usuarios sintéticos sin permisos", "status": "inactive", "membership": "ausente", "bridge_identity": null, "telchi_business_permissions": 0}
+    ],
+    "observed_permission_difference": "Los once permisos listados en identity.json para devfull faltan en admin. NO es una comparación Mario-Abraham ni prueba de desigualdad entre ellos. No se atribuye ninguna cuenta administrativa a una persona por inferencia.",
+    "parity": "BLOCKED: los dos extremos humanos de la comparación no están acreditados.",
+    "minimal_correction_proposal": "Primero confirmar o vincular legítimamente los user_id de ambas personas en la organización/workspace autorizados. Después comparar sus permisos informativos efectivos e intersección con capabilities habilitadas. Si difieren, proponer únicamente los permisos informativos faltantes mediante roles/perfiles existentes; no asignar FULL_ACCESS técnico ni copiar ciegamente devfull. Con la evidencia actual no es posible proponer IDs de grants concretos sin inventarlos.",
+    "grants_modified": 0,
+    "authentication": {
+      "active_password_credentials": 0,
+      "documented_private_issuer_configuration_exists": true,
+      "token_files_in_documented_auth_directory": 0,
+      "current_shell_console_session_or_public_key_configuration": "No variables Console/PASETO/TEAM360 de sesión observadas; no se volcaron sus valores ni entornos ajenos.",
+      "private_identity_allowlists": "Existen, pero no son una sesión Console ni una prueba de login humano.",
+      "legitimate_session_available": false,
+      "limitation": "Búsqueda limitada a configuración documentada y shell actual. No se extrajeron tokens de otros procesos/browsers ni se firmaron tokens usando la clave del issuer. No se intentó activar passwords, simular login o emplear UID local.",
+      "bridge_real_invocation": "NOT_RUN"
+    }
+  },
+  "foundation": {
+    "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot": 1408,
+    "manifest_base_snapshot": 1322,
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "readonly": "PASS: attachment telchi readonly=True; FoundationReader.resolve_on verificó CURRENT, manifest, snapshot y componentes. No se leyó Atomic latest ni SAP.",
+    "discovery": "33 fuentes, esquemas y columnas descubiertos mediante discover() existente sin editar catálogo; detalle íntegro en foundation.json. Metadatos inspeccionados por diagnóstico DEV del owner, no catálogo autorizado de Mario/Abraham ni datos enviados a Luna.",
+    "discovered_domains": ["sales_document", "sales_line", "credit_memo_document", "credit_memo_line", "inventory_movement", "inventory_balance", "collection_method_fact", "commercial_term_classification", "receivable_settlement_status", "24 referencias ref_* incluyendo productos, clientes, proveedores, monedas, unidades, tipos empresariales, familias y depósitos"],
+    "reader_contract_gaps": {
+      "count": 13,
+      "published_but_not_discoverable": ["material_actual_consumption", "material_equivalent_demand", "material_lead_time_profile", "material_supply_status", "open_purchase_pipeline", "ap_invoice", "ap_invoice_line", "purchase_inventory_receipt", "purchase_order", "purchase_order_line", "purchase_receipt", "purchase_receipt_line", "purchasing_document_lineage"],
+      "cause": "El manifest sí publica material_supply y purchasing. discover intenta access.relation(component,name), pero FoundationAccess.relation solo admite los componentes/datasets de _COMPONENT_TABLES; purchasing y material_supply no están en ese contrato. No es ausencia de publicación ni permiso denegado. Son gaps explícitos unsupported_reader_contract.",
+      "correction": "No aplicada: la solución requiere habilitar un contrato FoundationReader coherente y pinned para estos componentes, lo cual excede la prohibición expresa de modificar Foundation. No se leyeron file_references directamente ni se insertaron fuentes físicas/manuales en el catálogo. No impide descubrir ventas/clientes ya existentes."
+    },
+    "semantic_coverage": [
+      {"need": "Clasificar materias primas", "available": "ref_products.sap_itms_grp_cod y taxonomías ref_product_business_type/ref_portfolio_family descubiertas", "accredited": false, "limit": "Esquemas no acreditan la correspondencia grupo SAP -> materia prima ni su vigencia. CURRENT no incluye el componente product_commercial_semantics. No se consultaron valores ni se sustituyó clasificación por nombres de productos."},
+      {"need": "Líneas comerciales", "available": "sales_line: item_code, doc_entry, line_num, currency, line_total, quantity, price", "accredited": false, "limit": "Tipos físicos VARCHAR para importes/cantidades. No existe aquí definición monetaria general acreditada, normalización numérica ni conciliación con IVA/NC/descuentos."},
+      {"need": "Documentos", "available": "sales_document: source_system, doc_entry, doc_num, doc_date, canceled, currency", "accredited": false, "limit": "Claves/grano/duplicados y cardinalidad no perfilados en B3."},
+      {"need": "Cliente facturado SAP", "available": "sales_document.card_code y ref_customers.source_system/code/name", "accredited": false, "limit": "No se perfilaron unicidad, cobertura o relación; no equivale a comprador final DMS."},
+      {"need": "Mes de venta", "available": "sales_document.doc_date VARCHAR", "accredited": false, "limit": "No se ejecutó agrupación ni se verificaron formatos/cobertura. El corte de extracción no acredita meses completos."},
+      {"need": "Monedas", "available": "currency en documentos/líneas, ref_currencies", "accredited": false, "limit": "No se verificó consistencia por línea/documento ni conversión; no se mezclaron importes."}
+    ],
+    "authorization": "NOT_ACCREDITED: no SourcePolicy empresarial aprobada y compuesta en un consumidor real. rg encontró SourcePolicy y ConsoleResearchService instanciados únicamente por tests, no por runtime.",
+    "relationships": "El ResearchBinding existente emite relationships=(). Nombres de claves coincidentes no prueban una relación técnicamente segura o empresarialmente válida. No se inventaron relaciones ni se ejecutaron joins.",
+    "temporal_coverage": "2026 no puede presentarse como año completo: extracción de ventas fechada en septiembre. No se ejecutaron min/max ni conteos de población; cobertura efectiva mensual permanece pendiente. El manifest de compras declara WINDOW_ONLY desde enero hasta 23/09/2026; no trasladar esa cobertura a ventas."
+  },
+  "research": {
+    "model_policy": "gpt-5.6-luna / medium / sin fallback, sin cambios",
+    "luna_calls": 0,
+    "business_queries": 0,
+    "raw_materials_question": "Durante 2026, ¿en qué mes vendimos más materias primas y cuál fue el cliente al que más le vendimos en ese mes?",
+    "raw_materials_result": null,
+    "raw_materials_status": "BLOCKED por identidad/sesión y contratos de autorización no acreditados; clasificación/relaciones/medida tampoco acreditadas. No se hizo una investigación alternativa local para aparentar acceso empresarial.",
+    "reference_pi": {"month": "agosto 2026", "line_amount_bs": "853568.45", "customer": "NUTRI-MIX S.R.L.", "customer_code": "C012100", "customer_amount_bs": "139200.00", "provenance": "Referencia del usuario, NO resultado B3 ni dato entregado al modelo", "comparison": "NOT_POSSIBLE sin ejecución y conciliación independientes"},
+    "verification_checklist": {"raw_material_universe_and_classification_validity": "NOT_RUN", "line_amount_currency_iva": "NOT_RUN", "credit_memos_cancellations_duplicates": "NOT_RUN", "monthly_grouping_and_partial_2026": "NOT_RUN; corte de extracción observado, no perfil de población", "invoiced_sap_customer": "NOT_RUN", "total_and_top_customer_reconciliation": "NOT_RUN"},
+    "second_domain": "NOT_RUN: inventarios/cobranzas tienen fuentes descubiertas; no hay identidad ni SourcePolicy acreditada para considerarlas autorizadas. No se eligió una pregunta artificial sobre fixtures ni se utilizó la pregunta sorpresa.",
+    "hypotheses_and_revisions": ["Se intentó resolver Mario/Abraham por nombres en Telchi DEV; no hubo coincidencias.", "Se amplió el inventario a todos los workspaces y señales de email/metadata sin exponer sus valores: tampoco identifican a las personas.", "Se verificó que existencia de issuer/allowlist no implica sesión: cero credenciales y ningún token en ubicación documentada.", "Se comprobó Foundation real sin población: fuentes comerciales sí existen; trece gaps son contratos del reader, no datos ausentes.", "No se atribuyó el bloqueo empresarial a I/O ni se afirmó que el modelo hubiera fallado."]
+  },
+  "authorization_evidence": {
+    "real_database": ["Usuarios activos admin/devfull resueltos por ResearchConsoleRepository.identity con organización/workspace/membership reales.", "Dos registros Telchi sintéticos inactivos y sin membership no resuelven identidad; son registros reales DEV pero NO perfiles humanos reales.", "Permisos efectivos reales calculados por el repositorio canónico: cero frente a once; FULL_ACCESS limitado al módulo, sin expansión manual."],
+    "fixtures_separate": "85 tests PASS incluyen bridge PASETO, aislamiento por catálogo/columnas/workspace, revocación y reautorización antes de entrega más test_assistant. Usan puertos de identidad/política/modelo fixture; no acreditan revocación o acceso autenticado de Mario/Abraham.",
+    "real_restricted_role_or_second_tenant_session": "NOT_AVAILABLE",
+    "revocations_performed": 0,
+    "metadata_egress_to_model": 0,
+    "real_denied_relationship_probe": "NOT_RUN: sin sesión/políticas acreditadas no se inventó una relación ni un grant para completar un gate."
+  },
+  "resources": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE para consultas administrativas y esquemas pequeños; guard normal safe=false para investigación Foundation",
+    "initial_observation": "8 CPU; 7887 MiB disponibles; I/O wait 63-71%; swap muy pequeña y estable, sin si/so. Preflight identidad: I/O 58.8%, 8236093440 bytes disponibles.",
+    "concurrent_heavy_postgresql_query": "Ninguna consulta activa ajena visible en pg_stat_activity al inicio; es una muestra, no monitor continuo de todo el host.",
+    "dev_io_exception_applicability": "La excepción existente DevExecutor es para el piloto CLI supervisado local, no una sesión empresarial. open_binding/AuthorizedFoundationExecutor conservan guard normal sin composición de excepción. No se amplió el mecanismo ni se usó monkeypatch/UID local. El diagnóstico breve de metadatos no ejecutó scans investigativos y no declara PASS de ese guard.",
+    "dev_io_exception_used_for_research": false,
+    "CONCURRENCY_USED": 1,
+    "duckdb_threads": 1,
+    "duckdb_memory_limit": "256MB para diagnóstico de esquemas; sin spill",
+    "foundation_schema_elapsed_seconds": 5.904,
+    "foundation_schema_max_rss_kib": 180800,
+    "identity_probe_elapsed_seconds": 12.006,
+    "regression": "85 passed in 202.95s, una ejecución secuencial, OMP/OPENBLAS=1",
+    "cost_and_tokens": "0 llamadas Luna en B3; no benchmark/coste de investigación disponible",
+    "final_observation": "7775 MiB disponibles; I/O wait 51-53%, swap estable sin si/so. Sin errores de almacenamiento observados por las operaciones; no se certifica salud física de disco.",
+    "cancellation": "No hubo investigación real que cancelar; cancelación/cleanup cubiertos solo con fixtures de regresión.",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "cleanup": "Comandos síncronos completados, context managers cierran conexiones y pytest terminó; sin servidores, browsers ni workers persistentes propios."
+  },
+  "code_and_scope": {
+    "runtime_changes": [],
+    "new_diagnostics": ["probe.py", "identity_inventory.py", "foundation_probe.py"],
+    "new_evidence": ["identity.json", "identity-inventory.json", "foundation.json", "regression.txt", "report.json"],
+    "preexisting_b2_sha256_verified_unchanged": {"console_bridge.py": "015ad4aa9ae512ed46d2eb37cb16d972a68782f5830c37da814a561cd05331a3", "console_repository.py": "11cfb7cf322090892adc1fe18426467af8039efda5621ce906d549fe060bad0f", "test_console_bridge.py": "c35940175ec9004eb700fc78a7687ae5e08f07585d33e00c7e797ed09a5ded2c", "ask.py": "0bdaa56254397be8fa595ef2b18d59ae914b7c53fca3df61b791ef43f2888d16"},
+    "validation": "git diff --check PASS; 85 focused tests PASS. Sin Markdown creado/modificado, gates LAT documentales no aplican. Sin corrección de runtime que requiera nueva regresión específica.",
+    "transversal_impact": "Ninguno: sin escrituras PostgreSQL de negocio/auditoría, grants, Foundation, SAP, migraciones, servicios compartidos, Web o WhatsApp. Cambios preexistentes preservados; sin commit ni push."
+  },
+  "gates": {
+    "REAL_IDENTITY_RESOLUTION": {"status": "PARTIAL", "evidence": "identity.json e identity-inventory.json: resolución real DEV realizada; Mario/Abraham no identificables"},
+    "MARIO_ABRAHAM_PERMISSION_PARITY": {"status": "BLOCKED", "evidence": "Sin correspondencia humana a user_id; diferencia admin/devfull no sustituye esa comparación"},
+    "REAL_CONSOLE_AUTH_CONTEXT": {"status": "BLOCKED", "evidence": "Cero credenciales, sin sesión disponible en shell/directorio documentados; no se emitieron tokens"},
+    "EFFECTIVE_RBAC": {"status": "PARTIAL", "evidence": "Repositorio real devuelve cero/once permisos con capabilities; falta cadena de sesión humana"},
+    "DYNAMIC_FOUNDATION_DISCOVERY": {"status": "PARTIAL", "evidence": "33 fuentes reales, 13 datasets publicados con unsupported_reader_contract; foundation.json"},
+    "FOUNDATION_REAL_READONLY": {"status": "PASS", "evidence": "FoundationReader y attachment readonly=True reales; snapshot 1408; alcance diagnóstico de metadatos, no consulta empresarial autenticada"},
+    "SOURCE_SEMANTIC_COVERAGE": {"status": "PARTIAL", "evidence": "Columnas comerciales descubiertas; clasificación/vigencia, relaciones, moneda/IVA y grano no acreditados"},
+    "LUNA_MEDIUM_REAL_RESEARCH": {"status": "BLOCKED", "evidence": "Cero llamadas por prerrequisitos de identidad/autorización ausentes; sin fallo funcional del modelo demostrado"},
+    "RAW_MATERIALS_RECONCILIATION": {"status": "BLOCKED", "evidence": "Sin ejecución ni conciliación; referencias Pi no se convirtieron en resultados"},
+    "SECOND_DOMAIN_RESEARCH": {"status": "BLOCKED", "evidence": "Fuentes inventario/cobranzas disponibles pero no acreditadas como autorizadas para una identidad real"},
+    "INDEPENDENT_CLAIM_VERIFICATION": {"status": "BLOCKED", "evidence": "No existen afirmaciones empresariales B3 generadas y verificadas independientemente"},
+    "RESTRICTED_ROLE_ISOLATION": {"status": "PARTIAL", "evidence": "Regresión fixture PASS; resolución real deniega registros DEV inactivos, sin perfil humano restringido autenticado"},
+    "DYNAMIC_REVOCATION": {"status": "PARTIAL", "evidence": "Regresión fixture PASS; no se revocaron grants reales ni se acreditó sesión real revocada"},
+    "RESOURCE_BUDGET_COMPLIANCE": {"status": "PASS", "evidence": "Diagnóstico acotado y secuencial, un thread DuckDB/256MB, sin scans ni límites elevados; no significa guard Foundation investigativo aprobado"},
+    "TELCHIAI_V1_REGRESSION": {"status": "PARTIAL", "evidence": "85 focalizados PASS incluidos test_assistant; no suite completa, transporte o sesión humana"},
+    "WHATSAPP_UNCHANGED": {"status": "PASS", "evidence": "Sin modificaciones ni operaciones de canal por B3; no gate E2E WhatsApp"},
+    "WEB_UNCHANGED": {"status": "PASS", "evidence": "Sin modificaciones ni operaciones Web por B3; no gate E2E Web"},
+    "READY_FOR_PHASE_C": {"status": "BLOCKED", "evidence": "Identidad humana/sesión, políticas fuente-columna, semántica y dos investigaciones reales pendientes"}
+  },
+  "next_step_within_b3": "Solicitar únicamente la correspondencia autorizada de las dos personas con sus identidades DEV y un contexto Console legítimo disponible; confirmar contratos empresariales fuente/columna/filas sin inferirlos de FULL_ACCESS. No comenzar fase C ni ampliar arquitectura. Los gaps Foundation requieren autorización separada antes de modificar su reader."
+}

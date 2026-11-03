@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterator, Mapping
 
 from .ducklake import DATA_ROOT, DuckLakeConnector
+from .query_profile import measured
 from .foundation_publication import (
     COMPONENT_NAMES,
     CURRENT,
@@ -51,6 +52,16 @@ def _quoted(value: str) -> str:
     return '"' + value.replace('"', '""') + '"'
 
 
+def pinned_atomic_relation(component: str, table: str, snapshot: int) -> str:
+    """Exact historical binding for readers and succession replay, never latest."""
+    if (component not in {'sales','credit_memo','oinm','oitw'}
+            or table not in _COMPONENT_TABLES[component]
+            or type(snapshot) is not int or snapshot < 0):
+        raise FoundationReaderError('invalid pinned Atomic relation')
+    return (f'(SELECT * FROM telchi.atomic.{_quoted(table)} '
+            f'AT (VERSION => {snapshot}))')
+
+
 @dataclass(frozen=True)
 class FoundationAccess:
     """Resolved global publication plus immutable physical read references."""
@@ -77,6 +88,12 @@ class FoundationAccess:
             raise FoundationReaderError(
                 f"table {table!r} is not part of foundation component {component!r}"
             )
+        from .sales_facts_transition import uses_sealed_sales, relation as sales_facts_relation
+        if uses_sealed_sales(self.manifest) and component in {'sales', 'credit_memo'}:
+            return sales_facts_relation(self.manifest, component, table)
+        from .independent_facts_succession import stock_contract, relation as stock_relation
+        if component == 'oitw' and stock_contract(self.manifest):
+            return stock_relation(self.manifest)
         if component == "receivables_collections":
             entry = (self.manifest.get("components") or {}).get(component)
             datasets = entry.get("datasets") if isinstance(entry, dict) else None
@@ -88,10 +105,38 @@ class FoundationAccess:
                 f"(SELECT * FROM telchi.business.{_quoted(table)} "
                 f"AT (VERSION => {int(self.manifest_base_snapshot_id)}))"
             )
-        return (
-            f"(SELECT * FROM telchi.atomic.{_quoted(table)} "
-            f"AT (VERSION => {int(self.ducklake_snapshot_id)}))"
-        )
+        return pinned_atomic_relation(component, table, self.ducklake_snapshot_id)
+
+    def operational_observation(self, domain: str, dataset: str) -> str:
+        """Bounded source observations, explicitly separate from legacy metrics.
+
+        Use the declared native grain, cancellation, currency, unit and coverage.
+        This API never upgrades a prefix to continuity or a balance to aging.
+        """
+        from .operational_domains import relation
+        return relation(self.manifest, domain, dataset)
+
+    def require_sales_coverage(self, component: str, start: str, end_exclusive: str) -> list[dict]:
+        """Prove each daily source window, including accredited zero days.
+
+        Date maxima are deliberately not a substitute for a coverage ledger.
+        Historical publications without this contract cannot claim this proof.
+        """
+        from datetime import date, timedelta
+        if component not in {'sales', 'credit_memo'}:
+            raise FoundationReaderError('coverage requires a sales component')
+        first, end = date.fromisoformat(start), date.fromisoformat(end_exclusive)
+        if first >= end:
+            raise FoundationReaderError('invalid sales coverage range')
+        ledger = {(w['domain'], w['start']): w for w in self.manifest.get('sales_coverage', [])}
+        result = []
+        while first < end:
+            window = ledger.get((component, first.isoformat()))
+            if window is None or not window.get('complete'):
+                raise FoundationReaderError('sales temporal coverage is not accredited: ' + first.isoformat())
+            result.append(window)
+            first += timedelta(days=1)
+        return result
 
     def sales(self, table: str) -> str:
         return self.relation("sales", table)
@@ -117,6 +162,50 @@ class FoundationAccess:
                 f"reference dataset {dataset!r} is absent from {self.foundation.reference_version}"
             )
         return path
+
+    def product_commercial_semantics(self) -> dict[str, list[dict]]:
+        """Read this publication's sealed semantics, never an implicit latest."""
+        from .product_commercial_semantics import COMPONENT, read_component
+
+        entry = (self.manifest.get("components") or {}).get(COMPONENT)
+        if not isinstance(entry, dict):
+            raise FoundationReaderError("Product commercial semantics is not part of this Foundation")
+        try:
+            return read_component(entry)
+        except (ValueError, KeyError) as exc:
+            raise FoundationReaderError(str(exc)) from exc
+
+    def product_semantics_relation(self, dataset: str) -> str:
+        """Expose a sealed crosswalk for SQL joins at its declared unique grain."""
+        from .product_commercial_semantics import COMPONENT, dataset_relation
+
+        entry = (self.manifest.get("components") or {}).get(COMPONENT)
+        if not isinstance(entry, dict):
+            raise FoundationReaderError("Product commercial semantics is not part of this Foundation")
+        try:
+            return dataset_relation(entry, dataset)
+        except (ValueError, KeyError) as exc:
+            raise FoundationReaderError(str(exc)) from exc
+
+    def stock_availability(self) -> str:
+        """Pinned warehouse availability in the item's inventory UoM.
+
+        Open purchase orders are separate supply; negative availability remains
+        visible. Consumers must preserve source_as_of when aggregating.
+        """
+        path = str(self.reference("products")).replace("'", "''")
+        return (
+            "(SELECT s.source_system,s.item_code,s.whs_code AS warehouse,"
+            "p.inventory_uom_id,try_cast(s.on_hand AS DECIMAL(38,12)) AS on_hand_qty,"
+            "try_cast(s.is_commited AS DECIMAL(38,12)) AS committed_qty,"
+            "try_cast(s.on_hand AS DECIMAL(38,12))-"
+            "try_cast(s.is_commited AS DECIMAL(38,12)) AS available_qty,"
+            "s.source_as_of AS stock_as_of "
+            f"FROM {self.oitw()} s LEFT JOIN read_parquet('{path}') p "
+            "ON (p.source_system=s.source_system OR "
+            "(p.source_system='SAP_HANA' AND s.source_system='SAP_B1_HANA')) "
+            "AND p.item_code=s.item_code)"
+        )
 
     def as_dict(self) -> dict[str, Any]:
         result = self.foundation.as_dict()
@@ -201,22 +290,43 @@ class FoundationReader:
             yield connection
 
         store = FoundationPublicationStore(same_connection, catalog=self.metadata_catalog)
-        current_count = store.current_count()
+        current_count = measured('foundation_current_count', store.current_count)
         if current_count != 1:
             raise FoundationReaderError(
                 f"CURRENT_PUBLICATION_COUNT={current_count}; expected exactly one"
             )
-        foundation = _get_current_foundation_metadata(store)
-        publication = store.get(foundation.foundation_publication_id)
+        foundation = measured('foundation_current_metadata', _get_current_foundation_metadata, store)
+        publication = measured('foundation_publication_get', store.get, foundation.foundation_publication_id)
         if publication is None or publication.status != CURRENT:
             raise FoundationReaderError("CURRENT publication disappeared during resolution")
-        _validate_manifest(publication, foundation)
-        snapshot_id = int(self.snapshot_resolver(connection, foundation.foundation_publication_id))
-        self.component_verifier(connection, publication, snapshot_id)
+        measured('foundation_manifest_validation', _validate_manifest, publication, foundation)
+        snapshot_id = int(measured('foundation_commit_snapshot_resolution', self.snapshot_resolver, connection, foundation.foundation_publication_id))
+        from .reference_compatibility import KIND as REFRESH_KIND
+        if publication.manifest.get("candidate_kind") == REFRESH_KIND:
+            from .foundation_manifest import validate_manifest
+            measured('foundation_reference_refresh_validation', validate_manifest, store, publication)
+            # A metadata-only commit must not expose later staged/failed facts.
+            snapshot_id = publication.manifest["reference_data_snapshot_id"]
+        from .sales_facts_transition import uses_sealed_sales, verify_files as verify_sales_facts
+        if uses_sealed_sales(publication.manifest):
+            from .foundation_manifest import validate_manifest
+            # A Reference successor was fully validated above, including its
+            # sales ancestry. Do not repeat the same full projection scan.
+            if publication.manifest.get('candidate_kind') != REFRESH_KIND:
+                measured('foundation_sales_facts_validation', validate_manifest, store, publication)
+            measured('foundation_sales_facts_physical_validation', verify_sales_facts, publication.manifest)
+            # Independent Atomic components retain the precise prior visible
+            # snapshot. New sales relations are sealed file-backed versions.
+            snapshot_id = publication.manifest['facts_base_snapshot_id']
+        measured('foundation_component_verification', self.component_verifier, connection, publication, snapshot_id)
         base_snapshot_id = publication.manifest.get("base_snapshot_id")
         if not isinstance(base_snapshot_id, int):
             raise FoundationReaderError("foundation manifest base snapshot is missing (fail closed)")
         reference_path = DATA_ROOT / "reference" / "_versions" / foundation.reference_version
+        if publication.manifest.get("candidate_kind") == REFRESH_KIND:
+            declared = publication.manifest["reference_compatibility"]["reference_path"]
+            if Path(declared).resolve() != reference_path.resolve():
+                raise FoundationReaderError("Reference refresh proof is bound to another immutable root")
         if self.verify_reference_path and not reference_path.is_dir():
             raise FoundationReaderError(
                 f"Reference {foundation.reference_version!r} has no immutable version directory"
@@ -333,7 +443,18 @@ def _verify_component_publications(
         "oinm": publication.oinm_publication_id,
         "oitw": publication.oitw_publication_id,
     }
+    from .sales_facts_transition import uses_sealed_sales
+    from .independent_facts_succession import stock_contract
     for component, publication_id in expected.items():
+        if component == 'oitw' and stock_contract(getattr(publication, 'manifest', {})):
+            # The canonical successor validator has replayed this exact sealed
+            # file against verified capture bytes. It is not an Atomic record.
+            continue
+        if (uses_sealed_sales(getattr(publication, 'manifest', {}))
+                and component in {'sales', 'credit_memo'}):
+            # This kind has already passed manifest and physical file checks;
+            # it does not impersonate a legacy Atomic publication record.
+            continue
         if not publication_id:
             raise FoundationReaderError(f"foundation component {component} is missing")
         row = connection.execute(

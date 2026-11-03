@@ -1,0 +1,71 @@
+{
+  "at": "2026-10-20T12:33:19.311072+00:00",
+  "branch": "feature/console-backend-core",
+  "tests": {
+    "command": "cd SrvRestAstroLS_v1/backend && uv run pytest modules/telchi/investigation/validation/iva_bolivia_13_v1/test_reconcile.py -q",
+    "result": "15 passed in 0.56s"
+  },
+  "gates": [
+    {
+      "command": "lat check md",
+      "exit_code": 0,
+      "stdout": "Scanned 32 .md\nmd: All links OK\n",
+      "stderr": ""
+    },
+    {
+      "command": "lat check index",
+      "exit_code": 0,
+      "stdout": "index: All directory index files OK\n",
+      "stderr": ""
+    },
+    {
+      "command": "lat check sections",
+      "exit_code": 0,
+      "stdout": "sections: All sections have valid leading paragraphs\n",
+      "stderr": ""
+    },
+    {
+      "command": "lat check code-refs",
+      "exit_code": 0,
+      "stdout": "Scanned 47 .astro, 1 .bak, 4 .css, 156 .csv, 1 .diff, 1 .example, 183 .html, 2 .ico, 27 .js, 502 .json, 14 .jsonl, 7 .mjs, 3 .patch, 1 .pdf, 10 .pid, 27 .png, 1131 .py, 12 .sh, 136 .sql, 6 .stderr, 68 .svelte, 1 .toml, 92 .ts, 162 .txt, 2 .webm, 1 .xlsx, 19 .yaml, 1 .zip, 3 (no ext)\ncode-refs: All references OK\n",
+      "stderr": ""
+    },
+    {
+      "command": "lat check",
+      "exit_code": 0,
+      "stdout": "Scanned 47 .astro, 1 .bak, 4 .css, 156 .csv, 1 .diff, 1 .example, 183 .html, 2 .ico, 27 .js, 502 .json, 14 .jsonl, 32 .md, 7 .mjs, 3 .patch, 1 .pdf, 10 .pid, 27 .png, 1131 .py, 12 .sh, 136 .sql, 6 .stderr, 68 .svelte, 1 .toml, 92 .ts, 162 .txt, 2 .webm, 1 .xlsx, 19 .yaml, 1 .zip, 3 (no ext) in 1.4s\n\nWarning: No init version recorded \u2014 run lat init to set up agent hooks and configuration.\nAll checks passed\nWarning: No LLM key found \u2014 semantic search (lat search) will not work. Provide a key via LAT_LLM_KEY, LAT_LLM_KEY_FILE, LAT_LLM_KEY_HELPER, or run lat init to configure.\n",
+      "stderr": ""
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "report_local_links_and_sections": "PASS",
+  "new_files_whitespace": "PASS",
+  "final_review": "New research sources and report inspected; no pre-existing files edited",
+  "files": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/iva_bolivia_13_v1/reconcile.py": "c5784cb45757ce02fcd0cced55c78031935631c4f7cee6e81a14cae9a4e96618",
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/iva_bolivia_13_v1/hana_probe.py": "252b89f81d71385e816dfca401c1df11e1dba319b3d3df79e0445e7b2a7bc509",
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/iva_bolivia_13_v1/enrich.py": "e16ace9687bfb6421eb831d4b1a36e063eda7eec8e484a14940c1a24910f1af9",
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/iva_bolivia_13_v1/sources.py": "72645facf15f313c2dc56079308ce02a7888d6e126b598ab6d3378792ba93a1c",
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/iva_bolivia_13_v1/test_reconcile.py": "0fc95a736e7cf65efae9d3d208d1122ac3e62cfcdbe58dcf5293c55f770cd846",
+    "data/reports/telchi/iva-bolivia-13-v1/report.md": "2ebf0a7adaf6f99be5bc47749ff137caef672a0044bffc3bcd039c953db9b438"
+  },
+  "artifact_hashes": {
+    "data/reports/telchi/iva-bolivia-13-v1/verified/documents.csv": "a39deebc86a98aaae43193e4a4f23f53585a205a24bb0c82da2deefe0e0b12d8",
+    "data/reports/telchi/iva-bolivia-13-v1/verified/diagnostics.json": "3761d2349e6aff9e1bc9bcb5745dc072452e846b54f7e457d3415f58b77667ef",
+    "data/reports/telchi/iva-bolivia-13-v1/verified/reconciliation.json": "d1662373dcd9e388e30197accb24d627a6b4cd0d49419ecd69a82f6f42ecc9c7"
+  },
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "limitations": [
+    "HANA TCP ConnectionRefusedError; no SQL executed",
+    "No header fiscal decomposition available",
+    "Currency configuration reused dated OADM evidence; no live recheck",
+    "No runtime capability or production promotion",
+    "Unresolved credit-note net semantics"
+  ]
+}

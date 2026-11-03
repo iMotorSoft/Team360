@@ -1,0 +1,2375 @@
+{
+  "cors": {
+    "headers": [
+      "*"
+    ],
+    "methods": [
+      "*"
+    ],
+    "origins": [
+      "http://localhost:3050",
+      "http://127.0.0.1:3050",
+      "http://localhost:3060",
+      "http://127.0.0.1:3060",
+      "http://localhost:3061",
+      "http://127.0.0.1:3061",
+      "https://team360.live",
+      "https://mamamia360.com",
+      "https://www.mamamia360.com"
+    ]
+  },
+  "openapi": {
+    "components": {
+      "schemas": {
+        "DevTurnRequest": {
+          "properties": {
+            "assistant_instance_code": {
+              "default": "team360_sales_diagnosis",
+              "type": "string"
+            },
+            "knowledge_scope_code": {
+              "default": "ks_team360_sales_diagnosis",
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object"
+            },
+            "package_code": {
+              "default": "pkg_sales_diagnosis",
+              "type": "string"
+            },
+            "session_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "message",
+            "session_id"
+          ],
+          "title": "DevTurnRequest",
+          "type": "object"
+        },
+        "ProductTurnRequest": {
+          "properties": {
+            "assistant_instance_code": {
+              "default": "team360_sales_diagnosis",
+              "type": "string"
+            },
+            "knowledge_scope_code": {
+              "default": "ks_team360_sales_diagnosis",
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object"
+            },
+            "package_code": {
+              "default": "pkg_sales_diagnosis",
+              "type": "string"
+            },
+            "service_code": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "session_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "message",
+            "session_id"
+          ],
+          "title": "ProductTurnRequest",
+          "type": "object"
+        },
+        "PublicEmbedAuthRequest": {
+          "properties": {
+            "client_id": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "session_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "client_id",
+            "message",
+            "session_id"
+          ],
+          "title": "PublicEmbedAuthRequest",
+          "type": "object"
+        },
+        "PublicEmbedAuthResponse": {
+          "properties": {
+            "client_id": {
+              "type": "string"
+            },
+            "signature": {
+              "type": "string"
+            },
+            "timestamp": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "client_id",
+            "signature",
+            "timestamp"
+          ],
+          "title": "PublicEmbedAuthResponse",
+          "type": "object"
+        },
+        "PublicLeadRequest": {
+          "properties": {
+            "consent": {
+              "default": false,
+              "type": "boolean"
+            },
+            "contact": {
+              "type": "object"
+            },
+            "cta_type": {
+              "default": "",
+              "type": "string"
+            },
+            "session_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "session_id"
+          ],
+          "title": "PublicLeadRequest",
+          "type": "object"
+        },
+        "PublicMessageRequest": {
+          "properties": {
+            "locale": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "session_id": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "session_id",
+            "text"
+          ],
+          "title": "PublicMessageRequest",
+          "type": "object"
+        },
+        "PublicStartRequest": {
+          "properties": {
+            "assistant_display_name": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "assistant_instance_code": {
+              "default": "team360_sales_diagnosis",
+              "type": "string"
+            },
+            "initial_text": {
+              "default": "",
+              "type": "string"
+            },
+            "knowledge_scope_code": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lead_owner": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "locale": {
+              "default": "es",
+              "type": "string"
+            },
+            "package_code": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "service_code": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "site_channel": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "source_channel": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "source_url": {
+              "default": "",
+              "type": "string"
+            },
+            "visitor": {
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "PublicStartRequest",
+          "type": "object"
+        },
+        "PublicSubmitChecklistRequest": {
+          "properties": {
+            "answers": {
+              "type": "array"
+            },
+            "session_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "session_id"
+          ],
+          "title": "PublicSubmitChecklistRequest",
+          "type": "object"
+        },
+        "PublicTurnRequest": {
+          "properties": {
+            "assistant_instance_code": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "client_id": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "interaction_response": {
+              "oneOf": [
+                {
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "knowledge_scope_code": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "locale": {
+              "default": "es",
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "organization_code": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "package_code": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "session_id": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "timestamp": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "workspace_code": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "message"
+          ],
+          "title": "PublicTurnRequest",
+          "type": "object"
+        },
+        "PublicTurnResponse": {
+          "properties": {
+            "assistant_display_name": {
+              "default": "Diagnosticador",
+              "type": "string"
+            },
+            "diagnosis": {
+              "oneOf": [
+                {
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "interaction_block": {
+              "oneOf": [
+                {
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "is_new": {
+              "default": false,
+              "type": "boolean"
+            },
+            "language": {
+              "oneOf": [
+                {
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "response_text": {
+              "type": "string"
+            },
+            "session_id": {
+              "type": "string"
+            },
+            "turn_count": {
+              "default": 0,
+              "type": "integer"
+            },
+            "turn_decision": {
+              "oneOf": [
+                {
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "response_text",
+            "session_id"
+          ],
+          "title": "PublicTurnResponse",
+          "type": "object"
+        },
+        "SaveAnswerRequest": {
+          "properties": {
+            "answer": {
+              "type": "object"
+            },
+            "step_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "step_id"
+          ],
+          "title": "SaveAnswerRequest",
+          "type": "object"
+        },
+        "StartSessionRequest": {
+          "properties": {
+            "assistant_instance_id": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "locale": {
+              "default": "es",
+              "type": "string"
+            },
+            "source_url": {
+              "default": "",
+              "type": "string"
+            },
+            "visitor": {
+              "type": "object"
+            }
+          },
+          "required": [],
+          "title": "StartSessionRequest",
+          "type": "object"
+        }
+      }
+    },
+    "info": {
+      "title": "Litestar API",
+      "version": "1.0.0"
+    },
+    "openapi": "3.1.0",
+    "paths": {
+      "/api/automation-diagnosis/session/start": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiAutomationDiagnosisSessionStartStartSession",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartSessionRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "StartSession"
+        }
+      },
+      "/api/automation-diagnosis/session/{session_id}/answer": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiAutomationDiagnosisSessionSessionIdAnswerSaveAnswer",
+          "parameters": [
+            {
+              "deprecated": false,
+              "in": "path",
+              "name": "session_id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveAnswerRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "SaveAnswer"
+        }
+      },
+      "/api/automation-diagnosis/session/{session_id}/classify": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiAutomationDiagnosisSessionSessionIdClassifyClassify",
+          "parameters": [
+            {
+              "deprecated": false,
+              "in": "path",
+              "name": "session_id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "Classify"
+        }
+      },
+      "/api/console/bootstrap": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiConsoleBootstrapConsoleBootstrap",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "ConsoleBootstrap"
+        }
+      },
+      "/api/console/me": {
+        "get": {
+          "deprecated": false,
+          "operationId": "ApiConsoleMeConsoleMe",
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            }
+          },
+          "summary": "ConsoleMe"
+        }
+      },
+      "/api/dev/sales-diagnosis-runtime/turn": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiDevSalesDiagnosisRuntimeTurnDevSalesDiagnosisTurn",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevTurnRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "DevSalesDiagnosisTurn"
+        }
+      },
+      "/api/diagnosis/embed/auth": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiDiagnosisEmbedAuthPublicEmbedAuth",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicEmbedAuthRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/PublicEmbedAuthResponse"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "PublicEmbedAuth"
+        }
+      },
+      "/api/diagnosis/lead": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiDiagnosisLeadPublicLead",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicLeadRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            },
+            "501": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Server does not support this operation",
+              "headers": {}
+            }
+          },
+          "summary": "PublicLead"
+        }
+      },
+      "/api/diagnosis/message": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiDiagnosisMessagePublicMessage",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicMessageRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "PublicMessage"
+        }
+      },
+      "/api/diagnosis/session/{session_id}": {
+        "get": {
+          "deprecated": false,
+          "operationId": "ApiDiagnosisSessionSessionIdPublicGetSession",
+          "parameters": [
+            {
+              "deprecated": false,
+              "in": "path",
+              "name": "session_id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "PublicGetSession"
+        }
+      },
+      "/api/diagnosis/start": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiDiagnosisStartPublicStart",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicStartRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "PublicStart"
+        }
+      },
+      "/api/diagnosis/submit-checklist": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiDiagnosisSubmitChecklistPublicSubmitChecklist",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicSubmitChecklistRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            },
+            "501": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Server does not support this operation",
+              "headers": {}
+            }
+          },
+          "summary": "PublicSubmitChecklist"
+        }
+      },
+      "/api/diagnosis/turn": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiDiagnosisTurnPublicTurn",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicTurnRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/PublicTurnResponse"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "PublicTurn"
+        }
+      },
+      "/api/health": {
+        "get": {
+          "deprecated": false,
+          "operationId": "ApiHealthHealth",
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            }
+          },
+          "summary": "Health"
+        }
+      },
+      "/api/sales-diagnosis-runtime/turn": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiSalesDiagnosisRuntimeTurnSalesDiagnosisTurn",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductTurnRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "SalesDiagnosisTurn"
+        }
+      },
+      "/api/team360-flow/cases/clear": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowCasesClearFlowCasesClear",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "FlowCasesClear"
+        }
+      },
+      "/api/team360-flow/configuration": {
+        "get": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowConfigurationFlowConfigurationList",
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            }
+          },
+          "summary": "FlowConfigurationList"
+        }
+      },
+      "/api/team360-flow/configuration/{sector_id}": {
+        "get": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowConfigurationSectorIdFlowConfigurationGet",
+          "parameters": [
+            {
+              "deprecated": false,
+              "in": "path",
+              "name": "sector_id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "FlowConfigurationGet"
+        },
+        "patch": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowConfigurationSectorIdFlowConfigurationUpdate",
+          "parameters": [
+            {
+              "deprecated": false,
+              "in": "path",
+              "name": "sector_id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "FlowConfigurationUpdate"
+        }
+      },
+      "/api/team360-flow/executive": {
+        "get": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowExecutiveExecutiveCaseList",
+          "parameters": [
+            {
+              "allowEmptyValue": false,
+              "allowReserved": false,
+              "deprecated": false,
+              "in": "query",
+              "name": "page",
+              "required": false,
+              "schema": {
+                "default": 1,
+                "type": "integer"
+              }
+            },
+            {
+              "allowEmptyValue": false,
+              "allowReserved": false,
+              "deprecated": false,
+              "in": "query",
+              "name": "page_size",
+              "required": false,
+              "schema": {
+                "default": 20,
+                "type": "integer"
+              }
+            },
+            {
+              "allowEmptyValue": false,
+              "allowReserved": false,
+              "deprecated": false,
+              "in": "query",
+              "name": "status",
+              "required": false,
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            {
+              "allowEmptyValue": false,
+              "allowReserved": false,
+              "deprecated": false,
+              "in": "query",
+              "name": "sector_id",
+              "required": false,
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            {
+              "allowEmptyValue": false,
+              "allowReserved": false,
+              "deprecated": false,
+              "in": "query",
+              "name": "search",
+              "required": false,
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            {
+              "allowEmptyValue": false,
+              "allowReserved": false,
+              "deprecated": false,
+              "in": "query",
+              "name": "sla_status",
+              "required": false,
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            {
+              "allowEmptyValue": false,
+              "allowReserved": false,
+              "deprecated": false,
+              "in": "query",
+              "name": "escalated",
+              "required": false,
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "ExecutiveCaseList"
+        }
+      },
+      "/api/team360-flow/executive/{request_id}": {
+        "get": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowExecutiveRequestIdExecutiveAuditQuery",
+          "parameters": [
+            {
+              "deprecated": false,
+              "in": "path",
+              "name": "request_id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "allowEmptyValue": false,
+              "allowReserved": false,
+              "deprecated": false,
+              "in": "query",
+              "name": "question",
+              "required": false,
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "ExecutiveAuditQuery"
+        }
+      },
+      "/api/team360-flow/executive/{request_id}/resend-approval": {
+        "post": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowExecutiveRequestIdResendApprovalFlowResendApproval",
+          "parameters": [
+            {
+              "deprecated": false,
+              "in": "path",
+              "name": "request_id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Document created, URL follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "FlowResendApproval"
+        }
+      },
+      "/api/team360-flow/operational-settings": {
+        "get": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowOperationalSettingsFlowOperationalSettingsGet",
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            }
+          },
+          "summary": "FlowOperationalSettingsGet"
+        },
+        "patch": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowOperationalSettingsFlowOperationalSettingsUpdate",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "description": "Validation Exception",
+                    "examples": [
+                      {
+                        "detail": "Bad Request",
+                        "extra": {},
+                        "status_code": 400
+                      }
+                    ],
+                    "properties": {
+                      "detail": {
+                        "type": "string"
+                      },
+                      "extra": {
+                        "additionalProperties": {},
+                        "type": [
+                          "null",
+                          "object",
+                          "array"
+                        ]
+                      },
+                      "status_code": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "detail",
+                      "status_code"
+                    ],
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Bad request syntax or unsupported method"
+            }
+          },
+          "summary": "FlowOperationalSettingsUpdate"
+        }
+      },
+      "/api/team360-flow/scheduler/status": {
+        "get": {
+          "deprecated": false,
+          "operationId": "ApiTeam360FlowSchedulerStatusFlowSchedulerStatus",
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            }
+          },
+          "summary": "FlowSchedulerStatus"
+        }
+      },
+      "/health": {
+        "get": {
+          "deprecated": false,
+          "operationId": "HealthHealthRoot",
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            }
+          },
+          "summary": "HealthRoot"
+        }
+      },
+      "/webhooks/messaging/gupshup/whatsapp": {
+        "post": {
+          "deprecated": false,
+          "operationId": "WebhooksMessagingGupshupWhatsappReceiveWebhook",
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "additionalProperties": {},
+                    "type": "object"
+                  }
+                }
+              },
+              "description": "Request fulfilled, document follows",
+              "headers": {}
+            }
+          },
+          "summary": "ReceiveWebhook",
+          "tags": [
+            "Messaging Webhooks"
+          ]
+        }
+      }
+    },
+    "servers": [
+      {
+        "url": "/"
+      }
+    ]
+  },
+  "routes": [
+    {
+      "handler": "routes.automation_diagnosis.start_session",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/automation-diagnosis/session/start"
+    },
+    {
+      "handler": "routes.automation_diagnosis.save_answer",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/automation-diagnosis/session/{session_id:str}/answer"
+    },
+    {
+      "handler": "routes.automation_diagnosis.classify",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/automation-diagnosis/session/{session_id:str}/classify"
+    },
+    {
+      "handler": "routes.console_bootstrap.console_bootstrap",
+      "method": "POST",
+      "owner": "Console",
+      "path": "/api/console/bootstrap"
+    },
+    {
+      "handler": "routes.console_me.console_me",
+      "method": "GET",
+      "owner": "Console",
+      "path": "/api/console/me"
+    },
+    {
+      "handler": "routes.sales_diagnosis_runtime_dev.dev_sales_diagnosis_turn",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/dev/sales-diagnosis-runtime/turn"
+    },
+    {
+      "handler": "routes.diagnosis.public_embed_auth",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/diagnosis/embed/auth"
+    },
+    {
+      "handler": "routes.diagnosis.public_lead",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/diagnosis/lead"
+    },
+    {
+      "handler": "routes.diagnosis.public_message",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/diagnosis/message"
+    },
+    {
+      "handler": "routes.diagnosis.public_get_session",
+      "method": "GET",
+      "owner": "Diagnosis",
+      "path": "/api/diagnosis/session/{session_id:str}"
+    },
+    {
+      "handler": "routes.diagnosis.public_start",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/diagnosis/start"
+    },
+    {
+      "handler": "routes.diagnosis.public_submit_checklist",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/diagnosis/submit-checklist"
+    },
+    {
+      "handler": "routes.diagnosis.public_turn",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/diagnosis/turn"
+    },
+    {
+      "handler": "ls_iMotorSoft_Srv01.health",
+      "method": "GET",
+      "owner": "Core",
+      "path": "/api/health"
+    },
+    {
+      "handler": "routes.sales_diagnosis_runtime.sales_diagnosis_turn",
+      "method": "POST",
+      "owner": "Diagnosis",
+      "path": "/api/sales-diagnosis-runtime/turn"
+    },
+    {
+      "handler": "modules.flow.routes.flow_cases_clear",
+      "method": "POST",
+      "owner": "Flow",
+      "path": "/api/team360-flow/cases/clear"
+    },
+    {
+      "handler": "modules.flow.routes.flow_configuration_list",
+      "method": "GET",
+      "owner": "Flow",
+      "path": "/api/team360-flow/configuration"
+    },
+    {
+      "handler": "modules.flow.routes.flow_configuration_get",
+      "method": "GET",
+      "owner": "Flow",
+      "path": "/api/team360-flow/configuration/{sector_id:str}"
+    },
+    {
+      "handler": "modules.flow.routes.flow_configuration_update",
+      "method": "PATCH",
+      "owner": "Flow",
+      "path": "/api/team360-flow/configuration/{sector_id:str}"
+    },
+    {
+      "handler": "modules.flow.routes.executive_case_list",
+      "method": "GET",
+      "owner": "Flow",
+      "path": "/api/team360-flow/executive"
+    },
+    {
+      "handler": "modules.flow.routes.executive_audit_query",
+      "method": "GET",
+      "owner": "Flow",
+      "path": "/api/team360-flow/executive/{request_id:str}"
+    },
+    {
+      "handler": "modules.flow.routes.flow_resend_approval",
+      "method": "POST",
+      "owner": "Flow",
+      "path": "/api/team360-flow/executive/{request_id:str}/resend-approval"
+    },
+    {
+      "handler": "modules.flow.routes.flow_operational_settings_get",
+      "method": "GET",
+      "owner": "Flow",
+      "path": "/api/team360-flow/operational-settings"
+    },
+    {
+      "handler": "modules.flow.routes.flow_operational_settings_update",
+      "method": "PATCH",
+      "owner": "Flow",
+      "path": "/api/team360-flow/operational-settings"
+    },
+    {
+      "handler": "modules.flow.routes.flow_scheduler_status",
+      "method": "GET",
+      "owner": "Flow",
+      "path": "/api/team360-flow/scheduler/status"
+    },
+    {
+      "handler": "ls_iMotorSoft_Srv01.health_root",
+      "method": "GET",
+      "owner": "Core",
+      "path": "/health"
+    },
+    {
+      "handler": "modules.messaging.webhooks.gupshup_whatsapp.GupshupWhatsAppWebhookController.receive_webhook",
+      "method": "POST",
+      "owner": "Messaging",
+      "path": "/webhooks/messaging/gupshup/whatsapp"
+    }
+  ],
+  "shutdown": [
+    "ls_iMotorSoft_Srv01._stop_flow_scheduler",
+    "ls_iMotorSoft_Srv01._close_db_pool"
+  ],
+  "startup": [
+    "ls_iMotorSoft_Srv01._open_db_pool",
+    "ls_iMotorSoft_Srv01._start_flow_scheduler"
+  ]
+}

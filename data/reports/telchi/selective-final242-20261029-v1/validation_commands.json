@@ -1,0 +1,33 @@
+{
+  "working_directory": "SrvRestAstroLS_v1/backend",
+  "offline_review": {
+    "command": "uv run python -m modules.telchi.investigation.validation.operational_universe_v2.final_completion",
+    "result": "Integrity PASS; 3000 resolved, 242 pending; offline latency continuation allowed; zero HANA queries"
+  },
+  "tests": {
+    "command": "uv run pytest --import-mode=importlib --basetemp=/dev/shm/telchi-final242-regression-$(date +%s) modules/telchi/investigation/validation/operational_universe_v2 modules/telchi/investigation/validation/controlled_physical_capture_v1 modules/telchi/investigation/validation/operational_products_offline_v1 modules/telchi/datalake/tests/test_product_business_classification.py modules/telchi/datalake/tests/test_physical_reference_offline.py modules/telchi/datalake/tests/test_physical_reference_end_to_end.py -k 'not real_sales_and_returns_exclude_canceled_documents' -q",
+    "passed": 245,
+    "deselected": 1,
+    "seconds": 143.93,
+    "evidence_reused_at_close": "No source changes after this passing regression and before or after HANA execution"
+  },
+  "execution": {
+    "command": "uv run python -m modules.telchi.investigation.validation.operational_universe_v2.final_completion --authorize-hana FINAL_242_EXPLICITLY_AUTHORIZED",
+    "exit_code": 1,
+    "result": "PARTIAL: safe stop after third SELECT, latency 1.9761375669986592 seconds; response durable; no later SELECT"
+  },
+  "offline_final_checks": {
+    "result": "Active ledger hashes/order/reconciliation PASS; two recoveries no writes; 84 prior directory inventories unchanged; original 59 historical inventories unchanged; 72 old ledgers valid; one historical incomplete ledger unchanged, not a source",
+    "historical_incomplete_ledger": "physical-capture-20261028T231759Z-block1 references absent batch-0048.json; absence and checkpoint already present in phase4 preflight inventory; no repair performed"
+  },
+  "repository_root_commands": [
+    "lat check md",
+    "lat check index",
+    "lat check sections",
+    "lat check code-refs",
+    "lat check",
+    "git diff --check"
+  ],
+  "gates_result": "PASS; LAT warnings about absent init version and optional LLM key do not fail gates",
+  "final_diff_review": "Read both new source files; existing transport.py and continuation.py hashes match phase5 report; no existing tracked files edited by this execution"
+}

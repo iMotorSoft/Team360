@@ -1,0 +1,283 @@
+{
+  "GATE": "TELCHI_PRODUCT_COMMERCIAL_SEMANTICS_CONTRACT_V1_PASS",
+  "commercial_purpose": {
+    "values": [
+      "COMMERCIAL_ONLY",
+      "INTERNAL_ONLY",
+      "MIXED",
+      "UNKNOWN"
+    ],
+    "rule_version": "1.0.0",
+    "absence_is_window_bounded": true,
+    "no_name_or_prefix_inference": true
+  },
+  "brand": {
+    "status": "UNKNOWN",
+    "source_dimension_rows": 0,
+    "gap": "SOURCE_GAP_REQUIRES_FUTURE_INGESTION"
+  },
+  "uom": {
+    "base": "ITEM_INVENTORY_UOM",
+    "line_factor": "SAP_NumPerMsr",
+    "states": [
+      "UOM_INCOMPATIBLE",
+      "UOM_RESOLVED_EXACT",
+      "UOM_RESOLVED_SUPPORTED",
+      "UOM_UNRESOLVED"
+    ],
+    "credit_historical_support": "KEY_AND_VALUES_AND_DOCUMENT_LAST_UPDATE_MATCH; NOT_EXACT_CURRENT_LINEAGE",
+    "base_invoice_link_is_not_conversion_proof": true
+  },
+  "net_quantity": {
+    "grain": [
+      "source_system",
+      "item_code",
+      "inventory_uom_id"
+    ],
+    "formula": "SUM(invoice_base_qty)-SUM(credit_memo_base_qty)",
+    "any_unresolved_line_blocks_product_total": true
+  },
+  "net_amount": {
+    "status": "NET_PRODUCT_AMOUNT_UNRESOLVED",
+    "reason": "Pinned invoice extraction omits header discount attribution; historical header amounts cannot silently establish current source-native product allocation"
+  },
+  "available_stock": {
+    "status": "PASS",
+    "relation": "(SELECT * FROM telchi.atomic.\"inventory_balance\" AT (VERSION => 1408))",
+    "grain": [
+      "source_system",
+      "item_code",
+      "whs_code",
+      "inventory_uom_id",
+      "source_as_of"
+    ],
+    "on_hand_qty": "on_hand",
+    "committed_qty": "is_commited",
+    "available_qty": "CAST(on_hand AS DECIMAL)-CAST(is_commited AS DECIMAL)",
+    "stock_as_of": "source_as_of",
+    "inbound_orders_included": false,
+    "aggregation_requires": [
+      "same_item",
+      "same_inventory_uom",
+      "same_source_as_of",
+      "unique_warehouse"
+    ]
+  },
+  "production_consumption": {
+    "relation": [
+      {
+        "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-01/fact-capture-2026-09-24_production_issue_2026-01_1790295329888997898/manifest.json",
+        "manifest_sha256": "8b16a0c0d322c3e240d8d1aef288c1c05f9669604431bdeff1cabceef72dac11",
+        "files": [
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-01/fact-capture-2026-09-24_production_issue_2026-01_1790295329888997898/part-00000.parquet"
+        ],
+        "file_hashes": [
+          "5c279787179d4bfe9e55b9e4437a361b5b73ead7428cefa772654357380eb462"
+        ],
+        "source_as_of": "2026-09-25T00:15:29.889081+00:00",
+        "source_as_of_window": {
+          "from": "2026-01-01",
+          "to": "2026-02-01"
+        }
+      },
+      {
+        "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-02/fact-capture-2026-09-24_production_issue_2026-02_1790295331907944208/manifest.json",
+        "manifest_sha256": "e87f73f8a20ebe2409ce9eb140e295cc8bc717810fde84c4ff6c8af08c5231aa",
+        "files": [
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-02/fact-capture-2026-09-24_production_issue_2026-02_1790295331907944208/part-00000.parquet"
+        ],
+        "file_hashes": [
+          "3964f0f5d6c9937e9282bae5008eaa7f86daf4bf1da5ad31e30851f3ea5e7fb6"
+        ],
+        "source_as_of": "2026-09-25T00:15:31.908020+00:00",
+        "source_as_of_window": {
+          "from": "2026-02-01",
+          "to": "2026-03-01"
+        }
+      },
+      {
+        "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-03/fact-capture-2026-09-24_production_issue_2026-03_1790295334043084738/manifest.json",
+        "manifest_sha256": "362178bc683d1fc39a852e0651c796c8dec16ba35af58394f19ecfa2eaf0548f",
+        "files": [
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-03/fact-capture-2026-09-24_production_issue_2026-03_1790295334043084738/part-00000.parquet"
+        ],
+        "file_hashes": [
+          "f34a3b8d50e88dd449337d6676a58ea2ae8fdd3d591cbd4ae1998296f8bcab73"
+        ],
+        "source_as_of": "2026-09-25T00:15:34.043127+00:00",
+        "source_as_of_window": {
+          "from": "2026-03-01",
+          "to": "2026-04-01"
+        }
+      },
+      {
+        "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-04/fact-capture-2026-09-24_production_issue_2026-04_1790295336373323609/manifest.json",
+        "manifest_sha256": "e5bd94a423e97af2e86536f32037b3c873053e025e7a73480d6f44b50cd87a90",
+        "files": [
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-04/fact-capture-2026-09-24_production_issue_2026-04_1790295336373323609/part-00000.parquet"
+        ],
+        "file_hashes": [
+          "56e689ed76f1b5d829b07f5cb7b7b19458e800255a1afeb83d0eb5cc26ab2528"
+        ],
+        "source_as_of": "2026-09-25T00:15:36.373384+00:00",
+        "source_as_of_window": {
+          "from": "2026-04-01",
+          "to": "2026-05-01"
+        }
+      },
+      {
+        "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-05/fact-capture-2026-09-24_production_issue_2026-05_1790295338849264588/manifest.json",
+        "manifest_sha256": "2dd99f4e9bfebe8e63bd50b892b0af053b10a0d4d6a95dca33d179f0f13a1c67",
+        "files": [
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-05/fact-capture-2026-09-24_production_issue_2026-05_1790295338849264588/part-00000.parquet"
+        ],
+        "file_hashes": [
+          "a19ef457cd897430e6d475922667628e977b9a0346cf75844792e4a99b358c00"
+        ],
+        "source_as_of": "2026-09-25T00:15:38.849364+00:00",
+        "source_as_of_window": {
+          "from": "2026-05-01",
+          "to": "2026-06-01"
+        }
+      },
+      {
+        "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-06/fact-capture-2026-09-24_production_issue_2026-06_1790295341033188058/manifest.json",
+        "manifest_sha256": "cfa6cde262ce6733f2324f67b23a6f4e241c99e8de7e697d0ad54ba079b8a6de",
+        "files": [
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-06/fact-capture-2026-09-24_production_issue_2026-06_1790295341033188058/part-00000.parquet"
+        ],
+        "file_hashes": [
+          "ff38f105013ba896ee6ff63c02b008875ee141ee76b00b551b7c95b0cb295fa5"
+        ],
+        "source_as_of": "2026-09-25T00:15:41.033245+00:00",
+        "source_as_of_window": {
+          "from": "2026-06-01",
+          "to": "2026-07-01"
+        }
+      },
+      {
+        "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-07/fact-capture-2026-09-24_production_issue_2026-07_1790295345725841493/manifest.json",
+        "manifest_sha256": "8290551a7430886159343a62988bd6b64fba95e1b993b46a90bde78dcf0d4882",
+        "files": [
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-07/fact-capture-2026-09-24_production_issue_2026-07_1790295345725841493/part-00000.parquet"
+        ],
+        "file_hashes": [
+          "f048b65982b431fcbcfa658f8c0ef43d4d2d15b97b9827aecfbcfa9891694090"
+        ],
+        "source_as_of": "2026-09-25T00:15:45.725888+00:00",
+        "source_as_of_window": {
+          "from": "2026-07-01",
+          "to": "2026-08-01"
+        }
+      },
+      {
+        "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-08/fact-capture-2026-09-24_production_issue_2026-08_1790295347878659368/manifest.json",
+        "manifest_sha256": "4e91ae5b61ce6e6a8e18cf0b26f23688656f3b826c597ec91489465837c99cb8",
+        "files": [
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-08/fact-capture-2026-09-24_production_issue_2026-08_1790295347878659368/part-00000.parquet"
+        ],
+        "file_hashes": [
+          "083675cbdec1003e138c8111c207f67086e7bf0b605d3e36fd38c7f0846e0c22"
+        ],
+        "source_as_of": "2026-09-25T00:15:47.878754+00:00",
+        "source_as_of_window": {
+          "from": "2026-08-01",
+          "to": "2026-09-01"
+        }
+      },
+      {
+        "manifest_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-09/fact-capture-2026-09-24_production_issue_2026-09_1790295350285418163/manifest.json",
+        "manifest_sha256": "43eb27ad50aac206dc14d624adc9e61c7736a4fc894a928cc47d52366faea997",
+        "files": [
+          "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/TELCHI_DATALAKE_MATERIAL_SUPPLY_FACT_CAPTURE_V1/production_issue/2026-09/fact-capture-2026-09-24_production_issue_2026-09_1790295350285418163/part-00000.parquet"
+        ],
+        "file_hashes": [
+          "95a5a8d13fdbbc00fa9958e1d09312432ba568a10b72f9c31f86e29c40f410ab"
+        ],
+        "source_as_of": "2026-09-25T00:15:50.285463+00:00",
+        "source_as_of_window": {
+          "from": "2026-09-01",
+          "to": "2026-10-01"
+        }
+      }
+    ],
+    "filter": "CANCELED=N AND BaseType=202 AND Quantity>0",
+    "grain": [
+      "DocEntry",
+      "LineNum"
+    ],
+    "product_key": "ItemCode",
+    "quantity_conversion": "Quantity*NumPerMsr only with verified item inventory UoM",
+    "bom_is_not_actual_consumption": true,
+    "parent_orders_outside_capture_issue_lines": 105,
+    "parent_order_capture_is_complete": false
+  },
+  "temporal": {
+    "sales": {
+      "data_as_of": "2026-09-24T13:53:45.185438+00:00",
+      "coverage_from": "2022-03-31",
+      "coverage_to": "2026-09-24",
+      "coverage_meaning": "OBSERVED_DOCUMENT_BOUNDS_NOT_COMPLETENESS_PROOF",
+      "quantity_materialization_from": "2026-01-01",
+      "quantity_materialization_to": "2026-09-24"
+    },
+    "credit_memo": {
+      "data_as_of": "2026-09-24T13:12:12.361426+00:00",
+      "coverage_from": "2026-01-01",
+      "coverage_to": "2026-09-23",
+      "coverage_meaning": "OBSERVED_DOCUMENT_BOUNDS_NOT_COMPLETENESS_PROOF",
+      "quantity_materialization_from": "2026-01-01",
+      "quantity_materialization_to": "2026-09-24"
+    },
+    "stock": {
+      "data_as_of": "2026-09-24T14:07:04.221589+00:00",
+      "coverage_from": null,
+      "coverage_to": null,
+      "coverage_meaning": "POINT_IN_TIME"
+    },
+    "production_consumption": {
+      "data_as_of": "2026-09-25T00:15:50.285463+00:00",
+      "coverage_from": "2026-01-01",
+      "coverage_to": "2026-09-23",
+      "coverage_meaning": "CAPTURED_MONTHLY_WINDOWS_INTRADAY_FINAL_MONTH",
+      "windows": [
+        {
+          "from": "2026-01-01",
+          "to": "2026-02-01"
+        },
+        {
+          "from": "2026-02-01",
+          "to": "2026-03-01"
+        },
+        {
+          "from": "2026-03-01",
+          "to": "2026-04-01"
+        },
+        {
+          "from": "2026-04-01",
+          "to": "2026-05-01"
+        },
+        {
+          "from": "2026-05-01",
+          "to": "2026-06-01"
+        },
+        {
+          "from": "2026-06-01",
+          "to": "2026-07-01"
+        },
+        {
+          "from": "2026-07-01",
+          "to": "2026-08-01"
+        },
+        {
+          "from": "2026-08-01",
+          "to": "2026-09-01"
+        },
+        {
+          "from": "2026-09-01",
+          "to": "2026-10-01"
+        }
+      ]
+    }
+  }
+}

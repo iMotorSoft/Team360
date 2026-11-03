@@ -1,0 +1,62 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "TELCHI conversational quality DEVELOPMENT; no new commercial capability",
+  "delivery": {
+    "NATURAL_LANGUAGE_VARIANTS": "PASS",
+    "ROOT_CAUSE_FIRST_FAILURE": "Audited 4e3f7bdd: correct sales intent but forbidden /product_context in unset; same previous state as successful c0623889. Engine rejected whole delta, not evidence of punctuation constraint.",
+    "MONETARY_COMPARISON": "PASS",
+    "DETERMINISTIC_CALCULATION": "PASS",
+    "PARTIAL_PERIOD_WARNING": "PASS",
+    "REAL_LUNA": "PASS",
+    "RBAC_AND_ISOLATION": "PASS",
+    "EXISTING_CAPABILITIES": "UNCHANGED",
+    "READY_FOR_MANUAL_WHATSAPP": "NO"
+  },
+  "files": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/state_engine.py": "5869466f28a877723deb8d574816c9d4550570dbc8b0135f991527a17e0240f4",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py": "679156d4638fa8e080820d0f89b4125827c0e4dba83be8d2505eaad7337ea1fe",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py": "228030a03bf9706b86a78839e8d2a35dc3379e15a0ee69959746aaa9cc82266d",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py": "a8af2c1d657ac00b4169d9b7a56fcd7aab721ce4c8a3282e2bc68e3b57e20a56",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/capabilities.py": "ded95678f2ed8a481fa55ed64d59da7d9a9d24631d625f0cf7b1dd79196ce1fc",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/monetary_comparison.py": "09a43abb8132663ed15a5739da7fba480f703857c3810baa89b4b8072f7cb905",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md": "79f333144e66503e500f1c832da0e616b2d8ba4c0e4167b3b44b625904c2d941",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_conversational_quality.py": "894d76a591edd08ce3dea23e956bf8045d437dbf27002719170a9e7959602157",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_conversational_quality.py": "54b9f87438f2892962f51bec77abe9e1b6a4e3ba5f502b0e00933ac7bbb69fbb",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/fixtures/conversational_quality_audited.json": "d2b7d1022f04eeec37ff6050cdf39c8b53b130b6dab13c4a876c7d3fc17d350a",
+    "SrvRestAstroLS_v1/backend/modules/telchi/status_actual.md": "2d6fb3da659d0ffb362afc2519d58ecfff0a81d5fb0eeee5320078541120369f"
+  },
+  "validation": {
+    "focused_pytest": "215 passed; 15 explicit assistant test files; PostgreSQL opt-in enabled, one pool connection and sequential runner",
+    "real_probe": "uv run python -m modules.telchi.assistant.tests.live_conversational_quality --output ../../data/reports/telchi/conversational-quality-v1/live-final.json; eight turns PASS",
+    "docs": [
+      "lat check md",
+      "lat check index",
+      "lat check sections",
+      "lat check code-refs",
+      "lat check"
+    ],
+    "diff": "git diff --check plus whitespace inspection of all changed/new task paths, untracked preexisting module preserved",
+    "local_comparison_foundation_calls": [
+      0,
+      0
+    ],
+    "real_security": "Existing Console resolver denies effective permission withdrawal despite stale identity; rollback and original role/profile links verified; tenant/workspace changes denied"
+  },
+  "limitations": [
+    "Initial real run aborted on missing-period preflight semantic assertion; raw proposal not captured, no root cause claimed. Subsequent focused preflight and eight-turn real probes passed, not a universal reliability guarantee.",
+    "Assumption disproved: FULL_ACCESS revocation alone preserves preexisting ordinary monetary grant, correctly. Initial assertion aborted and rolled back. No code changed to hide it.",
+    "Manual admission BLOCKED by gate_scope_mismatch; no old evidence edited, manifest published, authorization introduced or expiry added. Next: reviewed change-based reconciliation of affected gate evidence, not a general benchmark or automatic service restart.",
+    "Local dispatch is not WhatsApp ingress/delivery; created DEV conversation audits only. PG negative tests used session-local temporary message tables; effective grant withdrawal was rollback-only."
+  ],
+  "impact": "Only Telchi assistant code, tests, contract and local status. Foundation, commercial SQL, Messaging, shared RBAC resolver, infrastructure and services unchanged.",
+  "resource": {
+    "HOST_PREFLIGHT": "SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": 1,
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "signals": "8 cores; load ~0.9, ~6.9 GiB available; observed CPU majority idle, no swap out during vmstat interval. Sequential focused tests/probes, no browser or service launcher."
+  },
+  "git_operations": "No commit, push, index change, branch switch or cleanup."
+}

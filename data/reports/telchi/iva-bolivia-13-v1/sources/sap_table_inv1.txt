@@ -1,0 +1,4604 @@
+ 
+ 
+ 
+     
+     
+     A/R Invoice - Rows - SAP B1 SDK Help 
+     
+     
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+ 
+     
+     
+         
+             📚 SAP Business One SDK Help 
+             
+                 
+                  
+             
+         
+     
+
+     
+     
+         
+             Home  ›  A/R Invoice - Rows 
+         
+     
+
+     
+     
+         
+             
+ 
+ 
+ 
+ 
+ 
+ 
+    
+ 
+ SAP 
+			 Business One SDK 10.0 - Database Tables Reference  
+ 
+ 
+ A/R Invoice - Rows 
+ 
+ Table Name: INV1 
+ Table Description: A/R Invoice - Rows 
+ 
+ 
+  Field  
+  Description  
+  Type  
+  Size  
+  Related  
+  Default Value  
+  Constraints  
+ 
+ 
+ DocEntry 
+ Document Internal ID 
+ Int 
+ 11 
+  OINV  
+   
+   
+   
+ 
+ 
+ LineNum 
+ Row Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ TargetType 
+ Target Document Type 
+ Int 
+ 11 
+ - 
+ -1 
+ -1 
+   
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 0 
+   
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 14 
+ A/R Credit Note 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 15 
+ Delivery 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 165 
+ A/R Correction Invoice 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 234000031 
+ A/R Return Request 
+ 
+ 
+ TrgetEntry 
+ Target Document Internal ID 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ BaseRef 
+ Base Document Reference 
+ nVarChar 
+ 16 
+ - 
+   
+   
+   
+ 
+ 
+ BaseType 
+ Base Document Type 
+ Int 
+ 11 
+ - 
+ -1 
+ -1 
+   
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 0 
+   
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 23 
+ Sales Quotation 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 17 
+ Sales Order 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 15 
+ Delivery 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 13 
+ Invoice 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 67 
+ Inventory Transfer 
+ 
+ 
+ BaseEntry 
+ Base Document Internal ID 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ BaseLine 
+ Base Row 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ LineStatus 
+ Row Status 
+ VarChar 
+ 1 
+ - 
+ O 
+ O 
+ Open 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ C 
+ Closed 
+ 
+ 
+ ItemCode 
+ Item No. 
+ nVarChar 
+ 50 
+  OITM  
+   
+   
+   
+ 
+ 
+ Dscription 
+ Item/Service Description 
+ nVarChar 
+ 200 
+ - 
+   
+   
+   
+ 
+ 
+ Quantity 
+ Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ShipDate 
+ Row Delivery Date 
+ Date 
+ 8 
+ - 
+   
+   
+   
+ 
+ 
+ OpenQty 
+ Remaining Open Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Price 
+ Price after Discount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Currency 
+ Price Currency 
+ nVarChar 
+ 3 
+  OCRN  
+   
+   
+   
+ 
+ 
+ Rate 
+ Currency Rate 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ DiscPrcnt 
+ Discount % per Row 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ LineTotal 
+ Row Total 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ TotalFrgn 
+ Row Total (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ OpenSum 
+ Open Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ OpenSumFC 
+ Open Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VendorNum 
+ Vendor Catalog No. 
+ nVarChar 
+ 50 
+ - 
+   
+   
+   
+ 
+ 
+ SerialNum 
+ Serial Number 
+ nVarChar 
+ 17 
+ - 
+   
+   
+   
+ 
+ 
+ WhsCode 
+ Warehouse Code 
+ nVarChar 
+ 8 
+  OWHS  
+   
+   
+   
+ 
+ 
+ SlpCode 
+ Sales Employee Code 
+ Int 
+ 11 
+  OSLP  
+ -1 
+   
+   
+ 
+ 
+ Commission 
+ Commission Percentage 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ TreeType 
+ BOM Type 
+ VarChar 
+ 1 
+ - 
+ N 
+ N 
+ Not a BOM 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ A 
+ Assembly 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ S 
+ Sales 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ I 
+ Sales BOM Component 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ P 
+ Production 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ T 
+ Template 
+ 
+ 
+ AcctCode 
+ Account Code 
+ nVarChar 
+ 15 
+  OACT  
+   
+   
+   
+ 
+ 
+ TaxStatus 
+ Tax Definition 
+ VarChar 
+ 1 
+ - 
+   
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ GrossBuyPr 
+ Gross Profit Base Price 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ PriceBefDi 
+ Unit Price 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ DocDate 
+ Posting Date 
+ Date 
+ 8 
+ - 
+   
+   
+   
+ 
+ 
+ Flags 
+ Flags 
+ Int 
+ 11 
+ - 
+ 0 
+   
+   
+ 
+ 
+ OpenCreQty 
+ Credit Memo Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ UseBaseUn 
+ Inventory UoM 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ SubCatNum 
+ BP Catalog No. 
+ nVarChar 
+ 50 
+  OSCN  
+   
+   
+   
+ 
+ 
+ BaseCard 
+ Base BP Code 
+ nVarChar 
+ 15 
+  OCRD  
+   
+   
+   
+ 
+ 
+ TotalSumSy 
+ Row Total (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ OpenSumSys 
+ Open Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ InvntSttus 
+ Warehouse Status 
+ VarChar 
+ 1 
+ - 
+ O 
+ O 
+ Open 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ C 
+ Closed 
+ 
+ 
+ OcrCode 
+ Distribution Rule 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ Project 
+ Project Code 
+ nVarChar 
+ 20 
+  OPRJ  
+   
+   
+   
+ 
+ 
+ CodeBars 
+ Bar Code 
+ nVarChar 
+ 254 
+ - 
+   
+   
+   
+ 
+ 
+ VatPrcnt 
+ Tax Rate per Row 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VatGroup 
+ Tax Definition 
+ nVarChar 
+ 8 
+  OVTG  
+   
+   
+   
+ 
+ 
+ PriceAfVAT 
+ Gross Price after Discount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Height1 
+ Height 1 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Hght1Unit 
+ Unit of Height 1 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ Height2 
+ Height 2 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Hght2Unit 
+ Unit of Height 2 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ Width1 
+ Width 1 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Wdth1Unit 
+ Unit of Width 1 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ Width2 
+ Width 2 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Wdth2Unit 
+ Unit of Width 2 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ Length1 
+ Length 1 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Len1Unit 
+ Unit of Length 1 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ length2 
+ Length 2 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Len2Unit 
+ Unit of Length 2 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ Volume 
+ Volume 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VolUnit 
+ Vol. Unit 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ Weight1 
+ Weight 1 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Wght1Unit 
+ Unit of Weight 1 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ Weight2 
+ Weight 2 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Wght2Unit 
+ Unit of Weight 2 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ Factor1 
+ Factor 1 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Factor2 
+ Factor 2 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Factor3 
+ Factor 3 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Factor4 
+ Factor 4 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ PackQty 
+ Packing Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ UpdInvntry 
+ Whse Update 
+ VarChar 
+ 1 
+ - 
+ Y 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ BaseDocNum 
+ Base Document No. 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ BaseAtCard 
+ Customer/Vendor Base Document 
+ nVarChar 
+ 200 
+ - 
+   
+   
+   
+ 
+ 
+ SWW 
+ Additional Identifier 
+ nVarChar 
+ 16 
+ - 
+   
+   
+   
+ 
+ 
+ VatSum 
+ Total Tax 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VatSumFrgn 
+ Tax Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VatSumSy 
+ Tax Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ FinncPriod 
+ Posting Period 
+ Int 
+ 11 
+  OFPR  
+   
+   
+   
+ 
+ 
+ ObjType 
+ Object Type 
+ nVarChar 
+ 20 
+  ADP1  
+ 13 
+   
+   
+ 
+ 
+ LogInstanc 
+ Log Instance 
+ Int 
+ 11 
+ - 
+ 0 
+   
+   
+ 
+ 
+ BlockNum 
+ Block Number 
+ nVarChar 
+ 100 
+ - 
+   
+   
+   
+ 
+ 
+ ImportLog 
+ Import Log 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ DedVatSum 
+ Deductible Tax Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ DedVatSumF 
+ Deductible Tax Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ DedVatSumS 
+ Deductible Tax Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ IsAqcuistn 
+ Acquisition Tax 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ DistribSum 
+ Distributed Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ DstrbSumFC 
+ Distributed Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ DstrbSumSC 
+ Distributed Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ GrssProfit 
+ Row Gross Profit 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ GrssProfSC 
+ Row Gross Profit (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ GrssProfFC 
+ Row Gross Profit (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VisOrder 
+ Visual Order 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ INMPrice 
+ Item's Last Sales Price (OINM) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ PoTrgNum 
+ PO Target No. 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ PoTrgEntry 
+ PO Target Internal ID 
+ nVarChar 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ DropShip 
+ Drop-Ship 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ PoLineNum 
+ PO Target Row No. 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ Address 
+ Address 
+ nVarChar 
+ 254 
+ - 
+   
+   
+   
+ 
+ 
+ TaxCode 
+ Tax Code 
+ nVarChar 
+ 8 
+  OSTC  
+   
+   
+   
+ 
+ 
+ TaxType 
+ Tax Type 
+ VarChar 
+ 1 
+ - 
+   
+ Y 
+ Regular Tax 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No Tax 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ U 
+ Use Tax 
+ 
+ 
+ OrigItem 
+ Original Item 
+ nVarChar 
+ 50 
+  OITM  
+   
+   
+   
+ 
+ 
+ BackOrdr 
+ Allow Backorder 
+ VarChar 
+ 1 
+ - 
+   
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ FreeTxt 
+ Free Text 
+ nVarChar 
+ 100 
+ - 
+   
+   
+   
+ 
+ 
+ PickStatus 
+ Pick Status 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Picked 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ Not Picked 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ R 
+ Released for Picking 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ P 
+ Partially Picked 
+ 
+ 
+ PickOty 
+ Pick Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ PickIdNo 
+ Pick ID 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ TrnsCode 
+ Shipping Method 
+ Int 
+ 6 
+  OSHP  
+ -1 
+   
+   
+ 
+ 
+ VatAppld 
+ Applied Tax 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VatAppldFC 
+ Applied Tax (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VatAppldSC 
+ Applied Tax (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ BaseQty 
+ Base Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ BaseOpnQty 
+ Base Open Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VatDscntPr 
+ Tax Discount % 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ WtLiable 
+ WTax Liable 
+ VarChar 
+ 1 
+ - 
+   
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ DeferrTax 
+ Deferred Tax 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ EquVatPer 
+ Equalization Tax % 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ EquVatSum 
+ Total Equalization Tax 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ EquVatSumF 
+ Total Equalization Tax (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ EquVatSumS 
+ Total Equalization Tax (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ LineVat 
+ Net Tax Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ LineVatlF 
+ Net Tax Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ LineVatS 
+ Net Tax Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ unitMsr 
+ Unit 
+ nVarChar 
+ 100 
+ - 
+   
+   
+   
+ 
+ 
+ NumPerMsr 
+ UoM Value 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ CEECFlag 
+ Correction Invoice Was/Should Be 
+ VarChar 
+ 1 
+ - 
+ S 
+ W 
+ Was 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ S 
+ Should Be 
+ 
+ 
+ ToStock 
+ Corr. Invoice Amt to Inventory 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ToDiff 
+ Corr. Invoice Amount to Diff. 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ExciseAmt 
+ Excise Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ TaxPerUnit 
+ Tax per Unit 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ TotInclTax 
+ Total Including Tax 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ CountryOrg 
+ Country/Region of Origin 
+ nVarChar 
+ 3 
+ - 
+   
+   
+   
+ 
+ 
+ StckDstSum 
+ Stock Distribution Sum 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ReleasQtty 
+ Released Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ LineType 
+ Row Type 
+ VarChar 
+ 1 
+ - 
+ R 
+ R 
+ Regular 
+ 
+ 
+ TranType 
+ Transaction Type 
+ VarChar 
+ 1 
+ - 
+   
+ C 
+ Complete 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ R 
+ Reject 
+ 
+ 
+ Text 
+ Text 
+ Text 
+ 16 
+ - 
+   
+   
+   
+ 
+ 
+ OwnerCode 
+ Document Owner 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ StockPrice 
+ Item Cost 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ConsumeFCT 
+ Consumer Sales Forecast 
+ VarChar 
+ 1 
+ - 
+   
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ LstByDsSum 
+ Last Buy Distribute Sum 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StckINMPr 
+ Stock Inm Price 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ LstBINMPr 
+ Last Buy Inventory Journal Pr. 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StckDstFc 
+ Stock Distribution Sum (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StckDstSc 
+ Stock Distribution Sum (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ LstByDsFc 
+ Last Buy Distribute Sum (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ LstByDsSc 
+ Last Buy Distribute Sum (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StockSum 
+ Stock Sum 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StockSumFc 
+ Stock Sum FC 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StockSumSc 
+ Stock Sum SC 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StckSumApp 
+ Stock Sum Applied 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StckAppFc 
+ Stock Sum Applied FC 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StckAppSc 
+ Stock Sum Applied SC 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ShipToCode 
+ Ship-to Code 
+ nVarChar 
+ 50 
+ - 
+   
+   
+   
+ 
+ 
+ ShipToDesc 
+ Ship-to Description 
+ nVarChar 
+ 254 
+ - 
+   
+   
+   
+ 
+ 
+ StckAppD 
+ Stock Distrib. - Applied Sum 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StckAppDFC 
+ Stock Dist. - Applied Sum (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StckAppDSC 
+ Stock Dist. - Applied Sum (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ BasePrice 
+ Price for Total Calculation 
+ VarChar 
+ 1 
+ - 
+ E 
+ E 
+ Exclude Tax 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ I 
+ Include Tax 
+ 
+ 
+ GTotal 
+ Gross Total 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ GTotalFC 
+ Gross Total (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ GTotalSC 
+ Gross Total (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ DistribExp 
+ Distribute Freight Charges 
+ VarChar 
+ 1 
+ - 
+   
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ DescOW 
+ Description overwritten 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ DetailsOW 
+ Remarks overwritten 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ GrossBase 
+ Base Method for Gross Profit 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ VatWoDpm 
+ Tax Before DPM Applied 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VatWoDpmFc 
+ Tax Before DPM Applied (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ VatWoDpmSc 
+ Tax Before DPM Applied (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ CFOPCode 
+ CFOP Code for Document 
+ nVarChar 
+ 6 
+  OCFP  
+   
+   
+   
+ 
+ 
+ CSTCode 
+ CST Code for ICMS 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ Usage 
+ Usage Code for Document 
+ Int 
+ 11 
+  OUSG  
+   
+   
+   
+ 
+ 
+ TaxOnly 
+ Tax Only 
+ VarChar 
+ 1 
+ - 
+   
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ WtCalced 
+ Withholding Tax Calculated 
+ VarChar 
+ 1 
+ - 
+ N 
+ N 
+ No 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ Y 
+ Yes 
+ 
+ 
+ QtyToShip 
+ Quantity to Ship 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ DelivrdQty 
+ Delivered Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ OrderedQty 
+ Ordered Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ CogsOcrCod 
+ COGS Distribution Rule Code 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ CiOppLineN 
+ Row Number of Associated Row 
+ Int 
+ 11 
+ - 
+ -1 
+   
+   
+ 
+ 
+ CogsAcct 
+ COGS Account Code 
+ nVarChar 
+ 15 
+  OACT  
+   
+   
+   
+ 
+ 
+ ChgAsmBoMW 
+ Change Whs for Asm BoM Child 
+ VarChar 
+ 1 
+ - 
+   
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ ActDelDate 
+ Actual Delivery Date 
+ Date 
+ 8 
+ - 
+   
+   
+   
+ 
+ 
+ OcrCode2 
+ Costing Code 2 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ OcrCode3 
+ Costing Code 3 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ OcrCode4 
+ Costing Code 4 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ OcrCode5 
+ Costing Code 5 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ TaxDistSum 
+ Tax Distributed Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ TaxDistSFC 
+ Tax Distributed Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ TaxDistSSC 
+ Tax Distributed Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ PostTax 
+ Post Tax in Price to Stock 
+ VarChar 
+ 1 
+ - 
+ Y 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ Excisable 
+ Excisable [Yes/No] 
+ VarChar 
+ 1 
+ - 
+   
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ AssblValue 
+ Assessable Value 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ RG23APart1 
+ RG23A Part1 Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ RG23APart2 
+ RG23A Part2 Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ RG23CPart1 
+ RG23C Part1 Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ RG23CPart2 
+ RG23C Part2 Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ CogsOcrCo2 
+ COGS Distribution Rule Code2 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ CogsOcrCo3 
+ COGS Distribution Rule Code3 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ CogsOcrCo4 
+ COGS Distribution Rule Code4 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ CogsOcrCo5 
+ COGS Distribution Rule Code5 
+ nVarChar 
+ 8 
+  OOCR  
+   
+   
+   
+ 
+ 
+ LnExcised 
+ Line Excised 
+ VarChar 
+ 1 
+ - 
+   
+ O 
+ Open 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ C 
+ Closed 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ P 
+ Copied to OEI 
+ 
+ 
+ LocCode 
+ Location Code 
+ Int 
+ 11 
+  OLCT  
+   
+   
+   
+ 
+ 
+ StockValue 
+ Total COGS Value 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ GPTtlBasPr 
+ Total Base Price for Profit 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ unitMsr2 
+ Pur/Sal UoM if BaseUnit 
+ nVarChar 
+ 100 
+ - 
+   
+   
+   
+ 
+ 
+ NumPerMsr2 
+ Pur/Sal UoM Value if Base Unit 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ SpecPrice 
+ Price Source Type 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Special Prices for Business Partner 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ Manual 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ W 
+ Active Price List, Discount Groups 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ R 
+ Active Price List 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ U 
+ Inactive Price List 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ A 
+ Blanket Agreement 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ P 
+ Period and Volume Discounts 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ Q 
+ Period and Volume Discounts, Discount Groups 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ V 
+ Inactive Price List, Discount Groups 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 9 
+ Special Prices for Business Partner 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ ! 
+ Blanket Agreement 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 0 
+ Period and Volume Discounts 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 1 
+ Period and Volume Discounts, Discount Groups 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 2 
+ Active Price List 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 7 
+ Active Price List, Discount Groups 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 5 
+ Inactive Price List 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 6 
+ Inactive Price List, Discount Groups 
+ 
+ 
+ CSTfIPI 
+ CST for IPI Code 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ CSTfPIS 
+ CST for PIS Code 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ CSTfCOFINS 
+ CST for COFINS Code 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ ExLineNo 
+ ExLineNo 
+ nVarChar 
+ 10 
+ - 
+   
+   
+   
+ 
+ 
+ isSrvCall 
+ Created from Service Call 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ PQTReqQty 
+ Pur Quotation: Required Qty 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ PQTReqDate 
+ Pur Quotation: Required Date 
+ Date 
+ 8 
+ - 
+   
+   
+   
+ 
+ 
+ PcDocType 
+ Purchase Confirmation Doc Type 
+ Int 
+ 11 
+ - 
+ -1 
+ -1 
+ No Type 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 22 
+ Purchase Order 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ 540000006 
+ Purchase Quotation 
+ 
+ 
+ PcQuantity 
+ Purchase Confirmation Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ LinManClsd 
+ Line Was Closed Manually 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ U 
+ Unknown 
+ 
+ 
+ VatGrpSrc 
+ VAT Group Source 
+ VarChar 
+ 1 
+ - 
+ N 
+ N 
+ Not Defined 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ M 
+ Manually Entered 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ D 
+ Determined 
+ 
+ 
+ NoInvtryMv 
+ Without Inventory Movement 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ ActBaseEnt 
+ Actual Base Document Entry 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ ActBaseLn 
+ Actual Base Line Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ ActBaseNum 
+ Actual Base Document No. 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ OpenRtnQty 
+ Quantity Open for Return 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ AgrNo 
+ Agreement No. 
+ Int 
+ 11 
+  OOAT  
+   
+   
+   
+ 
+ 
+ AgrLnNum 
+ Agreement Row Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ CredOrigin 
+ Credit Origin 
+ VarChar 
+ 1 
+  OBSI  
+   
+   
+   
+ 
+ 
+ Surpluses 
+ Surpluses 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ DefBreak 
+ Defect and Breakup 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Shortages 
+ Shortages 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ UomEntry 
+ UoM Entry 
+ Int 
+ 11 
+  OUOM  
+ 0 
+   
+   
+ 
+ 
+ UomEntry2 
+ UoM Entry if Base Unit 
+ Int 
+ 11 
+  OUOM  
+ 0 
+   
+   
+ 
+ 
+ UomCode 
+ UoM Code 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ UomCode2 
+ UoM Code if Base Unit 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ FromWhsCod 
+ From Warehouse Code 
+ nVarChar 
+ 8 
+  OWHS  
+   
+   
+   
+ 
+ 
+ NeedQty 
+ Consider Quantity of Items 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ PartRetire 
+ Partial Retirement 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ RetireQty 
+ Retirement Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ RetireAPC 
+ Retirement APC 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ RetirAPCFC 
+ Retirement APC FC 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ RetirAPCSC 
+ Retirement APC SC 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ InvQty 
+ Quantity - Inventory UoM 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ OpenInvQty 
+ Open Quantity (Inventory UoM) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ EnSetCost 
+ Enable Set Item Cost in Return 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ RetCost 
+ Return Cost in A/R Return 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ Incoterms 
+ Incoterms 
+ Int 
+ 11 
+  ODCI  
+   
+   
+   
+ 
+ 
+ TransMod 
+ Transport Mode 
+ Int 
+ 11 
+  ODCI  
+   
+   
+   
+ 
+ 
+ LineVendor 
+ Line Vendor Code 
+ nVarChar 
+ 15 
+  OCRD  
+   
+   
+   
+ 
+ 
+ DistribIS 
+ Distribute Intrastat Freight 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ ISDistrb 
+ Intrastat Distrib. Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ISDistrbFC 
+ Intrastat Distrib. Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ISDistrbSC 
+ Intrastat Distrib. Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ IsByPrdct 
+ Item Is By-Product 
+ VarChar 
+ 1 
+ - 
+ N 
+ N 
+ No 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ Y 
+ Yes 
+ 
+ 
+ ItemType 
+ Item Type 
+ Int 
+ 11 
+ - 
+ 4 
+ 4 
+ Item 
+ 
+ 
+ PriceEdit 
+ Price Was Edited by User 
+ VarChar 
+ 1 
+ - 
+ N 
+ N 
+ No 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ Y 
+ Yes 
+ 
+ 
+ PrntLnNum 
+ Parent Line Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ LinePoPrss 
+ Line PO Process 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ FreeChrgBP 
+ Free of Charge (BP) 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ TaxRelev 
+ Tax Relevant Row 
+ VarChar 
+ 1 
+ - 
+ Y 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ LegalText 
+ Legal Text 
+ nVarChar 
+ 254 
+ - 
+   
+   
+   
+ 
+ 
+ ThirdParty 
+ Third Party 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ LicTradNum 
+ Federal Tax ID 
+ nVarChar 
+ 32 
+ - 
+   
+   
+   
+ 
+ 
+ InvQtyOnly 
+ Change Qty (Inv. UoM) Only 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ UnencReasn 
+ Reason for Unencumbered ICMS 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ ShipFromCo 
+ Ship-From Code 
+ nVarChar 
+ 50 
+ - 
+   
+   
+   
+ 
+ 
+ ShipFromDe 
+ Ship-From Description 
+ nVarChar 
+ 254 
+ - 
+   
+   
+   
+ 
+ 
+ FisrtBin 
+ First Bin Location 
+ nVarChar 
+ 228 
+ - 
+   
+   
+   
+ 
+ 
+ AllocBinC 
+ Allocated Bin Location Count 
+ nVarChar 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ ExpType 
+ Expense Type 
+ nVarChar 
+ 4 
+  OEXD  
+   
+   
+   
+ 
+ 
+ ExpUUID 
+ Expense UUID 
+ nVarChar 
+ 50 
+ - 
+   
+   
+   
+ 
+ 
+ ExpOpType 
+ Expense Operation Type 
+ VarChar 
+ 1 
+ - 
+   
+ P 
+ Professional Services 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ R 
+ Renting Assets 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ O 
+ Others 
+ 
+ 
+   
+   
+   
+   
+   
+   
+   
+   
+ 
+ 
+   
+   
+   
+   
+   
+   
+ D 
+ Disposal of Goods 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ S 
+ Import of Goods and Services 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ V 
+ Import by Virtual Transfer 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ G 
+ Global Operations 
+ 
+ 
+ DIOTNat 
+ DIOT Nationality 
+ nVarChar 
+ 3 
+  OCRY  
+   
+   
+   
+ 
+ 
+ MYFtype 
+ MYF type 
+ nVarChar 
+ 2 
+ - 
+   
+ S1 
+ MYF Wholesale Sales 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ S2 
+ Retail Sales 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ P1 
+ MYF Wholesale Purchases 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ P3 
+ Other Expense Transactions 
+ 
+ 
+ GPBefDisc 
+ Gross Price 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ReturnRsn 
+ Return Reason 
+ Int 
+ 6 
+ - 
+ -1 
+   
+   
+ 
+ 
+ ReturnAct 
+ Return Action 
+ Int 
+ 6 
+ - 
+ -1 
+   
+   
+ 
+ 
+ StgSeqNum 
+ Stage Sequence Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ StgEntry 
+ Stage Entry 
+ Int 
+ 11 
+  ORST  
+   
+   
+   
+ 
+ 
+ StgDesc 
+ Stage Description 
+ nVarChar 
+ 100 
+ - 
+   
+   
+   
+ 
+ 
+ ItmTaxType 
+ Item GST Tax Category 
+ nVarChar 
+ 2 
+ - 
+   
+ GR 
+ GST Regular 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ GN 
+ GST Nil Rated 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ GE 
+ GST Exempt 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ NE 
+ Excisable 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ NN 
+ Non-GST Non-Excisable 
+ 
+ 
+ SacEntry 
+ SAC Entry 
+ Int 
+ 11 
+  OSAC  
+   
+   
+   
+ 
+ 
+ NCMCode 
+ NCM Code 
+ Int 
+ 11 
+  ONCM  
+ -1 
+   
+   
+ 
+ 
+ HsnEntry 
+ HSN Entry 
+ Int 
+ 11 
+  OCHP  
+   
+   
+   
+ 
+ 
+ OriBAbsEnt 
+ Original Base Document Internal ID 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ OriBLinNum 
+ Original Base Document Line Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ OriBDocTyp 
+ Original Base Document Type 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ IsPrscGood 
+ Is Prescribed Goods 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ IsCstmAct 
+ Apply Customer Accounting Tax Rule 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ U 
+ Use 
+ 
+ 
+ EncryptIV 
+ Encrypt IV 
+ nVarChar 
+ 100 
+ - 
+   
+   
+   
+ 
+ 
+ ExtTaxRate 
+ External Tax Rate 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ExtTaxSum 
+ External Tax Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ TaxAmtSrc 
+ Tax Amount Source 
+ VarChar 
+ 1 
+ - 
+ S 
+ S 
+ Internal System Calculation 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ E 
+ External Calculation 
+ 
+ 
+ ExtTaxSumF 
+ External Tax Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ ExtTaxSumS 
+ External Tax Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ StdItemId 
+ Standard Item Identification 
+ Int 
+ 11 
+  OUNCL  
+   
+   
+   
+ 
+ 
+ CommClass 
+ Commodity Classification 
+ Int 
+ 11 
+  OUNCL  
+   
+   
+   
+ 
+ 
+ VatExEntry 
+ VAT Exemption AbsEntry 
+ Int 
+ 11 
+  OVEB  
+   
+   
+   
+ 
+ 
+ VatExLN 
+ VAT Exemption LineNum 
+ Int 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ NatOfTrans 
+ Nature of Transaction 
+ Int 
+ 11 
+  ODCI  
+   
+   
+   
+ 
+ 
+ ISDtCryImp 
+ Destination Country/Region for Import 
+ nVarChar 
+ 3 
+  OCRY  
+   
+   
+   
+ 
+ 
+ ISDtRgnImp 
+ Destination Region for Import 
+ Int 
+ 11 
+  ODCI  
+   
+   
+   
+ 
+ 
+ ISOrCryExp 
+ Country/Region of Origin for Export 
+ nVarChar 
+ 3 
+  OCRY  
+   
+   
+   
+ 
+ 
+ ISOrRgnExp 
+ Region of Origin for Export 
+ Int 
+ 11 
+  ODCI  
+   
+   
+   
+ 
+ 
+ NVECode 
+ NVE Code 
+ nVarChar 
+ 6 
+ - 
+   
+   
+   
+ 
+ 
+ PoNum 
+ Customer's Purchase Order Number 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ PoItmNum 
+ Customer's Purchase Order Item Number 
+ Int 
+ 11 
+ - 
+   
+   
+   
+ 
+ 
+ IndEscala 
+ Indicator for Relevant Scale 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ CESTCode 
+ CEST Code 
+ Int 
+ 11 
+  OCEST  
+   
+   
+   
+ 
+ 
+ CtrSealQty 
+ Control Seal Quantity 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ CNJPMan 
+ CNPJ of Manufacturer 
+ nVarChar 
+ 14 
+ - 
+   
+   
+   
+ 
+ 
+ UFFiscBene 
+ UF Fiscal Benefit Code 
+ nVarChar 
+ 10 
+ - 
+   
+   
+   
+ 
+ 
+ CUSplit 
+ CU Split 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ LegalTIMD 
+ Legal Text from Item Master Data 
+ nVarChar 
+ 250 
+ - 
+   
+   
+   
+ 
+ 
+ LegalTTCA 
+ Legal Text from Tax Code Attributes 
+ nVarChar 
+ 250 
+ - 
+   
+   
+   
+ 
+ 
+ LegalTW 
+ Legal Text from Warehouse 
+ nVarChar 
+ 250 
+ - 
+   
+   
+   
+ 
+ 
+ LegalTCD 
+ Legal Text from Tax Code Determination 
+ nVarChar 
+ 250 
+ - 
+   
+   
+   
+ 
+ 
+ RevCharge 
+ Reverse Charge 
+ VarChar 
+ 1 
+ - 
+ N 
+ Y 
+ Yes 
+ 
+ 
+   
+   
+   
+   
+   
+   
+ N 
+ No 
+ 
+ 
+ ListNum 
+ Price List No. 
+ Int 
+ 6 
+  OPLN  
+   
+   
+   
+ 
+ 
+ RecogAmt 
+ Deducted Tax Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ RecogAmtSC 
+ Deducted Tax Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ RecogAmtFC 
+ Deducted Tax Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ RecogVatGr 
+ Deducted Tax Code 
+ nVarChar 
+ 8 
+  OVTG  
+   
+   
+   
+ 
+ 
+ RecogVatPr 
+ Deducted Tax % 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ NonDdAmt 
+ Non-Deductible Amount 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ NonDdAmtSC 
+ Non-Deductible Amount (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ NonDdAmtFC 
+ Non-Deductible Amount (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ PPTaxExRe 
+ Plastic Packaging Tax Exemption Reason 
+ nVarChar 
+ 2 
+  OBSI  
+   
+   
+   
+ 
+ 
+ PlPaWght 
+ Plastic Packaging Weight 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ CUP 
+ Unique Code of Project 
+ Int 
+ 11 
+  OCUP  
+   
+   
+   
+ 
+ 
+ CIG 
+ Contract Code Identification 
+ Int 
+ 11 
+  OCIG  
+   
+   
+   
+ 
+ 
+ OperProfit 
+ Row Operating Profit 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ OperProfFC 
+ Row Operating Profit (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ OperProfSy 
+ Row Operating Profit (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ NetIncome 
+ Row Net Income 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ NetIncomFC 
+ Row Net Income (FC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ NetIncomSy 
+ Row Net Income (SC) 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ UoMNum 
+ UoM Item Per Unit Numerator 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ UoMDen 
+ UoM Item Per Unit Denominator 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ UoMNum2 
+ UoM Item Per Unit Numerator2 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ UoMDen2 
+ UoM Item Per Unit Denominator2 
+ Num 
+ 19.6 
+ - 
+   
+   
+   
+ 
+ 
+ CSTfIBS 
+ CST for IBS Code 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ CSTfCBS 
+ CST for CBS Code 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ CSTfIS 
+ CST for IS Code 
+ nVarChar 
+ 20 
+ - 
+   
+   
+   
+ 
+ 
+ EnLicTradN 
+ Encrypt TAX ID Number 
+ Text 
+ 16 
+ - 
+   
+   
+   
+ 
+ 
+ 
+ 
+  Key  
+  Unique  
+  Field  
+ 
+ 
+ PRIMARY 
+ Yes 
+ DocEntry 
+ 
+ 
+   
+   
+ LineNum 
+ 
+ 
+ STATUS 
+ No 
+ LineStatus 
+ 
+ 
+ CURRENCY 
+ No 
+ Currency 
+ 
+ 
+ ACCOUNT 
+ No 
+ AcctCode 
+ 
+ 
+ BASE_ENTRY 
+ No 
+ BaseEntry 
+ 
+ 
+   
+   
+ BaseType 
+ 
+ 
+   
+   
+ BaseLine 
+ 
+ 
+ VIS_ORDER 
+ No 
+ DocEntry 
+ 
+ 
+   
+   
+ VisOrder 
+ 
+ 
+ OWNER_CODE 
+ No 
+ OwnerCode 
+ 
+ 
+ ITM_WHS_OQ 
+ No 
+ ItemCode 
+ 
+ 
+   
+   
+ WhsCode 
+ 
+ 
+   
+   
+ OpenQty 
+ 
+ 
+ PROJECT 
+ No 
+ Project 
+ 
+ 
+ 
+         
+     
+
+    
+    
+    
+ 
+ 

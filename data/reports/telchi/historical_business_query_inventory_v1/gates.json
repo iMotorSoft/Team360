@@ -1,0 +1,57 @@
+[
+  {
+    "gate": "TELCHI_INVESTIGATION_PHYSICAL_INVENTORY",
+    "status": "PASS",
+    "evidence": "physical_inventory.csv; validation_results.json: INVESTIGATION_PHYSICAL_COVERAGE 1219/1219 y hashes preservados"
+  },
+  {
+    "gate": "TELCHI_HISTORICAL_QUESTIONS_INVENTORY",
+    "status": "PARTIAL",
+    "evidence": "5791 ocurrencias/1398 textos; catálogos CEO 74+8 cubiertos; adjudicación semántica de variantes/candidatos pendiente"
+  },
+  {
+    "gate": "TELCHI_HISTORICAL_SQL_INVENTORY",
+    "status": "PARTIAL",
+    "evidence": "102 archivos SQL y SQL embebido indexados; builders y statements dinámicos no reconstruidos integralmente"
+  },
+  {
+    "gate": "TELCHI_QUESTION_SQL_TRACEABILITY",
+    "status": "PARTIAL",
+    "evidence": "111 links: 70 registry, 24 report artifacts, 17 misma sección; faltan cadenas granulares del resto"
+  },
+  {
+    "gate": "TELCHI_HISTORICAL_RESULTS_TRACEABILITY",
+    "status": "PARTIAL",
+    "evidence": "30 operaciones con resultados/hashes; 24 contratos documentados y 19 baselines; no resultado individual atribuido a todo SQL"
+  },
+  {
+    "gate": "TELCHI_BUSINESS_SEMANTICS_INVENTORY",
+    "status": "PARTIAL",
+    "evidence": "business_semantics.md preserva estados/sources y gaps; el catálogo completo no está adjudicado por operación"
+  },
+  {
+    "gate": "TELCHI_FOUNDATION_READINESS_MAPPING",
+    "status": "PARTIAL",
+    "evidence": "CURRENT 1408 confirmado; 30 operaciones/35 partes reproducidas; 9 READY, 8 condicionales, 13 requieren métrica; resto sin reproducción completa"
+  },
+  {
+    "gate": "TELCHI_QUERY_FAMILIES",
+    "status": "PARTIAL",
+    "evidence": "26 grupos respaldados por referencias e IDs; agrupación completa y equivalencia semántica aún no certificadas"
+  },
+  {
+    "gate": "TELCHI_EXECUTIVE_QUERY_REUSE",
+    "status": "PASS",
+    "evidence": "executive_query_reuse.md evalúa los seis casos, SQL/evidencia/semántica/mapping/gap/esfuerzo y recomendaciones; PASS de evaluación, no de habilitación"
+  },
+  {
+    "gate": "TELCHI_INVENTORY_COVERAGE",
+    "status": "PARTIAL",
+    "evidence": "investigation físico completo y 4186 archivos extendidos; gzip de datos sólo metadata/hash y fuentes dinámicas pendientes"
+  },
+  {
+    "gate": "TELCHI_HISTORICAL_QUERY_AUDIT",
+    "status": "PARTIAL",
+    "evidence": "Conocimiento reutilizable confirmado con evidencia; no total definitivo de intents y cadenas empresariales en toda la historia"
+  }
+]

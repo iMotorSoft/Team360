@@ -1,0 +1,1924 @@
+{
+  "foundation": {
+    "foundation_publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+    "reference_version": "v2_sales_448ae93a960bf7342564a2d0",
+    "sales_publication_id": "sales_6daf72e9a14c5852e35c465f",
+    "credit_memo_publication_id": "credit_memo_29bf92c1dbeb692d02665629",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "oitw_26775585ee26d41a5d5532d3",
+    "data_as_of": "2026-11-01T17:50:16.749000+00:00",
+    "reference_source_as_of": "2026-11-01T17:50:16.749000+00:00",
+    "sales_source_as_of": "2026-11-01T13:55:45.750071+00:00",
+    "credit_memo_source_as_of": "2026-11-01T13:55:47.173006+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-11-01T17:43:38.461000+00:00",
+    "validated_at": null,
+    "committed_at": "2026-11-01T23:12:01.348274+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-11-01T17:50:16.749000+00:00",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 76151.008,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_sales_448ae93a960bf7342564a2d0",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_42483d2e035e98e73e0a2d98ddc7d986"
+  },
+  "tests": [],
+  "question_matrix": [
+    {
+      "question": "¿Cuánto stock tenemos del producto con código SAP E00003 por depósito?",
+      "capability": "inventory.stock_by_warehouse.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "inventory_balance": "oitw_26775585ee26d41a5d5532d3"
+      },
+      "metric": "inventory.stock_by_warehouse",
+      "permission": "telchi.inventory.stock_by_warehouse.read.v1",
+      "coverage": {
+        "kind": "STOCK_SNAPSHOT",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:43:38.461000",
+        "observation_finished_at": "2026-11-01T17:46:05.375000",
+        "source_scope": {
+          "branch": "ONLY_ACCREDITED_REFERENCE_CROSSWALKS",
+          "history_rebuilt": false,
+          "kind": "CURRENT_STOCK_STATEMENT_SNAPSHOT",
+          "limitation": "SAP statement observation; not simultaneous with other domains"
+        },
+        "requested_period": {},
+        "source_as_of": "2026-11-01T17:43:38.461000+00:00"
+      },
+      "response": "Stock observado por depósito:\nE00003 · depósito 01: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMD: existencia 0E-12, comprometido 2.000000000000, disponible -2.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMK: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-DEV: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-EXT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-KIT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MAG: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MEI: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MKT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-SAL: existencia 14.000000000000, comprometido 0E-12, disponible 14.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-SMK: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-TRAN: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito ALM-CON: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito ALM-IMP: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito CM-AMD: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito CM-SAL: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito DMS-DEV: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito DMS-PROF: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito DV-SAL: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-A1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-C1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D0: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D10: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D11: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D12: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D2: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D3: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D4: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D5: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D6: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D7: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D8: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D9: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-DAN: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-DES: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-IMP: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-M1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P2: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P3: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P4: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P5: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T2: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T3: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T4: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T5: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T6: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T7: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nControles: unknown_unit_positions=0\nMostradas 50 de 73 filas; 23 omitidas del mensaje. No es un ranking global entre unidades.\nDepósitos no son sucursales. Disponible = existencia menos comprometido; pedidos de compra no incluidos.\nUnidades desconocidas no se infieren ni se suman. Posiciones ausentes no acreditan stock cero.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "result": {
+        "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+        "capability": "inventory.stock_by_warehouse.v1",
+        "metric": "inventory.stock_by_warehouse",
+        "label": "Stock observado por depósito",
+        "parameters": {
+          "item_code": "E00003",
+          "limit": 50
+        },
+        "rows": [
+          {
+            "item_code": "E00003",
+            "warehouse": "01",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-AMD",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "2.000000000000",
+            "available_qty": "-2.000000000000",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-AMK",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-DEV",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-EXT",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-KIT",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-MAG",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-MEI",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-MKT",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-SAL",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "14.000000000000",
+            "committed_qty": "0E-12",
+            "available_qty": "14.000000000000",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-SMK",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "2A-TRAN",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "ALM-CON",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "ALM-IMP",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "CM-AMD",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "CM-SAL",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "DMS-DEV",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "DMS-PROF",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "DV-SAL",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-A1",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-C1",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D0",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D1",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D10",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D11",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D12",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D2",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D3",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D4",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D5",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D6",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D7",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D8",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-D9",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-DAN",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-DES",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-IMP",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-M1",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-P1",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-P2",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-P3",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-P4",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-P5",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-T1",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-T2",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-T3",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-T4",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-T5",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-T6",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          },
+          {
+            "item_code": "E00003",
+            "warehouse": "LAB-T7",
+            "unit": "unit_of_measure_f2e5d6c1c196dad84c354537",
+            "on_hand_qty": "0E-12",
+            "committed_qty": "0E-12",
+            "available_qty": "0E-12",
+            "stock_as_of": "2026-11-01T17:43:38.461000+00:00"
+          }
+        ],
+        "total_rows": 73,
+        "omitted_rows": 23,
+        "controls": {
+          "unknown_unit_positions": 0
+        },
+        "coverage": {
+          "kind": "STOCK_SNAPSHOT",
+          "complete_business_history": false,
+          "absence_is_zero": false,
+          "observation_started_at": "2026-11-01T17:43:38.461000",
+          "observation_finished_at": "2026-11-01T17:46:05.375000",
+          "source_scope": {
+            "branch": "ONLY_ACCREDITED_REFERENCE_CROSSWALKS",
+            "history_rebuilt": false,
+            "kind": "CURRENT_STOCK_STATEMENT_SNAPSHOT",
+            "limitation": "SAP statement observation; not simultaneous with other domains"
+          },
+          "requested_period": {},
+          "source_as_of": "2026-11-01T17:43:38.461000+00:00"
+        },
+        "limitations": [
+          "Depósitos no son sucursales. Disponible = existencia menos comprometido; pedidos de compra no incluidos.",
+          "Unidades desconocidas no se infieren ni se suman. Posiciones ausentes no acreditan stock cero."
+        ],
+        "read_only": true,
+        "sap_accessed": false,
+        "source": {
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "snapshot_id": 1408,
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0",
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "datasets": {
+            "inventory_balance": "oitw_26775585ee26d41a5d5532d3"
+          }
+        },
+        "timings": {
+          "foundation_resolution_ms": 76151.008,
+          "sql_and_serialization_ms": 25.20931499748258
+        }
+      },
+      "independent_control": {
+        "positions": 73,
+        "presented_native_quantities_exact": true,
+        "omitted_positions": 23
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 45.93566599942278,
+      "authorization": "NOT_EXERCISED_IN_READER_CONTROL"
+    },
+    {
+      "question": "¿Qué materias primas consumimos durante octubre de 2026?",
+      "capability": "production.consumption.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+        "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33",
+        "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7"
+      },
+      "metric": "production.consumption",
+      "permission": "telchi.production.consumption.read.v1",
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:46:37.892000",
+        "observation_finished_at": "2026-11-01T17:46:53.281000",
+        "source_scope": {
+          "absent_optional_fields": [],
+          "end_exclusive": "2026-11-02",
+          "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+          "limitation": "No claim of modifications outside this business-date scope; no CDC",
+          "start": "2026-01-01"
+        },
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "first_observed_date": "2026-01-05 00:00:00",
+        "last_observed_date": "2026-10-31 00:00:00",
+        "dataset_rows": 41808,
+        "declared_start": "2026-01-01",
+        "declared_end_exclusive": "2026-11-02",
+        "requested_outside_capture": false
+      },
+      "response": "Consumo registrado para producción:\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05849: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05970: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05187: 80.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM03242: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05191: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05829: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nL00097: 24145.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00252: 22595.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00085: 7512.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00095: 6733.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00938: 4000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00937: 2435.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00092: 2276.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00088: 2041.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00173: 2000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03681: 1995.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03723: 1772.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03118: 1098.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00090: 1028.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00562: 1000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00881: 992.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03395: 400.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00066: 1772.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL03399: 1772.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02888: 400.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01038: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01041: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01117: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL00207: 90.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL00060: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02837: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02944: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nM02022: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL03197: 2250.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nL00039: 315.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nL01287: 9.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nM0006: 1071.358000000000 · unidad HH · código UoM no disponible · factor nativo 0\nR0019: 736.039600000000 · unidad HH · código UoM no disponible · factor nativo 0\nM0003: 587.863600000000 · unidad HH · código UoM no disponible · factor nativo 0\nR0018: 561.518100000000 · unidad HH · código UoM no disponible · factor nativo 0\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nControles: period_source_lines=4814, included_issue_lines=3974, unknown_native_identity_lines_affected=0\nMostradas 50 de 556 filas; 506 omitidas del mensaje. No es un ranking global entre unidades.\nEmisiones activas BaseType 202; identidad no equivale a materia prima clasificada. Incluye identidades de recursos/desconocidas separadas, sin inferir su naturaleza.\n31 líneas fuente desconocidas se conservan; no hay recepción de producto terminado ni vigencia histórica de BOM.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "result": {
+        "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+        "capability": "production.consumption.v1",
+        "metric": "production.consumption",
+        "label": "Consumo registrado para producción",
+        "parameters": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01",
+          "limit": 50
+        },
+        "rows": [
+          {
+            "item_code": "L01685",
+            "unit": "BOLSA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "641.000000000000"
+          },
+          {
+            "item_code": "M02927",
+            "unit": "BOLSA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "30.000000000000"
+          },
+          {
+            "item_code": "M05939",
+            "unit": "CAPS",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "L02331",
+            "unit": "CJA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "L02322",
+            "unit": "CJA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "5.000000000000"
+          },
+          {
+            "item_code": "L02157",
+            "unit": "CJA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "3.000000000000"
+          },
+          {
+            "item_code": "L02227",
+            "unit": "CJA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "3.000000000000"
+          },
+          {
+            "item_code": "M02605",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05375",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05847",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05849",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05970",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05187",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "80.000000000000"
+          },
+          {
+            "item_code": "M03242",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "40.000000000000"
+          },
+          {
+            "item_code": "M05191",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "40.000000000000"
+          },
+          {
+            "item_code": "M05829",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "40.000000000000"
+          },
+          {
+            "item_code": "L00097",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 29,
+            "quantity": "24145.000000000000"
+          },
+          {
+            "item_code": "L00252",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 15,
+            "quantity": "22595.000000000000"
+          },
+          {
+            "item_code": "L00085",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "7512.000000000000"
+          },
+          {
+            "item_code": "L00095",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 6,
+            "quantity": "6733.000000000000"
+          },
+          {
+            "item_code": "L00938",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 2,
+            "quantity": "4000.000000000000"
+          },
+          {
+            "item_code": "L00937",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 2,
+            "quantity": "2435.000000000000"
+          },
+          {
+            "item_code": "L00092",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "2276.000000000000"
+          },
+          {
+            "item_code": "L00088",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "2041.000000000000"
+          },
+          {
+            "item_code": "L00173",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "2000.000000000000"
+          },
+          {
+            "item_code": "L03681",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "1995.000000000000"
+          },
+          {
+            "item_code": "L03723",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 39,
+            "quantity": "1772.000000000000"
+          },
+          {
+            "item_code": "L03118",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "1098.000000000000"
+          },
+          {
+            "item_code": "L00090",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 2,
+            "quantity": "1028.000000000000"
+          },
+          {
+            "item_code": "L00562",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "1000.000000000000"
+          },
+          {
+            "item_code": "L00881",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "992.000000000000"
+          },
+          {
+            "item_code": "L03395",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "400.000000000000"
+          },
+          {
+            "item_code": "L00066",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 39,
+            "quantity": "1772.000000000000"
+          },
+          {
+            "item_code": "L03399",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 39,
+            "quantity": "1772.000000000000"
+          },
+          {
+            "item_code": "L02888",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "400.000000000000"
+          },
+          {
+            "item_code": "L01038",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 4,
+            "quantity": "250.000000000000"
+          },
+          {
+            "item_code": "L01041",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 4,
+            "quantity": "250.000000000000"
+          },
+          {
+            "item_code": "L01117",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 4,
+            "quantity": "250.000000000000"
+          },
+          {
+            "item_code": "L00207",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "90.000000000000"
+          },
+          {
+            "item_code": "L00060",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "L02837",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "L02944",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "M02022",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "L03197",
+            "unit": "GR",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "2250.000000000000"
+          },
+          {
+            "item_code": "L00039",
+            "unit": "GR",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 15,
+            "quantity": "315.000000000000"
+          },
+          {
+            "item_code": "L01287",
+            "unit": "GR",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "9.000000000000"
+          },
+          {
+            "item_code": "M0006",
+            "unit": "HH",
+            "uom_code": null,
+            "native_factor": "0",
+            "issue_lines": 152,
+            "quantity": "1071.358000000000"
+          },
+          {
+            "item_code": "R0019",
+            "unit": "HH",
+            "uom_code": null,
+            "native_factor": "0",
+            "issue_lines": 110,
+            "quantity": "736.039600000000"
+          },
+          {
+            "item_code": "M0003",
+            "unit": "HH",
+            "uom_code": null,
+            "native_factor": "0",
+            "issue_lines": 170,
+            "quantity": "587.863600000000"
+          },
+          {
+            "item_code": "R0018",
+            "unit": "HH",
+            "uom_code": null,
+            "native_factor": "0",
+            "issue_lines": 89,
+            "quantity": "561.518100000000"
+          }
+        ],
+        "total_rows": 556,
+        "omitted_rows": 506,
+        "controls": {
+          "period_source_lines": 4814,
+          "included_issue_lines": 3974,
+          "unknown_native_identity_lines_affected": 0
+        },
+        "coverage": {
+          "kind": "BOUNDED_OBSERVATION",
+          "complete_business_history": false,
+          "absence_is_zero": false,
+          "observation_started_at": "2026-11-01T17:46:37.892000",
+          "observation_finished_at": "2026-11-01T17:46:53.281000",
+          "source_scope": {
+            "absent_optional_fields": [],
+            "end_exclusive": "2026-11-02",
+            "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+            "limitation": "No claim of modifications outside this business-date scope; no CDC",
+            "start": "2026-01-01"
+          },
+          "requested_period": {
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "first_observed_date": "2026-01-05 00:00:00",
+          "last_observed_date": "2026-10-31 00:00:00",
+          "dataset_rows": 41808,
+          "declared_start": "2026-01-01",
+          "declared_end_exclusive": "2026-11-02",
+          "requested_outside_capture": false
+        },
+        "limitations": [
+          "Emisiones activas BaseType 202; identidad no equivale a materia prima clasificada. Incluye identidades de recursos/desconocidas separadas, sin inferir su naturaleza.",
+          "31 líneas fuente desconocidas se conservan; no hay recepción de producto terminado ni vigencia histórica de BOM.",
+          "Cantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles."
+        ],
+        "read_only": true,
+        "sap_accessed": false,
+        "source": {
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "snapshot_id": 1408,
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0",
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "datasets": {
+            "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+            "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33",
+            "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7"
+          }
+        },
+        "timings": {
+          "foundation_resolution_ms": 76151.008,
+          "sql_and_serialization_ms": 69.56916599301621
+        }
+      },
+      "independent_control": {
+        "all_groups": 556,
+        "included_lines": 3974,
+        "presented_groups_exact": true,
+        "source_native_decimal_control": true
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 144.53181000135373,
+      "authorization": "NOT_EXERCISED_IN_READER_CONTROL"
+    },
+    {
+      "question": "¿Cuánto facturaron los proveedores durante octubre de 2026?",
+      "capability": "purchasing.invoiced_amount.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "ap_invoice": "0999e81c5e1cdf75dea5ba52f75a53f38ab13f334cf7d191b0ded6f654d7a7e7"
+      },
+      "metric": "purchasing.invoiced_amount",
+      "permission": "telchi.purchasing.invoiced_amount.read.v1",
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:47:42.978000",
+        "observation_finished_at": "2026-11-01T17:47:50.867000",
+        "source_scope": {
+          "absent_optional_fields": [],
+          "end_exclusive": "2026-11-02",
+          "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+          "limitation": "No claim of modifications outside this business-date scope; no CDC",
+          "start": "2026-01-01"
+        },
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "first_observed_date": "2026-01-01 00:00:00",
+        "last_observed_date": "2026-10-31 00:00:00",
+        "dataset_rows": 7190,
+        "declared_start": "2026-01-01",
+        "declared_end_exclusive": "2026-11-02",
+        "requested_outside_capture": false
+      },
+      "response": "Facturado por proveedores:\nBS 1.167.975,07 · 303 documentos/pagos · estado C\nBS 2.858.499,51 · 302 documentos/pagos · estado O\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nControles: excluded_nonactive_documents=48, excluded_other_currency_documents=0\nImportes de cabeceras activas en BS, separados por estado. No se suman órdenes, recepciones y facturas.\nMoneda extranjera excluida: DocTotal no acredita su importe nativo. Solicitudes y devoluciones no capturadas; no es compra neta después de devoluciones.\nLas 442 diferencias de líneas en 18 OC no acreditan su causa histórica SAP.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "result": {
+        "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+        "capability": "purchasing.invoiced_amount.v1",
+        "metric": "purchasing.invoiced_amount",
+        "label": "Facturado por proveedores",
+        "parameters": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01",
+          "limit": 50
+        },
+        "rows": [
+          {
+            "document_status": "C",
+            "currency": "BS",
+            "documents": 303,
+            "suppliers": 160,
+            "amount": "1167975.070000000000"
+          },
+          {
+            "document_status": "O",
+            "currency": "BS",
+            "documents": 302,
+            "suppliers": 143,
+            "amount": "2858499.510000000000"
+          }
+        ],
+        "total_rows": 2,
+        "omitted_rows": 0,
+        "controls": {
+          "excluded_nonactive_documents": 48,
+          "excluded_other_currency_documents": 0
+        },
+        "coverage": {
+          "kind": "BOUNDED_OBSERVATION",
+          "complete_business_history": false,
+          "absence_is_zero": false,
+          "observation_started_at": "2026-11-01T17:47:42.978000",
+          "observation_finished_at": "2026-11-01T17:47:50.867000",
+          "source_scope": {
+            "absent_optional_fields": [],
+            "end_exclusive": "2026-11-02",
+            "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+            "limitation": "No claim of modifications outside this business-date scope; no CDC",
+            "start": "2026-01-01"
+          },
+          "requested_period": {
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "first_observed_date": "2026-01-01 00:00:00",
+          "last_observed_date": "2026-10-31 00:00:00",
+          "dataset_rows": 7190,
+          "declared_start": "2026-01-01",
+          "declared_end_exclusive": "2026-11-02",
+          "requested_outside_capture": false
+        },
+        "limitations": [
+          "Importes de cabeceras activas en BS, separados por estado. No se suman órdenes, recepciones y facturas.",
+          "Moneda extranjera excluida: DocTotal no acredita su importe nativo. Solicitudes y devoluciones no capturadas; no es compra neta después de devoluciones.",
+          "Las 442 diferencias de líneas en 18 OC no acreditan su causa histórica SAP."
+        ],
+        "read_only": true,
+        "sap_accessed": false,
+        "source": {
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "snapshot_id": 1408,
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0",
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "datasets": {
+            "ap_invoice": "0999e81c5e1cdf75dea5ba52f75a53f38ab13f334cf7d191b0ded6f654d7a7e7"
+          }
+        },
+        "timings": {
+          "foundation_resolution_ms": 76151.008,
+          "sql_and_serialization_ms": 20.024753001052886
+        }
+      },
+      "independent_control": {
+        "C": {
+          "documents": 303,
+          "amount_bs": "1167975.07"
+        },
+        "O": {
+          "documents": 302,
+          "amount_bs": "2858499.51"
+        }
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 63.69395599904237,
+      "authorization": "NOT_EXERCISED_IN_READER_CONTROL"
+    },
+    {
+      "question": "¿Cuánto cobramos durante octubre de 2026?",
+      "capability": "collections.received_amount.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "collection_payment": "7f239cc3701c6ca888a8c23d824d3cc06913dfc12af6ab6a12e745426c580ee0"
+      },
+      "metric": "collections.received_amount",
+      "permission": "telchi.collections.received_amount.read.v1",
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:48:30.543000",
+        "observation_finished_at": "2026-11-01T17:48:54.816000",
+        "source_scope": {
+          "end_exclusive": "2026-11-02",
+          "kind": "BOUNDED_OVERLAP_PLUS_GAP",
+          "limitation": "Historical balances/payments before overlap NOT refreshed; aging not accredited by this capture",
+          "start": "2026-09-21"
+        },
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "first_observed_date": "2026-09-21 00:00:00",
+        "last_observed_date": "2026-11-01 00:00:00",
+        "dataset_rows": 50687,
+        "declared_start": "2026-09-21",
+        "declared_end_exclusive": "2026-11-02",
+        "requested_outside_capture": false
+      },
+      "response": "Cobros registrados:\nBS 12.180.925,36 · 40077 documentos/pagos\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-09-21, 2026-11-02). No certifica histórico completo.\nControles: excluded_nonactive_payments=311, excluded_other_currency_payments=0\nEventos de pagos publicados, no saldo histórico ni aging global. Pagos y aplicaciones son grains distintos y nunca se suman como ingresos independientes.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "result": {
+        "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+        "capability": "collections.received_amount.v1",
+        "metric": "collections.received_amount",
+        "label": "Cobros registrados",
+        "parameters": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01",
+          "limit": 50
+        },
+        "rows": [
+          {
+            "currency": "BS",
+            "payments": 40077,
+            "customers": 2763,
+            "amount": "12180925.360000000000"
+          }
+        ],
+        "total_rows": 1,
+        "omitted_rows": 0,
+        "controls": {
+          "excluded_nonactive_payments": 311,
+          "excluded_other_currency_payments": 0
+        },
+        "coverage": {
+          "kind": "BOUNDED_OBSERVATION",
+          "complete_business_history": false,
+          "absence_is_zero": false,
+          "observation_started_at": "2026-11-01T17:48:30.543000",
+          "observation_finished_at": "2026-11-01T17:48:54.816000",
+          "source_scope": {
+            "end_exclusive": "2026-11-02",
+            "kind": "BOUNDED_OVERLAP_PLUS_GAP",
+            "limitation": "Historical balances/payments before overlap NOT refreshed; aging not accredited by this capture",
+            "start": "2026-09-21"
+          },
+          "requested_period": {
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "first_observed_date": "2026-09-21 00:00:00",
+          "last_observed_date": "2026-11-01 00:00:00",
+          "dataset_rows": 50687,
+          "declared_start": "2026-09-21",
+          "declared_end_exclusive": "2026-11-02",
+          "requested_outside_capture": false
+        },
+        "limitations": [
+          "Eventos de pagos publicados, no saldo histórico ni aging global. Pagos y aplicaciones son grains distintos y nunca se suman como ingresos independientes."
+        ],
+        "read_only": true,
+        "sap_accessed": false,
+        "source": {
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "snapshot_id": 1408,
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0",
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "datasets": {
+            "collection_payment": "7f239cc3701c6ca888a8c23d824d3cc06913dfc12af6ab6a12e745426c580ee0"
+          }
+        },
+        "timings": {
+          "foundation_resolution_ms": 76151.008,
+          "sql_and_serialization_ms": 316.51098700240254
+        }
+      },
+      "independent_control": {
+        "payments": 40077,
+        "amount_bs": "12180925.36"
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 818.18008999835,
+      "authorization": "NOT_EXERCISED_IN_READER_CONTROL"
+    },
+    {
+      "question": "¿Qué materiales registraron mayor consumo durante octubre de 2026?",
+      "capability": "material_supply.consumption.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+        "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33",
+        "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7"
+      },
+      "metric": "material_supply.consumption",
+      "permission": "telchi.material_supply.consumption.read.v1",
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:46:37.892000",
+        "observation_finished_at": "2026-11-01T17:46:53.281000",
+        "source_scope": {
+          "absent_optional_fields": [],
+          "end_exclusive": "2026-11-02",
+          "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+          "limitation": "No claim of modifications outside this business-date scope; no CDC",
+          "start": "2026-01-01"
+        },
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "first_observed_date": "2026-01-05 00:00:00",
+        "last_observed_date": "2026-10-31 00:00:00",
+        "dataset_rows": 41808,
+        "declared_start": "2026-01-01",
+        "declared_end_exclusive": "2026-11-02",
+        "requested_outside_capture": false
+      },
+      "response": "Consumo elegible de Material Supply:\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05849: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05970: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05187: 80.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM03242: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05191: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05829: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nL00097: 24145.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00252: 22595.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00085: 7512.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00095: 6733.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00938: 4000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00937: 2435.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00092: 2276.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00088: 2041.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00173: 2000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03681: 1995.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03723: 1772.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03118: 1098.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00090: 1028.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00562: 1000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00881: 992.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03395: 400.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00066: 1772.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL03399: 1772.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02888: 400.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01038: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01041: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01117: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL00207: 90.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL00060: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02837: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02944: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nM02022: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL03197: 2250.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nL00039: 315.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nL01287: 9.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nM03695: 3.000000000000 · unidad JUEGO · código UoM Manual · factor nativo 1\nL01785: 20314.515000000000 · unidad KG · código UoM Manual · factor nativo 1\nL01094: 11790.900000000000 · unidad KG · código UoM Manual · factor nativo 1\nL01129: 9752.764900000000 · unidad KG · código UoM Manual · factor nativo 1\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nControles: period_source_lines=4814, included_issue_lines=2297, unknown_native_identity_lines_affected=0\nMostradas 50 de 520 filas; 470 omitidas del mensaje. No es un ranking global entre unidades.\nSubconjunto elegible del derivado publicado, filtrado por fecha de emisión. Identidad de material no equivale a clasificación de materia prima.\nLos cinco datasets históricos de Material Supply no se actualizan. No acredita faltantes, reposición ni cobertura de demanda.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "result": {
+        "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+        "capability": "material_supply.consumption.v1",
+        "metric": "material_supply.consumption",
+        "label": "Consumo elegible de Material Supply",
+        "parameters": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01",
+          "limit": 50
+        },
+        "rows": [
+          {
+            "item_code": "L01685",
+            "unit": "BOLSA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "641.000000000000"
+          },
+          {
+            "item_code": "M02927",
+            "unit": "BOLSA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "30.000000000000"
+          },
+          {
+            "item_code": "M05939",
+            "unit": "CAPS",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "L02331",
+            "unit": "CJA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "L02322",
+            "unit": "CJA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "5.000000000000"
+          },
+          {
+            "item_code": "L02157",
+            "unit": "CJA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "3.000000000000"
+          },
+          {
+            "item_code": "L02227",
+            "unit": "CJA",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "3.000000000000"
+          },
+          {
+            "item_code": "M02605",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05375",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05847",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05849",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05970",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "100.000000000000"
+          },
+          {
+            "item_code": "M05187",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "80.000000000000"
+          },
+          {
+            "item_code": "M03242",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "40.000000000000"
+          },
+          {
+            "item_code": "M05191",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "40.000000000000"
+          },
+          {
+            "item_code": "M05829",
+            "unit": "COMP",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "40.000000000000"
+          },
+          {
+            "item_code": "L00097",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 29,
+            "quantity": "24145.000000000000"
+          },
+          {
+            "item_code": "L00252",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 15,
+            "quantity": "22595.000000000000"
+          },
+          {
+            "item_code": "L00085",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "7512.000000000000"
+          },
+          {
+            "item_code": "L00095",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 6,
+            "quantity": "6733.000000000000"
+          },
+          {
+            "item_code": "L00938",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 2,
+            "quantity": "4000.000000000000"
+          },
+          {
+            "item_code": "L00937",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 2,
+            "quantity": "2435.000000000000"
+          },
+          {
+            "item_code": "L00092",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "2276.000000000000"
+          },
+          {
+            "item_code": "L00088",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "2041.000000000000"
+          },
+          {
+            "item_code": "L00173",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "2000.000000000000"
+          },
+          {
+            "item_code": "L03681",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "1995.000000000000"
+          },
+          {
+            "item_code": "L03723",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 39,
+            "quantity": "1772.000000000000"
+          },
+          {
+            "item_code": "L03118",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 3,
+            "quantity": "1098.000000000000"
+          },
+          {
+            "item_code": "L00090",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 2,
+            "quantity": "1028.000000000000"
+          },
+          {
+            "item_code": "L00562",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "1000.000000000000"
+          },
+          {
+            "item_code": "L00881",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "992.000000000000"
+          },
+          {
+            "item_code": "L03395",
+            "unit": "ENV",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "400.000000000000"
+          },
+          {
+            "item_code": "L00066",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 39,
+            "quantity": "1772.000000000000"
+          },
+          {
+            "item_code": "L03399",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 39,
+            "quantity": "1772.000000000000"
+          },
+          {
+            "item_code": "L02888",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "400.000000000000"
+          },
+          {
+            "item_code": "L01038",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 4,
+            "quantity": "250.000000000000"
+          },
+          {
+            "item_code": "L01041",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 4,
+            "quantity": "250.000000000000"
+          },
+          {
+            "item_code": "L01117",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 4,
+            "quantity": "250.000000000000"
+          },
+          {
+            "item_code": "L00207",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "90.000000000000"
+          },
+          {
+            "item_code": "L00060",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "L02837",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "L02944",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "M02022",
+            "unit": "FCO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "10.000000000000"
+          },
+          {
+            "item_code": "L03197",
+            "unit": "GR",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "2250.000000000000"
+          },
+          {
+            "item_code": "L00039",
+            "unit": "GR",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 15,
+            "quantity": "315.000000000000"
+          },
+          {
+            "item_code": "L01287",
+            "unit": "GR",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "9.000000000000"
+          },
+          {
+            "item_code": "M03695",
+            "unit": "JUEGO",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 1,
+            "quantity": "3.000000000000"
+          },
+          {
+            "item_code": "L01785",
+            "unit": "KG",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 33,
+            "quantity": "20314.515000000000"
+          },
+          {
+            "item_code": "L01094",
+            "unit": "KG",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 6,
+            "quantity": "11790.900000000000"
+          },
+          {
+            "item_code": "L01129",
+            "unit": "KG",
+            "uom_code": "Manual",
+            "native_factor": "1",
+            "issue_lines": 4,
+            "quantity": "9752.764900000000"
+          }
+        ],
+        "total_rows": 520,
+        "omitted_rows": 470,
+        "controls": {
+          "period_source_lines": 4814,
+          "included_issue_lines": 2297,
+          "unknown_native_identity_lines_affected": 0
+        },
+        "coverage": {
+          "kind": "BOUNDED_OBSERVATION",
+          "complete_business_history": false,
+          "absence_is_zero": false,
+          "observation_started_at": "2026-11-01T17:46:37.892000",
+          "observation_finished_at": "2026-11-01T17:46:53.281000",
+          "source_scope": {
+            "absent_optional_fields": [],
+            "end_exclusive": "2026-11-02",
+            "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+            "limitation": "No claim of modifications outside this business-date scope; no CDC",
+            "start": "2026-01-01"
+          },
+          "requested_period": {
+            "date_from": "2026-10-01",
+            "date_to_exclusive": "2026-11-01"
+          },
+          "first_observed_date": "2026-01-05 00:00:00",
+          "last_observed_date": "2026-10-31 00:00:00",
+          "dataset_rows": 41808,
+          "declared_start": "2026-01-01",
+          "declared_end_exclusive": "2026-11-02",
+          "requested_outside_capture": false
+        },
+        "limitations": [
+          "Subconjunto elegible del derivado publicado, filtrado por fecha de emisión. Identidad de material no equivale a clasificación de materia prima.",
+          "Los cinco datasets históricos de Material Supply no se actualizan. No acredita faltantes, reposición ni cobertura de demanda.",
+          "Cantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles."
+        ],
+        "read_only": true,
+        "sap_accessed": false,
+        "source": {
+          "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+          "snapshot_id": 1408,
+          "reference_version": "v2_sales_448ae93a960bf7342564a2d0",
+          "updated_at": "2026-11-01T17:50:16.749000+00:00",
+          "datasets": {
+            "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+            "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33",
+            "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7"
+          }
+        },
+        "timings": {
+          "foundation_resolution_ms": 76151.008,
+          "sql_and_serialization_ms": 74.40076299826615
+        }
+      },
+      "independent_control": {
+        "all_groups": 520,
+        "included_lines": 2297,
+        "presented_groups_exact": true,
+        "source_native_decimal_control": true
+      },
+      "parity": "EXACT",
+      "elapsed_ms": 144.79763100098353,
+      "authorization": "NOT_EXERCISED_IN_READER_CONTROL"
+    }
+  ],
+  "model_or_auth_exercised": false,
+  "publications": 0,
+  "sap_queries": 0,
+  "entitlement_changes": 0,
+  "trace": {
+    "schema": "telchi-pre-sql-profile-v1",
+    "clock": "perf_counter_ns",
+    "spans": [
+      {
+        "label": "duckdb_import",
+        "start_ms": 0.012787,
+        "end_ms": 59.739437,
+        "duration_ms": 59.72665
+      },
+      {
+        "label": "duckdb_connect",
+        "start_ms": 59.801833,
+        "end_ms": 75.487346,
+        "duration_ms": 15.685513
+      },
+      {
+        "label": "load_ducklake",
+        "start_ms": 75.514047,
+        "end_ms": 134.154799,
+        "duration_ms": 58.640752
+      },
+      {
+        "label": "load_postgres",
+        "start_ms": 134.177085,
+        "end_ms": 194.216438,
+        "duration_ms": 60.039353
+      },
+      {
+        "label": "attachment_open_including_catalog_session",
+        "start_ms": 194.365974,
+        "end_ms": 397.04043,
+        "duration_ms": 202.674456
+      },
+      {
+        "label": "foundation_current_count",
+        "start_ms": 398.4039,
+        "end_ms": 805.626602,
+        "duration_ms": 407.222702
+      },
+      {
+        "label": "foundation_current_metadata",
+        "start_ms": 805.652719,
+        "end_ms": 1041.559295,
+        "duration_ms": 235.906576
+      },
+      {
+        "label": "foundation_publication_get",
+        "start_ms": 1041.572467,
+        "end_ms": 1071.374104,
+        "duration_ms": 29.801637
+      },
+      {
+        "label": "foundation_manifest_validation",
+        "start_ms": 1071.393602,
+        "end_ms": 1071.4085,
+        "duration_ms": 0.014898
+      },
+      {
+        "label": "foundation_commit_snapshot_resolution",
+        "start_ms": 1071.419569,
+        "end_ms": 1841.414758,
+        "duration_ms": 769.995189
+      },
+      {
+        "label": "foundation_sales_facts_validation",
+        "start_ms": 1847.586829,
+        "end_ms": 76413.730495,
+        "duration_ms": 74566.143666
+      },
+      {
+        "label": "foundation_sales_facts_physical_validation",
+        "start_ms": 76413.855182,
+        "end_ms": 76515.284629,
+        "duration_ms": 101.429447
+      },
+      {
+        "label": "foundation_component_verification",
+        "start_ms": 76515.301102,
+        "end_ms": 76549.296755,
+        "duration_ms": 33.995653
+      },
+      {
+        "label": "attachment_connection_close",
+        "start_ms": 78065.004839,
+        "end_ms": 78104.865981,
+        "duration_ms": 39.861142
+      }
+    ],
+    "total_ms": 78064.990861
+  }
+}

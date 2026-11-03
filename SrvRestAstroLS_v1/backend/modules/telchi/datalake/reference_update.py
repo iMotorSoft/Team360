@@ -12,6 +12,7 @@ repeatable local tests and fault injection; it never pretends to be a SAP run.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
 import hashlib
 import json
@@ -43,7 +44,7 @@ ENTITY_CONFIG = {
 
 OITM_SQL = '''
 SELECT "ItemCode", "ItemName", "validFor", "frozenFor", "InvntItem", "SellItem", "PrchseItem",
-       "ItmsGrpCod", "InvntryUom", "SalUnitMsr", "BuyUnitMsr", "AvgPrice", "LastPurPrc", "UpdateDate"
+       "ItmsGrpCod", "InvntryUom", "SalUnitMsr", "BuyUnitMsr", "AvgPrice", "LastPurPrc", "UpdateDate", "U_FormaFarmac"
 FROM "TELCHI"."OITM"
 '''
 OCRD_SQL = '''
@@ -96,7 +97,7 @@ def _normal(value: Any) -> Any:
 
 def read_parquet_rows(path: Path) -> tuple[list[str], list[str], list[dict[str, Any]]]:
     """Read Parquet without requiring optional timezone Python packages."""
-    db = duckdb.connect()
+    db = duckdb.connect(config={"threads": 2})
     try:
         description = db.execute("DESCRIBE SELECT * FROM read_parquet(?)", [str(path)]).fetchall()
         columns = [str(row[0]) for row in description]
@@ -110,15 +111,18 @@ def read_parquet_rows(path: Path) -> tuple[list[str], list[str], list[dict[str, 
 
 def write_parquet(path: Path, columns: list[str], types: list[str], rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True, mode=0o750)
-    db = duckdb.connect()
+    db = duckdb.connect(config={"threads": 2})
     json_path = path.with_suffix(".csv")
     try:
         if rows:
+            null_marker = "__TELCHI_NULL__"
+            while any(str(value) == null_marker for row in rows for value in row.values() if value is not None):
+                null_marker += "_"
             with json_path.open("w", encoding="utf-8", newline="") as stream:
                 writer = csv.DictWriter(stream, fieldnames=columns)
                 writer.writeheader()
-                writer.writerows({column: row.get(column) for column in columns} for row in rows)
-            db.execute("CREATE TABLE input AS SELECT * FROM read_csv(?, header=true, all_varchar=true, nullstr='')", [str(json_path)])
+                writer.writerows({column: row.get(column) if row.get(column) is not None else null_marker for column in columns} for row in rows)
+            db.execute("CREATE TABLE input AS SELECT * FROM read_csv(?, header=true, all_varchar=true, nullstr=?)", [str(json_path), null_marker])
             expressions = ",".join(f'CAST("{c.replace(chr(34), chr(34) * 2)}" AS {t}) AS "{c.replace(chr(34), chr(34) * 2)}"' for c, t in zip(columns, types))
             db.execute(f"COPY (SELECT {expressions} FROM input) TO ? (FORMAT PARQUET, COMPRESSION ZSTD)", [str(path)])
         else:
@@ -167,12 +171,59 @@ def extract_from_sap(source: HanaReadOnlySource) -> tuple[dict[str, list[dict[st
 
 def _find(path: Path, name: str) -> Path:
     direct = path / name / "part-00000.parquet"
-    if direct.is_file():
-        return direct
     candidates = sorted(path.glob(f"{name}/*.parquet"))
     if not candidates:
         raise FileNotFoundError(f"missing Reference V2 dataset: {direct}")
+    if len(candidates) != 1:
+        raise RuntimeError(f"Reference master refresh requires a single sealed part: {name}")
     return candidates[0]
+
+
+@contextlib.contextmanager
+def reference_publication_lock(data_root: Path):
+    """Serialize canonical pointer writers; yield a compare-and-swap publisher.
+
+    Existing immutable versions are never removed. Holding this lock across a
+    Foundation logical commit permits journaled roll-forward after interruption.
+    Foundation readers always resolve their own pinned Reference, not this slot.
+    """
+    import fcntl
+    import tempfile
+    pointer_path = data_root / 'manifests' / POINTER_NAME
+    pointer_path.parent.mkdir(parents=True, exist_ok=True, mode=0o750)
+    with (pointer_path.parent / (POINTER_NAME + '.lock')).open('a+b') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        def publish(expected, replacement):
+            actual = json.loads(pointer_path.read_text()) if pointer_path.exists() else {}
+            if actual != expected:
+                raise RuntimeError('REFERENCE_COMPARE_AND_SWAP_CONFLICT')
+            version = replacement.get('current_reference_version')
+            for family, key in (('reference', 'reference_path'), ('crosswalk', 'crosswalk_path')):
+                target = data_root / family / '_versions' / str(version)
+                if (not version or replacement.get(key) != str(target)
+                        or target.is_symlink() or not target.is_dir()
+                        or not list(target.rglob('*.parquet'))):
+                    raise ValueError('Reference pointer requires complete immutable version roots')
+            if actual == replacement:
+                return 'NOOP'
+            # A unique temporary file, fsync and rename retain the producer's
+            # existing atomic publication mechanism with durable CAS semantics.
+            fd, name = tempfile.mkstemp(prefix=POINTER_NAME + '.', dir=pointer_path.parent)
+            try:
+                with os.fdopen(fd, 'w') as stream:
+                    json.dump(replacement, stream, sort_keys=True, indent=2)
+                    stream.write('\n'); stream.flush(); os.fsync(stream.fileno())
+                os.replace(name, pointer_path)
+                directory = os.open(pointer_path.parent, os.O_RDONLY | os.O_DIRECTORY)
+                try: os.fsync(directory)
+                finally: os.close(directory)
+            finally:
+                if os.path.exists(name): os.unlink(name)
+            return 'PUBLISHED'
+        try:
+            yield publish
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
 
 
 def active_pointer(data_root: Path) -> tuple[dict[str, Any], Path, Path]:
@@ -215,6 +266,43 @@ def _set_if(columns: list[str], row: dict[str, Any], key: str, value: Any) -> No
         row[key] = None if value is None else _normal(value)
 
 
+PHYSICAL_FIELDS = (
+    "sap_forma_farmac_code", "physical_classification_label", "physical_state",
+    "physical_classification_status", "physical_classification_source",
+    "physical_classification_observed_at",
+)
+PHYSICAL_DICTIONARY = {
+    "0": ("NINGUNA", None, "UNCLASSIFIED"),
+    "1": ("LIQUIDO", "LIQUID", "CLASSIFIED"),
+    "2": ("SEMI-SOLIDO", "SEMISOLID", "CLASSIFIED"),
+    "3": ("SOLIDO", "SOLID", "CLASSIFIED"),
+    "4": ("MEDICAMENTO", None, "NOT_PHYSICAL"),
+    "5": ("NO CORRESPONDE", None, "NOT_APPLICABLE"),
+}
+
+
+def physical_classification(value: Any, observed_at: str | None) -> dict[str, Any]:
+    """Official dictionary only; the raw SAP code is never trimmed or inferred."""
+    code = _normal(value)
+    label, state, status = PHYSICAL_DICTIONARY.get(
+        code, (None, None, "MISSING" if code is None or not code.strip() else "UNKNOWN")
+    )
+    return dict(zip(PHYSICAL_FIELDS, (
+        code, label, state, status, "SAP_HANA.OITM.U_FormaFarmac", observed_at,
+    )))
+
+
+def validate_physical_rows(rows: list[dict]) -> None:
+    for row in rows:
+        if not any(row.get(field) is not None for field in PHYSICAL_FIELDS):
+            continue  # unobserved historical/legacy row, not backfilled
+        if row.get("source_system") != "SAP_HANA":
+            raise RuntimeError("Physical classification cannot silently backfill legacy rows")
+        expected = physical_classification(row.get("sap_forma_farmac_code"), row.get("physical_classification_observed_at"))
+        if any(row.get(field) != expected[field] for field in PHYSICAL_FIELDS) or not row.get("physical_classification_observed_at"):
+            raise RuntimeError("Physical classification dictionary/observation integrity failed")
+
+
 def merge_entity(entity: str, source_rows: list[dict[str, Any]], ref_rows: list[dict[str, Any]], ref_columns: list[str], cw_rows: list[dict[str, Any]], cw_columns: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     cfg = ENTITY_CONFIG[entity]
     source_key = cfg["key"]
@@ -238,6 +326,7 @@ def merge_entity(entity: str, source_rows: list[dict[str, Any]], ref_rows: list[
         canonical = (old or {}).get(cfg["canonical"]) or canonical_id(cfg["prefix"], native)
         row[cfg["canonical"]] = canonical
         if entity == "product":
+            row.update(physical_classification(src.get("U_FormaFarmac"), src.get("_source_extracted_at")))
             row.update({"item_code": native, "canonical_name": str(src.get("ItemName") or ""), "product_name": str(src.get("ItemName") or ""), "active": _active(src.get("validFor"), src.get("frozenFor")), "status": _status(src.get("validFor"), src.get("frozenFor"))})
             uom = str(src.get("InvntryUom") or "").strip()
             row["inventory_uom_id"] = canonical_id("unit_of_measure", uom) if uom else None
@@ -268,6 +357,7 @@ def merge_entity(entity: str, source_rows: list[dict[str, Any]], ref_rows: list[
             changed += 1
     # Existing SAP keys not in current remain in output and are SOURCE_KEY_DISAPPEARED.
     disappeared = len(set(existing) - current_keys)
+    canonical_by_native = {r["source_native_id"]: r[cfg["canonical"]] for r in output if r.get("source_system") == "SAP_HANA"}
     by_key = {_source_key(r, "source_native_id"): r for r in cw_rows if r.get("source_system") == "SAP_HANA" and _source_key(r, "source_native_id")}
     cw_output = [dict(r) for r in cw_rows if not (r.get("source_system") == "SAP_HANA" and _source_key(r, "source_native_id") in current_keys)]
     for src in sorted(role_rows, key=lambda r: _source_key(r, source_key)):
@@ -275,7 +365,7 @@ def merge_entity(entity: str, source_rows: list[dict[str, Any]], ref_rows: list[
         old = by_key.get(native)
         row = dict(old or {})
         row.update({c: row.get(c) for c in cw_columns})
-        row.update({"source_system": "SAP_HANA", "source_native_id": native, "canonical_id": (old or {}).get("canonical_id") or canonical_id(cfg["prefix"], native), "mapping_source": (old or {}).get("mapping_source") or "canonical_source_identity", "confidence": (old or {}).get("confidence") or "1.0", "status": (old or {}).get("status") or "CONFIRMED"})
+        row.update({"source_system": "SAP_HANA", "source_native_id": native, "canonical_id": (old or {}).get("canonical_id") or canonical_by_native[native], "mapping_source": (old or {}).get("mapping_source") or "canonical_source_identity", "confidence": (old or {}).get("confidence") or "1.0", "status": (old or {}).get("status") or "CONFIRMED"})
         for c in ("_source_system", "_source_dataset", "_source_native_key", "_source_extracted_at", "_ingested_at", "_transformation_version", "_semantic_version", "_lineage_quality"):
             if c in cw_columns:
                 row[c] = {"_source_system": "SAP_HANA", "_source_dataset": cfg["table"], "_source_native_key": native, "_source_extracted_at": src.get("_source_extracted_at"), "_ingested_at": src.get("_source_extracted_at"), "_transformation_version": GATE, "_semantic_version": "2.0.0", "_lineage_quality": "FULL_DOCUMENT_TRACE"}[c]
@@ -283,9 +373,35 @@ def merge_entity(entity: str, source_rows: list[dict[str, Any]], ref_rows: list[
     return output, cw_output, {"new": new, "changed": changed, "disappeared": disappeared, "existing": len(existing), "final": len(output), "existing_ids_changed": 0, "crosswalk_remapped": 0}
 
 
+def validate_identity(entity: str, refs: list[dict], crosswalk: list[dict], old_refs: list[dict], old_crosswalk: list[dict]) -> None:
+    """Prove source-scoped uniqueness, referential integrity and preservation."""
+    canonical = ENTITY_CONFIG[entity]["canonical"]
+    def index(rows: list[dict], field: str) -> dict:
+        result = {}
+        for row in rows:
+            key = (row.get("source_system"), row.get("source_native_id"))
+            if not all(key) or key in result or not row.get(field):
+                raise RuntimeError(f"Reference identity invalid/duplicate: {entity} {key}")
+            result[key] = row[field]
+        return result
+    current, mappings = index(refs, canonical), index(crosswalk, "canonical_id")
+    for before, after in ((index(old_refs, canonical), current), (index(old_crosswalk, "canonical_id"), mappings)):
+        if any(after.get(key) != value for key, value in before.items()):
+            raise RuntimeError(f"Reference identity changed: {entity}")
+    if any(current.get(key) != value for key, value in mappings.items()):
+        raise RuntimeError(f"Reference crosswalk mismatch: {entity}")
+    sap_values = [value for key, value in current.items() if key[0] == "SAP_HANA"]
+    sap_ids = set(sap_values)
+    if len(sap_ids) != len(sap_values):
+        raise RuntimeError(f"Reference canonical identity collision: {entity}")
+    if any(value in sap_ids for key, value in current.items() if key[0] != "SAP_HANA"):
+        raise RuntimeError(f"Reference SAP/legacy identity collision: {entity}")
+
+
 def _owned_fields(entity: str, columns: list[str]) -> list[str]:
     base = ["source_native_id", "code", "name", "item_code", "canonical_name", "product_name", "active", "status", "tax_id", "credit_limit", "payment_term_id"]
-    return [x for x in base + [c for c in columns if c.startswith("sap_")] if x in columns]
+    physical = list(PHYSICAL_FIELDS[:-1]) if entity == "product" else []
+    return [x for x in base + physical + [c for c in columns if c.startswith("sap_")] if x in columns]
 
 
 def _add_columns(rows: list[dict[str, Any]], columns: list[str], types: list[str], additions: list[tuple[str, str]]) -> tuple[list[str], list[str]]:
@@ -314,7 +430,8 @@ def _diff_for(entity: str, rows: list[dict[str, Any]], old_rows: list[dict[str, 
         source = current[key]; old = previous[key]
         if entity == "product":
             values = {"ItemName": source.get("ItemName"), "validFor": source.get("validFor"), "frozenFor": source.get("frozenFor"), "ItmsGrpCod": source.get("ItmsGrpCod")}
-            old_values = {"ItemName": old.get("sap_item_name", old.get("canonical_name")), "validFor": old.get("sap_valid_for"), "frozenFor": old.get("sap_frozen_for"), "ItmsGrpCod": old.get("sap_itms_grp_cod")}
+            values["U_FormaFarmac"] = _normal(source.get("U_FormaFarmac"))
+            old_values = {"U_FormaFarmac": old.get("sap_forma_farmac_code"), "ItemName": old.get("sap_item_name", old.get("canonical_name")), "validFor": old.get("sap_valid_for"), "frozenFor": old.get("sap_frozen_for"), "ItmsGrpCod": old.get("sap_itms_grp_cod")}
         elif entity in {"customer", "supplier"}:
             values = {"CardName": source.get("CardName"), "CardType": source.get("CardType"), "GroupCode": source.get("GroupCode"), "validFor": source.get("validFor"), "frozenFor": source.get("frozenFor")}
             old_values = {"CardName": old.get("name"), "CardType": old.get("sap_card_type"), "GroupCode": old.get("sap_group_code"), "validFor": old.get("sap_valid_for"), "frozenFor": old.get("sap_frozen_for")}
@@ -326,6 +443,155 @@ def _diff_for(entity: str, rows: list[dict[str, Any]], old_rows: list[dict[str, 
             old_values = {"SlpName": old.get("name"), "Active": old.get("salesperson_active"), "U_CATVENDEDOR": old.get("salesperson_category_code")}
         if any(str(values[k] or "") != str(old_values[k] or "") for k in values): changed.append(key)
     return {"entity": entity, "previous": len(previous), "current_sap": len(current), "new": new, "changed": changed, "unchanged": len(current) - len(new) - len(changed), "source_key_disappeared": disappeared, "inactive_current": sorted(k for k, v in current.items() if _status(v.get("validFor"), v.get("frozenFor")) == "INACTIVE")}
+
+
+def _version_parts(reference: Path, crosswalk: Path):
+    volatile = {"_source_extracted_at", "_ingested_at", "physical_classification_observed_at"}
+    for family, root in (("reference", reference), ("crosswalk", crosswalk)):
+        for path in sorted(root.rglob("*.parquet")):
+            from .verification_cache import verified_projection
+            def project():
+                columns, types, rows = read_parquet_rows(path)
+                return {
+                    "schema": list(zip(columns, types)),
+                    "rows": sorted([{k: v for k, v in row.items() if k not in volatile} for row in rows], key=digest),
+                }
+            # Immutable copies across ancestry often have identical bytes.
+            # Reuse only inside one validation, with a fresh SHA on every hit.
+            yield family + "/" + str(path.relative_to(root)), path, verified_projection(
+                path, 'reference-version-content-v1', project)
+
+
+def version_content(reference: Path, crosswalk: Path) -> dict:
+    return {key: value for key, _, value in _version_parts(reference, crosswalk)}
+
+
+def version_fingerprint(reference: Path, crosswalk: Path) -> str:
+    """Exactly digest(version_content), streaming byte-verified canonical parts.
+
+    The same serialized part is shared only inside canonical validation. JSON
+    settings and sorted key order are identical to digest; identities do not
+    change, and no certificate substitutes for file or transformation checks.
+    """
+    from .verification_cache import verified_projection
+    encoder = lambda value: json.dumps(value, sort_keys=True, ensure_ascii=False, default=str).encode()
+    parts = []
+    volatile = {'_source_extracted_at', '_ingested_at', 'physical_classification_observed_at'}
+    for family, root in (("reference", reference), ("crosswalk", crosswalk)):
+        for path in sorted(root.rglob('*.parquet')):
+            def encoded_part():
+                columns, types, rows = read_parquet_rows(path)
+                # digest(row) and the enclosing canonical JSON previously
+                # serialized every cell twice. Serialize once and reuse those
+                # exact bytes both for the original ordering and final digest.
+                encoded_rows = [encoder({k:v for k,v in row.items() if k not in volatile}) for row in rows]
+                encoded_rows.sort(key=lambda value: hashlib.sha256(value).hexdigest())
+                schema = encoder(list(zip(columns, types)))
+                return b'{"rows": [' + b', '.join(encoded_rows) + b'], "schema": ' + schema + b'}'
+            encoded = verified_projection(path, 'reference-version-json-v2', encoded_part)
+            parts.append((family + '/' + str(path.relative_to(root)), encoded))
+    hashed = hashlib.sha256()
+    hashed.update(b'{')
+    for number, (key, encoded) in enumerate(sorted(parts)):
+        if number:
+            hashed.update(b', ')
+        hashed.update(encoder(key)); hashed.update(b': '); hashed.update(encoded)
+    hashed.update(b'}')
+    return hashed.hexdigest()
+
+
+def prepare_physical_reference(*, previous_reference: Path, previous_crosswalk: Path,
+                               observations: list[dict[str, Any]], candidate_root: Path) -> dict[str, Any]:
+    """Prepare an isolated, additive physical-only version; never activate pointers.
+
+    Observations contain exact ItemCode, U_FormaFarmac and accredited observed_at.
+    Missing identities are reported, not created or matched by description. Caller
+    owns capture verification. This deliberately does not run the master refresh.
+    """
+    import tempfile
+    previous_reference = Path(previous_reference).resolve()
+    previous_crosswalk = Path(previous_crosswalk).resolve()
+    candidate_root = Path(candidate_root).resolve()
+    shared = Path('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi').resolve()
+    for protected in (shared, previous_reference, previous_crosswalk):
+        if candidate_root.is_relative_to(protected) or protected.is_relative_to(candidate_root):
+            raise ValueError('physical candidate must be isolated from shared and source roots')
+    indexed = {}
+    for observation in observations:
+        key = observation.get('ItemCode')
+        stamp = observation.get('observed_at')
+        if (not isinstance(key, str) or not key.strip() or key in indexed
+                or 'U_FormaFarmac' not in observation or not isinstance(stamp, str)):
+            raise ValueError('duplicate/invalid physical observation')
+        try:
+            parsed = datetime.fromisoformat(stamp.replace('Z', '+00:00'))
+            if parsed.tzinfo is None:
+                raise ValueError('observation must have timezone')
+        except ValueError as exc:
+            raise ValueError('invalid accredited observation timestamp') from exc
+        indexed[key] = observation
+    product_path = _find(previous_reference, 'products')
+    columns, types, old = read_parquet_rows(product_path)
+    _, _, crosswalk = read_parquet_rows(_find(previous_crosswalk, 'product_crosswalk'))
+    validate_identity('product', old, crosswalk, old, crosswalk)
+    rows = [dict(row) for row in old]
+    if indexed:
+        _add_columns(rows, columns, types, [(name, 'VARCHAR') for name in PHYSICAL_FIELDS])
+    matched, changed = set(), 0
+    for row in rows:
+        key = row.get('source_native_id')
+        if row.get('source_system') != 'SAP_HANA' or key not in indexed:
+            continue
+        observation = indexed[key]
+        physical = physical_classification(observation['U_FormaFarmac'], observation['observed_at'])
+        changed += any(row.get(field) != physical[field] for field in PHYSICAL_FIELDS[:-1])
+        row.update(physical)
+        matched.add(key)
+    validate_physical_rows(rows)
+    validate_identity('product', rows, crosswalk, old, crosswalk)
+    candidate_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    # Preserve interrupted preparation for inspection; never overwrite or remove it.
+    stage = Path(tempfile.mkdtemp(prefix='physical-prepare-', dir=candidate_root))
+    stage_ref, stage_cw = stage / 'reference', stage / 'crosswalk'
+    shutil.copytree(previous_reference, stage_ref)
+    shutil.copytree(previous_crosswalk, stage_cw)
+    if indexed:
+        write_parquet(stage_ref / product_path.relative_to(previous_reference), columns, types, rows)
+    fingerprint = digest(version_content(stage_ref, stage_cw))
+    noop = fingerprint == digest(version_content(previous_reference, previous_crosswalk))
+    version = previous_reference.name if noop else 'v2_' + fingerprint[:24]
+    final_ref = candidate_root / 'reference/_versions' / version
+    final_cw = candidate_root / 'crosswalk/_versions' / version
+    for source, target in ((previous_reference if noop else stage_ref, final_ref),
+                           (previous_crosswalk if noop else stage_cw, final_cw)):
+        if not target.exists():
+            shutil.copytree(source, target)
+        expected = {str(p.relative_to(source)): hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in source.rglob('*') if p.is_file()}
+        actual = {str(p.relative_to(target)): hashlib.sha256(p.read_bytes()).hexdigest()
+                  for p in target.rglob('*') if p.is_file()}
+        # Material equality alone is insufficient to accept a partially installed version.
+        if actual != expected:
+            differing = {name for name in set(actual) | set(expected) if actual.get(name) != expected.get(name)}
+            # Observation/ingestion timestamps are non-material. Reuse the sealed
+            # version without replacing its accredited timestamps on replay.
+            try:
+                same_material = (set(actual) == set(expected)
+                    and all(name.endswith('.parquet') for name in differing)
+                    and digest(version_content(source, stage / 'absent'))
+                        == digest(version_content(target, stage / 'absent')))
+            except duckdb.Error:
+                same_material = False
+            if not same_material:
+                raise RuntimeError('physical immutable version collision or interrupted preparation')
+    result = {'status': 'NOOP' if noop else 'PREPARED', 'reference_version': version,
+              'reference_path': str(final_ref), 'crosswalk_path': str(final_cw),
+              'content_fingerprint': fingerprint, 'product_rows': len(rows),
+              'matched_observations': len(matched), 'enriched_rows': changed,
+              'preserved_rows': len(rows) - changed,
+              'pending_structural_identities': sorted(set(indexed) - matched),
+              'activated': False}
+    return result
 
 
 def _write_evidence(root: Path, payload: dict[str, Any]) -> None:
@@ -381,22 +647,41 @@ def run_reference_update(*, data_root: Path = DATA_ROOT, evidence_root: Path = E
             "warehouse": [("sap_locked", "VARCHAR"), ("sap_inactive", "VARCHAR"), ("sap_branch_office_id", "VARCHAR"), ("sap_type", "VARCHAR"), ("sap_warehouse_dms", "VARCHAR"), ("sap_update_date", "VARCHAR")],
             "salesperson": [("salesperson_active", "VARCHAR"), ("salesperson_category_code", "VARCHAR"), ("salesperson_category_name", "VARCHAR"), ("is_corporate", "VARCHAR"), ("sap_category_source_label", "VARCHAR")],
         }[entity]
+        if entity == "product":
+            additions += [(name, "VARCHAR") for name in PHYSICAL_FIELDS]
         ref_columns, ref_types = _add_columns(ref_rows, ref_columns, ref_types, additions)
         chosen_source = source_rows[cfg["table"]]
         merged_ref, merged_cw, merge_result = merge_entity(entity, chosen_source, ref_rows, ref_columns, cw_rows, cw_columns)
         diffs[entity] = _diff_for(entity, merged_ref, previous_rows_cache[entity], chosen_source)
         results[entity] = merge_result
-        write_parquet(stage_ref / cfg["ref"] / "part-00000.parquet", ref_columns, ref_types, merged_ref)
-        write_parquet(stage_cw / cfg["crosswalk"] / "part-00000.parquet", cw_columns, cw_types, merged_cw)
+        validate_identity(entity, merged_ref, merged_cw, ref_rows, cw_rows)
+        if entity == "product":
+            validate_physical_rows(merged_ref)
+            evidence["physical_classification"] = {
+                "contract_version": "1.0.0", "source_field": "SAP_HANA.OITM.U_FormaFarmac",
+                "observed_at": source_as_of, "business_effective_at": "UNKNOWN",
+                "official_dictionary": PHYSICAL_DICTIONARY,
+                "status_counts": dict(Counter(row.get("physical_classification_status") or "UNOBSERVED" for row in merged_ref)),
+                "changed_products": diffs[entity]["changed"],
+                "inference_used": False, "legacy_backfill_used": False,
+            }
+        write_parquet(stage_ref / ref_path.relative_to(previous_ref), ref_columns, ref_types, merged_ref)
+        write_parquet(stage_cw / cw_path.relative_to(previous_cw), cw_columns, cw_types, merged_cw)
     canonical_changes = []
     remapped = 0
     for entity, result in results.items():
         if result["existing_ids_changed"]:
             canonical_changes.append(entity)
         remapped += result["crosswalk_remapped"]
-    source_fingerprint = digest(source_files)
-    stage_fingerprint = digest({"source_files": source_files, "previous_version": previous_version, "diffs": diffs})
-    new_version = previous_version if pointer.get("source_fingerprint") == source_fingerprint else "v2_" + source_fingerprint[:16]
+    # Paths, fixture serialization and observation time are not business changes.
+    source_fingerprint = digest({table: sorted(
+        [{k: _normal(v) for k, v in row.items() if k != "_source_extracted_at"} for row in values],
+        key=lambda row: digest(row),
+    ) for table, values in source_rows.items()})
+    content_fingerprint = digest(version_content(stage_ref, stage_cw))
+    previous_fingerprint = digest(version_content(previous_ref, previous_cw))
+    noop = previous_fingerprint == content_fingerprint
+    new_version = previous_version if noop else "v2_" + content_fingerprint[:24]
     final_ref = data_root / "reference" / "_versions" / new_version
     final_cw = data_root / "crosswalk" / "_versions" / new_version
     validation = {"source_duplicate_guard": "PASS", "canonical_preservation": "PASS" if not canonical_changes else "FAIL", "crosswalk_preservation": "PASS" if remapped == 0 else "FAIL", "schema_validation": "PASS", "coherent_master_version": "PASS"}
@@ -408,25 +693,23 @@ def run_reference_update(*, data_root: Path = DATA_ROOT, evidence_root: Path = E
     if not all(value == "PASS" for value in validation.values() if value != "TRIGGERED"):
         raise RuntimeError(f"Reference validation failed: {validation}")
     # The version directories are immutable once activated.  Existing target means a deterministic second run.
-    noop = new_version == previous_version and pointer.get("source_fingerprint") == source_fingerprint
     if not noop:
         if not final_ref.exists():
             shutil.copytree(stage_ref, final_ref)
         if not final_cw.exists():
             shutil.copytree(stage_cw, final_cw)
-        new_pointer = {"current_reference_version": new_version, "reference_path": str(final_ref), "crosswalk_path": str(final_cw), "previous_version": previous_version, "rollback": {"current_reference_version": previous_version, "reference_path": str(previous_ref), "crosswalk_path": str(previous_cw)}, "build_id": new_version, "source_as_of": source_as_of, "source_fingerprint": source_fingerprint, "gate": GATE}
-        pointer_path = data_root / "manifests" / POINTER_NAME
-        temporary = pointer_path.with_suffix(".json.tmp")
-        temporary.parent.mkdir(parents=True, exist_ok=True, mode=0o750)
-        temporary.write_text(json.dumps(new_pointer, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        os.replace(temporary, pointer_path)
+        if digest(version_content(final_ref, final_cw)) != content_fingerprint:
+            raise RuntimeError("Reference immutable version collision or interrupted preparation; pointer unchanged")
+        new_pointer = {"current_reference_version": new_version, "reference_path": str(final_ref), "crosswalk_path": str(final_cw), "previous_version": previous_version, "rollback": {"current_reference_version": previous_version, "reference_path": str(previous_ref), "crosswalk_path": str(previous_cw)}, "build_id": new_version, "source_as_of": source_as_of, "source_fingerprint": source_fingerprint, "content_fingerprint": content_fingerprint, "gate": GATE}
+        with reference_publication_lock(data_root) as publish:
+            publish(pointer, new_pointer)
     else:
         new_pointer = pointer
     publication_ms = round((time.perf_counter() - started) * 1000, 3)
     products = results["product"]; customers = results["customer"]; suppliers = results["supplier"]; warehouses = results["warehouse"]; salespersons = results["salesperson"]
     role_counts = Counter(str(row.get("CardType") or "OTHER").upper() for row in source_rows["OCRD"])
     same_name_role_merges = len({str(row.get("CardName") or "").strip().upper() for row in source_rows["OCRD"] if str(row.get("CardName") or "").strip()}) - len({(str(row.get("CardName") or "").strip().upper(), str(row.get("CardType") or "").upper()) for row in source_rows["OCRD"] if str(row.get("CardName") or "").strip()})
-    summary = {"GATE": GATE, "VERDICT": GATE + "_PASS", **sap_meta, "REFERENCE_PREVIOUS_VERSION": previous_version, "REFERENCE_NEW_VERSION": new_version, "REFERENCE_SECOND_RUN_NOOP": "YES" if noop else "SOURCE_CHANGED", "SAP_MASTER_SOURCE_AS_OF": source_as_of, "SAP_OITM_ROWS": len(source_rows["OITM"]), "REFERENCE_PRODUCTS_PREVIOUS": diffs["product"]["previous"], "REFERENCE_PRODUCTS_FINAL": products["final"], "PRODUCTS_NEW": products["new"], "PRODUCTS_SAP_ATTRIBUTE_CHANGED": len(diffs["product"]["changed"]), "PRODUCTS_SOURCE_DISAPPEARED": products["disappeared"], "NEW_CANONICAL_PRODUCTS": products["new"], "EXISTING_PRODUCT_CANONICAL_IDS_CHANGED": 0, "SAP_OCRD_ROWS": len(source_rows["OCRD"]), "SAP_CUSTOMERS": role_counts.get("C", 0), "SAP_SUPPLIERS": role_counts.get("S", 0), "SAP_LEADS": role_counts.get("L", 0), "REFERENCE_BP_PREVIOUS": diffs["customer"]["previous"] + diffs["supplier"]["previous"], "REFERENCE_BP_FINAL": customers["final"] + suppliers["final"], "CUSTOMERS_NEW": customers["new"], "SUPPLIERS_NEW": suppliers["new"], "LEADS_NEW": role_counts.get("L", 0), "BP_SAP_ATTRIBUTE_CHANGED": len(diffs["customer"]["changed"]) + len(diffs["supplier"]["changed"]), "BP_SOURCE_DISAPPEARED": customers["disappeared"] + suppliers["disappeared"], "EXISTING_BP_CANONICAL_IDS_CHANGED": 0, "SAME_NAME_ROLE_MERGES": max(0, same_name_role_merges), "SAP_OSLP_ROWS": len(source_rows["OSLP"]), "REFERENCE_SALESPERSON_ROWS": salespersons["final"], "SALESPERSONS_NEW": salespersons["new"], "SALESPERSONS_SAP_ATTRIBUTE_CHANGED": len(diffs["salesperson"]["changed"]), "SALESPERSONS_SOURCE_DISAPPEARED": salespersons["disappeared"], "EXISTING_SALESPERSON_CANONICAL_IDS_CHANGED": 0, "CORPORATE_CATEGORY_CODE": "2", "CORPORATE_CATEGORY_NAME": "CORPORATIVO", "CORPORATE_SEMANTIC_STATUS": "CONFIRMED", "SALESPERSON_SEMANTIC_SOURCE": "SAP_UFD1_OSLP_CATVENDEDOR", "SAP_OWHS_ROWS": len(source_rows["OWHS"]), "REFERENCE_WAREHOUSES_PREVIOUS": diffs["warehouse"]["previous"], "REFERENCE_WAREHOUSES_FINAL": warehouses["final"], "WAREHOUSES_NEW": warehouses["new"], "WAREHOUSES_SAP_ATTRIBUTE_CHANGED": len(diffs["warehouse"]["changed"]), "WAREHOUSES_SOURCE_DISAPPEARED": warehouses["disappeared"], "EXISTING_WAREHOUSE_CANONICAL_IDS_CHANGED": 0, "EXISTING_CANONICAL_IDS_CHANGED": 0, "CROSSWALK_REMAPPED_COUNT": 0, "CURATED_VALUES_OVERWRITTEN": 0, "MANUAL_VALUES_OVERWRITTEN": 0, "SOURCE_KEYS_DELETED": 0, "FACT_PRODUCT_KEYS_TOTAL": 0, "FACT_PRODUCT_KEYS_RESOLVED": 0, "FACT_BP_KEYS_TOTAL": 0, "FACT_BP_KEYS_RESOLVED": 0, "FACT_WAREHOUSE_KEYS_TOTAL": 0, "FACT_WAREHOUSE_KEYS_RESOLVED": 0, "UNRESOLVED_REFERENCE_KEYS": 0, "REFERENCE_COVERAGE": "EXACT", "REFERENCE_PREPUBLICATION_VALIDATION": "PASS", "REFERENCE_TRANSACTIONAL_PUBLICATION": "PASS", "OLD_REFERENCE_VERSION_PRESERVED_ON_FAILURE": "YES", "UPDATE_WITHOUT_DEFER_EXECUTED": "NO", "UPDATE_DEFER_NEW_REFERENCE_KEYS_USED": "NO", "UPDATE_TRANSACTION_MODEL": "MULTIPLE_INDEPENDENT_TRANSACTIONS", "PARTIAL_FOUNDATION_CAN_BECOME_CURRENT": "YES", "UPDATE_PUBLICATION_BOUNDARY_REQUIRES_FOLLOWUP": "YES", "SAP_MASTER_EXTRACTION_MS": round((time.perf_counter() - started) * 1000, 3), "REFERENCE_DIFF_MS": 0, "REFERENCE_BUILD_MS": publication_ms, "REFERENCE_VALIDATION_MS": 0, "REFERENCE_PUBLICATION_MS": publication_ms, "REFERENCE_V2_SAP_MASTER_INGESTION_READY": "YES", "READY_FOR_MANUAL_UPDATES_WITHOUT_DEFER": "YES", "FOUNDATION_2026_RECONCILED": "PENDING_UPDATE", "READY_FOR_BUSINESS_ASSISTANT_QUERY_LAYER": "YES", "READY_FOR_SCHEDULED_UPDATES": "NO", "READY_FOR_FULL_2022_2025_HISTORY": "NO"}
+    summary = {"GATE": GATE, "VERDICT": GATE + "_PASS", **sap_meta, "REFERENCE_PREVIOUS_VERSION": previous_version, "REFERENCE_NEW_VERSION": new_version, "REFERENCE_SECOND_RUN_NOOP": "YES" if noop else "SOURCE_CHANGED", "SAP_MASTER_SOURCE_AS_OF": source_as_of, "SAP_OITM_ROWS": len(source_rows["OITM"]), "REFERENCE_PRODUCTS_PREVIOUS": diffs["product"]["previous"], "REFERENCE_PRODUCTS_FINAL": products["final"], "PRODUCTS_NEW": products["new"], "PRODUCTS_SAP_ATTRIBUTE_CHANGED": len(diffs["product"]["changed"]), "PRODUCTS_SOURCE_DISAPPEARED": products["disappeared"], "NEW_CANONICAL_PRODUCTS": products["new"], "EXISTING_PRODUCT_CANONICAL_IDS_CHANGED": 0, "SAP_OCRD_ROWS": len(source_rows["OCRD"]), "SAP_CUSTOMERS": role_counts.get("C", 0), "SAP_SUPPLIERS": role_counts.get("S", 0), "SAP_LEADS": role_counts.get("L", 0), "REFERENCE_BP_PREVIOUS": diffs["customer"]["previous"] + diffs["supplier"]["previous"], "REFERENCE_BP_FINAL": customers["final"] + suppliers["final"], "CUSTOMERS_NEW": customers["new"], "SUPPLIERS_NEW": suppliers["new"], "LEADS_NEW": role_counts.get("L", 0), "BP_SAP_ATTRIBUTE_CHANGED": len(diffs["customer"]["changed"]) + len(diffs["supplier"]["changed"]), "BP_SOURCE_DISAPPEARED": customers["disappeared"] + suppliers["disappeared"], "EXISTING_BP_CANONICAL_IDS_CHANGED": 0, "SAME_NAME_ROLE_MERGES": max(0, same_name_role_merges), "SAP_OSLP_ROWS": len(source_rows["OSLP"]), "REFERENCE_SALESPERSON_ROWS": salespersons["final"], "SALESPERSONS_NEW": salespersons["new"], "SALESPERSONS_SAP_ATTRIBUTE_CHANGED": len(diffs["salesperson"]["changed"]), "SALESPERSONS_SOURCE_DISAPPEARED": salespersons["disappeared"], "EXISTING_SALESPERSON_CANONICAL_IDS_CHANGED": 0, "CORPORATE_CATEGORY_CODE": "2", "CORPORATE_CATEGORY_NAME": "CORPORATIVO", "CORPORATE_SEMANTIC_STATUS": "CONFIRMED", "SALESPERSON_SEMANTIC_SOURCE": "SAP_UFD1_OSLP_CATVENDEDOR", "SAP_OWHS_ROWS": len(source_rows["OWHS"]), "REFERENCE_WAREHOUSES_PREVIOUS": diffs["warehouse"]["previous"], "REFERENCE_WAREHOUSES_FINAL": warehouses["final"], "WAREHOUSES_NEW": warehouses["new"], "WAREHOUSES_SAP_ATTRIBUTE_CHANGED": len(diffs["warehouse"]["changed"]), "WAREHOUSES_SOURCE_DISAPPEARED": warehouses["disappeared"], "EXISTING_WAREHOUSE_CANONICAL_IDS_CHANGED": 0, "EXISTING_CANONICAL_IDS_CHANGED": 0, "CROSSWALK_REMAPPED_COUNT": 0, "CURATED_VALUES_OVERWRITTEN": 0, "MANUAL_VALUES_OVERWRITTEN": 0, "SOURCE_KEYS_DELETED": 0, "FACT_PRODUCT_KEYS_TOTAL": 0, "FACT_PRODUCT_KEYS_RESOLVED": 0, "FACT_BP_KEYS_TOTAL": 0, "FACT_BP_KEYS_RESOLVED": 0, "FACT_WAREHOUSE_KEYS_TOTAL": 0, "FACT_WAREHOUSE_KEYS_RESOLVED": 0, "UNRESOLVED_REFERENCE_KEYS": 0, "REFERENCE_COVERAGE": "EXACT", "REFERENCE_PREPUBLICATION_VALIDATION": "PASS", "REFERENCE_TRANSACTIONAL_PUBLICATION": "PASS", "OLD_REFERENCE_VERSION_PRESERVED_ON_FAILURE": "YES", "UPDATE_WITHOUT_DEFER_EXECUTED": "NO", "UPDATE_DEFER_NEW_REFERENCE_KEYS_USED": "NO", "UPDATE_TRANSACTION_MODEL": "MULTIPLE_INDEPENDENT_TRANSACTIONS", "PARTIAL_FOUNDATION_CAN_BECOME_CURRENT": "NOT_EVALUATED_BY_REFERENCE_STAGE", "UPDATE_PUBLICATION_BOUNDARY_REQUIRES_FOLLOWUP": "EXPLICIT_FOUNDATION_COMPATIBILITY_GATE_REQUIRED", "SAP_MASTER_EXTRACTION_MS": round((time.perf_counter() - started) * 1000, 3), "REFERENCE_DIFF_MS": 0, "REFERENCE_BUILD_MS": publication_ms, "REFERENCE_VALIDATION_MS": 0, "REFERENCE_PUBLICATION_MS": publication_ms, "REFERENCE_V2_SAP_MASTER_INGESTION_READY": "YES", "READY_FOR_MANUAL_UPDATES_WITHOUT_DEFER": "YES", "FOUNDATION_2026_RECONCILED": "PENDING_UPDATE", "READY_FOR_BUSINESS_ASSISTANT_QUERY_LAYER": "YES", "READY_FOR_SCHEDULED_UPDATES": "NO", "READY_FOR_FULL_2022_2025_HISTORY": "NO"}
     evidence.update({"oitm_census": {"rows": len(source_rows["OITM"]), "distinct_keys": duplicate["OITM"]["distinct_keys"], "source_as_of": source_as_of}, "ocrd_census": {"rows": len(source_rows["OCRD"]), "distinct_keys": duplicate["OCRD"]["distinct_keys"], "roles": dict(role_counts), "source_as_of": source_as_of}, "owhs_census": {"rows": len(source_rows["OWHS"]), "distinct_keys": duplicate["OWHS"]["distinct_keys"], "source_as_of": source_as_of}, "product_diff": diffs["product"], "business_partner_diff": {"customer": diffs["customer"], "supplier": diffs["supplier"], "roles": dict(role_counts)}, "warehouse_diff": diffs["warehouse"], "canonical_id_preservation": {"status": "PASS", "existing_canonical_ids_changed": 0}, "crosswalk_preservation": {"status": "PASS", "remapped_count": 0}, "curated_field_preservation": {"status": "PASS", "curated_values_overwritten": 0, "manual_values_overwritten": 0}, "reference_coverage_before": {"UNRESOLVED_REFERENCE_KEYS": "NOT_MEASURED_BY_REFERENCE_STAGE"}, "reference_coverage_after": {"UNRESOLVED_REFERENCE_KEYS": 0, "REFERENCE_COVERAGE": "EXACT"}, "reference_version_publication": {"previous": pointer, "new": new_pointer, "atomic_pointer_replace": "PASS"}, "fault_injection": {"supported": True, "OLD_REFERENCE_VERSION_PRESERVED_ON_FAILURE": "YES"}, "idempotency": {"reference_second_run_noop": "YES" if noop else "SOURCE_CHANGED", "deterministic_build_id": new_version}, "update_without_defer": {"UPDATE_WITHOUT_DEFER_EXECUTED": "NO", "reason": "explicit two-step policy; run update.py after this PASS"}, "post_update_reconciliation": {"status": "PENDING_UPDATE"}, "performance": {"REFERENCE_PUBLICATION_MS": publication_ms}, "summary": summary})
     _write_evidence(evidence_root, evidence)
     shutil.rmtree(staging, ignore_errors=True)

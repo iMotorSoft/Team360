@@ -1,0 +1,568 @@
+{
+  "status": "INCREMENTAL_PUBLISHED_PASS",
+  "branch": "feature/console-backend-core",
+  "finished_at": "2026-11-01T15:51:27.661000+00:00",
+  "identity": {
+    "candidate": "foundation_5a76699adba7eb2ab388167244e7869b",
+    "candidate_manifest_sha256": "0cb36041830c88e3c577a1026539fc976b76308a2ab7bfb4a503a2f045bf7784",
+    "candidate_file_sha256": "0983e70845445f5bd9af79107bd54fc38caf46a97822470eeacc47cca12e7df2",
+    "candidate_rebuilt": false,
+    "current_before": "foundation_881005a5a694a25dc806233dcb3838ac",
+    "current_after": "foundation_5a76699adba7eb2ab388167244e7869b",
+    "reference": "v2_sales_3b5cfb885a90e82fcf905d2b",
+    "runtime": {
+      "current": "foundation_5a76699adba7eb2ab388167244e7869b",
+      "status": "CURRENT",
+      "committed_at": "2026-11-01T14:55:59.253936+00:00",
+      "commit_snapshot": 1485,
+      "data_snapshot": 1408,
+      "derivation_snapshot": 1322,
+      "source_sha256": "4e91965bc3482922af110e62c063a4fe34aead20adbb2458791142ba576aea04",
+      "resource_allowed": true,
+      "resource_assessment": "ResourceAssessment(metrics=ResourceMetrics(available_memory_bytes=6035320832, memory_used_percent=63.73439941245211, swap_used_percent=11.825706835119187, load_ratio=0.2581787109375, disk_free_bytes=447932416000, temp_disk_free_bytes=447932416000, active_worker_count=0, elapsed_seconds=0.0), warnings=(), critical_reasons=())"
+    }
+  },
+  "root_cause": {
+    "symptom": [
+      "sales_binding_changed",
+      "category_accreditation_binding_changed"
+    ],
+    "documentary": "Publication allowlist and snapshot 1408 rejected any content successor despite canonical SALES_FACTS_TRANSITION_V1 lineage",
+    "category": "Historical publication/snapshot tuple and unchanged category crosswalk hash used as a single accreditation binding",
+    "physical": "Physical admission additionally pinned publication, Reference and original product/crosswalk byte hashes",
+    "intended_protection": "BS denomination, OINV/INV1 metric meaning, identity, classified joins, lineage and scope; no permissive latest fallback",
+    "fix": "Inherit accreditation only through canonically validated incremental or preserving Reference ancestry rooted in existing historical accreditation. Exact schemas and inherited business/permission metadata, original data snapshot, complete nonregressing ledger and Material Supply proofs. No candidate-specific exception or parallel registry. Parent verifies CURRENT and source; process-local revalidation reuse never survives JSON.",
+    "contracts": "datalake/SALES_FOUNDATION_PROMOTION_V1.md#sucesión-incremental-y-acreditación-comercial"
+  },
+  "succession_tests": {
+    "new": "test_sales_succession.py: accepted canonical increments/physical preservation; schema, metric, permissions, classification, category, dependencies, duplicate component identities, manifest, fingerprint, lineage, coverage/watermark, material, snapshot, physical file/report corruption rejected; JSON cannot self-accredit",
+    "reused": [
+      "test_sales_refresh_cycle.py: changed/cancelled late documents, whole-document upsert, bounded overlap, durable recovery and watermark NOOP",
+      "test_sales_reference_release.py: exact append producer, identities/crosswalks, unchanged historical attributes, corruption/uncertain receipt rejection",
+      "test_physical_sales_reference_inheritance.py: Reference successor keeps sealed sales and snapshots; corrupted proof/snapshot/file rejection",
+      "test_sales_foundation_promotion.py: CAS conflicts, locks, commit faults, interrupted recovery, NOOP, rollback including corrupt candidate",
+      "test_sales_material_revalidation.py: exact original replay, incompatible old derivation rejection and selective versioning"
+    ]
+  },
+  "integrity": {
+    "components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "count": 8,
+    "data_snapshot": 1408,
+    "commit_snapshot": 1485,
+    "historical_derivation_snapshot": 1322,
+    "material_supply": {
+      "algorithm": "Same DocDate+item+quantity projection as sealed derivation; no new cancellation filter",
+      "end": "2026-09-24",
+      "historical_coverage_not_advanced": true,
+      "proofs": {
+        "credit_memo": {
+          "affected_items": 0,
+          "after_sha256": "1af28bb6b8b5483c460c81d340fb245e87ffb869d4cb41ee7817733b52d1ed20",
+          "before_sha256": "1af28bb6b8b5483c460c81d340fb245e87ffb869d4cb41ee7817733b52d1ed20",
+          "unchanged": true
+        },
+        "sales": {
+          "affected_items": 0,
+          "after_sha256": "eaea4b88cbe770a2f2c2fa86a0e39b7588ada2df092a88340ed4fc3db8825aa9",
+          "before_sha256": "eaea4b88cbe770a2f2c2fa86a0e39b7588ada2df092a88340ed4fc3db8825aa9",
+          "unchanged": true
+        }
+      },
+      "start": "2026-06-26",
+      "unchanged": true
+    },
+    "historical_files": "CANONICAL_PHYSICAL_SEAL_VALIDATION_PASS",
+    "physical_classification": {
+      "historical_product_rows_preserved": 53430,
+      "new_products": 6,
+      "new_product_classification": "UNKNOWN_NULL_NOT_INFERRED",
+      "products_sha256": "56c5a456de09b72071aeb27a6bcffc8871322bb9c89bc829051b8c1bcd62ef83",
+      "crosswalk_sha256": "108e5c5ac9fc57fbbd92e5e8e07007c6adf954395fabec2a579801bf7a921490"
+    },
+    "late_changes": {
+      "changes_by_day": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-refresh-cycle-v1/sales-refresh-20261101-v1/changes-by-day.json",
+      "credit_notes_modified": 0,
+      "doc_status_O_to_C": 25,
+      "existing_cancelled_pair_observed_retained": {
+        "C": 1,
+        "Y": 1
+      },
+      "integrity": {
+        "credit_memo": {
+          "credit_memo_document_duplicate_ids": 0,
+          "credit_memo_document_duplicate_keys": 0,
+          "credit_memo_line_duplicate_ids": 0,
+          "credit_memo_line_duplicate_keys": 0,
+          "headers_without_lines": 0,
+          "orphan_lines": 0,
+          "unreturned_historical_documents": 0
+        },
+        "sales": {
+          "headers_without_lines": 0,
+          "orphan_lines": 0,
+          "sales_document_duplicate_ids": 0,
+          "sales_document_duplicate_keys": 0,
+          "sales_line_duplicate_ids": 0,
+          "sales_line_duplicate_keys": 0,
+          "unreturned_historical_documents": 0
+        }
+      },
+      "invoices_modified": 25,
+      "modified_field_evidence": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-refresh-cycle-v1/sales-refresh-20261101-v1/modified-fields.json",
+      "modified_lines": 0,
+      "new_cancellations": 0,
+      "new_credit_lines": 60,
+      "new_invoice_lines": 5357,
+      "removed_lines": 0,
+      "retroactive_new_invoices": 7,
+      "salesperson_changed_in_one_of_those_documents": 1,
+      "unchanged_credit_notes": 51,
+      "unchanged_invoices_in_overlap": 8486
+    },
+    "recovery": {
+      "checkpoints": 126,
+      "completed_windows": 20,
+      "elapsed_seconds": 5.092865870999958,
+      "receipts": 262,
+      "source_calls": 0
+    }
+  },
+  "reconciliation": {
+    "october": {
+      "documents": {
+        "credit_notes": [
+          {
+            "canceled": "N",
+            "currency": "BS",
+            "documentary_total": "479145.780000000000",
+            "documents": 280
+          }
+        ],
+        "invoices": [
+          {
+            "canceled": "C",
+            "currency": "BS",
+            "documentary_total": "2436.540000000000",
+            "documents": 3
+          },
+          {
+            "canceled": "N",
+            "currency": "BS",
+            "documentary_total": "11982896.130000000000",
+            "documents": 41078
+          },
+          {
+            "canceled": "Y",
+            "currency": "BS",
+            "documentary_total": "2436.540000000000",
+            "documents": 3
+          }
+        ]
+      },
+      "end_exclusive": "2026-11-01",
+      "net_by_currency": {
+        "BS": "11503750.350000000000"
+      },
+      "partial": false,
+      "start": "2026-10-01"
+    },
+    "november": {
+      "documents": {
+        "credit_notes": [],
+        "invoices": [
+          {
+            "canceled": "N",
+            "currency": "BS",
+            "documentary_total": "1643.160000000000",
+            "documents": 12
+          }
+        ]
+      },
+      "end_exclusive": "2026-11-02",
+      "net_by_currency": {
+        "BS": "1643.160000000000"
+      },
+      "partial": true,
+      "start": "2026-11-01"
+    },
+    "zero_tolerance": true,
+    "source_cutoff": "2026-11-01T13:55:47.518136+00:00",
+    "published_sales_checkpoint_cutoff": "2026-11-01T13:55:47.173006+00:00",
+    "cutoff_distinction": "Capture completion vs last committed source-window checkpoint, both 13:55:47 UTC; master observation 13:59:40 is separate; no transactionally consistent source snapshot claimed",
+    "physical": [
+      {
+        "amount": "4083033.060000",
+        "key": "LIQUID"
+      },
+      {
+        "amount": "18272.940000",
+        "key": "MEDICINE"
+      },
+      {
+        "amount": "64037.860000",
+        "key": "MISSING"
+      },
+      {
+        "amount": "563.780000",
+        "key": "NOT_APPLICABLE"
+      },
+      {
+        "amount": "524182.660000",
+        "key": "SEMISOLID"
+      },
+      {
+        "amount": "3515384.860000",
+        "key": "SOLID"
+      },
+      {
+        "amount": "2622507.680000",
+        "key": "UNCLASSIFIED"
+      }
+    ],
+    "physical_metric": "Active invoice LineTotal BS before credit notes/header adjustments; not documentary net or accounting revenue"
+  },
+  "publication": {
+    "wrapper": "modules.telchi.datalake.sales_foundation_promotion promote",
+    "journal": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-refresh-cycle-v1/sales-refresh-20261101-v1-resolved/promotion-journal",
+    "technical_binding": "Exact prepared candidate/base/manifest, flocks and Foundation CAS; no mandatory nominal authorization",
+    "postpublication": {
+      "current": "foundation_5a76699adba7eb2ab388167244e7869b",
+      "luna_parity": "FIVE_REAL_TURNS_ZERO_TOLERANCE_PASS",
+      "noop": "PASS_LIVE_CANONICAL_WRAPPER",
+      "noop_seconds": 118.16185497700098,
+      "previous": "foundation_881005a5a694a25dc806233dcb3838ac",
+      "reader": {
+        "components": [
+          "credit_memo",
+          "material_supply",
+          "oinm",
+          "oitw",
+          "purchasing",
+          "receivables_collections",
+          "reference",
+          "sales"
+        ],
+        "foundation": "foundation_5a76699adba7eb2ab388167244e7869b",
+        "reference": "v2_sales_3b5cfb885a90e82fcf905d2b",
+        "snapshot": 1408
+      },
+      "recovery": {
+        "checkpoints": 126,
+        "completed_windows": 20,
+        "elapsed_seconds": 5.092865870999958,
+        "receipts": 262,
+        "source_calls": 0
+      },
+      "reference": "v2_sales_3b5cfb885a90e82fcf905d2b",
+      "rollback": "RETAINED_BASE_AND_REFERENCE_HASHES_VERIFIED; ISOLATED_EXECUTION_PASS; LIVE_ROLLBACK_NOT_EXECUTED",
+      "status": "POSTPUBLICATION_PASS",
+      "watermark": {
+        "business_coverage_end_exclusive": "2026-11-02",
+        "contract": "sales-refresh-cycle-v1",
+        "foundation": "foundation_5a76699adba7eb2ab388167244e7869b",
+        "global_change_watermark": null,
+        "late_change_scope": [],
+        "plan_sha256": "84473d71f60cecd20e725ad82825880938d6cd2b30ddacc7803a5871caa24648"
+      }
+    },
+    "watermark_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-refresh-cycle-v1/sales-refresh-20261101-v1-resolved/published-watermark.json",
+    "rollback": "PASS_ISOLATED; live retained base and rollback Reference hashes verified; live rollback intentionally not executed",
+    "scheduler": {
+      "enabled": false,
+      "installed": false,
+      "frequency": null,
+      "reason": "Explicitly prohibited; no frequency inferred from diagnostic loop and no global CDC claim"
+    }
+  },
+  "luna": {
+    "status": "PASS",
+    "real_conversation": true,
+    "identity": "actual approved DEV phone binding and Console resolver",
+    "authentication": "owner-authorized local probe, not a human login or WhatsApp ingress",
+    "persistence": "actual PostgreSQL committed DEV audit rows",
+    "provider": {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "preparation_ms": 0.12241700096637942,
+      "response_bytes": 7237,
+      "duration_ms": 5280.596,
+      "attempts": 1
+    },
+    "source_sha256": "4e91965bc3482922af110e62c063a4fe34aead20adbb2458791142ba576aea04",
+    "five_turns": [
+      {
+        "question": "¿Cuánto vendimos en octubre de 2026 completo?",
+        "classification": "DIRECT_AVAILABLE",
+        "answer": "Facturación registrada: Bs 11.982.896,13, del 1 de octubre de 2026 al 31 de octubre de 2026. Notas de crédito: Bs 479.145,78. Neto documental tras notas de crédito: Bs 11.503.750,35. Facturas activas en BS, con impuestos y descuentos; excluye anuladas y otras monedas. No equivale a ingreso contable, cobros ni a saldo pendiente; cobertura histórica completa no certificada. Información actualizada al 1 de noviembre de 2026. Corte de ventas: 2026-11-01T13:55:47.173006+00:00 (observaciones por consulta, no snapshot transaccional). Cobertura capturada [2026-09-01, 2026-11-02). Foundation: foundation_5a76699adba7eb2ab388167244e7869b; Reference: v2_sales_3b5cfb885a90e82fcf905d2b; snapshot: 1408.",
+        "event_id": "4fe0570d-1ab5-457f-a3fd-f8106c769b61",
+        "thread_id": "6069a59e-1a76-42ff-891e-b138c3457186",
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "business_rbac_verified": true,
+        "execution_status": "executed",
+        "source": {
+          "updated_at": "2026-11-01T13:59:40.724221+00:00",
+          "snapshot_id": 1408,
+          "sales_cutoff": "2026-11-01T13:55:47.173006+00:00",
+          "coverage_start": "2026-09-01",
+          "publication_id": "foundation_5a76699adba7eb2ab388167244e7869b",
+          "reference_version": "v2_sales_3b5cfb885a90e82fcf905d2b",
+          "coverage_end_exclusive": "2026-11-02"
+        },
+        "elapsed_ms": 111404.96295900084,
+        "model": {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true,
+          "preparation_ms": 0.10743299935711548,
+          "response_bytes": 6974,
+          "duration_ms": 6171.381,
+          "attempts": 1
+        }
+      },
+      {
+        "question": "¿Cuánto vendimos el 30 de octubre de 2026?",
+        "classification": "DIRECT_AVAILABLE",
+        "answer": "Facturación registrada: Bs 520.326,33, del 30 de octubre de 2026 al 30 de octubre de 2026. Notas de crédito: Bs 17.796,00. Neto documental tras notas de crédito: Bs 502.530,33. Facturas activas en BS, con impuestos y descuentos; excluye anuladas y otras monedas. No equivale a ingreso contable, cobros ni a saldo pendiente; cobertura histórica completa no certificada. Información actualizada al 1 de noviembre de 2026. Corte de ventas: 2026-11-01T13:55:47.173006+00:00 (observaciones por consulta, no snapshot transaccional). Cobertura capturada [2026-09-01, 2026-11-02). Foundation: foundation_5a76699adba7eb2ab388167244e7869b; Reference: v2_sales_3b5cfb885a90e82fcf905d2b; snapshot: 1408.",
+        "event_id": "2d1eef8f-1673-47be-bbff-ba509d54ae01",
+        "thread_id": "6069a59e-1a76-42ff-891e-b138c3457186",
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "business_rbac_verified": true,
+        "execution_status": "executed",
+        "source": {
+          "updated_at": "2026-11-01T13:59:40.724221+00:00",
+          "snapshot_id": 1408,
+          "sales_cutoff": "2026-11-01T13:55:47.173006+00:00",
+          "coverage_start": "2026-09-01",
+          "publication_id": "foundation_5a76699adba7eb2ab388167244e7869b",
+          "reference_version": "v2_sales_3b5cfb885a90e82fcf905d2b",
+          "coverage_end_exclusive": "2026-11-02"
+        },
+        "elapsed_ms": 160475.49461299967,
+        "model": {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true,
+          "preparation_ms": 0.1162329990620492,
+          "response_bytes": 6829,
+          "duration_ms": 4967.109,
+          "attempts": 1
+        }
+      },
+      {
+        "question": "¿Cuánto vendimos el 31 de octubre de 2026?",
+        "classification": "DIRECT_AVAILABLE",
+        "answer": "Facturación registrada: Bs 191.226,73, del 31 de octubre de 2026 al 31 de octubre de 2026. Notas de crédito: Bs 3.556,48. Neto documental tras notas de crédito: Bs 187.670,25. Facturas activas en BS, con impuestos y descuentos; excluye anuladas y otras monedas. No equivale a ingreso contable, cobros ni a saldo pendiente; cobertura histórica completa no certificada. Información actualizada al 1 de noviembre de 2026. Corte de ventas: 2026-11-01T13:55:47.173006+00:00 (observaciones por consulta, no snapshot transaccional). Cobertura capturada [2026-09-01, 2026-11-02). Foundation: foundation_5a76699adba7eb2ab388167244e7869b; Reference: v2_sales_3b5cfb885a90e82fcf905d2b; snapshot: 1408.",
+        "event_id": "33672615-4e17-4225-9006-c8a56dd1d256",
+        "thread_id": "6069a59e-1a76-42ff-891e-b138c3457186",
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "business_rbac_verified": true,
+        "execution_status": "executed",
+        "source": {
+          "updated_at": "2026-11-01T13:59:40.724221+00:00",
+          "snapshot_id": 1408,
+          "sales_cutoff": "2026-11-01T13:55:47.173006+00:00",
+          "coverage_start": "2026-09-01",
+          "publication_id": "foundation_5a76699adba7eb2ab388167244e7869b",
+          "reference_version": "v2_sales_3b5cfb885a90e82fcf905d2b",
+          "coverage_end_exclusive": "2026-11-02"
+        },
+        "elapsed_ms": 211320.41030699838,
+        "model": {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true,
+          "preparation_ms": 0.17814999955589883,
+          "response_bytes": 6145,
+          "duration_ms": 4511.845,
+          "attempts": 1
+        }
+      },
+      {
+        "question": "¿Cuánto vendimos en noviembre de 2026 hasta el corte disponible?",
+        "classification": "DIRECT_AVAILABLE",
+        "answer": "Facturación registrada: Bs 1.643,16, del 1 de noviembre de 2026 al 30 de noviembre de 2026. Notas de crédito: Bs 0,00. Neto documental tras notas de crédito: Bs 1.643,16. Facturas activas en BS, con impuestos y descuentos; excluye anuladas y otras monedas. No equivale a ingreso contable, cobros ni a saldo pendiente; cobertura histórica completa no certificada. El período solicitado termina después de la actualización disponible: no es un cierre mensual completo. Información actualizada al 1 de noviembre de 2026. Período parcial hasta el corte disponible; no es un mes ni un día completo. Corte de ventas: 2026-11-01T13:55:47.173006+00:00 (observaciones por consulta, no snapshot transaccional). Cobertura capturada [2026-09-01, 2026-11-02). Foundation: foundation_5a76699adba7eb2ab388167244e7869b; Reference: v2_sales_3b5cfb885a90e82fcf905d2b; snapshot: 1408.",
+        "event_id": "fcbc3587-2830-4992-b8ce-0233e326fb56",
+        "thread_id": "6069a59e-1a76-42ff-891e-b138c3457186",
+        "required_permission": "telchi.sales.period_billed_amount.read.v1",
+        "business_rbac_verified": true,
+        "execution_status": "executed",
+        "source": {
+          "updated_at": "2026-11-01T13:59:40.724221+00:00",
+          "snapshot_id": 1408,
+          "sales_cutoff": "2026-11-01T13:55:47.173006+00:00",
+          "coverage_start": "2026-09-01",
+          "publication_id": "foundation_5a76699adba7eb2ab388167244e7869b",
+          "reference_version": "v2_sales_3b5cfb885a90e82fcf905d2b",
+          "coverage_end_exclusive": "2026-11-02"
+        },
+        "elapsed_ms": 255406.8309160011,
+        "model": {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true,
+          "preparation_ms": 0.15593799980706535,
+          "response_bytes": 9453,
+          "duration_ms": 7056.836,
+          "attempts": 1
+        }
+      },
+      {
+        "question": "¿Cómo se distribuyeron las ventas de octubre de 2026 entre líquidos, sólidos, semisólidos y productos sin clasificación física explícita?",
+        "classification": "DIRECT_AVAILABLE",
+        "answer": "Importe registrado en líneas comerciales — octubre de 2026:\n\n• Líquidos: Bs 4.083.033,06 (37,71 % del total).\n• Sólidos: Bs 3.515.384,86 (32,47 % del total).\n• Semisólidos: Bs 524.182,66 (4,84 % del total).\n• Sin clasificación explícita (0, ausente o desconocida): Bs 2.686.545,54 (24,81 % del total).\n• Medicamento (4; no es estado físico): Bs 18.272,94 (0,17 % del total).\n• No corresponde (5): Bs 563,78 (0,01 % del total).\n\nTotal de líneas acreditadas: Bs 10.827.982,84 (BS). Dentro del importe con estado físico explícito: Líquidos 50,27 %, Sólidos 43,28 %, Semisólidos 6,45 %.\nCobertura física: 75,01 % del importe, 54484/88978 líneas y 547/4502 productos. 3955 productos vendidos sin estado físico explícito. Sin estado físico explícito, incluidos códigos 4/5: Bs 2.705.382,26.\nObservación física: 28 de octubre de 2026 a 1 de noviembre de 2026. Clasificación física observada en octubre de 2026, no necesariamente vigente en la fecha de cada factura. Códigos 4 y 5 no son estados físicos.\nVentas observadas: 1 de octubre de 2026 a 31 de octubre de 2026; no acredita cierre mensual.\nMétrica: suma de importes de líneas de facturas activas, descuentos propios incluidos, sin IVA de línea y antes de NC y ajustes de cabecera.\nCabeceras: Bs 11.982.896,13; diferencia no asignada con líneas: Bs 1.154.913,29; NC documentales separadas: Bs 479.145,78. No se distribuyen cabeceras ni se atribuye todo el residuo a impuestos.\nCorte de ventas: 2026-11-01T13:55:47.173006+00:00; observaciones por consulta, no snapshot transaccional. No es ingreso contable.\nFoundation: foundation_5a76699adba7eb2ab388167244e7869b; snapshot: 1408; Reference: v2_sales_3b5cfb885a90e82fcf905d2b.",
+        "event_id": "975e09bb-3094-4cab-b509-0927ad9b721a",
+        "thread_id": "6069a59e-1a76-42ff-891e-b138c3457186",
+        "required_permission": "telchi.sales.commercial_line_amount_by.read.v1",
+        "business_rbac_verified": true,
+        "execution_status": "executed",
+        "source": {
+          "updated_at": "2026-11-01T13:59:40.724221+00:00",
+          "snapshot_id": 1408,
+          "sales_cutoff": "2026-11-01T13:55:47.173006+00:00",
+          "coverage_start": "2026-09-01",
+          "publication_id": "foundation_5a76699adba7eb2ab388167244e7869b",
+          "reference_version": "v2_sales_3b5cfb885a90e82fcf905d2b",
+          "coverage_end_exclusive": "2026-11-02"
+        },
+        "elapsed_ms": 317087.2136859998,
+        "model": {
+          "model": "gpt-5.6-luna",
+          "reasoning": "medium",
+          "provider": "OpenAI direct",
+          "reasoning_echo_verified": true,
+          "preparation_ms": 0.13901199963584077,
+          "response_bytes": 15103,
+          "duration_ms": 11755.193,
+          "attempts": 1
+        }
+      }
+    ],
+    "artifact": "luna-r2.json",
+    "whatsapp_sent": 0,
+    "listener_created": 0,
+    "production_runtime_started_or_restarted": false,
+    "whatsapp_six_gates": "NOT_REACCREDITED; do not infer WhatsApp readiness"
+  },
+  "timings": {
+    "reused_capture_seconds": 500.1346660449999,
+    "reused_first_query_to_candidate_seconds": 1226.128759,
+    "five_real_turns_sum_seconds": 1055.6949124809996,
+    "turns_seconds": [
+      111.40496295900084,
+      160.47549461299965,
+      211.32041030699838,
+      255.4068309160011,
+      317.0872136859998
+    ],
+    "luna_completed_report_written_at": "2026-11-01T15:41:27.761078+00:00",
+    "first_capture_intent_to_luna_report_wall_seconds": 6840.376618,
+    "wall_time_includes": "Prior candidate preparation, binding implementation/tests, two externally interrupted commands, diagnostic retries and publication. Not a fresh capture benchmark or scheduler service-level measurement.",
+    "live_noop_seconds": 118.16185497700098
+  },
+  "gates": {
+    "datalake": "681 passed in 130.73s, pytest-datalake.xml",
+    "assistant_segments": "297 passed / 2 skipped before isolated SQL fixture failure; remaining segment after fixture adaptation 425 passed / 2 skipped in 107.21s. Prior unaffected results reused, not an uninterrupted new full-suite PASS.",
+    "final_affected_paths": "180 passed in 133.99s, pytest-final.xml",
+    "candidate": "CANDIDATE_PASS, candidate-gate.json; same bytes validated again by canonical promotion and NOOP",
+    "reader": "LIVE_CANONICAL_PASS",
+    "commercial": "FIVE_TURN_ZERO_TOLERANCE_PASS",
+    "permissions": "Five real Console-authorized turns plus isolation/revocation contracts in assistant regression; no grant mutation",
+    "publication": "PASS_LIVE_WRAPPER_CAS_JOURNAL",
+    "rollback": "PASS_ISOLATED_AND_RETAINED_INPUT_VALIDATION",
+    "noop": "PASS_LIVE",
+    "durability": "262 receipts / 126 checkpoints / 20 cycle windows; no source calls",
+    "LAT": "PASS_ALL_REQUIRED; final log lat-final.log",
+    "diff_check": "PASS; diff-check.log"
+  },
+  "interruptions": [
+    {
+      "command": "Combined Data Lake/assistant regression",
+      "classification": "ENVIRONMENTAL_ABORT",
+      "reason": "External command timeout 240s",
+      "replacement": "Completed Data Lake and segmented assistant runs; never claimed interrupted run as PASS"
+    },
+    {
+      "command": "Initial five-turn live Luna probe",
+      "classification": "ENVIRONMENTAL_ABORT",
+      "reason": "External command timeout 1200s, no final report; own process cleanup verified",
+      "replacement": "Individual October probe plus complete five-turn r2 with per-turn durable evidence"
+    },
+    {
+      "command": "First postpublication diagnostic parity assertion",
+      "classification": "DIAGNOSTIC_FAILURE",
+      "reason": "Harness incorrectly expected UNCLASSIFIED+MISSING under one raw key; runtime correctly retains seven raw groups and only combines presentation. No runtime change.",
+      "replacement": "Exact seven-key comparison against independent captured parity PASS in postpublication-r2.log"
+    }
+  ],
+  "files_modified": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_succession.py": "e1ecf6f5613a25728e9d9f8e50d6b6cfa4e3157d4b0bf06d15515ec27c114ca0",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_facts_transition.py": "4a82d33e78a3c3f04ce7a97eae66e0ea9c85999506854244c3dcd13a175eea27",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_foundation_promotion.py": "11df79e7fa79aa9517635d1845f33b8a23bb093dbaa0a178a24140c4655c3d68",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/sales_query.py": "d60533c7c118fb7d83b7a05fcbfa7d893d1845cbfcce9690e82a42917caf84ae",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/category_line_amount_query.py": "c1d497a33a8868dbfbb21491a795513c6c2d210bc8bdf8edcf067246ddbc9ad0",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/product_line_amount_ranking_query.py": "d6d3d1be5f6b38a76c380eb094d9e0ab5bdb919ab765974e39ed9305cd4cb85c",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/commercial_line_amount_by_query.py": "1d3ec011154152de3b374e0f357fb2c2c37851f8d37e8b813e30fe6f665b5d89",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/tests/test_sales_succession.py": "342cb7baf6639460e99a3e16a389ea540df958addee0ce639b4701a0cad7a49e",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/capabilities.py": "a87946be496af25e242a2261f91b71fc865e492be3a388d39a0106d310ebca27",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/commercial_answer.py": "d0b4e9626d0b7233056dc1e762316ee1b15df8304442be2d7d02aa95c3ffddcb",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_horizontal_sales.py": "e3776deaa6ecba0d366ea22dde0320fb45bbae572222afd07feb70c2f82bdef6",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_business_close.py": "5a2c8d9f006fc438bb79b5cbf17bef30e55e0988558977e503ddcd7669f45cbf",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/SALES_FOUNDATION_PROMOTION_V1.md": "29bfc0887a609746fe64aafd48bd11b6081601ae2f5cca6e81de2f1ecc8d44ba",
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/CATEGORY_LINE_AMOUNT_V1.md": "d0e9f6cba7c978d2412eb2cc0365cc087336f117e897cfa87a2c518c2f37c092",
+    "SrvRestAstroLS_v1/backend/modules/telchi/status_actual.md": "62829a607d8ee45d87572ce9dc9dafa1b6cb1363bcaa203a742ed35a171a2c9e"
+  },
+  "evidence_directory": "data/reports/telchi/incremental-foundation-succession-v1",
+  "transversal_impact": "Telchi commercial readers, canonical incremental validation/promotion and answer provenance only; shared Atomic and all other modules remain untouched. PostgreSQL stores authorized DEV conversation audits through existing pipeline.",
+  "restrictions": {
+    "new_hana_queries": 0,
+    "repeated_capture": false,
+    "reference_rebuilt": false,
+    "shared_atomic_modified": false,
+    "accounting_queried": false,
+    "permissions_modified": false,
+    "scheduler_activated": false,
+    "commits": 0,
+    "pushes": 0,
+    "concurrent_changes_preserved": true
+  },
+  "resources": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": "sequential pytest; one Foundation operation/worker at a time, workers threads=2, parent validation threads=1; no browsers",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 2,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "observed": "8 CPUs, final MemAvailable ~5.85 GB; swap 3.61 GB but no swap-out in final sampled intervals; high I/O wait alone did not halt work",
+    "diagnostic_budget": {
+      "worker_seconds": 180,
+      "turn_seconds": 360,
+      "model_seconds": 20,
+      "model_attempts": 1,
+      "DEV_only": true,
+      "production_budgets_changed": false
+    }
+  },
+  "risks": [
+    "Canonical ancestry remains bounded to 32 extensions; future consolidation/accreditation must use explicit existing contracts, never disable the bound",
+    "DEV conversational latency 111-317s grows while historical result provenance is revalidated; this PASS proves correctness, not production channel latency readiness",
+    "Overlap strategy is not CDC; changes outside authorized overlap need explicit bounded late-date evidence",
+    "Physical classification is observed, not certified historically effective; six new identities remain UNKNOWN",
+    "Partial November, independent component historical cutoffs and accounting gaps remain explicit"
+  ],
+  "next_action": "Keep scheduler disabled. Extend the same explicit per-domain compatibility/reconciliation contracts to inventory, production, purchasing and collections using their existing canonical producers/readers; accounting only after its sources are incorporated. Address historical-result revalidation cost before selecting operational frequency or channel latency budget. No extraction is authorized by this closeout."
+}

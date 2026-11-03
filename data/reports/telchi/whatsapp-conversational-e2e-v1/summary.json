@@ -1,0 +1,150 @@
+{
+  "milestone": "TELCHIAI_WHATSAPP_CONVERSATIONAL_E2E_V1",
+  "verdict": "PARTIAL",
+  "branch": "feature/console-backend-core",
+  "architecture": "Authenticated Evolution webhook -> durable message_events inbox -> scoped ordered PostgreSQL worker -> existing identity/RBAC/dispatcher -> existing Luna/State Engine/Foundation -> atomic Telchi result/audit -> unique outbound intent -> revalidated send fence -> acceptance and separate delivery callbacks",
+  "foundation": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+  "reference": "v2_sales_448ae93a960bf7342564a2d0",
+  "components": 8,
+  "foundation_changed": false,
+  "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+  "test_identity_id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+  "provider": "evolution",
+  "channel_id": "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+  "instance": "team360-meta-dev",
+  "ownership": {
+    "administrative_owner_in_existing_signed_trust": "mario",
+    "database_instance_id_matches_private_scope": true,
+    "receiver_matches_existing_private_configuration": true,
+    "ownerJid_present": false,
+    "ownerJid_is_not_used_as_enterprise_authorization": true,
+    "current_container_matches_owned_runtime_record": false,
+    "container_state": "created",
+    "candidate_deployment_authorized_label": false,
+    "v1_admission_open": false,
+    "instance_started_or_adopted": false,
+    "external_credentials_asserted_missing": false
+  },
+  "inbound": {
+    "persistence_before_ack": "real PostgreSQL and local authenticated HTTP validated",
+    "idempotency_scope": "environment, workspace, tenant, provider, instance, channel, receiver, external message ID",
+    "ten_simultaneous_webhook_duplicates": "one durable inbound",
+    "persistence_failure": "HTTP 503 and rollback; subsequent retry queues",
+    "long_turn_ingress": "existing conversation lock no longer blocks durable inbound inserts"
+  },
+  "worker": {
+    "activation": "TEAM360_TELCHI_DURABLE=1; DEV opt-in; existing Telchi Srv05 composition",
+    "storage": "existing message_threads/message_events; no migration or broker",
+    "ordering": "oldest nonterminal message per conversation, PostgreSQL transaction advisory lock",
+    "poll_seconds": 2,
+    "turn_budget_seconds": 300,
+    "foundation_read_budget_seconds": 180,
+    "uncommitted_dispatch_error_attempts": 3,
+    "retry_delay_seconds": 30,
+    "shutdown": "worker supervisor stopped before pool closure; durable inbox remains",
+    "restart_validation": "worker reconstruction and fault injection, including real committed Telchi result before outbound intent",
+    "os_process_kill_during_real_luna": "NOT_TESTED",
+    "physical_model_invocation_exactly_once": "NOT_GUARANTEED; uncommitted work can repeat after crash"
+  },
+  "outbound": {
+    "local_probe_transport": "SIMULATED",
+    "logical_response_per_inbound": 1,
+    "durable_intent": true,
+    "confirmed_failure_retry": "explicit retry, same logical intent, current authorization, no analytical recalculation",
+    "uncertain_acceptance": "no automatic resend; provider/operator reconciliation required",
+    "accepted_is_delivered": false,
+    "external_sent": 0,
+    "external_delivered": 0
+  },
+  "authorization": {
+    "live_positive": "existing verified phone link -> approved enterprise identity -> existing effective Console grants",
+    "new_identity_system": false,
+    "new_grants_or_role_changes": false,
+    "prepared_result_reauthorization": true,
+    "revocation_before_send": "real PG fixture with simulated authorization revocation; protected outbound canceled",
+    "real_operational_permission_revocation_in_this_run": "NOT_RUN"
+  },
+  "conversation": {
+    "identity_session_separate_from_analytical_context": true,
+    "persistent_ids": ["conversation_id", "turn_id", "analysis_context_id", "parent_turn_id"],
+    "continue": "preserves state and analytical context; control itself invokes neither Luna nor capability",
+    "new_query": "new context; clears active state, history and reference pointers; retained audit events are not deleted",
+    "free_domain_change": "real production -> collections and stock/material questions through existing Luna/State Engine",
+    "controls": "text Continuar / Nueva consulta, appended to newly prepared authenticated responses; native buttons not assumed",
+    "supplier_followup_defect": "initial live run incorrectly repeated purchase total; preserved as failed evidence",
+    "supplier_followup_fix": "real focused rerun DIRECT_UNAVAILABLE, no Luna/capability call, purchasing period retained; no unsupported ranking invented"
+  },
+  "business_controls_observed": {
+    "purchasing_documents": 605,
+    "purchasing_amount_BS": "4026474.58",
+    "production_consumption_lines": 3974,
+    "collections_payments": 40077,
+    "collections_amount_BS": "12180925.36",
+    "material_supply_lines": 2297,
+    "inventory": "E00003 by warehouse, published observation and unit limitations retained"
+  },
+  "latencies": {
+    "initial_real_backend_ingress_ms_range": [18.9, 102.9],
+    "initial_real_business_turn_seconds_range": [63.09, 69.67],
+    "corrected_unsupported_followup_seconds": 0.29,
+    "latency_is_not_external_whatsapp_latency": true
+  },
+  "tests": {
+    "focused_command": "cd SrvRestAstroLS_v1/backend && uv run pytest tests/test_messaging_durable_inbox.py modules/telchi/assistant/tests/test_conversation_controls.py tests/test_messaging_horizontal_runtime.py tests/test_messaging_evolution.py tests/test_messaging_handlers.py tests/test_messaging_durable_egress.py tests/test_telchi_assistant_srv05.py tests/test_srv05_evolution_isolation.py modules/telchi/assistant/tests/test_assistant.py modules/telchi/assistant/tests/test_operational.py -q",
+    "focused_result": "353 passed, 16 skipped; one existing in-memory Diagnosis configuration warning",
+    "postgres_command": "After existing private load_config: TEAM360_DURABLE_INBOX_POSTGRES_TEST=1; pytest tests/test_messaging_durable_inbox_postgres.py -q",
+    "postgres_result": "1 passed; unique disposable schema removed",
+    "live_probe": "python -m modules.telchi.assistant.tests.live_durable_conversation --output <report.json> --max-turns <N>",
+    "initial_live_turns": 8,
+    "corrected_live_turns": 5,
+    "source_provenance": "Each live artifact preserves its original source digest. Later changes to presentation, context-ID reuse and retry delay were validated in focused tests; older live artifacts do not certify changed startup fingerprints.",
+    "interrupted_checks": [
+      "Combined assistant/conversational_quality/delivery_reliability test command exceeded external 120-second budget; NOT PASS",
+      "Separate conversational_quality command exceeded external 120-second budget; NOT PASS"
+    ],
+    "interrupted_check_classification": "ENVIRONMENTAL_ABORT (external command deadline); no functional defect established by the interruption"
+  },
+  "gates": {
+    "Srv01_without_Evolution_and_Srv05_OFF_ON": "focused isolation contracts PASS; Srv01 not modified",
+    "binding_and_idempotency": "real local PG PASS",
+    "worker_lifecycle": "controlled Srv05 lifecycle fixture PASS",
+    "recovery_and_outbound_retry": "scoped real PG/fault-injection coverage PASS; physical crash matrix not fully executed",
+    "Luna_Foundation_PostgreSQL": "real local authorized backend evidence",
+    "external_Evolution_webhook_outbound_delivery": "NOT_RUN",
+    "six_private_startup_gates": "NOT_REACCREDITED; source/config fingerprint changed",
+    "LAT": "md, index, sections, code-refs and full check PASS",
+    "git_diff_check": "PASS"
+  },
+  "modified_source_paths": [
+    "SrvRestAstroLS_v1/backend/modules/messaging/repository.py",
+    "SrvRestAstroLS_v1/backend/modules/messaging/service.py",
+    "SrvRestAstroLS_v1/backend/modules/messaging/webhooks/evolution_whatsapp.py",
+    "SrvRestAstroLS_v1/backend/modules/messaging/durable.py",
+    "SrvRestAstroLS_v1/backend/modules/messaging/durable_repository.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/composition.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/operational.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/conversation_controls.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/whatsapp_dev_lifecycle.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/README.md",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_conversation_controls.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_durable_conversation.py",
+    "SrvRestAstroLS_v1/backend/tests/test_messaging_durable_inbox.py",
+    "SrvRestAstroLS_v1/backend/tests/test_messaging_durable_inbox_postgres.py",
+    "SrvRestAstroLS_v1/backend/tests/test_telchi_assistant_srv05.py"
+  ],
+  "cross_module_impact": "Messaging changes are explicit opt-in for replay-safe horizontal handlers. Existing legacy/Flow contracts retained; no Srv01, global bootstrap, migrations, dependencies, scheduler, production grants, SAP or Foundation changes.",
+  "resources": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": "one foreground runner; local probe PG pool max 4, disposable fixture pool max 5; no parallel Foundation scans",
+    "observation": "Approximately 7 GB available RAM, swap stable during sampled intervals; elevated I/O wait did not by itself block work",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 2,
+    "OWN_PROCESSES_LEFT_RUNNING": 0
+  },
+  "commits": 0,
+  "pushes": 0,
+  "next_exact_action": "Reconcile the current Evolution container ID and deployment authority with the existing mario-owned isolated DEV binding, without adopting an unrelated runtime. Reaccredit only affected private startup guarantees for TEAM360_TELCHI_DURABLE=1; then start that verified isolated runtime using the existing launcher and perform actual authorized inbound/outbound plus delivery/restart conversation tests. Do not publish external PASS before those exchanges are observed."
+}

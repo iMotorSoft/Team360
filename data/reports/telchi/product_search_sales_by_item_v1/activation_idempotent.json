@@ -1,0 +1,43 @@
+{
+  "changed": false,
+  "run_id": null,
+  "catalog_created": 0,
+  "assignments_created": 0,
+  "effective": [
+    "telchi.products.search.read.v1",
+    "telchi.sales.by_products.read.v1",
+    "telchi.sales.coverage.read.v1",
+    "telchi.sales.latest_documents.read.v1",
+    "telchi.sales.period_billed_amount.read.v1",
+    "telchi.sales.source_quantity.read.v1"
+  ],
+  "delegation": {
+    "limits": {
+      "environment": "dev",
+      "modules": [
+        "telchi"
+      ],
+      "permissions": [
+        "telchi.products.search.read.v1",
+        "telchi.sales.by_products.read.v1"
+      ],
+      "capabilities": [
+        "products.search.v1",
+        "sales.by_products.v1"
+      ],
+      "roles": [
+        "telchi_products_search_reader_v1",
+        "telchi_sales_by_products_reader_v1"
+      ],
+      "whole_workspace": true,
+      "credential_enrollment": false,
+      "free_sql": false,
+      "publication": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+      "snapshot": 1408,
+      "line_amounts": false,
+      "physical_quantity_totals": false,
+      "namespace": "SAP_HANA"
+    },
+    "admin_id": "73d09264-8be2-4402-8023-0142a5f26730"
+  }
+}

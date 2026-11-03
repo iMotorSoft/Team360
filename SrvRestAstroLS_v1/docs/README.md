@@ -1,8 +1,25 @@
 # Project Docs
 
-Documentacion transversal del proyecto Team360.
+Documentación transversal de Team360. Comenzar por [AGENTS](../../AGENTS.md) y el [único estado técnico GLOBAL](status_actual.md); este índice organiza detalle e historia, no otro tablero vigente.
+
+## Navegación vigente
+
+El tablero GLOBAL enlaza las autoridades locales. LAT conserva arquitectura y reglas; fases y reportes guardan evidencia fechada sin sustituir el estado actual.
+
+- [Estado GLOBAL](status_actual.md) → [LAT](../../lat.md/lat.md), [ownership](../../lat.md/team360-global-orchestration.md) y [política documental](../../lat.md/lat-documentation-policy.md).
+- Flow: [README / runbook](../backend/modules/flow/README.md).
+- Diagnosis: [estado local](../backend/modules/sales_diagnosis_runtime/status_actual.md).
+- Messaging/Evolution: [README canónico](../backend/modules/messaging/README.md).
+- Telchi: [estado local](../backend/modules/telchi/status_actual.md) y [CONTEXT arquitectónico](../backend/modules/telchi/CONTEXT.md).
+- Console/Auth: [estado local](../backend/modules/console/status_actual.md), [enrollment/login CLI DEV](team360_console_dev_password_login_v1.md).
+- Srv05: [aislamiento Evolution y source runtime](team360_srv05_evolution_isolation.md), [Fase 1](team360_srv05_phase1.md), [Fase 2](team360_srv05_phase2.md), [runtime Fase 3](../backend/modules/srv05_runtime.py) y [tests](../backend/tests/test_srv05_runtime.py). Perfil `full` no equivale a Full Team360 Gate.
+- [Full Gate y follow-up](team360_full_gate_v1.md#followup-operacional-seguro) → [evidencia final](../../data/reports/team360-full-gate/operational-followup-final/report.json): Structural PASS / Operational DEGRADED, sin promoción.
+- [Messaging↔Telchi: profiling y condición operativa del 08/10](../../data/reports/messaging/telchi-datalake-pre-sql-profile-v1/report.md); autoridades locales conservan el estado y los límites.
+- [Histórico hasta 2026-06-28](status_historico_hasta_2026-06-28.md) y [bitácora congelada al normalizar](status_historico_hasta_normalizacion_2026-10-06.md), incluidos cambios preexistentes. No son estados alternativos.
 
 ## Documentos tecnicos
+
+Los documentos siguientes conservan contratos y fases de implementación; interpretar sus límites según fecha y consultar el tablero vigente antes de operar.
 
 - `automation_diagnosis_fase1.md`: modulo de diagnostico de automatizacion con LiteLLM, RAG simple, scoring deterministico y contratos preparados para multi-paquete / multi-worker.
 - `postgresql_live_team360_setup.md`: inicializacion de la DB viva `team360`, aplicacion de migraciones 001-004 y auditorias post-migracion.
@@ -18,6 +35,8 @@ Documentacion transversal del proyecto Team360.
 - `ux_console_backend_alignment.md`: analisis tecnico para alinear Team360 Console con el modelo PostgreSQL aplicado, definir mapeos UX-DB, rutas, visibilidad y fases de integracion.
 
 ## Decisiones transversales relacionadas
+
+Estas fuentes preservan decisiones de producto y UX; LAT mantiene las invariantes arquitectónicas correspondientes.
 
 - `../../docs/ux/team360-domains-and-console-strategy.md`: separacion de dominios, Team360 Console y modelo conceptual multi-organizacion.
 - `../../docs/ux/team360-console-navigation-model.md`: modelo de navegacion contextual, App Shell y contratos esperados para frontend y backend.

@@ -1,0 +1,1669 @@
+{
+  "preflight": {
+    "version": "PostgreSQL 18.4 (Debian 18.4-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+    "read_only": "on"
+  },
+  "channel_id": "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+  "events": [
+    {
+      "id": "7bc705a9-9ac3-47fd-90f3-f053a9f580da",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": null,
+      "direction": "inbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "received",
+      "occurred_at_utc": "2026-10-11 23:42:10.137512+00:00",
+      "audit": {
+        "previous_state": {
+          "metric": null,
+          "period": null,
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {
+              "/metric": "sales.source_top_items",
+              "/period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              }
+            },
+            "unset": [
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference"
+            ]
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "committed": true,
+        "decision": "EXECUTE",
+        "execution_status": "executed",
+        "bmd": null,
+        "response_prepared": {
+          "text": "Top 10 por cantidad documental, 01/01–15/09/2026:\nL00505: 557199.0000000000\nL02467: 200000.0000000000\nM05970: 133931.0000000000\nL01698: 116567.0000000000\nL01003: 115269.0000000000\nL01613: 108791.0000000000\nL02837: 101919.0000000000\nL00003: 98511.0000000000\nM05239: 94065.0000000000\nM05486: 93144.0000000000\nUnidades originales por producto, no comparables entre productos. Sin descontar notas de crédito ni anulaciones; no es facturación ni venta neta. Cobertura histórica completa no certificada. Actualización: 2026-09-28T18:18:35.264000. Fuente: Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9.",
+          "classification": "DIRECT_AVAILABLE"
+        }
+      },
+      "execution_binding": {
+        "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+        "source": {
+          "updated_at": "2026-09-28T18:18:35.264000",
+          "snapshot_id": 1408,
+          "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+        }
+      },
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "current_permissions_not_historical": [
+        "telchi.sales.source_quantity.read.v1"
+      ],
+      "payload_keys": [
+        "channel",
+        "dispatch_result",
+        "environment",
+        "metadata",
+        "processing_state",
+        "provider",
+        "recipients",
+        "sender",
+        "telchi_assistant_v1",
+        "text",
+        "timings"
+      ],
+      "text": "Top 10 productos por cantidad documental del 1 de enero al 15 de septiembre de 2026, sin filtros",
+      "dispatch_result": {
+        "text": "Top 10 por cantidad documental, 01/01–15/09/2026:\nL00505: 557199.0000000000\nL02467: 200000.0000000000\nM05970: 133931.0000000000\nL01698: 116567.0000000000\nL01003: 115269.0000000000\nL01613: 108791.0000000000\nL02837: 101919.0000000000\nL00003: 98511.0000000000\nM05239: 94065.0000000000\nM05486: 93144.0000000000\nUnidades originales por producto, no comparables entre productos. Sin descontar notas de crédito ni anulaciones; no es facturación ni venta neta. Cobertura histórica completa no certificada. Actualización: 2026-09-28T18:18:35.264000. Fuente: Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9.",
+        "classification": "DIRECT_AVAILABLE",
+        "correlation_id": "7bc705a9-9ac3-47fd-90f3-f053a9f580da"
+      }
+    },
+    {
+      "id": "2e219946-c51b-411d-a33f-e475ff9df960",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "7bc705a9-9ac3-47fd-90f3-f053a9f580da",
+      "direction": "outbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:42:19.263670+00:00",
+      "payload_keys": [
+        "environment",
+        "initial_result",
+        "t6_ms",
+        "text",
+        "timings"
+      ],
+      "text": "Top 10 por cantidad documental, 01/01–15/09/2026:\nL00505: 557199.0000000000\nL02467: 200000.0000000000\nM05970: 133931.0000000000\nL01698: 116567.0000000000\nL01003: 115269.0000000000\nL01613: 108791.0000000000\nL02837: 101919.0000000000\nL00003: 98511.0000000000\nM05239: 94065.0000000000\nM05486: 93144.0000000000\nUnidades originales por producto, no comparables entre productos. Sin descontar notas de crédito ni anulaciones; no es facturación ni venta neta. Cobertura histórica completa no certificada. Actualización: 2026-09-28T18:18:35.264000. Fuente: Foundation foundation_afd08d9eca6a725be53cdc3f9d5709c9.",
+      "dispatch_result": null
+    },
+    {
+      "id": "1911c4f4-7c36-469a-9a99-e6064fd6a1b9",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "7bc705a9-9ac3-47fd-90f3-f053a9f580da",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "sent",
+      "occurred_at_utc": "2026-10-11 23:42:22.619807+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "9e84cc40-d6d3-474b-bf83-2d60fc8c6393",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "7bc705a9-9ac3-47fd-90f3-f053a9f580da",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "delivered",
+      "occurred_at_utc": "2026-10-11 23:42:23.073587+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "3b00b6f0-196e-48f1-8589-e8e43b85ced6",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "7bc705a9-9ac3-47fd-90f3-f053a9f580da",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:42:23.174544+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": null,
+      "direction": "inbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "received",
+      "occurred_at_utc": "2026-10-11 23:42:43.256391+00:00",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "interpretation_proposed": {
+          "action": "ASK",
+          "intent": "NEW_QUERY",
+          "state_delta": {
+            "set": {},
+            "unset": []
+          },
+          "clarification": {
+            "slot": "metric",
+            "question": "¿Querés el importe vendido de Calenta o las cantidades por producto?"
+          }
+        },
+        "validated_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés el importe vendido de Calenta o las cantidades por producto?"
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés el importe vendido de Calenta o las cantidades por producto?"
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "committed": true,
+        "decision": "ASK",
+        "execution_status": "not_executed",
+        "bmd": null,
+        "response_prepared": {
+          "text": "¿Querés el importe vendido de Calenta o las cantidades por producto?",
+          "classification": "NEEDS_CLARIFICATION"
+        }
+      },
+      "execution_binding": {
+        "capability": null,
+        "source": null
+      },
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "current_permissions_not_historical": [
+        "telchi.sales.source_quantity.read.v1"
+      ],
+      "payload_keys": [
+        "channel",
+        "dispatch_result",
+        "environment",
+        "metadata",
+        "processing_state",
+        "provider",
+        "recipients",
+        "sender",
+        "telchi_assistant_v1",
+        "text",
+        "timings"
+      ],
+      "text": "dame las ultimas ventas de calenta",
+      "dispatch_result": {
+        "text": "¿Querés el importe vendido de Calenta o las cantidades por producto?",
+        "classification": "NEEDS_CLARIFICATION",
+        "correlation_id": "b1b19579-1dea-4f7a-acda-bf08f415fe08"
+      }
+    },
+    {
+      "id": "e6977d52-dae4-44e8-9744-9deea8b7a5af",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+      "direction": "outbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:42:48.549943+00:00",
+      "payload_keys": [
+        "environment",
+        "initial_result",
+        "t6_ms",
+        "text",
+        "timings"
+      ],
+      "text": "¿Querés el importe vendido de Calenta o las cantidades por producto?",
+      "dispatch_result": null
+    },
+    {
+      "id": "1288b38c-c36e-4554-8890-e20b9e0918ca",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "sent",
+      "occurred_at_utc": "2026-10-11 23:42:51.638136+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "3279dfe7-1644-4b96-b539-5a89ecefc623",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:42:51.671268+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "52759bca-f650-403e-92d5-605ccb232b8f",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "delivered",
+      "occurred_at_utc": "2026-10-11 23:42:51.750629+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": null,
+      "direction": "inbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "received",
+      "occurred_at_utc": "2026-10-11 23:43:00.984286+00:00",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Querés el importe vendido de Calenta o las cantidades por producto?"
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "interpretation_proposed": {
+          "action": "ASK",
+          "intent": "ANSWER_CLARIFICATION",
+          "state_delta": {
+            "set": {},
+            "unset": []
+          },
+          "clarification": {
+            "slot": "metric",
+            "question": "¿Cuál querés consultar primero: el importe vendido o las cantidades por producto?"
+          }
+        },
+        "validated_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Cuál querés consultar primero: el importe vendido o las cantidades por producto?"
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Cuál querés consultar primero: el importe vendido o las cantidades por producto?"
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "committed": true,
+        "decision": "ASK",
+        "execution_status": "not_executed",
+        "bmd": null,
+        "response_prepared": {
+          "text": "¿Cuál querés consultar primero: el importe vendido o las cantidades por producto?",
+          "classification": "NEEDS_CLARIFICATION"
+        }
+      },
+      "execution_binding": {
+        "capability": null,
+        "source": null
+      },
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "current_permissions_not_historical": [
+        "telchi.sales.source_quantity.read.v1"
+      ],
+      "payload_keys": [
+        "channel",
+        "dispatch_result",
+        "environment",
+        "metadata",
+        "processing_state",
+        "provider",
+        "recipients",
+        "sender",
+        "telchi_assistant_v1",
+        "text",
+        "timings"
+      ],
+      "text": "las dos",
+      "dispatch_result": {
+        "text": "¿Cuál querés consultar primero: el importe vendido o las cantidades por producto?",
+        "classification": "NEEDS_CLARIFICATION",
+        "correlation_id": "9482bd5b-6129-4c89-a031-cde878ec5d5f"
+      }
+    },
+    {
+      "id": "129d79e0-3f20-4337-8d85-61efe2436395",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+      "direction": "outbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:43:04.912055+00:00",
+      "payload_keys": [
+        "environment",
+        "initial_result",
+        "t6_ms",
+        "text",
+        "timings"
+      ],
+      "text": "¿Cuál querés consultar primero: el importe vendido o las cantidades por producto?",
+      "dispatch_result": null
+    },
+    {
+      "id": "8a60e7d6-570b-4753-8f97-215cc6a8afb3",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "sent",
+      "occurred_at_utc": "2026-10-11 23:43:07.444164+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "912e8164-5334-48d3-a705-c7d7ad088226",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "delivered",
+      "occurred_at_utc": "2026-10-11 23:43:07.648442+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "bfaee901-ea04-454b-be19-c662402b1cc8",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:43:07.674616+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": null,
+      "direction": "inbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "received",
+      "occurred_at_utc": "2026-10-11 23:43:30.797567+00:00",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "metric",
+              "question": "¿Cuál querés consultar primero: el importe vendido o las cantidades por producto?"
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "interpretation_proposed": {
+          "action": "ASK",
+          "intent": "ANSWER_CLARIFICATION",
+          "state_delta": {
+            "set": {},
+            "unset": []
+          },
+          "clarification": {
+            "slot": "period",
+            "question": "¿De qué mes y año querés el importe de ventas?"
+          }
+        },
+        "validated_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué mes y año querés el importe de ventas?"
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué mes y año querés el importe de ventas?"
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "committed": true,
+        "decision": "ASK",
+        "execution_status": "not_executed",
+        "bmd": null,
+        "response_prepared": {
+          "text": "¿De qué mes y año querés el importe de ventas?",
+          "classification": "NEEDS_CLARIFICATION"
+        }
+      },
+      "execution_binding": {
+        "capability": null,
+        "source": null
+      },
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "current_permissions_not_historical": [
+        "telchi.sales.source_quantity.read.v1"
+      ],
+      "payload_keys": [
+        "channel",
+        "dispatch_result",
+        "environment",
+        "metadata",
+        "processing_state",
+        "provider",
+        "recipients",
+        "sender",
+        "telchi_assistant_v1",
+        "text",
+        "timings"
+      ],
+      "text": "primero dame el importe de las ventas del mes",
+      "dispatch_result": {
+        "text": "¿De qué mes y año querés el importe de ventas?",
+        "classification": "NEEDS_CLARIFICATION",
+        "correlation_id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d"
+      }
+    },
+    {
+      "id": "78b4d648-8081-4d90-a57e-98e5777b9584",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+      "direction": "outbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:43:36.625598+00:00",
+      "payload_keys": [
+        "environment",
+        "initial_result",
+        "t6_ms",
+        "text",
+        "timings"
+      ],
+      "text": "¿De qué mes y año querés el importe de ventas?",
+      "dispatch_result": null
+    },
+    {
+      "id": "368e4a91-1e21-4ade-8fe3-218e647d08eb",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "sent",
+      "occurred_at_utc": "2026-10-11 23:43:39.326186+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "b025bf27-d720-4369-b13f-fafa1a4305fb",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "delivered",
+      "occurred_at_utc": "2026-10-11 23:43:39.809506+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "7c1dc9ec-6ea1-47ae-9da5-2bee834660cb",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:43:39.814106+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": null,
+      "direction": "inbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "received",
+      "occurred_at_utc": "2026-10-11 23:43:49.490409+00:00",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿De qué mes y año querés el importe de ventas?"
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "interpretation_proposed": {
+          "action": "ASK",
+          "intent": "ANSWER_CLARIFICATION",
+          "state_delta": {
+            "set": {},
+            "unset": []
+          },
+          "clarification": {
+            "slot": "period",
+            "question": "¿Qué mes y año querés consultar? No puedo determinar cuál fue el último mes registrado."
+          }
+        },
+        "validated_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿Qué mes y año querés consultar? No puedo determinar cuál fue el último mes registrado."
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿Qué mes y año querés consultar? No puedo determinar cuál fue el último mes registrado."
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "committed": true,
+        "decision": "ASK",
+        "execution_status": "not_executed",
+        "bmd": null,
+        "response_prepared": {
+          "text": "¿Qué mes y año querés consultar? No puedo determinar cuál fue el último mes registrado.",
+          "classification": "NEEDS_CLARIFICATION"
+        }
+      },
+      "execution_binding": {
+        "capability": null,
+        "source": null
+      },
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "current_permissions_not_historical": [
+        "telchi.sales.source_quantity.read.v1"
+      ],
+      "payload_keys": [
+        "channel",
+        "dispatch_result",
+        "environment",
+        "metadata",
+        "processing_state",
+        "provider",
+        "recipients",
+        "sender",
+        "telchi_assistant_v1",
+        "text",
+        "timings"
+      ],
+      "text": "ultimo mes registrado",
+      "dispatch_result": {
+        "text": "¿Qué mes y año querés consultar? No puedo determinar cuál fue el último mes registrado.",
+        "classification": "NEEDS_CLARIFICATION",
+        "correlation_id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f"
+      }
+    },
+    {
+      "id": "a14807e0-1429-470e-9a12-6c682c5a744f",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+      "direction": "outbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:43:53.573033+00:00",
+      "payload_keys": [
+        "environment",
+        "initial_result",
+        "t6_ms",
+        "text",
+        "timings"
+      ],
+      "text": "¿Qué mes y año querés consultar? No puedo determinar cuál fue el último mes registrado.",
+      "dispatch_result": null
+    },
+    {
+      "id": "9277b746-87e9-4262-a14e-8b5e40df81f4",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "sent",
+      "occurred_at_utc": "2026-10-11 23:43:55.850630+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "c7951d75-4f49-4f6c-88ec-78c8a012a41e",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "delivered",
+      "occurred_at_utc": "2026-10-11 23:43:56.294495+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "ce0fcf72-c321-4756-a369-1de1d2592f49",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:43:56.410601+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "947b3d01-e494-44c1-9a90-1a580dd11dc4",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": null,
+      "direction": "inbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "received",
+      "occurred_at_utc": "2026-10-11 23:44:08.479049+00:00",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-01-01",
+            "end_exclusive": "2026-09-16"
+          },
+          "pending": {
+            "spec": {
+              "slot": "period",
+              "question": "¿Qué mes y año querés consultar? No puedo determinar cuál fue el último mes registrado."
+            },
+            "proposed": {
+              "metric": "sales.source_top_items",
+              "period": {
+                "start": "2026-01-01",
+                "end_exclusive": "2026-09-16"
+              },
+              "pending": null,
+              "branches": [],
+              "reference": null,
+              "comparison": null,
+              "sales_channel": null
+            },
+            "source_turn_id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+            "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+          },
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "ANSWER_CLARIFICATION",
+          "state_delta": {
+            "set": {
+              "/period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              }
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "committed": true,
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "bmd": {
+          "category": "COVERAGE_GAP"
+        },
+        "response_prepared": {
+          "text": "Esta consulta sólo cubre del 1 de enero al 15 de septiembre de 2026.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      },
+      "execution_binding": {
+        "capability": null,
+        "source": null
+      },
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "current_permissions_not_historical": [
+        "telchi.sales.source_quantity.read.v1"
+      ],
+      "payload_keys": [
+        "channel",
+        "dispatch_result",
+        "environment",
+        "metadata",
+        "processing_state",
+        "provider",
+        "recipients",
+        "sender",
+        "telchi_assistant_v1",
+        "text",
+        "timings"
+      ],
+      "text": "mayo 2026",
+      "dispatch_result": {
+        "text": "Esta consulta sólo cubre del 1 de enero al 15 de septiembre de 2026.",
+        "classification": "DIRECT_UNAVAILABLE",
+        "correlation_id": "947b3d01-e494-44c1-9a90-1a580dd11dc4"
+      }
+    },
+    {
+      "id": "be8177d6-ef33-4e50-9262-09217f99ee97",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "947b3d01-e494-44c1-9a90-1a580dd11dc4",
+      "direction": "outbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:44:11.956152+00:00",
+      "payload_keys": [
+        "environment",
+        "initial_result",
+        "t6_ms",
+        "text",
+        "timings"
+      ],
+      "text": "Esta consulta sólo cubre del 1 de enero al 15 de septiembre de 2026.",
+      "dispatch_result": null
+    },
+    {
+      "id": "4212dbb6-cfac-4fdc-9616-25b432bcdbcf",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "947b3d01-e494-44c1-9a90-1a580dd11dc4",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "sent",
+      "occurred_at_utc": "2026-10-11 23:44:14.246137+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "c949d92f-7668-4a23-b68f-1e7dae686ff5",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "947b3d01-e494-44c1-9a90-1a580dd11dc4",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "delivered",
+      "occurred_at_utc": "2026-10-11 23:44:14.604998+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "d9649ff5-e44d-4e9b-90c7-3fff34cb7fd1",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "947b3d01-e494-44c1-9a90-1a580dd11dc4",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:44:14.610639+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "f231b236-72ea-45d8-8732-21f854895882",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": null,
+      "direction": "inbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "received",
+      "occurred_at_utc": "2026-10-11 23:44:43.294386+00:00",
+      "audit": {
+        "previous_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "interpretation_proposed": {
+          "action": "EXECUTE",
+          "intent": "REFINE",
+          "state_delta": {
+            "set": {
+              "/period": {
+                "start": "2026-05-01",
+                "end_exclusive": "2026-06-01"
+              }
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "validated_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "confirmed_state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "committed": true,
+        "decision": "DIRECT_UNAVAILABLE",
+        "execution_status": "not_executed",
+        "bmd": {
+          "category": "COVERAGE_GAP"
+        },
+        "response_prepared": {
+          "text": "Esta consulta sólo cubre del 1 de enero al 15 de septiembre de 2026.",
+          "classification": "DIRECT_UNAVAILABLE"
+        }
+      },
+      "execution_binding": {
+        "capability": null,
+        "source": null
+      },
+      "owner": [
+        "dev",
+        "telchi",
+        "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+        "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+        "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+      ],
+      "current_permissions_not_historical": [
+        "telchi.sales.source_quantity.read.v1"
+      ],
+      "payload_keys": [
+        "channel",
+        "dispatch_result",
+        "environment",
+        "metadata",
+        "processing_state",
+        "provider",
+        "recipients",
+        "sender",
+        "telchi_assistant_v1",
+        "text",
+        "timings"
+      ],
+      "text": "todo mayo de 2026",
+      "dispatch_result": {
+        "text": "Esta consulta sólo cubre del 1 de enero al 15 de septiembre de 2026.",
+        "classification": "DIRECT_UNAVAILABLE",
+        "correlation_id": "f231b236-72ea-45d8-8732-21f854895882"
+      }
+    },
+    {
+      "id": "96a9efde-542c-458a-b68d-7a0a57093d9c",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "f231b236-72ea-45d8-8732-21f854895882",
+      "direction": "outbound",
+      "event_type": "message",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:44:46.059276+00:00",
+      "payload_keys": [
+        "environment",
+        "initial_result",
+        "t6_ms",
+        "text",
+        "timings"
+      ],
+      "text": "Esta consulta sólo cubre del 1 de enero al 15 de septiembre de 2026.",
+      "dispatch_result": null
+    },
+    {
+      "id": "5c98ed81-e30c-48f3-8c15-7d95c482f57b",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "f231b236-72ea-45d8-8732-21f854895882",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "sent",
+      "occurred_at_utc": "2026-10-11 23:44:48.767908+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "5ce87128-b34c-4401-8473-7e83e4f11328",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "f231b236-72ea-45d8-8732-21f854895882",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "delivered",
+      "occurred_at_utc": "2026-10-11 23:44:49.029049+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    },
+    {
+      "id": "acc73a53-4722-41e8-a5b5-525a0208bed5",
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "correlation_id": "f231b236-72ea-45d8-8732-21f854895882",
+      "direction": "outbound",
+      "event_type": "status",
+      "status": "completed",
+      "transport_status": "read",
+      "occurred_at_utc": "2026-10-11 23:44:49.315297+00:00",
+      "payload_keys": [
+        "environment",
+        "provider",
+        "status",
+        "t_callback_ms"
+      ],
+      "text": null,
+      "dispatch_result": null
+    }
+  ],
+  "durable_threads": [
+    {
+      "thread_id": "baea2cb9-a8fa-478d-84e0-808994beac11",
+      "assistant": {
+        "owner": [
+          "dev",
+          "telchi",
+          "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+          "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+          "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+        ],
+        "state": {
+          "metric": "sales.source_top_items",
+          "period": {
+            "start": "2026-05-01",
+            "end_exclusive": "2026-06-01"
+          },
+          "pending": null,
+          "branches": [],
+          "reference": null,
+          "comparison": null,
+          "sales_channel": null
+        },
+        "history": {
+          "7bc705a9-9ac3-47fd-90f3-f053a9f580da": {
+            "metric": "sales.source_top_items",
+            "period": {
+              "start": "2026-01-01",
+              "end_exclusive": "2026-09-16"
+            },
+            "pending": null,
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "947b3d01-e494-44c1-9a90-1a580dd11dc4": {
+            "metric": "sales.source_top_items",
+            "period": {
+              "start": "2026-05-01",
+              "end_exclusive": "2026-06-01"
+            },
+            "pending": null,
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "9482bd5b-6129-4c89-a031-cde878ec5d5f": {
+            "metric": "sales.source_top_items",
+            "period": {
+              "start": "2026-01-01",
+              "end_exclusive": "2026-09-16"
+            },
+            "pending": {
+              "spec": {
+                "slot": "metric",
+                "question": "¿Cuál querés consultar primero: el importe vendido o las cantidades por producto?"
+              },
+              "proposed": {
+                "metric": "sales.source_top_items",
+                "period": {
+                  "start": "2026-01-01",
+                  "end_exclusive": "2026-09-16"
+                },
+                "pending": null,
+                "branches": [],
+                "reference": null,
+                "comparison": null,
+                "sales_channel": null
+              },
+              "source_turn_id": "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+              "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+            },
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "b1b19579-1dea-4f7a-acda-bf08f415fe08": {
+            "metric": "sales.source_top_items",
+            "period": {
+              "start": "2026-01-01",
+              "end_exclusive": "2026-09-16"
+            },
+            "pending": {
+              "spec": {
+                "slot": "metric",
+                "question": "¿Querés el importe vendido de Calenta o las cantidades por producto?"
+              },
+              "proposed": {
+                "metric": "sales.source_top_items",
+                "period": {
+                  "start": "2026-01-01",
+                  "end_exclusive": "2026-09-16"
+                },
+                "pending": null,
+                "branches": [],
+                "reference": null,
+                "comparison": null,
+                "sales_channel": null
+              },
+              "source_turn_id": "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+              "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+            },
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "b73b82ee-6c87-4e8c-aa24-434644a9b18f": {
+            "metric": "sales.source_top_items",
+            "period": {
+              "start": "2026-01-01",
+              "end_exclusive": "2026-09-16"
+            },
+            "pending": {
+              "spec": {
+                "slot": "period",
+                "question": "¿Qué mes y año querés consultar? No puedo determinar cuál fue el último mes registrado."
+              },
+              "proposed": {
+                "metric": "sales.source_top_items",
+                "period": {
+                  "start": "2026-01-01",
+                  "end_exclusive": "2026-09-16"
+                },
+                "pending": null,
+                "branches": [],
+                "reference": null,
+                "comparison": null,
+                "sales_channel": null
+              },
+              "source_turn_id": "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+              "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+            },
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d": {
+            "metric": "sales.source_top_items",
+            "period": {
+              "start": "2026-01-01",
+              "end_exclusive": "2026-09-16"
+            },
+            "pending": {
+              "spec": {
+                "slot": "period",
+                "question": "¿De qué mes y año querés el importe de ventas?"
+              },
+              "proposed": {
+                "metric": "sales.source_top_items",
+                "period": {
+                  "start": "2026-01-01",
+                  "end_exclusive": "2026-09-16"
+                },
+                "pending": null,
+                "branches": [],
+                "reference": null,
+                "comparison": null,
+                "sales_channel": null
+              },
+              "source_turn_id": "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+              "base_state_hash": "6f93a90fd8aa8d637595ff570f0a0284bf05b2af5ef6c33efc19730cae88841f"
+            },
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          },
+          "f231b236-72ea-45d8-8732-21f854895882": {
+            "metric": "sales.source_top_items",
+            "period": {
+              "start": "2026-05-01",
+              "end_exclusive": "2026-06-01"
+            },
+            "pending": null,
+            "branches": [],
+            "reference": null,
+            "comparison": null,
+            "sales_channel": null
+          }
+        },
+        "history_order": [
+          "7bc705a9-9ac3-47fd-90f3-f053a9f580da",
+          "b1b19579-1dea-4f7a-acda-bf08f415fe08",
+          "9482bd5b-6129-4c89-a031-cde878ec5d5f",
+          "cf7a3acd-7c4c-4ebc-bda4-2aad00498e5d",
+          "b73b82ee-6c87-4e8c-aa24-434644a9b18f",
+          "947b3d01-e494-44c1-9a90-1a580dd11dc4",
+          "f231b236-72ea-45d8-8732-21f854895882"
+        ]
+      }
+    }
+  ]
+}

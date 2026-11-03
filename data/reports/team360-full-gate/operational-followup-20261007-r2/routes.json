@@ -1,0 +1,170 @@
+[
+  {
+    "path": "/api/automation-diagnosis/session/start",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.automation_diagnosis.start_session"
+  },
+  {
+    "path": "/api/automation-diagnosis/session/{session_id:str}/answer",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.automation_diagnosis.save_answer"
+  },
+  {
+    "path": "/api/automation-diagnosis/session/{session_id:str}/classify",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.automation_diagnosis.classify"
+  },
+  {
+    "path": "/api/console/bootstrap",
+    "method": "POST",
+    "owner": "Console",
+    "handler": "routes.console_bootstrap.console_bootstrap"
+  },
+  {
+    "path": "/api/console/me",
+    "method": "GET",
+    "owner": "Console",
+    "handler": "routes.console_me.console_me"
+  },
+  {
+    "path": "/api/dev/sales-diagnosis-runtime/turn",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.sales_diagnosis_runtime_dev.dev_sales_diagnosis_turn"
+  },
+  {
+    "path": "/api/diagnosis/embed/auth",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.diagnosis.public_embed_auth"
+  },
+  {
+    "path": "/api/diagnosis/lead",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.diagnosis.public_lead"
+  },
+  {
+    "path": "/api/diagnosis/message",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.diagnosis.public_message"
+  },
+  {
+    "path": "/api/diagnosis/session/{session_id:str}",
+    "method": "GET",
+    "owner": "Diagnosis",
+    "handler": "routes.diagnosis.public_get_session"
+  },
+  {
+    "path": "/api/diagnosis/start",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.diagnosis.public_start"
+  },
+  {
+    "path": "/api/diagnosis/submit-checklist",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.diagnosis.public_submit_checklist"
+  },
+  {
+    "path": "/api/diagnosis/turn",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.diagnosis.public_turn"
+  },
+  {
+    "path": "/api/health",
+    "method": "GET",
+    "owner": "Core",
+    "handler": "ls_iMotorSoft_Srv01.health"
+  },
+  {
+    "path": "/api/sales-diagnosis-runtime/turn",
+    "method": "POST",
+    "owner": "Diagnosis",
+    "handler": "routes.sales_diagnosis_runtime.sales_diagnosis_turn"
+  },
+  {
+    "path": "/api/team360-flow/cases/clear",
+    "method": "POST",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.flow_cases_clear"
+  },
+  {
+    "path": "/api/team360-flow/configuration",
+    "method": "GET",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.flow_configuration_list"
+  },
+  {
+    "path": "/api/team360-flow/configuration/{sector_id:str}",
+    "method": "GET",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.flow_configuration_get"
+  },
+  {
+    "path": "/api/team360-flow/configuration/{sector_id:str}",
+    "method": "PATCH",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.flow_configuration_update"
+  },
+  {
+    "path": "/api/team360-flow/executive",
+    "method": "GET",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.executive_case_list"
+  },
+  {
+    "path": "/api/team360-flow/executive/{request_id:str}",
+    "method": "GET",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.executive_audit_query"
+  },
+  {
+    "path": "/api/team360-flow/executive/{request_id:str}/resend-approval",
+    "method": "POST",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.flow_resend_approval"
+  },
+  {
+    "path": "/api/team360-flow/operational-settings",
+    "method": "GET",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.flow_operational_settings_get"
+  },
+  {
+    "path": "/api/team360-flow/operational-settings",
+    "method": "PATCH",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.flow_operational_settings_update"
+  },
+  {
+    "path": "/api/team360-flow/scheduler/status",
+    "method": "GET",
+    "owner": "Flow",
+    "handler": "modules.flow.routes.flow_scheduler_status"
+  },
+  {
+    "path": "/health",
+    "method": "GET",
+    "owner": "Core",
+    "handler": "ls_iMotorSoft_Srv01.health_root"
+  },
+  {
+    "path": "/webhooks/messaging/evolution/whatsapp",
+    "method": "POST",
+    "owner": "Messaging",
+    "handler": "modules.messaging.webhooks.evolution_whatsapp.EvolutionWhatsAppWebhookController.receive"
+  },
+  {
+    "path": "/webhooks/messaging/gupshup/whatsapp",
+    "method": "POST",
+    "owner": "Messaging",
+    "handler": "modules.messaging.webhooks.gupshup_whatsapp.GupshupWhatsAppWebhookController.receive_webhook"
+  }
+]

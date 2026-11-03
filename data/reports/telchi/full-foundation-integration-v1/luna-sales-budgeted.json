@@ -1,0 +1,223 @@
+{
+  "status": "BUDGETED_DIAGNOSTIC_PASS",
+  "observed_at": "2026-11-01T20:29:04.570078+00:00",
+  "question": "¿Cuánto vendimos en octubre de 2026 completo?",
+  "text": "Facturación registrada: Bs 11.982.896,13, del 1 de octubre de 2026 al 31 de octubre de 2026. Notas de crédito: Bs 479.145,78. Neto documental tras notas de crédito: Bs 11.503.750,35. Facturas activas en BS, con impuestos y descuentos; excluye anuladas y otras monedas. No equivale a ingreso contable, cobros ni a saldo pendiente; cobertura histórica completa no certificada. Información actualizada al 1 de noviembre de 2026. Corte de ventas: 2026-11-01T13:55:47.173006+00:00 (observaciones por consulta, no snapshot transaccional). Cobertura capturada [2026-09-01, 2026-11-02). Foundation: foundation_9cd0d1a146308f555733d58fb3fda1ff; Reference: v2_sales_448ae93a960bf7342564a2d0; snapshot: 1408.",
+  "classification": "DIRECT_AVAILABLE",
+  "audit": {
+    "bmd": null,
+    "owner": [
+      "dev",
+      "telchi",
+      "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+      "5015a69d-eb86-4ac9-b97f-c31dc06e2b59"
+    ],
+    "timings": {
+      "capability_ms": 110691.76908699956,
+      "state_engine_ms": 1.4237289979064371,
+      "interpretation_ms": 6303.352892999101,
+      "response_format_ms": 0.05596100163529627,
+      "total_processing_ms": 117023.0461229985
+    },
+    "decision": "EXECUTE",
+    "committed": true,
+    "business_scope": {
+      "focus": {},
+      "metric": "sales.net_amount",
+      "period": {
+        "start": "2026-10-01",
+        "end_exclusive": "2026-11-01"
+      },
+      "dataset": null,
+      "measure": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+      "periods": [
+        {
+          "start": "2026-10-01",
+          "end_exclusive": "2026-11-01"
+        }
+      ],
+      "product": null,
+      "category": null,
+      "currency": "BS",
+      "customer": null,
+      "universe": "active_bs_invoice_lines",
+      "breakdown": null,
+      "dimension": null,
+      "comparison": null,
+      "period_mode": null,
+      "accreditation": "verified",
+      "customer_type": null,
+      "customer_label": null,
+      "product_offset": 0,
+      "excluded_product": null
+    },
+    "contract_error": null,
+    "previous_state": {
+      "metric": null,
+      "period": null,
+      "pending": null,
+      "branches": [],
+      "reference": null,
+      "comparison": null,
+      "sales_channel": null
+    },
+    "confirmed_state": {
+      "limit": 10,
+      "metric": "sales.net_amount",
+      "period": {
+        "start": "2026-10-01",
+        "end_exclusive": "2026-11-01"
+      },
+      "pending": null,
+      "branches": [],
+      "reference": null,
+      "comparison": null,
+      "period_mode": null,
+      "sales_channel": null,
+      "entity_mention": null,
+      "schema_version": 2,
+      "product_context": null,
+      "requested_metrics": [
+        "sales.net_amount"
+      ],
+      "temporal_reference": null,
+      "product_search_text": null,
+      "selected_item_codes": []
+    },
+    "validated_state": {
+      "limit": 10,
+      "metric": "sales.net_amount",
+      "period": {
+        "start": "2026-10-01",
+        "end_exclusive": "2026-11-01"
+      },
+      "pending": null,
+      "branches": [],
+      "reference": null,
+      "comparison": null,
+      "period_mode": null,
+      "sales_channel": null,
+      "entity_mention": null,
+      "schema_version": 2,
+      "product_context": null,
+      "requested_metrics": [
+        "sales.net_amount"
+      ],
+      "temporal_reference": null,
+      "product_search_text": null,
+      "selected_item_codes": []
+    },
+    "capability_calls": 1,
+    "execution_result": {
+      "sql": "WITH invoices AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-refresh-cycle-v1/sales-refresh-20261101-v1/sales_document.parquet')) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? \n), credits AS (\nSELECT COUNT(*) documents,COUNT(DISTINCT doc_entry) unique_documents,COUNT(doc_total) amount_documents,\nCOALESCE(SUM(CAST(doc_total AS DECIMAL(38,6))),0) amount\nFROM (SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/staging/sales-refresh-cycle-v1/sales-refresh-20261101-v1/credit_memo_document.parquet')) WHERE source_system=? AND canceled=? AND currency=? AND doc_date>=? AND doc_date<? \n)\nSELECT i.documents invoice_count,i.unique_documents unique_invoices,i.amount billed_amount,\nc.documents credit_count,c.unique_documents unique_credits,c.amount credit_amount,\ni.amount-c.amount net_amount,i.amount_documents invoice_amount_count,c.amount_documents credit_amount_count\nFROM invoices i CROSS JOIN credits c",
+      "rows": [
+        {
+          "net_amount": "11503750.350000",
+          "credit_count": 280,
+          "billed_amount": "11982896.130000",
+          "credit_amount": "479145.780000",
+          "invoice_count": 41078,
+          "unique_credits": 280,
+          "unique_invoices": 41078,
+          "credit_amount_count": 280,
+          "invoice_amount_count": 41078
+        }
+      ],
+      "grain": "document_header",
+      "period": {
+        "currency": "BS",
+        "date_from": "2026-10-01",
+        "date_to_exclusive": "2026-11-01"
+      },
+      "source": {
+        "updated_at": "2026-11-01T17:50:16.749000+00:00",
+        "snapshot_id": 1408,
+        "sales_cutoff": "2026-11-01T13:55:47.173006+00:00",
+        "coverage_start": "2026-09-01",
+        "publication_id": "foundation_9cd0d1a146308f555733d58fb3fda1ff",
+        "reference_version": "v2_sales_448ae93a960bf7342564a2d0",
+        "coverage_end_exclusive": "2026-11-02"
+      },
+      "currency": "BS",
+      "read_only": true,
+      "capability": "sales.period_billed_amount.v1",
+      "definition": "SALES_VALID_GROSS=active OINV DocTotal; SALES_NET=SALES_VALID_GROSS-active ORIN DocTotal",
+      "limitations": "DocDate; active N; BS only; DocTotal retains source taxes/discounts. Not cash collections. Historical completeness and separate tax/discount reconciliation not certified.",
+      "sap_accessed": false,
+      "sql_parameters": [
+        "SAP_B1_HANA",
+        "N",
+        "BS",
+        "2026-10-01",
+        "2026-11-01",
+        "SAP_B1_HANA",
+        "N",
+        "BS",
+        "2026-10-01",
+        "2026-11-01"
+      ],
+      "sql_duration_ms": 154.6203100006096,
+      "requested_metrics": [
+        "sales.net_amount"
+      ]
+    },
+    "execution_status": "executed",
+    "response_prepared": {
+      "text": "Facturación registrada: Bs 11.982.896,13, del 1 de octubre de 2026 al 31 de octubre de 2026. Notas de crédito: Bs 479.145,78. Neto documental tras notas de crédito: Bs 11.503.750,35. Facturas activas en BS, con impuestos y descuentos; excluye anuladas y otras monedas. No equivale a ingreso contable, cobros ni a saldo pendiente; cobertura histórica completa no certificada. Información actualizada al 1 de noviembre de 2026. Corte de ventas: 2026-11-01T13:55:47.173006+00:00 (observaciones por consulta, no snapshot transaccional). Cobertura capturada [2026-09-01, 2026-11-02). Foundation: foundation_9cd0d1a146308f555733d58fb3fda1ff; Reference: v2_sales_448ae93a960bf7342564a2d0; snapshot: 1408.",
+      "classification": "DIRECT_AVAILABLE"
+    },
+    "required_permission": "telchi.sales.period_billed_amount.read.v1",
+    "pilot_approval_sha256": "13945a47cabc992e666bf166a133a378385eb3fe73ef13d09463e2dd490d4ba5",
+    "business_rbac_verified": true,
+    "interpretation_proposed": {
+      "action": "EXECUTE",
+      "intent": "NEW_QUERY",
+      "state_delta": {
+        "set": {
+          "/metric": "sales.net_amount",
+          "/period": {
+            "start": "2026-10-01",
+            "end_exclusive": "2026-11-01"
+          },
+          "/entity_mention": null,
+          "/schema_version": 2,
+          "/requested_metrics": [
+            "sales.net_amount"
+          ],
+          "/temporal_reference": null
+        },
+        "unset": [
+          "/branches",
+          "/sales_channel",
+          "/comparison",
+          "/reference",
+          "/limit",
+          "/periods",
+          "/period_mode",
+          "/product_search_text",
+          "/selected_item_codes"
+        ]
+      },
+      "clarification": null
+    }
+  },
+  "model": {
+    "model": "gpt-5.6-luna",
+    "reasoning": "medium",
+    "provider": "OpenAI direct",
+    "reasoning_echo_verified": true,
+    "preparation_ms": 0.11744099901989102,
+    "response_bytes": 8384,
+    "duration_ms": 6295.466,
+    "attempts": 1
+  },
+  "elapsed_ms": 117283.23882400218,
+  "turn_timeout_seconds": 180,
+  "worker_timeout_seconds": 60,
+  "default_turn_timeout_80s": "NOT_PASS; prior real failure retained; no runtime setting changed",
+  "scope": "actual DEV identity, Console, canonical dispatcher, persisted PostgreSQL audit, live CURRENT; not HTTP composition or WhatsApp",
+  "listeners": 0,
+  "whatsapp_sent": 0,
+  "grants_modified": 0
+}

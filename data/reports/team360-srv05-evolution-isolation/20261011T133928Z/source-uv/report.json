@@ -1,0 +1,58 @@
+{
+  "ls_iMotorSoft_Srv01:app": {
+    "health": {
+      "status": "ok",
+      "service": "backend-team360",
+      "version": "0.1.0"
+    },
+    "operations": 27,
+    "evolution": 404,
+    "pid": 165763,
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "uvicorn",
+      "ls_iMotorSoft_Srv01:app",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "33379",
+      "--fd",
+      "3",
+      "--no-access-log"
+    ],
+    "returncode": 143,
+    "cleanup": true,
+    "shutdown_complete": true
+  },
+  "ls_iMotorSoft_Srv05:app": {
+    "health": {
+      "status": "ok",
+      "service": "backend-team360",
+      "version": "0.1.0"
+    },
+    "operations": 27,
+    "evolution": 404,
+    "pid": 165768,
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "uvicorn",
+      "ls_iMotorSoft_Srv05:app",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "39527",
+      "--fd",
+      "5",
+      "--no-access-log"
+    ],
+    "returncode": 143,
+    "cleanup": true,
+    "shutdown_complete": true
+  },
+  "simultaneous": "PASS memory/mock, neither has a DB pool/delivery destination",
+  "rollback": "PASS Srv01 source listener and legacy schema remain usable"
+}

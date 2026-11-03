@@ -1,0 +1,34 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "Accredit current DEV lifecycle prerequisite gates",
+  "TELCHIAI_GATES": "6/6 PASS",
+  "BASELINE": "UNAVAILABLE",
+  "MANIFEST": "VALID",
+  "PREFLIGHT": "PASS",
+  "READY_FOR_LIFECYCLE_TEST": "YES",
+  "source_sha256": "454eddaebef39b836247bd2b167bc533a1bfbb7d0ca62761a2b75a61aa7d352f",
+  "approval_sha256": "85ba7e30c448316645620416e55087f3d9fdeb52f043f6e2e9ef73461440c448",
+  "manifest_sha256": "66104026e9ef8f9e30823a591ab43a3656339a1fcd8808ff3a04275df36b3971",
+  "expires_at": "2026-10-16T17:09:43.922863+00:00",
+  "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/gate-renewal-final-20261016T130750Z/current-accreditation.json",
+  "artifact_sha256": "cab3f6bb2fbc754d20c8045d2c548e8fa92ec053b5c73d1a22d3ffbc357dbd79",
+  "previous_manifest": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/gate-renewal-final-20261016T130750Z/previous-manifest.json",
+  "focused_tests": {
+    "command": "uv run pytest modules/telchi/assistant/tests/test_assistant.py modules/telchi/assistant/tests/test_safety.py -k 'authorization_before_llm or permission_rechecked or provider_failure_no_model_fallback or luna_real_http_contract or crash_after_state_commit' -q",
+    "result": "16 passed, 45 deselected",
+    "sha256": "6e4885949eaf11f1d76460cf91af596691afbcd3dc91ce9021a28cfae67483b2"
+  },
+  "impact": "Evidence/private manifest only; runtime, approvals, grants, services, webhooks and Foundation unchanged",
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "risks": "DEV scoped; recording egress is not WhatsApp delivery certification. Lifecycle operational session not run.",
+  "next_step": "One explicitly authorized start/status/stop session",
+  "files": [
+    "identity_inventory.py",
+    "current_probes.py",
+    "current-probes-summary.json",
+    "complete.py",
+    "focused-tests.txt",
+    "closure.json"
+  ]
+}

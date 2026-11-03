@@ -1,0 +1,123 @@
+{
+  "timestamp": "2026-10-19T00:17:18.085717+00:00",
+  "FOUNDATION_DOCUMENT_LINEAGE": "PASS",
+  "REAL_INVOICE_LINES": "FOUND",
+  "source": {
+    "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "snapshot_id": 1408,
+    "updated_at": "2026-09-28T18:18:35.264000"
+  },
+  "document": {
+    "source_system": "SAP_B1_HANA",
+    "document_type": "OINV",
+    "doc_entry": "11532517",
+    "doc_num": "260192728",
+    "doc_date": "2026-09-24T00:00:00"
+  },
+  "headers_for_docentry": [
+    [
+      "SAP_B1_HANA",
+      "OINV",
+      "11532517",
+      "260192728",
+      "2026-09-24T00:00:00",
+      "N",
+      "manual-update-20260924T132754050866Z_changed",
+      "2026-09-24T13:53:07.952772+00:00"
+    ]
+  ],
+  "lines_for_docentry": [
+    [
+      "SAP_B1_HANA",
+      "INV1",
+      "11532517",
+      "0",
+      "L00003",
+      "10",
+      "manual-update-20260924T132754050866Z_changed",
+      "2026-09-24T13:53:07.952772+00:00"
+    ]
+  ],
+  "schema": {
+    "sales_document": [
+      "atomic_id",
+      "source_system",
+      "source_table",
+      "doc_entry",
+      "doc_num",
+      "doc_date",
+      "doc_due_date",
+      "tax_date",
+      "doc_status",
+      "canceled",
+      "currency",
+      "doc_total",
+      "card_code",
+      "source_as_of",
+      "raw_extraction_id",
+      "reference_version",
+      "reference_manifest_hash",
+      "transformation_version",
+      "schema_version",
+      "doc_total_system",
+      "doc_total_foreign",
+      "slp_code",
+      "series",
+      "user_sign",
+      "sales_channel_code",
+      "sales_channel_name",
+      "sales_channel_semantic_status"
+    ],
+    "sales_line": [
+      "atomic_id",
+      "source_system",
+      "source_table",
+      "doc_entry",
+      "line_num",
+      "item_code",
+      "whs_code",
+      "quantity",
+      "currency",
+      "line_total",
+      "price",
+      "line_status",
+      "source_as_of",
+      "raw_extraction_id",
+      "reference_version",
+      "reference_manifest_hash",
+      "transformation_version",
+      "schema_version",
+      "slp_code",
+      "attributed_slp_code"
+    ]
+  },
+  "producer": "modules/telchi/datalake/create_initial.py::_sales_candidate",
+  "composite_key": [
+    "Telchi authenticated tenant/workspace",
+    "foundation_publication_id",
+    "ducklake_snapshot_id",
+    "source_system",
+    "document_type OINV with INV1 lines",
+    "doc_entry",
+    "line_num for each line"
+  ],
+  "description_source": "same publication reference.products SAP_HANA OITM catalog; not historical invoice Dscription",
+  "native_line_unit": "NOT_PUBLISHED",
+  "catalog_unit_not_substituted": true,
+  "no_conversions": true,
+  "no_amounts": true,
+  "parity_independent_sql": "PASS",
+  "rows": [
+    {
+      "line_num": 0,
+      "item_code": "L00003",
+      "quantity": "10",
+      "source_as_of": "2026-09-24T13:53:07.952772+00:00",
+      "description": "AGUA DESIONIZADA GRANEL x L.",
+      "unit": null,
+      "description_source": "Foundation reference.products SAP_HANA"
+    }
+  ],
+  "sap_accessed": false,
+  "foundation_modified": false
+}

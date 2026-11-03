@@ -1,0 +1,45 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "Remove only the inherited commercial ingress requirement",
+  "SRV05_CONTRACT": "PASS",
+  "WEBHOOK_CONTRACT": "PASS",
+  "REAL_HTTP_INGRESS": "PASS",
+  "RBAC_PER_CAPABILITY": "PASS",
+  "TENANT_ISOLATION": "PASS",
+  "REVOCATION": "PASS",
+  "SIX_GATES": "BLOCKED",
+  "READY_FOR_MANUAL_START": "NO",
+  "changes": [
+    "SrvRestAstroLS_v1/backend/ls_iMotorSoft_Srv05.py: removed nonempty required_permissions composition requirement; registration type, environment and callable checks preserved",
+    "SrvRestAstroLS_v1/backend/modules/messaging/webhooks/evolution_whatsapp.py: require registered handler, not a fixed commercial entry permission",
+    "SrvRestAstroLS_v1/backend/tests/test_srv05_horizontal_composition.py: permissionless Telchi admission, unknown/revoked identities, tenant/workspace negatives, explicit Flow entry permission preserved",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_pilot_access.py: admitted pilot without capability permission denied before query"
+  ],
+  "validation": {
+    "focused_tests": "51 passed; see focused-tests.txt",
+    "command": "cd SrvRestAstroLS_v1/backend && uv run pytest tests/test_srv05_horizontal_composition.py tests/test_messaging_handlers.py modules/telchi/assistant/tests/test_pilot_access.py -q",
+    "listener_command": "SrvRestAstroLS_v1/backend/.venv/bin/python data/reports/telchi/ingress-contract-fix-v1/probe.py",
+    "http_statuses": {"missing_token": 401, "unauthorized_sender": 403, "revoked_access": 403, "authorized_pilot": 200},
+    "listener_scope": "Real loopback HTTP, Srv05 composition, webhook builder, dispatcher, PG identity and Telchi admission authorization. Admission-only handler double and fail-closed egress double prevent model, Foundation and WhatsApp calls. Not commercial or delivery E2E.",
+    "rbac_isolation_revocation_scope": "Focused offline contracts; real PG positive identity/tenant/workspace preflight and HTTP admission. No new real capability execution claimed.",
+    "diff_check": "PASS",
+    "final_review": "Only the two inherited ingress conditions removed; dispatcher required_permissions enforcement and capability authorization unchanged"
+  },
+  "pending": [
+    "The six-gate manifest expired at 2026-10-16T17:09:43.922863+00:00 and its source and approval fingerprints differ from current values. All six artifact hashes are intact, but their applicability to current source/approval is not demonstrated. See gates-review.json.",
+    "Focused HTTP admission evidence does not reaccredit historical model/Foundation/business/idempotency guarantees. No fingerprints or expiry were substituted and no private manifest was published. Current-scope evidence is still required before manual start."
+  ],
+  "cross_module_impact": "Explicit nonempty ingress permissions remain enforced by MessageDispatcher; Flow positive and missing-permission cases pass. No auth engine, commercial permission, SQL, Luna, State Engine or Foundation implementation changed.",
+  "runtime_state": "STOPPED before and after",
+  "whatsapp_sends": 0,
+  "model_calls": 0,
+  "foundation_queries": 0,
+  "webhook_mutations": 0,
+  "private_inputs_unchanged": true,
+  "host_preflight": "BUSY_BUT_SAFE",
+  "concurrency": "One test process followed by one listener, sequential HTTP requests, PG pool max 2",
+  "own_processes_left_running": 0,
+  "cleanup": "Listener task and socket closed; PG pool closed; PID 50616 absent and port 44159 no longer listening",
+  "unrelated_processes_terminated": 0,
+  "commit_or_push": false
+}

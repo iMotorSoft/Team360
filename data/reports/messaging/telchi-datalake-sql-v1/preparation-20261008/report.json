@@ -1,0 +1,76 @@
+{
+  "gate": "TEAM360_MESSAGING_TELCHI_DATALAKE_SQL_V1",
+  "status": "BLOCKED",
+  "branch": "feature/console-backend-core",
+  "blocking_layer": "Evolution transport",
+  "blocking_evidence": "session.json: ConnectError; no listener on 18180 and no running Evolution container at inspection",
+  "implemented": [
+    "Exact strip/lower hola trigger, no intent detection or user-derived SQL",
+    "Opt-in DEV authorized sender mapping through TEAM360_MESSAGING_DEV_SQL_TENANT=telchi; no phone in code",
+    "Messaging adapter invokes Telchi capability outside investigation, with canonical FoundationReader",
+    "Fixed source-quantity top 10 SELECT; WhatsApp formats first 5 ItemCodes, not reinterpretation as normalized units or eligible commercial products",
+    "Foundation CURRENT pinned relations, enforced and verified DuckLake READ_ONLY attachment",
+    "Bounded task-owned SQL subprocess, 30 second timeout, cancellation/timeout kill and reap exact own child; one invocation per runtime, overlaps fail closed without a queue",
+    "Durable inbound claim precedes SQL; duplicate cannot re-run SQL or send response; new provider ID runs anew",
+    "Team360 JSONB execution intent/result/hash/timestamps/tenant and existing outbound/provider/delivery audit",
+    "Sanitized authorized error response; no SQL/DSN/credentials in error artifacts",
+    "Separate T0..T7 SQL gate collector and bounded real-human session for 1 or 10 sequential messages"
+  ],
+  "query": {
+    "capability": "telchi.sales_top_items.source_quantity.20260101_20260915.v1",
+    "runtime_file": "SrvRestAstroLS_v1/backend/modules/telchi/datalake/messaging_sales_query.py",
+    "semantic_origin": "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/datalake_direct_business_query_validation_v1/runner.py: sales_top_items",
+    "prior_evidence": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/evidence/telchi/TELCHI_DATALAKE_DIRECT_BUSINESS_QUERY_VALIDATION_V1/sales_queries.json: sales_top_items status EXACT",
+    "tables": ["telchi.atomic.sales_document", "telchi.atomic.sales_line"],
+    "period_from": "2026-01-01",
+    "period_to_exclusive": "2026-09-16",
+    "business_definition": "Rank ItemCode by SUM(source-native Quantity), with count of lines and source LineTotal. Includes preserved source states: no cancellation exclusion, no credit-memo netting, no UoM conversion or commercial eligibility filtering. Stable ties by ItemCode. Canonical LIMIT 10 retained; presentation uses first 5.",
+    "sql_change": "Only raw Atomic relations replaced by FoundationReader snapshot-pinned relations. No runtime import of investigation and no SAP access.",
+    "security": "SELECT and fixed period parameters only. Effective DuckLake readonly checked using duckdb_databases(). Existing PostgreSQL catalog role is reused, not claimed to have read-only grants. No privilege, Data Lake, Foundation or SAP mutations performed by the capability.",
+    "actual_result_evidence": "datalake-preflight.json"
+  },
+  "validation": {
+    "final_command": "cd SrvRestAstroLS_v1/backend && TEAM360_MESSAGING_POSTGRES_TEST=1 TEAM360_MESSAGING_TELCHI_SQL_TEST=1 uv run --no-sync pytest tests/test_messaging_*.py modules/telchi/datalake/tests/test_messaging_sales_query.py -q",
+    "final_result": "199 passed, 1 existing diagnosis in-memory configuration warning; 15.78 seconds. Session CLI --help succeeds.",
+    "real_pg_and_datalake": true,
+    "whatsapp_real_test": false,
+    "llm_requests": 0,
+    "error_tests": "timeout (own-worker cleanup), cancellation, connection/query code sanitization, empty, unauthorized, same ID sequential/concurrent, new ID, disabled/mismatched tenant, writable attachment rejection",
+    "delivery_tests": "Existing real-PG persistence with synthetic delivered/read callbacks. Not evidence of real WhatsApp delivery for this gate.",
+    "initial_functional_failure": "Expanded suite found two DeadlockDetected failures after initial focused PASS. New audit locked inbound before thread, opposite to existing claim. Fixed only new method to thread-before-inbound; permanent order regression and real concurrent duplicate integration pass. No retries or weakening tests.",
+    "git_diff_check": "clean before and after edits; no stage/commit"
+  },
+  "latency": {
+    "whatsapp_n": 0,
+    "sql_preflight_only": "Actual timestamps and result in datalake-preflight.json; NOT an end-to-end benchmark",
+    "first_observed_sql_ms": 4002.8626450002776,
+    "first_observed_foundation_resolution_ms": 9193.319,
+    "final_preflight_sql_ms": 3269.8620869996375,
+    "final_preflight_foundation_resolution_ms": 1857.08,
+    "observations": "Foundation resolution/bootstrap can dominate pre-SQL. Preserve canonical fail-closed access, do not bypass pins for speed. Cold/warm observations are not an N=10 baseline.",
+    "baseline_fixed_team360_p50_ms": 56.37,
+    "baseline_fixed_team360_p95_ms": 146.04,
+    "baseline_fixed_total_p50_ms": 2516.86,
+    "baseline_fixed_total_p95_ms": 2972.98,
+    "comparison": "No subtraction of unmatched baseline percentiles. SQL adds directly measured SELECT time; new pre-SQL also includes attachment and Foundation resolution. Ten real sequential samples still required.",
+    "timestamp_contract": "T0 webhook; T1 after authorized inbound/conversation commit; T2 actual fixed SELECT start in worker; T3 fixed SELECT finish; T4 formatted response ready; T5 send_text start; T6 Evolution HTTP acceptance; T7 local delivered callback. Missing SQL timestamps on failure are not fabricated. Formatting T3→T5 includes worker cleanup and durable intent. Existing t6_ms callback is mapped to this gate T7, without changing historic metric semantics."
+  },
+  "scope": {
+    "global_files_changed": false,
+    "preexisting_changes_preserved": true,
+    "historical_benchmarks_changed": false,
+    "new_dependencies": false,
+    "no_ia_sap_redis_broker_queues_ui": true,
+    "production_enabled": false
+  },
+  "host": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "CONCURRENCY_USED": "One pytest process and at most one own SQL subprocess with 2 DuckDB threads; no suites in parallel",
+    "signals": "8 CPUs; observed load 2.40 then 3.69; MemAvailable about 4.47 then 3.96 GiB; only a few KiB swap used; vmstat observed idle capacity. Existing agents, media jobs and services left intact.",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0
+  },
+  "next_step": "Restore Evolution and valid Meta ingress/Quick Tunnel under a separately coordinated runtime/infrastructure scope. Then launch the new bounded session with private env loaded and TEAM360_MESSAGING_DEV_SQL_TENANT=telchi, correct host.containers.internal IP and a new output directory. No need for Milvus/LiteLLM/LLM. Ask human for hola only after readiness checks pass."
+}

@@ -1,0 +1,372 @@
+{
+  "identifier": "TELCHIAI_EXPLORATORY_SQL_DIRECT_READONLY_V1",
+  "timestamp": "2026-10-27T14:23:22.875382+00:00",
+  "environment": "DEV",
+  "scope": "synthetic",
+  "question": "Investiga las facturas sintéticas sin canal, vendedores y movimientos. Cuantifica importes a grano documental y comprueba si los movimientos multiplican la facturación. Separa cabeceras de líneas, hechos e hipótesis. Incluye al finalizar el total global de cabeceras como claim invoice_header_total_bs.",
+  "turns": [
+    {
+      "proposal": {
+        "sql": "SELECT i.seller_id, s.name, i.channel_id, COUNT(*), SUM(i.amount), MIN(i.amount), MAX(i.amount) FROM invoices i LEFT JOIN sellers s ON i.seller_id = s.id WHERE i.channel_id IS NULL GROUP BY i.seller_id, s.name, i.channel_id ORDER BY i.seller_id LIMIT 100",
+        "objective": "Cuantificar las facturas sin canal al grano documental de cabecera y describir sus vendedores.",
+        "justification": "La pregunta pide investigar facturas sin canal; se mantiene una fila lógica por factura antes de estudiar movimientos, y el vendedor se obtiene mediante una relación conocida.",
+        "requested_sources": [
+          "invoices",
+          "sellers"
+        ],
+        "expected_grain": "Una fila por vendedor entre las facturas con channel_id nulo.",
+        "expected_result": "Conteo, total, mínimo y máximo de amount de cabecera por vendedor sin canal.",
+        "candidate_relations": [],
+        "requested_budget": {
+          "query_seconds": 2.0,
+          "total_seconds": 10.0,
+          "cpu_seconds": 1,
+          "process_memory_bytes": 536870912,
+          "threads": 1,
+          "result_rows": 100,
+          "result_bytes": 65536,
+          "source_bytes": 65536,
+          "queries": 5,
+          "concurrency": 1,
+          "max_join_pairs": 10000
+        },
+        "parameters": [],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "decision": {
+        "decision": "ALLOW",
+        "reason": "structurally_valid_synthetic_only",
+        "query_id": "4f529dba2b8308b14a92fc163aaac8983d1e2bbd5f4dcc6fbd099e4c23936768",
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "validated": {
+        "admitted_tree_json": "{\"error\":false,\"statements\":[{\"named_param_map\":[],\"node\":{\"aggregate_handling\":\"STANDARD_HANDLING\",\"cte_map\":{\"map\":[]},\"from_table\":{\"alias\":\"\",\"condition\":{\"alias\":\"\",\"class\":\"COMPARISON\",\"left\":{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"seller_id\"],\"query_location\":135,\"type\":\"COLUMN_REF\"},\"query_location\":147,\"right\":{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"s\",\"id\"],\"query_location\":149,\"type\":\"COLUMN_REF\"},\"type\":\"COMPARE_EQUAL\"},\"delim_flipped\":false,\"duplicate_eliminated_columns\":[],\"join_type\":\"LEFT\",\"left\":{\"alias\":\"i\",\"at_clause\":null,\"catalog_name\":\"\",\"column_name_alias\":[],\"query_location\":101,\"sample\":null,\"schema_name\":\"\",\"table_name\":\"invoices\",\"type\":\"BASE_TABLE\"},\"query_location\":112,\"ref_type\":\"REGULAR\",\"right\":{\"alias\":\"s\",\"at_clause\":null,\"catalog_name\":\"\",\"column_name_alias\":[],\"query_location\":122,\"sample\":null,\"schema_name\":\"\",\"table_name\":\"sellers\",\"type\":\"BASE_TABLE\"},\"sample\":null,\"type\":\"JOIN\",\"using_columns\":[]},\"group_expressions\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"seller_id\"],\"query_location\":190,\"type\":\"COLUMN_REF\"},{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"s\",\"name\"],\"query_location\":203,\"type\":\"COLUMN_REF\"},{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"channel_id\"],\"query_location\":211,\"type\":\"COLUMN_REF\"}],\"group_sets\":[[0,1,2]],\"having\":null,\"modifiers\":[{\"orders\":[{\"expression\":{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"seller_id\"],\"query_location\":233,\"type\":\"COLUMN_REF\"},\"null_order\":\"ORDER_DEFAULT\",\"type\":\"ORDER_DEFAULT\"}],\"type\":\"ORDER_MODIFIER\"},{\"limit\":{\"alias\":\"\",\"class\":\"CONSTANT\",\"query_location\":251,\"type\":\"VALUE_CONSTANT\",\"value\":{\"is_null\":false,\"type\":{\"id\":\"INTEGER\",\"type_info\":null},\"value\":100}},\"offset\":null,\"type\":\"LIMIT_MODIFIER\"}],\"qualify\":null,\"sample\":null,\"select_list\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"seller_id\"],\"query_location\":7,\"type\":\"COLUMN_REF\"},{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"s\",\"name\"],\"query_location\":20,\"type\":\"COLUMN_REF\"},{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"channel_id\"],\"query_location\":28,\"type\":\"COLUMN_REF\"},{\"alias\":\"\",\"catalog\":\"\",\"children\":[],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"count_star\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":42,\"schema\":\"\",\"type\":\"FUNCTION\"},{\"alias\":\"\",\"catalog\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"amount\"],\"query_location\":56,\"type\":\"COLUMN_REF\"}],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"sum\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":52,\"schema\":\"\",\"type\":\"FUNCTION\"},{\"alias\":\"\",\"catalog\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"amount\"],\"query_location\":71,\"type\":\"COLUMN_REF\"}],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"min\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":67,\"schema\":\"\",\"type\":\"FUNCTION\"},{\"alias\":\"\",\"catalog\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"amount\"],\"query_location\":86,\"type\":\"COLUMN_REF\"}],\"class\":\"FUNCTION\",\"distinct\":false,\"export_state\":false,\"filter\":null,\"function_name\":\"max\",\"is_operator\":false,\"order_bys\":{\"orders\":[],\"type\":\"ORDER_MODIFIER\"},\"query_location\":82,\"schema\":\"\",\"type\":\"FUNCTION\"}],\"type\":\"SELECT_NODE\",\"where_clause\":{\"alias\":\"\",\"children\":[{\"alias\":\"\",\"class\":\"COLUMN_REF\",\"column_names\":[\"i\",\"channel_id\"],\"query_location\":160,\"type\":\"COLUMN_REF\"}],\"class\":\"OPERATOR\",\"query_location\":173,\"type\":\"OPERATOR_IS_NULL\"}}}]}",
+        "generated_sql": "SELECT \"i\".\"seller_id\" AS \"seller_id\", \"s\".\"name\" AS \"name\", \"i\".\"channel_id\" AS \"channel_id\", COUNT(*) AS \"expr_3\", SUM(\"i\".\"amount\") AS \"expr_4\", MIN(\"i\".\"amount\") AS \"expr_5\", MAX(\"i\".\"amount\") AS \"expr_6\" FROM (\"invoices\" AS \"i\" LEFT JOIN \"sellers\" AS \"s\" ON (\"i\".\"seller_id\" = \"s\".\"id\")) WHERE (\"i\".\"channel_id\" IS NULL) GROUP BY \"i\".\"seller_id\", \"s\".\"name\", \"i\".\"channel_id\" ORDER BY \"i\".\"seller_id\" ASC LIMIT 100",
+        "sources": [
+          "invoices",
+          "sellers"
+        ],
+        "columns": [
+          [
+            "invoices",
+            "amount"
+          ],
+          [
+            "invoices",
+            "channel_id"
+          ],
+          [
+            "invoices",
+            "seller_id"
+          ],
+          [
+            "sellers",
+            "id"
+          ],
+          [
+            "sellers",
+            "name"
+          ]
+        ],
+        "functions": [
+          "count_star",
+          "max",
+          "min",
+          "sum"
+        ],
+        "relations": [
+          {
+            "left": [
+              "invoices",
+              "seller_id"
+            ],
+            "right": [
+              "sellers",
+              "id"
+            ],
+            "state": "ACCREDITED"
+          }
+        ],
+        "parameters": [],
+        "limits": {
+          "query_seconds": 2.0,
+          "total_seconds": 10.0,
+          "cpu_seconds": 1,
+          "process_memory_bytes": 536870912,
+          "threads": 1,
+          "result_rows": 100,
+          "result_bytes": 65536,
+          "source_bytes": 65536,
+          "queries": 5,
+          "concurrency": 1,
+          "max_join_pairs": 10000
+        },
+        "required_permissions": [
+          "telchi.exploratory.synthetic.read.v1"
+        ],
+        "query_id": "4f529dba2b8308b14a92fc163aaac8983d1e2bbd5f4dcc6fbd099e4c23936768",
+        "context_digest": "b6267a2476cb594ac17f4e585a784d269d9631b313bbdaf6c67eb66d18014b2f",
+        "declared_grain": "Una fila por vendedor entre las facturas con channel_id nulo.",
+        "mandatory_checks": [
+          "integrity",
+          "provenance",
+          "grain",
+          "counts",
+          "sums",
+          "percentages",
+          "duplicates",
+          "cardinality",
+          "partitions"
+        ],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "result": {
+        "query_id": "4f529dba2b8308b14a92fc163aaac8983d1e2bbd5f4dcc6fbd099e4c23936768",
+        "schema": [
+          {
+            "name": "seller_id",
+            "sql_type": "INTEGER",
+            "nullable": true
+          },
+          {
+            "name": "name",
+            "sql_type": "VARCHAR",
+            "nullable": true
+          },
+          {
+            "name": "channel_id",
+            "sql_type": "INTEGER",
+            "nullable": true
+          },
+          {
+            "name": "expr_3",
+            "sql_type": "BIGINT",
+            "nullable": true
+          },
+          {
+            "name": "expr_4",
+            "sql_type": "DECIMAL(38,2)",
+            "nullable": true
+          },
+          {
+            "name": "expr_5",
+            "sql_type": "DECIMAL(18,2)",
+            "nullable": true
+          },
+          {
+            "name": "expr_6",
+            "sql_type": "DECIMAL(18,2)",
+            "nullable": true
+          }
+        ],
+        "declared_grain": "Una fila por vendedor entre las facturas con channel_id nulo.",
+        "rows": [
+          [
+            1,
+            "Synthetic seller A",
+            null,
+            1,
+            "100.00",
+            "100.00",
+            "100.00"
+          ]
+        ],
+        "aggregates": [],
+        "returned_count": 1,
+        "total_count": 1,
+        "truncated": false,
+        "elapsed_seconds": 0.018226674999823445,
+        "cpu_seconds": null,
+        "peak_memory_bytes": null,
+        "bytes_read": null,
+        "source": "synthetic",
+        "publication": "synthetic_publication_v1",
+        "snapshot": "synthetic_snapshot_v1",
+        "evidence": [
+          "4f529dba2b8308b14a92fc163aaac8983d1e2bbd5f4dcc6fbd099e4c23936768",
+          "b6267a2476cb594ac17f4e585a784d269d9631b313bbdaf6c67eb66d18014b2f",
+          "direct_readonly_dev"
+        ],
+        "status": "COMPLETED",
+        "limitations": [
+          "dev_pilot_not_multiuser_accreditation",
+          "os_isolation_not_accredited",
+          "process_memory_cpu_and_scan_bytes_not_enforced"
+        ],
+        "version": "telchiai.exploratory_sql.v1"
+      },
+      "verification": {
+        "state": "UNVERIFIED",
+        "checks": [
+          [
+            "integrity",
+            true
+          ],
+          [
+            "provenance",
+            true
+          ],
+          [
+            "grain",
+            false
+          ],
+          [
+            "counts",
+            false
+          ],
+          [
+            "sums",
+            false
+          ],
+          [
+            "percentages",
+            false
+          ],
+          [
+            "duplicates",
+            false
+          ],
+          [
+            "cardinality",
+            false
+          ],
+          [
+            "partitions",
+            false
+          ]
+        ],
+        "evidence": [
+          "4f529dba2b8308b14a92fc163aaac8983d1e2bbd5f4dcc6fbd099e4c23936768"
+        ],
+        "limitations": [
+          "execution_evidence_not_accredited",
+          "business_claim_unverified",
+          "header_amount_join_multiplication_risk"
+        ]
+      }
+    }
+  ],
+  "status": "BLOCKED",
+  "foundation": {
+    "status": "BLOCKED",
+    "reasons": [
+      "enterprise_openai_destination_scope_not_accredited",
+      "foundation_authorized_catalog_binding_not_implemented",
+      "host_io_pressure_requires_new_preflight"
+    ],
+    "foundation_opened": false,
+    "business_data_sent_to_model": false
+  },
+  "whatsapp_e2e": "NOT_RUN",
+  "os_isolation": "F1_EXECUTION_ISOLATION_FAIL preserved",
+  "ready_for_channel_integration": false,
+  "blocked_reason": "ambiguous_model_messages",
+  "elapsed_seconds": 20.560027221999917,
+  "model_calls": [
+    {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "fallback": false,
+      "elapsed_seconds": 10.125633822999589,
+      "usage": {
+        "input_tokens": 1253,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 1250
+        },
+        "output_tokens": 902,
+        "output_tokens_details": {
+          "reasoning_tokens": 503
+        },
+        "total_tokens": 2155
+      },
+      "output_text": "{\"action\":\"query\",\"sql\":\"SELECT i.seller_id, s.name, i.channel_id, COUNT(*), SUM(i.amount), MIN(i.amount), MAX(i.amount) FROM invoices i LEFT JOIN sellers s ON i.seller_id = s.id WHERE i.channel_id IS NULL GROUP BY i.seller_id, s.name, i.channel_id ORDER BY i.seller_id LIMIT 100\",\"objective\":\"Cuantificar las facturas sin canal al grano documental de cabecera y describir sus vendedores.\",\"justification\":\"La pregunta pide investigar facturas sin canal; se mantiene una fila lógica por factura antes de estudiar movimientos, y el vendedor se obtiene mediante una relación conocida.\",\"requested_sources\":[\"invoices\",\"sellers\"],\"expected_grain\":\"Una fila por vendedor entre las facturas con channel_id nulo.\",\"expected_result\":\"Conteo, total, mínimo y máximo de amount de cabecera por vendedor sin canal.\",\"candidate_relations\":[]}",
+      "output_messages": [
+        "{\"action\":\"query\",\"sql\":\"SELECT i.seller_id, s.name, i.channel_id, COUNT(*), SUM(i.amount), MIN(i.amount), MAX(i.amount) FROM invoices i LEFT JOIN sellers s ON i.seller_id = s.id WHERE i.channel_id IS NULL GROUP BY i.seller_id, s.name, i.channel_id ORDER BY i.seller_id LIMIT 100\",\"objective\":\"Cuantificar las facturas sin canal al grano documental de cabecera y describir sus vendedores.\",\"justification\":\"La pregunta pide investigar facturas sin canal; se mantiene una fila lógica por factura antes de estudiar movimientos, y el vendedor se obtiene mediante una relación conocida.\",\"requested_sources\":[\"invoices\",\"sellers\"],\"expected_grain\":\"Una fila por vendedor entre las facturas con channel_id nulo.\",\"expected_result\":\"Conteo, total, mínimo y máximo de amount de cabecera por vendedor sin canal.\",\"candidate_relations\":[]}",
+        "{\"action\":\"query\",\"sql\":\"SELECT i.seller_id, s.name, i.channel_id, COUNT(*), SUM(i.amount), MIN(i.amount), MAX(i.amount) FROM invoices i LEFT JOIN sellers s ON i.seller_id = s.id WHERE i.channel_id IS NULL GROUP BY i.seller_id, s.name, i.channel_id ORDER BY i.seller_id LIMIT 100\",\"objective\":\"Cuantificar las facturas sin canal al grano documental de cabecera y describir sus vendedores.\",\"justification\":\"La pregunta pide investigar facturas sin canal; se mantiene una fila lógica por factura antes de estudiar movimientos, y el vendedor se obtiene mediante una relación conocida.\",\"requested_sources\":[\"invoices\",\"sellers\"],\"expected_grain\":\"Una fila por vendedor entre las facturas con channel_id nulo.\",\"expected_result\":\"Conteo, total, mínimo y máximo de amount de cabecera por vendedor sin canal.\",\"candidate_relations\":[]}"
+      ],
+      "output_types": [
+        "reasoning",
+        "message",
+        "reasoning",
+        "message"
+      ],
+      "message_metadata": [
+        {
+          "id": "msg_092718fef7759b4c016ae0b3e15b6087d1b03c43fe22b149ed",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "phase": "final_answer"
+        },
+        {
+          "id": "msg_092718fef7759b4c016ae0b3e36d5487d1999945a887247635",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "phase": "final_answer"
+        }
+      ],
+      "identical_message_copies": 2
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "reasoning": "medium",
+      "provider": "OpenAI direct",
+      "reasoning_echo_verified": true,
+      "fallback": false,
+      "elapsed_seconds": 9.011487638999824,
+      "usage": {
+        "input_tokens": 1877,
+        "input_tokens_details": {
+          "cache_write_tokens": 1874,
+          "cached_tokens": 0
+        },
+        "output_tokens": 884,
+        "output_tokens_details": {
+          "reasoning_tokens": 130
+        },
+        "total_tokens": 2761
+      },
+      "output_text": "{\"action\":\"query\",\"sql\":\"SELECT i.id AS invoice_id, i.seller_id, i.channel_id, i.amount AS header_amount_bs, COUNT(m.id) AS movement_rows, COALESCE(SUM(m.quantity), 0) AS movement_quantity, COALESCE(SUM(m.quantity), 0) * i.amount AS multiplied_header_amount_bs FROM invoices i LEFT JOIN movements m ON i.id = m.invoice_id WHERE i.channel_id IS NULL GROUP BY i.id, i.seller_id, i.channel_id, i.amount ORDER BY i.id LIMIT 100\",\"objective\":\"Investigar, a grano de factura, los movimientos asociados a las facturas sin canal y medir la multiplicación potencial del importe de cabecera observada para el vendedor 1.\",\"justification\":\"La consulta previa encontró una factura sin canal del vendedor 1 con cabecera de 100.00 BS. Esta consulta conserva el grano documental por factura y cuantifica filas y cantidades de movimientos; el importe multiplicado se presenta solo como diagnóstico de riesgo, no como facturación.\",\"requested_sources\":[\"invoices\",\"movements\"],\"expected_grain\":\"Una fila por factura sin channel_id.\",\"expected_result\":\"Para cada factura sin canal: importe de cabecera, número de movimientos, cantidad total y un valor diagnóstico de cabecera multiplicada por cantidad.\",\"candidate_relations\":[{\"left_table\":\"invoices\",\"left_column\":\"id\",\"right_table\":\"movements\",\"right_column\":\"invoice_id\",\"rationale\":\"Relación investigativa declarada por el catálogo; invoice_id en movements no es un vínculo documental acreditado.\"}]}",
+      "output_messages": [
+        "{\"action\":\"query\",\"sql\":\"SELECT i.id AS invoice_id, i.seller_id, i.channel_id, i.amount AS header_amount_bs, COUNT(m.id) AS movement_rows, COALESCE(SUM(m.quantity), 0) AS movement_quantity, COALESCE(SUM(m.quantity), 0) * i.amount AS multiplied_header_amount_bs FROM invoices i LEFT JOIN movements m ON i.id = m.invoice_id WHERE i.channel_id IS NULL GROUP BY i.id, i.seller_id, i.channel_id, i.amount ORDER BY i.id LIMIT 100\",\"objective\":\"Investigar, a grano de factura, los movimientos asociados a las facturas sin canal y medir la multiplicación potencial del importe de cabecera observada para el vendedor 1.\",\"justification\":\"La consulta previa encontró una factura sin canal del vendedor 1 con cabecera de 100.00 BS. Esta consulta conserva el grano documental por factura y cuantifica filas y cantidades de movimientos; el importe multiplicado se presenta solo como diagnóstico de riesgo, no como facturación.\",\"requested_sources\":[\"invoices\",\"movements\"],\"expected_grain\":\"Una fila por factura sin channel_id.\",\"expected_result\":\"Para cada factura sin canal: importe de cabecera, número de movimientos, cantidad total y un valor diagnóstico de cabecera multiplicada por cantidad.\",\"candidate_relations\":[{\"left_table\":\"invoices\",\"left_column\":\"id\",\"right_table\":\"movements\",\"right_column\":\"invoice_id\",\"rationale\":\"Relación investigativa declarada por el catálogo; invoice_id en movements no es un vínculo documental acreditado.\"}]}",
+        "{\"action\":\"final\",\"answer\":\"Estado: VERIFIED_WITH_LIMITATIONS.\\n\\nHechos verificados en la evidencia disponible:\\n- Se identificó 1 factura sintética sin canal, perteneciente al vendedor 1 (Synthetic seller A).\\n- Su importe de cabecera es 100.00 BS.\\n- El total global de cabeceras sin canal observado es 100.00 BS.\\n- A este grano, el conteo es 1 factura y los valores mínimo, máximo y total de cabecera son 100.00 BS.\\n\\nMovimientos y facturación:\\n- La asociación entre `movements.invoice_id` y `invoices.id` es únicamente investigativa; el catálogo indica que no es un vínculo documental acreditado.\\n- Por tanto, cualquier importe obtenido al unir movimientos con cabeceras debe tratarse como hipótesis diagnóstica, no como facturación verificada.\\n- Las cabeceras y las líneas deben mantenerse separadas: el importe de cabecera no equivale al ingreso de líneas.\\n- No se debe sumar directamente el importe de cabecera después de unir movimientos, porque varias filas de movimientos pueden multiplicar artificialmente la facturación.\\n\\nLimitaciones:\\n- La evidencia de ejecución disponible marca la consulta previa como UNVERIFIED para afirmaciones de negocio; no se acreditaron conteos, sumas, duplicados ni cardinalidades.\\n- El segundo análisis solicitado sobre movimientos no produjo una evidencia de resultado disponible para esta respuesta; por ello no afirmo un número de movimientos ni una multiplicación concreta.\\n- Los datos son un experimento sintético de desarrollo y no representan información real de Calenta.\\n- `invoice_header_total_bs` refleja cabeceras de las facturas sin canal observadas, no facturación acreditada ni ingresos de líneas.\",\"claims\":[{\"metric\":\"invoice_header_total_bs\",\"value\":\"100.00\",\"status\":\"VERIFIED_WITH_LIMITATIONS\",\"scope\":\"facturas sintéticas con channel_id nulo\"}]}"
+      ],
+      "output_types": [
+        "reasoning",
+        "message",
+        "reasoning",
+        "message"
+      ],
+      "message_metadata": [
+        {
+          "id": "msg_0fea67ea1c761343016ae0b3e944c487d18d63111e0f1da5ec",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "phase": "commentary"
+        },
+        {
+          "id": "msg_0fea67ea1c761343016ae0b3ebafc887d1a1d9dc98d240edc5",
+          "type": "message",
+          "role": "assistant",
+          "status": "completed",
+          "phase": "final_answer"
+        }
+      ],
+      "identical_message_copies": null
+    }
+  ],
+  "resources": {
+    "peak_process_rss_kib": 129136,
+    "duckdb_threads": 1,
+    "concurrency": 1,
+    "observation_bytes_limit": 32768,
+    "wall_budget_seconds": 180,
+    "own_processes_left_running": 0
+  },
+  "code_digest": "a9127971e32f6237ad1cb23d485204386d8ddd8946d2d6c3cc0a0ccd4c946684"
+}

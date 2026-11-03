@@ -5,6 +5,8 @@ description: Reglas y flujo de trabajo para desarrollar Team360 con Codex CLI, i
 
 # Team360
 
+Este skill contiene workflows específicos. [AGENTS.md](../../../AGENTS.md) define inicio y ownership; el [estado técnico GLOBAL](../../../SrvRestAstroLS_v1/docs/status_actual.md) enlaza LAT y autoridades locales.
+
 ## Propósito
 Team360 es una solución multicanal conversacional.
 El núcleo del sistema es `team360_orquestador`.
@@ -28,13 +30,11 @@ Al comenzar cualquier sesión de Codex CLI, OpenCode u otro agente de código, a
 
 Pasos obligatorios:
 
-1. Leer este skill:
+1. Leer `AGENTS.md`, fuente operativa canónica, y seguir su inicio obligatorio.
 
-   `.agents/skills/team360-project/SKILL.md`
+2. Leer `SrvRestAstroLS_v1/docs/status_actual.md`, único estado técnico GLOBAL vigente.
 
-2. Leer `AGENTS.md` si existe.
-
-3. Leer `lat.md/team360-global-orchestration.md` si existe.
+3. Cargar este skill solo para su workflow específico; consultar `lat.md/team360-global-orchestration.md` para ownership transversal.
 
 4. Verificar rama actual:
 
@@ -50,7 +50,7 @@ Pasos obligatorios:
 
 6. No cambiar de rama si el worktree no está limpio.
 
-7. No modificar archivos si hay cambios o archivos untracked no esperados.
+7. Clasificar cambios preexistentes: preservar scopes ajenos; detenerse solo ante ownership inexplicado. Una ventana explícita de reconciliación documental permite integrar sobre el diff inspeccionado, sin reset, limpieza ni adopción del trabajo previo.
 
 8. No hacer commit, push, merge, rebase, reset, clean ni borrar ramas salvo pedido explícito del usuario.
 
@@ -133,7 +133,9 @@ Reglas de uso:
 4. No anclar cada linea ni comentarios obvios.
 5. No usar `lat.md/` para bitacoras diarias, evidencias, snapshots, instrucciones efimeras o estado de implementacion.
 6. Al crear o modificar documentos de `lat.md/`, actualizar `lat.md/status_actual.md`.
-7. Mantener `SrvRestAstroLS_v1/docs/status_actual.md` como bitacora tecnica principal; `lat.md/` solo registra invariantes y conceptos estables.
+7. Mantener `SrvRestAstroLS_v1/docs/status_actual.md` como único tablero técnico GLOBAL compacto, no como bitácora. Usar estado vigente + decisión + límite + enlace; historia y evidencia permanecen en sus fuentes.
+8. Usar `status_actual.md` en minúsculas para estados nuevos. `lat.md/status_actual.md` registra mantenimiento LAT, no replica el estado GLOBAL. Telchi conserva `CONTEXT.md` como autoridad arquitectónica.
+9. GLOBAL admite lectura de todos y un solo writer coordinado. Los scopes locales pueden continuar sin alterar GLOBAL; una ventana documental no habilita código, infraestructura, Git ni producción. Los nombres de procesos activos no prueban ownership.
 
 ## Documentation gates
 
@@ -163,7 +165,7 @@ A task with failing LAT gates must not be reported as PASS.
 8. Para validaciones de navegador, Playwright + Chromium es el gate E2E oficial; Browser MCP / `opencode-browser` es exploratorio y de diagnostico visual, no reemplaza Playwright para cerrar fases, regresiones o produccion. Ver `lat.md/browser-mcp-validation-policy.md`.
 9. Para validaciones visuales y reproduccion interactiva con Playwright MCP Server, leer primero `lat.md/playwright-mcp-server-policy.md`.
 10. Para tests locales de paginas/componentes/E2E reales, leer `lat.md/browser-mcp-validation-policy.md`: levantar/bajar backend y Astro solo con `SrvRestAstroLS_v1/backend-dev.sh` y `SrvRestAstroLS_v1/astro-dev.sh`; Playwright debe automatizar navegador con `PLAYWRIGHT_SKIP_WEBSERVER=1`, no levantar su `webServer` automatico ni usar proxy/puertos paralelos salvo justificacion explicita.
-11. Para validaciones Browser MCP / `opencode-browser`, seguir `lat.md/browser-mcp-validation-policy.md`: antes de navegar deben responder backend `127.0.0.1:7050` y Astro `127.0.0.1:3050`; el agente puede bajar/subir esos dos servidores locales si hace falta; si Browser MCP falla, detener la prueba y avisar, sin reemplazarla por terminal, `curl`, Playwright, HTML o lectura de codigo salvo autorizacion explicita.
+11. Para validaciones Browser MCP / `opencode-browser`, seguir `lat.md/browser-mcp-validation-policy.md`: antes de navegar deben responder backend `127.0.0.1:7050` y Astro `127.0.0.1:3050`; respetar `AGENTS.md` sección Shared development host, reutilizar servidores existentes y bajar solo servidores creados por la ejecución actual, nunca reiniciar servicios para liberar recursos; si Browser MCP falla, detener la prueba y avisar, sin reemplazarla por terminal, `curl`, Playwright, HTML o lectura de codigo salvo autorizacion explicita.
 12. Para despliegue frontend Astro de `team360.live` por `rsync`, seguir `lat.md/team360-frontend-rsync-deploy-policy.md`: verificar `IS_REST_PRO=true`, build limpio, fix en source y `dist`, backup remoto, dry-run revisado, rsync real, assets local=produccion y Playwright productivo antes de declarar PASS.
 13. Para despliegue backend de Team360 por `rsync`, seguir `lat.md/team360-backend-rsync-deploy-policy.md`: validar rama/HEAD, tests backend, exclusiones `.env*`/`.venv`, backup remoto, dry-run revisado, rsync real, preservar sensibles, no reiniciar automaticamente, esperar reinicio manual en `tmux`, health y smoke modelo real sin fallback antes de aprobar.
 14. Para diagramas tecnicos, seguir `lat.md/team360-mermaid-diagram-policy.md`: Mermaid es la fuente canonica versionable; renders SVG/PNG/Excalidraw son derivados opcionales; no hay instalacion global obligatoria ni se adopta el skill gstack `/diagram` completo.

@@ -1,0 +1,55 @@
+{
+  "observed_at": "2026-10-23T17:52:14.839567+00:00",
+  "branch": "feature/console-backend-core",
+  "target_writes": 0,
+  "real_messages_sent": 0,
+  "production_modified": false,
+  "meta_calls": 0,
+  "services_started": 0,
+  "keys_generated": 0,
+  "credentials_provisioned": false,
+  "bindings": [
+    {
+      "slug": "team360_public_site",
+      "channel_alias": "evolution-meta-dev",
+      "status": "testing",
+      "provider_instance": "team360-meta-dev",
+      "environment": null
+    },
+    {
+      "slug": "telchi_dev",
+      "channel_alias": "telchi_whatsapp_dev",
+      "status": "testing",
+      "provider_instance": "team360-meta-dev",
+      "environment": "dev"
+    }
+  ],
+  "event_counts": [
+    {
+      "channel_id": "3cc01e11-da1c-4630-a9c6-ecc2f79220d4",
+      "n": 164
+    },
+    {
+      "channel_id": "489e6f2c-8bac-4805-99ba-7dbe4d48c10e",
+      "n": 1335
+    }
+  ],
+  "protected_events_unchanged": true,
+  "protected_event_count": 5,
+  "ot_inventory_count": 0,
+  "counts_match_prior": true,
+  "configuration_matches_verified_backup": {
+    "evolution.env": true,
+    "image.ref": true,
+    "backend.env": true,
+    "telchi-control.json": true
+  },
+  "evolution_state": "created",
+  "blocker": "Existing instance still has two persisted workspace bindings; testing is not evidence of retirement. Exclusive V1 inventory is empty. No authority inferred to alter the other workspace or claim exclusive routing.",
+  "source_sha256": {
+    "SrvRestAstroLS_v1/backend/modules/messaging/administration/__init__.py": "c3c96ecad7dd38fa4d8467212bd1525bb607090bd3e94b5f6ce7fb130ef8efe9",
+    "SrvRestAstroLS_v1/backend/modules/messaging/administration/contract.py": "a776a631ecd20d5928e11da3fc189183093294a9809f2f72773aa9e99ca3ef53",
+    "SrvRestAstroLS_v1/backend/modules/messaging/administration/repository.py": "29d3ca5f74d62df6b0158437b43c567b2ee31f60e569e6d913a381b6aa9a1472",
+    "SrvRestAstroLS_v1/backend/tests/test_messaging_single_owner_dev.py": "c5aab004814e0c21929b58f186e29a74fabd90fd8fe3a2f4ac7a47e552813296"
+  }
+}

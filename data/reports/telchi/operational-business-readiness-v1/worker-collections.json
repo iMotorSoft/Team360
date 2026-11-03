@@ -1,0 +1,75 @@
+{
+  "result": {
+    "contract": "TELCHI_OPERATIONAL_ANALYTICS_V1",
+    "capability": "collections.received_amount.v1",
+    "metric": "collections.received_amount",
+    "label": "Cobros registrados",
+    "summary": null,
+    "parameters": {
+      "date_from": "2026-10-01",
+      "date_to_exclusive": "2026-11-01",
+      "limit": 10
+    },
+    "rows": [
+      {
+        "currency": "BS",
+        "payments": 40077,
+        "customers": 2763,
+        "amount": "12180925.360000000000"
+      }
+    ],
+    "total_rows": 1,
+    "omitted_rows": 0,
+    "controls": {
+      "excluded_nonactive_payments": 311,
+      "excluded_other_currency_payments": 0
+    },
+    "coverage": {
+      "kind": "BOUNDED_OBSERVATION",
+      "complete_business_history": false,
+      "absence_is_zero": false,
+      "observation_started_at": "2026-11-01T17:48:30.543000",
+      "observation_finished_at": "2026-11-01T17:48:54.816000",
+      "source_scope": {
+        "end_exclusive": "2026-11-02",
+        "kind": "BOUNDED_OVERLAP_PLUS_GAP",
+        "limitation": "Historical balances/payments before overlap NOT refreshed; aging not accredited by this capture",
+        "start": "2026-09-21"
+      },
+      "requested_period": {
+        "date_from": "2026-10-01",
+        "date_to_exclusive": "2026-11-01"
+      },
+      "first_observed_date": "2026-09-21 00:00:00",
+      "last_observed_date": "2026-11-01 00:00:00",
+      "dataset_rows": 50687,
+      "declared_start": "2026-09-21",
+      "declared_end_exclusive": "2026-11-02",
+      "requested_outside_capture": false
+    },
+    "limitations": [
+      "Eventos de pagos publicados, no saldo hist\u00f3rico ni aging global. Pagos y aplicaciones son grains distintos y nunca se suman como ingresos independientes."
+    ],
+    "read_only": true,
+    "sap_accessed": false,
+    "source": {
+      "publication_id": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+      "snapshot_id": 1408,
+      "reference_version": "v2_sales_448ae93a960bf7342564a2d0",
+      "updated_at": "2026-11-01T17:50:16.749000+00:00",
+      "datasets": {
+        "collection_payment": "7f239cc3701c6ca888a8c23d824d3cc06913dfc12af6ab6a12e745426c580ee0"
+      }
+    },
+    "timings": {
+      "foundation_resolution_ms": 76182.727,
+      "planning_and_sql_ms": 330.6738979954389,
+      "serialization_ms": 0.12375300138955936
+    }
+  },
+  "wall_ms": 76997.4906100033,
+  "diagnostic_budget_seconds": 180,
+  "environment": "DEV",
+  "authorization": "OWNER_DATA_READER_DIAGNOSTIC_NOT_CONVERSATIONAL_AUTH_PASS",
+  "default_budget_changed": false
+}

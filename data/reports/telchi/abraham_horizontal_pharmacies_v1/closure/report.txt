@@ -1,0 +1,116 @@
+TELCHIAI — ABRAHAM HORIZONTAL / FARMACIAS — DIAGNÓSTICO DE CIERRE
+Rama: feature/console-backend-core. HEAD inspeccionado: 09d2ec7.
+Contexto: TELCHI → VENTAS + CLIENTES → INVESTIGATION.
+Estado del diagnóstico: DONE_WITH_CONCERNS. Resolución ejecutiva: BLOCKED.
+DATA_READINESS=CONDITIONAL_OBSERVED / COMMERCIAL_RECONCILIATION_BLOCKED.
+INTENT_PRESERVATION=FUNCTIONAL_FAILURE_CONFIRMED / MINIMAL_CORRECTION_PROPOSED_NOT_IMPLEMENTED.
+
+1. ALCANCE Y EVIDENCIA
+Pregunta exacta en closure/acceptance.json bajo el caso investigativo.
+HTTP original: ../first_run/spontaneous.json; agregados y SQL: ../first_run/independent.json.
+Se reutilizan como evidencia fechada, NO como nueva ejecución HTTP, nueva medición del modelo o nueva consulta Foundation.
+Foundation registrada: foundation_afd08d9eca6a725be53cdc3f9d5709c9; snapshot 1408; data_as_of 2026-09-28T18:18:35.264000.
+Esta tarea no consultó HANA ni servicios, no modificó CURRENT, catálogo, permisos, modelo, router, runtime, prompts o configuración Evolution. No activó WhatsApp ni suspendió procesos: su puesta en marcha queda fuera de alcance por instrucción del usuario.
+Inventario local reproducible: local_inventory.json, con schemas y SHA256 de fuentes, evidencia y contratos examinados. Sin secretos ni muestras de clientes.
+
+2. DATA_READINESS — ORIGEN Y BRECHAS
+Cadena de source actual inspeccionada:
+SAP OINV.Series/UserSign → create_initial._sales_candidate → executive_sales.classify_sales_channel → sales_channel_code/name/semantic_status en sales_document → componente Sales publicado → FoundationReader fijado al snapshot → filtro investigador HORIZONTAL.
+El update reconstruye las filas normalizadas y vuelve a transformarlas por create_initial; conserva Series/UserSign. U_ORIGIN no participa en este clasificador ni está publicado en el esquema inspeccionado.
+Lista facturas actual: 1248–1259, 1403, 1407. La función decide sólo por Series; recibe UserSign pero NO lo verifica. Devuelve HORIZONTAL/CONFIRMED incluso con otro usuario. CONFIRMED es una etiqueta del software, NO una conciliación independiente realizada en esta tarea.
+El comentario de origen cita un censo NNM1/OUSR; los agregados previos muestran esas 14 series con UserSign=145. Eso es coherente con atribución DMS, pero no demuestra completitud ni ausencia de falsos positivos.
+La autoridad investigativa users_audit/application_origin.py distingue U_ORIGIN=DMS (EXACT), SeriesName DMS* (STRONG) y usuario técnico (HEURISTIC). No deben colapsarse esos niveles.
+
+BRECHA ADICIONAL DE LINEAGE, reproducida offline:
+independent.json registra ORIN horizontal con series 1269–1280. _credit_memo_candidate llama al MISMO clasificador actual, que devuelve (None,None) para TODAS esas series. Por tanto, el código actual examinado no reproduce esa etiqueta publicada de NC.
+No se atribuye sin evidencia a corrupción, fallo SAP o migración concreta. Falta localizar transformación/backfill/versionado que produjo esa publicación y contrastarla con el manifiesto y snapshot originales. No se retoca el clasificador ni se recalculan importes para ocultar el gap.
+Consecuencia: la frase anterior «todo el neteo procede de las 14 series» es insuficiente; son 14 series de FACTURAS, con series distintas de NC. El importe observado permanece aritméticamente calculable pero su lineage comercial completo NO está cerrado.
+
+Fuentes ya disponibles, sin nueva conexión HANA:
+- Dos OCRD raw locales de septiembre: schemas sin U_CANAL_VENTAS, U_TIPOCLIENTE ni propiedades de farmacia. Tabla raw/table_extract inspeccionada: sin archivos NNM1.parquet ni UFD1.parquet; sí hay OUSR. Ausencia limitada a ese root, no afirmación universal.
+- DS/clientSB1.parq y DS0/clientSB1.parq: 11.512 códigos únicos cada uno; son COPIAS IDÉNTICAS por SHA256, no fuentes independientes ni poblaciones sumables. Fecha de archivo observada mayo 2024; no prueba fecha efectiva de cada clasificación.
+- Esos maestros contienen ClientSLPropertyCode/Name. Propiedad exacta 11/Farmacias: 4.649 filas del snapshot histórico; también hay combinaciones como 11|14/Farmacias|Particulares. Son conteos de ese archivo, NO farmacias horizontales actuales ni intersección con los 4.004 compradores.
+- sales_dimensions/channel_homologation.yaml y SALES_DIMENSIONS_FINAL_REPORT.md documentan OCRD.U_CANAL_VENTAS=1 como Farmacias en 2026; es una TAXONOMÍA DISTINTA de la propiedad legacy 11. Su fuente primaria/diccionario y membresía actual deben recuperarse; no asumir 11=1 por igualdad numérica ni homologación automática.
+- Legacy activeTools01.py define HORIZONTAL por PriceTypeCode=11. Ese 11 es PRECIO, no propiedad Farmacias. El mapping histórico declara NON_HOMOLOGABLE a detalle respecto al canal de cliente actual. No sustituir DMS por precio legacy, vendedor corporativo ni rubro farmacia.
+- Discovery previo de pedidos/reparto documenta falta de dataset/conector DMS externo en su alcance. Las búsquedas acotadas actuales no descubrieron padrón DMS nuevo; no prueban que no exista fuera de los roots inspeccionados. No se inspeccionaron secretos ni conexiones privadas.
+
+Cómo identificar farmacias de forma defendible:
+Recuperar padrón/export DMS o maestro SAP con clasificación explícita y diccionario autorizado, identificador de cliente, fecha de extracción, vigencia y versión. Validar CardCode/crosswalk 1:1, faltantes, conflictos y clasificación múltiple; no usar coincidencia de nombre como verdad.
+El snapshot legacy es un candidato de enrichment y contraste, NO sustituto del maestro vigente. Obtener procedencia de ClientSLPropertyCode y definición de exclusividad/multietiqueta. Hasta validación, conservar UNKNOWN separado de no-farmacia.
+Si sólo existe maestro actual sin historia, rotular segmentación «según maestro al corte», no «farmacia al momento de cada venta»; el muestreo histórico de 20 clientes sin cambios no prueba estabilidad universal.
+
+3. CIFRAS Y MÉTRICAS DEFENDIBLES
+Defendibles COMO OBSERVACIONES DEL SNAPSHOT Y DE SU ETIQUETA:
+- 4.004 CardCode compradores distintos con factura activa HORIZONTAL en [2026-01-01,2026-10-01), dentro de cobertura disponible.
+- 23.615 facturas activas; los 4.004 códigos tienen un match SAP único en el maestro pinned según prueba previa. Cuenta SAP no equivale automáticamente a persona jurídica, cadena ni cliente único DMS conciliado.
+- Compradores mensuales observados enero–septiembre: 1.722, 1.598, 1.772, 1.876, 1.590, 1.804, 1.859, 1.763, 1.564. COUNT DISTINCT por mes no se suma para obtener compradores distintos del período.
+- Promedio documental enero–agosto: Bs 1.687.116,62, sólo observación condicional, con impuestos y con el gap de lineage NC arriba indicado. No es cifra comercial reconciliada ni venta tax-exclusive.
+- Septiembre horizontal hasta 23/09. Data_as_of de publicación no significa cierre del mes. Enero–agosto tampoco adquiere certificación de completitud por alcanzar fin de mes.
+
+Definición monetaria observada: SUM DocTotal de OINV canceled=N menos SUM DocTotal de ORIN canceled=N, ambos por DocDate, moneda BS, DECIMAL; sin sumar líneas a cabeceras ni unir ventas DMS+SAP. Excluye anuladas Y/C. Es neto DOCUMENTAL con impuestos, no cobro ni ingreso sin impuestos.
+Las NC se restan en el mes y canal de su propio documento. Falta conciliar factura base, NC de otro canal y devoluciones pendientes/no integradas. Una NC emitida después del período no se resta retroactivamente en esta definición.
+
+BLOQUEADAS, no cero:
+- Clientes registrados horizontal: requiere padrón de membresía, estado/vigencia y fecha de corte. No se obtiene de compradores ni del maestro general.
+- Farmacias horizontales registradas, compradoras del período y compradoras mensuales: falta clasificación vigente/crosswalk verificable.
+- Importe mensual a farmacias y proporción farmacia/no-farmacia/UNKNOWN.
+- Horizontal comercial definitivo: falta conciliación DMS y lineage separado OINV/ORIN.
+
+Métricas candidatas soportables sin inventar semántica: compradores observados por CardCode, compradores mensuales, conteo documental OINV/ORIN y sus importes separados/neteo por DocDate y moneda, siempre con publicación, cobertura y condición de etiqueta. Ninguna se habilita aquí como capability.
+«Tenemos clientes» sigue ambiguo entre registrados y compradores: preservar esa ambigüedad explícitamente. «Principalmente farmacias» se propone como foco/desglose, NO filtro exclusivo silencioso; confirmar con Abraham si espera sólo farmacias.
+
+4. INTENT_PRESERVATION — CAUSA EXACTA
+Síntoma: HTTP DEV 200 / DIRECT_UNAVAILABLE con texto «Entendí que pedís importe de ventas».
+Session original: abraham-274d96530a889ecb; correlation_id 35d4ab94-0c92-455a-8119-f7b7b1f07611. No se infiere el HEAD de aquella corrida a partir del HEAD actual.
+Hipótesis: catálogo de intención estrecho obliga a representar pregunta ejecutiva como una operación de ventas disponible; motor valida estructura pero no completitud respecto del texto.
+Evidencia:
+1. audit.interpretation_proposed YA tiene requested_metrics=[sales.net_amount], entity_mention=null y temporal_reference=null; no customer_count, farmacia ni month grain. La pérdida aparece en la SALIDA LLM bajo el contrato vigente, no en el SQL.
+2. Replay por documentary_request_contract y fixed_ranking_request_contract no altera la propuesta. Normalización descartada como causa inmediata de este caso.
+3. process(previous_state,proposal) reproduce exactamente validated_state, committed=true. El reducer no borró esas dimensiones: nunca las recibió. No compara la pregunta natural con el plan para detectar omisiones.
+4. Restricción estructural confirmada: METRICS no admite conteo de clientes; requested_metrics sólo permite hasta dos métricas del mismo allowlist; no existen paths de segmentación ni granularidad. entity_mention exige type=null y está pensado para entidad propia, no para taxonomía genérica «farmacias». Añadir un nombre de métrica al prompt no basta: el motor lo rechazaría sin commit.
+5. SalesCapabilities rechaza canal/entidad para importe y no tiene contrato de conteo o segmentación. Ese rechazo posterior es correcto, pero no explica ni repara la pérdida inicial.
+6. unavailable_response resume las métricas retenidas y entidad/período; no enumera canal ni desglose/granularidad ausentes. Es un amplificador de la pérdida, no su origen.
+
+Separación del resultado:
+SEGURIDAD_EJECUCIÓN=PASS para la evidencia original: 0 capability_calls, not_executed, sin cifras inventadas.
+COMPRENSIÓN=PARTIAL; preservación completa=FAIL demostrado.
+RESOLUCIÓN_NEGOCIO=BLOCKED.
+EXACTITUD_COMERCIAL=NO_VERIFICADA.
+No se ha aislado un fallo intrínseco del modelo frente a un schema adecuado: no hubo comparación de modelos ni nueva llamada. Sí se demuestra salida incompleta y contrato incapaz de contener la pregunta.
+
+5. CORRECCIÓN MÍNIMA PROPUESTA — NO IMPLEMENTADA
+No nueva capability, router, modelo ni instrucciones acumulativas para frases particulares.
+Extender de forma versionada el contrato del State Engine EXISTENTE con intención solicitada independiente de operaciones ejecutables: métricas entendidas, entidad/población, segmentación/foco, filtros de canal, granularidad y período separados. Mantener compatibilidad de estados anteriores; métrica entendida desconocida para ejecución no es permiso ni SQL.
+Emitir esas facetas desde el MISMO intérprete y conservarlas por deltas atómicos/pending/hash. La normalización no debe convertir lo solicitado a la única operación soportada. El motor puede impedir pérdidas de facetas previamente conocidas salvo retiro explícito; no puede recuperar de manera mágica lo que el primer output omitió.
+Resolver disponibilidad POR REQUISITO sin mutar la intención. Conteo, farmacia, canal o month grain no habilitados permanecen visibles y bloqueados, aunque el total monetario global sí exista. No ejecutar ese total como sustitución. Una entrega parcial futura exige alcance explícito y no debe proclamar resolución completa.
+Renderizar resumen y blockers desde la estructura completa: «clientes del canal horizontal, foco farmacias, cantidad de clientes e importe por mes; faltan definición de población, período, conciliación y clasificación». No preguntar fechas como si desbloquearan una operación inexistente.
+El cambio futuro mínimo toca contrato/validador existente, schema de salida del intérprete y evaluación/render de disponibilidad existente; requiere autorización Development y tests de persistencia/migración. No cambia transporte ni lector de datos.
+
+6. PROTOTIPO Y REUTILIZACIÓN LLMFIT
+closure/acceptance.json conserva la pregunta como caso permanente investigativo: ambas métricas, canal HORIZONTAL, entidad cliente, foco PHARMACY, mes como dimensión y período sin adivinar. Conserva pendientes de población, mapping y base monetaria. execution_authority=false.
+Se validó candidate_query contra contracts/state.json de LlmFit/conversation_state_v1, read-only. Reutiliza metrics/dimensions/filters/time en lugar de construir otro reducer. Los nombres nuevos son conceptos candidatos, NO entradas habilitadas del catálogo de LlmFit ni de Team360.
+TCS_001 existente («Conteo comercial y elipsis mensual») sirve como antecedente para elipsis y persistencia temporal; su DOCUMENT_COUNT no es customer_count y no se renombra. Esquema/fixture/catalog tienen hashes en local_inventory.json. No se regeneró ni modificó LlmFit, ni se ejecutó su runner con credenciales.
+Se agregaron contraejemplos offline de total mensual simple, últimas facturas, cobertura y falta de período; más rechazos atómicos de paths/métricas no soportados. El prototipo demuestra representabilidad y diagnóstico, NO precisión LLM ni fix end-to-end.
+acceptance.json incluye seguimientos de período, prioridad, sólo farmacias, retiro de desglose y nueva consulta simple. Quedan como requisitos de aceptación de la implementación futura; no se declaran conversaciones ejecutadas ni aprobadas.
+
+7. VALIDACIONES Y LIMITACIONES
+Comando desde backend:
+uv run pytest -q modules/telchi/investigation/validation/abraham_horizontal_pharmacies_v1/closure/test_intent_diagnosis.py modules/telchi/assistant/tests/test_rejected_execution_guard.py modules/telchi/assistant/tests/test_sales_monetary.py modules/telchi/datalake/tests/test_executive_sales.py
+Resultado final: 50 passed en 0,45 s (13 nuevos de caracterización/prototipo + 37 existentes). No demuestra corrección runtime.
+Inventario: .venv/bin/python modules/telchi/investigation/validation/abraham_horizontal_pharmacies_v1/closure/local_inventory.py --output ../../data/reports/telchi/abraham_horizontal_pharmacies_v1/closure/local_inventory.json
+Un primer intento falló por alias SQL reservado rows, antes de escribir evidencia; corregido a row_count y ejecutado correctamente. Fue defecto del runner nuevo, no de datos, modelo ni ambiente.
+Warning uv preexistente: tool.uv.dev-dependencies deprecado; no se editó pyproject.
+No se crearon/modificaron Markdown; no aplica gate LAT por documentación Markdown. git diff --check ejecutado sin errores; revisión final de archivos nuevos y diff acotado obligatoria al cierre.
+
+HOST_PREFLIGHT=SAFE; RESOURCE_GUARD=PASS; CONCURRENCY_USED=1 proceso secuencial, DuckDB 2 threads/512MB.
+8 cores; carga ~1,7–2,0, ~5,7 GB disponibles, CPU idle ~81–83%, swap ~6 MB sin si/so. No scans de ventas masivos ni servicios/browser nuevos.
+UNRELATED_PROCESSES_TERMINATED=0; ENVIRONMENTAL_ABORTS=0; OWN_PROCESSES_LEFT_RUNNING=0 (comandos síncronos terminados; no daemon/hijos persistentes creados).
+
+8. ENTREGA, IMPACTO Y PRÓXIMO PASO
+Sólo archivos nuevos:
+- backend/modules/telchi/investigation/validation/abraham_horizontal_pharmacies_v1/closure/acceptance.json
+- mismo directorio: test_intent_diagnosis.py y local_inventory.py
+- data/reports/telchi/abraham_horizontal_pharmacies_v1/closure/local_inventory.json y report.txt
+No se editaron archivos preexistentes ni estados GLOBAL/locales compartidos. Sin commit, deploy, promoción o capability nueva. Sin impacto funcional transversal.
+Riesgos: fuentes legacy desactualizadas/multietiqueta; falta procedencia NC; taxonomías no homologables; gold candidato pendiente de revisión de Abraham; evidencia HTTP original no equivale a nueva disponibilidad de servicios.
+Orden recomendado: localizar origen/versionado del etiquetado ORIN; obtener export maestro/diccionario/padrón y conciliación DMS read-only; confirmar población/período/foco con Abraham. En paralelo, autorizar Development únicamente para preservación versionada de intención en el motor existente y su replay de aceptación. Habilitación SQL y WhatsApp siguen fuera de esta entrega.

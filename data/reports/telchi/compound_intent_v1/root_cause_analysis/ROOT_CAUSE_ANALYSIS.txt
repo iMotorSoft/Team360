@@ -1,0 +1,354 @@
+ROOT_CAUSE_ANALYSIS — TelchiAI Compound Intent V1
+Decision: NO PROMOTE V1. Recommendation: V2_JUSTIFIED, ONLY for a passive,
+non-authoritative requirements ledger; NOT for another replacement interpreter.
+Branch: feature/console-backend-core
+HEAD inspected: 09d2ec715a31bb88574d734eacb9f437f008624e
+Context: TELCHI / VENTAS-CLIENTES + multidomain regression corpus /
+INVESTIGATION / frozen local artifacts / ANALYSIS + REPORT.
+Status: DONE_WITH_CONCERNS (analysis only; no fix or V2 implemented).
+
+1. Scope, reproducibility and evidence
+
+Source evidence is immutable run01 under data/reports/telchi/compound_intent_v1/.
+This sibling directory contains summary.json and turn_differentials.json. The
+latter reconstructs EVERY one of the 104 LlmFit turns, 8 simple turns and 2 Abraham
+turns: original message, prior state, original parsed Luna proposal/raw proposal
+where available, sidecar extraction, accepted intent, missing/unexpected atoms,
+plan availability and exact failing guard predicates. Each record has its ID.
+
+Correction to the task's denominator: there are NOT 22 simple turns. There are
+6 simple conversations, 8 turns, and 22 scored requirement atoms (22/22 -> 12/22).
+Total run01 remains 114 turns, not 128. Seven of eight simple turns were allowed.
+
+Verified all three LlmFit inputs against run01 manifest hashes. Verified scores
+against errors_and_regressions.json for all 114 rows. rows.jsonl SHA256:
+2859811ccdedbeabdf44373b937085ef625fde462d1b75431e09dd697a51e7a1
+No provider request, SQL, Foundation read, SAP, server or transport was needed.
+No rerun of the 114-turn LLM evaluation. V1 source and runtime were not edited.
+
+Reproduce from repository root:
+python3 SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/compound_intent_v1/rca/analyze.py \
+  --source data/reports/telchi/compound_intent_v1/run01 \
+  --llmfit /media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/LlmFit/benchmarks/telchi/conversation_state_v1 \
+  --output data/reports/telchi/compound_intent_v1/root_cause_analysis
+The command refuses to overwrite different existing audit outputs.
+
+Important evidence limits:
+- The stored extraction is parsed JSON, not internal model reasoning or a full
+  network transcript. We identify the FIRST OBSERVABLE divergence, not a hidden
+  cognitive explanation or statistically isolated prompt effect.
+- For all 104 LlmFit turns candidate_plan=null: V1 did NOT run a candidate State
+  Engine. evaluate.replay_eligibility is a POST-RUN deterministic guard over a
+  frozen laboratory plan. No productive execution or RBAC correctness is proved.
+- Simple state_before is reconstructed from EMPTY and prior frozen plan; LlmFit
+  state_before is directly preserved in the external baseline turns.jsonl.
+- Input hashes establish comparability of those artifacts, not independent gold.
+
+2. Quantified differential reconstruction
+
+The 86 are exact-structure regressions among 96 baseline-exact turns. They are
+NOT 86 proven semantic misunderstandings or 86 damaged State Engine states.
+The partition below is deterministic and disjoint. Priority: end-only, restricted
+representation-only, non-EXECUTE target, missing result context, propagated field,
+new inherited-field divergence, other new extraction divergence.
+
+Primary observable location                            Turns    Share of 86
+END_KEY_ONLY                                             22       25.58%
+OTHER_REPRESENTATION_ONLY                                  3        3.49%
+REQUEST_VS_ACCEPTED_STATE_TARGET                          18       20.93%
+RESULT_CONTEXT_NOT_SUPPLIED                                1        1.16%
+PROPAGATED_SIDECAR_DIVERGENCE                              24       27.91%
+INHERITED_FIELD_DIVERGENCE                                  4        4.65%
+NEW_EXTRACTION_DIVERGENCE                                 14       16.28%
+TOTAL                                                    86      100.00%
+
+These buckets locate the observed mechanism, not seven mutually exclusive
+psychological causes. The 18 target mismatches may ALSO contain genuine errors;
+the 24 propagated cases can propagate schema mistakes rather than semantic loss.
+The partition must not be reported as '18 harmless + 28 continuity errors'.
+
+Requested cause families, with OVERLAPPING measured signatures:
+- Schema/representation: 67/86 miss an end_exclusive atom; 22 are fixed ONLY by
+  scorer-side end->end_exclusive. Across all 104 outputs 71 use end. Another 3
+  regressions become exact after restricted eq/in or same-field OR equivalence.
+- Continuity: 46/86 disagree on a field whose GOLD did not change from the prior
+  turn. In 29/86 at least one such erroneous field is unchanged in the SIDECAR
+  too. 24 receive propagation as primary bucket after higher-priority exclusions.
+- Additional-model divergence: all 86 are already visible in its parsed output;
+  all 114 accepted intents equal their raw extraction exactly. Zero losses were
+  introduced by accept_sidecar, zero rejected sidecars, zero observed provider
+  errors. This does not make every divergence an incorrect interpretation.
+- Entity/filter binding: residual filters differ in 27/86, dimensions in 13/86,
+  scope in 3/86. These are signatures, NOT 43 distinct entity errors. P_SODA vs
+  literal soda caustica is inspectable in TCS_004_T01..T04; the supplied catalog
+  enumerates P_SODA but has NO soda-caustica alias. Exact ID recovery is therefore
+  not fairly established by this input. Geographic/distributor tuple errors:
+  zero in the two Abraham 002 tuples under the existing non-independent review;
+  this corpus cannot estimate general relation-binding error frequency.
+- Evaluation/harness: 20/86 have non-EXECUTE baseline actions; 18 are primary
+  target mismatches, two are end-key-only. Result-dependent TCS_026_T02..T04 lack
+  result context; T03 is the one primary result-context case (T02/T04 fall under
+  non-EXECUTE). Gold authorship and accepted-state targets remain confounders.
+- Guard: seven current simple authorized plans become blocked; 74/80 frozen
+  LlmFit eligible plans become blocked. Guard cannot cause extraction-score
+  regressions because scoring uses the stored sidecar independently of it.
+
+Other residual field incidence after restricted representation normalization:
+measure_context 30, time 9, reference 9, metrics 7, business_domain 5,
+comparison 5, limit 2 (all denominators 86; overlaps intentional).
+A free-text measure_context may be sensible prose but is not the accepted nested
+schema. Its persistence must not automatically be called business-reasoning loss.
+
+Scorer discrepancy discovered:
+run.summarize reports 12 candidate-exact LlmFit turns, while evaluate.raw_score
+and its regression list imply 10, reproduced here. summarize ignores gold field
+families with no atoms, so it overlooks added scope in TCS_003_T02 and added
+intent/time in TCS_020_T01. Thus 96 -> 12 and 86 regressions describe DIFFERENT
+exactness predicates. Both structural micro-recall values (853/883 -> 723/883)
+remain the published values; this discrepancy does not rescue V1.
+The published end-key-only diagnostic is 791/883; it is NOT a repaired candidate.
+
+3. Verifiable primary and secondary causes
+
+Primary architecture defect: V1 creates a second FULL REPLACEMENT interpretation
+without the first interpretation as input, then demands structural compatibility
+before retaining baseline plan eligibility. There is no single interpretation
+authority at that interface. Evidence: contract.PROMPT explicitly says full
+replacement, run.conversation calls extraction with only previous requested intent
+and catalog, and evaluate/plan_current use that independent result as a veto.
+In simple controls the extraction is called BEFORE the original interpreter.
+The baseline proposal/state itself is not rewritten: the actual failure is the
+competing interpretation plus veto, not demonstrated corruption of State Engine.
+
+Secondary mechanisms demonstrated:
+a. Under-specified nested contract. PROMPT lists kind/as_of/periods but does not
+   spell out period.end_exclusive's key, comparison schema, or measure_context
+   shape. validate_intent validates outer fields and assertion provenance, but
+   explicitly treats other nested values as inert JSON. end, month/year periods,
+   scalar measure_context and ad hoc comparisons all pass unchanged.
+b. A separate sidecar history propagates both unsupported requests and shape
+   errors. It does not receive committed/rejected/pending baseline outcomes.
+   'Keep unmentioned requirements' is different from 'retain accepted query'.
+c. Blanket predicates substitute for a coverage proof. Any dimension/filter/
+   granularities/reference etc. can veto without comparing with actual capability
+   semantics. Product search is also rejected merely for domain PRODUCTS.
+d. The harness supplies less context than the baseline for result references,
+   and uses accepted-state gold to judge requested-intent extraction on ASK/BLOCK.
+   These are evaluation comparability defects, not evidence to change the model.
+
+No evidence of loss in the accept/commit step: extraction == accepted on 114/114.
+No evidence that model identity changed. No evidence of State Engine runtime
+regression, execution permission gain, SQL correctness loss or environmental abort.
+The historical measure_context AttributeError was an experimental harness defect,
+fixed fail-closed before resume; it did NOT cause the 104 already-stored corpus
+extractions. run01 snapshots and execution.log preserve that history.
+
+4. Representative trace reviews
+
+TCS_001_T01 (schema-only): original Luna sets DOCUMENT_COUNT@1/customer and
+September 2026 with end_exclusive=2026-10-01. Sidecar preserves metric, customer,
+start and boundary date but calls the key end. First mismatch: raw extraction
+shape; accept passes it; replay atom equality fails. No semantic month loss proved.
+
+TCS_002_T02 (representation): channel HORIZONTAL OR SALON is emitted as two DNF
+clauses with eq instead of one IN. Same-field OR equivalence makes scoring exact.
+This is one of three additional representation-only cases, along with
+TCS_012_T04 and TCS_017_T04 (singleton IN instead of eq).
+
+TCS_002_T04 (new continuity divergence): 'Quita el cliente, mantene el canal'.
+Baseline/gold retain grouping customer, removing the customer filter. Sidecar
+removes grouping too. This is genuinely different accepted behavior, not end-key
+noise; changing a filter was interpreted as changing a dimension.
+
+TCS_005_T02 -> T03 -> T04 (target mismatch becomes continuity problem): baseline
+BLOCKs historical reconstruction at 2024-07-31 and retains 2026-08-27. Sidecar
+stores requested 2024-07-31 (legitimate as a request, not an accepted query).
+'Con el corte que teniamos' at T03 still yields 2024-07-31 in sidecar, while the
+accepted baseline remains 2026-08-27; T04 propagates it. Sidecar never sees BLOCK.
+First mismatch T02; wrong operational antecedent on T03; no runtime rewrite.
+
+TCS_018_T02 / TCS_019_T03 (schema AND information loss, kept separate): T018
+retains July dates but places them at comparison.periods instead of
+comparison.baseline.periods. T019 emits PERCENTAGE_CHANGE/PREVIOUS_MONTH/SAME_DAYS
+but drops the explicit September 1..7 baseline dates. The latter is not explained
+by renaming end. T019_T04 propagates the incomplete comparison.
+
+TCS_020_T01 -> T04 (pending vs request and underspecified dates): initial gold is
+empty accepted state while ASK year; sidecar retains September/customer/document
+count as requested intent (not necessarily an error). On T02 '2025', and later
+August corrections, it retains {month,year} instead of concrete ISO boundaries.
+This is a verifiable contract mismatch on already-resolvable dates.
+
+TCS_021_T03 -> T04 (reference): sidecar reconstructs business facets of the first
+query but omits reference.source_turn_id=TCS_021_T01. Content restoration is not
+proof of provenance restoration. This does not authorize inventing result IDs.
+
+TCS_025_T02/T03 (permission/request distinction): sidecar records B_SECRET when
+asked, even after 'autorizo yo'. Baseline accepted scope excludes it. Recording
+that request is NOT permission. No new plan is enabled by V1; the extra scope is
+wrong ONLY if used as accepted state or certified authorization.
+
+TCS_026_T02..T04 (missing input): dataset.conversations[TCS_026].results contains
+DEPENDENCY_F with ordered row IDs R1..R9 and product IDs; run.conversation supplies
+neither these results nor delivered-result context. At T03 sidecar explicitly
+states five identities are unavailable instead of fabricating them. Baseline gold
+knows L00001/L01945/L02944/L02837/L01295. This mismatch cannot fairly be blamed on
+its model. The audit does not fill these IDs into candidate outputs.
+
+5. ALL seven simple overblocks
+
+Each baseline is committed EXECUTE with availability allowed. These are ALL
+failing predicates, not merely the first if. state_after is preserved unchanged.
+
+S01_1 'Ventas de mayo de 2026': baseline sales.net_amount vs sidecar
+sales.unspecified; time has end vs end_exclusive. Veto: metric_not_in_plan AND
+time_exact_dict_mismatch. Either suffices. PROMPT removed the baseline's explicit
+sales-net convention and asks for unspecified sales rather than capability fit.
+
+S02_1 'Dame las ultimas 10 ventas registradas': correct sales.latest_documents,
+limit 10, but sidecar adds dimension document, granularity document, sort
+(document_date desc), reference latest. Veto: dimensions, granularities, sort,
+comparison_or_reference_nonempty. These facets describe the intended operation;
+guard has no equivalence rule for capability semantics. No extraction-score
+regression on its metric-only gold, yet a real plan-availability regression.
+
+S03_1 'Cual es el ultimo mes con ventas registradas': baseline sales.coverage and
+temporal_reference latest_available_month. Sidecar uses sales.latest_documents,
+granularity month, sort time desc, reference latest, limit 1. Veto: granularities,
+sort, metric_not_in_plan, comparison_or_reference_nonempty, limit_mismatch
+(baseline default 10). This includes genuine operation reinterpretation.
+
+S04_1 'Busca Citrato de magnesio': both select products.search. Sidecar represents
+product via dimension product and product_name contains filter, domain PRODUCTS.
+Baseline already has product_search_text. Veto: dimensions, filters,
+domain_not_SALES. Guard never checks whether those facets are already represented
+by product_search_text. Also metric-only gold stays exact despite blocking.
+
+S05_1 'Ventas de mayo de 2026': same two blockers as S01_1.
+S05_2 'Y el mes anterior?': sidecar correctly moves May -> April; inherits
+sales.unspecified and emits end again. Same two blockers. This is not loss of
+the relative-month calculation; it is propagated metric/shape disagreement.
+
+S06_2 'mayo de 2026' after 'Quiero importes y cantidades': baseline answers pending
+with requested_metrics=[sales.net_amount,sales.source_top_items]. Sidecar keeps
+[sales.net_amount,sales.unspecified], adds monthly granularity, retains unresolved
+business domain/quantity meaning, and emits end. Veto: granularities,
+unresolved_requirements, metric_not_in_plan, time_exact_dict_mismatch. The mere
+presence of extra unresolved requirements independently vetoes a valid plan.
+S06_1 was already ASK/blocked and is NOT a new overblock.
+
+LlmFit replay separately loses 74 prior plans (80 -> 6). Its guard blocks ANY
+extra facet or any baseline/candidate atom inequality. Its reasons and IDs are in
+the 104 audit records; it is not the operational guard used on simple controls.
+
+6. Does the second Luna call supply irreplaceable information?
+
+It supplies useful SEMANTIC STRUCTURING on Abraham, but no new external fact or
+source. Both user texts already contain farmacias, mensual, the product, cities
+and L&S/propia relations. The first accepted state loses some of those; its output
+alone is NOT enough to recover them. Original messages remain essential evidence.
+A copied source ledger can preserve them without interpreting them a second time.
+This does NOT prove deterministic extraction can reconstruct every requirement.
+
+Abraham evidence remains existing analyst review, NOT independent adjudication:
+001 3/9 -> 8/9; 002 1/7 -> 7/7; two correctly bound distribution tuples 0/2 -> 2/2.
+001 still omits registered-customers vs distinct-period/monthly-buyers ambiguity.
+No input data for DMS traceability, pharmacy membership or L&S actual distribution
+was established by either call. User assertions remain USER_ASSERTED_UNVERIFIED.
+
+Minimal passive design to consider, WITHOUT implementing it:
+- Immutable source-turn/message ledger with byte/character offsets and turn IDs;
+  keep full original input, not just the interpreter's text[:4000] truncation.
+- Link to the existing parsed proposal, accepted/pending state and plan outcome
+  as separate references; do not flatten requests into the accepted state.
+- Optionally index literal spans and already-explicit output facets. Unknown
+  requirements remain unclassified source text, not silently 'covered'.
+- Explicit distinctions: USER_REQUESTED, USER_ASSERTED_UNVERIFIED,
+  REPRESENTED_BY_BASELINE and NOT_EVALUATED. A coverage label needs evidence;
+  it is not an execution grant, a fact certification or a veto.
+- No write into State Engine, no plan change, no extra capability, no automatic
+  execution block. Existing authorization/availability remain sole authority.
+- A valid partial response must not claim it answered the entire compound request;
+  communicate unresolved facets separately without withdrawing valid authorization.
+
+Deterministic limits / counterexamples for a future specification:
+'No farmacias, salvo las de cadena X' defeats flat pharmacy keyword membership.
+'Alla lo hace L&S; aca nosotros' needs antecedent/geography binding, not term sets.
+'Primero importes' reorders, while 'solo importes' removes a metric.
+'Los mismos cinco' needs a verified result and row IDs absent from raw text.
+'En La Paz distribucion propia y en Cochabamba L&S' versus the swapped pairing
+has identical word/atom sets but different relation tuples.
+'Farmacia Central' can be a proper name rather than a pharmacy classification.
+A full literal ledger preserves these utterances but does not resolve them.
+
+7. Measurable conditions BEFORE authorizing a future V2 experiment
+
+V2 here means passive preservation, not rehabilitating V1's replacement+veto.
+No implementation or new LLM corpus run is authorized by this report.
+
+Entry gates:
+1. Separate independently reviewed gold for requested requirements, accepted
+   state/action, and verified relation tuples. Resolve summarize/raw_score's
+   empty-field-family discrepancy in the FUTURE harness, preserving old evidence.
+2. Document which context each arm receives (pending/commit/rejection/results),
+   and make shared-context comparisons explicit; do not supply gold to extraction.
+3. Freeze design and hold out at least 20 new turns across >=5 conversations,
+   including negation, correction, permission claims, result reference and paired
+   city/distributor swaps, before inspecting their candidate outputs. Independent
+   review cannot be the implementation author or a reused Abraham fingerprint.
+
+Required acceptance criteria on frozen corpus + 8 current simple turns + holdout:
+- Baseline executable plan, action, accepted state, pending behavior and reference
+  lineage unchanged in 100% of cases. Compare states exactly, not just atom recall.
+- Zero new authorization and zero new blocking, specifically 7/7 current valid
+  simple plans retained; S06_1 remains non-authorized. 80/80 frozen LlmFit plans
+  retained only as a laboratory invariant, NOT as productive permissions.
+- No loss among 96 baseline-exact turns; structural recall not below 853/883.
+  Passive attachment must not trade existing behavior for improved request scores.
+- Literal preservation/provenance 100%; semantic coverage must abstain explicitly
+  where unproven. Independently adjudicated Abraham 001 9/9, 002 7/7, relations
+  2/2 EXACT (subject,predicate,object,geography), all assertions unverified.
+- No regression in per-requirement precision/recall on held-out requests and no
+  fabricated capability, branch, source fact, product ID, or result/row binding.
+- Additional model calls=0 for this minimal design. Proposed local overhead budget
+  p95 <=50 ms and <=2% of measured baseline p95, measured on matched hardware with
+  bounded ledger/history storage. These are proposed gates, not observed V2 results.
+  Any relaxation needs a separately justified benefit/cost experiment.
+
+Recommendation rationale: V2_JUSTIFIED for a passive source ledger because original
+messages hold the missing requirements and authority can remain untouched. A full
+deterministic semantic parser is NOT justified by this evidence. If the requested
+V2 goal instead requires complete executable semantic extraction without preserving
+raw sources or independent gold, that stronger claim NEEDS_MORE_EVIDENCE.
+Do not promote V1, integrate it behind a flag, change model, add an interpreter,
+add capabilities, or re-run the full LLM battery before those entry gates.
+
+8. Validation, impact and next step
+
+Executed: deterministic audit, input SHA256 checks, reproduction of all per-turn
+published detailed scores and replay decisions, and guard predicate reconstruction.
+Focused tests from backend:
+uv run pytest modules/telchi/investigation/validation/compound_intent_v1 -q
+Result: 36 passed in 0.18 s, including 6 new audit tests. No provider calls.
+A missing 'python' executable was handled by using python3. During creation of
+this audit, a syntax typo and tuple/list comparison assertion were corrected;
+final command and tests succeed. They were audit-development errors, not V1 results.
+
+git diff --check: no errors. New source reviewed separately because untracked
+files are not covered by git diff. Report is .txt; no Markdown or LAT changes.
+No global/SHARED writer, deployment, commit or production change requested.
+
+Host observation: load ~2 on shared host, MemAvailable ~5902 MB, swap ~96 MB;
+only short stdlib analysis and focused sequential tests were run. No heavy scan,
+browser or server started. No unrelated processes were terminated. Foreground
+commands finished; own background processes started=0, left running=0.
+
+Residual risk: no independent semantic relabeling of all 86 cases, no repeated
+stochastic samples, no timing benchmark of a nonexistent V2, no actual SQL/RBAC
+execution test. Counts describe observed structural mechanisms, not causal effects
+of a hypothetical prompt fix. There is no runtime fix to validate in this task.
+
+Next step: review this evidence and independently define request/accepted-state
+and relation gold plus held-out cases. Only then request a narrowly scoped passive
+ledger experiment. DMS/pharmacy classification/L&S traceability remain separate
+commercial source/capability work: preserving the question does not produce figures.

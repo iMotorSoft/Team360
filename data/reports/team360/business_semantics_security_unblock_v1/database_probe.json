@@ -1,0 +1,1034 @@
+{
+  "timestamp_utc": "2026-10-14T12:59:07.689280+00:00",
+  "writes": 0,
+  "queries": {
+    "server": "SELECT current_database() AS database,current_schema() AS schema,current_schemas(true) AS schemas,current_user AS role,session_user,inet_server_addr()::text AS address,inet_server_port() AS port,current_setting('server_version') AS version,current_setting('search_path') AS search_path,current_setting('row_security') AS row_security,current_setting('transaction_read_only') AS read_only,pg_is_in_recovery() AS recovery,(pg_control_system()).system_identifier::text AS system_identifier",
+    "role": "SELECT rolname,rolsuper,rolbypassrls,rolcreaterole,rolcreatedb,rolinherit,rolcanlogin FROM pg_roles WHERE rolname=current_user",
+    "membership": "SELECT r.rolname,r.rolsuper,r.rolbypassrls,r.rolcreaterole,r.rolcreatedb,pg_has_role(current_user,r.oid,'USAGE') AS effective_inherited FROM pg_roles r WHERE r.rolname<>current_user AND pg_has_role(current_user,r.oid,'MEMBER') ORDER BY r.rolname",
+    "direct_role_grants": "SELECT r.rolname,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.roleid JOIN pg_roles u ON u.oid=m.member WHERE u.rolname=current_user ORDER BY r.rolname",
+    "databases": "SELECT datname,pg_get_userbyid(datdba) AS owner,datallowconn FROM pg_database ORDER BY datname",
+    "extensions": "SELECT extname,extversion FROM pg_extension WHERE extname IN ('vector','pgcrypto') ORDER BY extname",
+    "tables": "SELECT n.nspname AS schema,c.relname AS table_name,pg_get_userbyid(c.relowner) AS owner,c.relrowsecurity,c.relforcerowsecurity,has_table_privilege(current_user,c.oid,'SELECT') AS can_select,has_table_privilege(current_user,c.oid,'INSERT') AS can_insert,has_table_privilege(current_user,c.oid,'UPDATE') AS can_update,has_table_privilege(current_user,c.oid,'DELETE') AS can_delete FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind='r' AND c.relname LIKE 'business_concept%' ORDER BY n.nspname,c.relname",
+    "runtime_role_candidates": "SELECT r.rolname,r.rolsuper,r.rolbypassrls,has_table_privilege(r.oid,'public.business_concepts','SELECT') AS concept_select,has_table_privilege(r.oid,'public.business_concepts','INSERT') AS concept_insert FROM pg_roles r WHERE r.rolcanlogin ORDER BY r.rolname",
+    "policies": "SELECT schemaname,tablename,policyname,permissive,roles,cmd,qual,with_check FROM pg_policies WHERE tablename LIKE 'business_concept%' ORDER BY tablename,policyname",
+    "sessions": "SELECT datname,usename,application_name,client_addr::text,state,count(*) AS n FROM pg_stat_activity WHERE backend_type='client backend' GROUP BY 1,2,3,4,5 ORDER BY 1,2,3",
+    "identity_inventory": "SELECT o.organization_code,w.slug,u.status,count(u.id) AS n FROM core_organizations o JOIN core_workspaces w ON w.organization_id=o.id LEFT JOIN core_users u ON u.workspace_id=w.id GROUP BY 1,2,3 ORDER BY 1,2,3",
+    "admin_inventory": "SELECT o.organization_code,r.role_code,m.status AS member_status,r.status AS assignment_status,count(*) AS n FROM core_organization_members m JOIN core_organization_member_roles r ON r.organization_member_id=m.id JOIN core_organizations o ON o.id=m.organization_id GROUP BY 1,2,3,4 ORDER BY 1,2",
+    "auth_column_names": "SELECT table_name,column_name FROM information_schema.columns WHERE table_schema='public' AND table_name LIKE 'core_%' AND (column_name ILIKE '%password%' OR column_name ILIKE '%auth%' OR column_name ILIKE '%login%') ORDER BY 1,2"
+  },
+  "contexts": {
+    "inherited_shell": {
+      "source": "DB_PG_V360_URL",
+      "target": {
+        "host": "localhost",
+        "port": "5432",
+        "dbname": "team360",
+        "user": "administrator"
+      },
+      "TEAM360_ENV": null,
+      "approved_marker_present": false,
+      "paseto_enabled_setting": null,
+      "public_key_present": false,
+      "operator_trust_present": false,
+      "explicit_provisioning_dsn_present": false,
+      "results": {
+        "server": [
+          {
+            "database": "team360",
+            "schema": "public",
+            "schemas": [
+              "pg_catalog",
+              "public"
+            ],
+            "role": "administrator",
+            "session_user": "administrator",
+            "address": "172.18.0.2/32",
+            "port": 5432,
+            "version": "18.4 (Debian 18.4-1.pgdg13+1)",
+            "search_path": "\"$user\", public",
+            "row_security": "on",
+            "read_only": "on",
+            "recovery": false,
+            "system_identifier": "7630993354699489317"
+          }
+        ],
+        "role": [
+          {
+            "rolname": "administrator",
+            "rolsuper": true,
+            "rolbypassrls": true,
+            "rolcreaterole": true,
+            "rolcreatedb": true,
+            "rolinherit": true,
+            "rolcanlogin": true
+          }
+        ],
+        "membership": [
+          {
+            "rolname": "concilia_app",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "concilia_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "evolution_api",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "litellm",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_checkpoint",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_create_subscription",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_database_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_execute_server_program",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_maintain",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_monitor",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_data",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_settings",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_stats",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_server_files",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_signal_autovacuum_worker",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_signal_backend",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_stat_scan_tables",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_use_reserved_connections",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_write_all_data",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_write_server_files",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "team360_telchi_ducklake",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          }
+        ],
+        "direct_role_grants": [],
+        "databases": [
+          {
+            "datname": "concilia_fce",
+            "owner": "concilia_owner",
+            "datallowconn": true
+          },
+          {
+            "datname": "evolution_api",
+            "owner": "evolution_api",
+            "datallowconn": true
+          },
+          {
+            "datname": "litellm",
+            "owner": "litellm",
+            "datallowconn": true
+          },
+          {
+            "datname": "postgres",
+            "owner": "administrator",
+            "datallowconn": true
+          },
+          {
+            "datname": "team360",
+            "owner": "administrator",
+            "datallowconn": true
+          },
+          {
+            "datname": "team360_telchi_ducklake",
+            "owner": "team360_telchi_ducklake",
+            "datallowconn": true
+          },
+          {
+            "datname": "tebaai",
+            "owner": "administrator",
+            "datallowconn": true
+          },
+          {
+            "datname": "template0",
+            "owner": "administrator",
+            "datallowconn": false
+          },
+          {
+            "datname": "template1",
+            "owner": "administrator",
+            "datallowconn": true
+          },
+          {
+            "datname": "v360",
+            "owner": "administrator",
+            "datallowconn": true
+          }
+        ],
+        "extensions": [
+          {
+            "extname": "pgcrypto",
+            "extversion": "1.4"
+          },
+          {
+            "extname": "vector",
+            "extversion": "0.8.2"
+          }
+        ],
+        "tables": [
+          {
+            "schema": "public",
+            "table_name": "business_concept_aliases",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_capability_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_classification_rules",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_embeddings",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_entity_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_observations",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_versions",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concepts",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          }
+        ],
+        "runtime_role_candidates": [
+          {
+            "rolname": "administrator",
+            "rolsuper": true,
+            "rolbypassrls": true,
+            "concept_select": true,
+            "concept_insert": true
+          },
+          {
+            "rolname": "concilia_app",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          },
+          {
+            "rolname": "concilia_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          },
+          {
+            "rolname": "evolution_api",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          },
+          {
+            "rolname": "litellm",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          },
+          {
+            "rolname": "team360_telchi_ducklake",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          }
+        ],
+        "policies": [],
+        "sessions": [
+          {
+            "datname": "litellm",
+            "usename": "litellm",
+            "application_name": "",
+            "client_addr": "172.18.0.1/32",
+            "state": "idle",
+            "n": 3
+          },
+          {
+            "datname": "team360",
+            "usename": "administrator",
+            "application_name": "bs-security-unblock-readonly",
+            "client_addr": "172.18.0.1/32",
+            "state": "active",
+            "n": 1
+          }
+        ],
+        "identity_inventory": [
+          {
+            "organization_code": "team360_live",
+            "slug": "team360_public_site",
+            "status": "active",
+            "n": 2
+          },
+          {
+            "organization_code": "team360_platform",
+            "slug": "team360_admin_dev",
+            "status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "telchi",
+            "slug": "telchi_dev",
+            "status": "active",
+            "n": 2
+          }
+        ],
+        "admin_inventory": [
+          {
+            "organization_code": "team360_live",
+            "role_code": "content_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_live",
+            "role_code": "organization_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_live",
+            "role_code": "organization_owner",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_platform",
+            "role_code": "organization_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_platform",
+            "role_code": "organization_owner",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_platform",
+            "role_code": "technical_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "telchi",
+            "role_code": "organization_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          }
+        ],
+        "auth_column_names": []
+      }
+    },
+    "backend_dev_launcher_override": {
+      "source": "DB_PG_V360_URL",
+      "target": {
+        "host": "localhost",
+        "port": "5432",
+        "dbname": "team360",
+        "user": "administrator"
+      },
+      "TEAM360_ENV": "development",
+      "approved_marker_present": false,
+      "paseto_enabled_setting": null,
+      "public_key_present": false,
+      "operator_trust_present": false,
+      "explicit_provisioning_dsn_present": false,
+      "results": {
+        "server": [
+          {
+            "database": "team360",
+            "schema": "public",
+            "schemas": [
+              "pg_catalog",
+              "public"
+            ],
+            "role": "administrator",
+            "session_user": "administrator",
+            "address": "172.18.0.2/32",
+            "port": 5432,
+            "version": "18.4 (Debian 18.4-1.pgdg13+1)",
+            "search_path": "\"$user\", public",
+            "row_security": "on",
+            "read_only": "on",
+            "recovery": false,
+            "system_identifier": "7630993354699489317"
+          }
+        ],
+        "role": [
+          {
+            "rolname": "administrator",
+            "rolsuper": true,
+            "rolbypassrls": true,
+            "rolcreaterole": true,
+            "rolcreatedb": true,
+            "rolinherit": true,
+            "rolcanlogin": true
+          }
+        ],
+        "membership": [
+          {
+            "rolname": "concilia_app",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "concilia_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "evolution_api",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "litellm",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_checkpoint",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_create_subscription",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_database_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_execute_server_program",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_maintain",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_monitor",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_data",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_settings",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_all_stats",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_read_server_files",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_signal_autovacuum_worker",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_signal_backend",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_stat_scan_tables",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_use_reserved_connections",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_write_all_data",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "pg_write_server_files",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          },
+          {
+            "rolname": "team360_telchi_ducklake",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "rolcreaterole": false,
+            "rolcreatedb": false,
+            "effective_inherited": true
+          }
+        ],
+        "direct_role_grants": [],
+        "databases": [
+          {
+            "datname": "concilia_fce",
+            "owner": "concilia_owner",
+            "datallowconn": true
+          },
+          {
+            "datname": "evolution_api",
+            "owner": "evolution_api",
+            "datallowconn": true
+          },
+          {
+            "datname": "litellm",
+            "owner": "litellm",
+            "datallowconn": true
+          },
+          {
+            "datname": "postgres",
+            "owner": "administrator",
+            "datallowconn": true
+          },
+          {
+            "datname": "team360",
+            "owner": "administrator",
+            "datallowconn": true
+          },
+          {
+            "datname": "team360_telchi_ducklake",
+            "owner": "team360_telchi_ducklake",
+            "datallowconn": true
+          },
+          {
+            "datname": "tebaai",
+            "owner": "administrator",
+            "datallowconn": true
+          },
+          {
+            "datname": "template0",
+            "owner": "administrator",
+            "datallowconn": false
+          },
+          {
+            "datname": "template1",
+            "owner": "administrator",
+            "datallowconn": true
+          },
+          {
+            "datname": "v360",
+            "owner": "administrator",
+            "datallowconn": true
+          }
+        ],
+        "extensions": [
+          {
+            "extname": "pgcrypto",
+            "extversion": "1.4"
+          },
+          {
+            "extname": "vector",
+            "extversion": "0.8.2"
+          }
+        ],
+        "tables": [
+          {
+            "schema": "public",
+            "table_name": "business_concept_aliases",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_capability_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_classification_rules",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_embeddings",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_entity_links",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_observations",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concept_versions",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          },
+          {
+            "schema": "public",
+            "table_name": "business_concepts",
+            "owner": "administrator",
+            "relrowsecurity": false,
+            "relforcerowsecurity": false,
+            "can_select": true,
+            "can_insert": true,
+            "can_update": true,
+            "can_delete": true
+          }
+        ],
+        "runtime_role_candidates": [
+          {
+            "rolname": "administrator",
+            "rolsuper": true,
+            "rolbypassrls": true,
+            "concept_select": true,
+            "concept_insert": true
+          },
+          {
+            "rolname": "concilia_app",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          },
+          {
+            "rolname": "concilia_owner",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          },
+          {
+            "rolname": "evolution_api",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          },
+          {
+            "rolname": "litellm",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          },
+          {
+            "rolname": "team360_telchi_ducklake",
+            "rolsuper": false,
+            "rolbypassrls": false,
+            "concept_select": false,
+            "concept_insert": false
+          }
+        ],
+        "policies": [],
+        "sessions": [
+          {
+            "datname": "litellm",
+            "usename": "litellm",
+            "application_name": "",
+            "client_addr": "172.18.0.1/32",
+            "state": "idle",
+            "n": 3
+          },
+          {
+            "datname": "team360",
+            "usename": "administrator",
+            "application_name": "bs-security-unblock-readonly",
+            "client_addr": "172.18.0.1/32",
+            "state": "active",
+            "n": 1
+          }
+        ],
+        "identity_inventory": [
+          {
+            "organization_code": "team360_live",
+            "slug": "team360_public_site",
+            "status": "active",
+            "n": 2
+          },
+          {
+            "organization_code": "team360_platform",
+            "slug": "team360_admin_dev",
+            "status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "telchi",
+            "slug": "telchi_dev",
+            "status": "active",
+            "n": 2
+          }
+        ],
+        "admin_inventory": [
+          {
+            "organization_code": "team360_live",
+            "role_code": "content_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_live",
+            "role_code": "organization_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_live",
+            "role_code": "organization_owner",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_platform",
+            "role_code": "organization_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_platform",
+            "role_code": "organization_owner",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "team360_platform",
+            "role_code": "technical_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          },
+          {
+            "organization_code": "telchi",
+            "role_code": "organization_admin",
+            "member_status": "active",
+            "assignment_status": "active",
+            "n": 1
+          }
+        ],
+        "auth_column_names": []
+      }
+    }
+  },
+  "errors": {}
+}

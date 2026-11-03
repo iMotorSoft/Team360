@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mamamia360 · Vera Diagnosticador</title>
+    <meta
+      name="description"
+      content="Demo del Diagnosticador Vera embebible para Mamamia360."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background: #f7f5ef;
+        color: #17324a;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .site-header {
+        padding: 1.5rem 2rem;
+        background: #fff;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .site-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #102d4f;
+      }
+
+      .site-header p {
+        margin: 0.25rem 0 0;
+        font-size: 0.85rem;
+        color: #78909f;
+      }
+
+      .demo-container {
+        flex: 1;
+        max-width: 52rem;
+        width: 100%;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      #team360-vera {
+        min-height: 30rem;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 1.5rem;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+      }
+
+      .site-footer {
+        padding: 1rem 2rem;
+        text-align: center;
+        font-size: 0.78rem;
+        color: #94a3b8;
+        border-top: 1px solid rgba(148, 163, 184, 0.15);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Mamamia360 · Diagnosticador Vera</h1>
+      <p>Demo del componente embebible — diagnóstico de factibilidad</p>
+    </header>
+
+    <main class="demo-container">
+      <div id="team360-vera" data-testid="mamamia360-embed-target"></div>
+    </main>
+
+    <footer class="site-footer">
+      Team360 · Diagnosticador embebible para distribuidores
+    </footer>
+
+    <script
+      src="/embed/vera-loader.js"
+      data-client-id="mamamia360"
+      data-locale="es"
+      data-target="#team360-vera"
+      data-assistant-name="Vera"
+    ></script>
+  </body>
+</html>

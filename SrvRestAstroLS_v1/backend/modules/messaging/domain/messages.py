@@ -34,3 +34,4 @@ class OutboundMessageReceipt:
 
     external_message_id: str
     external_thread_id: str
+    egress: Mapping[str, Any] | None = None

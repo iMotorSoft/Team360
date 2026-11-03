@@ -1,0 +1,1254 @@
+{
+  "timestamp": "2026-10-15T13:55:33.028305+00:00",
+  "queries": [
+    {
+      "name": "invoices_coverage",
+      "sql": "SELECT source_system, source_table, currency, canceled,\n                MIN(doc_date) min_date,MAX(doc_date) max_date,COUNT(*) documents,\n                COUNT(DISTINCT doc_entry) distinct_doc_entries FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\n                WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01' GROUP BY ALL",
+      "rows": [
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "currency": "BS",
+          "canceled": "N",
+          "min_date": "2026-01-01T00:00:00",
+          "max_date": "2026-09-24T00:00:00",
+          "documents": 330428,
+          "distinct_doc_entries": 330428
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "currency": "BS",
+          "canceled": "Y",
+          "min_date": "2026-01-05T00:00:00",
+          "max_date": "2026-09-12T00:00:00",
+          "documents": 7,
+          "distinct_doc_entries": 7
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "OINV",
+          "currency": "BS",
+          "canceled": "C",
+          "min_date": "2026-01-05T00:00:00",
+          "max_date": "2026-09-12T00:00:00",
+          "documents": 7,
+          "distinct_doc_entries": 7
+        }
+      ]
+    },
+    {
+      "name": "invoices_channel_profile",
+      "sql": "SELECT sales_channel_code,sales_channel_semantic_status,\n                COUNT(*) documents,COUNT(DISTINCT card_code) customers,\n                MIN(doc_date) min_date,MAX(doc_date) max_date FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\n                WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01' GROUP BY ALL",
+      "rows": [
+        {
+          "sales_channel_code": "SALON",
+          "sales_channel_semantic_status": "SUPPORTED",
+          "documents": 287684,
+          "customers": 1378,
+          "min_date": "2026-01-01T00:00:00",
+          "max_date": "2026-09-24T00:00:00"
+        },
+        {
+          "sales_channel_code": null,
+          "sales_channel_semantic_status": null,
+          "documents": 19142,
+          "customers": 2166,
+          "min_date": "2026-01-03T00:00:00",
+          "max_date": "2026-09-23T00:00:00"
+        },
+        {
+          "sales_channel_code": "HORIZONTAL",
+          "sales_channel_semantic_status": "CONFIRMED",
+          "documents": 23616,
+          "customers": 4004,
+          "min_date": "2026-01-03T00:00:00",
+          "max_date": "2026-09-23T00:00:00"
+        }
+      ]
+    },
+    {
+      "name": "invoices_horizontal_series",
+      "sql": "SELECT series,user_sign,COUNT(*) documents FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\n                WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01'\n                AND sales_channel_code='HORIZONTAL' GROUP BY ALL ORDER BY series,user_sign",
+      "rows": [
+        {
+          "series": "1248",
+          "user_sign": "145",
+          "documents": 2022
+        },
+        {
+          "series": "1249",
+          "user_sign": "145",
+          "documents": 2223
+        },
+        {
+          "series": "1250",
+          "user_sign": "145",
+          "documents": 1852
+        },
+        {
+          "series": "1251",
+          "user_sign": "145",
+          "documents": 1939
+        },
+        {
+          "series": "1252",
+          "user_sign": "145",
+          "documents": 1863
+        },
+        {
+          "series": "1253",
+          "user_sign": "145",
+          "documents": 1847
+        },
+        {
+          "series": "1254",
+          "user_sign": "145",
+          "documents": 1573
+        },
+        {
+          "series": "1255",
+          "user_sign": "145",
+          "documents": 1857
+        },
+        {
+          "series": "1256",
+          "user_sign": "145",
+          "documents": 595
+        },
+        {
+          "series": "1257",
+          "user_sign": "145",
+          "documents": 2732
+        },
+        {
+          "series": "1258",
+          "user_sign": "145",
+          "documents": 2307
+        },
+        {
+          "series": "1259",
+          "user_sign": "145",
+          "documents": 2769
+        },
+        {
+          "series": "1403",
+          "user_sign": "145",
+          "documents": 1
+        },
+        {
+          "series": "1407",
+          "user_sign": "145",
+          "documents": 36
+        }
+      ]
+    },
+    {
+      "name": "credit_memos_coverage",
+      "sql": "SELECT source_system, source_table, currency, canceled,\n                MIN(doc_date) min_date,MAX(doc_date) max_date,COUNT(*) documents,\n                COUNT(DISTINCT doc_entry) distinct_doc_entries FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408))\n                WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01' GROUP BY ALL",
+      "rows": [
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "currency": "BS",
+          "canceled": "N",
+          "min_date": "2026-01-01T00:00:00",
+          "max_date": "2026-09-23T00:00:00",
+          "documents": 2213,
+          "distinct_doc_entries": 2213
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "currency": "BS",
+          "canceled": "Y",
+          "min_date": "2026-01-03T00:00:00",
+          "max_date": "2026-01-03T00:00:00",
+          "documents": 1,
+          "distinct_doc_entries": 1
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "source_table": "ORIN",
+          "currency": "BS",
+          "canceled": "C",
+          "min_date": "2026-01-03T00:00:00",
+          "max_date": "2026-01-03T00:00:00",
+          "documents": 1,
+          "distinct_doc_entries": 1
+        }
+      ]
+    },
+    {
+      "name": "credit_memos_channel_profile",
+      "sql": "SELECT sales_channel_code,sales_channel_semantic_status,\n                COUNT(*) documents,COUNT(DISTINCT card_code) customers,\n                MIN(doc_date) min_date,MAX(doc_date) max_date FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408))\n                WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01' GROUP BY ALL",
+      "rows": [
+        {
+          "sales_channel_code": "SALON",
+          "sales_channel_semantic_status": "SUPPORTED",
+          "documents": 894,
+          "customers": 64,
+          "min_date": "2026-01-01T00:00:00",
+          "max_date": "2026-09-23T00:00:00"
+        },
+        {
+          "sales_channel_code": null,
+          "sales_channel_semantic_status": null,
+          "documents": 401,
+          "customers": 221,
+          "min_date": "2026-01-03T00:00:00",
+          "max_date": "2026-09-23T00:00:00"
+        },
+        {
+          "sales_channel_code": "HORIZONTAL",
+          "sales_channel_semantic_status": "CONFIRMED",
+          "documents": 920,
+          "customers": 641,
+          "min_date": "2026-01-06T00:00:00",
+          "max_date": "2026-09-23T00:00:00"
+        }
+      ]
+    },
+    {
+      "name": "credit_memos_horizontal_series",
+      "sql": "SELECT series,user_sign,COUNT(*) documents FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408))\n                WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01'\n                AND sales_channel_code='HORIZONTAL' GROUP BY ALL ORDER BY series,user_sign",
+      "rows": [
+        {
+          "series": "1269",
+          "user_sign": "145",
+          "documents": 147
+        },
+        {
+          "series": "1270",
+          "user_sign": "145",
+          "documents": 152
+        },
+        {
+          "series": "1271",
+          "user_sign": "145",
+          "documents": 119
+        },
+        {
+          "series": "1272",
+          "user_sign": "145",
+          "documents": 76
+        },
+        {
+          "series": "1273",
+          "user_sign": "145",
+          "documents": 124
+        },
+        {
+          "series": "1274",
+          "user_sign": "145",
+          "documents": 42
+        },
+        {
+          "series": "1275",
+          "user_sign": "145",
+          "documents": 38
+        },
+        {
+          "series": "1276",
+          "user_sign": "145",
+          "documents": 93
+        },
+        {
+          "series": "1277",
+          "user_sign": "145",
+          "documents": 18
+        },
+        {
+          "series": "1278",
+          "user_sign": "145",
+          "documents": 57
+        },
+        {
+          "series": "1279",
+          "user_sign": "145",
+          "documents": 18
+        },
+        {
+          "series": "1280",
+          "user_sign": "145",
+          "documents": 36
+        }
+      ]
+    },
+    {
+      "name": "horizontal_buying_customers_conditional",
+      "sql": "SELECT COUNT(DISTINCT card_code) buying_customer_codes,\n            COUNT(*) active_invoices,COUNT(*) FILTER(WHERE card_code IS NULL) null_customer_codes,\n            COUNT(*) FILTER(WHERE TRY_CAST(doc_total AS DECIMAL(38,6)) IS NULL) invalid_amounts\n            FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01'\n            AND sales_channel_code='HORIZONTAL' AND canceled='N' ",
+      "rows": [
+        {
+          "buying_customer_codes": 4004,
+          "active_invoices": 23615,
+          "null_customer_codes": 0,
+          "invalid_amounts": 0
+        }
+      ]
+    },
+    {
+      "name": "horizontal_monthly_conditional",
+      "sql": "WITH i AS (\n            SELECT SUBSTR(doc_date,1,7) AS period_month,COUNT(*) invoices,COUNT(DISTINCT card_code) buyers,\n                SUM(TRY_CAST(doc_total AS DECIMAL(38,6))) billed,MAX(doc_date) latest_invoice\n            FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01'\n                AND sales_channel_code='HORIZONTAL' AND canceled='N' AND currency='BS' GROUP BY 1),\n            n AS (SELECT SUBSTR(doc_date,1,7) AS period_month,COUNT(*) credits,\n                SUM(TRY_CAST(doc_total AS DECIMAL(38,6))) credited,MAX(doc_date) latest_credit\n            FROM (SELECT * FROM telchi.atomic.\"credit_memo_document\" AT (VERSION => 1408)) WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01'\n                AND sales_channel_code='HORIZONTAL' AND canceled='N' AND currency='BS' GROUP BY 1)\n            SELECT COALESCE(i.period_month,n.period_month) AS period_month, i.invoices,i.buyers,i.billed,\n                COALESCE(n.credits,0) credits,COALESCE(n.credited,0) credited,\n                COALESCE(i.billed,0)-COALESCE(n.credited,0) net_documental,\n                i.latest_invoice,n.latest_credit FROM i FULL JOIN n USING(period_month) ORDER BY period_month",
+      "rows": [
+        {
+          "period_month": "2026-01",
+          "invoices": 2565,
+          "buyers": 1722,
+          "billed": "1608795.730000",
+          "credits": 51,
+          "credited": "46437.420000",
+          "net_documental": "1562358.310000",
+          "latest_invoice": "2026-01-31T00:00:00",
+          "latest_credit": "2026-01-30T00:00:00"
+        },
+        {
+          "period_month": "2026-02",
+          "invoices": 2304,
+          "buyers": 1598,
+          "billed": "1431183.220000",
+          "credits": 60,
+          "credited": "42997.480000",
+          "net_documental": "1388185.740000",
+          "latest_invoice": "2026-02-28T00:00:00",
+          "latest_credit": "2026-02-28T00:00:00"
+        },
+        {
+          "period_month": "2026-03",
+          "invoices": 2719,
+          "buyers": 1772,
+          "billed": "1749907.450000",
+          "credits": 110,
+          "credited": "82001.850000",
+          "net_documental": "1667905.600000",
+          "latest_invoice": "2026-03-31T00:00:00",
+          "latest_credit": "2026-03-31T00:00:00"
+        },
+        {
+          "period_month": "2026-04",
+          "invoices": 2899,
+          "buyers": 1876,
+          "billed": "1868159.660000",
+          "credits": 114,
+          "credited": "79508.140000",
+          "net_documental": "1788651.520000",
+          "latest_invoice": "2026-04-30T00:00:00",
+          "latest_credit": "2026-04-30T00:00:00"
+        },
+        {
+          "period_month": "2026-05",
+          "invoices": 2421,
+          "buyers": 1590,
+          "billed": "1689331.400000",
+          "credits": 112,
+          "credited": "109686.990000",
+          "net_documental": "1579644.410000",
+          "latest_invoice": "2026-05-30T00:00:00",
+          "latest_credit": "2026-05-30T00:00:00"
+        },
+        {
+          "period_month": "2026-06",
+          "invoices": 2791,
+          "buyers": 1804,
+          "billed": "1792524.840000",
+          "credits": 109,
+          "credited": "96137.150000",
+          "net_documental": "1696387.690000",
+          "latest_invoice": "2026-06-30T00:00:00",
+          "latest_credit": "2026-06-30T00:00:00"
+        },
+        {
+          "period_month": "2026-07",
+          "invoices": 3016,
+          "buyers": 1859,
+          "billed": "2090114.260000",
+          "credits": 114,
+          "credited": "145537.520000",
+          "net_documental": "1944576.740000",
+          "latest_invoice": "2026-07-31T00:00:00",
+          "latest_credit": "2026-07-31T00:00:00"
+        },
+        {
+          "period_month": "2026-08",
+          "invoices": 2665,
+          "buyers": 1763,
+          "billed": "1996773.280000",
+          "credits": 142,
+          "credited": "127550.360000",
+          "net_documental": "1869222.920000",
+          "latest_invoice": "2026-08-31T00:00:00",
+          "latest_credit": "2026-08-31T00:00:00"
+        },
+        {
+          "period_month": "2026-09",
+          "invoices": 2235,
+          "buyers": 1564,
+          "billed": "1536255.180000",
+          "credits": 108,
+          "credited": "78250.900000",
+          "net_documental": "1458004.280000",
+          "latest_invoice": "2026-09-23T00:00:00",
+          "latest_credit": "2026-09-23T00:00:00"
+        }
+      ]
+    },
+    {
+      "name": "customer_master_sources",
+      "sql": "SELECT source_system,sap_card_type,COUNT(*) AS row_count,\n            COUNT(DISTINCT source_native_id) native_ids,MAX(_source_snapshot_at) snapshot_at\n            FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet') GROUP BY ALL",
+      "rows": [
+        {
+          "source_system": "LEGACY_DS",
+          "sap_card_type": null,
+          "row_count": 11512,
+          "native_ids": 11512,
+          "snapshot_at": null
+        },
+        {
+          "source_system": "LEGACY_DS0",
+          "sap_card_type": null,
+          "row_count": 10580,
+          "native_ids": 10580,
+          "snapshot_at": null
+        },
+        {
+          "source_system": "SAP_HANA",
+          "sap_card_type": "C",
+          "row_count": 12979,
+          "native_ids": 12979,
+          "snapshot_at": null
+        }
+      ]
+    },
+    {
+      "name": "horizontal_customer_master_match",
+      "sql": "WITH b AS (SELECT DISTINCT card_code FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\n            WHERE doc_date>='2026-01-01' AND doc_date<'2026-10-01' AND canceled='N'\n            AND sales_channel_code='HORIZONTAL'), m AS (SELECT source_native_id,COUNT(*) matches\n            FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet') WHERE source_system='SAP_HANA' GROUP BY 1)\n            SELECT COUNT(*) buyer_codes,COUNT(*) FILTER(WHERE matches=1) unique_master_matches,\n            COUNT(*) FILTER(WHERE matches IS NULL) missing_master_matches,\n            COUNT(*) FILTER(WHERE matches>1) ambiguous_master_matches FROM b LEFT JOIN m\n            ON b.card_code=m.source_native_id",
+      "rows": [
+        {
+          "buyer_codes": 4004,
+          "unique_master_matches": 4004,
+          "missing_master_matches": 0,
+          "ambiguous_master_matches": 0
+        }
+      ]
+    },
+    {
+      "name": "customers_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "customer_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "branch_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "tax_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "credit_limit",
+          "column_type": "DECIMAL(38,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "payment_term_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_card_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_group_code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_valid_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_frozen_for",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "sap_update_date",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "sales_channel_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/sales_channel/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "sales_channel_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "sales_channel_dictionary",
+      "sql": "SELECT code,name,status,source FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/sales_channel/part-00000.parquet')",
+      "rows": []
+    },
+    {
+      "name": "customer_business_type_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customer_business_type/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "customer_business_type_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "code",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "name",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "description",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "active",
+          "column_type": "BOOLEAN",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "customer_business_type_dictionary",
+      "sql": "SELECT code,name,status,source FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customer_business_type/part-00000.parquet')",
+      "rows": [
+        {
+          "code": "COMMERCIAL_CUSTOMER",
+          "name": "Cliente comercial",
+          "status": "CONFIRMED",
+          "source": "TELCHI_GENERIC_CUSTOMER_RAW_MATERIAL_AUDIT_V1"
+        },
+        {
+          "code": "GENERIC_CUSTOMER",
+          "name": "Cuenta de cliente genérico",
+          "status": "CONFIRMED",
+          "source": "TELCHI_GENERIC_CUSTOMER_RAW_MATERIAL_AUDIT_V1"
+        },
+        {
+          "code": "INTERNAL_ACCOUNT",
+          "name": "Cuenta interna o parte relacionada",
+          "status": "CONFIRMED",
+          "source": "TELCHI_GENERIC_CUSTOMER_RAW_MATERIAL_AUDIT_V1"
+        },
+        {
+          "code": "FISCAL_TECHNICAL_ACCOUNT",
+          "name": "Cuenta fiscal o técnica",
+          "status": "CONFIRMED",
+          "source": "TELCHI_GENERIC_CUSTOMER_RAW_MATERIAL_AUDIT_V1"
+        },
+        {
+          "code": "OTHER_NON_COMMERCIAL",
+          "name": "Otra cuenta no comercial",
+          "status": "CONFIRMED",
+          "source": "TELCHI_GENERIC_CUSTOMER_RAW_MATERIAL_AUDIT_V1"
+        },
+        {
+          "code": "UNKNOWN",
+          "name": "Tipo de cliente desconocido",
+          "status": "CONFIRMED",
+          "source": "TELCHI_GENERIC_CUSTOMER_RAW_MATERIAL_AUDIT_V1"
+        }
+      ]
+    },
+    {
+      "name": "customer_crosswalk_crosswalk_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/customer_crosswalk/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "canonical_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_native_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "valid_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "mapping_source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "confidence",
+          "column_type": "DECIMAL(38,12)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_system",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_dataset",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_native_key",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_file",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_snapshot_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_ingested_at",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_transformation_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_semantic_version",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_lineage_quality",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "customer_business_type_crosswalk_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/crosswalk/_versions/v2_reference_closure_2088d5885204313a/customer_business_type/part-00000.parquet')",
+      "rows": [
+        {
+          "column_name": "CardCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CardName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "customer_business_type",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_status",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_source",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_basis",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "classification_confidence",
+          "column_type": "DECIMAL(10,6)",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "effective_from",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "effective_to",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "source_as_of",
+          "column_type": "TIMESTAMP WITH TIME ZONE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    },
+    {
+      "name": "raw_OCRD_schema",
+      "sql": "DESCRIBE SELECT * FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/table_extract/sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OCRD.parquet')",
+      "rows": [
+        {
+          "column_name": "CardCode",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CardName",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CardType",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "frozenFor",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "validFor",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "LicTradNum",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "CreditLine",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "GroupNum",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "UpdateDate",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_source_extracted_at",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_extract_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "_observation_sequence",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "extraction_date",
+          "column_type": "DATE",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        },
+        {
+          "column_name": "run_id",
+          "column_type": "VARCHAR",
+          "null": "YES",
+          "key": null,
+          "default": null,
+          "extra": null
+        }
+      ]
+    }
+  ],
+  "sap_write_count": 0,
+  "read_only": true,
+  "threads": 2,
+  "monetary_definition": "Active (canceled=N) invoice header DocTotal minus active credit memo header DocTotal, DocDate, BS only. Document total includes taxes; not tax-exclusive revenue. Returns only insofar as represented by credit memos. No SAP+DMS union.",
+  "horizontal_definition": "Existing Foundation sales_channel_code=HORIZONTAL, derived by existing ingestion from 14 series. Not newly inferred from pharmacies. Conditional proxy until DMS/U_ORIGIN and series census reconciled.",
+  "pharmacy_definition": "Requires authoritative customer classification, e.g. OCRD.U_CANAL_VENTAS=1 with verified UFD1 meaning; no name matching.",
+  "sap_preflight": {
+    "status": "BLOCKED",
+    "error_type": "ConnectionRefusedError",
+    "reason": "Configured HANA source not reachable; no live reconciliation performed"
+  },
+  "foundation": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+  "snapshot": 1408,
+  "data_as_of": "2026-09-28T18:18:35.264000",
+  "reference": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+  "inspected_raw_master": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/raw/sap/table_extract/sap_master_reference_v1_20260916T121605Z/extraction_date=2026-09-16/run_id=sap_master_reference_v1_20260916T121605Z/OCRD.parquet",
+  "publication_unchanged": true,
+  "unresolved": {
+    "registered_horizontal_clients": "No inspected master provides registered DMS membership; buying customers != registered customers.",
+    "horizontal_pharmacy_clients_and_amounts": "Inspected pinned customers/master lack U_CANAL_VENTAS; business type dictionary has no pharmacy subtype. No mapping fabricated.",
+    "dms_sap_identity_reconciliation": "Native SAP CardCode matches can be checked locally; no independent DMS customer ledger reconciled.",
+    "net_returns_completeness": "Subtracts tagged active ORIN; cross-channel credits/base-document attribution and unposted DMS returns not certified.",
+    "january_september_full_months_average": "No full-month completeness certification. September latest available date must be read from coverage; no nine-month average certified."
+  }
+}

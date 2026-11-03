@@ -1,0 +1,113 @@
+TEAM360 / EVOLUTION — SINGLE OWNER DEV (PARTIAL, ACTIVATION BLOCKED)
+Branch: feature/console-backend-core
+Owner requested: Mario, sole human administrator. No second identity requested or fabricated.
+
+IMPLEMENTATION
+Promoted the existing accredited offline V1 contract/repository into Messaging;
+historical laboratory sources/evidence remain unchanged. This is the deployed
+source location for subsequent administrative operations, not an additional
+runtime or service. It does not automatically accredit a human, mint trust or
+activate a provider.
+
+New files:
+- SrvRestAstroLS_v1/backend/modules/messaging/administration/__init__.py
+- SrvRestAstroLS_v1/backend/modules/messaging/administration/contract.py
+- SrvRestAstroLS_v1/backend/modules/messaging/administration/repository.py
+- SrvRestAstroLS_v1/backend/tests/test_messaging_single_owner_dev.py
+Evidence: this directory (inspect_readonly.py, inspection.json, focused-tests.txt, result.txt).
+
+Explicit single_owner_dev envelopes contain owner (not fictitious requester and
+approver), one domain-separated Ed25519 signature and signed human-readable
+confirmation of action/operation/binding/revision. Signature also covers the full
+scope, credential hash, target IDs/epochs, nonce, lifetime and bilateral receipts.
+Pinned trust must explicitly name the owner, enable that actor, identify its
+accreditation reference and owner key custody, and grant the exact action/scope.
+All prepare/activate/revoke operations require explicit confirmation.
+DEV trust plus explicit trusted deployment environment dev/development are both
+required; missing/production/unknown environments and laboratory trust are denied.
+The environment argument belongs to the trusted caller, never to the signed input.
+Existing dual-control envelopes retain independent actors and their two signatures;
+a single-owner trust root cannot authorize a legacy dual envelope as a fallback.
+
+Retained without SQL/schema changes: target signer checks, DB target epochs,
+locked inventory scope, monotonic revisions, bilateral preparation signatures,
+old revision revocation, permanent credential hash uniqueness, durable operation
+insertion in caller-owned transaction, exact replay read-only receipts, conflicting
+operation/nonce rejection and append-only audit schema. Existing approver column
+records the actual sole owner ID; the full envelope preserves the explicit mode.
+No business role or phone-number authority is introduced.
+
+VALIDATION
+- Initial focused contract run: 42 PASS in 0.35s.
+- Final: cd SrvRestAstroLS_v1/backend && uv run pytest
+  tests/test_messaging_single_owner_dev.py tests/test_srv05_evolution_isolation.py -q
+  => 65 PASS in 5.63s (45 new administrative cases, 20 existing Srv05 cases).
+- Existing Diagnosis in-memory warning and uv deprecated dev-dependencies warning;
+  no Diagnosis request, LLM call or WhatsApp operation.
+- Covered: valid/invalid signatures, unauthorized/disabled/expired owner, wrong
+  workspace/binding/grants, missing accreditation/custody/config, tampering,
+  confirmation, production and unknown environments, bilateral receipts,
+  exact/conflicting replay, nonce reuse, obsolete revision, revoked credential,
+  recovery via newer revision and retained dual-control semantics (DEV/laboratory).
+- Repository state-machine tests use controlled SQL responses: NOT live durable
+  accreditation or an operational signed callback PASS. Prior V1 durability/backup
+  evidence is retained, not relabeled as a new single-owner operational PASS.
+- git diff --check PASS; new untracked Python whitespace checked independently PASS;
+  reviewed deployment delta against original accredited contract/repository.
+  First check wrapper treated normal no-index exit 1 as failure; corrected to
+  inspect diagnostics. A shell-only python invocation was unavailable; python3
+  then completed the new-file check. Neither issue changed runtime code.
+- No Markdown changed: LAT Markdown gates NOT_APPLICABLE.
+- Previous three migrations, backup/recovery and unaffected 161 PASS/16 skips
+  retained as dated evidence; no rebuild, restore, general suite or migration rerun.
+
+CURRENT READ-ONLY BLOCKER
+PostgreSQL currently has TWO persisted bindings for team360-meta-dev:
+  telchi_dev / telchi_whatsapp_dev (testing)
+  team360_public_site / evolution-meta-dev (testing)
+Neither testing status nor a stopped container accredits retirement of the other
+consumer. ot_inventory is empty. The prior canonical operational proposal already
+requires exclusive-consumer accreditation; the new single-owner decision resolves
+the number of human administrators, not the cross-workspace route ownership.
+No evidence or authorization to retire the other workspace consumer was inferred.
+Per instruction to stop at an intervention outside the assigned scope, operational
+provisioning/startup stops here. No cryptographic owner accreditation, owner key,
+service credential, target/epoch, exclusive inventory or revision was fabricated.
+The administrative source is available but NOT wired into an activated live CLI or
+service. Runtime/configuration/admission remain unchanged and closed.
+
+PRESERVATION (inspection.json)
+- Read-only, bounded PostgreSQL queries, repeatable-read snapshot and rollback.
+- Telchi 1,335 events and other historical consumer 164 events match prior report.
+- All five protected events retain their prior status/transport_status, including
+  the unresolved real UNKNOWN. No replay or reclassification.
+- Evolution .env/image.ref, backend private env and Telchi control are byte-identical
+  to the verified backup. No Meta/Cloudflare calls or configuration changes.
+- Evolution container remains Created, not running; no legacy fallback started.
+- No DB writes, grants, credentials, key generation, new resources, services,
+  production changes, commit or push. Existing worktree changes preserved.
+
+RESOURCE / TRANSVERSAL IMPACT
+Host: 8 CPUs, ~7.6 GiB initially available, observed swap stable during samples,
+81-91% CPU idle in recent vmstat intervals. Focused sequential tests only; no pools,
+browsers, servers or background workers created. No unrelated process terminated.
+New administrative source affects future offline provisioning only. No Srv01,
+provider, runtime lifecycle, frontend, Meta or other workspace modification.
+HOST_PREFLIGHT=SAFE_FOR_FOCUSED_TESTS
+CONCURRENCY_USED=1 pytest process, no parallel workers
+UNRELATED_PROCESSES_TERMINATED=0
+ENVIRONMENTAL_ABORTS=0
+OWN_PROCESSES_LEFT_RUNNING=0
+
+SINGLE_OWNER_DEV=FAIL
+OWNER_IDENTITY=BLOCKED
+V1_CREDENTIALS=FAIL
+PRIVATE_CALLBACK=FAIL
+SRV05_PROVIDER_V1=FAIL
+EVOLUTION_DEV_RUNNING=NO
+META_UNCHANGED=YES
+HISTORY_PRESERVED=YES
+REAL_MESSAGES_SENT=0
+READY_FOR_WHATSAPP_TEST=NO
+BLOCKERS=Operational exclusive binding not accredited; other workspace consumer not retired. Subsequent owner accreditation, credentials, callback and activation not performed. FAIL means incomplete/blocked, not a demonstrated functional failure.
+NEXT_ACTION=Owner explicitly authorize retirement ONLY of the operative Evolution consumer team360_public_site/evolution-meta-dev, preserving channel/history and without Meta/Cloudflare changes, or provide existing evidence that it is already retired. Then accredit Mario with single_owner_dev and continue the authorized DEV provisioning/startup. No second human approver is required. Real recipient/message authorization remains later, only after actual readiness.

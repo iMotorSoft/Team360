@@ -1,0 +1,49 @@
+{
+  "mode": "READ_ONLY_PLAN",
+  "identities": {
+    "global": {
+      "id": "67a1b108-7c65-4c80-bbca-ffc42891949c",
+      "workspace_id": "d848e051-3dfc-408b-ad5a-94f2ba85ee23",
+      "status": "active"
+    },
+    "admin": {
+      "id": "73d09264-8be2-4402-8023-0142a5f26730",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "status": "active"
+    },
+    "pilot": {
+      "id": "5015a69d-eb86-4ac9-b97f-c31dc06e2b59",
+      "workspace_id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "status": "active"
+    },
+    "workspace": {
+      "id": "3fb026a1-a4ba-44b3-b65b-fab452df7fc9",
+      "organization_id": "44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99"
+    }
+  },
+  "limits": {
+    "environment": "dev",
+    "modules": [
+      "telchi"
+    ],
+    "permissions": [
+      "telchi.sales.period_billed_amount.read.v1"
+    ],
+    "capabilities": [
+      "sales.period_billed_amount.v1"
+    ],
+    "roles": [
+      "telchi_sales_period_billed_amount_reader_v1"
+    ],
+    "whole_workspace": true,
+    "currency": "BS",
+    "metrics": [
+      "SALES_VALID_GROSS",
+      "SALES_CREDIT_NOTES",
+      "SALES_NET"
+    ],
+    "credential_enrollment": false,
+    "free_sql": false,
+    "entity_filters": false
+  }
+}

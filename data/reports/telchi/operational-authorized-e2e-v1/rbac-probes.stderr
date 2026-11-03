@@ -1,0 +1,22 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/provisioning/tests/live_operational_authorization.py", line 75, in <module>
+    print(json.dumps(asyncio.run(run()),indent=2))
+                     ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/modules/telchi/provisioning/tests/live_operational_authorization.py", line 38, in run
+    await conn.execute('UPDATE core_module_full_access_grants SET revoked_at_utc=now() WHERE workspace_id=%s AND user_id=%s AND revoked_at_utc IS NULL',(WORKSPACE,PILOT))
+  File "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/lib/python3.12/site-packages/psycopg/connection_async.py", line 327, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.CheckViolation: new row for relation "core_module_full_access_grants" violates check constraint "core_module_full_access_grants_check"
+DETAIL:  Failing row contains (6dc9766a-1a02-456d-b0ec-e18d10face97, 44b9b7ea-1c19-4a9f-a3d5-1f20622d2f99, 3fb026a1-a4ba-44b3-b65b-fab452df7fc9, telchi, 5015a69d-eb86-4ac9-b97f-c31dc06e2b59, 67a1b108-7c65-4c80-bbca-ffc42891949c, 2026-10-19 16:46:20.029829+00, 2026-11-02 17:00:33.541595+00, null).

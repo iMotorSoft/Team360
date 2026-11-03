@@ -1,0 +1,37 @@
+{
+  "head": "09d2ec715a31bb88574d734eacb9f437f008624e",
+  "branch": "feature/console-backend-core",
+  "connection": {"host": "localhost", "port": "5432", "dbname": "team360"},
+  "environment": null,
+  "approved_cluster_marker_present": false,
+  "transaction": {"read_only": true, "connect_timeout_seconds": 5, "statement_timeout_seconds": 5, "rollback": true},
+  "queries": {
+    "server": "SELECT current_database() AS database,current_setting('server_version') AS version,inet_server_addr()::text AS address,pg_is_in_recovery() AS recovery",
+    "role": "SELECT rolsuper,rolbypassrls FROM pg_roles WHERE rolname=current_user",
+    "vector": "SELECT extversion FROM pg_extension WHERE extname='vector'",
+    "schema": "SELECT tablename,rowsecurity FROM pg_tables WHERE schemaname='public' AND tablename LIKE 'business_concept%' ORDER BY tablename",
+    "catalog": "SELECT c.semantic_code,c.status,c.current_version,count(v.version) AS versions FROM business_concepts c JOIN business_concept_versions v ON c.id=v.concept_id GROUP BY c.id ORDER BY c.semantic_code",
+    "identities": "SELECT o.organization_code,w.slug,count(u.id) FILTER (WHERE u.status='active') AS active_users FROM core_organizations o JOIN core_workspaces w ON w.organization_id=o.id LEFT JOIN core_users u ON u.workspace_id=w.id GROUP BY o.organization_code,w.slug ORDER BY o.organization_code,w.slug"
+  },
+  "results": {
+    "server": {"database": "team360", "version": "18.4 (Debian 18.4-1.pgdg13+1)", "address": "172.18.0.2/32", "recovery": false},
+    "role": {"rolsuper": true, "rolbypassrls": true},
+    "vector": "0.8.2",
+    "schema_tables": ["business_concept_aliases", "business_concept_capability_links", "business_concept_classification_rules", "business_concept_embeddings", "business_concept_entity_links", "business_concept_observations", "business_concept_versions", "business_concepts"],
+    "rowsecurity_all_tables": false,
+    "published_concepts": 9,
+    "proposed_concepts": 2,
+    "corporate_current_version": 2,
+    "other_published_current_versions": 1,
+    "identities": [
+      {"organization_code": "team360_live", "slug": "team360_public_site", "active_users": 2},
+      {"organization_code": "team360_platform", "slug": "team360_admin_dev", "active_users": 1},
+      {"organization_code": "telchi", "slug": "telchi_dev", "active_users": 2}
+    ]
+  },
+  "production_destination_comparison": "NOT_ACREDITED",
+  "foundation_connection": "NOT_TESTED",
+  "srv05_authenticated_http": "NOT_EXECUTED",
+  "database_writes": 0,
+  "interpretation": "Local target is not proof of DEV isolation. No grants, tokens, migrations or seed executed."
+}

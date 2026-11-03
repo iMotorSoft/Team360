@@ -1,0 +1,145 @@
+TEAM360 — BINDING RESOLVED / V1 DEV RUNNING / WHATSAPP ADMISSION CLOSED
+Branch: feature/console-backend-core
+Scope: owner-authorized historical binding deactivation and DEV V1 activation only.
+
+HISTORICAL_BINDING_INACTIVE=YES
+HISTORICAL_EVENTS_PRESERVED=YES
+TELCHI_BINDING_EXCLUSIVE=YES
+
+SINGLE_OWNER_DEV=PASS
+V1_CREDENTIALS=PASS
+PRIVATE_CALLBACK=PASS
+SRV05_PROVIDER_V1=PASS
+EVOLUTION_DEV_RUNNING=YES
+
+META_UNCHANGED=YES
+REAL_MESSAGES_SENT=0
+
+READY_FOR_WHATSAPP_TEST=NO
+
+EXACT REMAINING CONDITION (NOT A WORKSPACE/BINDING BLOCKER)
+The existing local Evolution -> Team360 inbound webhook is enabled=false. Its
+complete PostgreSQL row, as well as Instance/Setting rows, remains byte-equivalent
+to the verified premigration backup. It was NOT enabled or rewritten because the
+owner explicitly prohibited webhook changes. Both V1 send-admission flags also
+remain false, as no WhatsApp message has been authorized yet.
+Next: obtain authorization to enable the EXISTING local Evolution forwarding
+configuration and open bounded DEV V1 send admission for the authorized test.
+No new instance/workspace/number or Meta/WABA/public webhook change is proposed.
+Remote Meta callback reachability and actual WhatsApp delivery remain NOT_RUN.
+
+BINDING / PRESERVATION
+- Reused dev-binding-recovery, dev-v1-intervention and single-owner-dev evidence.
+- Exact prior blocker: inventory decision treated the two persisted testing rows
+  as operative. Existing MessagingRepository.binding already uses exact
+  workspace+alias+provider+instance and c/w/p.status IN (active,testing).
+- Current observation: historical last event remains 2026-10-08; no pending or
+  unknown historical work, no local Team360 transport listener/consumer before
+  intervention, Evolution Created with PID 0. The one observed foreign Uvicorn
+  belongs to TebaAI and was left untouched. Owner's prior no-other-client
+  attestation is reused; no new global/remote process inventory was attempted.
+- Locked exact DEV-only historical row and changed ONLY status to inactive and
+  updated_at. Prior complete row retained privately for controlled reversal.
+- Existing runtime lookup rejects that inactive binding. New managed operational
+  exclusivity query uses the runtime status boundary and selects only Telchi.
+- All original 164 historical and 1335 Telchi events have identical full-row
+  digests. All five protected events including real UNKNOWN remain unchanged.
+- One necessary real business/idempotency probe added TWO new isolated recording
+  events (one inbound, one outbound; receiver_context=six-gates:<nonce>), not
+  WhatsApp messages. Current counts: historical 164, Telchi 1337. None deleted.
+- No replay of the real UNKNOWN; no legacy fixture migration or data deletion.
+
+V1 ACTIVATION / SECURITY
+- Mario is the sole accredited DEV administrator; one owner signature per
+  explicit prepare/activate confirmation. No second identity or business grant.
+- New DEV-only t360devv1_ credential, exact scope, target IDs/epochs, trust pins,
+  bilateral preparation receipts and active revision 1, same activation ID.
+- Keys/credentials/DSNs/receipts/private runtime configuration are outside Git in
+  PRIVATE_ROOT/evolution-dev-v1 (directory0700/files0600). Owner-local custody;
+  no keys/secrets printed. Prior credentials/control/configuration untouched.
+- Dedicated nonprivileged/noinherit/no-membership runtime logins. No runtime
+  target/revision/audit INSERT/UPDATE/DELETE/TRUNCATE, no schema CREATE, no
+  legacy configuration writes. Inventory UPDATE is the existing row-lock grant;
+  sender/callback permissions are combined in each current single-pool service.
+- Actual Srv05 startup attests current_user=t360devv1_runtime,
+  BoundEvolutionProvider, registered Telchi handler and callback server started.
+  No unrelated Flow scheduler and no legacy sender fallback.
+- Actual Evolution candidate image 5a25df47... is running against the SAME
+  Instance/store/network. Previous Created container preserved under
+  evolution-api-pre-v1-20261023. Entrypoint is node dist/main.js: NO automigration.
+- Actual Evolution container reaches Srv05 private UDS; SO_PEERCRED host UID1000,
+  parent0700/socket0600. Public callback path404. Invalid envelope401. Correctly
+  signed probe authenticates exact scope/epochs, then safely rejects nonexistent
+  intent; no fabricated real delivery or callback ledger row. Positive delivery
+  of a real WhatsApp event remains for the separately authorized test.
+- Existing inbound routing address retained via the original DEV control host;
+  actual container authentication/ignored-event probe PASS, no message payload.
+- Both send admissions CLOSED. Actual V1 send endpoint denies empty probe403.
+
+VALIDATIONS / EVIDENCE
+- consumer-observation.json, deactivation.json: original observation/status change.
+- provisioning.json, runtime-role-proof.json: real bilateral revision and roles.
+- srv05-live-attestation.json, runtime-start.json: actual service composition.
+- v1-six-gates.json: SIX_GATES=VALID, CURRENT_CODE_FINGERPRINT=VALID,
+  REAL_SECURITY_BOUNDARIES=PASS in a SEPARATE private V1 registry/approval copy;
+  original WhatsApp control/approval/gates were not overwritten.
+- Reused existing six-guarantee runner, one inert HTTP/container test and ONE real
+  PG/Console/identity/model/readonly Foundation turn with recording egress;
+  duplicate/concurrent claims exercise one handler/capability/intent. No broad
+  business battery or benchmark. Real model/provider/effort metadata verified,
+  no fallback. Stable successful observations reused after harness correction.
+- Focused clean-environment pytest: 108 PASS, one existing warning. Command:
+  cd SrvRestAstroLS_v1/backend && uv run pytest
+    tests/test_messaging_binding_administration.py
+    tests/test_messaging_single_owner_dev.py tests/test_srv05_evolution_isolation.py
+    tests/test_telchi_transport_dev.py
+    modules/telchi/assistant/tests/test_dev_gate_policy.py
+    modules/telchi/assistant/tests/test_whatsapp_operational_contract.py -q
+- final_verify.py PASS: live provider/binding/credential/epochs, inactive route
+  rejection, private auth/peer and public denial, six-gate parity, all original
+  event hashes/protected statuses, Instance/Webhook/Setting backup hashes,
+  original private config hashes and zero V1 send attempts.
+- git diff --check PASS; all 13 new Python sources AST + untracked no-index
+  whitespace checks PASS; final implementation/test diffs reviewed.
+- No Markdown changed; LAT Markdown gates NOT_APPLICABLE.
+
+ATTEMPTS / CORRECTIONS (NOT HIDDEN)
+- Runtime-role creation initially lacked CONNECT on evolution_api. Corrected only
+  this execution's two unused generated logins; explicit CONNECT and login check.
+- Generated psycopg conninfo was not an application PostgreSQL URL. Normalized
+  only this run's private DSN representation, without credential rotation.
+  Added startup actual-role attestation to exclude implicit admin fallback.
+- Two Podman pre-create timeouts with unnecessary keep-id mapping. Both Srv05
+  children closed, prior container restored, no stale workers. Reusing the
+  previously accredited default rootless mapping started normally. Actual host
+  SO_PEERCRED1000 verified. No host service restart or security threshold bypass.
+- First gate unit harness inherited real transport/dispatcher configuration:
+  104 PASS/4 fixture failures. Clean unit environment:108 PASS. All six real
+  observations had already passed; reused them rather than repeating model/PG.
+- Final verifier normalized Podman's string Entrypoint representation to actual
+  Path/Args and shortened its temporary UDS filename to fit AF_UNIX's limit.
+  These were harness issues, not runtime functional failures.
+
+FILES ADDED / TRANSVERSAL IMPACT
+- backend/modules/messaging/administration/bindings.py
+- backend/modules/telchi/assistant/transport_dev.py
+- backend/tests/test_messaging_binding_administration.py
+- backend/tests/test_telchi_transport_dev.py
+- data/reports/messaging/binding-activation-dev-20261023/*
+No existing tracked source or GLOBAL documentation modified by this task.
+All preexisting/concurrent changes preserved. No Srv01, Vera, frontend, SAP,
+Foundation publication, production, Meta/WABA/phone/webhook, commit or push.
+Operational changes are scoped to the authorized DEV channel, V1 tables/logins,
+private configuration and managed DEV service composition.
+
+RESOURCE / CLEANUP
+HOST_PREFLIGHT=SAFE (8 CPUs, ~6GiB available; focused sequential workload)
+CONCURRENCY_USED=one test/runner process; PG max3; numerical threads2;
+Evolution capped1CPU/768MiB; Srv05 one worker; no browsers.
+UNRELATED_PROCESSES_TERMINATED=0
+ENVIRONMENTAL_ABORTS=2 (Podman pre-create timeouts)
+TEMPORARY_PROCESSES_LEFT_RUNNING=0
+INTENTIONAL_DEV_SERVICES_RUNNING=2 (owner-requested Srv05 and Evolution)
+Private UDS peer probe and inert listener18182 closed; only DEV18180/18181 remain.
+Rollback closes admission while retaining V1 callback/history/UNKNOWN; never
+legacy-only fallback, revision decrement, DROP, deletion or replay.

@@ -1,0 +1,129 @@
+{
+  "benchmark_version": "compound_intent_v2_benchmark/1",
+  "status": "SEALED",
+  "sealed_date": "2026-10-15",
+  "provenance": "Authored in this benchmark package; not derived from any candidate extractor output.",
+  "independence": {
+    "cases": 20,
+    "by_level": {
+      "MODEL_ASSISTED_PROVISIONAL": 20
+    },
+    "human_reviewed_cases": 0,
+    "certified_gold_cases": 0,
+    "gold_status": "PROVISIONAL_GOLD"
+  },
+  "holdout_turns": 20,
+  "conversations": [
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5"
+  ],
+  "categories_covered": [
+    "ambiguity",
+    "assertion",
+    "correction",
+    "entity_product",
+    "metric",
+    "negation",
+    "non_executable",
+    "reference",
+    "relation",
+    "segment_geography",
+    "temporal_periodicity"
+  ],
+  "per_case_sha256": [
+    {
+      "turn_id": "H1_1",
+      "sha256": "7f35175712c2094b0e3fac2a4fb3f1bfbb9460b2da6e260cc3614f82997065da"
+    },
+    {
+      "turn_id": "H1_2",
+      "sha256": "3010a2b1f04bad8402481931b83b0799e025a18e4cfe97995c9baa6cd2866617"
+    },
+    {
+      "turn_id": "H1_3",
+      "sha256": "f1996ad40eae654570a339a6a52d401459e19c130d71a55dfde372006ad836e9"
+    },
+    {
+      "turn_id": "H1_4",
+      "sha256": "3fd087c46e23cf6a440d25a87799ddaf3e22981aa1465d9b84dc3c14ea4a72ca"
+    },
+    {
+      "turn_id": "H2_1",
+      "sha256": "c23e9ff90e06d8817f0824e21cbbd78573ea5c548c96e0455920b433c31e74a6"
+    },
+    {
+      "turn_id": "H2_2",
+      "sha256": "395b9436ccd35bbdf06175541cadd503016c3c70f780de383c1ce152600597a7"
+    },
+    {
+      "turn_id": "H2_3",
+      "sha256": "d1d048c71adb515872aca89793b808e5293e802d98b330274313c4d9308d96ae"
+    },
+    {
+      "turn_id": "H2_4",
+      "sha256": "3298db6b1bf02539776727125d0cf6f813bb43c1702fb4c93757a523ab07b2dd"
+    },
+    {
+      "turn_id": "H3_1",
+      "sha256": "a136db1e2011c13c47747ad5254e091f83bb3c35c7e8c48d419e2a989bbbd409"
+    },
+    {
+      "turn_id": "H3_2",
+      "sha256": "5aca2218f7e0fa2dd2951f4a67f52d81e6619733d3414770686fc11e06a563e3"
+    },
+    {
+      "turn_id": "H3_3",
+      "sha256": "bb8ffc6a4670e368f01f6ceebcfc96540001e76ad43b8befa20494655646f2e7"
+    },
+    {
+      "turn_id": "H3_4",
+      "sha256": "7c91379734fed893496b61eeb20fe0bb274d8af3f072afd138280434ff748854"
+    },
+    {
+      "turn_id": "H4_1",
+      "sha256": "f434781a7b920617c36487357e35151224e57c35c3153c2ffa6b5f29abdb7889"
+    },
+    {
+      "turn_id": "H4_2",
+      "sha256": "bbd8d4372ae5227a90eac08084793dacd058a81ae45193622c86a1c413a8c8b6"
+    },
+    {
+      "turn_id": "H4_3",
+      "sha256": "e433f1ed28eaa462f6a6d75872e3658c79def4bb8fc25258bb474e4760972f9c"
+    },
+    {
+      "turn_id": "H4_4",
+      "sha256": "2c735e2dca2e84b101e1e307b8043a9c005f0c4c1fc8efb2d1380a03b2f83e47"
+    },
+    {
+      "turn_id": "H5_1",
+      "sha256": "d2d72c2cb07adb6227725b0fa52f7f742e21ec1f12599d87123cc6cc17ed761c"
+    },
+    {
+      "turn_id": "H5_2",
+      "sha256": "90c4cacc7797729dda8c97fd731a12dd5353d361110d1967ddf743e27fd3c2fe"
+    },
+    {
+      "turn_id": "H5_3",
+      "sha256": "7df809087612d423f39225c6e4a108239860e8c7d829d23119723315f949e3a8"
+    },
+    {
+      "turn_id": "H5_4",
+      "sha256": "1c3052224c78fb51408f30223f3cafea2662b268c608fc797dc7d175d0122857"
+    }
+  ],
+  "aggregate_sha256": "796c0d526f1fdce22294666dde2a66b5df83364f00aa9d2c5ec8c4355bc01a07",
+  "known_acceptance_cases_excluded": [
+    "ABRAHAM_001",
+    "ABRAHAM_002"
+  ],
+  "non_contamination_rules": [
+    "Holdout turns were authored once and are not derived from any candidate output.",
+    "No candidate extractor may read this file before an experiment is frozen.",
+    "Abraham 001/002 are known acceptance cases and are never part of generalization evidence.",
+    "Any edit to a holdout turn invalidates aggregate_sha256 and requires re-sealing."
+  ]
+}

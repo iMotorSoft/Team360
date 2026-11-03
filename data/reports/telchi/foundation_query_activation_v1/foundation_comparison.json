@@ -1,0 +1,532 @@
+{
+  "service": {
+    "sales.latest_documents": {
+      "capability": "sales.latest_documents.v1",
+      "rows": [
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532517",
+          "doc_num": "260192728",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532516",
+          "doc_num": "260192727",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532515",
+          "doc_num": "260192726",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532514",
+          "doc_num": "260192725",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532513",
+          "doc_num": "260739131",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532512",
+          "doc_num": "260192724",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532511",
+          "doc_num": "260192723",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532510",
+          "doc_num": "260192722",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532509",
+          "doc_num": "260192721",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532508",
+          "doc_num": "260739130",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        }
+      ],
+      "source": {
+        "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot_id": 1408,
+        "updated_at": "2026-09-28T18:18:35.264000"
+      },
+      "read_only": true,
+      "sap_accessed": false,
+      "sql": "SELECT source_system,doc_entry,doc_num,doc_date,canceled\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\nWHERE source_system=? AND canceled=? AND doc_date IS NOT NULL\nORDER BY doc_date DESC,CAST(doc_entry AS BIGINT) DESC,doc_entry DESC LIMIT ?",
+      "sql_parameters": [
+        "SAP_B1_HANA",
+        "N",
+        10
+      ],
+      "sql_duration_ms": 137.5443200013251,
+      "grain": "invoice_header",
+      "document_type": "OINV",
+      "limitations": "Active invoices (N), by DocDate, not entry timestamp; excludes credit memos. Not net sales. Completeness not certified."
+    },
+    "sales.coverage": {
+      "capability": "sales.coverage.v1",
+      "rows": [
+        {
+          "first_date": "2022-03-31T00:00:00",
+          "last_date": "2026-09-24T00:00:00",
+          "documents": 330429,
+          "latest_month_with_rows": "2026-09",
+          "complete_month_certified": false
+        }
+      ],
+      "source": {
+        "publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+        "snapshot_id": 1408,
+        "updated_at": "2026-09-28T18:18:35.264000"
+      },
+      "read_only": true,
+      "sap_accessed": false,
+      "sql": "SELECT MIN(doc_date) AS first_date,MAX(doc_date) AS last_date,COUNT(*) AS documents\nFROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE source_system=? AND canceled=? AND doc_date IS NOT NULL",
+      "sql_parameters": [
+        "SAP_B1_HANA",
+        "N"
+      ],
+      "sql_duration_ms": 64.11163600023428,
+      "grain": "invoice_header",
+      "document_type": "OINV",
+      "limitations": "Active invoices (N), by DocDate, not entry timestamp; excludes credit memos. Not net sales. Completeness not certified."
+    }
+  },
+  "comparisons": {
+    "sales.latest_documents": {
+      "sql": "WITH ordered AS (\n                SELECT source_system,doc_entry,doc_num,doc_date,canceled,\n                       ROW_NUMBER() OVER (ORDER BY doc_date DESC, CAST(doc_entry AS BIGINT) DESC,doc_entry DESC) AS position\n                FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) WHERE canceled='N' AND source_system='SAP_B1_HANA' AND doc_date IS NOT NULL)\n                SELECT source_system,doc_entry,doc_num,doc_date,canceled FROM ordered WHERE position<=? ORDER BY position",
+      "parameters": [
+        10
+      ],
+      "rows": [
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532517",
+          "doc_num": "260192728",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532516",
+          "doc_num": "260192727",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532515",
+          "doc_num": "260192726",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532514",
+          "doc_num": "260192725",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532513",
+          "doc_num": "260739131",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532512",
+          "doc_num": "260192724",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532511",
+          "doc_num": "260192723",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532510",
+          "doc_num": "260192722",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532509",
+          "doc_num": "260192721",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        },
+        {
+          "source_system": "SAP_B1_HANA",
+          "doc_entry": "11532508",
+          "doc_num": "260739130",
+          "doc_date": "2026-09-24T00:00:00",
+          "canceled": "N"
+        }
+      ],
+      "elapsed_ms": 180.65095900055894,
+      "parity": true
+    },
+    "sales.coverage": {
+      "sql": "SELECT doc_date,COUNT(*) AS n FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408))\n                WHERE canceled='N' AND source_system='SAP_B1_HANA' AND doc_date IS NOT NULL\n                GROUP BY doc_date ORDER BY doc_date",
+      "parameters": [],
+      "rows": [
+        {
+          "first_date": "2022-03-31T00:00:00",
+          "last_date": "2026-09-24T00:00:00",
+          "documents": 330429,
+          "latest_month_with_rows": "2026-09",
+          "complete_month_certified": false
+        }
+      ],
+      "elapsed_ms": 48.97299499862129,
+      "parity": true
+    }
+  },
+  "read_only": true,
+  "sap_accessed": false,
+  "binding": {
+    "foundation_publication_id": "foundation_afd08d9eca6a725be53cdc3f9d5709c9",
+    "reference_version": "v2_reference_closure_2088d5885204313a",
+    "sales_publication_id": "update_publication_06cba09af83481c325e7aed0688ebace",
+    "credit_memo_publication_id": "update_publication_d56f2c34733debf3ceed3ff895472dbe",
+    "oinm_publication_id": "update_publication_fd0cc57d2e5e31c6dfb04dee6bfb2a4c",
+    "oitw_publication_id": "update_publication_b567d267b6340baf3939083e4c4cea27",
+    "data_as_of": "2026-09-28T18:18:35.264000",
+    "reference_source_as_of": "2026-09-24T13:36:06.423947+00:00",
+    "sales_source_as_of": "2026-09-24T13:53:45.185438+00:00",
+    "credit_memo_source_as_of": "2026-09-24T13:12:12.361426+00:00",
+    "oinm_source_as_of": "2026-09-24T13:53:46.471312+00:00",
+    "oitw_source_as_of": "2026-09-24T14:07:04.221589+00:00",
+    "validated_at": "2026-10-01T12:12:25.201282+00:00",
+    "committed_at": "2026-10-01T14:07:58.406216+00:00",
+    "component_count": 5,
+    "foundation_data_as_of": "2026-09-28T18:18:35.264000",
+    "ducklake_snapshot_id": 1408,
+    "foundation_resolution_ms": 1141.613,
+    "reference_path": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a",
+    "manifest_base_snapshot_id": 1322,
+    "logical_manifest_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "FOUNDATION_PUBLICATION_ID_USED": "foundation_afd08d9eca6a725be53cdc3f9d5709c9"
+  },
+  "calenta_evidence_reused": [
+    {
+      "probe_id": "calenta_products",
+      "sql": "SELECT item_code,source_system,canonical_product_id,product_name,inventory_uom_id,sales_uom_id,sap_sell_item FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet') WHERE upper(product_name) LIKE ? ORDER BY item_code LIMIT 30",
+      "params": [
+        "%CALENTA%"
+      ],
+      "semantic_basis": "Name contains matching identifies candidates, not an approved alias/family resolver.",
+      "sql_sha256": "8bfd3d027ece063c13e9fc5888df6e66652e4a7aa928c393cd3f498d5ef61cf1",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "item_code": "7508214",
+          "source_system": "LEGACY_DS0",
+          "canonical_product_id": "product_7a4060b49de0162196cd0d6a",
+          "product_name": "Horno de Calentamiento Indirecto Mufla",
+          "inventory_uom_id": null,
+          "sales_uom_id": null,
+          "sap_sell_item": null
+        },
+        {
+          "item_code": "G00082",
+          "source_system": "LEGACY_DS",
+          "canonical_product_id": "product_5406be0a37e77e9723f3a407",
+          "product_name": "INCUBADORA DE TUBO DE ENSAYO Y CALENTADOR",
+          "inventory_uom_id": "unit_of_measure_f8bb8aba0f62655598a6658e",
+          "sales_uom_id": null,
+          "sap_sell_item": null
+        },
+        {
+          "item_code": "G00082",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_c00b684d6cfcd53b2a94bdf5",
+          "product_name": "INCUBADORA DE TUBO DE ENSAYO Y CALENTADOR",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L02822",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_c01355844d4a04e756e3d426",
+          "product_name": "CALENTA (POMADA SALICILATO DE METILO) x 250 g.",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L02823",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_2058b9550c8d045285843703",
+          "product_name": "CALENTA (POMADA SALICILATO DE METILO) x 30 g",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L02877",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_53c02537638f3720672e2106",
+          "product_name": "CALENTA x Kg.",
+          "inventory_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "sales_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "sap_sell_item": "N"
+        },
+        {
+          "item_code": "L03035",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_c5b392632b964746307f00f7",
+          "product_name": "CALENTA (MEDIAN GROUP)  x 50 g",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L03648",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_4ef3b41af6a510bd00e57d62",
+          "product_name": "CALENTA FORTE x Kg.",
+          "inventory_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "sales_uom_id": "unit_of_measure_af53fa9878218cd65d3c59cb",
+          "sap_sell_item": "N"
+        },
+        {
+          "item_code": "L03649",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_b3a849a9f81829397835bcfa",
+          "product_name": "CALENTA FORTE x 30 g",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L03650",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_70a4e5edb55198184748f7de",
+          "product_name": "CALENTA FORTE x 50 g",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        },
+        {
+          "item_code": "L03658",
+          "source_system": "SAP_HANA",
+          "canonical_product_id": "product_d02ab393831a50690c22dabc",
+          "product_name": "CALENTA FORTE  x 250 g.",
+          "inventory_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sales_uom_id": "unit_of_measure_f2e5d6c1c196dad84c354537",
+          "sap_sell_item": "Y"
+        }
+      ],
+      "elapsed_ms": 172.012
+    },
+    {
+      "probe_id": "calenta_customers",
+      "sql": "SELECT code,name,source_system FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/customers/part-00000.parquet') WHERE upper(name) LIKE ? ORDER BY code LIMIT 10",
+      "params": [
+        "%CALENTA%"
+      ],
+      "semantic_basis": "No matches does not prove absence in all historical sources.",
+      "sql_sha256": "1f33693791fb710b2d902972ac0245f523df6f83ca5b2e42c5c951b0ec77d4d7",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [],
+      "elapsed_ms": 20.483
+    },
+    {
+      "probe_id": "may_calenta_native_lines",
+      "sql": "SELECT p.item_code,p.product_name,p.sales_uom_id,h.currency,h.canceled,COUNT(*) AS lines,SUM(TRY_CAST(l.quantity AS DECIMAL(38,10))) AS source_quantity,SUM(TRY_CAST(l.line_total AS DECIMAL(38,10))) AS source_line_total FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) h JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON l.source_system=h.source_system AND l.doc_entry=h.doc_entry JOIN read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/products/part-00000.parquet') p ON p.source_system=l.source_system AND p.item_code=l.item_code WHERE h.doc_date>=? AND h.doc_date<? AND upper(p.product_name) LIKE ? GROUP BY ALL ORDER BY p.item_code,h.currency,h.canceled LIMIT 30",
+      "params": [
+        "2026-05-01",
+        "2026-06-01",
+        "%CALENTA%"
+      ],
+      "semantic_basis": "Registry sales_by_item adapted to bounded period with explicit source keys; quantities remain native, sales UoM is reference and not documentary proof.",
+      "sql_sha256": "ee015edb9917982e448858e95fc8dbb197a0e9fb295db637983bd6a7c80477ea",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [],
+      "elapsed_ms": 148.609
+    },
+    {
+      "probe_id": "calenta_exact_skus_may",
+      "sql": "SELECT l.item_code,h.currency,h.canceled,COUNT(*) AS lines,SUM(TRY_CAST(l.quantity AS DECIMAL(38,10))) AS native_quantity,SUM(TRY_CAST(l.line_total AS DECIMAL(38,10))) AS native_line_total FROM (SELECT * FROM telchi.atomic.\"sales_document\" AT (VERSION => 1408)) h JOIN (SELECT * FROM telchi.atomic.\"sales_line\" AT (VERSION => 1408)) l ON l.source_system=h.source_system AND l.doc_entry=h.doc_entry WHERE h.doc_date>=? AND h.doc_date<? AND l.item_code IN ('L02822','L02823','L02877','L03035','L03648','L03649','L03650','L03658') GROUP BY ALL ORDER BY l.item_code,h.currency,h.canceled",
+      "params": [
+        "2026-05-01",
+        "2026-06-01"
+      ],
+      "semantic_basis": "Exact SKU evidence from SAP_HANA Reference. Native Atomic namespace SAP_B1_HANA differs: no blind source_system join to Reference.",
+      "sql_sha256": "ff4dd9e3d17939c1bd6a7a9578149812ce2fd0d3fd0819a9f986730a620954cd",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "item_code": "L02822",
+          "currency": "BS",
+          "canceled": "N",
+          "lines": 570,
+          "native_quantity": "1568.0000000000",
+          "native_line_total": "63287.9600000000"
+        },
+        {
+          "item_code": "L02823",
+          "currency": "BS",
+          "canceled": "N",
+          "lines": 475,
+          "native_quantity": "3472.0000000000",
+          "native_line_total": "24889.6500000000"
+        },
+        {
+          "item_code": "L03649",
+          "currency": "BS",
+          "canceled": "N",
+          "lines": 421,
+          "native_quantity": "2125.0000000000",
+          "native_line_total": "18487.3900000000"
+        },
+        {
+          "item_code": "L03658",
+          "currency": "BS",
+          "canceled": "N",
+          "lines": 425,
+          "native_quantity": "785.0000000000",
+          "native_line_total": "43082.5200000000"
+        }
+      ],
+      "elapsed_ms": 173.612
+    },
+    {
+      "probe_id": "calenta_aliases",
+      "sql": "SELECT entity_type,canonical_id,alias,alias_source,resolution_status FROM read_parquet('/media/issajar/DEVELOP/Projects/iMotorSoft/ai/lab/dataclient/telchi/reference/_versions/v2_reference_closure_2088d5885204313a/entity_alias/part-00000.parquet') WHERE upper(alias) LIKE ? LIMIT 30",
+      "params": [
+        "%CALENTA%"
+      ],
+      "semantic_basis": "Sealed alias candidates: contains match is not one resolved commercial family.",
+      "sql_sha256": "aaf65d0a21e5d53dd7905342b925bff2838f161c40e87360261dbe365930bddd",
+      "status": "EXECUTED_CURRENT_READ_ONLY",
+      "rows": [
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_2058b9550c8d045285843703",
+          "alias": "CALENTA (POMADA SALICILATO DE METILO) x 30 g",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_4ef3b41af6a510bd00e57d62",
+          "alias": "CALENTA FORTE x Kg.",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "MAPPED"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_53c02537638f3720672e2106",
+          "alias": "CALENTA x Kg.",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_5406be0a37e77e9723f3a407",
+          "alias": "INCUBADORA DE TUBO DE ENSAYO Y CALENTADOR",
+          "alias_source": "reference.products:LEGACY_DS",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_70a4e5edb55198184748f7de",
+          "alias": "CALENTA FORTE x 50 g",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "MAPPED"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_7a4060b49de0162196cd0d6a",
+          "alias": "Horno de Calentamiento Indirecto Mufla",
+          "alias_source": "reference.products:LEGACY_DS0",
+          "resolution_status": "MAPPED"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_b3a849a9f81829397835bcfa",
+          "alias": "CALENTA FORTE x 30 g",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "MAPPED"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_c00b684d6cfcd53b2a94bdf5",
+          "alias": "INCUBADORA DE TUBO DE ENSAYO Y CALENTADOR",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_c01355844d4a04e756e3d426",
+          "alias": "CALENTA (POMADA SALICILATO DE METILO) x 250 g.",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_c5b392632b964746307f00f7",
+          "alias": "CALENTA (MEDIAN GROUP)  x 50 g",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "AMBIGUOUS"
+        },
+        {
+          "entity_type": "PRODUCT",
+          "canonical_id": "product_d02ab393831a50690c22dabc",
+          "alias": "CALENTA FORTE  x 250 g.",
+          "alias_source": "reference.products:SAP_HANA",
+          "resolution_status": "MAPPED"
+        }
+      ],
+      "elapsed_ms": 121.8
+    }
+  ]
+}

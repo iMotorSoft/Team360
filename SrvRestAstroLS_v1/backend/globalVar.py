@@ -158,23 +158,25 @@ TEAM360_GUPSHUP_BASE_URL_PRO: str = os.environ.get(
 # =========================
 # Messaging / Meta WhatsApp Cloud (Team360)
 # =========================
+# @lat: [[team360-platform#Team360 Platform#WhatsApp transport boundary]]
+# Team360 assets only: never fall back to another project's Meta credentials.
 TEAM360_META_WABA_TOKEN: str = os.environ.get(
-    "META_VERTICE360_WABA_TOKEN", ""
+    "META_TEAM360_WABA_TOKEN", ""
 )
 TEAM360_META_WABA_ID: str = os.environ.get(
-    "META_VERTICE360_WABA_ID", ""
+    "META_TEAM360_WABA_ID", ""
 )
 TEAM360_META_PHONE_NUMBER_ID: str = os.environ.get(
-    "META_VERTICE360_PHONE_NUMBER_ID", ""
+    "META_TEAM360_PHONE_NUMBER_ID", ""
 )
 TEAM360_META_VERIFY_TOKEN: str = os.environ.get(
-    "META_VERTICE360_VERIFY_TOKEN", ""
+    "META_TEAM360_VERIFY_TOKEN", ""
 )
 TEAM360_META_APP_SECRET: str = os.environ.get(
-    "META_APP_SECRET_IMOTORSOFT", ""
+    "META_TEAM360_APP_SECRET", ""
 )
 TEAM360_META_GRAPH_VERSION: str = os.environ.get(
-    "META_GRAPH_VERSION", "v20.0"
+    "META_TEAM360_GRAPH_VERSION", "v20.0"
 )
 
 

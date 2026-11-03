@@ -1,0 +1,88 @@
+{
+  "status": "BLOCKED_OWNER_AUTHORIZATION_REQUIRED",
+  "branch": "feature/console-backend-core",
+  "objective": "Audit effective FULL_ACCESS for the Telchi DEV pilot before sales.invoice_amount.v1",
+  "FULL_ACCESS_IMPLEMENTED": "NO",
+  "PILOT_FULL_ACCESS": "NO",
+  "AUTHORIZATION_MECHANISM": "Explicit permission-code union from active/testing workspace-compatible roles and permission profiles, followed by exact membership checks and live Console re-resolution before execution",
+  "NEW_CAPABILITY_AUTO_AUTHORIZED": "NO",
+  "WORKSPACE_ISOLATION": "PASS",
+  "MODULE_BOUNDARY": "PASS",
+  "REVOCATION": "NOT_TESTED_FOR_FULL_ACCESS; PASS_FOR_SPECIFIC_GRANTS_AND_PILOT_ADMISSION",
+  "OTHER_USERS_UNCHANGED": "YES",
+  "CORRECTION_APPLIED": "NO",
+  "classification": "Category 4: FULL_ACCESS appears as an investigative policy label, but no implemented integral identity authorization mode was found. The pilot has seven explicit role grants, not a materialized FULL_ACCESS assignment.",
+  "root_cause": "Console has no integral-access semantic branch. It returns only core_role_permissions UNION core_profile_permissions. Telchi pilot admission is deliberately distinct from commercial authorization. Incremental provisioning has repeatedly created narrow roles and exact permission grants.",
+  "identity": {
+    "email": "devfull@telchiai.com",
+    "workspace": "telchi_dev",
+    "organization": "telchi",
+    "transport_tenant": "telchi",
+    "effective_permission_count": 7,
+    "permission_profiles": 0,
+    "full_access_roles_or_permissions_found": 0
+  },
+  "module_enablement": "Existing private admission validated with read_approval: module_enabled=true, whole_workspace_scope_verified=true, revoked=false, identity/workspace match PostgreSQL. DB channel is horizontal_v1, dev, module=telchi, tenant=telchi. These are pilot/runtime policy and channel binding, not a generic DB module entitlement resolver. Live listener/gates/transport readiness not certified by this audit.",
+  "authorization_path": [
+    "Console bearer authentication verifies PASETO subject/user identity, not permission grants.",
+    "Console bootstrap resolves the requested user's workspace then reads effective permissions from PermissionConsoleRepository.",
+    "WhatsApp channel scope is resolved from existing communication_channels metadata and workspace/provider status.",
+    "PhoneIdentityRepository requires a unique verified phone binding, active/testing user and matching tenant/workspace/environment, then invokes the Console permission resolver.",
+    "MessageDispatcher rejects mismatched identity/channel scope and enforces registration permissions. Pilot Telchi registration has no commercial grant requirement for admission.",
+    "BusinessAuthorization checks pilot revocation, fixed pilot identity, tenant/workspace/module/environment, module_enabled and whole_workspace_scope_verified.",
+    "Before capability execution, capability-specific exact permissions must exist in both the resolved identity and the live Console result when a connection is available.",
+    "Capability availability and contract constraints remain mandatory; execution validates Foundation provenance/results. Audit records required_permission, business_rbac_verified and pilot_approval_sha256, not an integral-access authorization mechanism."
+  ],
+  "tests": {
+    "command": "cd SrvRestAstroLS_v1/backend && uv run --no-sync pytest -q -rs modules/telchi/investigation/validation/full_access_rbac_v1/test_full_access_audit.py modules/telchi/assistant/tests/test_pilot_access.py modules/telchi/assistant/tests/test_enterprise_context.py modules/telchi/assistant/tests/test_sales_business_contract.py modules/telchi/assistant/tests/test_invoice_continuity.py tests/test_messaging_handlers.py tests/test_messaging_phone_binding_isolated.py",
+    "passed": 93,
+    "skipped": 1,
+    "skip_reason": "Real isolated PG18 identity/migration test requires an explicit disposable DSN; none provided. No disposable database was created and DEV permissions were not mutated.",
+    "new_audit_tests": 11,
+    "synthetic_new_permission": "telchi.audit.synthetic_operation.read.v1 (test-only string, no production registration)",
+    "demonstrated": [
+      "New permission denied with no grant, old specific grant, FULL_ACCESS, * or telchi.* strings.",
+      "New permission allowed with its explicit grant in an isolated authorization fixture.",
+      "Foreign workspace/tenant/environment denied, disabled module denied.",
+      "Live permission revocation overrides stale identity grants.",
+      "Existing capability, pilot admission revocation, pre-Foundation rejection, contract availability and scoped identity regressions pass using offline doubles."
+    ],
+    "not_demonstrated": [
+      "Successful integral FULL_ACCESS execution or automatic new-capability authorization: mechanism does not exist.",
+      "Revoking a real FULL_ACCESS role: no such role exists.",
+      "Live WhatsApp execution, provider delivery or isolated PostgreSQL mutation regression."
+    ]
+  },
+  "proposal_requires_owner_authorization": {
+    "decision": "Implement FULL_ACCESS as an identity authorization mode assigned to an explicit tenant/workspace/module scope, dynamically evaluated by a shared authorization resolver, never by globally interpreting role names or permission prefixes.",
+    "runtime_rules": [
+      "Require authenticated active identity, valid binding, exact tenant/workspace/module scope and current module enablement.",
+      "Resolve only registered, enabled capabilities whose catalog explicitly assigns them to the module. Unknown/disabled/foreign-module capabilities remain denied.",
+      "Authorize ordinary identities by existing exact grants; authorize integral identities by a live active scoped assignment without per-operation grant materialization.",
+      "Recheck scoped assignment/module status before execution and cached result reuse; preserve pilot admission and all per-capability restrictions.",
+      "Record authorization mechanism, scoped assignment/role, evaluated capability, scope and decision in audit; preserve Foundation integrity/provenance checks."
+    ],
+    "global_impact": "PermissionConsoleRepository and shared authorization contracts, persisted scoped access metadata/schema if required, and Telchi BusinessAuthorization's exact-membership gates. Existing consumers must be inventoried and regression-tested before implementation; no changes to other identity assignments are authorized.",
+    "scope_to_request": "Explicit exclusive GLOBAL authorization window for shared RBAC design/implementation and any required migration, plus Telchi integration and tests. After approval and tests, assign only the pilot DEV scoped access mode with backup/audit. Do not broaden other users.",
+    "no_invoice_amount_implementation": true
+  },
+  "safety": {
+    "postgres_transaction_read_only": true,
+    "database_writes": 0,
+    "runtime_source_changes": 0,
+    "services_started_or_stopped": 0,
+    "whatsapp_sent": 0,
+    "foundation_or_commercial_data_changes": 0,
+    "host_preflight": "BUSY_BUT_SAFE: 8 cores, load about 5, approximately 4.5 GiB available memory, 18 MiB swap used; only small sequential tests and bounded SQL queries",
+    "test_concurrency": 1,
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0
+  },
+  "artifacts_created": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/full_access_rbac_v1/readonly_audit.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/full_access_rbac_v1/test_full_access_audit.py",
+    "data/reports/telchi/full-access-rbac-v1/readonly-audit.json",
+    "data/reports/telchi/full-access-rbac-v1/pytest.txt",
+    "data/reports/telchi/full-access-rbac-v1/conclusion.json"
+  ]
+}

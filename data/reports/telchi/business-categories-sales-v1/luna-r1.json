@@ -1,0 +1,766 @@
+{
+  "scope": "real interpreter + real State Engine/catalog; no data execution or live RBAC claim",
+  "foundation_calls": 0,
+  "whatsapp_sent": 0,
+  "category_context": {
+    "dimension": "product_business_type",
+    "classification_version": "v2_product_business_type_f9c1130d852ccb61",
+    "taxonomy_sha256": "47869a144029baf4862dbb0da0aa47d2dceda53cee810cd8acf7a145d95ecede",
+    "categories": {
+      "RAW_MATERIAL": "Materia prima",
+      "LAB_FINISHED_PRODUCT": "Producto terminado de laboratorio",
+      "FRACTIONATED_PRODUCT": "Producto fraccionado",
+      "PACKAGING": "Envase, etiqueta o material de acondicionamiento",
+      "OTHER_INPUT": "Otro insumo",
+      "SEMI_FINISHED": "Producto semielaborado",
+      "TRADED_PRODUCT": "Producto comercial de reventa",
+      "SERVICE": "Servicio",
+      "OTHER": "Otro",
+      "UNKNOWN": "Clasificación desconocida"
+    },
+    "category_sales_capability": "unavailable",
+    "production_consumption_capability": "unavailable",
+    "membership_source": "existing classified product crosswalk; never product name matching",
+    "limitations": "Current classification is not historical membership. No monetary attribution approved."
+  },
+  "turns": [
+    {
+      "name": "preflight",
+      "question": "Cuánto facturamos en septiembre de 2026",
+      "before": {
+        "metric": null,
+        "period": null,
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "raw": {
+        "intent": "NEW_QUERY",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "/branches": [],
+            "/sales_channel": null,
+            "/comparison": null,
+            "/reference": null,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": null,
+            "/temporal_reference": null
+          },
+          "unset": [
+            "/product_search_text",
+            "/selected_item_codes"
+          ]
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "NEW_QUERY",
+          "action": "EXECUTE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/branches": [],
+              "/sales_channel": null,
+              "/comparison": null,
+              "/reference": null,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/entity_mention": null,
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/product_search_text",
+              "/selected_item_codes"
+            ]
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "entity_mention": null,
+          "temporal_reference": null,
+          "product_search_text": null,
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "availability": {
+        "allowed": true,
+        "reason": null,
+        "category": null
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "no_category_search": true,
+        "compatible": true,
+        "period": true
+      },
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS",
+      "elapsed_seconds": 6.614
+    },
+    {
+      "name": "raw_material",
+      "question": "Cuánto vendimos de materia prima en septiembre",
+      "before": {
+        "schema_version": 2,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "entity_mention": null,
+        "temporal_reference": null,
+        "product_search_text": null,
+        "product_context": null,
+        "selected_item_codes": [],
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "raw": {
+        "intent": "NEW_QUERY",
+        "action": "DIRECT_UNAVAILABLE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": {
+              "text": "RAW_MATERIAL",
+              "type": null
+            },
+            "/temporal_reference": null,
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            }
+          },
+          "unset": [
+            "/product_search_text",
+            "/selected_item_codes"
+          ]
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "NEW_QUERY",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/entity_mention": {
+                "text": "RAW_MATERIAL",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              }
+            },
+            "unset": [
+              "/product_search_text",
+              "/selected_item_codes"
+            ]
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "entity_mention": {
+            "text": "RAW_MATERIAL",
+            "type": null
+          },
+          "temporal_reference": null,
+          "product_search_text": null,
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "availability": {
+        "allowed": false,
+        "reason": "La operación por categoría todavía no está disponible.",
+        "category": "CATEGORY_CAPABILITY_UNAVAILABLE"
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "no_category_search": true,
+        "compatible": true,
+        "period": true
+      },
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS",
+      "response": "Entiendo que querés saber el importe de ventas de materia prima del 1 de septiembre de 2026 al 30 de septiembre de 2026. Todavía no tengo disponible el importe de ventas calculado para esa categoría.",
+      "elapsed_seconds": 9.677
+    },
+    {
+      "name": "finished",
+      "question": "¿Y de productos terminados?",
+      "before": {
+        "schema_version": 2,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "entity_mention": {
+          "text": "RAW_MATERIAL",
+          "type": null
+        },
+        "temporal_reference": null,
+        "product_search_text": null,
+        "product_context": null,
+        "selected_item_codes": [],
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "raw": {
+        "intent": "REFINE",
+        "action": "DIRECT_UNAVAILABLE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "sales.net_amount"
+            ],
+            "/entity_mention": {
+              "text": "LAB_FINISHED_PRODUCT",
+              "type": null
+            },
+            "/metric": "sales.net_amount",
+            "/period": {
+              "start": "2026-09-01",
+              "end_exclusive": "2026-10-01"
+            },
+            "/temporal_reference": null
+          },
+          "unset": [
+            "/product_search_text",
+            "/selected_item_codes"
+          ]
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "REFINE",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "sales.net_amount"
+              ],
+              "/entity_mention": {
+                "text": "LAB_FINISHED_PRODUCT",
+                "type": null
+              },
+              "/metric": "sales.net_amount",
+              "/period": {
+                "start": "2026-09-01",
+                "end_exclusive": "2026-10-01"
+              },
+              "/temporal_reference": null
+            },
+            "unset": [
+              "/product_search_text",
+              "/selected_item_codes"
+            ]
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "sales.net_amount"
+          ],
+          "entity_mention": {
+            "text": "LAB_FINISHED_PRODUCT",
+            "type": null
+          },
+          "temporal_reference": null,
+          "product_search_text": null,
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": "sales.net_amount",
+          "period": {
+            "start": "2026-09-01",
+            "end_exclusive": "2026-10-01"
+          },
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "availability": {
+        "allowed": false,
+        "reason": "La operación por categoría todavía no está disponible.",
+        "category": "CATEGORY_CAPABILITY_UNAVAILABLE"
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "no_category_search": true,
+        "compatible": true,
+        "period": true
+      },
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS",
+      "response": "Entiendo que querés saber el importe de ventas de producto terminado de laboratorio del 1 de septiembre de 2026 al 30 de septiembre de 2026. Todavía no tengo disponible el importe de ventas calculado para esa categoría.",
+      "elapsed_seconds": 5.209
+    },
+    {
+      "name": "code",
+      "question": "Buscame el producto L01128",
+      "before": {
+        "schema_version": 2,
+        "requested_metrics": [
+          "sales.net_amount"
+        ],
+        "entity_mention": {
+          "text": "LAB_FINISHED_PRODUCT",
+          "type": null
+        },
+        "temporal_reference": null,
+        "product_search_text": null,
+        "product_context": null,
+        "selected_item_codes": [],
+        "metric": "sales.net_amount",
+        "period": {
+          "start": "2026-09-01",
+          "end_exclusive": "2026-10-01"
+        },
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "raw": {
+        "intent": "NEW_QUERY",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "products.search"
+            ],
+            "/entity_mention": null,
+            "/temporal_reference": null,
+            "/metric": "products.search",
+            "/period": null,
+            "/product_search_text": "L01128",
+            "/selected_item_codes": []
+          },
+          "unset": [
+            "/branches",
+            "/sales_channel",
+            "/comparison",
+            "/reference"
+          ]
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "NEW_QUERY",
+          "action": "EXECUTE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "products.search"
+              ],
+              "/entity_mention": null,
+              "/temporal_reference": null,
+              "/metric": "products.search",
+              "/period": null,
+              "/product_search_text": "L01128",
+              "/selected_item_codes": []
+            },
+            "unset": [
+              "/branches",
+              "/sales_channel",
+              "/comparison",
+              "/reference"
+            ]
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "products.search"
+          ],
+          "entity_mention": null,
+          "temporal_reference": null,
+          "product_search_text": "L01128",
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": "products.search",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "availability": {
+        "allowed": true,
+        "reason": null,
+        "category": null
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "no_category_search": true,
+        "compatible": true,
+        "search_text": true
+      },
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS",
+      "elapsed_seconds": 3.925
+    },
+    {
+      "name": "text",
+      "question": "Buscá productos que digan materia prima",
+      "before": {
+        "schema_version": 2,
+        "requested_metrics": [
+          "products.search"
+        ],
+        "entity_mention": null,
+        "temporal_reference": null,
+        "product_search_text": "L01128",
+        "product_context": null,
+        "selected_item_codes": [],
+        "metric": "products.search",
+        "period": null,
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "raw": {
+        "intent": "NEW_QUERY",
+        "action": "EXECUTE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/requested_metrics": [
+              "products.search"
+            ],
+            "/entity_mention": null,
+            "/temporal_reference": null,
+            "/metric": "products.search",
+            "/period": null,
+            "/branches": [],
+            "/sales_channel": null,
+            "/comparison": null,
+            "/reference": null,
+            "/product_search_text": "materia prima",
+            "/selected_item_codes": []
+          },
+          "unset": []
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "NEW_QUERY",
+          "action": "EXECUTE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [
+                "products.search"
+              ],
+              "/entity_mention": null,
+              "/temporal_reference": null,
+              "/metric": "products.search",
+              "/period": null,
+              "/branches": [],
+              "/sales_channel": null,
+              "/comparison": null,
+              "/reference": null,
+              "/product_search_text": "materia prima",
+              "/selected_item_codes": []
+            },
+            "unset": []
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [
+            "products.search"
+          ],
+          "entity_mention": null,
+          "temporal_reference": null,
+          "product_search_text": "materia prima",
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": "products.search",
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "availability": {
+        "allowed": true,
+        "reason": null,
+        "category": null
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "no_category_search": true,
+        "compatible": true,
+        "search_text": true
+      },
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS",
+      "elapsed_seconds": 3.937
+    },
+    {
+      "name": "production",
+      "question": "¿Cuánta materia prima consumimos en producción?",
+      "before": {
+        "schema_version": 2,
+        "requested_metrics": [
+          "products.search"
+        ],
+        "entity_mention": null,
+        "temporal_reference": null,
+        "product_search_text": "materia prima",
+        "product_context": null,
+        "selected_item_codes": [],
+        "metric": "products.search",
+        "period": null,
+        "branches": [],
+        "sales_channel": null,
+        "comparison": null,
+        "reference": null,
+        "pending": null
+      },
+      "raw": {
+        "intent": "NEW_QUERY",
+        "action": "DIRECT_UNAVAILABLE",
+        "state_delta": {
+          "set": {
+            "/schema_version": 2,
+            "/requested_metrics": [],
+            "/entity_mention": {
+              "text": "RAW_MATERIAL",
+              "type": null
+            },
+            "/temporal_reference": null,
+            "/metric": null,
+            "/period": null
+          },
+          "unset": [
+            "/product_search_text",
+            "/selected_item_codes"
+          ]
+        },
+        "clarification": null
+      },
+      "processed": {
+        "output": {
+          "intent": "NEW_QUERY",
+          "action": "DIRECT_UNAVAILABLE",
+          "state_delta": {
+            "set": {
+              "/schema_version": 2,
+              "/requested_metrics": [],
+              "/entity_mention": {
+                "text": "RAW_MATERIAL",
+                "type": null
+              },
+              "/temporal_reference": null,
+              "/metric": null,
+              "/period": null
+            },
+            "unset": [
+              "/product_search_text",
+              "/selected_item_codes"
+            ]
+          },
+          "clarification": null
+        },
+        "state_after": {
+          "schema_version": 2,
+          "requested_metrics": [],
+          "entity_mention": {
+            "text": "RAW_MATERIAL",
+            "type": null
+          },
+          "temporal_reference": null,
+          "product_search_text": null,
+          "product_context": null,
+          "selected_item_codes": [],
+          "metric": null,
+          "period": null,
+          "branches": [],
+          "sales_channel": null,
+          "comparison": null,
+          "reference": null,
+          "pending": null
+        },
+        "committed": true,
+        "contract_error": null
+      },
+      "availability": {
+        "allowed": false,
+        "reason": "La operación por categoría todavía no está disponible.",
+        "category": "CATEGORY_CAPABILITY_UNAVAILABLE"
+      },
+      "checks": {
+        "committed": true,
+        "metric": true,
+        "category": true,
+        "no_category_search": true,
+        "compatible": true
+      },
+      "metadata": {
+        "model": "gpt-5.6-luna",
+        "reasoning": "medium",
+        "provider": "OpenAI direct",
+        "reasoning_echo_verified": true
+      },
+      "status": "PASS",
+      "response": "Entiendo la consulta de consumo productivo de materia prima. Todavía no tengo disponible esa operación de producción; no la sustituyo por ventas ni por una búsqueda de productos.",
+      "elapsed_seconds": 5.789
+    }
+  ],
+  "source_hashes": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/monetary_comparison.py": "09a43abb8132663ed15a5739da7fba480f703857c3810baa89b4b8072f7cb905",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/state_engine.py": "5869466f28a877723deb8d574816c9d4550570dbc8b0135f991527a17e0240f4",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/whatsapp_dev_evidence.py": "973c66ac29215e1f66275c413c532036305817dba82ffeaaebfcf91a9e78fa40",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/repository.py": "228030a03bf9706b86a78839e8d2a35dc3379e15a0ee69959746aaa9cc82266d",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/business_categories.py": "4a9fb0f24dadf0bc15255864f4df27c31c7da48d2a5a1e900ce292c49e6b9f04",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/capabilities.py": "c022910a38ae6fb819cb6d5c40b5f7802c38794018a80a6eefa3dd90af879ec6",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/__init__.py": "5e077f893f781a8f0265be4655c1af245513755552ffe4e72d87fea64129b386",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/result_references.py": "825cfde2af03e44444dc12e4ecd02866460445b9138ec63836940b2083b31774",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/whatsapp_dev_lifecycle.py": "e78a21b7c82dc86e04f747f3b21fbd5a0b7bc7898fd00438e6fd8babeb06abad",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py": "a79c15b096d03b85684bd1c01ba4df8ab45df3800c42acfe28d9174bddd9020f",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/composition.py": "41e3bf569751e320820a03b20e8edbd03bee4b7877fc0e9e281f0499bf64e26a",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/dev_runtime_http.py": "8dbec24c3aa80515fb8b32c9b28b42b0f1a6c9c68c289fe9382ce987099a2e3d",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/whatsapp_dev_repository.py": "1ef2c34c89d84721091325c8efa0bd428c800ce0106791c66dd39c7ace0a8e9b",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py": "74e279d41e07083188422bb58f1b446c82f54246239000fe04350c5116b3b27d",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/whatsapp_dev.py": "e1eaaaeafc388bba96587852809da3c4a326d375b0b6351f82ec367847e319ad"
+  },
+  "status": "PASS"
+}

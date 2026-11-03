@@ -1,0 +1,157 @@
+{
+  "generated_at": "2026-10-16T12:39:18.546499+00:00",
+  "branch": "feature/console-backend-core",
+  "objective": "Focused six-gate renewal only; no lifecycle session",
+  "approval": "VALID",
+  "source_sha256": "454eddaebef39b836247bd2b167bc533a1bfbb7d0ca62761a2b75a61aa7d352f",
+  "approval_sha256": "85ba7e30c448316645620416e55087f3d9fdeb52f043f6e2e9ef73461440c448",
+  "config_sha256": "3f69ac997b76af9549a2588edd018bac160bc06ee571d4dba8b0df254f9e359c",
+  "source_fingerprint": "VALID",
+  "historical_manifest_unchanged": true,
+  "historical_manifest_backup": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/gate-renewal-20261016T123830Z/historical-manifest.json",
+  "new_manifest_issued": false,
+  "http_probe": {
+    "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/gate-renewal-20261016T123830Z/http-auth.json",
+    "sha256": "978d964d5c67520f59826d8dc88b7d5f34064b57745ebd5ac03c5c72bf4e8133",
+    "http_auth_local": "PASS",
+    "container_state": "created",
+    "container_probe": "BLOCKED: container not running; no service start authorized",
+    "error_class": null,
+    "fingerprints_stable": true,
+    "own_processes_left_running": 0
+  },
+  "gate_review": {
+    "assistant_foundation": {
+      "historical_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/whatsapp-gate-audit-foundation-20261015T2337Z.json",
+      "historical_sha256": "fb152224e40aa00cc737bf80160c9a7165b4339f5c3ce4d1f182974f08f64ba4",
+      "historical_integrity": true,
+      "historical_scope": "Approved source_top_items fixed period on real read-only Foundation; 10 rows, publication/snapshot lineage.",
+      "current_scoped_hashes": {
+        "modules/telchi/assistant/capabilities.py": "08013cc0a0784ff8a0083f36c870508d0ab9b0ebbe180212564a4bc0bc3f9c0a",
+        "modules/telchi/datalake/messaging_sales_query.py": "f90d46678389d0d23a5d20879a8f058f875c95ec9c1bb34676639aa3cf084898",
+        "modules/telchi/datalake/foundation_reader.py": "9f68b985ce73c4cd8bcbd502c9471e5b1284c946aefa63ec9078bb7af94cedb4",
+        "modules/telchi/datalake/foundation_publication.py": "3d7cc3034b0524d683a9f415aadde0f34ac684d2d518621242052f6ef48a7661"
+      },
+      "decision": "HISTORICAL_REUSE_CANDIDATE_NOT_REEXECUTED",
+      "review_basis": "Approval/sender/workspace/instance match historical evidence; scope implementation matches prior closure per-file inventory. Only launcher/helper/tests have post-historical mtimes. Mtimes are corroboration, NOT cryptographic historical parity.",
+      "limitations": "Historical aggregate source hash lacks a complete pre-lifecycle per-file/config baseline. Do not claim an independently proven cross-version identity or a new live run.",
+      "scope_limit": "Fixed source_quantity period 2026-01-01..2026-09-16 exclusive; recorded publication foundation_afd08d9eca6a725be53cdc3f9d5709c9 snapshot 1408. No business query repeated; no new current publication attestation issued."
+    },
+    "business_authorization": {
+      "historical_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/negative-gates-20261015T235435Z/negative_gates.json",
+      "historical_sha256": "1159cc5211ca06e5e5031b12cb49923a54b400c42fd5ed6121d144cfff394a58",
+      "historical_integrity": true,
+      "historical_scope": "Real active Telchi DEV identity with an effective non-source_quantity permission resolves but is denied by MessageDispatcher/BusinessAuthorization; zero model/capability/Foundation execution.",
+      "current_scoped_hashes": {
+        "modules/telchi/assistant/handler.py": "f0d44268aa94d32298c0906b181667d42a7248c0053c3bde11d97bbbb7419d4e",
+        "modules/messaging/handlers.py": "7fea28a5974a5d3025c17730d6dade85616050060da5904d911b22f800908dcd",
+        "modules/telchi/assistant/whatsapp_dev_repository.py": "a75d351d47dc9d148fd15b334b4fe6b8280273681a006cbd18cbffcea86dfa1e"
+      },
+      "decision": "HISTORICAL_REUSE_CANDIDATE_NOT_REEXECUTED",
+      "review_basis": "Approval/sender/workspace/instance match historical evidence; scope implementation matches prior closure per-file inventory. Only launcher/helper/tests have post-historical mtimes. Mtimes are corroboration, NOT cryptographic historical parity.",
+      "limitations": "Historical aggregate source hash lacks a complete pre-lifecycle per-file/config baseline. Do not claim an independently proven cross-version identity or a new live run.",
+      "fixture_limit": "Synthetic negative fixtures were deactivated; their permission to create/use expired after the recorded run. No fixture reactivation authorized or performed."
+    },
+    "durable_idempotency": {
+      "historical_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/durable-idempotency-v1-20261015T232924Z/durable_idempotency.json",
+      "historical_sha256": "17ab1af880e1c3102117ee5d2fb6e6f8245f396c2f54061762733d7243ef9e02",
+      "historical_integrity": true,
+      "historical_scope": "Real PostgreSQL Messaging fence; at-most-once handler execution; recording egress double.",
+      "current_scoped_hashes": {
+        "modules/messaging/service.py": "85d6d56e45c1cd9dbbcb890c2a3daa165da079bf5da0b204e0c51def25ac338a",
+        "modules/messaging/repository.py": "fdc122579c5a7947feec623919e1b0faafd078144891cabd138dd0830044c3bd",
+        "modules/telchi/assistant/repository.py": "4f67619b45f4920cdc2e24c79dcacc7075a9a7c618e1c130498fe21d9207a523",
+        "modules/db/transaction.py": "a19b79289aee9b1c855583840020039ec0f02666db177d9f561e033e678a0627"
+      },
+      "decision": "HISTORICAL_REUSE_CANDIDATE_NOT_REEXECUTED",
+      "review_basis": "Approval/sender/workspace/instance match historical evidence; scope implementation matches prior closure per-file inventory. Only launcher/helper/tests have post-historical mtimes. Mtimes are corroboration, NOT cryptographic historical parity.",
+      "limitations": "Historical aggregate source hash lacks a complete pre-lifecycle per-file/config baseline. Do not claim an independently proven cross-version identity or a new live run.",
+      "scope_limit": "Historical real PG inbox/outbox and handler-at-most-once only; recording sender, not real delivery."
+    },
+    "http_auth": {
+      "historical_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/remaining-gates-20261015T234312Z-d30305/remaining_gates.json",
+      "historical_sha256": "86547f9b69cd279eaadc386ce2635cffca06c5ac0434513a8440666e7772ea27",
+      "historical_integrity": true,
+      "historical_scope": "Real Srv05 ingress + PilotBoundary HTTP authentication rejected before body/execution; PostgreSQL scope unchanged.",
+      "current_scoped_hashes": {
+        "modules/telchi/assistant/whatsapp_dev.py": "5815fce7cce1ab827e315824c47d27c09c76a41cfbd68bf10162000d415df2bc",
+        "modules/messaging/webhooks/evolution_whatsapp.py": "bff5c4d96a893ad6c08f745dc87c02fd345418021de34f65f3e555932872caea"
+      },
+      "decision": "NEW_LOCAL_HTTP_PASS; CONTAINER_INGRESS_BLOCKED",
+      "review_basis": "Approval/sender/workspace/instance match historical evidence; scope implementation matches prior closure per-file inventory. Only launcher/helper/tests have post-historical mtimes. Mtimes are corroboration, NOT cryptographic historical parity.",
+      "limitations": "Historical aggregate source hash lacks a complete pre-lifecycle per-file/config baseline. Do not claim an independently proven cross-version identity or a new live run."
+    },
+    "identity_tenant_isolation": {
+      "historical_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/negative-gates-20261015T235435Z/negative_gates.json",
+      "historical_sha256": "1159cc5211ca06e5e5031b12cb49923a54b400c42fd5ed6121d144cfff394a58",
+      "historical_integrity": true,
+      "historical_scope": "Real DEV identity in a separate synthetic tenant/workspace resolves in its own scope but is denied on the Telchi channel; cross-scope phone binding rejected by the DB trigger; no tenant/capability contamination.",
+      "current_scoped_hashes": {
+        "modules/messaging/identity.py": "485f41da43601cd6a1fc26b7adf22e579f94d4d9ae8f049aac4dcc52eb1da572",
+        "modules/messaging/handlers.py": "7fea28a5974a5d3025c17730d6dade85616050060da5904d911b22f800908dcd",
+        "modules/telchi/assistant/whatsapp_dev_repository.py": "a75d351d47dc9d148fd15b334b4fe6b8280273681a006cbd18cbffcea86dfa1e"
+      },
+      "decision": "HISTORICAL_REUSE_CANDIDATE_NOT_REEXECUTED",
+      "review_basis": "Approval/sender/workspace/instance match historical evidence; scope implementation matches prior closure per-file inventory. Only launcher/helper/tests have post-historical mtimes. Mtimes are corroboration, NOT cryptographic historical parity.",
+      "limitations": "Historical aggregate source hash lacks a complete pre-lifecycle per-file/config baseline. Do not claim an independently proven cross-version identity or a new live run.",
+      "fixture_limit": "Synthetic negative fixtures were deactivated; their permission to create/use expired after the recorded run. No fixture reactivation authorized or performed."
+    },
+    "model_no_fallback": {
+      "historical_artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/durable-idempotency-v1-20261015T232924Z/durable_idempotency.json",
+      "historical_sha256": "17ab1af880e1c3102117ee5d2fb6e6f8245f396c2f54061762733d7243ef9e02",
+      "historical_integrity": true,
+      "historical_scope": "Real Luna OpenAI direct credential path; gpt-5.6-luna / medium; no retry, fallback or proxy.",
+      "current_scoped_hashes": {
+        "modules/telchi/assistant/luna.py": "e3f77ba5c3c55c9a7551325d53e4f16d5f519ef6013b1e5545b7e1567e93f9ec"
+      },
+      "decision": "HISTORICAL_REUSE_CANDIDATE_NOT_REEXECUTED",
+      "review_basis": "Approval/sender/workspace/instance match historical evidence; scope implementation matches prior closure per-file inventory. Only launcher/helper/tests have post-historical mtimes. Mtimes are corroboration, NOT cryptographic historical parity.",
+      "limitations": "Historical aggregate source hash lacks a complete pre-lifecycle per-file/config baseline. Do not claim an independently proven cross-version identity or a new live run.",
+      "scope_limit": "Historical real OpenAI direct gpt-5.6-luna / medium. Adapter pins model/effort, checks response echo, trust_env=False and no retries/fallback. No generation/benchmark repeated; present provider availability is not claimed."
+    }
+  },
+  "files_created": [
+    "audit.py",
+    "audit.json",
+    "http_probe.py",
+    "http-result.json",
+    "close.py",
+    "closure.json"
+  ],
+  "cross_module_impact": "NONE: no runtime/tests/shared documentation/service configuration changed",
+  "postgres_read_only": "PASS: binding, approved identity, receiver, effective permission, transport and identity schema",
+  "gate_evidence": {
+    "result": "BLOCKED",
+    "error_class": "ValueError",
+    "code": "gate_scope_mismatch"
+  },
+  "preflight_cli": {
+    "command": "python -m modules.telchi.assistant.whatsapp_dev preflight --approval PRIVATE_APPROVAL",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "BLOCKED: revisar configuraci\u00f3n/evidencia privada y restauraci\u00f3n; sin detalles sensibles."
+  },
+  "evolution_read_only": {
+    "result": "BLOCKED",
+    "error_class": "ConnectError",
+    "endpoint": "127.0.0.1:18180",
+    "container_state": "created (read-only podman inspect)"
+  },
+  "historical_backup_exact": true,
+  "source_stable_at_end": true,
+  "config_stable_at_end": true,
+  "approval_stable_at_end": true,
+  "result": {
+    "TELCHIAI_GATES": "BLOCKED",
+    "SOURCE_FINGERPRINT": "VALID",
+    "APPROVAL": "VALID",
+    "MANIFEST": "BLOCKED",
+    "PREFLIGHT": "BLOCKED",
+    "READY_FOR_LIFECYCLE_TEST": "NO"
+  },
+  "blockers": [
+    "Evolution is unavailable on 127.0.0.1:18180 and the configured evolution-api container is created, not running. No container-to-owned-listener auth/reachability or inactive/restorable webhook readback could be certified. No authority to start it.",
+    "Historical scoped evidence is intact, but its aggregate digest does not supply complete historical per-file/config parity. Candidates and exact current hashes retained; no automatic six-PASS inheritance or replacement manifest issued."
+  ],
+  "next_action": "Operator makes the existing Evolution service available without changing the approved DEV scope. Then complete the inert container ingress/readback and scoped parity review before issuing a manifest; do not repeat business/model/idempotency batteries."
+}

@@ -1,0 +1,58 @@
+{
+  "branch": "feature/console-backend-core",
+  "objective": "Focused operational closure; no feature development, service start, WhatsApp or manifest renewal",
+  "RESULT_REFERENCE_CODE": "VALID",
+  "SIX_GATES": "BLOCKED",
+  "CURRENT_FINGERPRINT": "STALE",
+  "RBAC_AND_ISOLATION": "BLOCKED",
+  "TELCHIAI_RUNTIME": "STOPPED",
+  "EVOLUTION": "READY",
+  "CLOUDFLARE": "READY",
+  "META_CALLBACK": "UNKNOWN",
+  "READY_FOR_MANUAL_WHATSAPP": "NO",
+  "source_sha256": "71ea1cb702490715a5e677d48c1e6066cf3de719d82e65c2b983104b93573d19",
+  "manifest_source_sha256": "0e370c0bd4a8fed6d2f50d365d9e28d435486db6cf400b39a96615859eea2a07",
+  "fingerprint_meaning": "Current source computed successfully; STALE describes the operational manifest binding, not the four RESULT_REFERENCE source files",
+  "previous_evidence": {
+    "result_reference": "validation.json and luna-medium.json reviewed; all four current source hashes match validation.json exactly; prior 357 tests and real Luna medium ordinal evidence retained within their fixture scope",
+    "six_gate_artifacts": "All six private artifact SHA-256 values match their manifest; approval hash matches; manifest is not expired at inspection but its source fingerprint does not match current code",
+    "reuse_limit": "Integrity is not applicability. Prior whole-runtime attestation cannot cover new persisted-result retrieval, selection authorization and audit/cache paths. No six-gate renewal claimed."
+  },
+  "affected_guarantees": {
+    "http_auth": "No HTTP auth implementation change identified in the four files; old artifact remains intact. No fresh live HTTP boundary check or complete dependency-baseline equivalence established.",
+    "identity_tenant_isolation": "repository.py retrieves prior audit results; handler.py exposes descriptors and selection. Requires owner, tenant, workspace, conversation and channel scope on the real authorized result path.",
+    "business_authorization": "handler.py rechecks capability permissions before descriptors and before selection, including cached selections. Fixture revocation PASS; full real between-turn result-path revocation remains unaccredited.",
+    "durable_idempotency": "Messaging transport/fence not changed by these four files; repository audit/result pointer and cached selection changed. Focused persistence/audit regression PASS; no current live ingress retry/concurrency selection proof.",
+    "assistant_foundation": "result_references.py and handler.py select deterministically without capability execution. Real PG fixture regression confirms zero new Foundation calls on selection; actual authorized business-result pipeline not reaccredited.",
+    "model_no_fallback": "luna.py adds result-reference interpretation. Exact matching-source real Luna medium evidence retained, no model request repeated; not a replacement for the complete current-runtime manifest."
+  },
+  "fresh_checks": {
+    "focused_pytest": {
+      "paths": ["modules/telchi/assistant/tests/test_result_references.py", "modules/telchi/assistant/tests/test_result_references_postgres.py"],
+      "execution": "Backend .venv Python loaded existing private lifecycle config, enabled TEAM360_RESULT_REFERENCE_POSTGRES_TEST=1 and numeric thread budget 2, then pytest.main(paths + ['-q'])",
+      "result": "21 passed in 0.39s; one PytestAssertRewriteWarning because anyio was already imported",
+      "scope": "Real PostgreSQL session-local temporary tables; independent committed turns; synthetic business results and controlled authorization. Revocation, invalid references, owner/conversation integrity, selected-result persistence and audit covered, not operational pilot revocation."
+    },
+    "live_readonly_rbac": "PASS: existing approved pilot phone resolved against real PG; effective Console invoice permission accepted; empty permission cache, foreign tenant and foreign workspace denied. READ ONLY transaction, pool max_size=1, pool closed. No grant changes and no business rows retrieved.",
+    "initial_probe_error": "Initial read-only helper omitted required pilot_access_check and was rejected with ValueError. Helper corrected, policy unchanged, subsequent real read-only checks PASS; no functional defect inferred.",
+    "runtime_status": "Existing telchiai-dev.sh status: STOPPED, launcher/backend absent or changed, webhook INTERNAL, approval VALID, PostgreSQL READY, Evolution READY, gates INVALID_OR_EXPIRED. Direct inspection narrows gate invalidity to source mismatch, not expiry.",
+    "evolution_status": "Existing lab evolution-api/status.sh: container running and healthy; API 2.3.7 responsive. Lifecycle authenticated GET reports instance READY.",
+    "cloudflare_status": "Existing lab evolution-api/cloudflare-status.sh: READY; managed identity and URL verified by existing read-only script. This is not a public delivery test.",
+    "meta_callback": "UNKNOWN: required Team360 Meta app administration credentials absent from inspected existing control/backend/lab configuration. No Graph mutation or callback change performed.",
+    "git_diff_check": "PASS before report creation; repeated at final review"
+  },
+  "commercial_capabilities": "No capability, Foundation, SQL business query, permission or State Engine file edited; no commercial authorization added. This closure changes evidence only.",
+  "operational_manifest_published": false,
+  "minimal_next_action": "Operator must arrange the existing controlled runtime validation window, reaccredit affected real result-path and ingress guarantees with no WhatsApp egress, then publish the manifest only after PASS and manually start TelchiAI. Verify Meta callback read-only with existing Team360 app credentials. No need to repeat 357 tests, LlmFit or commercial approval.",
+  "resource_guard": {
+    "HOST_PREFLIGHT": "BUSY_BUT_SAFE",
+    "RESOURCE_GUARD": "PASS",
+    "observations": "Load 4.20/3.83/3.51; approximately 4.5 GiB available; 1189 MiB swap stable; sampled idle 74-77%, no ongoing swap IO",
+    "CONCURRENCY_USED": "One sequential helper/test process; one PG connection; numeric thread budget 2; no browsers/listeners/workers created",
+    "UNRELATED_PROCESSES_TERMINATED": 0,
+    "OWN_PROCESSES_LEFT_RUNNING": 0,
+    "ENVIRONMENTAL_ABORTS": 0,
+    "SERVICES_STARTED_OR_STOPPED": 0,
+    "WHATSAPP_SENT": 0
+  }
+}

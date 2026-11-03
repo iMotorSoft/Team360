@@ -86,9 +86,30 @@ solapamientos dentro de ese proceso; multiworker queda fuera de la demo.
 
 ### Política de acceso de la demo
 
-La demo/MVP opera sin login ni RBAC de configuración. Toda visita efectiva es
-el Administrador implícito `flow-mvp-administrator`. El hardening enterprise de
-autenticación, usuarios, roles y permisos queda para una fase posterior.
+`default_admin` es una capacidad DEV/demo explícita y no una política de
+producción. Para la UI demo, iniciar el backend DEV con ambas variables:
+
+```bash
+TEAM360_ENV=development TEAM360_FLOW_ACCESS_MODE=default_admin ../backend-dev.sh
+```
+
+También se admite `TEAM360_ENV=dev`. No se infiere DEV por localhost ni por el
+default de `globalVar.DEFAULT_ENV`. El administrador sintético
+`flow-mvp-administrator` conserva las tres capabilities Flow en las diez
+operaciones HTTP, sin afectar Console, Diagnosis ni Messaging.
+
+`TEAM360_FLOW_ACCESS_MODE` admite únicamente `authenticated` y `default_admin`
+(con trim y normalización a minúsculas). Ausente → `authenticated`: PASETO y
+permisos persistentes existentes. Vacío, whitespace, typo o valor desconocido →
+configuración inválida. `default_admin` con entorno ausente, inválido o no DEV
+(incluido PROD) → configuración inválida. HTTP responde 503 antes de acceder a
+datos; no hay fallback admin. La validación es por petición, no un nuevo hook
+de startup: Srv01/Srv05 pueden construirse, pero Flow no concede acceso.
+
+Los runners CLI y la demo de dominio no consumen esta política HTTP y conservan
+su comportamiento; no se habilita automatización ni transporte por estas
+variables. Las fixtures HTTP demo solicitan ambos valores explícitamente.
+No se modifica login, PASETO global, tenancy ni RBAC enterprise.
 
 ### Preparar una shell sin exponer secretos
 
@@ -378,7 +399,7 @@ uv run python -m modules.flow.executive_query_once <request-id> \
   --question "¿Qué pasó con el reclamo?"
 ```
 
-Ruta HTTP autenticada con PASETO console:
+Ruta HTTP con PASETO Console por defecto (excepto demo DEV explícita):
 
 ```text
 GET /api/team360-flow/executive/{request_id}?question=...
@@ -386,7 +407,8 @@ GET /api/team360-flow/executive/{request_id}?question=...
 
 ## Executive Query Authorization
 
-La ruta HTTP separa AUTHENTICATION de AUTHORIZATION:
+En modo `authenticated` (default), la ruta HTTP separa AUTHENTICATION de
+AUTHORIZATION. La única excepción es la demo DEV explícita descrita arriba:
 
 - autenticación: PASETO `console_access` demuestra identidad (401 si falta o es
   inválido);

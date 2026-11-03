@@ -1,0 +1,112 @@
+{
+  "branch": "feature/console-backend-core",
+  "generated_at": "2026-10-20T14:03:18.876863+00:00",
+  "SIX_GATES": "STALE",
+  "CURRENT_FINGERPRINT": "INVALID",
+  "STARTUP_DIAGNOSTICS": "PASS",
+  "READY_FOR_ONE_MANUAL_RETRY": "NO",
+  "current_source_sha256": "fa20154fb2bc96ee4ee69a69c9412dab50b275397973d628e3710d1f8927acfb",
+  "accredited_source_sha256": "cb61aa5c13b2d7fa61e6f2216743e31097a32f8073c34a0ca1ce81cb2e3fbc8d",
+  "approval_match": true,
+  "configuration_match": true,
+  "validity_policy": "change_based_v1",
+  "expires_at_present": false,
+  "checks": {
+    "assistant_foundation": {
+      "artifact_integrity": true,
+      "original_observation_pass": true,
+      "artifact_source_matches_manifest": true,
+      "generated_at": "2026-10-20T13:10:25.512075+00:00",
+      "scoped_source_baseline_present": false,
+      "input_integrity": {
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/real-verification-r3.json": true,
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/test-validations.json": true
+      }
+    },
+    "business_authorization": {
+      "artifact_integrity": true,
+      "original_observation_pass": true,
+      "artifact_source_matches_manifest": true,
+      "generated_at": "2026-10-20T13:10:25.512075+00:00",
+      "scoped_source_baseline_present": false,
+      "input_integrity": {
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/real-verification-r3.json": true,
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/test-validations.json": true
+      }
+    },
+    "durable_idempotency": {
+      "artifact_integrity": true,
+      "original_observation_pass": true,
+      "artifact_source_matches_manifest": true,
+      "generated_at": "2026-10-20T13:10:25.512075+00:00",
+      "scoped_source_baseline_present": false,
+      "input_integrity": {
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/real-verification-r3.json": true,
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/test-validations.json": true
+      }
+    },
+    "http_auth": {
+      "artifact_integrity": true,
+      "original_observation_pass": true,
+      "artifact_source_matches_manifest": true,
+      "generated_at": "2026-10-20T13:10:25.512075+00:00",
+      "scoped_source_baseline_present": false,
+      "input_integrity": {
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/real-verification-r3.json": true,
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/test-validations.json": true
+      }
+    },
+    "identity_tenant_isolation": {
+      "artifact_integrity": true,
+      "original_observation_pass": true,
+      "artifact_source_matches_manifest": true,
+      "generated_at": "2026-10-20T13:10:25.512075+00:00",
+      "scoped_source_baseline_present": false,
+      "input_integrity": {
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/real-verification-r3.json": true,
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/test-validations.json": true
+      }
+    },
+    "model_no_fallback": {
+      "artifact_integrity": true,
+      "original_observation_pass": true,
+      "artifact_source_matches_manifest": true,
+      "generated_at": "2026-10-20T13:10:25.512075+00:00",
+      "scoped_source_baseline_present": false,
+      "input_integrity": {
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/real-verification-r3.json": true,
+        "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/data/reports/telchi/category-scoped-registration-v1/test-validations.json": true
+      }
+    }
+  },
+  "mechanism_results": {
+    "gate_evidence": {
+      "class": "ValueError",
+      "code": "gate_scope_mismatch"
+    },
+    "normal_preflight": {
+      "class": "ValueError",
+      "code": "gate_scope_mismatch"
+    }
+  },
+  "tests": {
+    "command": "uv run pytest modules/telchi/assistant/tests/test_whatsapp_dev_diagnostics.py modules/telchi/assistant/tests/test_whatsapp_dev.py modules/telchi/assistant/tests/test_whatsapp_dev_lifecycle.py modules/telchi/assistant/tests/test_whatsapp_dev_lifecycle_extra.py modules/telchi/assistant/tests/test_dev_gate_policy.py -q",
+    "result": "112 passed in 51.96s",
+    "scope": "Offline contracts and synthetic owned Uvicorn children, not real TelchiAI startup or six real operational guarantees"
+  },
+  "blockers": [
+    "Current source differs from manifest: gate_scope_mismatch invalidates admission of all six entries. This does not demonstrate functional failures in all six contracts.",
+    "The inspected current accreditation report and its referenced inputs do not provide an accredited per-file source baseline to establish diagnostic-only drift. Existing proportional migration/reaccreditation runners require exact source or scoped baseline parity before reuse; their historical source-specific preconditions do not match this tree. No manifest published."
+  ],
+  "next_step": "Recover an accredited pre-diagnostics snapshot/baseline for scoped comparison, or reaccredit incompatible guarantees with fresh real evidence under the existing runbook; do not update hashes alone.",
+  "host_preflight": "BUSY_BUT_SAFE; 8 CPUs, load 1.88/2.16/4.58, MemAvailable 5717 MiB, swap 4479 MiB stable over sample, sampled CPU idle 81-83%",
+  "concurrency_used": 1,
+  "services_started_or_stopped": 0,
+  "whatsapp_sent": 0,
+  "manifest_changed": false,
+  "source_modified": false,
+  "unrelated_processes_terminated": 0,
+  "own_processes_left_running": 0,
+  "environmental_aborts": 0,
+  "runtime_state": "STOPPED"
+}

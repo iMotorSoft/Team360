@@ -1,0 +1,566 @@
+{
+  "status": "BLOCKED",
+  "requested_verdict": "TELCHI_OPERATIONAL_BUSINESS_READINESS_V1_PASS",
+  "achieved": false,
+  "branch": "feature/console-backend-core",
+  "reported_at": "2026-11-02T00:12:22.126835+00:00",
+  "context": {
+    "entity": "TELCHI",
+    "stage": "DEVELOPMENT",
+    "sources": [
+      "PUBLISHED_DATA_LAKE",
+      "IMMUTABLE_EXISTING_CAPTURES",
+      "LEGACY_READ_ONLY_SOURCE_CONTRACTS"
+    ],
+    "outputs": [
+      "BACKEND_CAPABILITIES",
+      "METRIC_TRANSITION_MATRIX",
+      "EVIDENCE"
+    ],
+    "ownership": "Owner-assigned Telchi module-local operational analytics extension; preserve all existing worktree changes; no GLOBAL/SHARED writer claim"
+  },
+  "foundation": {
+    "current": "foundation_42483d2e035e98e73e0a2d98ddc7d986",
+    "reference": "v2_sales_448ae93a960bf7342564a2d0",
+    "logical_components": [
+      "credit_memo",
+      "material_supply",
+      "oinm",
+      "oitw",
+      "purchasing",
+      "receivables_collections",
+      "reference",
+      "sales"
+    ],
+    "historical_snapshots_retained": [
+      1322,
+      1408,
+      1492,
+      1499,
+      1506
+    ],
+    "publication_commit_snapshot": 1506,
+    "pinned_independent_data_snapshot": 1408,
+    "derivation_snapshot": 1322,
+    "current_unchanged": true,
+    "evidence": "current-final.json and readers-r2.json"
+  },
+  "capabilities_implemented": [
+    "inventory.stock_by_warehouse",
+    "production.consumption",
+    "purchasing.invoiced_amount",
+    "collections.received_amount",
+    "material_supply.consumption",
+    "production.orders",
+    "purchasing.received_amount",
+    "collections.unallocated",
+    "purchasing.ordered_amount",
+    "production.bom"
+  ],
+  "capabilities_available_in_dev_for_actual_identity": [],
+  "capability_activation": "IMPLEMENTED / REAL_READERS_EXECUTED / NOT_ACTIVATED: no effective operational grants. No entitlements/catalog/roles/assignments modified to obtain a PASS.",
+  "blockers": [
+    {
+      "code": "MISSING_EFFECTIVE_OPERATIONAL_PERMISSIONS",
+      "evidence": "luna-final.json",
+      "detail": "Existing approved DEV identity resolved by real phone binding + Console has only sales/product grants. All five final natural questions select the right operation and are denied at its distinct permission before Foundation access; capability_calls=0. No new grant or technical FULL_ACCESS equivalence fabricated."
+    },
+    {
+      "code": "NORMAL_BUDGET_NOT_ACCREDITED",
+      "evidence": "worker-collections.json and readers-r2.json trace",
+      "detail": "Canonical Foundation sealed-facts validation takes about 76 seconds; normal worker budget remains 60 seconds. Controlled DEV 180s diagnostic worker succeeds. This is not SQL slowness or a proven I/O-wait outage. No permanent timeout increase or validation bypass introduced."
+    }
+  ],
+  "capabilities_pending": [
+    "Real allowed-path business runtime for all five domains with effective existing-business-authority mapping",
+    "DEV/UI authenticated integration and UI E2E; frontend not modified or certified",
+    "Specific invoice applications, invoices with applications, due-date queries and customer-level collections filters",
+    "Inventory zero-product listing, complete warehouse pagination and concentration ranking beyond bounded explicit positions",
+    "Purchasing requests and returns unavailable in published captures; supplier-specific document drilldown not implemented",
+    "Business-category-only production/material consumption, physical-unit conversions and historical BOM effectivity not accredited",
+    "Conversational inventory movement-prefix operation not implemented; historical movements reader and prefix remain separate",
+    "Full regression completion and observed shared Srv05 test mismatch"
+  ],
+  "question_matrix": [
+    {
+      "question": "¿Cuánto stock tenemos del producto con código SAP E00003 por depósito?",
+      "capability": "inventory.stock_by_warehouse.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "inventory_balance": "oitw_26775585ee26d41a5d5532d3"
+      },
+      "metric": "inventory.stock_by_warehouse",
+      "permission": "telchi.inventory.stock_by_warehouse.read.v1",
+      "coverage": {
+        "kind": "STOCK_SNAPSHOT",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:43:38.461000",
+        "observation_finished_at": "2026-11-01T17:46:05.375000",
+        "source_scope": {
+          "branch": "ONLY_ACCREDITED_REFERENCE_CROSSWALKS",
+          "history_rebuilt": false,
+          "kind": "CURRENT_STOCK_STATEMENT_SNAPSHOT",
+          "limitation": "SAP statement observation; not simultaneous with other domains"
+        },
+        "requested_period": {},
+        "source_as_of": "2026-11-01T17:43:38.461000+00:00"
+      },
+      "independent_control": {
+        "positions": 73,
+        "presented_native_quantities_exact": true,
+        "omitted_positions": 23
+      },
+      "parity": "EXACT",
+      "reader_response": "Stock observado por depósito:\nE00003 · depósito 01: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMD: existencia 0E-12, comprometido 2.000000000000, disponible -2.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-AMK: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-DEV: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-EXT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-KIT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MAG: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MEI: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-MKT: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-SAL: existencia 14.000000000000, comprometido 0E-12, disponible 14.000000000000 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-SMK: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito 2A-TRAN: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito ALM-CON: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito ALM-IMP: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito CM-AMD: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito CM-SAL: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito DMS-DEV: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito DMS-PROF: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito DV-SAL: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-A1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-C1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D0: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D10: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D11: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D12: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D2: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D3: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D4: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D5: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D6: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D7: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D8: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-D9: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-DAN: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-DES: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-IMP: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-M1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P2: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P3: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P4: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-P5: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T1: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T2: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T3: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T4: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T5: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T6: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nE00003 · depósito LAB-T7: existencia 0E-12, comprometido 0E-12, disponible 0E-12 · unidad unit_of_measure_f2e5d6c1c196dad84c354537 · corte 2026-11-01T17:43:38.461000+00:00\nObservación fuente: 2026-11-01T17:43:38.461000 a 2026-11-01T17:46:05.375000.\nControles: unknown_unit_positions=0\nMostradas 50 de 73 filas; 23 omitidas del mensaje. No es un ranking global entre unidades.\nDepósitos no son sucursales. Disponible = existencia menos comprometido; pedidos de compra no incluidos.\nUnidades desconocidas no se infieren ni se suman. Posiciones ausentes no acreditan stock cero.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "runtime_response": "No se pudo autorizar esta operación: requiere un permiso comercial específico. No se consultó Foundation.",
+      "runtime_classification": "DENIED",
+      "capability_calls": 0,
+      "event_id": "1f3fcb00-0987-4642-8728-ac9a275d110a",
+      "thread_id": "5c9cf712-9e5a-4d62-a603-eaaa0ce98089",
+      "evidence": "readers-r2.json + luna-final.json"
+    },
+    {
+      "question": "¿Qué materias primas consumimos durante octubre de 2026?",
+      "capability": "production.consumption.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+        "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33",
+        "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7"
+      },
+      "metric": "production.consumption",
+      "permission": "telchi.production.consumption.read.v1",
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:46:37.892000",
+        "observation_finished_at": "2026-11-01T17:46:53.281000",
+        "source_scope": {
+          "absent_optional_fields": [],
+          "end_exclusive": "2026-11-02",
+          "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+          "limitation": "No claim of modifications outside this business-date scope; no CDC",
+          "start": "2026-01-01"
+        },
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "first_observed_date": "2026-01-05 00:00:00",
+        "last_observed_date": "2026-10-31 00:00:00",
+        "dataset_rows": 41808,
+        "declared_start": "2026-01-01",
+        "declared_end_exclusive": "2026-11-02",
+        "requested_outside_capture": false
+      },
+      "independent_control": {
+        "all_groups": 556,
+        "included_lines": 3974,
+        "presented_groups_exact": true,
+        "source_native_decimal_control": true
+      },
+      "parity": "EXACT",
+      "reader_response": "Consumo registrado para producción:\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05849: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05970: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05187: 80.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM03242: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05191: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05829: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nL00097: 24145.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00252: 22595.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00085: 7512.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00095: 6733.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00938: 4000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00937: 2435.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00092: 2276.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00088: 2041.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00173: 2000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03681: 1995.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03723: 1772.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03118: 1098.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00090: 1028.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00562: 1000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00881: 992.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03395: 400.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00066: 1772.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL03399: 1772.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02888: 400.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01038: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01041: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01117: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL00207: 90.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL00060: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02837: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02944: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nM02022: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL03197: 2250.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nL00039: 315.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nL01287: 9.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nM0006: 1071.358000000000 · unidad HH · código UoM no disponible · factor nativo 0\nR0019: 736.039600000000 · unidad HH · código UoM no disponible · factor nativo 0\nM0003: 587.863600000000 · unidad HH · código UoM no disponible · factor nativo 0\nR0018: 561.518100000000 · unidad HH · código UoM no disponible · factor nativo 0\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:46:37.892000 a 2026-11-01T17:46:53.281000.\nControles: period_source_lines=4814, included_issue_lines=3974, unknown_native_identity_lines_affected=0\nMostradas 50 de 556 filas; 506 omitidas del mensaje. No es un ranking global entre unidades.\nEmisiones activas BaseType 202; identidad no equivale a materia prima clasificada. Incluye identidades de recursos/desconocidas separadas, sin inferir su naturaleza.\n31 líneas fuente desconocidas se conservan; no hay recepción de producto terminado ni vigencia histórica de BOM.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "runtime_response": "No se pudo autorizar esta operación: requiere un permiso comercial específico. No se consultó Foundation.",
+      "runtime_classification": "DENIED",
+      "capability_calls": 0,
+      "event_id": "c4d4be22-e9f0-4383-a1e5-4d33af5173cb",
+      "thread_id": "1653f813-e134-4ccc-9b2c-e83a15c92bc1",
+      "evidence": "readers-r2.json + luna-final.json"
+    },
+    {
+      "question": "¿Cuánto facturaron los proveedores durante octubre de 2026?",
+      "capability": "purchasing.invoiced_amount.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "ap_invoice": "0999e81c5e1cdf75dea5ba52f75a53f38ab13f334cf7d191b0ded6f654d7a7e7"
+      },
+      "metric": "purchasing.invoiced_amount",
+      "permission": "telchi.purchasing.invoiced_amount.read.v1",
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:47:42.978000",
+        "observation_finished_at": "2026-11-01T17:47:50.867000",
+        "source_scope": {
+          "absent_optional_fields": [],
+          "end_exclusive": "2026-11-02",
+          "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+          "limitation": "No claim of modifications outside this business-date scope; no CDC",
+          "start": "2026-01-01"
+        },
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "first_observed_date": "2026-01-01 00:00:00",
+        "last_observed_date": "2026-10-31 00:00:00",
+        "dataset_rows": 7190,
+        "declared_start": "2026-01-01",
+        "declared_end_exclusive": "2026-11-02",
+        "requested_outside_capture": false
+      },
+      "independent_control": {
+        "C": {
+          "documents": 303,
+          "amount_bs": "1167975.07"
+        },
+        "O": {
+          "documents": 302,
+          "amount_bs": "2858499.51"
+        }
+      },
+      "parity": "EXACT",
+      "reader_response": "Facturado por proveedores:\nTotal acreditado BS 4.026.474,58 · 605 documentos de esta etapa.\nBS 1.167.975,07 · 303 documentos/pagos · estado C\nBS 2.858.499,51 · 302 documentos/pagos · estado O\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:47:42.978000 a 2026-11-01T17:47:50.867000.\nControles: excluded_nonactive_documents=48, excluded_other_currency_documents=0\nImportes de cabeceras activas en BS, separados por estado. No se suman órdenes, recepciones y facturas.\nMoneda extranjera excluida: DocTotal no acredita su importe nativo. Solicitudes y devoluciones no capturadas; no es compra neta después de devoluciones.\nLas 442 diferencias de líneas en 18 OC no acreditan su causa histórica SAP.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "runtime_response": "No se pudo autorizar esta operación: requiere un permiso comercial específico. No se consultó Foundation.",
+      "runtime_classification": "DENIED",
+      "capability_calls": 0,
+      "event_id": "e2ffe740-f21e-4e68-9897-91661bffa3e1",
+      "thread_id": "28e353d5-b88f-4e82-aef6-6b9b1a8f25a7",
+      "evidence": "readers-r2.json + luna-final.json"
+    },
+    {
+      "question": "¿Cuánto cobramos durante octubre de 2026?",
+      "capability": "collections.received_amount.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "collection_payment": "7f239cc3701c6ca888a8c23d824d3cc06913dfc12af6ab6a12e745426c580ee0"
+      },
+      "metric": "collections.received_amount",
+      "permission": "telchi.collections.received_amount.read.v1",
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:48:30.543000",
+        "observation_finished_at": "2026-11-01T17:48:54.816000",
+        "source_scope": {
+          "end_exclusive": "2026-11-02",
+          "kind": "BOUNDED_OVERLAP_PLUS_GAP",
+          "limitation": "Historical balances/payments before overlap NOT refreshed; aging not accredited by this capture",
+          "start": "2026-09-21"
+        },
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "first_observed_date": "2026-09-21 00:00:00",
+        "last_observed_date": "2026-11-01 00:00:00",
+        "dataset_rows": 50687,
+        "declared_start": "2026-09-21",
+        "declared_end_exclusive": "2026-11-02",
+        "requested_outside_capture": false
+      },
+      "independent_control": {
+        "payments": 40077,
+        "amount_bs": "12180925.36"
+      },
+      "parity": "EXACT",
+      "reader_response": "Cobros registrados:\nBS 12.180.925,36 · 40077 documentos/pagos\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-09-21, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:48:30.543000 a 2026-11-01T17:48:54.816000.\nControles: excluded_nonactive_payments=311, excluded_other_currency_payments=0\nEventos de pagos publicados, no saldo histórico ni aging global. Pagos y aplicaciones son grains distintos y nunca se suman como ingresos independientes.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "runtime_response": "No se pudo autorizar esta operación: requiere un permiso comercial específico. No se consultó Foundation.",
+      "runtime_classification": "DENIED",
+      "capability_calls": 0,
+      "event_id": "f8afb928-c84a-4e32-a8ee-893ac38c6cf7",
+      "thread_id": "afa70ee1-8c04-4e57-a43c-8b52f67cfaec",
+      "evidence": "readers-r2.json + luna-final.json"
+    },
+    {
+      "question": "¿Qué materiales registraron mayor consumo durante octubre de 2026?",
+      "capability": "material_supply.consumption.v1",
+      "reader": "FoundationReader / FoundationAccess",
+      "datasets": {
+        "production_issue": "3ea819e75ae4ff5aaa997b8fb6000292850c6ac3732dc63a10a205b7a86ced61",
+        "observed_material_actual_consumption": "1ff98e720799e40297f0f6d5de0e78debd63f8382a1d181488627b4b1fec8e33",
+        "production_order": "c38839d503a16bee578c424c3f26588293eab0120f629773f6f75ab8e80872d7"
+      },
+      "metric": "material_supply.consumption",
+      "permission": "telchi.material_supply.consumption.read.v1",
+      "coverage": {
+        "kind": "BOUNDED_OBSERVATION",
+        "complete_business_history": false,
+        "absence_is_zero": false,
+        "observation_started_at": "2026-11-01T17:46:37.892000",
+        "observation_finished_at": "2026-11-01T17:46:53.281000",
+        "source_scope": {
+          "absent_optional_fields": [],
+          "end_exclusive": "2026-11-02",
+          "kind": "BOUNDED_YEAR_DOCUMENT_STATE",
+          "limitation": "No claim of modifications outside this business-date scope; no CDC",
+          "start": "2026-01-01"
+        },
+        "requested_period": {
+          "date_from": "2026-10-01",
+          "date_to_exclusive": "2026-11-01"
+        },
+        "first_observed_date": "2026-01-05 00:00:00",
+        "last_observed_date": "2026-10-31 00:00:00",
+        "dataset_rows": 41808,
+        "declared_start": "2026-01-01",
+        "declared_end_exclusive": "2026-11-02",
+        "requested_outside_capture": false
+      },
+      "independent_control": {
+        "all_groups": 520,
+        "included_lines": 2297,
+        "presented_groups_exact": true,
+        "source_native_decimal_control": true
+      },
+      "parity": "EXACT",
+      "reader_response": "Consumo elegible de Material Supply:\nL01685: 641.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM02927: 30.000000000000 · unidad BOLSA · código UoM Manual · factor nativo 1\nM05939: 100.000000000000 · unidad CAPS · código UoM Manual · factor nativo 1\nL02331: 10.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02322: 5.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02157: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nL02227: 3.000000000000 · unidad CJA · código UoM Manual · factor nativo 1\nM02605: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05375: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05847: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05849: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05970: 100.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05187: 80.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM03242: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05191: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nM05829: 40.000000000000 · unidad COMP · código UoM Manual · factor nativo 1\nL00097: 24145.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00252: 22595.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00085: 7512.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00095: 6733.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00938: 4000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00937: 2435.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00092: 2276.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00088: 2041.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00173: 2000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03681: 1995.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03723: 1772.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03118: 1098.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00090: 1028.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00562: 1000.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00881: 992.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL03395: 400.000000000000 · unidad ENV · código UoM Manual · factor nativo 1\nL00066: 1772.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL03399: 1772.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02888: 400.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01038: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01041: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL01117: 250.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL00207: 90.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL00060: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02837: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL02944: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nM02022: 10.000000000000 · unidad FCO · código UoM Manual · factor nativo 1\nL03197: 2250.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nL00039: 315.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nL01287: 9.000000000000 · unidad GR · código UoM Manual · factor nativo 1\nM03695: 3.000000000000 · unidad JUEGO · código UoM Manual · factor nativo 1\nL01785: 20314.515000000000 · unidad KG · código UoM Manual · factor nativo 1\nL01094: 11790.900000000000 · unidad KG · código UoM Manual · factor nativo 1\nL01129: 9752.764900000000 · unidad KG · código UoM Manual · factor nativo 1\nPeríodo solicitado [2026-10-01, 2026-11-01); cobertura observada [2026-01-01, 2026-11-02). No certifica histórico completo.\nObservación fuente: 2026-11-01T17:46:37.892000 a 2026-11-01T17:46:53.281000.\nControles: period_source_lines=4814, included_issue_lines=2297, unknown_native_identity_lines_affected=0\nMostradas 50 de 520 filas; 470 omitidas del mensaje. No es un ranking global entre unidades.\nSubconjunto elegible del derivado publicado, filtrado por fecha de emisión. Identidad de material no equivale a clasificación de materia prima.\nLos cinco datasets históricos de Material Supply no se actualizan. No acredita faltantes, reposición ni cobertura de demanda.\nCantidades separadas por producto, unidad nativa y factor; factor mostrado, no aplicado. Sin suma ni ranking global entre unidades incompatibles.\nFoundation foundation_42483d2e035e98e73e0a2d98ddc7d986; cortes propios por dominio, no actualización global de métricas legacy.",
+      "runtime_response": "No se pudo autorizar esta operación: requiere un permiso comercial específico. No se consultó Foundation.",
+      "runtime_classification": "DENIED",
+      "capability_calls": 0,
+      "event_id": "1236ad6d-ce5a-4c45-84c3-38f6def26199",
+      "thread_id": "5e175f94-d5f1-49d0-8f34-73c73c5a62fb",
+      "evidence": "readers-r2.json + luna-final.json"
+    }
+  ],
+  "business_results": {
+    "period": "[2026-10-01,2026-11-01)",
+    "supplier_invoices_active_bs": {
+      "documents": 605,
+      "amount": "4026474.58",
+      "closed": {
+        "documents": 303,
+        "amount": "1167975.07"
+      },
+      "open": {
+        "documents": 302,
+        "amount": "2858499.51"
+      },
+      "excluded_nonactive": 48,
+      "other_active_currency_documents": 0
+    },
+    "collections_active_bs": {
+      "payments": 40077,
+      "amount": "12180925.36",
+      "customers": 2763,
+      "excluded_nonactive": 311,
+      "other_active_currency_payments": 0
+    },
+    "production": {
+      "native_groups": 556,
+      "active_202_issue_lines": 3974,
+      "unknown_identity_lines_affected": 0,
+      "global_unknown_lines_retained": 31,
+      "raw_material_only_total_accredited": false
+    },
+    "material_supply": {
+      "eligible_native_groups": 520,
+      "eligible_issue_lines": 2297,
+      "global_publication_groups": 994,
+      "global_publication_eligible_lines": 19984,
+      "physical_global_ranking_accredited": false
+    },
+    "inventory": {
+      "real_item_code": "E00003",
+      "positions": 73,
+      "presented_in_reader_page": 50,
+      "omitted": 23,
+      "first_position": {
+        "warehouse": "01",
+        "on_hand": "0",
+        "committed": "0",
+        "available": "0"
+      },
+      "second_position": {
+        "warehouse": "2A-AMD",
+        "on_hand": "0",
+        "committed": "2",
+        "available": "-2"
+      },
+      "unit": "canonical inventory_uom_id retained, not inferred physical unit"
+    },
+    "qualification": "Independent owner-authorized reader diagnostics; these amounts were NOT returned to the denied conversational identity. Not a complete monthly close or historical balance."
+  },
+  "legacy_transition": {
+    "canonical_matrix": "metric-transition.json",
+    "substitutable": [],
+    "complementary": [
+      "legacy DS purchase PurchaseProductPriceFinal",
+      "legacy SAP payment DocTotal / DocTotalFC",
+      "legacy DS product transformation",
+      "legacy DS ProductMovCant",
+      "inventory.stock_by_warehouse"
+    ],
+    "partial": [
+      "purchasing.invoiced_amount / ordered_amount / received_amount",
+      "collections.received_amount / unallocated",
+      "production.consumption / orders / bom",
+      "material_supply.consumption"
+    ],
+    "historical": [
+      "Foundation purchasing stages and lineage",
+      "Foundation current/historical aging, open receivables, payment method facts, commercial terms",
+      "Foundation OINM historical movement component",
+      "Five Foundation Material Supply datasets"
+    ],
+    "not_accredited": [
+      "Complete OINM continuity, refreshed global aging/historical balances, finished production receipts, purchasing returns/requests and supply shortages"
+    ],
+    "legacy_data_deleted": false,
+    "dates_rejuvenated": false
+  },
+  "readers": {
+    "canonical": "FoundationReader.resolve_on -> FoundationAccess.stock_availability / operational_observation",
+    "verified_real": 10,
+    "independent_question_controls": 5,
+    "source_capture_hashes_verified": true,
+    "source_access_read_only": true,
+    "no_fixed_foundation_ids_in_new_capabilities": true,
+    "derivation": "Subperiod uses exact published eligible item/unit/factor cohorts plus pinned issue/order identities; same cohorts independently reproduced from captured OITM/order/unit facts."
+  },
+  "permissions": {
+    "base": "Existing authenticated Team360 DEV policy",
+    "per_operation": [
+      "telchi.inventory.stock_by_warehouse.read.v1",
+      "telchi.production.consumption.read.v1",
+      "telchi.purchasing.invoiced_amount.read.v1",
+      "telchi.collections.received_amount.read.v1",
+      "telchi.material_supply.consumption.read.v1"
+    ],
+    "allowed_real": "NOT_RUN: effective grant missing",
+    "denied_real": "5/5 DENIED before data, persisted in PostgreSQL",
+    "allowed_fixture": "Focal tests only; not AUTH_PASS",
+    "tenant_isolation": "Existing authorization retained; per-capability allow/deny, different-tenant and uncommitted-request fixtures tested",
+    "presidency": "Not impersonated; no Presidencia grant or hierarchy changed; not equated to technical FULL_ACCESS",
+    "changes": 0
+  },
+  "timings": {
+    "foundation_resolution_ms": 76044.889,
+    "largest_foundation_span": {
+      "label": "foundation_sales_facts_validation",
+      "start_ms": 1674.619847,
+      "end_ms": 76139.53851,
+      "duration_ms": 74464.918663
+    },
+    "reader_operation_ms": {
+      "inventory.stock_by_warehouse": {
+        "foundation_resolution_ms": 76044.889,
+        "planning_and_sql_ms": 23.88071500172373,
+        "serialization_ms": 0.3634789973148145
+      },
+      "production.consumption": {
+        "foundation_resolution_ms": 76044.889,
+        "planning_and_sql_ms": 72.0831310027279,
+        "serialization_ms": 0.2526140015106648
+      },
+      "purchasing.invoiced_amount": {
+        "foundation_resolution_ms": 76044.889,
+        "planning_and_sql_ms": 20.55588200164493,
+        "serialization_ms": 0.14275000285124406
+      },
+      "collections.received_amount": {
+        "foundation_resolution_ms": 76044.889,
+        "planning_and_sql_ms": 322.1185059956042,
+        "serialization_ms": 0.1318360009463504
+      },
+      "material_supply.consumption": {
+        "foundation_resolution_ms": 76044.889,
+        "planning_and_sql_ms": 74.73159000073792,
+        "serialization_ms": 0.26608200278133154
+      }
+    },
+    "worker_wall_ms": 76997.4906100033,
+    "luna_ms": [
+      7573.883,
+      3807.731,
+      5299.522,
+      6090.713,
+      6371.323
+    ],
+    "persisted_pipeline_wall_ms": [
+      7822.090740999556,
+      4087.337828001182,
+      5453.526602002967,
+      6198.512168004527,
+      6504.570566001348
+    ],
+    "phase_traces": "readers-r2.json and luna-final.json request_trace; model, SQL, serialization, PG audit save and transaction spans where exercised",
+    "dev_budgets": {
+      "model_seconds": 20,
+      "attempts": 1,
+      "worker_seconds": 180,
+      "turn_seconds": 240
+    },
+    "defaults_unchanged": true
+  },
+  "tests": {
+    "final_focal": "324 passed in 6.23s on final source; pytest-module-final3.xml/log",
+    "scope": "Capability registry/state, semantic guards, coverage/snapshot parameters, allow/deny/isolation, no-commit fence, timeout/cancellation cleanup, persistence ports, operational readers and independent-facts succession",
+    "real_reader": "10 executed; 5 exact independent raw-source/Decimal question controls",
+    "real_worker": "Collections worker subprocess read-only with DEV 180s budget, actual result exact",
+    "real_luna": "5 final questions, gpt-5.6-luna medium / OpenAI direct / store=false, actual Console/phone/PG, 5 DENIED with 0 data calls",
+    "real_conversation_persistence": "Committed denial audits have event/thread IDs and prepared responses; positive-result persistence not real-accredited",
+    "shared_regression": "pytest-focused-final.xml: 284 passed / 1 failed; tests/test_telchi_assistant_srv05.py expects no transport_runtime kwarg, actual existing composition supplies one. Paths not edited; no baseline PASS claimed.",
+    "expanded_suite": "Two external 120s aborts (pytest-final.log, pytest-assistant-r3.log); neither counted PASS. Diagnostic stopped on compact-context regression in pytest-assistant-r2.xml, corrected by removing redundant context text while preserving the prompt contract; later focal test PASS.",
+    "lat": "md/index/sections/code-refs/full all PASS; lat-*.log",
+    "diff_check": "PASS",
+    "browser": "NOT_RUN; no UI PASS",
+    "recovery_rollback": "Existing succession tests included; no publication and no live rollback required",
+    "final_operational": "140 passed in 0.53s before final audit-scope-only change; all 140 included again in final 324"
+  },
+  "corrections": [
+    {
+      "symptom": "Luna returned DIRECT_UNAVAILABLE for production despite registered operational route",
+      "root_cause": "Old explicit SYSTEM rule metric=null + category_context production_consumption_capability=unavailable contradicted the new vocabulary",
+      "fix": "Replaced both stale declarations; no natural-language SQL shortcut, no permission relaxation",
+      "evidence": "luna-r1.json -> luna-production-r2.json -> luna-final.json",
+      "regression": "test_interpreter_has_no_stale_consumption_veto and actual final production permission DENIED"
+    },
+    {
+      "symptom": "Semantic context exceeded compact contract (<2000 bytes)",
+      "root_cause": "Redundant new explanatory context field repeated the prompt",
+      "fix": "Removed redundant field, retained correct capability name",
+      "evidence": "pytest-assistant-r2.xml, later focal PASS"
+    }
+  ],
+  "publications_performed": 0,
+  "restrictions": {
+    "sap_queries": 0,
+    "recaptures": 0,
+    "scheduler_changes": 0,
+    "shared_atomic_changes": 0,
+    "service_restarts": 0,
+    "whatsapp_sent": 0,
+    "commits": 0,
+    "pushes": 0,
+    "entitlement_changes": 0
+  },
+  "files_modified": {
+    "SrvRestAstroLS_v1/backend/modules/telchi/datalake/operational_query.py": "27099e2cdb70ef26b1959b95ec395a817885a55bf9f651da726b52093f278f33",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/operational.py": "19fe5d99907612c3e07eb37a3aa49d6516cc9dfb77596e4791114b713ae14cde",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/capabilities.py": "be08bd78d3ddc31a8e4877307056eefa2d504df75fb174cce1cd0555cbbb6426",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/state_engine.py": "44ee9ec7a4ad6b53b15d8a0e82f7a3f2acace39fccca313bb47093062dc432a8",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/luna.py": "e61fe04e0cb6020f0a2b94a4de1a96393ad39243f13a51907a6d60e4c3b5d9e8",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/business_categories.py": "a4775960f02ecb0b82b351f59c3ac3431df98ed9437dfd5adbcafec8585aee41",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/handler.py": "d015b0e9666becce424c054be14d5d5897ffa5ee439e1c771625ebcfd8030f3c",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/test_operational.py": "cf66824e7712f477d131d73036b41ecef802144ff6c4cfc595db3966b31ca34d",
+    "SrvRestAstroLS_v1/backend/modules/telchi/assistant/tests/live_operational_readiness.py": "03c2c71cc9af8e89e7d6fc940f94742af449c7443bbe134e47fd64a183d24ed9"
+  },
+  "evidence_directory": "data/reports/telchi/operational-business-readiness-v1",
+  "transversal_impact": "Additive Telchi backend catalog/state/Luna behavior only. Existing Messaging dispatcher, Console resolver, PostgreSQL conversation namespace, canonical Foundation and legacy metric readers reused; no frontend, infrastructure or shared auth edits.",
+  "risks": [
+    "No authorized positive conversational result: do not claim BACKEND_PASS_UI_PENDING or full readiness",
+    "Normal latency budget remains unaccredited; inherited full manifest validation dominates",
+    "List caps preserve omitted counts but no operational pagination/ordinal adapter added",
+    "Native identities are not accredited raw-material taxonomy; no mixed-unit totals",
+    "Late isolated annotation change derives the unchanged 31/442/18 warning counts from the same hash-checked reconciliation instead of literals; numerical reader controls reused because SQL, files, selection and values unchanged",
+    "Final audit-only fix separates operational universe/coverage from inherited commercial-sales universe; tested in final 324. Real DENIED turns never enter successful-result audit branch, so their final live evidence remains applicable."
+  ],
+  "resources": {
+    "host_preflight": "BUSY_BUT_SAFE",
+    "concurrency_used": "Sequential probes and tests, two DuckDB threads, one small PostgreSQL metadata query alongside a denial-only Luna probe",
+    "mem_available_mb_initial": 7057,
+    "mem_available_mb_final": 6952,
+    "swap_stable_during_samples": true,
+    "unrelated_processes_terminated": 0,
+    "environmental_aborts": 2,
+    "own_processes_left_running": 0,
+    "temporary_services_started": 0
+  },
+  "next_action_exact": "Use the existing Telchi provisioning/Console mechanism to inspect and reconcile operational capability registration with the already approved business authorization model, without changing role assignments or manufacturing Presidencia/FULL_ACCESS equivalence. Until effective grants exist, keep denial. Separately optimize/profile the 74.5s canonical sealed-facts validation without dropping any gate; then rerun the same five persisted real questions and independent controls with an authorized identity and normal DEV budgets. Do not republish Foundation or query SAP."
+}

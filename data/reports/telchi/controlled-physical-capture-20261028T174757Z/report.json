@@ -1,0 +1,133 @@
+{
+  "verdict": "PARTIAL",
+  "branch": "feature/console-backend-core",
+  "scope": "TELCHI / PRODUCCION: clasificacion fisica / INVESTIGATION / SAP_HANA read-only",
+  "stop_reason": "Batch 44 execute+fetch took 3143.095 ms, exceeding the authorized 3000 ms. No subsequent query and no retry.",
+  "capture_directory": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/physical-capture-20261028T174757Z",
+  "capture_permissions": {"directory": "0700", "checkpoint": "0600"},
+  "operation": {
+    "authentication": "PASS",
+    "connection_attempts": 1,
+    "queries": 44,
+    "batches": 44,
+    "articles": 4400,
+    "query_execute_and_fetch_sum_ms": 14179.001,
+    "max_query_execute_and_fetch_ms": 3143.095,
+    "instrumented_capture_duration_ms": 178428.036,
+    "started_at": "2026-10-28T17:48:05.872412+00:00",
+    "finished_at": "2026-10-28T17:51:05.828358+00:00",
+    "pilot_durations_ms": [225.089, 523.468, 568.375],
+    "pilot": "PASS",
+    "latency_reviews_at_batches": [10, 20, 30, 40],
+    "latency_review_medians_ms": [223.272, 225.728, 223.773, 225.010],
+    "pause_seconds_minimum": 1.1,
+    "batch_size_maximum": 100,
+    "autocommit": true,
+    "query_timeout_seconds": 3,
+    "connect_timeout_ms": 3000,
+    "communication_timeout_ms": 3000,
+    "timeout_limitation": "Driver timeout is not a proven strict end-to-end deadline; the 3143 ms result triggered immediate stop before any further query.",
+    "cursor_opened": 44,
+    "cursor_closed": 44,
+    "connection_closed": true,
+    "retries": 0,
+    "concurrency": 1,
+    "eof_reached": false,
+    "batch_44": "Returned successfully; validated and retained, but latency exceeded the limit. Capture remains partial."
+  },
+  "integrity": {
+    "distinct_items": 4400,
+    "duplicate_items": 0,
+    "strict_order": "PASS",
+    "no_overlap": "PASS",
+    "checkpoint_recovery_each_batch": "PASS",
+    "checkpoint_sha256": "88c1560d45352e61ae58c9782137e9b8e2f08a4822072fa3578d0fc9c4a144c2",
+    "operation_sha256": "5a623f741451aa9c0d042d2bf570bd645c35c235ea14c6a344504aeb9f2dff84",
+    "complete_marker_created": false,
+    "consistency": "Ordered keyset interval scan; not a simultaneous transactional snapshot. Concurrent changes or backdated inserts cannot be excluded. No missing products can be inferred from this partial prefix."
+  },
+  "classification_percentages_scope": "ONLY THE 4400 CAPTURED ARTICLES; NOT REPRESENTATIVE OF FULL CATALOG",
+  "classification": [
+    {"code": "0", "category": "Ninguna", "articles": 2299, "percent": 52.25},
+    {"code": "1", "category": "Liquido", "articles": 962, "percent": 21.8636},
+    {"code": "2", "category": "Semisolido", "articles": 150, "percent": 3.4091},
+    {"code": "3", "category": "Solido", "articles": 984, "percent": 22.3636},
+    {"code": "4", "category": "Medicamento", "articles": 3, "percent": 0.0682},
+    {"code": "5", "category": "No corresponde", "articles": 2, "percent": 0.0455},
+    {"code": "OTHER_OR_NULL", "category": "Sin determinar", "articles": 0, "percent": 0}
+  ],
+  "physical_contract": {
+    "validation": "PASS offline against existing physical_classification and validate_physical_rows",
+    "physical_state_classified": 2096,
+    "unclassified_code_0": 2299,
+    "unexpected_values": 0,
+    "missing_values": 0,
+    "medicamento_as_physical_state": false,
+    "inference_used": false
+  },
+  "historical_comparison": {
+    "reference_version": "v2_b19ceecf40d3ba09",
+    "reference_source_as_of": "2026-09-24T12:03:11.919356Z",
+    "reference_sap_products": 16934,
+    "captured_matching_reference": 4381,
+    "captured_new_to_reference": 19,
+    "coverage_of_reference_keys_percent": 25.871,
+    "reference_not_observed_in_partial_capture": 12553,
+    "confirmed_absent_current_products": "NOT_DETERMINABLE",
+    "matched_canonical_identity_crosswalk_mismatches": 0,
+    "reference_contains_physical_columns": false,
+    "legacy_changes": "PENDING: current Reference has no physical attributes. Inspected local legacy product.parq schema lacks official U_FormaFarmac. No inferred correspondence or physical mapping applied.",
+    "historical_effective_dates_inferred": false
+  },
+  "integration": {
+    "ready_for_complete_reference_candidate": false,
+    "candidate_generated": false,
+    "recommendation": "Preserve this partial capture without publication. Any later continuation requires new authorization, checkpoint/hash verification and consistency accreditation across sessions; do not automatically combine sessions. Resolve the 19 new SAP identities. Prepare a physical-only candidate offline only after coverage/scope approval, preserving all existing columns and canonical IDs, validating derived-component compatibility and obtaining separate publication authorization."
+  },
+  "preparation": {
+    "existing_changes": "Preserved; no preexisting file edited",
+    "equivalent_complete_capture": "None identified in targeted local evidence and physical-capture locations; exhaustive shared-tree search stopped at a 10-second local timeout, without SAP access",
+    "configuration": "Schema TELCHI, loopback route, all six resolved connection fields match existing private hana.env; values not disclosed",
+    "driver_parameter_style": "qmark verified offline and real bound parameter query succeeded starting batch 2",
+    "host": "BUSY_BUT_SAFE for small sequential capture; approximately 7.7 GiB available RAM, no observed swap I/O, elevated disk wait; no heavy scans or parallelism",
+    "transport_diagnosis_repeated": false
+  },
+  "new_files": [
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/controlled_physical_capture_v1/capture.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/controlled_physical_capture_v1/analyze.py",
+    "SrvRestAstroLS_v1/backend/modules/telchi/investigation/validation/controlled_physical_capture_v1/test_capture.py",
+    "data/reports/telchi/controlled-physical-capture-20261028T174757Z/report.json"
+  ],
+  "source_sha256": {
+    "capture.py": "694bf9a54fa597032f4c34fdc882b8ebf34c791b4c6e19eda99949292e461dec",
+    "analyze.py": "c31d949d226f8638e6f431a3c77f5304d8b04236c2f9c8a949e53253f4e614cb",
+    "test_capture.py": "cbc8cfab12e2cdb7eff21122ae18af5c7de81b6bbbbd0007a13afbbd0a8cd1af"
+  },
+  "validation": {
+    "capture_tests": "9 passed; includes synthetic slow-query stop with retained recoverable batch and no retry",
+    "existing_physical_reference_offline_tests": "32 passed",
+    "commands": [
+      "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest --import-mode=importlib -q modules/telchi/investigation/validation/controlled_physical_capture_v1/test_capture.py",
+      "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q modules/telchi/datalake/tests/test_physical_reference_offline.py",
+      "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m modules.telchi.investigation.validation.controlled_physical_capture_v1.analyze <private-capture-directory>",
+      "git diff --check"
+    ],
+    "git_diff_check": "PASS",
+    "scope_review": "Only new isolated investigation files and report; preexisting diff preserved",
+    "full_suite": "NOT_RUN; no global PASS claimed"
+  },
+  "safety": {
+    "sap_write_count": 0,
+    "shared_data_writes": 0,
+    "reference_pointer_unchanged_during_offline_validation": true,
+    "foundation_catalog_opened": false,
+    "atomic_updates": 0,
+    "publication_count": 0,
+    "service_restarts": 0,
+    "credentials_changed": false,
+    "commits": 0,
+    "unrelated_processes_terminated": 0,
+    "own_processes_left_running": 0,
+    "article_codes_disclosed": false
+  }
+}
