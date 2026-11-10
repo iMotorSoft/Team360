@@ -279,6 +279,17 @@ La [investigación READ ONLY](../../../../data/reports/telchi/category-line-amou
 - 83 tests focalizados y un test PostgreSQL temporal PASS. Nueva sonda Luna Medium real: cinco turnos PASS / uno FAIL (EXECUTE con metric nula al buscar código), sin cambios de runtime ni atribución causal nueva. No reemplaza el PASS fechado anterior por una garantía universal.
 - `SIX_GATES=STALE`, `READY_FOR_MANUAL_WHATSAPP=NO`; sin servicios iniciados/detenidos, WhatsApp, promoción o cambios de Foundation/permisos.
 
+## Continuidad comercial, diferencia absoluta y promoción del runtime — 10/11/2026
+
+Cierre operativo sobre `feature/console-backend-core`, commit `dbc86d9`, publicado en `origin` sin forzar historia. [Reporte](../../../../data/reports/telchi/commercial-runtime-promotion-20261110/report.md).
+
+- D1–D5 quedan consolidados: la decisión del intérprete ya no declara indisponibilidad contra `Availability(allowed=True)`; el desglose por período se representa y reconcilia sin consolidación silenciosa; la investigación libre declara un límite de presupuesto medido en lugar de descartarse; canal × período sólo se acredita para la medida que admite ambas dimensiones; y un resultado cuya medida, grano o descomposición no corresponde se rechaza antes de entregarse.
+- Diferencia absoluta: el contrato local `MONETARY_COMPARISON` sólo admitía resta con signo (`difference`) y porcentaje. «Diferencia absoluta» se respondía con el importe negativo, sin distinguir magnitud de dirección. Se agregó el modo `absolute_difference` (períodos y componentes) junto a `difference`, `percent` y `ratio_percent`. La auditoría conserva `difference` con signo, `absolute_difference` como magnitud, `direction` (`target_higher`/`baseline_higher`/`equal`), `reported` y `value`; el texto declara magnitud y dirección por separado. La guía del intérprete elige el modo por lo que pide la pregunta. No se introdujo ningún parche sobre importes históricos.
+- Continuidad: los operandos persistidos por período se reutilizan para el seguimiento; la aritmética es local, con `Decimal` y sin segunda consulta. Una diferencia pedida sobre una única celda de investigación sigue usando el contrato de referencias de resultado, que ya distinguía `subtract` de `absolute_difference`.
+- Validación focalizada: `modules/telchi/assistant` 1128 PASS / 4 skips, `modules/telchi/exploratory_sql` + `test_research_port.py` 429 PASS, `datalake` focalizado 20 PASS / 1 skip, y la suite del gate de reacreditación 1246 PASS / 4 skips. `git diff --check` y `lat check` sin hallazgos; `SAP_WRITE_COUNT=0`.
+- Gates y runtime: reacreditación canónica sobre sesión inerte con las seis garantías `PASS`/`real`, registro DEV v2 `change_based_v1` sin `expires_at`, digest de fuente `3b84888d…`. La recarga siguió el mecanismo canónico `down` → `reaccredit.py` → `up` porque la reacreditación exige sesión inerte; parada con trabajo durable terminal y outbox vacío, y servicios compartidos sin reiniciar.
+- Código activo: backend nuevo arrancado después del último cambio de fuente, árbol de trabajo limpio en el alcance acreditado y `source_digest()` igual al `source_sha256` del manifiesto publicado; `state=READY`, `backend=OWNED`, `webhook=SESSION`, `durable_worker=PASS`. `EXTERNAL_WHATSAPP_E2E=NOT_TESTED` (no se enviaron mensajes ni se generaron conversaciones).
+
 ## Evidencia y navegación
 
 Los contratos y reportes conservan matrices, conteos, candidates y límites completos. La investigación histórica permanece donde está, sin convertirse en autoridad arquitectónica.

@@ -1,0 +1,39 @@
+{
+  "branch": "feature/console-backend-core",
+  "SIX_GATES": "VALID",
+  "GATE_FAILURES": [],
+  "CURRENT_CODE_FINGERPRINT": "VALID",
+  "CURRENT_PILOT_CONTRACT": "VALID",
+  "REAL_SECURITY_BOUNDARIES": "PASS",
+  "DEV_GATE_POLICY": "change_based_v1",
+  "READY_FOR_MANUAL_START": "YES",
+  "source_sha256": "3b84888dbc9d39253f143c8829db51e183a91b729caa45557b8f222888bc8bf5",
+  "approval_sha256": "f548d798c479d976e532098eaac170864ca30024b53769bec93dd5b9349cf8c5",
+  "configuration_sha256": "78fd5d12b6076f3f0e7551ec8fb47c5ed17a63678ed04fd0602d2536e1028ea5",
+  "manifest_sha256": "bb55d8adac8040955e27cbbd62c3a8b09fa424c347a89f68f5c76bfc47792de5",
+  "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/six-gates-20261110T221243545383Z/final-accreditation.json",
+  "artifact_sha256": "90b9034ca6c9db6ff87fbf2be5aa18df90e8e1dfd49e45f31f2f16c7eb34f9c8",
+  "validations": {
+    "command": [
+      "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/dev/Team360/SrvRestAstroLS_v1/backend/.venv/bin/python3",
+      "-m",
+      "pytest",
+      "modules/telchi/assistant/tests",
+      "tests/test_messaging_evolution.py",
+      "tests/test_messaging_horizontal_runtime.py",
+      "tests/test_messaging_handlers.py",
+      "-q"
+    ],
+    "exit_code": 0,
+    "artifact": "/media/issajar/DEVELOP/Projects/iMotorSoft/ai/private/telchi/six-gates-20261110T221243545383Z/focused-tests.txt",
+    "sha256": "6fd9418b578f32fce3ee2016d0c43a440bcb0c663f5634f2125b4e371e17a316",
+    "result": "1246 passed, 4 skipped in 89.61s (0:01:29)"
+  },
+  "lifecycle": "STOPPED",
+  "whatsapp_sends": 0,
+  "own_processes_left_running": 0,
+  "unrelated_processes_terminated": 0,
+  "impact": "Evidence/private manifest only; no runtime, security policy, grants, bindings, webhook, credentials or Foundation changes.",
+  "limits": "Not WhatsApp E2E; recording egress certifies logical intent only. No provider outage induced. Manual start remains separate.",
+  "next_step": "Manual operator start, then the presidential conversation on WhatsApp; no automatic start performed."
+}

@@ -1,0 +1,166 @@
+{
+  "window": "commercial-runtime-promotion-20261110",
+  "generated_at": "2026-11-10T22:20:00Z",
+  "branch": "feature/console-backend-core",
+  "objective": "Close D1-D5 with the absolute-difference semantic fix, consolidate and publish the DEV code, reaccredit the six gates against that code, and reload WhatsApp DEV with the consolidated version.",
+  "git": {
+    "head_previous": "2ff367fa9a78979cecd371f2afe7b7bba5b65990",
+    "head_consolidated": "dbc86d9c8093c48e92504ea4df12f733c41a9d24",
+    "remote_head": "dbc86d9c8093c48e92504ea4df12f733c41a9d24",
+    "remote_matches_local": true,
+    "push": "normal, no force",
+    "files_changed": 33,
+    "insertions": 2953,
+    "deletions": 132,
+    "diff_check": "PASS",
+    "lat_check": "PASS",
+    "backup": "ai/private/team360-git-backup-20261110T220522Z"
+  },
+  "excluded_from_commit": {
+    "policy": "Business evidence and execution artifacts under data/reports remain local and untracked; they were not deleted.",
+    "untracked_report_directories": 116,
+    "private_configuration": "outside the repository (PRIVATE_ROOT)",
+    "databases_or_sap_dumps": "none added",
+    "credentials": "none staged or printed"
+  },
+  "absolute_difference": {
+    "reported_followup_value": "-28024.280000",
+    "reported_operation": "MONETARY_COMPARISON/CALCULATE",
+    "cause": "The local monetary comparison contract only exposed signed 'difference' and 'percent'; there was no absolute-difference mode, so a question asking for a magnitude was answered with the signed subtraction without separating magnitude from direction.",
+    "fix": [
+      "Added mode 'absolute_difference' for period and component comparisons next to 'difference', 'percent' and 'ratio_percent'.",
+      "Audit keeps difference (signed), absolute_difference (magnitude), direction (target_higher/baseline_higher/equal), reported (signed/absolute) and value (delivered figure).",
+      "Response text states magnitude and direction of change separately.",
+      "Interpreter guidance selects the mode from the question and forbids conflating participation with variation or signed with absolute difference.",
+      "Unknown modes are rejected with ambiguous_comparison instead of silently degrading to a signed subtraction."
+    ],
+    "no_historical_amount_patch": true,
+    "contracts_distinguished": [
+      "difference (signed)",
+      "absolute_difference (magnitude)",
+      "percent (percentage variation)",
+      "ratio_percent (participation)"
+    ],
+    "tests": "modules/telchi/assistant/tests/test_absolute_difference_semantics.py (10 passed)"
+  },
+  "validations": [
+    {"command": "uv run pytest modules/telchi/assistant/tests/test_absolute_difference_semantics.py -q", "result": "10 passed"},
+    {"command": "uv run pytest modules/telchi/assistant -q", "result": "1128 passed, 4 skipped"},
+    {"command": "uv run pytest modules/telchi/exploratory_sql modules/telchi/test_research_port.py -q", "result": "429 passed"},
+    {"command": "uv run pytest modules/telchi/datalake/tests (5 D1-D5 files) -q", "result": "20 passed, 1 skipped"},
+    {"command": "uv run pytest modules/business_semantics/tests/test_embedded_meanings.py -q", "result": "2 passed"},
+    {"command": "gate focused suite (assistant + messaging)", "result": "1246 passed, 4 skipped"},
+    {"command": "git diff --check", "result": "clean"},
+    {"command": "lat check", "result": "All checks passed"}
+  ],
+  "six_gates": {
+    "mechanism": "data/reports/telchi/six-gates-reaccreditation-20261021/reaccredit.py via the window wrapper in this directory; probes and publisher unchanged",
+    "policy": "change_based_v1",
+    "schema_version": 2,
+    "expires_at": null,
+    "source_sha256": "3b84888dbc9d39253f143c8829db51e183a91b729caa45557b8f222888bc8bf5",
+    "configuration_sha256": "78fd5d12b6076f3f0e7551ec8fb47c5ed17a63678ed04fd0602d2536e1028ea5",
+    "approval_sha256": "f548d798c479d976e532098eaac170864ca30024b53769bec93dd5b9349cf8c5",
+    "manifest_sha256": "bb55d8adac8040955e27cbbd62c3a8b09fa424c347a89f68f5c76bfc47792de5",
+    "artifact": "six-gates-20261110T221243545383Z/final-accreditation.json",
+    "artifact_sha256": "90b9034ca6c9db6ff87fbf2be5aa18df90e8e1dfd49e45f31f2f16c7eb34f9c8",
+    "gates": {
+      "http_auth": "PASS/real",
+      "identity_tenant_isolation": "PASS/real",
+      "business_authorization": "PASS/real",
+      "durable_idempotency": "PASS/real",
+      "assistant_foundation": "PASS/real",
+      "model_no_fallback": "PASS/real"
+    },
+    "result": "SIX_GATES=VALID",
+    "blocked_attempts": [
+      {"attempt": 1, "error_class": "OSError", "cause": "port 18181 still held by the live DEV session; the runtime label read STOPPED while the real state was DEGRADED from stale gates", "manifest_changed": false, "resolution": "canonical ./whatsapp-dev.sh down, no foreign process terminated"},
+      {"attempt": 2, "error_class": "AssertionError", "cause": "all six real gates PASS, but the focused pytest subprocess inherited the private operational TEAM360_/META_TEAM360_ environment into unit fixtures (18 failed); documented fixture-isolation mode", "manifest_changed": false, "resolution": "offline pytest subprocess isolated to the original caller environment with umask 0o022"},
+      {"attempt": 3, "error_class": null, "cause": null, "manifest_changed": true, "resolution": "1246 passed, 4 skipped; manifest published atomically"}
+    ]
+  },
+  "reload": {
+    "mechanism": "canonical ./whatsapp-dev.sh down -> reaccreditation in an inert session -> ./whatsapp-dev.sh up",
+    "why": "reaccreditation requires an inert session (exclusive_inert_reaccreditation_required) and start requires valid gates (gate_evidence); no safer canonical hot reload exists",
+    "preconditions": {
+      "durable_nonterminal": 0,
+      "outbox_nonterminal": 0,
+      "shared_services": "POSTGRES/LITELLM/EVOLUTION/CLOUDFLARE READY",
+      "meta_callback": "SYNCED"
+    },
+    "stop": {
+      "state": "STOPPED",
+      "webhook": "INTERNAL",
+      "port_18181": "free",
+      "shared_services_restarted": 0
+    },
+    "start": {
+      "session_id": "15bb5afca9ee3066bef3760d97599ec6",
+      "launcher": "OWNED",
+      "backend": "OWNED",
+      "state": "READY",
+      "webhook": "SESSION",
+      "durable_worker": "PASS"
+    }
+  },
+  "active_code_identity": {
+    "source_digest_live": "3b84888dbc9d39253f143c8829db51e183a91b729caa45557b8f222888bc8bf5",
+    "equals_published_manifest": true,
+    "worktree_clean_in_accredited_scope": true,
+    "backend_start_utc": "2026-11-10T22:14:44Z",
+    "newest_source_file_mtime_utc": "2026-11-10T22:01:03Z",
+    "started_after_last_source_change": true,
+    "startup_log": "empty",
+    "startup_diagnostics": {"original_error": null, "stage": "backend_listening"},
+    "inbound_message_processed": false,
+    "outbound_sent": false,
+    "activity_marker": {"turns": 1, "in_flight": 0, "interpretation": "Evolution state event at webhook re-point, not a conversation"}
+  },
+  "final_status": {
+    "POSTGRES": "READY",
+    "LITELLM": "READY",
+    "EVOLUTION": "READY",
+    "CLOUDFLARE": "READY",
+    "META_CALLBACK": "SYNCED",
+    "SIX_GATES": "PASS",
+    "WHATSAPP_RUNTIME": "RUNNING",
+    "READY_FOR_DIALOGUE": "YES",
+    "BLOCKER": "NONE"
+  },
+  "states": {
+    "ABSOLUTE_DIFFERENCE_SEMANTICS": "PASS",
+    "COMMERCIAL_CAPABILITY_CLOSURE": "PASS",
+    "COMPOSITE_RESULT_CONTINUITY": "PARTIAL",
+    "FREE_INVESTIGATION_PRESERVED": "PASS",
+    "FAST_PATH_PRESERVED": "PASS",
+    "SECURITY": "PASS",
+    "GIT_CONSOLIDATION": "PASS",
+    "GITHUB_PUSH": "PASS",
+    "SIX_GATES": "PASS",
+    "WHATSAPP_DEV_RELOAD": "PASS",
+    "ACTIVE_CODE_MATCH": "PASS",
+    "READY_FOR_DIALOGUE": "YES",
+    "EXTERNAL_WHATSAPP_E2E": "NOT_TESTED"
+  },
+  "safety": {
+    "sap_write_count": 0,
+    "production_changes": 0,
+    "permission_changes": 0,
+    "source_policy_changes": 0,
+    "service_restarts": 0,
+    "webhook_meta_or_tunnel_mutations": 0,
+    "whatsapp_sends": 0,
+    "manual_hashes_or_manifests": 0,
+    "git_destructive_operations": 0,
+    "new_services_routers_engines_databases": 0,
+    "autostart_configured": false
+  },
+  "limits": [
+    "EXTERNAL_WHATSAPP_E2E=NOT_TESTED: no messages sent and no conversations generated.",
+    "FREE_RESEARCH_LIVE_RUN not executed with a real model in this window; covered by deterministic tests and the reexecuted gates.",
+    "Absolute difference over a single compound research cell that mixes scales needs its own window; the reference contract already distinguishes subtract from absolute_difference and is covered by tests.",
+    "Channel limitations (DMS/U_ORIGIN census, crossed credit notes, unposted returns) remain declared and are never turned into zero.",
+    "Credential rotation from the delivery-reliability closure remains pending a dedicated window.",
+    "Manual owner start remains the operational step; no automatic start is configured."
+  ]
+}
