@@ -57,6 +57,13 @@ def test_current_backend_routes_remain_registered_with_flow_module() -> None:
     }.issubset(paths)
 
 
+def test_telchi_is_not_mounted_even_when_enabled(monkeypatch) -> None:
+    monkeypatch.setenv("TEAM360_ENV", "dev")
+    monkeypatch.setenv("TEAM360_TELCHI_CONSOLE_ENABLED", "1")
+    paths = _application_paths()
+    assert not any(path.startswith(("/api/telchi/", "/api/telchiai")) for path in paths)
+
+
 def test_registry_composition_preserves_lifecycle_and_cors() -> None:
     app = backend_entrypoint.create_app()
 

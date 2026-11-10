@@ -139,3 +139,68 @@ def test_result_contract_rejects_tampering():
             broken['universe_total'] = dict(amount='not-a-number')
         with pytest.raises(Exception):
             reader.validate_result(options(), broken)
+
+
+# ------------------------------------------- product ranking with quantity
+
+PRODUCT_OPTIONS = dict(dataset='commercial_line_amount',
+                       filters=dict(category=None, item_code=None, card_code=None),
+                       date_from='2026-10-01', date_to_exclusive='2026-11-01', group_by='sap_product',
+                       breakdown_by=None, periods=None, measure=MEASURE,
+                       order_by=[['amount', 'desc'], ['key', 'asc']], limit=2, currency='BS')
+
+
+@pytest.fixture
+def product_con():
+    with duckdb.connect() as c:
+        c.execute('SET threads=1')
+        c.execute('''CREATE TABLE j(item_code VARCHAR, category VARCHAR, line_total VARCHAR,
+                                   quantity VARCHAR, doc_entry VARCHAR)''')
+        c.execute("INSERT INTO j VALUES "
+                  "('P1','LAB_FINISHED_PRODUCT','100.00','12.5','1'),"
+                  "('P1','LAB_FINISHED_PRODUCT','20.00','2','2'),"
+                  "('P2','LAB_FINISHED_PRODUCT','50.00','500','2'),"
+                  "('P3','RAW_MATERIAL','30.00','1','3')")
+        yield c
+
+
+def test_product_ranking_publishes_the_documentary_quantity(product_con):
+    rows = reader._grouped(product_con, 'WITH joined AS (SELECT * FROM j)', [],
+                           dict(PRODUCT_OPTIONS), None)
+    by_key = {row['key']: row for row in rows}
+    assert Decimal(by_key['P1']['quantity']) == Decimal('14.5')
+    assert Decimal(by_key['P2']['quantity']) == 500
+    assert Decimal(by_key['P1']['amount']) == 120 and by_key['P2']['line_count'] == 1
+    assert [row['key'] for row in rows] == ['P1', 'P2', 'P3']
+
+
+def test_product_ranking_can_be_ordered_by_quantity(product_con):
+    options = dict(PRODUCT_OPTIONS, order_by=[list(order) for order in reader.QUANTITY_ORDER_BY])
+    rows = reader._grouped(product_con, 'WITH joined AS (SELECT * FROM j)', [], options, None)
+    assert [row['key'] for row in rows] == ['P2', 'P1', 'P3']
+    assert reader.plan_of(options)['order_by'] == reader.QUANTITY_ORDER_BY
+
+
+def test_quantity_order_is_closed_to_the_product_grain():
+    quantity = [list(order) for order in reader.QUANTITY_ORDER_BY]
+    with pytest.raises(ValueError):
+        reader.parameters(dict(PRODUCT_OPTIONS, group_by='card_code', order_by=quantity))
+    with pytest.raises(ValueError):
+        reader.parameters(dict(PRODUCT_OPTIONS, group_by='physical_state', order_by=quantity, limit=9))
+    with pytest.raises(ValueError):
+        reader.parameters(dict(PRODUCT_OPTIONS, order_by=[['price', 'desc']]))
+    assert reader.parameters(dict(PRODUCT_OPTIONS, order_by=quantity))
+
+
+def test_quantity_is_reconciled_against_the_same_universe():
+    rows = [dict(key='P1', label='Uno', amount='120.00', line_count=2, document_count=2, quantity='14.5'),
+            dict(key='P2', label='Dos', amount='50.00', line_count=1, document_count=1, quantity='500')]
+    total = dict(amount='170.00', product_count=2, line_count=3, document_count=3, quantity='514.5')
+    evidence = reader.reconcile(rows, total, 'sap_product')
+    assert Decimal(evidence['quantity']) == Decimal('514.5')
+    assert Decimal(evidence['quantity_difference']) == 0
+    with pytest.raises(reader.CommercialAmountError):
+        reader.reconcile(rows, dict(total, quantity='514.6'), 'sap_product')
+    # A customer grouping never publishes nor reconciles a quantity.
+    cards = [dict(key='C1', label='Uno', amount='170.00', line_count=3, document_count=3)]
+    assert 'quantity' not in reader.reconcile(cards, dict(total, customer_count=1), 'card_code')

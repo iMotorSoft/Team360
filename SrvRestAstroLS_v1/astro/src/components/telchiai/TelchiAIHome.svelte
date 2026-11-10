@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
+  import { askLuna, verifyLunaSession, type LunaResult } from '../../lib/api/telchiLuna';
 
   type ExperienceState = "empty" | "processing" | "ready";
 
@@ -10,28 +11,44 @@
     "¿Qué clientes tienen deuda vencida?",
   ];
 
-  const progressMessages = [
-    "Entendiendo tu consulta…",
-    "Organizando la información de Telchi…",
-    "Preparando el análisis…",
-  ];
+  type Turn = { question: string; answer?: string; result?: LunaResult; error?: string };
+  let turns = $state<Turn[]>([]);
+  let token = '';
+  let authenticated = $state(false);
+  let sessionMessage = $state('Cargá el archivo de sesión emitido por el login real de Console (CLI). No se utilizan perfiles mock.');
+  let conversationId = '';
+  let controller: AbortController | undefined;
 
   let query = $state("");
-  let submittedQuery = $state("");
   let experienceState = $state<ExperienceState>("empty");
-  let progressIndex = $state(0);
+  let currentProgress = $state('');
   let historyOpen = $state(false);
   let textarea: HTMLTextAreaElement;
   let historyButton: HTMLButtonElement;
   let closeHistoryButton: HTMLButtonElement;
-  let timers: ReturnType<typeof setTimeout>[] = [];
+  const canSubmit = $derived(authenticated && query.trim().length > 0 && experienceState !== "processing");
 
-  const canSubmit = $derived(query.trim().length > 0 && experienceState !== "processing");
-  const currentProgress = $derived(progressMessages[progressIndex]);
-
-  function clearTimers() {
-    timers.forEach(clearTimeout);
-    timers = [];
+  async function loadSession(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || experienceState === 'processing') return;
+    token = '';
+    authenticated = false;
+    turns = [];
+    experienceState = 'empty';
+    conversationId = crypto.randomUUID();
+    try {
+      if (file.size > 16384) throw new Error('El archivo de sesión es demasiado grande.');
+      const candidate = (await file.text()).trim();
+      const session = await verifyLunaSession(candidate);
+      token = candidate;
+      authenticated = true;
+      sessionMessage = `Sesión Console verificada · Workspace ${session.workspace}`;
+    } catch (error) {
+      sessionMessage = error instanceof Error ? error.message : 'No se pudo verificar la sesión.';
+    } finally {
+      input.value = '';
+    }
   }
 
   function resizeTextarea() {
@@ -47,20 +64,36 @@
     textarea.focus();
   }
 
-  function submitQuery() {
+  async function submitQuery() {
     const cleanQuery = query.trim();
-    if (!cleanQuery || experienceState === "processing") return;
-
-    clearTimers();
-    submittedQuery = cleanQuery;
-    query = "";
-    experienceState = "processing";
-    progressIndex = 0;
+    if (!cleanQuery || !canSubmit) return;
+    const index = turns.length;
+    turns.push({ question: cleanQuery });
+    query = '';
+    experienceState = 'processing';
+    currentProgress = 'Esperando la ejecución del servidor…';
+    controller = new AbortController();
+    const started = performance.now();
     void tick().then(resizeTextarea);
-
-    timers.push(setTimeout(() => (progressIndex = 1), 450));
-    timers.push(setTimeout(() => (progressIndex = 2), 950));
-    timers.push(setTimeout(() => (experienceState = "ready"), 1550));
+    try {
+      const result = await askLuna(token, cleanQuery, conversationId, controller.signal,
+        (message) => { currentProgress = message; });
+      const answer = result.clarification || result.business_answer;
+      if (!answer) throw new Error('La investigación terminó sin una respuesta acreditada. Podés reintentar; no asumimos un resultado.');
+      turns[index] = { question: cleanQuery, answer, result: {
+        ...result, elapsed_seconds: Math.round((performance.now() - started) / 100) / 10,
+      } };
+    } catch (error) {
+      turns[index] = { question: cleanQuery, error: error instanceof Error ? error.message : 'No se pudo completar la investigación.' };
+      // The bridge invalidates failed context. Never imply continuity after failure.
+      conversationId = crypto.randomUUID();
+      turns[index].error += ' El próximo turno iniciará un contexto nuevo; incluí nuevamente el período y los filtros.';
+      query = cleanQuery;
+    } finally {
+      experienceState = 'ready';
+      controller = undefined;
+      void tick().then(resizeTextarea);
+    }
   }
 
   function handleKeydown(event: KeyboardEvent) {
@@ -71,10 +104,11 @@
   }
 
   function startNewConversation() {
-    clearTimers();
+    if (experienceState === 'processing') return;
     query = "";
-    submittedQuery = "";
-    progressIndex = 0;
+    turns = [];
+    conversationId = crypto.randomUUID();
+    currentProgress = '';
     experienceState = "empty";
     void tick().then(() => {
       resizeTextarea();
@@ -99,7 +133,8 @@
 
   onMount(() => {
     resizeTextarea();
-    return clearTimers;
+    conversationId = crypto.randomUUID();
+    return () => { controller?.abort(); token = ''; };
   });
 </script>
 
@@ -127,6 +162,15 @@
       <span>Análisis anteriores</span>
     </button>
   </header>
+
+  <section class="session-access" aria-label="Sesión empresarial">
+    <p role="status">{sessionMessage}</p>
+    <label>
+      {authenticated ? 'Cambiar sesión Console' : 'Cargar sesión Console'}
+      <input type="file" accept=".txt,.token,text/plain" onchange={loadSession} disabled={experienceState === 'processing'} />
+    </label>
+    <small>El token se mantiene solo en memoria hasta cerrar o recargar esta página. No cargues archivos de configuración ni claves privadas.</small>
+  </section>
 
   <main id="contenido-telchiai" class:conversation-active={experienceState !== "empty"}>
     {#if experienceState === "empty"}
@@ -177,9 +221,19 @@
           {/if}
         </div>
 
-        <article class="user-message" aria-label="Tu consulta">
-          <p>{submittedQuery}</p>
-        </article>
+        {#each turns as turn}
+          <article class="user-message" aria-label="Tu consulta"><p>{turn.question}</p></article>
+          {#if turn.answer}
+            <article class="prepared-state" aria-label="Respuesta de Luna">
+              <p class="result-label">Luna · {turn.result?.status}</p>
+              <p class="luna-answer">{turn.answer}</p>
+              <small>Foundation {turn.result?.publication} · Snapshot {turn.result?.snapshot}</small>
+              <p class="input-help">Cobertura: {turn.result?.question_coverage || 'Ver alcance y fechas efectivas en la respuesta'} · Tiempo completo: {turn.result?.elapsed_seconds} s</p>
+            </article>
+          {:else if turn.error}
+            <p role="alert">{turn.error}</p>
+          {/if}
+        {/each}
 
         <div class="analysis-space" aria-live="polite" aria-busy={experienceState === "processing"}>
           {#if experienceState === "processing"}
@@ -187,18 +241,9 @@
               <span class="progress-indicator" aria-hidden="true"><i></i><i></i><i></i></span>
               <div>
                 <p>{currentProgress}</p>
-                <span>Esto puede tomar unos segundos.</span>
+                <span>La investigación puede demorar. Esta página conserva tus mensajes mientras esperás.</span>
               </div>
             </div>
-          {:else}
-            <article class="prepared-state">
-              <p class="result-label">Consulta preparada</p>
-              <h2>La transición hacia el análisis está lista.</h2>
-              <p>
-                En esta primera versión todavía no se consultan datos reales. Este espacio recibirá la explicación,
-                los indicadores y la visualización cuando se conecte el servicio analítico de Telchi.
-              </p>
-            </article>
           {/if}
         </div>
 
@@ -245,13 +290,17 @@
       <div class="history-empty">
         <span aria-hidden="true">01</span>
         <h3>Acá vas a encontrar tus análisis</h3>
-        <p>El histórico se conectará en una próxima etapa. Por ahora, este acceso deja definido su lugar sin competir con una consulta nueva.</p>
+        <p>La conversación actual permanece visible en esta página. El histórico persistente todavía no está disponible; recargar cierra la sesión y el contexto.</p>
       </div>
     </aside>
   </div>
 {/if}
 
 <style>
+  .session-access { max-width: 850px; margin: 1rem auto; padding: 1rem; font-size: .85rem; }
+  .session-access label { display: block; margin: .5rem 0; }
+  .session-access input { display: block; max-width: 100%; }
+  .luna-answer { white-space: pre-wrap; overflow-wrap: anywhere; }
   :global(body) {
     background: #f7fafb;
   }

@@ -2,6 +2,57 @@
 
 Estado local reconciliado; observaciones operativas conjuntas publicadas en DEV, con métricas históricas y límites separados. [CONTEXT.md](CONTEXT.md) conserva la autoridad de arquitectura, roots y etapas.
 
+## Consolidación Git — 10/11/2026
+
+Código DEV de ambos agentes preservado en una base común; [inventario y validaciones](../../../../data/reports/team360/git-consolidation-20261110/report.md). No se implementaron las dos conexiones pendientes.
+
+- Los registros de edición verifican aportes sucesivos de GPT y DeepSeek en archivos compartidos; se conserva el contenido local integrado, incluidos recuperación/paginación y cierre semántico posterior. No se restaura una versión anterior por timestamp de archivo.
+- La inspección local `canonical-connections-inspection-v1/inspection.json` no certifica runtime: integración de conocimiento canónico parcial, prueba funcional Inbox → Worker → Outbox pendiente y generalización empresarial no demostrada. La evidencia posterior `source-temporal-20261109/result.json` conserva selección de fuentes discrepantes sin resolver; no se eleva a PASS.
+- Los cierres operativos de abajo describen sus respectivas ventanas históricas, no CURRENT vivo. Reportes con datos empresariales y artefactos temporales se preservan fuera del commit; validación de esta consolidación no ejecuta SAP, Luna real ni WhatsApp externo.
+
+## Análisis libre de Presidencia — integración mínima (DEV, sin habilitar)
+
+El investigador existente quedó conectado al canal ya autenticado sin motor nuevo, servicio nuevo ni HTTP hacia Console. [Contrato, evidencia y bloqueos](PRESIDENCIA_FREE_ANALYSIS_V1.md).
+
+- `ConsoleResearchService.ask_scope` expone el mismo núcleo a cualquier canal con un `scope_resolver` fresco; Console conserva su token. `research_port.py` adapta la identidad de WhatsApp y `TelchiHandler` solo intenta investigar cuando la planificación de capabilities terminó en una categoría del conjunto cerrado `RESEARCH_CATEGORIES` (`CAPABILITY_MISSING`, `COMPARISON_UNSUPPORTED`), sin router LLM adicional ni salto HTTP.
+- Medido en vivo: CURRENT `foundation_c0b08df908d3485c8668788933826f7c`, snapshot 1408, 70 sources y 0 reader gaps. Permisos Telchi efectivos: `devfull` 21, `admin` 0. Gates del port fail-closed verificados (sin `SourcePolicy`, permiso no poseído, revocación entre turnos) con cero llamadas al modelo y cero SQL. Regresión focalizada 1295 PASS / 4 SKIP; nuevos tests del port y del enrutamiento PASS.
+- Corregido un CURRENT hardcodeado en `console_http.py`; el turno fija publicación+snapshot desde el contrato de sucesión.
+- `PRESIDENCIA_ACCESS=FAIL` e `FREE_SQL_INVESTIGATION=BLOCKED`: faltan el mapa acreditado `dataset → permiso` con `whole_dataset` y las identidades de Presidencia/Abraham. No se inventaron permisos ni identidades; sin ese contrato el catálogo autorizado queda vacío y falla cerrado. Sin WhatsApp real, reinicios, commits ni push; `READY_FOR_PRESIDENCIA_DEMO=NO`.
+
+## Primer E2E de análisis libre — fallo del 08/11 22:56 y corrección
+
+El primer E2E real de análisis libre respondió «No encontré un producto acreditado»; la [reconstrucción del turno y la corrección](../../../../data/reports/telchi/free-analysis-first-e2e-20261108/report.md) parten del audit PostgreSQL y no repiten la auditoría general del port.
+
+- Tres defectos deterministas, no un problema de datos ni de Luna: el contrato de ruteo producto→clientes fijaba `comparison=None` y borraba la exclusión «pero no en septiembre»; la resolución de producto buscaba la mención completa como subcadena literal («soda cáustica x25 kg» contra `SODA CAUSTICA (HIDROXIDO DE SODIO) x 25kg.`) y concluía `product_not_found` con `L01010` acreditado; y el investigador solo se invocaba con `CAPABILITY_MISSING`, por lo que un `DATA_UNAVAILABLE` terminal lo dejaba inalcanzable.
+- Corrección mínima: se conserva el baseline explícito del turno, la búsqueda de catálogo se relaja de forma progresiva con cobertura de empaquetado normalizada y el desvío a investigación libre usa el conjunto cerrado `RESEARCH_CATEGORIES`, auditado en `research.routing_category`. Sin capability nueva, sin motor paralelo y sin permisos nuevos.
+- Validación: reproducción offline del turno, catálogo real con `L01010` resuelto para tres menciones equivalentes, `961 passed / 14 skipped`, corrida live in-process del investigador real (58,3 s, `sql_executions=4`, CURRENT `foundation_c0b08df9…`, snapshot 1408) y control SQL independiente con 7 clientes. `WHATSAPP_E2E=NOT_RUN`; la sesión DEV activa conserva el código anterior y requiere reinicio manual del owner.
+
+## Presentación completa del resultado exploratorio (7 de 7)
+
+El turno del 08/11 quedó corregido; este apartado corrige solo la presentación que recortaba el listado. [Reporte y replay determinista](../../../../data/reports/telchi/free-analysis-presentation-20261108/report.md).
+
+- Defecto de presentación, no de datos ni del motor: `AskRegistry._render_executed` repetía el filtro SQL completo en cada celda (~410 caracteres), así que 14 celdas acreditadas medían 7.369 caracteres y la guarda de 4.096 entregaba 4 de 7 clientes y 7 de 14 importes.
+- Corrección mínima en `exploratory_sql/ask_verifier.py`: una línea por fila ejecutada, alcance declarado una sola vez, condiciones con símbolos (`doc_month = "2026-10"`) y referencias `[alcance N]` cuando hay consultas distintas. Sin elevar el límite, sin tocar la guarda ni el investigador; la evidencia íntegra permanece en la auditoría privada.
+- Regresión sobre la traza real del turno: 2.069 caracteres acreditados y 2.154 entregados, 7/7 clientes y 14/14 importes, cero omisiones; `336 passed` en `exploratory_sql` y `1070 passed, 4 skipped` en asistente/messaging. `WHATSAPP_PRESENTATION=PASS`.
+- `SIX_GATES=DEGRADED`: el manifiesto vigente es anterior al código actual y la reacreditación canónica exige sesión inerte (`manifest_changed=false`, `OSError` por el listener vivo y webhook activo). Secuencia en una sola ventana: `down` → `reaccredit.py` → `up` → pregunta original. `READY_FOR_CONTROLLED_RESTART=YES`.
+
+## Actualización segura — Development, sin publicación real
+
+Publicador validado; adapter histórico CxC completado y validado en aislamiento. [Cierre del adapter](../../../../data/reports/telchi/cxc-adapter-completion-v1/report.json); [evidencia previa y límites](../../../../data/reports/telchi/safe-datalake-update-v1/report.json); [protocolo](datalake/SALES_FOUNDATION_PROMOTION_V1.md#contrato-de-publicación-y-actualización-completa).
+
+- El publicador acredita y selecciona CURRENT en una transacción; fallos previos al commit conservan el CURRENT aprobado. Un commit completo con acuse perdido se recupera desde su recibo. El checkpoint preparado no se confunde con el snapshot posterior de selección; receipts legacy intactos.
+- La inspección read-only posterior al cierre inicial encontró recibo persistente preexistente para `foundation_42483d2e035e98e73e0a2d98ddc7d986`, emitido `2026-11-03T12:33:00.604558+00:00`. El apartado siguiente describe aquel cierre inicial, no la disponibilidad actual.
+- CxC: `receivables_collections_succession.py` completa el replay físico de recibos fuente y la sucesión canónica del componente/snapshot, reutilizando los productores Atomic/Business y el kernel histórico existentes. Conserva identidades históricas, componentes ajenos, snapshots de ventas y permisos; el reader selecciona exclusivamente el snapshot acreditado de CxC, sin replay en consultas normales. Publicación/recibo coherentes y fallo conservando CURRENT anterior: PASS aislado. `READY_FOR_REAL_CXC_UPDATE=YES` para el próximo procedimiento explícito; captura/actualización real todavía NO ejecutada y saldos de octubre todavía NO acreditados con datos reales. Apertura y semántica de cancelaciones siguen exigiendo controles fuente acreditados, nunca inferidos.
+- CURRENT operativo no modificado. Foundation Reader, Luna, WhatsApp y transportes intactos. Los pendientes P3–P5 de Luna son independientes y no quedan condicionados a actualizar CxC u otros dominios.
+
+## Reader rápido Foundation — Development sin activación
+
+Implementado el recibo de acreditación en metadata existente y el reader sin reacreditación física por consulta. [Contrato y migración](datalake/SALES_FOUNDATION_PROMOTION_V1.md#contrato-de-publicación-y-actualización-completa); [evidencia](../../../../data/reports/telchi/foundation-read-binding-v1/report.md).
+
+- CURRENT y esquema vivo intactos: `foundation_42483d2e035e98e73e0a2d98ddc7d986`, commit 1506 y datos independientes 1408. Falta recibo persistido; el reader rápido falla cerrado hasta una operación explícita del publicador. `READY_FOR_TELCHIAI=NO`; no desplegar antes de esa acreditación.
+- Octubre real conciliado antes/después: 41.078 facturas, Bs 11.982.896,13 brutos; 280 NC, Bs 479.145,78; neto Bs 11.503.750,35. Benchmark con recibo efímero local, sin writes vivos: reader/SQL/validación 210,628 ms iniciales y 194,875–211,099 ms sucesivos; SQL 157,369–170,996 ms. No mide Luna ni conexión fría.
+- Regresión Foundation/adapters: 232 PASS; ampliación conversacional detectó un fallo de texto preexistente reproducido con módulos HEAD, documentado sin corregirlo fuera de scope. RBAC y read-only preservados en contratos; no prueba nueva de identidad viva ni habilitación de WhatsApp.
+
 ## Observaciones operativas V1 — publicación conjunta acotada
 
 `PARTIAL_PUBLISHED`: producción, compras, eventos de cobranza, prefijo OINM y consumo observado tienen datasets nuevos y readers canónicos. No es refresh integral de las métricas históricas.

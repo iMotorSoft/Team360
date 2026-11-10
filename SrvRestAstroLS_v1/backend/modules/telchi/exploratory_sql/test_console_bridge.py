@@ -119,7 +119,7 @@ def install_model(monkeypatch, seen):
                 candidate_relations=[], hypothesis='Fixture hypothesis', prior_observation_interpretation='',
                 hypothesis_state='OPEN', evidence_turns=[])
     monkeypatch.setattr(adaptive_research, 'LunaSQL', lambda **kw: Probe())
-    monkeypatch.setattr(ask, 'CancellableLuna', lambda cancel: Model())
+    monkeypatch.setattr(ask, 'CancellableLuna', lambda cancel, **kw: Model())
 
 
 def test_backend_worker_same_investigator_different_authorized_catalogs(setup, monkeypatch):
@@ -140,6 +140,27 @@ def test_backend_worker_same_investigator_different_authorized_catalogs(setup, m
         assert {t for t in repo.threads} == {loop_thread}  # no PG access from SQL worker
         assert [event[2] for event in repo.events] == ['STARTED', 'PARTIAL', 'STARTED', 'PARTIAL']
         assert 'v4.public' not in canonical((first, second, seen, repo.events))
+    asyncio.run(run())
+
+
+def test_console_conversation_identity_scope_and_explicit_thread_isolation(setup, monkeypatch):
+    from . import ask
+    seen = []
+    async def research(report, save, *, question, conversation, required_measure, **kwargs):
+        seen.append((question, list(conversation), required_measure))
+        report.update(status='PARTIAL', business_answer='Delivered fixture result only')
+    monkeypatch.setattr(ask, 'run', research)
+    async def run():
+        svc, repo = service(setup)
+        await svc.ask(token(), 'Ventas netas de octubre', lambda _:None)
+        await svc.ask(token(), '¿Y septiembre?', lambda _:None)
+        assert len(seen[-1][1]) == 2 and seen[-1][2] == 'net_document'
+        await svc.ask(token(), 'Otra pregunta', lambda _:None, conversation_id='separate')
+        assert not seen[-1][1]
+        setup.state[0] = replace(setup.state[0], permissions=frozenset(repo.enabled))
+        await svc.ask(token(), '¿Y agosto?', lambda _:None)
+        assert not seen[-1][1] and seen[-1][2] is None
+        assert all('v4.public' not in str(value) for value in svc._conversations.values())
     asyncio.run(run())
 
 

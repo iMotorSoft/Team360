@@ -69,6 +69,16 @@ ALLOWLIST: tuple[dict[str, str], ...] = (
         "reason": "additive deterministic Atomic-to-Business producer; never a Foundation consumer",
     },
     {
+        "path": "datalake/receivables_collections_history.py",
+        "classification": "VALIDATION_ONLY",
+        "reason": "update-time historical CxC validation over an explicit frozen snapshot; no publication or runtime consumer entrypoint",
+    },
+    {
+        "path": "datalake/receivables_collections_succession.py",
+        "classification": "VALIDATION_ONLY",
+        "reason": "CxC update-time source replay and staged business producer over frozen snapshots; no CURRENT selection",
+    },
+    {
         "path": "datalake/receivables_collections_foundation.py",
         "classification": "SHARED_LIBRARY",
         "reason": "exact-id, snapshot-pinned Receivables Foundation publication and reader boundary",

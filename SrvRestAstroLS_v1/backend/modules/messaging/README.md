@@ -56,6 +56,12 @@ Se reutilizan los contratos y las tablas core, sin enlazar Flow ni LLM. El alta 
 
 Evolution = transport/provider. Team360 = conversation owner. Sin segundo framework, servidor PostgreSQL, Redis, broker, automatizaciones ni inteligencia en este gate.
 
+## PostgreSQL Evolution: configuración y verificación
+
+El [runbook canónico PostgreSQL 18](providers/evolution/POSTGRESQL18.md) conserva la configuración acreditada, la matriz de permisos, el preflight read-only, el diagnóstico de incidentes y la checklist de migraciones/piloto.
+
+Base/schema `evolution_api`, runtime `evodevv1_runtime`, PostgreSQL 18.4. SELECT e INSERT sobre `evolution_api."Message"` acreditados por catálogo; UPDATE/DELETE no concedidos. No se ejecutó INSERT funcional ni se requiere corrección. No confundir el rol runtime con el propietario histórico de instalación ni con la conexión administrativa Team360.
+
 ## Configuración DEV y seguridad
 
 El adapter está deshabilitado por defecto y exige configuración explícita de identidad y transporte desde el entorno existente; nunca habilita autorización de negocio por un teléfono.
@@ -138,7 +144,7 @@ Overhead Team360 medido: p50 56.37 ms (<100), p95 146.04 ms (<250). Baseline Wha
 Evolution base v2.3.7 corre a demanda con Podman rootless, PostgreSQL 18.4 reutilizado, base/schema propios, Redis OFF y cache local ON.
 
 - Publicación: `127.0.0.1:18180 → container:8080`; 8080 del host libre. Health interno continúa en 8080.
-- Base, rol y schema: `evolution_api`; PostgreSQL compartido, sin crear otro servidor.
+- Base y schema: `evolution_api`; runtime acreditado `evodevv1_runtime`, distinto del rol histórico de instalación `evolution_api`. PostgreSQL compartido, sin crear otro servidor; [conexiones y permisos actuales](providers/evolution/POSTGRESQL18.md).
 - Persistencia: PostgreSQL y `data/store`; sin systemd, cron, auto-start ni restart automático.
 - Instancia: `team360-meta-dev`, integración `WHATSAPP-BUSINESS`.
 - Activos Meta independientes: app `Team360 Messaging Hub`, WABA propia, System User `team360-messaging` y número WhatsApp propio DEV (sólo sufijo `***4780` aquí).

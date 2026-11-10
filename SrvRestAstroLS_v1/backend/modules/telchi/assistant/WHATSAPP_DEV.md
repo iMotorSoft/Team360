@@ -2,6 +2,14 @@
 
 Este runbook conecta el webhook Evolution existente con la composición real Srv05/Telchi. No habilita producción ni sustituye [RBAC y límites comerciales](README.md) o [CONTEXT](../CONTEXT.md).
 
+## Arranque habitual desde Team360
+
+Usar `./whatsapp-dev.sh up`, conversar manualmente y terminar con `./whatsapp-dev.sh down`. `./whatsapp-dev.sh status` muestra dependencias y bloqueos. El [runbook operativo](../../messaging/providers/evolution/DEV_STARTUP.md#operación-habitual-de-un-comando) detalla el flujo.
+
+La configuración privada existente es la autoridad del bind, instancia, aprobación e identidad. El wrapper no reinicia servicios activos ni escribe Meta; si cambia el túnel, muestra el comando explícito del updater y bloquea hasta sincronización autorizada. Tampoco reacredita gates automáticamente.
+
+`down` detiene únicamente WhatsApp mediante el lifecycle canónico y restaura su webhook. Evolution/Cloudflare/PostgreSQL/LiteLLM permanecen disponibles. No hay cierres por duración/inactividad ni envío de mensajes durante `up`/`status`/`down`.
+
 ## Estado y alcance
 
 La implementación está preparada para validación; el estado operativo es **BLOCKED** hasta acreditar aprobación y gates reales. Ningún test con dobles certifica conectividad, credenciales o conversación humana.
@@ -44,7 +52,7 @@ unset TEAM360_TELCHI_ASSISTANT_DEV_HTTP TEAM360_BUSINESS_SEMANTICS
 
 El environment privado debe aportar `TEAM360_EVOLUTION_API_KEY`, `TEAM360_MESSAGING_WEBHOOK_TOKEN` (32 caracteres mínimo), `TEAM360_MESSAGING_DEV_AUTHORIZED_SENDER` (la única línea aprobada, formato numérico sin `+`), `META_TEAM360_PHONE_NUMBER_ID` (receiver existente), configuración PostgreSQL y la credencial Luna existente. No introducir otra línea ni confundir receiver con piloto.
 
-Evolution debe estar iniciado manualmente por el operador y conectado. El launcher sólo usa su API local; nunca lo arranca/reinicia. Se rechaza un webhook habilitado y también una configuración previa sin URL restaurable o con campos desconocidos.
+El arranque directo requiere Evolution conectado. El wrapper operativo puede iniciar únicamente el contenedor DEV existente y adoptado mediante el script aprobado; nunca reinicia uno activo ni aprovisiona otro. Se rechaza un webhook habilitado y también una configuración previa sin URL restaurable o con campos desconocidos.
 
 ## Aprobación y gates obligatorios
 
@@ -79,6 +87,8 @@ uv run python -m modules.telchi.assistant.tests.runtime_http.restart_continuity 
 ```
 
 No tomar automáticamente esos comandos como todos los gates aprobados: el adapter HTTP tiene un claim distinto de Messaging. Idempotencia durable, concurrencia/reintentos y aislamiento del ingress requieren evidencia real del pipeline Messaging y PostgreSQL además de los contratos con dobles. Si falta una garantía, conservar **BLOCKED**; no editar código ni etiquetar un doble como real para desbloquear.
+
+Separar la fase técnica de la activación operativa. La fase técnica cierra sólo si cada garantía tiene evidencia real aplicable al source/configuración/aprobación vigentes, tests afectados satisfactorios y un registro validado por `gate_evidence()`. La integridad de hashes sola no acredita vigencia. Si falta infraestructura, registrar `PENDING_EXTERNAL`; si un defecto está reproducido, `FAIL`. No publicar `SIX_GATES=VALID` mientras falte una garantía. La fase operativa posterior exige Evolution/Cloudflare disponibles, Meta autorizado y conversación real correlacionada; no se deduce del cierre técnico.
 
 Registrar seis garantías con nombres exactos: `http_auth`, `identity_tenant_isolation`, `business_authorization`, `durable_idempotency`, `assistant_foundation`, `model_no_fallback`. Cada entrada exige `status: "PASS"`, `kind: "real"`, `artifact` privado y `sha256` exacto. El artefacto debe identificar comandos, runtime, fecha, inputs/scope y resultado revisado.
 
@@ -118,14 +128,13 @@ read -r -p 'IPv4 específica del host accesible desde Evolution: ' TELCHI_WEBHOO
 uv run python -m modules.telchi.assistant.whatsapp_dev start \
   --approval "$TELCHI_APPROVAL" \
   --host "$TELCHI_WEBHOOK_HOST" --port 18181 \
-  --idle-timeout 900 --max-duration 14400 \
   --container evolution-api \
   --output "$TELCHI_PRIVATE/whatsapp-dev-session-new"
 ```
 
-La sesión ya no cierra por una duración fija: permanece mientras haya actividad y se cierra por inactividad (`--idle-timeout`, 900 s por defecto) o por duración máxima (`--max-duration`, 14.400 s por defecto). Un turno en curso nunca se interrumpe. La actividad y el motivo del cierre quedan en `activity.json` y `closure.json` dentro del directorio privado de salida. Para extender una sesión activa, ajustar `idle_timeout` o `max_duration` en el control privado `whatsapp-dev-control.json`: el controlador relee esas claves sin tocar el entorno.
+El responsable decide cuándo detener el piloto: no hay cierre automático por inactividad ni duración. Los argumentos y claves privados `idle_timeout=900`, `max_duration=14400` y el alias `duration` se aceptan por compatibilidad, pero ya no disparan cierres. No son expiraciones de credenciales. Se conservan revocación, autorización dinámica, expiración de gates legacy y cierre ante fallo del backend. Actividad y motivo de cierre quedan en `activity.json` y `closure.json` privados.
 
-El launcher conserva backup privado antes de mutar, verifica su listener mediante nonce, prueba desde el contenedor token inválido y evento ignorado con token válido y sólo entonces configura el webhook. Ninguna prueba genera un mensaje WhatsApp. El proceso permanece foreground hasta Ctrl-C, expiración o error.
+El launcher conserva backup privado antes de mutar, verifica su listener mediante nonce, prueba desde el contenedor token inválido y evento ignorado con token válido y sólo entonces configura el webhook. Ninguna prueba genera un mensaje WhatsApp. El proceso permanece foreground hasta Ctrl-C, revocación, vencimiento de seguridad legacy o error; no vence por edad o inactividad del piloto.
 
 Esperar `READY_FOR_HUMAN_TEST`. Desde el teléfono piloto aprobado, abrir el chat con la línea de la instancia DEV y enviar **una sola vez**:
 
@@ -153,11 +162,23 @@ Revisar además en la auditoría privada capacidad concreta, publicación/snapsh
 
 ## Cierre y recuperación
 
-Cerrar con Ctrl-C una sola vez o dejar expirar la ventana. Se restaura y verifica el webhook antes de terminar el hijo propio; un turno en curso dispone de hasta 100 segundos para cerrar. No se matan procesos ajenos ni se toca Evolution.
+Cerrar con Ctrl-C una sola vez cuando lo decida el responsable; no existe expiración automática de la ventana por duración ni inactividad. Se restaura y verifica el webhook antes de terminar el hijo propio; un turno en curso dispone de hasta 100 segundos para cerrar. No se matan procesos ajenos ni se toca Evolution.
 
 Revisar privadamente `closure.json`: exigir `webhook_restored=true` y `backend_stopped=true`; conservar `webhook-backup.json` con sus headers secretos fuera de Git. Nunca imprimirlo ni adjuntarlo a un reporte público. Verificar que el puerto propio ya no escucha, sin terminar listeners de ownership dudoso.
 
-Tras SIGKILL, caída del host, API inaccesible o restauración fallida, no asumir rollback automático. El backup durable permite recuperación explícita:
+Tras SIGKILL, caída del host, API inaccesible o restauración fallida, no asumir rollback automático. Un registro huérfano `STOPPING`/`REVIEW_REQUIRED` admite recuperación administrativa explícita del ID exacto, desde la raíz Team360:
+
+```bash
+./whatsapp-dev.sh reconcile --session ID_HISTORICO
+```
+
+Esta operación toma el lock canónico, exige procesos ausentes y puerto libre, consulta PostgreSQL READ ONLY con binding/identidad vigentes y bloquea ante jobs durables no terminales, intents outbound reanudables, incertidumbre outbound o inbound en curso de la sesión. No ejecuta ni reenvía trabajo.
+
+Los registros legacy inciertos anteriores se conservan y contabilizan, no se marcan exitosos ni se reintentan. El worker actual solo selecciona jobs durables; un job durable pendiente de cualquier fecha bloquea. La restauración existente compara todos los campos del backup y rechaza un webhook ajeno.
+
+Antes de restaurar se conservan originales byte a byte y luego evidencia privada `whatsapp-dev-control/recovery-ID/verified.json`. La transición auditada a `STOPPED` lleva `closure=ADMINISTRATIVE_RECOVERY`: significa recursos cerrados, nunca éxito runtime/E2E. La sesión histórica y los eventos permanecen; no hay UPDATE SQL ni borrados. No se ejecuta esta intervención implícitamente durante `up`.
+
+El backup durable también permite restauración explícita sin reconciliar el registro lifecycle:
 
 ```bash
 uv run python -m modules.telchi.assistant.whatsapp_dev restore \

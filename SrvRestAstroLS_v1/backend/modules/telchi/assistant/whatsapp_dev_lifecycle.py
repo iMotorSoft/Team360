@@ -181,6 +181,7 @@ def owned_session(args):
 # removed in this controller process before importing application settings.
 CONFIG_ENV = frozenset({
     'AUTOMATION_DIAGNOSIS_REPOSITORY', 'TEAM360_ENV', 'TEAM360_TELCHI_DURABLE',
+    'TEAM360_TELCHI_FREE_ANALYSIS', 'TEAM360_TELCHI_CONSOLE_CONFIG',
     'TEAM360_SRV05_EVOLUTION_ENABLED', 'TEAM360_SRV05_MESSAGING_PROVIDER',
     'TEAM360_MESSAGING_DEV_ENABLED', 'TEAM360_MESSAGING_DISPATCH_MODE',
     'TEAM360_MESSAGING_WORKSPACE_SLUG', 'TEAM360_MESSAGING_CHANNEL_ALIAS',
@@ -425,8 +426,6 @@ def stop(timeout=350):
     except FileNotFoundError:
         return status()
     if record['state'] == 'STOPPED':
-        if os.getenv('TEAM360_TRANSPORT_V1_CONFIG'):
-            evolution_running(False)
         return status()
     if (record['state'] == 'REVIEW_REQUIRED' or not matches(record.get('launcher'))
             or (record['state'] != 'STOPPING' and record.get('backend') and not matches(record['backend']))):

@@ -43,6 +43,29 @@ def test_explicit_postgres_and_terminal_independence(config):
     assert set(os.environ) <= control.BASE_ENV | control.CONFIG_ENV
 
 
+def test_explicit_research_configuration_survives_sanitization(config):
+    configured = {
+        'TEAM360_ENV': 'development',
+        'TEAM360_TELCHI_DURABLE': '1',
+        'TEAM360_TELCHI_FREE_ANALYSIS': '1',
+        'TEAM360_TELCHI_CONSOLE_CONFIG': str(config.parent / 'console.json'),
+    }
+    dev.save_private(config, {'env': configured})
+    os.environ.update(TEAM360_TELCHI_FREE_ANALYSIS='0',
+                      TEAM360_TELCHI_CONSOLE_CONFIG='/foreign/console.json')
+    control.load_config(config)
+    assert all(os.environ[key] == value for key, value in configured.items())
+
+
+def test_research_configuration_is_not_inherited(config):
+    dev.save_private(config, {'env': {}})
+    os.environ.update(TEAM360_TELCHI_FREE_ANALYSIS='1',
+                      TEAM360_TELCHI_CONSOLE_CONFIG='/foreign/console.json')
+    control.load_config(config)
+    assert 'TEAM360_TELCHI_FREE_ANALYSIS' not in os.environ
+    assert 'TEAM360_TELCHI_CONSOLE_CONFIG' not in os.environ
+
+
 def test_missing_authorized_host_cannot_create_session(config):
     with pytest.raises(ValueError, match='explicit_authorized_launch_host'):
         control.launch({'env': {}})

@@ -2,9 +2,9 @@
 
 Productive consumers must enter through :func:`get_current_foundation` (this
 module) or one of the ``open_current_*`` helpers.  Atomic relations are pinned
-to the DuckLake snapshot in which the selected foundation first became
-``CURRENT``.  This matters while a later candidate is being built: querying the
-latest Atomic snapshot directly could otherwise observe candidate component
+to the publisher-accredited data snapshot; the exact logical commit snapshot
+is recorded separately in the catalog receipt. While a later candidate is
+being built, querying the latest Atomic snapshot could expose component
 writes before their global logical commit.
 
 ``DIRECT_ATOMIC_SQL_UNSAFE_FOR_PRODUCTIVE_FOUNDATION=YES``.  Arbitrary SQL is
@@ -72,6 +72,8 @@ class FoundationAccess:
     reference_path: Path
     manifest: Mapping[str, Any]
     manifest_base_snapshot_id: int
+    commit_snapshot_id: int | None = None
+    read_binding: Mapping[str, Any] | None = None
 
     @property
     def foundation_publication_id(self) -> str:
@@ -101,9 +103,10 @@ class FoundationAccess:
                 raise FoundationReaderError(
                     f"Receivables & Collections dataset {table!r} is not pinned"
                 )
+            from .receivables_collections_succession import snapshot_for
             return (
                 f"(SELECT * FROM telchi.business.{_quoted(table)} "
-                f"AT (VERSION => {int(self.manifest_base_snapshot_id)}))"
+                f"AT (VERSION => {snapshot_for(self.manifest)}))"
             )
         return pinned_atomic_relation(component, table, self.ducklake_snapshot_id)
 
@@ -114,7 +117,7 @@ class FoundationAccess:
         This API never upgrades a prefix to continuity or a balance to aging.
         """
         from .operational_domains import relation
-        return relation(self.manifest, domain, dataset)
+        return relation(self.manifest, domain, dataset, verify_physical=self.read_binding is None)
 
     def require_sales_coverage(self, component: str, start: str, end_exclusive: str) -> list[dict]:
         """Prove each daily source window, including accredited zero days.
@@ -171,7 +174,7 @@ class FoundationAccess:
         if not isinstance(entry, dict):
             raise FoundationReaderError("Product commercial semantics is not part of this Foundation")
         try:
-            return read_component(entry)
+            return read_component(entry, verify_physical=self.read_binding is None)
         except (ValueError, KeyError) as exc:
             raise FoundationReaderError(str(exc)) from exc
 
@@ -183,7 +186,7 @@ class FoundationAccess:
         if not isinstance(entry, dict):
             raise FoundationReaderError("Product commercial semantics is not part of this Foundation")
         try:
-            return dataset_relation(entry, dataset)
+            return dataset_relation(entry, dataset, verify_physical=self.read_binding is None)
         except (ValueError, KeyError) as exc:
             raise FoundationReaderError(str(exc)) from exc
 
@@ -275,14 +278,34 @@ class FoundationReader:
         component_verifier: ComponentVerifier | None = None,
         verify_reference_path: bool = True,
         metadata_catalog: str = "telchi",
+        full_validation: bool = False,
     ) -> None:
         self.connector = connector or DuckLakeConnector()
         self.snapshot_resolver = snapshot_resolver or _resolve_commit_snapshot
         self.component_verifier = component_verifier or _verify_component_publications
         self.verify_reference_path = verify_reference_path
         self.metadata_catalog = metadata_catalog
+        # Injected resolvers are an explicit validation/test seam, never used by
+        # productive consumers. Only the update path requests full_validation.
+        self.full_validation = full_validation or snapshot_resolver is not None
 
     def resolve_on(self, connection: Any) -> FoundationAccess:
+        return measured('foundation_resolution', self._resolve_transaction, connection)
+
+    def _resolve_transaction(self, connection: Any) -> FoundationAccess:
+        if self.full_validation:
+            return self._resolve_on(connection)
+        # All metadata checks see one catalog version even during promotion.
+        connection.execute('BEGIN')
+        try:
+            access = self._resolve_on(connection)
+            connection.execute('COMMIT')
+            return access
+        except BaseException:
+            connection.execute('ROLLBACK')
+            raise
+
+    def _resolve_on(self, connection: Any) -> FoundationAccess:
         started = time.perf_counter()
 
         @contextlib.contextmanager
@@ -290,17 +313,26 @@ class FoundationReader:
             yield connection
 
         store = FoundationPublicationStore(same_connection, catalog=self.metadata_catalog)
-        current_count = measured('foundation_current_count', store.current_count)
-        if current_count != 1:
-            raise FoundationReaderError(
-                f"CURRENT_PUBLICATION_COUNT={current_count}; expected exactly one"
-            )
         foundation = measured('foundation_current_metadata', _get_current_foundation_metadata, store)
         publication = measured('foundation_publication_get', store.get, foundation.foundation_publication_id)
         if publication is None or publication.status != CURRENT:
             raise FoundationReaderError("CURRENT publication disappeared during resolution")
         measured('foundation_manifest_validation', _validate_manifest, publication, foundation)
+        if not self.full_validation:
+            from .foundation_read_binding import validate_binding
+            receipt = measured('foundation_read_binding_metadata', store.read_binding, publication.foundation_publication_id)
+            binding = measured('foundation_read_binding_validation', validate_binding, publication, receipt)
+            base_snapshot = publication.manifest.get('base_snapshot_id')
+            if type(base_snapshot) is not int or base_snapshot < 0:
+                raise FoundationReaderError('foundation base snapshot missing')
+            return FoundationAccess(
+                foundation=foundation, ducklake_snapshot_id=binding['snapshot_id'],
+                commit_snapshot_id=binding['commit_snapshot_id'], read_binding=binding,
+                foundation_resolution_ms=round((time.perf_counter()-started)*1000, 3),
+                reference_path=DATA_ROOT/'reference/_versions'/foundation.reference_version,
+                manifest=publication.manifest, manifest_base_snapshot_id=base_snapshot)
         snapshot_id = int(measured('foundation_commit_snapshot_resolution', self.snapshot_resolver, connection, foundation.foundation_publication_id))
+        commit_snapshot_id = snapshot_id
         from .reference_compatibility import KIND as REFRESH_KIND
         if publication.manifest.get("candidate_kind") == REFRESH_KIND:
             from .foundation_manifest import validate_manifest
@@ -338,6 +370,7 @@ class FoundationReader:
             reference_path=reference_path,
             manifest=publication.manifest,
             manifest_base_snapshot_id=base_snapshot_id,
+            commit_snapshot_id=commit_snapshot_id,
         )
 
     def get_current_foundation(self) -> FoundationAccess:

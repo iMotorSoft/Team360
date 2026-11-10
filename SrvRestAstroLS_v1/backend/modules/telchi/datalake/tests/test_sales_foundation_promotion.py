@@ -36,7 +36,22 @@ def prepared(tmp_path, store, built):
         current = store.current_publication()
         assert current.foundation_publication_id == c.foundation_publication_id
         return dict(foundation=current.foundation_publication_id, reference=current.reference_version)
-    promo = p.Promotion(store, data, tmp_path/'journal', validate=validate, verify_reader=reader, resource_check=lambda:None)
+    def accredit(c, con):
+        from modules.telchi.datalake.foundation_reader import FoundationReader
+        from modules.telchi.datalake.foundation_read_binding import make_binding
+        access = FoundationReader(metadata_catalog='', snapshot_resolver=lambda *_:100,
+            component_verifier=lambda *_:None, verify_reference_path=False).resolve_on(con)
+        assert access.foundation_publication_id == c.foundation_publication_id
+        return make_binding(c, access, commercial=True)
+    with store.connection_factory() as con:
+        # An operationally approved base must remain immediately readable on rollback.
+        from modules.telchi.datalake.foundation_read_binding import make_binding
+        from modules.telchi.datalake.foundation_reader import FoundationReader
+        access = FoundationReader(metadata_catalog='', snapshot_resolver=lambda *_:100,
+            component_verifier=lambda *_:None, verify_reference_path=False).resolve_on(con)
+    store.accredit_read_binding(store.current_publication(), make_binding(store.current_publication(), access, commercial=True))
+    promo = p.Promotion(store, data, tmp_path/'journal', validate=validate, verify_reader=reader,
+                        resource_check=lambda:None, accredit=accredit)
     plan = promo.prepare(path)
     authorization = dict(contract=p.CONTRACT, action='PROMOTE', candidate=plan['candidate'], base=plan['base'],
         manifest_sha256=plan['manifest_sha256'], reference=candidate.reference_version,
@@ -51,7 +66,7 @@ def test_interruption_recovery_and_duplicate_noop(prepared, point):
     def fault(at):
         if at == point: raise InterruptedError(point)
     with pytest.raises(InterruptedError): promo.promote(auth, fault=fault)
-    expected = plan['base'] if point == 'before_commit' else plan['candidate']
+    expected = plan['candidate'] if point == 'after_commit' else plan['base']
     assert promo.store.current_pointer()==expected
     # Readers remain pinned to exactly one Reference while activation lags.
     assert promo.store.current_publication().reference_version == promo.store.get(expected).reference_version
@@ -192,10 +207,12 @@ def test_prepare_no_publication_and_reader_failure_recoverable(prepared):
     promo,plan,auth=prepared
     assert promo.store.current_pointer()==plan['base']
     assert active_pointer(promo.data_root)[0]==plan['reference_before']
-    original=promo.verify_reader
-    promo.verify_reader=lambda _: (_ for _ in ()).throw(RuntimeError('reader'))
+    original=promo.accredit
+    promo.accredit=lambda *_: (_ for _ in ()).throw(RuntimeError('reader'))
     with pytest.raises(RuntimeError,match='reader'): promo.promote(auth)
+    assert promo.store.current_pointer()==plan['base']
+    assert promo.store.get(plan['candidate']).status=='READY_TO_COMMIT'
     assert not (promo.journal/'verified.json').exists()
-    promo.verify_reader=original
+    promo.accredit=original
     promo.promote(auth)
     assert (promo.journal/'verified.json').exists()

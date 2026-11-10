@@ -1,5 +1,6 @@
 """Real MessageHandler. Messaging retains reception, execution fence and delivery."""
 import asyncio
+import json
 from contextlib import asynccontextmanager
 from copy import deepcopy
 from dataclasses import dataclass
@@ -12,7 +13,7 @@ from modules.messaging.delivery_guard import guard_outbound
 from modules.messaging.handlers import HandlerRegistration, MessageResult
 
 from . import state_engine
-from .capabilities import SalesCapabilities, format_result, business_date, business_money
+from .capabilities import SalesCapabilities, ProductResolutionError, format_result, business_date, business_money
 from .luna import LunaError, LunaInterpreter
 from .repository import ConversationRepository
 from . import result_references
@@ -96,7 +97,7 @@ class PostgresConversationStore:
     @asynccontextmanager
     async def turn(self, context):
         # Deliberately serializes turns across processes. Bounded processing avoids
-        # unbounded pool occupation; crash rolls back, Messaging fence forbids replay.
+        # unbounded pool occupation; crash rolls back, DurableWorker fences replay.
         pool = self.pool() if callable(self.pool) else self.pool
         async with transaction(pool) as conn:
             turn = await self.repository.load(conn, context)
@@ -112,13 +113,16 @@ class TelchiHandler:
 
     def __init__(self, *, store, authorization, interpreter=None, capabilities=None,
                  turn_timeout_seconds=80, engine=state_engine.process, concept_resolver=None,
-                 semantics_connection=None):
+                 semantics_connection=None, researcher=None):
         self.store, self.authorization = store, authorization
         self.interpreter = interpreter or LunaInterpreter()
         self.capabilities = capabilities or SalesCapabilities()
         self.turn_timeout_seconds, self.engine = turn_timeout_seconds, engine
         self.concept_resolver = concept_resolver
         self.semantics_connection = semantics_connection
+        # Optional in-process free-analysis port. Composition supplies it only
+        # under an explicit DEV opt-in; absent, behavior is exactly as before.
+        self.researcher = researcher
 
     async def handle(self, message, context):
         denied = MessageResult('No se pudo autorizar esta consulta de Telchi.', context.correlation_id, 'DENIED')
@@ -145,6 +149,12 @@ class TelchiHandler:
                         if cached.get('business_rbac_verified') and not await self._operation_permissions_allowed(
                                 cached['confirmed_state'], context, turn.get('conn')):
                             return denied
+                        if cached.get('decision') == 'RESEARCH' or cached.get('research_reference'):
+                            receipt = (cached.get('research') or {}).get('recovery')
+                            if (not receipt or self.researcher is None
+                                    or not hasattr(self.researcher, 'revalidate')
+                                    or not await self.researcher.revalidate(context, receipt)):
+                                return denied
                         response = cached['response_prepared']
                         return MessageResult(response['text'], context.correlation_id, response['classification'])
                     result, audit = await self._process(message, context, turn)
@@ -158,10 +168,14 @@ class TelchiHandler:
 
     async def _process(self, message, context, turn):
         from uuid import uuid4
+        handler_started = perf_counter()
         command = message.text_body.strip().casefold()
         previous_turn = next(reversed(turn['history']), None)
         from .operational import unsupported_followup
-        unavailable = unsupported_followup(message.text_body, turn['state'])
+        # A legacy shortcut describes a catalog limit, not a SourcePolicy veto.
+        # With research enabled Luna must interpret the full question instead.
+        unavailable = (unsupported_followup(message.text_body, turn['state'])
+                       if self.researcher is None else None)
         if unavailable:
             result = MessageResult(unavailable, context.correlation_id, 'DIRECT_UNAVAILABLE')
             audit = dict(owner=turn['owner'], previous_state=deepcopy(turn['state']),
@@ -183,6 +197,15 @@ class TelchiHandler:
                 required_permission=None, response_prepared=dict(text=text, classification=result.classification))
         else:
             result, audit = await self._process_business(message, context, turn)
+            # Research is the normal path outside a fully represented accelerator.
+            # No valid commercial contract is required. Actual denials and failed
+            # authorization/integrity checks remain terminal, never fallbacks.
+            if (audit.get('decision') not in {'DENIED', 'ERROR', 'LUNA_TECHNICAL_FAILURE'}
+                    and not audit.get('business_rbac_verified')
+                    and (audit.get('bmd') or {}).get('category') in RESEARCH_CATEGORIES):
+                researched = await self._research_fallback(message, context, turn, audit)
+                if researched is not None:
+                    result = researched
             new = (audit.get('committed') is True
                    and audit.get('execution_status') != 'failed'
                    and audit.get('decision') not in {'DENIED', 'ERROR', 'EXECUTION_FORBIDDEN'}
@@ -190,7 +213,11 @@ class TelchiHandler:
         # One logical outbound: answer first, controls last, including a safe
         # unavailable/clarification response. Never assume native button support.
         from .conversation_controls import with_options
-        text = with_options(result.text)
+        # Rejected interpretations and unsupported comparisons must remain
+        # terminal, not invite continuation of a plan that cannot be executed.
+        terminal = (audit.get('decision') == 'EXECUTION_FORBIDDEN'
+                    or (audit.get('bmd') or {}).get('category') in TERMINAL_CATEGORIES)
+        text = result.text if terminal else with_options(result.text)
         result = MessageResult(text, result.correlation_id, result.classification)
         audit['response_prepared'] = dict(text=text, classification=result.classification)
         if new:
@@ -204,7 +231,90 @@ class TelchiHandler:
         audit.update(conversation_id=context.conversation_id, turn_id=context.correlation_id,
             analysis_context_id=turn.get('analysis_context_id', context.conversation_id),
             parent_turn_id=None if new else previous_turn)
+        audit.setdefault('timings', {})['handler_total_ms'] = (perf_counter() - handler_started) * 1000
         return result, audit
+
+    async def _research_fallback(self, message, context, turn, audit):
+        """Free analysis through the single existing investigator, in process.
+
+        No HTTP hop to Console, no second engine, no per-question capability. The
+        port owns fresh authorization (before execution and before disclosure),
+        read-only SQL validation, Foundation CURRENT binding and audit. On any
+        failure we keep the accredited capability-gap answer instead of inventing
+        a result; the attempt stays auditable.
+        """
+        if self.researcher is None:
+            return None
+        phase = perf_counter()
+        try:
+            options = ({'analysis_context_id': turn.get('analysis_context_id', context.conversation_id)}
+                       if hasattr(self.researcher, 'result_reference') else {})
+            # The research conversation does not contain prior fast-path turns.
+            # Supply committed scope as data, without changing routing or making
+            # presentation exclusions into SQL predicates.
+            state = turn.get('state') or {}
+            inherited = {key: state[key] for key in (
+                'metric', 'period', 'periods', 'period_mode', 'branches', 'sales_channel',
+                'product_target', 'customer_target', 'business_category', 'group_by',
+                'excluded_product', 'excluded_products') if state.get(key)}
+            question = message.text_body
+            if inherited:
+                question += '\nContexto previo confirmado (datos; solo para seguimientos, no para una consulta independiente): ' + json.dumps(inherited, ensure_ascii=False)
+            report = await self.researcher(question, context.conversation_id, context, **options)
+        except Exception:
+            if getattr(self.researcher, 'recovery_repository', None) is not None:
+                # Do not commit a catalog-gap answer over a recoverable research
+                # failure. Roll back the turn; DurableWorker owns the retry.
+                raise
+            audit['timings']['research_ms'] = (perf_counter() - phase) * 1000
+            audit['research'] = {'status': 'ERROR', 'reason': 'researcher_unavailable'}
+            return None
+        audit['timings']['research_ms'] = (perf_counter() - phase) * 1000
+        status = report.get('status')
+        text = report.get('business_answer') or report.get('clarification') or ''
+        audit['research'] = {'status': status or 'BLOCKED', 'reason': report.get('reason', ''),
+                             # Why free analysis was the path: the exact catalog
+                             # category that could not express this question.
+                             'routing_category': (audit.get('bmd') or {}).get('category'),
+                             'publication': report.get('publication'),
+                             'snapshot': report.get('snapshot'),
+                             'question_coverage': report.get('question_coverage'),
+                             'model_calls': report.get('model_calls'),
+                             'sql_executions': report.get('sql_executions'),
+                             'recovery': report.get('_recovery')}
+        if status == 'BLOCKED' and report.get('reason') in {
+                'execution_stopped:host_io_or_memory_pressure',
+                'execution_stopped:query_deadline_or_cancel',
+                'execution_stopped:research_budget_exhausted',
+                'model_call_budget_exhausted'}:
+            # A safe environmental stop is not a commercial catalog rejection.
+            # No unverified partial figures, exception text or authority changes.
+            audit.update(decision='RESEARCH_BLOCKED', committed=False,
+                         execution_status='not_completed', confirmed_state=deepcopy(turn['state']))
+            audit['bmd'] = {'category': 'RESEARCH_RESOURCE_BLOCKED'}
+            return MessageResult('La investigación se detuvo por un límite de recursos o de ejecución. '
+                                 'No tengo una respuesta completa acreditada; no es un rechazo '
+                                 'por falta de una capability comercial.',
+                                 context.correlation_id, 'DIRECT_UNAVAILABLE')
+        if status not in {'READY', 'VERIFIED_WITH_LIMITATIONS',
+                          'EXECUTOR_OBSERVED_WITH_LIMITATIONS', 'PARTIAL',
+                          'NEEDS_CLARIFICATION'} or not text.strip():
+            return None
+        clarification = status == 'NEEDS_CLARIFICATION'
+        partial = status == 'PARTIAL'
+        audit.update(decision='RESEARCH', committed=False,
+                     execution_status='not_executed' if clarification else 'executed',
+                     required_permission=None, confirmed_state=deepcopy(turn['state']))
+        # Preserve the actual interpreter output and rejected plan for diagnosis.
+        # Research never confers capability execution authority on that plan.
+        audit['bmd'] = {'category': ('RESEARCH_CLARIFICATION' if clarification else
+                                     'RESEARCH_PARTIAL' if partial else 'RESEARCH_ANSWER')}
+        # A partial investigation (including one with no checked figures) is not
+        # a correctly answered turn. Keep useful partial facts, never label it as
+        # a completed business answer for delivery/quality metrics.
+        return MessageResult(text, context.correlation_id,
+                             'NEEDS_CLARIFICATION' if clarification else
+                             'DIRECT_UNAVAILABLE' if partial else 'DIRECT_AVAILABLE')
 
     async def _process_business(self, message, context, turn):
         origin = perf_counter()
@@ -215,6 +325,13 @@ class TelchiHandler:
                      execution_status='not_executed', execution_result=None, capability_calls=0,
                      required_permission=None, bmd=None, timings=timings,
                      pilot_approval_sha256=self.authorization.policy.pilot_approval_sha256)
+        if (self.researcher is not None and hasattr(self.researcher, 'has_recovery')
+                and await self.researcher.has_recovery(context)):
+            # The original inbox already chose research. Never spend another
+            # interpretation/model call (or change routes) to recover its result.
+            audit.update(decision='DIRECT_UNAVAILABLE', bmd={'category': 'CAPABILITY_MISSING'})
+            return MessageResult('No hay un resultado confirmado.', context.correlation_id,
+                                 'DIRECT_UNAVAILABLE'), audit
         classification, text = 'ERROR', 'No pude interpretar la consulta. No se ejecutó ninguna consulta.'
         phase = perf_counter()
         semantics = None
@@ -241,6 +358,17 @@ class TelchiHandler:
                         semantics['connection'] = await repo.connection_identity(semantic_conn)
                 audit['business_semantics'] = semantics
                 interpretation_args['business_semantics'] = luna_context(semantics)
+                if (self.researcher is not None
+                        and semantics.get('semantic_guard', {}).get('requires_clarification')):
+                    # A commercial vocabulary mismatch is not a source/permission
+                    # denial. Investigate the ORIGINAL question, never execute an
+                    # unfiltered commercial delta or trust the rejected mapping.
+                    audit.update(committed=False, decision='RESEARCH_REQUESTED',
+                                 bmd={'category': 'RESEARCH_REQUESTED',
+                                      'reason': 'commercial_semantic_contract_unrepresentable'})
+                    timings['interpretation_ms'] = (perf_counter() - phase) * 1000
+                    return MessageResult('No hay un resultado de investigación confirmado.',
+                                         context.correlation_id, 'DIRECT_UNAVAILABLE'), audit
                 if semantics.get('semantic_guard', {}).get('requires_clarification'):
                     # Do not let Luna replace a rejected entity/direction with an
                     # unfiltered global plan. Preserve prior state, no pending plan
@@ -261,9 +389,21 @@ class TelchiHandler:
             if (isinstance(self.store, PostgresConversationStore)
                     and callable(getattr(self.store.repository, 'load_result', None)) and not turn.get('cached')):
                 reference_result = await self.store.repository.load_result(turn['conn'], context, turn)
+            if self.researcher is not None and hasattr(self.researcher, 'result_reference'):
+                research_result = await self.researcher.result_reference(context, turn)
+                if research_result is not None:
+                    order = list(turn['history'])
+                    research_position = (order.index(research_result['result_id'])
+                                         if research_result['result_id'] in order else -1)
+                    current_position = (order.index(reference_result['result_id'])
+                                        if reference_result and reference_result['result_id'] in order else -1)
+                    if reference_result is None or research_position >= current_position:
+                        reference_result = research_result
             if reference_result is not None and not await self._reference_allowed(reference_result, context, turn.get('conn')):
                 reference_result = None
-            selected = (turn.get('result_reference') or {}).get('selected_ordinal')
+            pointer = turn.get('result_reference') or {}
+            selected = (pointer.get('selected_ordinal') if reference_result is not None
+                        and pointer.get('result_id') == reference_result['result_id'] else None)
             document_pointer = turn.get('document_reference')
             if document_pointer and isinstance(self.store, PostgresConversationStore):
                 document_result = await self.store.repository.load_result(turn['conn'], context,
@@ -289,12 +429,25 @@ class TelchiHandler:
             if monetary_results:
                 from .monetary_comparison import descriptors
                 interpretation_args['monetary_context'] = descriptors(monetary_results, turn.get('monetary_comparison'))
+                audit['monetary_context_delivered'] = deepcopy(interpretation_args['monetary_context'])
+            if self.researcher is not None:
+                interpretation_args['research_available'] = True
             proposal = await self.interpreter.interpret(**interpretation_args)
             audit['interpretation_proposed'] = deepcopy(proposal)
+            if proposal == {'intent': 'RESEARCH', 'action': 'INVESTIGATE'} and self.researcher is not None:
+                state_engine.validate(before)
+                audit.update(committed=False, decision='RESEARCH_REQUESTED',
+                             bmd={'category': 'RESEARCH_REQUESTED'})
+                timings['interpretation_ms'] = (perf_counter() - phase) * 1000
+                timings['total_processing_ms'] = (perf_counter() - origin) * 1000
+                return MessageResult('No hay un resultado de investigación confirmado.',
+                                     context.correlation_id, 'DIRECT_UNAVAILABLE'), audit
             proposal = documentary_request_contract(proposal, message.text_body)
             proposal = fixed_ranking_request_contract(proposal, message.text_body)
             from .commercial_continuity import request_contract
-            proposal = request_contract(proposal, message.text_body, before)
+            proposal = request_contract(proposal, message.text_body, before, reference_result)
+            from .product_routing import request_contract as product_customers_contract
+            proposal = product_customers_contract(proposal, message.text_body, before, reference_result)
             if proposal != audit['interpretation_proposed']:
                 audit['business_contract_proposal'] = deepcopy(proposal)
         except LunaError as failure:
@@ -322,6 +475,9 @@ class TelchiHandler:
                     'Las categorías requieren el mismo período y cobertura, además de moneda y métrica iguales; '
                     'no puedo comparar una consulta no ejecutada ni mezclar importes de líneas y cabeceras. '
                     '¿Qué dos resultados querés comparar?')
+            if isinstance(proposal.get('comparison'), dict) and 'target_field' in proposal['comparison']:
+                text = ('Necesito un resultado anterior autorizado con los componentes y la base solicitados. '
+                        '¿Qué resultado y qué importes querés relacionar? No hice una nueva consulta.')
             audit.update(committed=False, decision='ASK')
             try:
                 record, calculated_text = calculate(proposal, monetary_results, turn['owner'])
@@ -333,7 +489,8 @@ class TelchiHandler:
                     classification, text = 'DIRECT_AVAILABLE', calculated_text
                     audit.update(decision='LOCAL_CALCULATION', monetary_calculation=record,
                         required_permission=record['target']['required_permission'],
-                        monetary_comparison_pointer={k: record[k] for k in ('target_id', 'baseline_id')})
+                        monetary_comparison_pointer={k: record[k] for k in
+                            ('target_id', 'baseline_id', 'target_field', 'baseline_field') if k in record})
             except (ValueError, KeyError, TypeError, ArithmeticError):
                 pass
             audit['response_prepared'] = dict(text=text, classification=classification)
@@ -359,6 +516,10 @@ class TelchiHandler:
                             result_reference=dict(result_id=reference_result['result_id'], selected_ordinal=ordinal),
                             result_provenance=deepcopy(reference_result['source']),
                             selected_field=proposal['result_reference']['field'])
+                        if reference_result.get('research_receipt'):
+                            audit.update(research_reference=True,
+                                research={'recovery': deepcopy(reference_result['research_receipt']),
+                                          'sql_executions': 0})
                         audit['reference_focus'] = 'result'
                         if reference_result['capability'] == 'sales.latest_documents.v1':
                             audit['document_reference'] = deepcopy(audit['result_reference'])
@@ -382,6 +543,12 @@ class TelchiHandler:
         if processed['committed'] is not True:
             # NEVER use raw EXECUTE, rejected state_after, or the retained prior plan.
             audit['decision'] = 'EXECUTION_FORBIDDEN'
+            reason = processed.get('researchable_contract_error')
+            if self.researcher is not None and reason in state_engine.RESEARCHABLE_CONTRACT_ERRORS:
+                audit.update(decision='FAST_PATH_UNREPRESENTABLE',
+                             bmd={'category': 'CONTRACT_SCOPE_UNSUPPORTED', 'reason': reason})
+                classification = 'DIRECT_UNAVAILABLE'
+                text = 'El camino rápido no representa esta consulta. No se ejecutó el plan rechazado.'
         else:
             state, action = processed['state_after'], processed['output']['action']
             from modules.telchi.datalake.operational_query import OPERATIONS
@@ -546,27 +713,51 @@ class TelchiHandler:
                         text = format_result(result, audit.get('business_scope'))
                         timings['response_format_ms'] = (perf_counter() - formatting) * 1000
                         classification = 'DIRECT_AVAILABLE'
+                    except ProductResolutionError as exc:
+                        # The request is understood but no single accredited
+                        # product was proved. Never guess an ItemCode or run a
+                        # global/other-product query as a substitute.
+                        candidates = [c for c in exc.candidates if isinstance(c, dict)]
+                        if candidates:
+                            shown = '; '.join(
+                                f"{c.get('item_code')} — {str(c.get('description') or '').rstrip('.')}"
+                                for c in candidates[:5])
+                            classification = 'NEEDS_CLARIFICATION'
+                            text = ('Encontré varios productos compatibles con ese nombre: ' + shown +
+                                    '. ¿Cuál querés analizar? Podés indicar el código SAP o el nombre completo.')
+                            audit.update(decision='ASK', execution_status='not_executed',
+                                         confirmed_state=deepcopy(state),
+                                         bmd={'category': 'PRODUCT_AMBIGUOUS'})
+                        else:
+                            classification = 'DIRECT_UNAVAILABLE'
+                            text = ('No encontré un producto acreditado con ese nombre. '
+                                    'No inventé un código ni ejecuté una consulta. '
+                                    'Indicá el código SAP o un nombre más específico.')
+                            audit.update(decision='DIRECT_UNAVAILABLE', execution_status='not_executed',
+                                         confirmed_state=deepcopy(state),
+                                         bmd={'category': 'PRODUCT_LOOKUP_UNRESOLVED'})
+                        audit['product_resolution'] = {'reason': exc.reason,
+                            'candidate_count': len(candidates),
+                            'candidates': [{k: c.get(k) for k in ('item_code', 'description')}
+                                           for c in candidates[:5]]}
                     except Exception as exc:
-                        from modules.telchi.datalake.product_line_amount_ranking_query import SAFE_ERRORS
+                        # Deterministic classification: the real Foundation family
+                        # and cause are audited; the user never sees SQL, secrets or
+                        # internal parameters and is never told to repeat a
+                        # non-retryable failure.
+                        failure = capability_failure(exc, state)
                         if getattr(exc, 'evidence', None) is not None:
                             audit['capability_failure_evidence'] = deepcopy(exc.evidence)
-                        reason = str(exc)
-                        if category_code(state) and reason in SAFE_ERRORS:
-                            classification = 'DIRECT_UNAVAILABLE'
-                            text = ({'category_currency_not_accredited':
-                                'El período contiene monedas documentales o de precio que no están acreditadas para esta métrica BS. No las sumé ni convertí.',
-                                'ranking_reconciliation_failed':
-                                'No pude verificar la consistencia del ranking monetario. No presento productos ni importes sin confirmar.',
-                                'ranking_catalog_integrity_failed':
-                                'No pude confirmar los productos del ranking monetario. No presento un resultado sin verificar.',
-                                'category_classification_provisional':
-                                'La categoría contiene clasificación provisional o insuficiente. No presento ese importe como validado.'}.get(reason,
-                                'No pude acreditar la integridad o la procedencia de las líneas de esta consulta. No calculé un importe sustituto.'))
-                            audit.update(decision='DIRECT_UNAVAILABLE', execution_status='not_executed',
-                                confirmed_state=deepcopy(state), bmd={'category': reason})
-                        else:
-                            classification, text = 'ERROR', 'No hay un resultado Foundation verificable. Intentá nuevamente.'
-                            audit.update(decision='ERROR', execution_status='failed', confirmed_state=before)
+                        classification, text = failure['classification'], failure['text']
+                        audit.update(
+                            decision='DIRECT_UNAVAILABLE' if classification == 'DIRECT_UNAVAILABLE' else 'ERROR',
+                            execution_status='not_executed' if classification == 'DIRECT_UNAVAILABLE' else 'failed',
+                            confirmed_state=deepcopy(state) if failure['category'] == 'DATA_UNAVAILABLE' else before,
+                            bmd={'category': failure['category']})
+                        audit['capability_failure'] = dict(category=failure['category'],
+                            reason=failure['reason'], metric=state.get('metric'),
+                            capability_contract=failure.get('capability'),
+                            retryable=False)
                     timings['capability_ms'] = (perf_counter() - phase) * 1000 - timings['response_format_ms']
         # The channel rejects a body longer than its limit. The accredited answer
         # is kept whole in the audit; the delivered text is always deliverable.
@@ -679,6 +870,9 @@ class TelchiHandler:
         return text
 
     async def _reference_allowed(self, result, context, conn):
+        if result.get('research_receipt'):
+            return (self.researcher is not None
+                    and await self.researcher.revalidate(context, result['research_receipt']))
         expected = (INVOICE_PERMISSION if result['capability'] == INVOICE_LINES
                     else self.capabilities.required_permission(result['state']))
         return (expected is not None and result['required_permission'] == expected
@@ -784,6 +978,85 @@ def normalized_request(text):
     import unicodedata
     return ' '.join(''.join(c for c in unicodedata.normalize('NFD', text.lower())
                            if not unicodedata.combining(c) and c not in '¿?¡!.').split())
+
+
+# Deterministic capability failures are terminal: they never invite a retry of
+# an operation that cannot succeed without a change of source or scope.
+TERMINAL_CATEGORIES = {'PUBLICATION_INCOMPATIBLE', 'CAPABILITY_UNAVAILABLE',
+                       'DATA_UNAVAILABLE', 'EXECUTION_ERROR', 'COMPARISON_UNSUPPORTED',
+                       'PRODUCT_AMBIGUOUS', 'PRODUCT_LOOKUP_UNRESOLVED'}
+# Representation limits can route the ORIGINAL question, never the rejected
+# plan. Missing source accreditation, integrity failures, stale references,
+# unproved net-product semantics and permission denials are intentionally absent.
+# A genuine ASK remains a clarification, not a reason to query behind the user.
+# The single researcher owns fresh SourcePolicy/RBAC and evidence verification.
+RESEARCH_CATEGORIES = frozenset({
+    'RESEARCH_REQUESTED', 'CONTRACT_SCOPE_UNSUPPORTED',
+    'CAPABILITY_MISSING', 'COMPARISON_UNSUPPORTED', 'ANALYSIS_REQUESTED',
+    'MAPPING_MISSING', 'METRIC_MISSING', 'TEMPORAL_METADATA_MISSING',
+    'CATEGORY_CAPABILITY_UNAVAILABLE', 'RANKING_UNAVAILABLE',
+    'OPERATIONAL_SCOPE_UNAVAILABLE', 'DIMENSION_NOT_ACCREDITED',
+    'PERIOD_SET_UNSUPPORTED', 'PERIOD_PARAMETER_UNSUPPORTED', 'COVERAGE_GAP',
+    'PAGINATION_UNSUPPORTED', 'PRODUCT_AMBIGUOUS', 'PRODUCT_LOOKUP_UNRESOLVED',
+})
+_PUBLICATION_FAILURES = {
+    'product_binding_changed', 'product_result_binding_mismatch',
+    'FOUNDATION_READ_BINDING_INVALID', 'FOUNDATION_READ_BINDING_CURRENT_CHANGED',
+    'Commercial publication accreditation missing',
+    'Commercial succession manifest mismatch', 'Commercial succession ancestry invalid',
+    'Commercial succession lineage missing',
+    'Commercial succession requires incremental reconciliation',
+    'Commercial succession adapter unsupported', 'Commercial inherited contract changed',
+    'Commercial physical accreditation lost', 'Commercial category accreditation lost',
+    'Commercial physical accreditation root changed', 'commercial_result_binding_mismatch',
+    'category_accreditation_binding_changed', 'PUBLICATION_INCOMPATIBLE'}
+_CAPABILITY_FAILURES = {
+    'product_worker_error', 'product_query_unavailable', 'category_amount_worker_error',
+    'ranking_worker_error', 'commercial_amount_worker_error', 'datalake_busy',
+    'operational_worker_error', 'CAPABILITY_UNAVAILABLE'}
+_DATA_FAILURES = {
+    'item_code_absent_from_catalog', 'duplicate_catalog_item_code',
+    'duplicate_product_documents', 'duplicate_product_lines', 'orphan_product_lines',
+    'commercial_quantity_unaccredited', 'commercial_reconciliation_failed',
+    'ranking_reconciliation_failed', 'ranking_catalog_integrity_failed',
+    'commercial_catalog_integrity_failed', 'category_currency_not_accredited',
+    'category_unaccredited_rows_or_lineage', 'category_key_integrity_failed',
+    'category_classification_provisional', 'category_classification_changed',
+    'DATA_UNAVAILABLE'}
+
+
+def capability_failure(exc, state):
+    """Classify a capability failure by family and cause, never exposing detail.
+
+    Uses the existing error contracts (TelchiQueryError codes, Commercial amount
+    reasons) instead of introducing a second taxonomy. The returned text never
+    contains SQL, parameters, credentials or driver messages.
+    """
+    reason = getattr(exc, 'code', None) or str(exc) or type(exc).__name__
+    if not isinstance(reason, str) or len(reason) > 120:
+        reason = type(exc).__name__
+    if reason in _PUBLICATION_FAILURES:
+        category, classification = 'PUBLICATION_INCOMPATIBLE', 'ERROR'
+        text = ('La publicación de datos vigente no es compatible con esta operación '
+                'acreditada. No ejecuté una consulta sobre una base no verificada. '
+                'No es un problema de la forma en que preguntaste. Podés iniciar otra consulta.')
+    elif reason in _CAPABILITY_FAILURES:
+        category, classification = 'CAPABILITY_UNAVAILABLE', 'ERROR'
+        text = ('La operación no está disponible en este momento por una falla de la capacidad. '
+                'No se obtuvo un resultado verificable. Podés iniciar otra consulta.')
+    elif reason in _DATA_FAILURES:
+        category, classification = 'DATA_UNAVAILABLE', 'DIRECT_UNAVAILABLE'
+        text = ('No pude acreditar los datos de ese alcance ni presentar cifras sin verificar. '
+                'No es un problema de la fecha ni de la forma de preguntar. '
+                'Podés iniciar otra consulta con otro producto o período.')
+    else:
+        category, classification = 'EXECUTION_ERROR', 'ERROR'
+        text = ('No hay un resultado Foundation verificable: la operación no se pudo completar. '
+                'No es un problema de la forma en que preguntaste. Podés iniciar otra consulta.')
+    metric = state.get('metric')
+    return dict(category=category, classification=classification, reason=reason, text=text,
+                retryable=False,
+                capability=(metric + '.v1') if isinstance(metric, str) else None)
 
 
 def technical_failure_text(failure):
@@ -946,6 +1219,12 @@ def _next_step(state, available):
     if available.category in {'MAPPING_MISSING', 'METRIC_MISSING'}:
         return ('Decime qué información necesitás (producto, cliente, período o categoría) y consulto la parte '
                 'que sí está acreditada.')
+    if available.category == 'CAPABILITY_MISSING':
+        # A real gap gets a concrete path that the catalog can actually run: a
+        # reformulation must never send the user back to the same rejection.
+        return ('Si lo que querés es un ranking por producto, puedo darte el importe vendido y la cantidad '
+                'documental de cada producto en un período concreto, ordenado por importe o por cantidad: '
+                'decime el período y el criterio.')
     return 'Podés reformular la consulta con los datos que ya tenemos, o indicarme el período faltante.'
 
 

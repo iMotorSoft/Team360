@@ -31,11 +31,16 @@ PHYSICAL_CROSSWALK_SHA256 = 'b458903333c6c78de83128a64a72bdfe70efa859bc7f9f9c3be
 ACCREDITED_BINDINGS = {(category.PUBLICATION, category.SNAPSHOT),
     ('foundation_38680850adc058b1bb11887632b7b681', 1408), (PHYSICAL_PUBLICATION, 1408)}
 ORDER_BY = [['amount', 'desc'], ['key', 'asc']]
+# A product ranking may be ordered by its documentary quantity. Only the
+# per-product grouping publishes that column; the amount stays the measure.
+QUANTITY_ORDER_BY = [['quantity', 'desc'], ['key', 'asc']]
+ORDER_CHOICES = {'amount': ORDER_BY, 'quantity': QUANTITY_ORDER_BY}
 PLAN = dict(dataset=DATASET, group_by=None, measure=MEASURE, order_by=ORDER_BY, breakdown=None)
 FILTERS = ('category', 'item_code', 'card_code')
 SAFE_ERRORS = category.SAFE_ERRORS | {'commercial_catalog_integrity_failed',
                                       'commercial_reconciliation_failed',
-                                      'commercial_universe_unchanged'}
+                                      'commercial_universe_unchanged',
+                                      'commercial_quantity_unaccredited'}
 LIMITATIONS = ['Sin IVA de línea; descuentos propios ya reflejados en el importe.',
     'No descuenta notas de crédito ni incorpora ajustes globales u otros componentes de cabecera.',
     'Clasificación actual, no histórica. Cobertura completa del período no certificada.',
@@ -43,6 +48,9 @@ LIMITATIONS = ['Sin IVA de línea; descuentos propios ya reflejados en el import
     '«Cliente» significa la cuenta facturada en SAP (CardCode) que recibe las líneas; '
     'no es el comprador final ni un cliente comercial validado por taxonomía.',
     'Un importe de un producto es el de sus líneas: no incluye los demás productos de la misma factura.']
+QUANTITY_LIMITATION = ('Cantidad documental por producto: suma de las cantidades de las mismas líneas acreditadas. '
+    'La unidad de medida nativa de la línea no está publicada en Foundation, así que la cantidad no se convierte '
+    'ni es comparable entre productos distintos.')
 ITEM_CODE = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,49}')
 CARD_CODE = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,19}')
 
@@ -62,13 +70,18 @@ def parameters(options):
     if set(options) - {'physical_focus', 'detail_limit'} != {'dataset', 'filters', 'date_from', 'date_to_exclusive', 'group_by',
                         'breakdown_by', 'periods', 'measure', 'order_by', 'limit', 'currency'}:
         raise ValueError('invalid_commercial_plan')
+    if options.get('order_by', ORDER_BY) not in ORDER_CHOICES.values():
+        raise ValueError('invalid_commercial_order_by')
+    # Only the product grain carries a documentary quantity column.
+    if options.get('order_by') == QUANTITY_ORDER_BY and options['group_by'] != 'sap_product':
+        raise ValueError('invalid_commercial_order_by')
     if 'detail_limit' in options and (options['group_by'] != 'physical_state'
             or options['breakdown_by'] != 'products' or type(options['detail_limit']) is not int
             or not 1 <= options['detail_limit'] <= 50):
         raise ValueError('invalid_physical_detail_limit')
     if options['dataset'] != DATASET or options['measure'] != MEASURE:
         raise ValueError('invalid_commercial_plan')
-    if options['order_by'] != ORDER_BY or options['currency'] != 'BS':
+    if options['order_by'] not in ORDER_CHOICES.values() or options['currency'] != 'BS':
         raise ValueError('invalid_commercial_plan')
     if options['group_by'] not in GROUP_BY:
         raise ValueError('invalid_commercial_group_by')
@@ -121,9 +134,15 @@ def parameters(options):
     return options
 
 
+def order_key(options):
+    """The column a product ranking is ordered by. Closed vocabulary only."""
+    return 'quantity' if options.get('order_by') == QUANTITY_ORDER_BY else 'amount'
+
+
 def plan_of(options):
     plan = dict(PLAN)
     plan['group_by'] = options['group_by']
+    plan['order_by'] = list(options.get('order_by') or ORDER_BY)
     plan['breakdown'] = (None if options['breakdown_by'] is None else dict(by=options['breakdown_by']))
     if options['breakdown_by'] == 'period':
         plan['breakdown']['periods'] = [dict(p) for p in options['periods']]
@@ -149,6 +168,17 @@ def reconcile(rows, total, group_by):
                     group_by=group_by)
     if difference != 0 or lines != total['line_count']:
         raise CommercialAmountError('commercial_reconciliation_failed', evidence)
+    # The documentary quantity is reconciled over exactly the same groups. It is
+    # a column of the accredited rows, never a second measure with another scope.
+    if group_by == 'sap_product' and all('quantity' in r for r in rows) and 'quantity' in total:
+        with localcontext() as ctx:
+            ctx.prec = 50
+            quantity = sum((Decimal(r['quantity']) for r in rows), Decimal(0))
+            quantity_difference = quantity - Decimal(total['quantity'])
+        evidence.update(quantity=str(quantity), universe_quantity=str(total['quantity']),
+                        quantity_difference=str(quantity_difference), quantity_tolerance='0')
+        if quantity_difference != 0:
+            raise CommercialAmountError('commercial_reconciliation_failed', evidence)
     # A billed customer partitions the documents of the universe; a product does not.
     if group_by == 'card_code' and documents != total['document_count']:
         raise CommercialAmountError('commercial_reconciliation_failed', evidence)
@@ -158,19 +188,30 @@ def reconcile(rows, total, group_by):
     return evidence
 
 
+def _scope(options, args):
+    """The category filter of the accredited universe, applied identically."""
+    if options['filters']['category'] is not None:
+        return ' WHERE category=?', list(args) + [options['filters']['category']]
+    return '', list(args)
+
+
 def _grouped(con, cte, args, options, window):
     """Group the guarded universe by the requested dimension."""
-    scope = ''
-    scope_args = list(args)
-    if options['filters']['category'] is not None:
-        scope = ' WHERE category=?'
-        scope_args = list(args) + [options['filters']['category']]
+    scope, scope_args = _scope(options, args)
     key = {'sap_product': 'item_code', 'card_code': 'card_code',
            'physical_state': 'physical_key'}[options['group_by']]
+    # Documentary quantity exists at the product grain only: a customer or a
+    # physical state aggregates different articles and must not publish it.
+    quantity = (', SUM(TRY_CAST(quantity AS DECIMAL(38,12))) quantity'
+                if options['group_by'] == 'sap_product' else '')
+    order = 5 if order_key(options) == 'quantity' and quantity else 2
     rows = con.execute(cte + f''' SELECT {key} group_key,
         SUM(CAST(line_total AS DECIMAL(38,6))) amount, COUNT(*) line_count,
-        COUNT(DISTINCT doc_entry) document_count
-        FROM joined{scope} GROUP BY {key} ORDER BY 2 DESC, 1 ASC''', scope_args).fetchall()
+        COUNT(DISTINCT doc_entry) document_count{quantity}
+        FROM joined{scope} GROUP BY {key} ORDER BY {order} DESC, 1 ASC''', scope_args).fetchall()
+    if quantity:
+        return [dict(key=r[0], amount=str(r[1]), line_count=r[2], document_count=r[3],
+                     quantity=str(r[4])) for r in rows]
     return [dict(key=r[0], amount=str(r[1]), line_count=r[2], document_count=r[3]) for r in rows]
 
 
@@ -222,7 +263,8 @@ def execute_query(options, connector=None):
         physical = options['group_by'] == 'physical_state'
         physical_binding = admit(access, con, physical=physical, category_legacy=True)
         path = DATA_ROOT / 'crosswalk/_versions' / access.foundation.reference_version / 'product_business_type/part-00000.parquet'
-        if hashlib.sha256(path.read_bytes()).hexdigest() != category.CROSSWALK_SHA256:
+        if (getattr(access, 'read_binding', None) is None
+                and hashlib.sha256(path.read_bytes()).hexdigest() != category.CROSSWALK_SHA256):
             raise TelchiQueryError('category_classification_changed')
         relation = f"read_parquet('{str(path).replace(chr(39), chr(39) * 2)}')"
         filters = options['filters']
@@ -246,15 +288,28 @@ def execute_query(options, connector=None):
             products = "read_parquet('" + str(access.reference('products')).replace("'", "''") + "')"
             crosswalk_path = DATA_ROOT / 'crosswalk/_versions' / access.foundation.reference_version / 'product_crosswalk/part-00000.parquet'
             crosswalk = "read_parquet('" + str(crosswalk_path).replace("'", "''") + "')"
-            if (hashlib.sha256(access.reference('products').read_bytes()).hexdigest() != physical_binding['products_sha256']
-                    or hashlib.sha256(crosswalk_path.read_bytes()).hexdigest() != physical_binding['crosswalk_sha256']):
+            if (getattr(access, 'read_binding', None) is None
+                    and (hashlib.sha256(access.reference('products').read_bytes()).hexdigest() != physical_binding['products_sha256']
+                         or hashlib.sha256(crosswalk_path.read_bytes()).hexdigest() != physical_binding['crosswalk_sha256'])):
                 raise TelchiQueryError('physical_classification_changed')
             cte, args = enrich(con, cte, args, products, crosswalk)
             physical_result = profile(con, cte, args, category=filters['category'])
-            physical_result.update(reference=access.foundation.reference_version,
-                products_sha256=hashlib.sha256(access.reference('products').read_bytes()).hexdigest(),
-                crosswalk_sha256=hashlib.sha256(crosswalk_path.read_bytes()).hexdigest())
+            physical_result.update(physical_binding)
         grouped = _grouped(con, cte, args, options, (options['date_from'], options['date_to_exclusive']))
+        if options['group_by'] == 'sap_product':
+            # Closed quantity guard: an unreadable quantity is never silently
+            # dropped from the sum, and its universe is the amount's universe.
+            scope, scope_args = _scope(options, args)
+            unaccredited = con.execute(cte + f''' SELECT COUNT(*) FROM joined{scope}
+                WHERE TRY_CAST(quantity AS DECIMAL(38,12)) IS NULL
+                OR NOT isfinite(TRY_CAST(quantity AS DOUBLE))''', scope_args).fetchone()[0]
+            if unaccredited:
+                raise CommercialAmountError('commercial_quantity_unaccredited',
+                                            dict(unaccredited_quantity_lines=unaccredited,
+                                                 group_by=options['group_by']))
+            total['quantity'] = str(con.execute(cte + f''' SELECT COALESCE(
+                SUM(TRY_CAST(quantity AS DECIMAL(38,12))),0) FROM joined{scope}''',
+                scope_args).fetchone()[0])
         # The universe of the same scope without the customer filter. It is the
         # denominator of a participation and is computed with the same measure
         # and the same guards, never with another definition.
@@ -309,7 +364,7 @@ def execute_query(options, connector=None):
             focus['card_code'] = filters['card_code']
             focus['customer_label'] = customer_labels[filters['card_code']]
         merged.sort(key=lambda r: r['key'])
-        merged.sort(key=lambda r: Decimal(r['amount']), reverse=True)
+        merged.sort(key=lambda r: Decimal(r[order_key(options)]), reverse=True)
         reconciliation = reconcile(merged, total, options['group_by'])
         customer_count = con.execute(cte + ''' SELECT COUNT(DISTINCT card_code) FROM joined''',
                                      args).fetchone()[0]
@@ -326,6 +381,8 @@ def execute_query(options, connector=None):
             source=source_metadata(access),
             limitations=LIMITATIONS, read_only=True, sap_accessed=False,
             unnamed_accounts=unnamed, focus=focus)
+        if options['group_by'] == 'sap_product':
+            result['quantity_limitation'] = QUANTITY_LIMITATION
         if physical_result is not None:
             result['physical_classification'] = physical_result
             if all(v is None for v in filters.values()) and not base.get('periods'):
@@ -353,14 +410,20 @@ def _merge(grouped, period_rows):
         for row in reading['rows']:
             entry = merged.setdefault(row['key'], dict(key=row['key'], amount='0', line_count=0,
                 document_count=0, periods=[]))
+            if 'quantity' in row:
+                entry.setdefault('quantity', '0')
             entry['periods'].append(dict(period=dict(reading['period']), amount=row['amount'],
-                line_count=row['line_count'], document_count=row['document_count']))
+                line_count=row['line_count'], document_count=row['document_count'],
+                **({'quantity': row['quantity']} if 'quantity' in row else {})))
     with localcontext() as ctx:
         ctx.prec = 50
         for entry in merged.values():
             entry['amount'] = str(sum((Decimal(p['amount']) for p in entry['periods']), Decimal(0)))
             entry['line_count'] = sum(p['line_count'] for p in entry['periods'])
             entry['document_count'] = sum(p['document_count'] for p in entry['periods'])
+            if 'quantity' in entry:
+                entry['quantity'] = str(sum((Decimal(p.get('quantity', '0'))
+                                             for p in entry['periods']), Decimal(0)))
     return [merged[k] for k in sorted(merged)]
 
 
@@ -397,6 +460,7 @@ def validate_result(options, result, *, _admitted=None, _physical_binding=None):
             or (e.get('header_currency') == e.get('line_currency') == 'BS') for e in exceptions):
         raise ValueError('invalid_commercial_exceptions')
     keys = set()
+    per_product = options['group_by'] == 'sap_product'
     for row in full:
         if (not isinstance(row.get('key'), str) or not row['key'] or row['key'] in keys
                 or not isinstance(row.get('label'), str) or not row['label'].strip()
@@ -404,14 +468,25 @@ def validate_result(options, result, *, _admitted=None, _physical_binding=None):
                 or any(type(row.get(k)) is not int or row[k] < 1 for k in ('line_count', 'document_count'))
                 or row['document_count'] > row['line_count']):
             raise ValueError('invalid_commercial_row')
+        if per_product is not None and ('quantity' in row) != per_product:
+            raise ValueError('invalid_commercial_quantity')
+        if 'quantity' in row and (not isinstance(row['quantity'], str)
+                                  or not Decimal(row['quantity']).is_finite()):
+            raise ValueError('invalid_commercial_quantity')
         keys.add(row['key'])
+    order_column = order_key(options)
     ordered = sorted(full, key=lambda r: r['key'])
-    ordered.sort(key=lambda r: Decimal(r['amount']), reverse=True)
+    ordered.sort(key=lambda r: Decimal(r[order_column]), reverse=True)
     if full != ordered:
         raise ValueError('invalid_commercial_order')
     expected = reconcile(full, result['total'], options['group_by'])
     if result.get('reconciliation') != expected:
         raise ValueError('invalid_commercial_reconciliation')
+    if options['group_by'] == 'sap_product':
+        if result.get('quantity_limitation') != QUANTITY_LIMITATION:
+            raise ValueError('invalid_commercial_quantity')
+    elif 'quantity_limitation' in result:
+        raise ValueError('invalid_commercial_quantity')
     if options['group_by'] == 'physical_state':
         from .physical_sales_dimension import LABELS, EXPLICIT, OBSERVATION_WARNING, validate_profile
         physical = result.get('physical_classification', {})

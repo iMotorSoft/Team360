@@ -33,9 +33,12 @@ def load_candidate(path):
     from .reference_compatibility import KIND as REFERENCE_KIND
     kind = candidate.manifest.get('candidate_kind')
     from .independent_facts_succession import KIND as INDEPENDENT_KIND
-    if kind not in {KIND, REFERENCE_KIND, INDEPENDENT_KIND}:
+    from .foundation_manifest import EXTENSIBLE_KIND
+    if kind not in {KIND, REFERENCE_KIND, INDEPENDENT_KIND, EXTENSIBLE_KIND}:
         raise ValueError('SALES_TRANSITION_CANDIDATE_REQUIRED')
-    if kind == REFERENCE_KIND:
+    if kind == EXTENSIBLE_KIND:
+        rich_components = set()  # additive extension retains exact catalog rows
+    elif kind == REFERENCE_KIND:
         rich_components = {'reference'}
     elif kind == INDEPENDENT_KIND:
         from .operational_domains import CONTRACT as OBSERVATIONS
@@ -43,7 +46,10 @@ def load_candidate(path):
         # of ALL components; promoting rich stock metadata here changes its
         # serialized component_hash even though stock was not replaced.
         proof = candidate.manifest.get('independent_facts_succession', {})
-        rich_components = set() if proof.get('contract') == OBSERVATIONS else {'oitw'}
+        from .receivables_collections_succession import CONTRACT as CXC_HISTORY
+        # CxC also retains the exact catalog representation of stock/sales.
+        # Only a stock replacement may enrich the stock catalog component.
+        rich_components = set() if proof.get('contract') in {OBSERVATIONS, CXC_HISTORY} else {'oitw'}
     else:
         rich_components = {'sales', 'credit_memo'}
         if candidate.manifest['sales_facts_revalidation'].get('reference_append'):
@@ -74,9 +80,10 @@ def tree_hashes(root):
 
 
 class Promotion:
-    def __init__(self, store, data_root, journal, *, validate, verify_reader, resource_check):
+    def __init__(self, store, data_root, journal, *, validate, verify_reader, resource_check, accredit):
         self.store, self.data_root, self.journal = store, Path(data_root), Path(journal)
         self.validate, self.verify_reader, self.resource_check = validate, verify_reader, resource_check
+        self.accredit = accredit
 
     def event(self, name, value):
         path = self.journal / (name + '.json')
@@ -197,9 +204,8 @@ class Promotion:
             self.trace(authorization)
             self.event('commit-intent', dict(candidate=plan['candidate'], base=plan['base']))
             if current == plan['base']:
-                # A changed master pointer before our commit is never adopted.
-                if pointer != plan['reference_before']:
-                    raise RuntimeError('REFERENCE_CONFLICT_BEFORE_COMMIT')
+                # The exact prepared target is also valid after an interrupted
+                # precommit master activation. No third-party pointer is adopted.
                 existing = self.store.get(plan['candidate'])
                 if existing is None:
                     self.store.create_candidate(candidate)
@@ -207,22 +213,29 @@ class Promotion:
                     raise RuntimeError('DUPLICATE_CANDIDATE_CONFLICT')
                 self.store.set_status(plan['candidate'], READY_TO_COMMIT)
                 self.resource_check()
+                fault('during_activation')
+                # The master pointer is not Foundation's visibility boundary.
+                # A crash here leaves the old Foundation/Reference pair pinned;
+                # the same journal can resume from either master-pointer state.
+                if pointer == plan['reference_before']:
+                    publish(pointer, plan['reference_after'])
+                fault('after_activation')
                 fault('before_commit')
-                self.store.logical_commit(plan['candidate'])
+                self.store.logical_commit(plan['candidate'], accredit=self.accredit)
                 fault('after_commit')
             self.event('committed', dict(candidate=plan['candidate']))
-            fault('during_activation')
-            if self.store.current_pointer() != plan['candidate']:
-                raise RuntimeError('CURRENT_CHANGED_BEFORE_ACTIVATION')
-            if pointer == plan['reference_before']:
-                publish(pointer, plan['reference_after'])
-            fault('after_activation')
             self.event('activated', dict(reference=plan['reference_after']['current_reference_version']))
             if self.store.current_pointer() != plan['candidate']:
                 raise RuntimeError('CURRENT_CHANGED_AFTER_COMMIT')
-            # On failure leave the durable journal and pinned publication intact;
-            # operator can retry validation or invoke exact CAS rollback.
-            result = self.verify_reader(candidate)
+            # All expensive reader/business gates ran BEFORE atomic visibility.
+            # Reentry after lost acknowledgement only checks the durable receipt.
+            from .foundation_read_binding import validate_binding
+            selected = self.store.get(plan['candidate'])
+            receipt = self.store.read_binding(plan['candidate'])
+            validate_binding(selected, receipt)
+            result = dict(foundation=selected.foundation_publication_id,
+                          reference=selected.reference_version, snapshot=receipt['snapshot_id'],
+                          components=sorted(selected.manifest['components']))
             self.event('verified', result)
             return dict(status='TECHNICALLY_ACTIVATED_READER_VERIFIED', candidate=plan['candidate'], reader=result)
 
@@ -284,10 +297,45 @@ def real_promotion(journal):
         if 'sales_facts_revalidation' in candidate.manifest:
             verify_files(candidate.manifest)
         validate_physical_files(candidate.manifest['components'])
-    def reader(candidate):
-        with connector.session(read_only=True) as con:
+        commercial = candidate.manifest['components'].get('commercial_purpose')
+        if commercial is not None:
+            from .commercial_purpose_candidate import verify_commercial_component
+            verify_commercial_component(commercial)
+    def reader(candidate, connection=None):
+        @contextmanager
+        def session():
+            if connection is not None:
+                yield connection
+            else:
+                with connector.session(read_only=True) as con:
+                    yield con
+        with session() as con:
             con.execute('SET threads=1'); con.execute("SET memory_limit='512MB'")
-            access = FoundationReader(connector).resolve_on(con)
+            # This is an already committed preparation checkpoint, NOT a guess
+            # at the next catalog snapshot. Data relations remain independently
+            # pinned by the manifest. The selection/receipt commit follows only
+            # after every full gate succeeds on this transaction's metadata.
+            anchor = connector.snapshot(con) if connection is not None else None
+            if anchor is not None:
+                # DuckLake overlays this transaction's own writes even on a
+                # time-travel relation. Use a separate read-only transaction to
+                # inspect the genuinely committed preparation checkpoint.
+                with connector.session(read_only=True) as checkpoint:
+                    staged = checkpoint.execute(
+                        'SELECT status, manifest_json, component_hash FROM telchi.ops.foundation_publications_v1 '
+                        f'AT (VERSION => {anchor}) WHERE foundation_publication_id = ?',
+                        [candidate.foundation_publication_id],
+                    ).fetchall()
+                selected_hash = con.execute(
+                    'SELECT component_hash FROM telchi.ops.foundation_publications_v1 '
+                    'WHERE foundation_publication_id = ?', [candidate.foundation_publication_id],
+                ).fetchone()[0]
+                if (len(staged) != 1 or staged[0][0] != READY_TO_COMMIT
+                        or json.loads(staged[0][1]) != candidate.manifest
+                        or staged[0][2] != selected_hash):
+                    raise RuntimeError('PREPARED_SNAPSHOT_BINDING_MISMATCH')
+            options = dict(snapshot_resolver=lambda *_: anchor) if anchor is not None else {}
+            access = FoundationReader(connector, full_validation=True, **options).resolve_on(con)
             if access.foundation_publication_id != candidate.foundation_publication_id or access.foundation.reference_version != candidate.reference_version:
                 raise RuntimeError('LIVE_READER_IDENTITY_MISMATCH')
             if 'sales_facts_revalidation' in candidate.manifest:
@@ -311,14 +359,66 @@ def real_promotion(journal):
             result = dict(foundation=access.foundation_publication_id, reference=access.foundation.reference_version,
                           snapshot=access.ducklake_snapshot_id, components=sorted(access.manifest['components']))
             from .independent_facts_succession import stock_contract, verify_reader
-            if stock_contract(access.manifest):
-                result['stock'] = verify_reader(con, access)
+            from .operational_domains import CONTRACT as OBSERVATIONS
+            stock = stock_contract(access.manifest)
+            if stock:
+                proof = access.manifest.get('independent_facts_succession', {})
+                from .foundation_manifest import EXTENSIBLE_KIND
+                retained = (access.manifest.get('candidate_kind') == EXTENSIBLE_KIND or
+                    (proof.get('contract') == OBSERVATIONS
+                    and bool(access.manifest.get('operational_observations', {}).get('overlap'))))
+                if retained:
+                    # The canonical full reader just verified the catalog-issued
+                    # ancestor receipt, exact component/snapshot/Reference
+                    # inheritance AND the sealed stock file's physical SHA256.
+                    # Its old aggregate/UoM query is not a changed-component gate.
+                    result['stock'] = dict(status='UNCHANGED_ACCREDITED_COMPONENT_BYTES_REUSED',
+                        sha256=stock['dataset']['sha256'])
+                else:
+                    result['stock'] = verify_reader(con, access)
             from .operational_domains import observation_contract, verify_reader as verify_observations
             if observation_contract(access.manifest):
                 result['operational_observations'] = verify_observations(con, access)
+            # Finalize only after every physical/business reader gate succeeded.
+            # This is an update operation, never invoked by productive readers.
+            from .foundation_read_binding import make_binding, validate_binding
+            from .foundation_publication import FoundationReaderError
+            from .sales_succession import validate_successor, physical_metadata
+            @contextmanager
+            def same(): yield con
+            read_store = FoundationPublicationStore(same)
+            current = read_store.get(access.foundation_publication_id)
+            for physical in (False, True):
+                validate_successor(read_store, current, access.ducklake_snapshot_id,
+                                   physical=physical, _reader_validated=True)
+            physical = physical_metadata(access)
+            try:
+                binding = read_store.read_binding(current.foundation_publication_id)
+            except FoundationReaderError:
+                binding = None
+            if binding is None:
+                binding = make_binding(current, access, commercial=True, physical=physical)
+            else:
+                # Preserve the first accreditation (including across rollback);
+                # retries validate again but never rewrite an immutable receipt.
+                validate_binding(current, binding)
+                if (binding['snapshot_id'] != access.ducklake_snapshot_id
+                        or binding['commercial'] is not True or binding['physical'] != physical):
+                    raise RuntimeError('READ_BINDING_REACCREDITATION_CONFLICT')
+            if connection is not None:
+                # New atomic activation receipts identify their durable
+                # preparation anchor separately from the selection transaction.
+                from .foundation_read_binding import digest
+                binding['activation'] = dict(protocol='atomic-current-receipt-v1',
+                                             prepared_snapshot_id=anchor)
+                binding['receipt_sha256'] = digest({k:v for k,v in binding.items() if k != 'receipt_sha256'})
+                validate_binding(current, binding)
+                resource()
+                return binding
+            FoundationPublicationStore(connector.session).accredit_read_binding(current, binding)
             return result
     return Promotion(FoundationPublicationStore(connector.session), DATA_ROOT, journal,
-                     validate=validate, verify_reader=reader, resource_check=resource)
+                     validate=validate, verify_reader=reader, resource_check=resource, accredit=reader)
 
 
 def main():

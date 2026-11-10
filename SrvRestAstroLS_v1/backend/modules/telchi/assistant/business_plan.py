@@ -6,7 +6,7 @@ this module turns that scope into an explicit plan, validates it against the
 closed vocabulary and hands it to the accredited reader.
 """
 from modules.telchi.datalake.commercial_line_amount_by_query import (
-    CAPABILITY, DATASET, GROUP_BY, MEASURE, ORDER_BY,
+    CAPABILITY, DATASET, GROUP_BY, MEASURE, ORDER_BY, QUANTITY_ORDER_BY,
     parameters as commercial_parameters,
 )
 
@@ -58,8 +58,11 @@ def build(state):
         group_by=group_by,
         breakdown_by=breakdown,
         periods=periods,
+        # A product ranking may be ordered by documentary quantity. The amount
+        # stays the measure; the order criterion is closed, never free form.
+        order_by=[list(order) for order in (
+            QUANTITY_ORDER_BY if state.get('ranking_by') == 'quantity' else dataset['order_by'])],
         measure=dataset['measure'],
-        order_by=[list(order) for order in dataset['order_by']],
         limit=max(9, state.get('limit', 10)) if group_by == 'physical_state' else state.get('limit', 10),
         currency=dataset['currency'],
     )

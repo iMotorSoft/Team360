@@ -30,3 +30,28 @@ async def check_session(conn, settings, evolution, approval):
     await MessagingRepository().validate_transport_schema(conn)
     await PhoneIdentityRepository().validate_schema(conn)
     return binding
+
+
+async def recovery_inventory(conn, binding, since):
+    """No payloads or writes; all replayable work fences administrative closure.
+
+    Legacy uncertain rows pre-dating the session remain evidence, never retries.
+    Current DurableWorker only selects rows carrying durable_job.
+    """
+    return await (await conn.execute('''SELECT
+        count(*) FILTER (WHERE payload_jsonb ? 'durable_job' AND
+            COALESCE(payload_jsonb->'durable_job'->>'state','') NOT IN
+                ('OUTBOUND_ACCEPTED','FAILED_FINAL','CANCELED')) AS durable_pending,
+        count(*) FILTER (WHERE direction='outbound' AND event_type='message' AND
+            (status='pending' OR payload_jsonb->>'initial_result'='dispatch_intent')) AS resumable_outbound,
+        count(*) FILTER (WHERE direction='outbound' AND transport_status='unknown'
+            AND created_at_utc >= %s) AS session_uncertain_outbound,
+        count(*) FILTER (WHERE direction='outbound' AND transport_status='unknown'
+            AND created_at_utc < %s) AS older_uncertain_outbound,
+        count(*) FILTER (WHERE direction='inbound' AND status='running'
+            AND created_at_utc >= %s) AS session_running_inbound,
+        count(*) FILTER (WHERE direction='inbound' AND status='running'
+            AND created_at_utc < %s AND NOT payload_jsonb ? 'durable_job') AS older_legacy_running
+        FROM message_events WHERE workspace_id=%s AND channel_id=%s AND provider_instance=%s''',
+        (since, since, since, since, binding.workspace_id, binding.channel_id,
+         binding.storage_instance))).fetchone()

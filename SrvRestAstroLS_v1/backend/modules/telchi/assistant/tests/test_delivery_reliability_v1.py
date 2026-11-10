@@ -429,13 +429,18 @@ def test_the_session_timing_is_configurable_and_bounded():
         session_timing(NS(idle_timeout=900, max_duration=300, duration=None))
 
 
-def test_an_idle_session_closes_but_a_turn_in_flight_is_never_interrupted():
-    assert session_close_reason(elapsed=100, idle_elapsed=1000, in_flight=0,
-                                max_duration=14400, idle_timeout=900) == 'idle_timeout_reached'
-    assert session_close_reason(elapsed=100, idle_elapsed=1000, in_flight=1,
-                                max_duration=14400, idle_timeout=900) is None
-    assert session_close_reason(elapsed=14400, idle_elapsed=1, in_flight=1,
-                                max_duration=14400, idle_timeout=900) == 'max_duration_reached'
+@pytest.mark.parametrize('in_flight', [None, 0, 1])
+@pytest.mark.parametrize('elapsed,idle_elapsed', [(100, 900), (14400, 1), (864000, 864000)])
+def test_only_the_operator_stops_the_pilot_not_legacy_timers(in_flight, elapsed, idle_elapsed):
+    assert session_close_reason(elapsed=elapsed, idle_elapsed=idle_elapsed,
+                                in_flight=in_flight, max_duration=14400,
+                                idle_timeout=900) is None
+
+
+def test_legacy_gate_security_expiration_is_preserved_even_during_a_turn():
+    assert session_close_reason(elapsed=14400, idle_elapsed=900, in_flight=1,
+                                max_duration=14400, idle_timeout=900,
+                                gates_expired=True) == 'gate_evidence_expired'
 
 
 def test_the_activity_record_is_verifiable_and_secret_free(tmp_path):

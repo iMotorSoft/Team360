@@ -13,6 +13,12 @@ from .state_engine import DEFAULTS
 LABELS = {'LAB_FINISHED_PRODUCT': 'Productos terminados de laboratorio',
           'RAW_MATERIAL': 'Materias primas', 'MEDICATIONS': 'Medicamentos',
           'FRACTIONATED_PRODUCT': 'Fraccionados'}
+# «Other things/products» is a semantic family, not one literal phrase. It keeps
+# the discussed product as a presentation reference instead of a hidden filter.
+_OTHER_THINGS = re.compile(
+    r'\botr[oa]s?\s+(?:productos?|cosas?|articulos?|items?)\b'
+    r'|\bque\s+mas\s+(?:compro|compraron|compra|compras)\b')
+_PURCHASE = re.compile(r'\b(?:compro|compraron|compra|compras|adquirio|adquirieron)\b')
 
 
 def normalized(text):
@@ -20,7 +26,37 @@ def normalized(text):
                    if unicodedata.category(c) != 'Mn')
 
 
-def request_contract(proposal, text, before):
+def _reference_product_codes(result):
+    """Item codes the cited result was explicitly filtered by, when published."""
+    expression = ((result or {}).get('manifest') or {}).get('filter_expression') or ''
+    codes = []
+    for code in re.findall(r'item_code\s+COMPARE_EQUAL\s+"([^"]+)"', expression):
+        if re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,49}', code) and code not in codes:
+            codes.append(code)
+    return codes if len(codes) <= 20 else []
+
+
+def _mention_matches_customer(mention, customer, before, reference_result):
+    """The mention names the resolved account, not a different unresolved entity."""
+    if not isinstance(mention, dict):
+        return True
+    text = normalized(str(mention.get('text') or ''))
+    if not text:
+        return True
+    if re.fullmatch(r'(?:(?:cuenta|sap|cliente)\s+)*' + re.escape(normalized(customer)), text):
+        return True  # The already resolved account code is identity, not a new name.
+    label = normalized(((before.get('focus') or {}).get('customer_label') or ''))
+    if label and text in label:
+        return True
+    for row in (reference_result or {}).get('rows') or []:
+        code = row.get('card_code') or row.get('key')
+        name = normalized(str(row.get('customer_name') or row.get('label') or ''))
+        if code == customer and name and text in name:
+            return True
+    return False
+
+
+def request_contract(proposal, text, before, reference_result=None):
     """REFINE vs CHANGE_DIMENSION vs NEW_ANALYSIS, before atomic validation.
 
     Only explicit commercial language triggers these corrections. No code or
@@ -43,29 +79,66 @@ def request_contract(proposal, text, before):
             if path in unsets:
                 unsets.remove(path)
 
-    if before.get('excluded_product') and re.fullmatch(r'[¿?¡!.,\s]*(?:y )?(?:mostrame mas|muestrame mas|mas|otros cinco|los siguientes|continua)[¿?¡!.,\s]*', q):
+    if (before.get('excluded_product') or before.get('excluded_products')) and re.fullmatch(r'[¿?¡!.,\s]*(?:y )?(?:mostrame mas|muestrame mas|mas|otros cinco|los siguientes|continua)[¿?¡!.,\s]*', q):
         return dict(intent='REFINE', action='EXECUTE', clarification=None,
                     state_delta={'set': {'/product_offset': min(before.get('product_offset', 0) + 5, 45),
                                          '/limit': 50}, 'unset': []})
 
     # A new operation must not inherit presentation/analysis instructions.
-    if before.get('excluded_product') and not re.search(r'otr[oa]s? productos', q):
-        put(excluded_product=None, product_offset=0)
+    if proposal.get('intent') == 'NEW_QUERY' and not _OTHER_THINGS.search(q):
+        if before.get('excluded_product'):
+            put(excluded_product=None, product_offset=0)
+        if before.get('excluded_products'):
+            put(excluded_products=None, product_offset=0)
+    if proposal.get('intent') == 'REFINE' and not re.search(r'quita.*exclusion|sin exclusion|inclui.*(?:primero|oculto)', q):
+        for key in ('excluded_product', 'excluded_products'):
+            if before.get(key) and (key_path := '/' + key) in set(sets) | set(unsets):
+                put(**{key: before[key]})
     if (before.get('analysis_categories') and proposal.get('intent') != 'EXPLAIN'
             and not re.search(r'porcent|procent|participacion', q)):
         put(analysis_categories=None)
 
-    if re.search(r'otros productos', q) and re.search(r'compro|compraron|compras', q):
-        customer = sets.get('/customer_target') or before.get('customer_target') or (before.get('focus') or {}).get('customer')
-        product = before.get('product_target') or (before.get('focus') or {}).get('product')
-        if not customer or not product:
+    # A requested purchase list is not a top-one summary. Recover the existing
+    # bounded result budget; presentation independently chooses a short page.
+    if (_PURCHASE.search(q) and re.search(r'que productos|lista.*productos', q)
+            and not re.search(r'mayor|principales|top|primeros|mas vendidos|\d+ productos', q)
+            and (sets.get('/customer_target') or before.get('customer_target'))
+            and (sets.get('/group_by') or before.get('group_by')) == 'sap_product'
+            and not _OTHER_THINGS.search(q)):
+        put(limit=50)
+
+    # Hiding a ranking row is presentation, independent of customer filtering.
+    if (re.search(r'no (?:muestres|mostres)|oculta|exclui', q)
+            and re.search(r'primero|primer producto', q)
+            and reference_result and reference_result.get('rows')
+            and before.get('group_by') == 'sap_product'):
+        code = reference_result['rows'][0].get('key') or reference_result['rows'][0].get('item_code')
+        if code:
+            put(excluded_product=code, excluded_products=None, product_offset=0,
+                limit=50, ranking_by=None)
+            p.update(intent='REFINE', action='EXECUTE', clarification=None)
+            return p
+
+    if _OTHER_THINGS.search(q) and _PURCHASE.search(q):
+        focus = before.get('focus') or {}
+        customer = sets.get('/customer_target') or before.get('customer_target') or focus.get('customer')
+        product = before.get('product_target')
+        if not product and focus.get('product'):
+            label = normalized(focus.get('product_label') or '')
+            search = normalized(before.get('product_search_text') or '')
+            # If an unresolved product search is the active reference and it does
+            # not name the focused code, excluding that code would hide a
+            # different product. Keep the new investigation without exclusion.
+            if not search or (label and search in label):
+                product = focus['product']
+        reference_codes = [] if product else _reference_product_codes(reference_result)
+        if not customer or (not product and not reference_codes):
             return p
         from .business_categories import CATEGORIES
         mention = sets.get('/entity_mention')
-        if isinstance(mention, dict) and mention.get('text') not in CATEGORIES:
-            published_name = normalized((before.get('focus') or {}).get('customer_label', ''))
-            if not published_name or normalized(mention.get('text', '')) not in published_name:
-                return p  # Do not replace an unresolved new customer with the old account.
+        if (isinstance(mention, dict) and mention.get('text') not in CATEGORIES
+                and not _mention_matches_customer(mention, customer, before, reference_result)):
+            return p  # Do not replace an unresolved new customer with the old account.
         # Category must be explicitly requested again; a reference product is
         # not evidence that every other purchase belongs to its category.
         category = None
@@ -75,11 +148,14 @@ def request_contract(proposal, text, before):
             category = 'RAW_MATERIAL'
         elif re.search(r'fraccionados?', q):
             category = 'FRACTIONATED_PRODUCT'
+        excluded = [product] if product else reference_codes
         put(metric='sales.commercial_line_amount_by', requested_metrics=['sales.commercial_line_amount_by'],
             schema_version=2, customer_target=customer, product_target=None,
-            excluded_product=product, product_offset=0, analysis_categories=None, group_by='sap_product',
+            excluded_product=product, excluded_products=None if product else reference_codes,
+            product_offset=0, analysis_categories=None, group_by='sap_product',
             business_category=category, entity_mention=None, breakdown_by=None,
-            ranking_target_item_code=None, ranking_detail=None, comparison=None, limit=6)
+            ranking_target_item_code=None, ranking_detail=None, comparison=None,
+            limit=min(5 + len(excluded), 50))
         if before.get('periods') and re.search(r'esos meses|estos meses|mismos meses', q):
             put(period=before['period'], periods=before['periods'], period_mode='union')
         p.update(intent='REFINE', action='EXECUTE', clarification=None)

@@ -141,7 +141,8 @@ CREATE TABLE IF NOT EXISTS {PUBLICATIONS_TABLE} (
     component_hash VARCHAR,
     validation_status VARCHAR,
     manifest_json VARCHAR,
-    failure_reason VARCHAR
+    failure_reason VARCHAR,
+    read_binding_json VARCHAR
 )
 """
 
@@ -179,7 +180,7 @@ def ensure_metadata_schema(connection: Any, *, catalog: str = CATALOG) -> None:
     ):
         connection.execute(ddl)
     existing = {str(row[0]) for row in connection.execute(f"DESCRIBE {publications_table}").fetchall()}
-    for column in ("credit_memo_publication_id", "credit_memo_source_as_of"):
+    for column in ("credit_memo_publication_id", "credit_memo_source_as_of", "read_binding_json"):
         if column not in existing:
             connection.execute(f"ALTER TABLE {publications_table} ADD COLUMN {column} VARCHAR")
 
@@ -470,6 +471,57 @@ class FoundationPublicationStore:
             ).fetchall()
         return [_row_to_publication(row) for row in rows]
 
+    def read_binding(self, publication_id: str) -> dict[str, Any]:
+        """Read only a publisher-issued receipt; legacy schemas fail closed."""
+        with self.connection_factory() as connection:
+            try:
+                rows = connection.execute(
+                    f"SELECT read_binding_json FROM {self.publications_table} WHERE foundation_publication_id = ?",
+                    [publication_id],
+                ).fetchall()
+                if len(rows) != 1 or not rows[0][0]:
+                    raise ValueError('missing receipt')
+                return json.loads(rows[0][0], object_pairs_hook=_unique_manifest_object)
+            except Exception as exc:
+                raise FoundationReaderError('FOUNDATION_READ_BINDING_REQUIRED') from exc
+
+    def accredit_read_binding(self, publication: FoundationPublication, binding: dict[str, Any]) -> None:
+        """Explicit legacy reaccreditation of an already selected publication.
+
+        New activations use logical_commit(accredit=...) instead: selection and
+        receipt are committed atomically. This method preserves the existing
+        migration path; it is never invoked by ordinary readers.
+        """
+        from .foundation_read_binding import validate_binding
+        validate_binding(publication, binding)
+        with self.connection_factory() as connection:
+            self._ensure(connection)
+            try:
+                connection.execute('BEGIN')
+                current = self._current_on_connection(connection)
+                if (current is None or current.status != CURRENT
+                        or current.foundation_publication_id != publication.foundation_publication_id
+                        or current.manifest != publication.manifest
+                        or current.as_row() != publication.as_row()):
+                    raise PublicationBoundaryError('READ_BINDING_CURRENT_CHANGED')
+                rows = connection.execute(
+                    f'SELECT read_binding_json FROM {self.publications_table} WHERE foundation_publication_id = ?',
+                    [publication.foundation_publication_id],
+                ).fetchall()
+                if len(rows) != 1:
+                    raise PublicationBoundaryError('READ_BINDING_DUPLICATE_PUBLICATION')
+                encoded = json.dumps(binding, sort_keys=True)
+                if rows[0][0] and json.loads(rows[0][0]) != binding:
+                    raise PublicationBoundaryError('READ_BINDING_IMMUTABLE')
+                connection.execute(
+                    f'UPDATE {self.publications_table} SET read_binding_json = ? WHERE foundation_publication_id = ?',
+                    [encoded, publication.foundation_publication_id],
+                )
+                connection.execute('COMMIT')
+            except BaseException:
+                connection.execute('ROLLBACK')
+                raise
+
     # -- writes (individual statements; visibility is controlled by commit) --
 
     def create_candidate(self, publication: FoundationPublication) -> FoundationPublication:
@@ -547,14 +599,18 @@ class FoundationPublicationStore:
 
     # -- the logical commit ----------------------------------------------
 
-    def logical_commit(self, foundation_publication_id: str) -> dict[str, Any]:
+    def logical_commit(self, foundation_publication_id: str, *, accredit=None) -> dict[str, Any]:
         """Atomically make ``foundation_publication_id`` the one CURRENT publication.
 
-        One small transaction against the metadata catalog:
+        One transaction against the metadata catalog:
 
         1. previous CURRENT -> SUPERSEDED
         2. candidate -> CURRENT (committed_at set)
         3. the single current pointer row -> candidate
+        4. publisher accreditation gates and receipt, when supplied
+
+        Steps remain invisible to concurrent readers until COMMIT. Once an
+        accredited CURRENT exists, subsequent commits require accreditation.
 
         If anything fails, the transaction rolls back and the previous pointer
         and statuses remain exactly as before (``CURRENT=A``). It never rewrites
@@ -573,6 +629,15 @@ class FoundationPublicationStore:
                     raise PublicationBoundaryError(f"unknown candidate {foundation_publication_id}")
                 candidate = _row_to_publication(candidate_row)
                 if candidate.status == CURRENT:
+                    if accredit is not None:
+                        from .foundation_read_binding import validate_binding
+                        encoded = connection.execute(
+                            f'SELECT read_binding_json FROM {self.publications_table} WHERE foundation_publication_id = ?',
+                            [foundation_publication_id],
+                        ).fetchone()
+                        if not encoded or not encoded[0]:
+                            raise PublicationBoundaryError('CURRENT_REACCREDITATION_REQUIRED')
+                        validate_binding(candidate, json.loads(encoded[0]))
                     connection.execute("ROLLBACK")
                     return {"status": "ALREADY_CURRENT", "foundation_publication_id": foundation_publication_id}
                 if candidate.status not in (READY_TO_COMMIT, PREPARING, VALIDATING):
@@ -586,6 +651,13 @@ class FoundationPublicationStore:
                 previous_id = self._pointer_on_connection(connection)
                 if previous_id != candidate.previous_foundation_publication_id:
                     raise PublicationBoundaryError("publication compare-and-swap failed: CURRENT changed since preparation")
+                if previous_id and accredit is None:
+                    approved = connection.execute(
+                        f'SELECT read_binding_json FROM {self.publications_table} WHERE foundation_publication_id = ?',
+                        [previous_id],
+                    ).fetchone()
+                    if approved and approved[0]:
+                        raise PublicationBoundaryError('ATOMIC_ACCREDITATION_REQUIRED')
                 # Pre-commit fault points: the transaction has not yet mutated
                 # anything, so a failure here rolls back to A with no ambiguity.
                 self.inject(CommitFaultPoint.DURING_VALIDATION)
@@ -610,6 +682,24 @@ class FoundationPublicationStore:
                     f"INSERT INTO {self.pointer_table} (slot, foundation_publication_id, updated_at) VALUES (1, ?, ?)",
                     [foundation_publication_id, committed_at],
                 )
+                if accredit is not None:
+                    # The full publisher reader sees our uncommitted selection;
+                    # other readers still see the previous approved publication.
+                    # No receipt or pointer becomes visible until this COMMIT.
+                    from .foundation_read_binding import validate_binding
+                    selected = self._current_on_connection(connection)
+                    binding = accredit(selected, connection)
+                    validate_binding(selected, binding)
+                    previous_binding = connection.execute(
+                        f'SELECT read_binding_json FROM {self.publications_table} WHERE foundation_publication_id = ?',
+                        [foundation_publication_id],
+                    ).fetchone()[0]
+                    if previous_binding and json.loads(previous_binding) != binding:
+                        raise PublicationBoundaryError('READ_BINDING_IMMUTABLE')
+                    connection.execute(
+                        f'UPDATE {self.publications_table} SET read_binding_json = ? WHERE foundation_publication_id = ?',
+                        [json.dumps(binding, sort_keys=True), foundation_publication_id],
+                    )
                 connection.execute("COMMIT")
                 self.metrics["logical_commit_count"] += 1
             except BaseException:
@@ -675,6 +765,19 @@ class FoundationPublicationStore:
                         f"rollback target has {target.component_count} components, "
                         f"expected {FOUNDATION_COMPONENT_COUNT}"
                     )
+                source_binding = connection.execute(
+                    f'SELECT read_binding_json FROM {self.publications_table} WHERE foundation_publication_id = ?',
+                    [current_id],
+                ).fetchone()
+                target_binding = connection.execute(
+                    f'SELECT read_binding_json FROM {self.publications_table} WHERE foundation_publication_id = ?',
+                    [foundation_publication_id],
+                ).fetchone()
+                if source_binding and source_binding[0]:
+                    if not target_binding or not target_binding[0]:
+                        raise PublicationBoundaryError('ROLLBACK_TARGET_UNACCREDITED')
+                    from .foundation_read_binding import validate_binding
+                    validate_binding(target, json.loads(target_binding[0]))
                 rolled_back_at = utc_now()
                 connection.execute(
                     f"UPDATE {self.publications_table} SET status = ?, failure_reason = ? "
@@ -853,9 +956,9 @@ def get_current_foundation(store: FoundationPublicationStore) -> CurrentFoundati
     more than one CURRENT, or a component is missing, it raises
     :class:`FoundationReaderError` instead of guessing.
     """
-    current_rows = [p for p in store.list_publications(limit=100) if p.status == CURRENT]
-    if len(current_rows) > 1:
-        raise FoundationReaderError(f"CURRENT_PUBLICATION_COUNT={len(current_rows)}; expected exactly one")
+    current_count = store.current_count()
+    if current_count != 1:
+        raise FoundationReaderError(f"CURRENT_PUBLICATION_COUNT={current_count}; expected exactly one")
     pointer_rows = store.pointer_row_count()
     if pointer_rows > 1:
         raise FoundationReaderError(f"current pointer has {pointer_rows} rows; expected at most one (fail closed)")

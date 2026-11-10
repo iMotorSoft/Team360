@@ -123,3 +123,33 @@ def test_context_roundtrip_and_period_does_not_search_again():
         await SalesCapabilities(product_query=query).execute(state)
         assert calls == ['sales.by_products']
     asyncio.run(run())
+
+
+def test_explicit_code_target_is_resolved_through_catalog_before_sales():
+    async def run():
+        state = dict(deepcopy(engine.EMPTY | engine.INTENT_V2 | engine.PRODUCT_FIELDS),
+            metric='sales.by_products', requested_metrics=['sales.by_products'],
+            product_target='X01', period=dict(start='2026-05-01', end_exclusive='2026-06-01'))
+        engine.validate(state)
+        capabilities = SalesCapabilities()
+        assert capabilities.availability(state).allowed
+        calls = []
+        async def query(op, options, **kw):
+            calls.append((op, options))
+            if op == 'products.search':
+                return search(options['text'])
+            return dict(capability=op+'.v1', parameters=options, rows=[dict(item_code='X01',
+                description='Producto 250 g', source_system='SAP_B1_HANA', document_type='OINV',
+                doc_date='2026-05-23T00:00:00', doc_entry='12', line_num='0', quantity='2')],
+                product_summary=[dict(item_code='X01', line_count=1,
+                    first_date='2026-05-23T00:00:00', last_date='2026-05-23T00:00:00')],
+                source=dict(publication_id=PUBLICATION, snapshot_id=1408), truncated=False,
+                grain='invoice_line', limitations='fixture',
+                read_only=True, sap_accessed=False)
+        capabilities.product_query = query
+        result = await capabilities.execute(state)
+        assert [op for op, _ in calls] == ['products.search', 'sales.by_products']
+        assert calls[0][1]['text'] == 'X01'
+        assert calls[1][1]['item_codes'] == ['X01']
+        assert result['product_summary'][0]['item_code'] == 'X01'
+    asyncio.run(run())

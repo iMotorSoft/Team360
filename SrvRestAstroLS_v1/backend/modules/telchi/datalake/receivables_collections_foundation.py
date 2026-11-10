@@ -388,7 +388,8 @@ def _resolve(publication: FoundationPublication, *, reader_mode: str, store: Fou
         raise ReceivablesComponentError(str(exc)) from exc
     if not set(LOGICAL_COMPONENT_NAMES).issubset(components):
         raise ReceivablesComponentError("Receivables required component set is incomplete")
-    snapshot = manifest.get("base_snapshot_id")
+    from .receivables_collections_succession import snapshot_for
+    snapshot = snapshot_for(manifest)
     if not isinstance(snapshot, int):
         raise ReceivablesComponentError("Receivables Foundation base snapshot is missing")
     versions: dict[str, str] = {}

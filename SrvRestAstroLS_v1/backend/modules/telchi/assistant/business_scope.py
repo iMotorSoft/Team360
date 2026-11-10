@@ -50,6 +50,7 @@ def scope(state):
     focus = state.get('focus') or {}
     return dict(
         excluded_product=state.get('excluded_product'),
+        excluded_products=state.get('excluded_products'),
         product_offset=state.get('product_offset', 0),
         category=state.get('business_category'),
         product=state.get('product_target'),
@@ -60,6 +61,7 @@ def scope(state):
         metric=state.get('metric'),
         dimension=state.get('group_by'),
         breakdown=state.get('breakdown_by'),
+        ranking_by=state.get('ranking_by'),
         period_mode=state.get('period_mode'),
         periods=periods or ([dict(window)] if window else []),
         period=dict(window) if window else None,

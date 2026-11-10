@@ -1,8 +1,9 @@
 """Closed sales catalog. Never substitutes documentary quantity for revenue."""
+import re
 from dataclasses import dataclass
 from decimal import Decimal
 
-from .state_engine import SalesState, validate
+from .state_engine import SalesState, validate, entity_represented_by_target
 from modules.telchi.datalake.invoice_lines_query import query_invoice_lines, validate_result as validate_invoice_lines
 from modules.telchi.datalake.sales_query import (
     PERMISSIONS, MONETARY_OPERATION, MONETARY_PERMISSION, query_sales, validate_result,
@@ -21,6 +22,15 @@ class Availability:
     allowed: bool
     reason: str | None = None
     category: str | None = None
+
+
+class ProductResolutionError(ValueError):
+    """A product mention that cannot be resolved to exactly one ItemCode."""
+
+    def __init__(self, candidates, reason='product_resolution_required'):
+        super().__init__(reason)
+        self.candidates = list(candidates)
+        self.reason = reason
 
 
 class SalesCapabilities:
@@ -89,10 +99,15 @@ class SalesCapabilities:
                 return Availability(False, 'El período por categoría excede el contrato.', 'CATEGORY_CAPABILITY_UNAVAILABLE')
             return Availability(True)
         if state['metric'] in PRODUCT_PERMISSIONS:
+            # An explicit ItemCode may arrive as product_target. It is still
+            # resolved through products.search before any sales read; the code
+            # is never trusted as a catalog existence proof.
+            product_reference = state.get('product_search_text') or (
+                state.get('product_target') if state['metric'] == 'sales.by_products' else None)
             if (state['branches'] or state['sales_channel'] or state['comparison'] or state.get('temporal_reference')
-                    or not state.get('product_search_text')
+                    or not product_reference
                     or not set(metrics) <= {'products.search', 'sales.by_products', 'sales.net_amount', 'sales.source_top_items'}):
-                return Availability(False, 'La búsqueda de productos necesita texto y no admite esos filtros.', 'CAPABILITY_MISSING')
+                return Availability(False, 'La búsqueda de productos necesita texto o un código explícito y no admite esos filtros.', 'CAPABILITY_MISSING')
             return Availability(True)
         if state.get('product_search_text') or state.get('selected_item_codes') or state.get('product_context'):
             return Availability(False, 'La consulta conserva productos seleccionados. Una operación global no puede sustituir sus ventas ni su importe; el neto por producto no está acreditado. Puedo consultar líneas y cantidades documentales por sus códigos.', 'MAPPING_MISSING')
@@ -108,8 +123,9 @@ class SalesCapabilities:
                 return Availability(False, 'La cobertura global no acredita todavía un mes monetario por entidad.', 'TEMPORAL_METADATA_MISSING')
             if not state['period']:
                 return Availability(False, 'La facturación requiere un período concreto.', 'PERIOD_UNRESOLVED')
-            if state.get('limit', 10) != 10:
-                return Availability(False, 'La agregación monetaria no admite límite de filas.', 'CAPABILITY_MISSING')
+            # A single-row aggregate has no rows to limit: `/limit` belongs to the
+            # row-producing operation that requested it and is not a parameter of
+            # this one. It never makes the aggregate unavailable.
             return Availability(True)
         if state['metric'] in PERMISSIONS:
             if metrics != [state['metric']]:
@@ -153,11 +169,20 @@ class SalesCapabilities:
                                 'meses se lee con el desglose por mes del conjunto de períodos.', 'COMPARISON_UNSUPPORTED')
         if (metrics != ['sales.commercial_line_amount_by'] or state['branches']
                 or state['sales_channel']
-                or state.get('temporal_reference') or state.get('product_search_text')
-                or state.get('selected_item_codes') or state.get('product_context')
+                or state.get('temporal_reference') or state.get('selected_item_codes')
+                or state.get('product_context')
                 or state.get('semantic_references')):
             return Availability(False, 'Esta operación comercial no admite esos filtros o métricas.', 'MAPPING_MISSING')
-        if isinstance(entity, dict) and entity.get('text') not in CATEGORIES:
+        # A named product may arrive as text for a customer drilldown. The service
+        # resolves it against the accredited catalog before compiling the plan;
+        # it never invents a code and never substitutes a global scope on failure.
+        needs_product_resolution = (state.get('group_by') == 'card_code'
+            and state.get('product_target') is None
+            and bool(state.get('product_search_text')))
+        if state.get('product_search_text') and not needs_product_resolution:
+            return Availability(False, 'Esta operación comercial no admite esos filtros o métricas.', 'MAPPING_MISSING')
+        if (isinstance(entity, dict) and entity.get('text') not in CATEGORIES
+                and not entity_represented_by_target(state)):
             return Availability(False, 'La entidad mencionada todavía no tiene un filtro comercial aprobado en esta consulta.', 'MAPPING_MISSING')
         category = state.get('business_category')
         if category is not None and category not in CATEGORIES:
@@ -187,6 +212,12 @@ class SalesCapabilities:
             from modules.telchi.datalake.category_line_amount_query import PERMISSION as category_permission
             from modules.telchi.datalake.commercial_line_amount_by_query import PERMISSION as commercial_permission
             return [category_permission, commercial_permission]
+        if (state.get('metric') == 'sales.commercial_line_amount_by'
+                and state.get('group_by') == 'card_code'
+                and state.get('product_target') is None
+                and state.get('product_search_text')):
+            # Resolving a name is a catalog read under its own permission.
+            return [PRODUCT_PERMISSIONS['products.search'], self.required_permission(state)]
         if state['metric'] in PRODUCT_PERMISSIONS:
             return [PRODUCT_PERMISSIONS['products.search']] + (
                 [PRODUCT_PERMISSIONS['sales.by_products']] if state['metric'] == 'sales.by_products' else [])
@@ -226,6 +257,9 @@ class SalesCapabilities:
         if state['metric'] == 'sales.commercial_line_amount_by':
             from .business_plan import build
             from modules.telchi.datalake.commercial_line_amount_by_query import validate_result as validate_commercial
+            if (state.get('group_by') == 'card_code' and state.get('product_target') is None
+                    and state.get('product_search_text')):
+                await self.resolve_commercial_product(state)
             options = build(state)
             return validate_commercial(options, await self.commercial_query(options, timeout_seconds=self.timeout_seconds))
         if state['metric'] == 'sales.product_line_amount_ranking':
@@ -277,8 +311,69 @@ class SalesCapabilities:
                     units='source_document_units_per_item; not comparable across items',
                     limitations='Invoices only, no cancellation filter or credit subtraction; not net sales or revenue.')
 
+    async def resolve_commercial_product(self, state):
+        """Resolve a product mention to exactly one accredited SAP ItemCode.
+
+        Uses the existing products.search capability (its own permission is
+        validated by the handler) and the shared normalization. The model never
+        provides an ItemCode. Ambiguity is a question, not a guessed filter.
+        """
+        from modules.telchi.datalake.product_sales_query import normalize
+        text = state['product_search_text']
+        tokens = [t for t in normalize(text).split() if t not in STOPWORDS]
+        if not tokens:
+            raise ProductResolutionError([], 'empty_product_mention')
+        # The catalog search is a literal containment test over the published
+        # label. A real mention carries packaging the label writes differently
+        # («soda cáustica x25 kg» vs «SODA CAUSTICA (HIDROXIDO DE SODIO) x 25kg.»),
+        # so the whole phrase cannot be the only attempt: search relaxation is
+        # progressive, and every attempt still has to name the same product
+        # through its significant tokens. Packaging only ranks candidates.
+        core = [t for t in tokens if not packaging_token(t)] or tokens
+        attempts = []
+        for candidate in (text, ' '.join(tokens), ' '.join(core),
+                          ' '.join(core[:2]) if len(core) > 2 else None):
+            if candidate and normalize(candidate) not in attempts:
+                attempts.append(normalize(candidate))
+        candidates = []
+        for attempt in attempts:
+            options = {'text': attempt, 'limit': 20}
+            catalog = validate_product_result('products.search', options,
+                await self.product_query('products.search', options, timeout_seconds=self.timeout_seconds))
+            found = [r for r in catalog['rows'] if all(mention_in_row(t, r) for t in core)]
+            if found:
+                candidates = found
+                break
+        if not candidates:
+            raise ProductResolutionError([], 'product_not_found')
+        sellable = [r for r in candidates if r.get('sell_item') == 'Y'] or candidates
+        # The candidate that names the whole mention, packaging included, wins;
+        # an equal coverage is real ambiguity and is asked, never guessed.
+        coverage = {id(r): sum(mention_in_row(t, r) for t in tokens) for r in sellable}
+        best_coverage = max(coverage.values())
+        best = [r for r in sellable if coverage[id(r)] == best_coverage]
+        if len(best) != 1:
+            # A unique sellable item ends the ambiguity; otherwise ask.
+            raise ProductResolutionError(best)
+        chosen = best[0]
+        state['product_target'] = chosen['item_code']
+        state['product_search_text'] = None
+        state['product_context'] = None
+        state['selected_item_codes'] = []
+        state['focus'] = dict(state.get('focus') or {},
+                             product=chosen['item_code'], product_label=chosen['description'])
+        validate(state)
+        return dict(item_code=chosen['item_code'], label=chosen['description'],
+                    candidates=len(candidates))
+
     async def execute_products(self, state):
         from copy import deepcopy
+        if state.get('product_target') and not state.get('product_search_text'):
+            # One canonical path: an explicit code is looked up in the catalog
+            # and selected only if it exists there. No synthesized result rows.
+            state = deepcopy(state)
+            state['product_search_text'] = state['product_target']
+            state['product_target'] = None
         options = {'text': state['product_search_text'], 'limit': 20}
         catalog = state.get('product_context')
         if catalog is None:
@@ -313,6 +408,32 @@ class SalesCapabilities:
 
 MONTHS = ('enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
           'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre')
+STOPWORDS = {'a', 'al', 'de', 'del', 'el', 'en', 'la', 'las', 'le', 'les', 'lo',
+             'los', 'por', 'para', 'que', 'se', 'un', 'una', 'x'}
+# Quantity/packaging noise of a commercial mention. It never identifies the
+# product and the catalog writes it with other spacing, so it is scored instead
+# of demanded from the published label.
+_PACKAGING = re.compile(
+    r'^x?\d+(?:[.,]\d+)?(?:kilos?|kg|gramos?|grs?|gr|mg|ml|cc|litros?|lt|l|'
+    r'unidades?|un|u|cm|mm|m)?$'
+    r'|^(?:kilos?|kg|gramos?|grs?|gr|mg|ml|cc|litros?|lt|unidades?|un|cm|mm)$')
+
+
+def packaging_token(token):
+    return bool(_PACKAGING.match(token))
+
+
+def _compact(text):
+    """Join a number and its unit so «x 25kg» and «x25 kg» compare equal."""
+    return re.sub(r'(?<=[0-9])\s+(?=[a-z])|(?<=[a-z])\s+(?=[0-9])', '', text)
+
+
+def mention_in_row(token, row):
+    """A mention token names this catalog row (description or ItemCode)."""
+    from modules.telchi.datalake.product_sales_query import normalize
+    description = normalize(str(row.get('description') or ''))
+    return (token in description or token in _compact(description)
+            or token in normalize(str(row.get('item_code') or '')))
 
 
 def business_date(value):

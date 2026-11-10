@@ -31,7 +31,7 @@ async function expectNoHorizontalOverflow(page: Page) {
 }
 
 test.describe("TelchiAI - primera experiencia", () => {
-  test("prioriza la consulta, completa sugerencias y evoluciona sin navegar", async ({ page }) => {
+  test("conserva las sugerencias pero exige una sesión real antes de consultar", async ({ page }) => {
     const runtime = observeRuntime(page);
     await page.goto("/telchiai");
 
@@ -46,15 +46,12 @@ test.describe("TelchiAI - primera experiencia", () => {
     await page.getByRole("button", { name: "Dame las ventas de septiembre" }).click();
     await expect(input).toHaveValue("Dame las ventas de septiembre");
     await expect(input).toBeFocused();
-    await expect(send).toBeEnabled();
-
-    const initialUrl = page.url();
-    await send.click();
-    await expect(page.locator('[data-testid="telchiai-shell"]')).toHaveAttribute("data-state", "processing");
-    await expect(page.getByText("Entendiendo tu consulta…")).toBeVisible();
-    await expect(page.locator('[data-testid="telchiai-shell"]')).toHaveAttribute("data-state", "ready", { timeout: 5_000 });
-    await expect(page.getByRole("heading", { name: "La transición hacia el análisis está lista." })).toBeVisible();
-    expect(page.url()).toBe(initialUrl);
+    await expect(send).toBeDisabled();
+    await expect(page.getByLabel('Cargar sesión Console')).toBeVisible();
+    await input.press('Enter');
+    await expect(page.locator('[data-testid="telchiai-shell"]')).toHaveAttribute('data-state', 'empty');
+    await expect(page.getByText('Consulta preparada')).toHaveCount(0);
+    expect([...runtime.requests.keys()]).toEqual([]);
 
     expect(runtime.serverErrors).toEqual([]);
     expect(runtime.criticalErrors).toEqual([]);

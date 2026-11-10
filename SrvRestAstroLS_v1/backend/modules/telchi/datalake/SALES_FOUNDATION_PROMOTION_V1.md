@@ -42,9 +42,9 @@ uv run python -m modules.telchi.datalake.sales_foundation_promotion promote \
 
 `--authorization` sigue disponible para adjuntar identidad o referencia; se archiva una vez y no condiciona la promoción. Repetir el comando sobre el mismo journal es idempotente aunque cambie la nota humana.
 
-El wrapper comprueba hashes y manifiesto, adquiere flock del journal y del publicador Reference, adquiere el lock Foundation y aplica `logical_commit` con CAS. Después activa Reference mediante el publicador existente y verifica el reader real.
+El wrapper comprueba hashes y manifiesto y adquiere los locks existentes. Prepara la Reference mediante el mismo publicador; Foundation sigue fijada a su versión anterior. `logical_commit(..., accredit=...)` valida el reader completo y persiste el recibo dentro de la misma transacción que selecciona CURRENT.
 
-El commit Foundation es el punto de visibilidad. Durante una interrupción entre commit y activación, los readers canónicos usan la Reference fijada por Foundation, no el pointer independiente. Los lectores legacy de `reference_current.json` no deben mezclar ese slot con facts de CURRENT.
+Un fallo de validación o persistencia revierte selección, estados y recibo. Los lectores concurrentes siguen viendo la aprobación anterior hasta el commit atómico. Una caída posterior al commit pierde como máximo el acuse: la nueva publicación ya está completa y el journal se recupera sin reacreditarla. La Reference de lectura sigue fijada por Foundation, nunca por el pointer independiente.
 
 Los consumidores del pointer independiente incluyen `create_initial.py` y `update.py`; no ejecutarlos durante esta ventana. El publicador de masters comparte el nuevo lock/CAS. Scripts históricos de investigación no constituyen publicadores habilitados.
 
@@ -58,13 +58,51 @@ El mismo wrapper admite `FOUNDATION_REFERENCE_REFRESH_V1`; no necesita otro moto
 - La validación conserva ocho componentes, ledger, snapshots y archivos sellados. El reader conserva las relaciones de ventas/NC file-backed cuando la base es `SALES_FACTS_TRANSITION_V1`; no vuelve a Atomic histórico.
 - La integración física publicada y el journal efectivo están en el [estado local](../status_actual.md) y su evidencia. Repetir `promote` sobre ese journal sólo reconcilia la misma publicación idempotentemente; rollback continúa siendo una operación explícita con motivo y expected-current.
 
+## Contrato de publicación y actualización completa
+
+La acreditación se almacena en `foundation_publications_v1.read_binding_json`, dentro del catálogo existente. No crea un registro paralelo, caché global, servicio ni infraestructura; el publicador incorpora la columna al asegurar su esquema.
+
+1. Capturar sólo si existe alcance fuente autorizado; esta implementación no captura ni consulta SAP. Los productores existentes sellan archivos/versiones y conservan los anteriores.
+2. Preparar candidata, manifiesto, cobertura por componente y journal; fijar base y hashes exactos. PREPARING/VALIDATING/READY_TO_COMMIT nunca autorizan lectura productiva.
+3. Con locks y preflight, revalidar manifiesto, ancestry, Reference/crosswalks, archivos, hashes, conciliaciones y compatibilidad empresarial antes del CAS. No se elimina ningún gate completo del actualizador.
+4. Preparar la activación Reference con el publicador existente. No adivinar el snapshot siguiente ni usar `MAX(snapshot_id)`. Antes de seleccionar CURRENT, la candidata READY_TO_COMMIT ya tiene un checkpoint durable.
+5. Dentro de `logical_commit`, el reader explícito `full_validation=True` valida la selección aún no visible, los datos, las conciliaciones y la admisión comercial/física. Una conexión read-only independiente verifica la candidata exacta en el checkpoint preparado: DuckLake superpone escrituras propias incluso en time travel dentro de la transacción escritora.
+6. Guardar el recibo y seleccionar CURRENT en esa única transacción CAS. Cualquier fallo anterior al COMMIT conserva la aprobación anterior. Los writers legacy no pueden sustituir una aprobación con recibo sin acreditación atómica; rollback a un target sin recibo se rechaza. Reentrada después del commit conserva los checks de integridad del plan y comprueba el recibo durable sin repetir el reader de acreditación.
+7. El reader habitual sólo consulta metadata consistente en una transacción: pointer único, estado CURRENT único, componentes coherentes y recibo ligado a manifiesto/cobertura/cortes. Devuelve relaciones fijadas, publicación y fecha; no recorre snapshots/ancestry ni relee hashes Foundation/Reference.
+8. Avanzar watermarks sólo después de publicación acreditada y los gates del consumidor. Un recibo no concede permisos: identidad, RBAC, workspace, datasets, columnas, filas, SQL read-only y auditoría siguen en sus boundaries existentes; Luna no puede sustituirlos.
+
+| Campo del recibo | Contrato |
+| --- | --- |
+| `contract` | `foundation-read-binding-v1` |
+| `foundation_publication_id` | Identidad exacta de la fila publicada |
+| `commit_snapshot_id` | Recibo legacy: snapshot de selección CURRENT. Con `activation.protocol=atomic-current-receipt-v1`: checkpoint de preparación ya comprometido, igual a `activation.prepared_snapshot_id`; no representa el snapshot posterior de selección |
+| `snapshot_id` | Snapshot de datos acreditado; puede ser anterior al commit de metadata |
+| `manifest_sha256`, `components` | Manifiesto y descriptores/hashes físicos ya validados; se comprueba sólo su vínculo de metadata |
+| `coverage`, `component_cutoffs`, `catalog_component_cutoffs`, `source_as_of` | Cobertura, cortes de todos los componentes del manifiesto y columnas fuente del catálogo; cortes ausentes siguen desconocidos, sin simular frescura integral |
+| `reference_version` | Versión inmutable, nunca el pointer independiente más reciente |
+| `validated_at` | Instante de emisión de la acreditación completa, separado de la fecha fuente |
+| `commercial`, `physical` | Admisión comercial y hashes Reference físicos acreditados al actualizar |
+| `receipt_sha256` | Checksum de metadata, no firma ni autorización del ejecutor |
+
+Las relaciones Atomic usan `snapshot_id`; los facts sellados usan exclusivamente los paths de la versión aprobada y las derivaciones conservan su snapshot contractual. Ejemplo medido: commit 1506, datos independientes 1408, derivaciones históricas 1322.
+
+El protocolo atómico separa el checkpoint acreditado del instante posterior de selección. No promete conocer por anticipado el ID de ese commit ni lo calcula sumando uno. El recibo y CURRENT se hacen visibles juntos; el snapshot de datos continúa independiente. Los recibos legacy conservan su significado original y no se reescriben.
+
+## Migración sin modificar CURRENT
+
+El código no migra ni reacredita una publicación antigua durante la lectura. Habilitar el reader rápido en un catálogo sin recibo requiere una operación de actualización/reacreditación explícita del publicador, no un fallback silencioso.
+
+El cierre inicial del reader no escribió el catálogo. La inspección read-only posterior encontró un recibo preexistente para `foundation_42483d2e035e98e73e0a2d98ddc7d986`, emitido el 03/11/2026 a las 12:33:00 UTC. Esta corrección del publicador tampoco cambia CURRENT operativo ni publica CxC; la evidencia de cada operación distingue validación aislada de activación real.
+
+El [benchmark read-only](../../../../../data/reports/telchi/foundation-read-binding-v1/benchmark.json) acredita igualdad sobre datos reales usando el recibo sólo en metadata efímera en memoria. No prueba migración viva, actor RBAC real ni arranque/conexión fríos.
+
 ## Recuperación y rollback
 
 El journal registra intención antes del commit y conserva eventos inmutables. Repetir el mismo comando autorizado reconcilia el estado real aunque el proceso se interrumpiera antes de registrar el commit o la activación.
 
-- Antes del commit: la publicación anterior permanece efectiva.
-- Después del commit: detectar CURRENT exacto y completar activación; no repetir captura ni commit.
-- Después de activación: revalidar el reader; duplicación retorna el mismo resultado.
+- Antes del commit atómico: la publicación anterior permanece efectiva, incluso si la preparación Reference ya avanzó. Reanudar únicamente con el mismo journal y sus pointers exactos.
+- Después del commit atómico: CURRENT ya contiene su recibo completo. Verificar integridad de los inputs del plan y recuperar el acuse desde metadata; no repetir captura, commit ni reader de acreditación.
+- Un CURRENT legacy sin recibo requiere reacreditación explícita del publicador: nunca se repara desde consultas normales ni se presenta como una activación atómica completada.
 - Si existe otro run activo o un pointer distinto: rechazar y coordinar; no robar locks ajenos ni desactivar CAS.
 - Un run propio interrumpido se recupera bajo el flock del mismo journal; no se roba un run distinto por antigüedad.
 - El rollback necesita un motivo auditado y conserva la traza opcional si existía; no exige una autorización nominal previa. Verifica la base retenida, incluso si la candidata nueva quedó corrupta.
@@ -83,7 +121,7 @@ Si el rollback se interrumpe, repetirlo con el mismo motivo. Un journal con inte
 La verificación del wrapper no equivale a `PUBLISHED_PASS`: falta acreditar el consumo conversacional real y los permisos efectivos del actor autorizado, sin impersonación ni cambios de grants.
 
 - Resolver CURRENT y Reference nuevamente; verificar ocho nombres reales: `reference`, `sales`, `credit_memo`, `oinm`, `oitw`, `material_supply`, `purchasing`, `receivables_collections`.
-- Reader sin snapshot inyectado: cobertura, conteos, importes documentales, conciliación contra raw y hashes.
+- Reader completo del publicador sin snapshot inyectado: cobertura, conteos, importes documentales, conciliación contra raw y hashes; después, reader rápido con recibo persistido.
 - Probar las siete preguntas comerciales solicitadas con identidad autorizada; rechazos de roles sin permiso deben conservarse.
 - Septiembre completo: neto documental Bs 10.591.046,24. Octubre 1–29: Bs 10.811.322,92; no es un mes completo ni ingreso contable.
 - Distinguir cliente facturado y comercial; rankings de líneas no son netos documentales; no inferir sucursal contable.
@@ -93,7 +131,7 @@ La verificación del wrapper no equivale a `PUBLISHED_PASS`: falta acreditar el 
 
 La identidad de publicación cambia con el contenido; la compatibilidad empresarial se demuestra por el lineage canónico, no por una lista creciente de IDs permitidos.
 
-`sales_succession.py` conserva las acreditaciones históricas como raíces de confianza y recorre únicamente `base_foundation_publication_id` en el catálogo existente. No agrega un registro paralelo. El wrapper comprueba admisión documental y física de cada incremental antes del CAS; los readers y el proceso padre revalidan la procedencia del resultado.
+`sales_succession.py` conserva las acreditaciones históricas como raíces de confianza. Sólo al actualizar recorre `base_foundation_publication_id` y valida hashes físicos. El wrapper comprueba admisión documental y física antes del CAS y acredita el consumo final; queries y proceso padre comprueban únicamente procedencia de metadata, sin reacreditar Foundation.
 
 - `SALES_FACTS_TRANSITION_V1` exige plan incremental durable, base acreditada, ledger sin regresión, snapshot independiente conservado, schemas exactos y metadata empresarial heredada sin cambios. Nuevos documentos, modificaciones y cancelaciones acreditadas pueden cambiar los fingerprints.
 - La validación canónica conserva ocho componentes, dependencias, identidades, crosswalks, hashes, sellados, conciliación y revalidación Material Supply. Una Reference append-only se prueba con los checkpoints locales del productor de maestros, sin acceso SAP durante la validación.

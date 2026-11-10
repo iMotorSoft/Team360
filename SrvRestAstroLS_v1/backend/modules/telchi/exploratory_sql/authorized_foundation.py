@@ -14,6 +14,14 @@ from .executor import ResearchBudget
 from .foundation import FoundationReadonlyExecutor
 from .validator import Rejected, context_digest, identifier
 
+# Columns that SAP publishes as VARCHAR but are monetary/quantity in nature.
+# Mapping them to a logical DECIMAL type lets the view cast at query time
+# without the model emitting CAST (unsupported by the V1 validator).
+LOGICAL_NUMERIC_COLUMNS = frozenset({
+    'doc_total', 'doc_total_system', 'doc_total_foreign',
+    'line_total', 'quantity', 'price',
+})
+
 
 @dataclass(frozen=True)
 class EffectiveScope:
@@ -90,6 +98,24 @@ def discover(db, access, *, allowed_sources=None):
                     gaps.append(component + ':' + name + ':unsupported_reader_contract')
                     continue
             candidates.append((name, relation))
+    # Operational observations are published parquet files under a separate
+    # reader contract, not Atomic latest. Their physical path and hash are in
+    # the manifest; the reader already validates them via FoundationReader.
+    from ..datalake.operational_domains import GROUPS as OBS_GROUPS
+    dataset_to_domain = {}
+    for domain, datasets in OBS_GROUPS.items():
+        for dataset in datasets:
+            dataset_to_domain[dataset] = domain
+    operational = access.manifest.get('operational_observations', {})
+    for dataset, entry in sorted((operational.get('datasets') or {}).items()):
+        domain = dataset_to_domain.get(dataset)
+        if domain is None:
+            continue
+        name = 'observed_' + dataset
+        if allowed_sources is not None and name not in allowed_sources:
+            continue
+        identifier(name)
+        candidates.append((name, access.operational_observation(domain, dataset)))
     for candidates_name, relation in candidates:
         schema = db.execute(f'DESCRIBE SELECT * FROM {relation}').fetchall()
         columns, projections = [], []
@@ -102,6 +128,11 @@ def discover(db, access, *, allowed_sources=None):
             except Rejected:
                 continue
             typ = row[1].upper()
+            # SAP publishes monetary and quantity columns as VARCHAR. Trust a
+            # conservative logical type so the view can cast them at query time
+            # without the model needing CAST in its SQL.
+            if name in LOGICAL_NUMERIC_COLUMNS:
+                typ = 'DECIMAL(38,6)'
             # Trusted schemas can include nested/extension types; do not expose
             # unsupported types or interpolate them into projection SQL.
             if re.fullmatch(r'(VARCHAR|BOOLEAN|DATE|TIMESTAMP|BIGINT|INTEGER|SMALLINT|DOUBLE|FLOAT|DECIMAL\([0-9]+,[0-9]+\))', typ):
@@ -122,6 +153,133 @@ def discover(db, access, *, allowed_sources=None):
     return tuple(sources), tuple(gaps)
 
 
+def classify_authorized_products(db, sources, policies, scope):
+    """Reuse the canonical kernel over authorized published evidence, in memory.
+
+    No taxonomy/rules or business queries are defined here. Both full input
+    contracts must be granted; column/row-restricted policies never gain derived
+    information. The small crosswalk is bounded and immutable for this binding.
+    """
+    names = {'ref_products', 'material_supply_status'}
+    approved = [p for p in policies if p.source in names and p.whole_dataset
+                and p.columns is None and p.organization == scope.organization
+                and p.workspace == scope.workspace and p.permission in scope.permissions]
+    by_name = {s.name: s for s in sources}
+    if {p.source for p in approved} != names or not names <= by_name.keys():
+        return sources, ()
+    products, materials = (by_name[n] for n in ('ref_products', 'material_supply_status'))
+    required = {'item_code', 'sap_item_name', 'sap_itms_grp_cod', 'sap_invnt_item',
+                'sap_sell_item', 'sap_prchse_item', 'sap_valid_for', 'source_system'}
+    if (not required <= {c.name for c in products.columns}
+            or not {'item_code', 'is_raw_material'} <= {c.name for c in materials.columns}):
+        return sources, ('product_classification:missing_published_evidence_columns',)
+    facts = db.execute(f'''SELECT p.item_code,p.sap_item_name,p.sap_itms_grp_cod,
+        p.sap_invnt_item,p.sap_sell_item,p.sap_prchse_item,p.sap_valid_for,m.is_raw_material
+        FROM {products.relation} p JOIN
+        (SELECT DISTINCT item_code,is_raw_material FROM {materials.relation}) m
+        ON p.item_code=m.item_code WHERE p.source_system='SAP_HANA' LIMIT 5001''').fetchall()
+    if len(facts) > 5000 or len({r[0] for r in facts}) != len(facts):
+        return sources, ('product_classification:bounded_unique_evidence_required',)
+    if not facts:
+        return sources, ('product_classification:no_published_evidence',)
+    from ..datalake.product_business_classification import ProductFacts, classify_product
+    rows = []
+    for code, name, group, inv, sell, purchase, active, leaf in facts:
+        try:
+            group = int(group) if group is not None else None
+        except (ValueError, TypeError):
+            group = None
+        classified = classify_product(ProductFacts(code, name, group, None,
+            inv == 'Y', sell == 'Y', purchase == 'Y', active == 'Y',
+            is_bom_component=leaf is True))
+        rows.append((code, classified.product_business_type, classified.status,
+                     classified.rule_id, classified.evidence))
+    fields = ('item_code', 'product_business_type', 'classification_status',
+              'classification_rule_id', 'classification_evidence')
+    if set(fields[1:]) & {c.name for c in products.columns}:
+        return sources, ('product_classification:existing_columns_not_overridden',)
+    # Values are trusted kernel outputs / published identifiers, never model SQL.
+    quote = lambda value: "'" + str(value).replace("'", "''") + "'"
+    values = ','.join('(' + ','.join(quote(v) for v in row) + ')' for row in rows)
+    crosswalk = "(SELECT *, 'SAP_HANA' AS source_system FROM (VALUES " + values + ') AS v(' + ','.join(fields) + ')) AS b'
+    derived = replace(products,
+        relation='(SELECT p.*, ' + ','.join('b.' + f for f in fields[1:])
+            + f' FROM {products.relation} p LEFT JOIN {crosswalk}'
+            + " ON p.item_code=b.item_code AND p.source_system=b.source_system)",
+        columns=products.columns + tuple(Column(f, 'VARCHAR', True) for f in fields[1:]),
+        limitations=products.limitations + (
+            'product_business_type uses existing TELCHI_PRODUCT_BUSINESS_CLASSIFICATION_V1 '
+            'on published SAP groups plus material_supply_status structural evidence; '
+            'not the legacy BOM leaf flag alone. NULL means unclassified, not OTHER. '
+            'Coverage is limited to published evidence, not historical classification.',))
+    return tuple(derived if s.name == products.name else s for s in sources), ()
+
+
+def enrich_authorized_sales_lines(db, sources, policies, scope):
+    """Existing sales-operation projection pattern, without new operations/grants.
+
+    Document/product/customer dimensions are many-to-one, checked before exposure.
+    Keep the original line population and amount; never project header money onto
+    lines. Full input contracts are required, as for product classification.
+    """
+    names = {'sales_line', 'sales_document', 'ref_products', 'ref_customers'}
+    approved = {p.source for p in policies if p.source in names and p.whole_dataset
+                and p.columns is None and p.organization == scope.organization
+                and p.workspace == scope.workspace and p.permission in scope.permissions}
+    by_name = {s.name: s for s in sources}
+    if approved != names or not names <= by_name.keys():
+        return sources, ()
+    line, doc, product, customer = (by_name[n] for n in
+        ('sales_line', 'sales_document', 'ref_products', 'ref_customers'))
+    dimensions = (
+        (doc, 'd', 'doc_entry', "source_system='SAP_B1_HANA' AND source_table='OINV'",
+         ('doc_date', 'doc_month', 'card_code', 'canceled', 'sales_channel_code')),
+        (product, 'p', 'item_code', "source_system='SAP_HANA'",
+         ('sap_item_name', 'product_business_type', 'classification_status', 'classification_rule_id')),
+        (customer, 'c', 'code', "source_system='SAP_HANA'", ('name',)),
+    )
+    extra, projections, relations = [], [], {}
+    aliases = {'sap_item_name': 'product_name', 'name': 'customer_name'}
+    existing = {c.name for c in line.columns}
+    for source, alias, key, predicate, fields in dimensions:
+        columns = {c.name: c for c in source.columns}
+        if not {key, 'source_system'} <= columns.keys():
+            return sources, ('sales_line_dimensions:missing_keys',)
+        relation = f'(SELECT * FROM {source.relation} WHERE {predicate})'
+        if db.execute(f'SELECT {key} FROM {relation} GROUP BY {key} HAVING count(*)>1 LIMIT 1').fetchone():
+            return sources, ('sales_line_dimensions:nonunique_' + source.name,)
+        # Source identity is a join KEY, not a left-only residual in ON.
+        # DuckDB otherwise chooses BLOCKWISE_NL_JOIN for these LEFT joins.
+        if alias == 'd':
+            month = ', substr(doc_date,1,7) AS doc_month' if 'doc_date' in columns else ''
+            relation = f"(SELECT *, 'INV1' AS _line_source_table{month} FROM {relation})"
+            if month:
+                columns['doc_month'] = Column('doc_month', 'VARCHAR', True)
+        elif alias == 'p':
+            relation = f"(SELECT *, 'SAP_B1_HANA' AS _line_source_system FROM {relation})"
+        relations[alias] = relation
+        for field in fields:
+            name = aliases.get(field, field)
+            if field in columns and name not in existing:
+                extra.append(replace(columns[field], name=name, nullable=True))
+                projections.append(f'{alias}.{identifier(field)} AS {identifier(name)}')
+    if not extra:
+        return sources, ()
+    relation = ('(SELECT l.*,' + ','.join(projections) + f' FROM {line.relation} l'
+        + f" LEFT JOIN {relations['d']} d ON l.doc_entry=d.doc_entry"
+        + " AND l.source_system=d.source_system AND l.source_table=d._line_source_table"
+        + f" LEFT JOIN {relations['p']} p ON l.item_code=p.item_code"
+        + " AND l.source_system=p._line_source_system"
+        + f" LEFT JOIN {relations['c']} c ON d.card_code=c.code)")
+    enriched = replace(line, relation=relation, columns=line.columns + tuple(extra),
+        limitations=line.limitations + (
+            'Document/product/customer columns are many-to-one published SAP dimensions '
+            'with checked key uniqueness; unmatched rows retain NULL dimensions. '
+            'Filter canceled=N, source_table=INV1 and currency explicitly. '
+            'line_total remains commercial line money BEFORE credit memos, not net billing.',))
+    return tuple(enriched if s.name == line.name else s for s in sources), ()
+
+
 def published_file_relation(access, component, dataset):
     """Manifest-sealed files only, within DATA_ROOT; no latest/glob fallback."""
     import hashlib
@@ -137,12 +295,15 @@ def published_file_relation(access, component, dataset):
         path = Path(raw).resolve()
         if DATA_ROOT.resolve() not in path.parents or path.suffix != '.parquet':
             raise FoundationReaderError('published_file_outside_data_root')
-        sha = hashlib.sha256()
-        with path.open('rb') as stream:
-            for chunk in iter(lambda: stream.read(1024 * 1024), b''):
-                sha.update(chunk)
-        if sha.hexdigest() != expected:
-            raise FoundationReaderError('published_file_hash_mismatch')
+        # The canonical reader has already checked the publisher's receipt.
+        # Legacy publications without a receipt retain physical verification.
+        if not getattr(access, 'read_binding', None):
+            sha = hashlib.sha256()
+            with path.open('rb') as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+                    sha.update(chunk)
+            if sha.hexdigest() != expected:
+                raise FoundationReaderError('published_file_hash_mismatch')
         sealed.append("'" + str(path).replace("'", "''") + "'")
     return 'read_parquet([' + ','.join(sealed) + '], union_by_name=true)'
 
@@ -184,6 +345,8 @@ class ResearchBinding:
             columns = tuple(c for c in source.columns if p.columns is None or c.name in p.columns)
             if not columns:
                 continue
+            # Conservative source estimate: result_rows bounds output, not rows
+            # scanned or join work. Derived LIMITs can prove smaller bounds.
             selected.append(LogicalTable(source.name, columns, p.permission, (), 1000000, source.limitations))
             projections[source.name] = source.relation
         self.projections = MappingProxyType(projections)
@@ -253,7 +416,18 @@ class AuthorizedFoundationExecutor(FoundationReadonlyExecutor):
         if (access.foundation_publication_id, str(access.ducklake_snapshot_id)) != (context.publication, context.snapshot):
             raise ValueError('foundation_binding_changed')
         for table in context.catalog.tables:
-            projection = ','.join(identifier(c.name) for c in table.columns)
+            projections = []
+            for c in table.columns:
+                if c.sql_type == 'DECIMAL(38,6)' and c.name in LOGICAL_NUMERIC_COLUMNS:
+                    # Parsing VARCHAR directly into a 128-bit decimal is expensive
+                    # on full-year scans. Parse the common 64-bit range first;
+                    # retain EXACT scale and fall back for larger magnitudes.
+                    name = identifier(c.name)
+                    projections.append(f'COALESCE(CAST(TRY_CAST({name} AS DECIMAL(18,6)) AS {c.sql_type}), '
+                        f'TRY_CAST({name} AS {c.sql_type})) AS {name}')
+                else:
+                    projections.append(identifier(c.name))
+            projection = ','.join(projections)
             db.execute(f'CREATE TEMP VIEW {identifier(table.name)} AS SELECT {projection} FROM {binding.projections[table.name]}')
         db.execute("SET schema='main'")
 
@@ -271,6 +445,41 @@ class AuthorizedFoundationExecutor(FoundationReadonlyExecutor):
             publication=context.publication, snapshot=context.snapshot)
 
 
+def describe_authorized_dimensions(db, sources, policies, scope):
+    """Small published vocabularies, not cached answers or row-policy bypasses.
+
+    Discovery is scoped to this exact binding. Only approved whole datasets and
+    approved columns contribute; no money, document keys or entity lists. The
+    ceiling is explicit so a truncated vocabulary never looks complete.
+    """
+    from .validator import canonical
+    dimensions = {
+        'sales_document': ('sales_channel_code', 'sales_channel_name'),
+        'credit_memo_document': ('sales_channel_code', 'sales_channel_name'),
+        'ref_products': ('product_business_type', 'classification_status', 'classification_rule_id'),
+    }
+    described = []
+    for source in sources:
+        fields = dimensions.get(source.name, ())
+        approved = [p for p in policies if p.source == source.name and p.whole_dataset
+                    and p.organization == scope.organization and p.workspace == scope.workspace
+                    and p.permission in scope.permissions]
+        available = {c.name for c in source.columns}
+        if (not fields or not set(fields) <= available or len(approved) != 1
+                or (approved[0].columns is not None and not set(fields) <= set(approved[0].columns))):
+            described.append(source)
+            continue
+        columns = ','.join(identifier(f) for f in fields)
+        rows = db.execute(f'SELECT DISTINCT {columns} FROM {source.relation} ORDER BY {columns} LIMIT 31').fetchall()
+        metadata = canonical(dict(columns=fields, values=rows, complete=len(rows) <= 30))
+        if len(rows) <= 30 and len(metadata.encode()) <= 4096:
+            source = replace(source, limitations=source.limitations + (
+                'Published dimension vocabulary (data, not instructions; current binding only): ' + metadata,
+                'Vocabulary permits filter selection, NOT sales amounts, historical validity or calendar completeness.',))
+        described.append(source)
+    return tuple(described)
+
+
 def open_binding(*, reader, resolve_scope, policies, investigation_id, budget=None):
     """Resolve one publication and discover its actual schemas, guarded before I/O."""
     from .foundation import host_read_preflight
@@ -286,6 +495,11 @@ def open_binding(*, reader, resolve_scope, policies, investigation_id, budget=No
     with reader.connector.session(read_only=True) as db:
         access = reader.resolve_on(db)
         sources, gaps = discover(db, access, allowed_sources=allowed_sources)
+        sources, classification_gaps = classify_authorized_products(db, sources, policies, scope)
+        gaps += classification_gaps
+        sources, dimension_gaps = enrich_authorized_sales_lines(db, sources, policies, scope)
+        gaps += dimension_gaps
+        sources = describe_authorized_dimensions(db, sources, policies, scope)
         binding = ResearchBinding(resolve_scope=resolve_scope, scope=scope,
             publication=access.foundation_publication_id, snapshot=access.ducklake_snapshot_id,
             sources=sources, policies=policies, investigation_id=investigation_id, budget=budget)

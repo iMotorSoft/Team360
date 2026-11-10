@@ -12,11 +12,21 @@ import json
 import sys
 import unicodedata
 
-from .sales_query import PUBLICATION, SNAPSHOT
 from .messaging_sales_query import TelchiQueryError
+from .sales_succession import ROOT_SNAPSHOT, SALES_ROOT
 
+# Historical accreditation root, never the pin of the current publication. A
+# successor is admitted only through the canonical commercial ancestry; an
+# exact match against this value is accepted for replaying sealed results.
+PUBLICATION = SALES_ROOT
+SNAPSHOT = ROOT_SNAPSHOT
 PERMISSIONS = {'products.search': 'telchi.products.search.read.v1',
                'sales.by_products': 'telchi.sales.by_products.read.v1'}
+SAFE_ERRORS = {'product_binding_changed', 'product_result_binding_mismatch',
+               'duplicate_catalog_item_code', 'item_code_absent_from_catalog',
+               'duplicate_product_documents', 'duplicate_product_lines',
+               'orphan_product_lines', 'datalake_not_read_only',
+               'product_worker_error', 'product_query_unavailable'}
 MAX_PRODUCTS = 20
 
 
@@ -92,8 +102,12 @@ def execute_query(operation, options, connector=None):
         if con.execute("SELECT readonly FROM duckdb_databases() WHERE database_name='telchi'").fetchone() != (True,):
             raise TelchiQueryError('datalake_not_read_only')
         access = FoundationReader(connector).resolve_on(con)
-        if (access.foundation_publication_id, access.ducklake_snapshot_id) != (PUBLICATION, SNAPSHOT):
-            raise TelchiQueryError('product_binding_changed')
+        # CURRENT is admissible only through the canonical commercial succession.
+        # A hash equality would reject every accredited successor; a missing or
+        # unprovable accreditation fails closed before any read.
+        from .sales_succession import admit, source_metadata
+        admit(access, con)
+        source = source_metadata(access)
         path = str(access.reference('products'))
         if con.execute("SELECT item_code FROM read_parquet(?) WHERE source_system='SAP_HANA' GROUP BY item_code HAVING count(*)<>1 LIMIT 1", [path]).fetchone():
             raise TelchiQueryError('duplicate_catalog_item_code')
@@ -126,21 +140,29 @@ def execute_query(operation, options, connector=None):
     if truncated:
         rows = rows[:options.get('limit', 10)]
     result = dict(capability=operation+'.v1', parameters=options, rows=rows,
-                  source=dict(publication_id=PUBLICATION, snapshot_id=SNAPSHOT, updated_at=access.foundation_data_as_of),
+                  source=source,
                   read_only=True, sap_accessed=False, sql=sql, sql_parameters=bound,
                   product_summary=summary, truncated=truncated, grain='catalog_product' if operation == 'products.search' else 'invoice_line',
                   limitations='Active OINV only; no credit subtraction. Quantity is source documentary quantity per line; physical line UoM/factor not published. Catalog UoM is metadata, not line UoM. No physical totals or approved line amounts. Empty results do not certify zero sales outside this publication.')
     return validate_result(operation, options, result)
 
 
-def validate_result(operation, options, result):
+def validate_result(operation, options, result, *, accredit=True):
     parameters(operation, options)
+    from .sales_succession import accepts_result, admitted_source
+    source = result.get('source', {})
     if (result.get('capability') != operation+'.v1' or result.get('parameters') != options
             or result.get('read_only') is not True or result.get('sap_accessed') is not False
-            or result.get('source', {}).get('publication_id') != PUBLICATION
-            or result.get('source', {}).get('snapshot_id') != SNAPSHOT
+            or not isinstance(source.get('publication_id'), str)
+            or type(source.get('snapshot_id')) is not int
             or not isinstance(result.get('rows'), list) or len(result['rows']) > options.get('limit', 10)
             or type(result.get('truncated')) is not bool):
+        raise ValueError('invalid_product_result')
+    # Execution already proved the canonical admission. Persisted context is
+    # validated structurally without catalog I/O: it is application-owned and
+    # was admitted when it was produced.
+    if accredit and not accepts_result(source, {(PUBLICATION, SNAPSHOT)},
+                                       _admitted=admitted_source(result)):
         raise ValueError('invalid_product_result')
     summary = result.get('product_summary')
     if operation == 'sales.by_products' and summary is not None:
@@ -189,18 +211,58 @@ async def query_products(operation, options, *, timeout_seconds=30):
             stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL)
         try:
             output, _ = await asyncio.wait_for(process.communicate(), timeout_seconds)
+            payload = json.loads(output)
             if process.returncode:
-                raise TelchiQueryError('product_worker_error')
-            return validate_result(operation, options, json.loads(output)['result'])
+                # Preserve the real, allowlisted cause instead of hiding it behind
+                # an opaque worker error. Unknown failures stay generic.
+                reason = payload.get('error')
+                raise TelchiQueryError(reason if reason in SAFE_ERRORS else 'product_worker_error')
+            from .sales_succession import mark_result
+            return mark_result(validate_result(operation, options, payload['result']))
         finally:
             if process.returncode is None:
                 process.kill()
                 await process.wait()
 
 
+def publication_compatibility(connector=None):
+    """Read-only proof that CURRENT is admissible for both product operations.
+
+    Run before enabling a runtime or promoting a publication. It resolves the
+    same CURRENT and the same canonical admission used by the capability, and
+    proves that the catalog and sales relations are readable. It never runs a
+    business query, replays ancestry or writes anything.
+    """
+    from .ducklake import DuckLakeConnector
+    from .foundation_reader import FoundationReader
+    connector = connector or DuckLakeConnector()
+    with connector.session(read_only=True) as con:
+        con.execute('SET threads=1')
+        con.execute("SET memory_limit='512MB'")
+        con.execute("SET max_temp_directory_size='0B'")
+        if con.execute("SELECT readonly FROM duckdb_databases() WHERE database_name='telchi'").fetchone() != (True,):
+            raise TelchiQueryError('datalake_not_read_only')
+        access = FoundationReader(connector).resolve_on(con)
+        from .sales_succession import admit, source_metadata
+        admit(access, con)
+        catalog = str(access.reference('products'))
+        con.execute("SELECT item_code FROM read_parquet(?) WHERE source_system='SAP_HANA' LIMIT 1", [catalog]).fetchone()
+        con.execute(f"SELECT doc_entry FROM {access.sales('sales_document')} LIMIT 1").fetchone()
+        con.execute(f"SELECT doc_entry FROM {access.sales('sales_line')} LIMIT 1").fetchone()
+        return dict(compatible=True, operations=sorted(PERMISSIONS),
+                    source=source_metadata(access), reference=access.foundation.reference_version,
+                    check='canonical_commercial_admission; read-only relations resolved')
+
+
 if __name__ == '__main__':
     try:
-        print(json.dumps({'result': execute_query(sys.argv[1], json.loads(sys.argv[2]))}))
+        if len(sys.argv) == 2 and sys.argv[1] == '--compatibility':
+            print(json.dumps(dict(compatibility=publication_compatibility())))
+        else:
+            print(json.dumps({'result': execute_query(sys.argv[1], json.loads(sys.argv[2]))}))
+    except TelchiQueryError as exc:
+        print(json.dumps({'error': str(exc) if str(exc) in SAFE_ERRORS else 'product_query_unavailable'}))
+        sys.exit(1)
     except Exception:
         print(json.dumps({'error': 'product_query_unavailable'}))
         sys.exit(1)

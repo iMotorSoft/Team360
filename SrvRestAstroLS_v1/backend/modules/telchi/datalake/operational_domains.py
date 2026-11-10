@@ -335,12 +335,14 @@ def observation_contract(manifest):
     if value is None:
         return None
     from .independent_facts_succession import KIND, CONTRACT as STOCK_CONTRACT
+    from .receivables_collections_succession import CONTRACT as CXC_CONTRACT
     from .reference_compatibility import KIND as REFERENCE_KIND
     from .sales_facts_transition import KIND as SALES_KIND
+    from .foundation_manifest import EXTENSIBLE_KIND
     proof = manifest.get('independent_facts_succession', {})
-    if (manifest.get('candidate_kind') not in {KIND, REFERENCE_KIND, SALES_KIND}
+    if (manifest.get('candidate_kind') not in {KIND, REFERENCE_KIND, SALES_KIND, EXTENSIBLE_KIND}
             or not isinstance(value, dict) or value.get('contract') != CONTRACT
-            or not isinstance(proof, dict) or proof.get('contract') not in {CONTRACT, STOCK_CONTRACT}
+            or not isinstance(proof, dict) or proof.get('contract') not in {CONTRACT, STOCK_CONTRACT, CXC_CONTRACT}
             or (proof.get('contract') != CONTRACT and not isinstance(manifest.get('sales_facts_revalidation'), dict))):
         fail('unvalidated operational dispatch')
     # Canonical successor validation preserves this complete envelope verbatim
@@ -349,13 +351,15 @@ def observation_contract(manifest):
     return value
 
 
-def relation(manifest, domain, dataset):
+def relation(manifest, domain, dataset, *, verify_physical=True):
     stable = observation_contract(manifest)
-    if stable is None or domain not in GROUPS or dataset not in GROUPS[domain]:
+    from .operational_overlap import groups
+    declared = groups(stable) if stable is not None else {}
+    if domain not in declared or dataset not in declared[domain]:
         fail('observation dataset is not in the declared domain')
     metadata = stable['datasets'][dataset]
     path = checked_path(metadata['path'], durable.DATA_ROOT / 'staging')
-    if durable.file_hash(path) != metadata['sha256']:
+    if verify_physical and durable.file_hash(path) != metadata['sha256']:
         fail('observation bytes changed before exposure')
     return '(SELECT * FROM read_parquet(' + literal(path) + '))'
 
@@ -376,6 +380,8 @@ def build_observed_consumption(con, root):
         JOIN production_order O ON I."BaseEntry"=O."DocEntry"
         WHERE try_cast(I."BaseType" AS DECIMAL(18,6))=202 AND I."CANCELED"='N'
         AND (nullif(trim(I."unitMsr"),'') IS NOT NULL OR nullif(trim(I."UomCode"),'') IS NOT NULL)
+        AND try_cast(I."DocDate" AS DATE)>=''' + literal(first.isoformat()) + '''::DATE
+        AND try_cast(I."DocDate" AS DATE)<=''' + literal(last.isoformat()) + '''::DATE
         ORDER BY I."DocEntry",I."LineNum"''')
     groups = {}
     for row in rows:
@@ -493,6 +499,42 @@ def make_candidate(base, root, destination):
     return candidate
 
 
+def accredited_base_components(store, publication, base):
+    """Reuse the publisher's exact frozen ancestor, not its historical producer.
+
+    Only observation-only succession qualifies: all component bytes/contracts,
+    snapshot selectors, Reference, permissions and financial coverage remain
+    bound to the same catalog-issued receipt. Physical file gates and the full
+    changed-observation replay still run in the canonical publisher. A missing
+    or invalid receipt fails closed; it never triggers an expensive fallback.
+    """
+    from .foundation_read_binding import validate_binding
+    from .operational_overlap import CONTRACT as OVERLAP
+    stable = observation_contract(publication.manifest)
+    mutable = {'foundation_publication_id','update_run_id','candidate_kind','manifest_schema_version',
+               'base_foundation_publication_id','independent_facts_succession','operational_observations'}
+    if (stable is None or stable.get('overlap', {}).get('contract') != OVERLAP
+            or publication.components != base.components
+            or publication.reference_version != base.reference_version
+            or publication.source_as_of != base.source_as_of
+            or publication.previous_foundation_publication_id != base.foundation_publication_id
+            or publication.manifest.get('base_foundation_publication_id') != base.foundation_publication_id
+            or {k:v for k,v in publication.manifest.items() if k not in mutable} !=
+               {k:v for k,v in base.manifest.items() if k not in mutable}):
+        fail('accredited ancestor components, snapshots, coverage or permissions changed')
+    binding = store.read_binding(base.foundation_publication_id)
+    validate_binding(base, binding)
+    if binding.get('commercial') is not True or binding.get('physical') is None:
+        fail('ancestor financial/physical accreditation missing')
+    stock = base.manifest['components'].get('oitw', {}).get('independent_facts_contract')
+    if stock is not None:
+        metadata = stock['dataset']
+        path = checked_path(metadata['path'], durable.DATA_ROOT / 'staging')
+        if durable.file_hash(path) != metadata['sha256']:
+            fail('inherited stock bytes changed despite unchanged metadata')
+    return base.manifest['components']
+
+
 def validate_transition(publication, base, base_components, connection_factory=None):
     stable = observation_contract(publication.manifest)
     if stable is None:
@@ -516,6 +558,10 @@ def validate_transition(publication, base, base_components, connection_factory=N
             or {k:v for k,v in manifest.items() if k not in mutable} !=
                {k:v for k,v in old.items() if k not in mutable}):
         fail('base, identity, snapshots, sealed components or permissions changed')
+    if stable.get('overlap'):
+        from .operational_overlap import validate_ancestor
+        validate_ancestor(stable, old)
+        return base_components
     report = canonical_json(reconcile(stable['capture_root'], base, connection_factory))
     path = checked_path(stable['reconciliation_path'], durable.DATA_ROOT / 'staging')
     if (durable.read_json(path) != report or durable.digest(report) != stable['reconciliation_sha256']):
@@ -528,6 +574,9 @@ def verify_reader(con, access):
     stable = observation_contract(access.manifest)
     if stable is None:
         fail('reader lacks operational observations')
+    if stable.get('overlap'):
+        from .operational_overlap import verify
+        return verify(stable, reader=access, con=con)
     _, captures = checked_captures(stable['capture_root'])
     result = {}
     with database() as derived:

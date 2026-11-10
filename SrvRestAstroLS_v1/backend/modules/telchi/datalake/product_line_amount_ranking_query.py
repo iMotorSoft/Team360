@@ -125,7 +125,8 @@ def execute_query(options, connector=None):
         from .sales_succession import admit, source_metadata
         admit(access, con, category_legacy=True)
         path = DATA_ROOT / 'crosswalk/_versions' / access.foundation.reference_version / 'product_business_type/part-00000.parquet'
-        if hashlib.sha256(path.read_bytes()).hexdigest() != category.CROSSWALK_SHA256:
+        if (getattr(access, 'read_binding', None) is None
+                and hashlib.sha256(path.read_bytes()).hexdigest() != category.CROSSWALK_SHA256):
             raise TelchiQueryError('category_classification_changed')
         relation = lambda p: "read_parquet('" + str(p).replace("'", "''") + "')"
         exceptions = []

@@ -47,6 +47,7 @@ SEMANTIC_FIELDS = {'semantic_references': []}  # Application-owned references, n
 SCOPE_FIELDS = {
     'analysis_categories': None,  # closed category-share request, including explicit unaccredited labels
     'excluded_product': None,   # presentation exclusion, never a product filter
+    'excluded_products': None,  # several codes from a cited list, presentation only
     'product_offset': 0,        # bounded presentation page within the retained ranking
     'business_category': None,   # canonical product_business_type code
     'product_target': None,      # SAP ItemCode in focus, transferable across metrics
@@ -56,6 +57,7 @@ SCOPE_FIELDS = {
     'breakdown_by': None,        # 'period': read each period of the set separately
     'periods': None,             # list[Period]: the set of periods read together
     'period_mode': None,         # 'single' | 'union' | 'compare'
+    'ranking_by': None,          # 'amount' | 'quantity': explicit product-ranking request
 }
 # Service-owned projection of the executed scope. Never written by the model.
 OWNED_SCOPE_FIELDS = {'focus': None, 'customer_type': None}
@@ -82,6 +84,16 @@ def limit_family(metric):
     return LIMIT_FAMILIES.get(metric, 'aggregate')
 
 
+def answers_pending(pending, delta):
+    """True when the delta fills the slot the open clarification is asking for."""
+    published = {'metric': '/metric', 'period': '/period', 'branches': '/branches',
+                 'comparison': '/comparison', 'reference': '/reference'}
+    path = published.get(((pending or {}).get('spec') or {}).get('slot'))
+    if not path or not isinstance(delta, dict):
+        return False
+    return (delta.get('set') or {}).get(path) not in (None, [], {})
+
+
 def scope_limit(base, after, delta):
     """Keep a row limit inside the operation that requested it.
 
@@ -101,6 +113,26 @@ def scope_limit(base, after, delta):
 # Metrics whose scope is a product or a business category: a commercial entity
 # mention is not a filter they can honour.
 PRODUCT_SCOPED_METRICS = {'sales.product_line_amount_ranking', 'sales.commercial_line_amount_by'}
+
+
+def entity_represented_by_target(state):
+    """True when the closed commercial scope already resolves the mention.
+
+    An interpreter can preserve the user's original mention (for example a
+    billed customer) and also set the resolved CardCode from an authorized
+    result. The mention is then descriptive, not an unresolved filter: the
+    dimension of the operation is the other side of that relationship.
+    """
+    entity = state.get('entity_mention')
+    if not isinstance(entity, dict) or state.get('metric') != 'sales.commercial_line_amount_by':
+        return False
+    from .business_categories import CATEGORIES
+    if entity.get('text') in CATEGORIES:
+        return False
+    group_by = state.get('group_by')
+    return bool((group_by == 'sap_product' and state.get('customer_target'))
+                or (group_by == 'card_code' and state.get('product_target')))
+
 DEFAULTS = EMPTY | INTENT_V2 | QUERY_FIELDS | PRODUCT_FIELDS | SCOPE_FIELDS
 GROUP_BY_VALUES = {'sap_product', 'card_code', 'physical_state'}
 PERIOD_MODES = {'single', 'union', 'compare'}
@@ -108,6 +140,18 @@ ITEM_CODE = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,49}')
 CARD_CODE = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,19}')
 INTENTS = {'NEW_QUERY', 'REFINE', 'COMPARE', 'REFERENCE', 'CORRECT', 'ANSWER_CLARIFICATION', 'EXPLAIN'}
 ACTIONS = {'ASK', 'EXECUTE', 'DIRECT_UNAVAILABLE', 'ANALYSIS_UNAVAILABLE'}
+
+# These are representation limits of the fast commercial plan, NOT authority.
+# The handler may investigate the original question independently; it must never
+# execute this rejected delta. Malformed envelopes, owned provenance, stale
+# references and pending integrity are deliberately absent (fail closed).
+RESEARCHABLE_CONTRACT_ERRORS = frozenset({
+    'unknown_metric', 'invalid_requested_metrics', 'entity_not_supported_by_metric',
+    'ranking_by_requires_product_ranking', 'incompatible_business_category',
+    'inconsistent_category_analysis', 'physical_focus_requires_dimension',
+    'physical_breakdown_requires_dimension', 'breakdown_requires_period_set',
+    'invalid_group_by', 'invalid_business_category',
+})
 
 
 def state_hash(state):
@@ -173,13 +217,21 @@ def patch(state, delta):
         after['comparison'] = None
     elif mode == 'single':
         after.pop('periods', None)
+    # A ranking criterion belongs to the product ranking that declared it: a
+    # change of operation or dimension drops an inherited criterion. An explicit
+    # one in this same delta is still validated and can be rejected below.
+    if ('/ranking_by' not in paths and after.get('ranking_by') is not None
+            and (after.get('metric') != 'sales.commercial_line_amount_by'
+                 or after.get('group_by') != 'sap_product')):
+        after['ranking_by'] = None
     # A product- or category-scoped operation cannot honour a commercial entity
     # filter. Reject the transition instead of persisting a mention that silently
     # replaces the category or the product in focus.
     if after.get('metric') in PRODUCT_SCOPED_METRICS:
         from .business_categories import CATEGORIES
         entity = after.get('entity_mention')
-        if isinstance(entity, dict) and entity.get('text') not in CATEGORIES:
+        if (isinstance(entity, dict) and entity.get('text') not in CATEGORIES
+                and not entity_represented_by_target(after)):
             raise ValueError('entity_not_supported_by_metric')
     validate(after)
     # Recover previously persisted abandoned searches too, not only explicit
@@ -274,12 +326,23 @@ def validate_scope(state):
                 or state.get('entity_mention') or state.get('periods') or state.get('comparison')):
             raise ValueError('inconsistent_category_analysis')
     offset = state.get('product_offset', 0)
-    if type(offset) is not int or not 0 <= offset <= 45 or (offset and not state.get('excluded_product')):
+    if type(offset) is not int or not 0 <= offset <= 45 or (offset and not (
+            state.get('excluded_product') or state.get('excluded_products'))):
         raise ValueError('invalid_product_offset')
     excluded = state.get('excluded_product')
     if excluded is not None and (not isinstance(excluded, str) or ITEM_CODE.fullmatch(excluded) is None
             or state.get('metric') != 'sales.commercial_line_amount_by'
-            or state.get('group_by') != 'sap_product' or not state.get('customer_target')
+            or state.get('group_by') != 'sap_product'
+            or state.get('product_target')):
+        raise ValueError('invalid_product_exclusion')
+    excluded_many = state.get('excluded_products')
+    if excluded_many is not None and (
+            not isinstance(excluded_many, list) or not 1 <= len(excluded_many) <= 20
+            or any(not isinstance(code, str) or ITEM_CODE.fullmatch(code) is None
+                   for code in excluded_many)
+            or len(set(excluded_many)) != len(excluded_many)
+            or state.get('metric') != 'sales.commercial_line_amount_by'
+            or state.get('group_by') != 'sap_product'
             or state.get('product_target')):
         raise ValueError('invalid_product_exclusion')
     category = state.get('business_category')
@@ -295,6 +358,15 @@ def validate_scope(state):
         raise ValueError('invalid_customer_target')
     if state.get('group_by') is not None and state['group_by'] not in GROUP_BY_VALUES:
         raise ValueError('invalid_group_by')
+    # A ranking request declares its order criterion. It is a product ranking
+    # only: the amount stays the measure and the quantity is a published column.
+    ranking_by = state.get('ranking_by')
+    if ranking_by not in {None, 'amount', 'quantity'}:
+        raise ValueError('invalid_ranking_by')
+    if ranking_by is not None and (state.get('metric') != 'sales.commercial_line_amount_by'
+                                   or state.get('group_by') != 'sap_product'
+                                   or state.get('breakdown_by') is not None):
+        raise ValueError('ranking_by_requires_product_ranking')
     if state.get('physical_focus') not in {None, 'LIQUID', 'SOLID', 'SEMISOLID', 'UNCLASSIFIED',
                                            'MISSING', 'MEDICINE', 'NOT_APPLICABLE', 'UNKNOWN', 'IDENTITY_MISSING'}:
         raise ValueError('invalid_physical_focus')
@@ -409,7 +481,9 @@ def validate(state):
             from modules.telchi.datalake.product_sales_query import validate_result
             if context.get('parameters', {}).get('limit') != 20:
                 raise ValueError('invalid_product_context_limit')
-            validate_result('products.search', context['parameters'], context)
+            # Application-owned context: structural replay, never catalog I/O on
+            # every state validation. It was canonically admitted on execution.
+            validate_result('products.search', context['parameters'], context, accredit=False)
             available_codes = {r['item_code'] for r in context['rows']}
         if any(not isinstance(c, str) or c not in available_codes for c in selected):
             raise ValueError('item_code_not_from_search')
@@ -497,7 +571,11 @@ def process(before, proposal, history, turn_id):
             elif before['pending'] and intent == 'NEW_QUERY':
                 base['pending'] = None
             elif before['pending'] and action == 'EXECUTE':
-                raise ValueError('unresolved_pending')
+                # A request that fills the open slot supersedes the question instead of
+                # colliding with it: the active plan stays the base, nothing is guessed.
+                if not answers_pending(before['pending'], delta):
+                    raise ValueError('unresolved_pending')
+                base['pending'] = None
             after = patch(base, delta)
             after = scope_limit(base, after, delta)
             if intent in {'ANSWER_CLARIFICATION', 'CORRECT'}:
@@ -517,6 +595,17 @@ def process(before, proposal, history, turn_id):
                 raise ValueError('not_ready')
         validate(after)
         return dict(output=deepcopy(proposal), state_after=after, committed=True, contract_error=None)
-    except (ValueError, TypeError, KeyError, AttributeError):
-        return dict(output=deepcopy(proposal), state_after=deepcopy(before), committed=False,
-                    contract_error='CONTRACT_ERROR_NO_COMMIT')
+    except (ValueError, TypeError, KeyError, AttributeError) as exc:
+        # Do not leak parser/driver messages or let corrupt prior state become a
+        # research route. Only a validated before-state and a known catalog error
+        # can be classified as a representation limit.
+        reason = str(exc) if isinstance(exc, ValueError) else ''
+        try:
+            validate(before)
+        except (ValueError, TypeError, KeyError, AttributeError):
+            reason = ''
+        result = dict(output=deepcopy(proposal), state_after=deepcopy(before), committed=False,
+                      contract_error='CONTRACT_ERROR_NO_COMMIT')
+        if reason in RESEARCHABLE_CONTRACT_ERRORS:
+            result['researchable_contract_error'] = reason
+        return result

@@ -136,6 +136,14 @@ def observation_rows(query, result):
     return result.rows[:cap]
 
 
+def ordered_observation(query):
+    """Only an admitted OUTER ORDER BY establishes an ordered result prefix."""
+    tree = json.loads(query.admitted_tree_json) if query else {}
+    statements = tree.get('statements', [])
+    node = statements[0].get('node', {}) if len(statements) == 1 else {}
+    return any(m.get('type') == 'ORDER_MODIFIER' and m.get('orders') for m in node.get('modifiers', []))
+
+
 def bounded_payload(payload):
     """Compact prior samples, never expand the byte budget or hide truncation."""
     import copy
@@ -153,6 +161,18 @@ def bounded_payload(payload):
         catalog['column_type_dictionary'] = types
         catalog['semantic_constraint_dictionary'] = constraints
         compact['compact_catalog_protocol'] = 'Column types and constraints are zero-based dictionary indices.'
+        if len(canonical(compact).encode()) > 32768:
+            # Published sources share many columns. Intern the complete
+            # (name, type-index) pair; keep every table's membership and order.
+            columns = sorted({(name, kind) for table in catalog['tables']
+                              for name, kind in table['columns'].items()})
+            indices = {column: index for index, column in enumerate(columns)}
+            for table in catalog['tables']:
+                table['columns'] = [indices[column] for column in table['columns'].items()]
+            catalog['column_dictionary'] = columns
+            compact['compact_catalog_protocol'] += (
+                ' Table columns are zero-based column_dictionary indices; each dictionary '
+                'entry is [column_name, column_type_dictionary index]. All sources remain available.')
     for observation in compact['observations']:
         if observation.get('evidence_manifest'):
             observation.pop('schema', None)  # schema is already in the manifest
@@ -213,9 +233,129 @@ def bounded_payload(payload):
     return compact
 
 
+def discovery_catalog(catalog, sources):
+    """Transport projection only; authorization always retains the FULL catalog.
+
+    All source names/grains remain visible. A discover action replaces the loaded
+    schemas, rather than appending schemas to evidence history indefinitely.
+    """
+    value = asdict(catalog)
+    # Expose schema differences BEFORE selecting a source. Names alone hide
+    # relevant alternatives (header vs line facts, different date/name fields).
+    # Intern names to retain every authorized column within the existing budget;
+    # types and constraints still require loading the actual schema.
+    names = sorted({c.name for t in catalog.tables for c in t.columns})
+    indices = {name: i for i, name in enumerate(names)}
+    value['source_column_dictionary'] = names
+    value['source_index'] = [dict(name=t.name, grain=t.grain, permission=t.permission,
+        columns=[indices[c.name] for c in t.columns]) for t in catalog.tables]
+    if len(canonical(value['source_index']).encode()) + len(canonical(names).encode()) > 16384:
+        # Unusually wide/unique schemas still need discovery headroom. Retain
+        # every source and its access family; full columns remain discoverable.
+        value.pop('source_column_dictionary')
+        for item in value['source_index']:
+            item['column_count'] = len(item.pop('columns'))
+    value['tables'] = [asdict(t) for t in catalog.tables if t.name in sources]
+    value['discovery_protocol'] = (
+        'source_index lists ALL authorized sources; when present, its columns index source_column_dictionary (names only). '
+        'Shared permission identifies possible alternatives, NOT equivalent populations or accredited semantics. '
+        'Presence in this index proves no rows, dates, grain or calendar completeness. '
+        'tables contains only currently loaded schemas. '
+        'Request any sources, across domains, with {"action":"discover","requested_sources":["name",...]}. '
+        'This replaces loaded schemas, executes no SQL, and grants no new authority. '
+        'Use exact column names from the loaded schema. Request a smaller set if schemas exceed the byte budget.')
+    return value
+
+
+class EvidenceWireIds:
+    """Lossless short handles for issued evidence, scoped to ONE investigation.
+
+    Long cryptographic IDs stay in audit/verification; wire handles grant nothing.
+    Only delivered manifests can issue handles, never arbitrary model fields.
+    """
+    def __init__(self):
+        self.encode = {key: {} for key in ('result_id', 'column_id', 'row_id')}
+        self.decode = {key: {} for key in self.encode}
+
+    def payload(self, payload):
+        for observation in payload['observations']:
+            manifest = observation.get('evidence_manifest')
+            if not manifest:
+                continue
+            values = dict(result_id=[manifest['result_id']], row_id=manifest['row_ids'],
+                          column_id=[c['column_id'] for c in manifest['columns']])
+            for key, ids in values.items():
+                for value in ids:
+                    if value not in self.encode[key]:
+                        prefix = {'result_id': 'q', 'column_id': 'c', 'row_id': 'r'}[key]
+                        short = prefix + str(len(self.encode[key]) + 1)
+                        self.encode[key][value] = short
+                        self.decode[key][short] = value
+        return self.translate(payload, self.encode)
+
+    def translate(self, value, maps):
+        if isinstance(value, list):
+            return [self.translate(v, maps) for v in value]
+        if isinstance(value, tuple):
+            return tuple(self.translate(v, maps) for v in value)
+        if isinstance(value, dict):
+            return {k: (maps[k].get(v, v) if k in maps and isinstance(v, str)
+                        else [maps['row_id'].get(r, r) for r in v] if k == 'row_ids'
+                        else self.translate(v, maps)) for k, v in value.items()}
+        return value
+
+    def claims(self, claims):
+        return self.translate(claims, self.decode)
+
+
+def population_coverage(registry, checks):
+    """Coverage of selected populations only; unrelated discovery cannot complete it."""
+    selected = {check.get('claim', {}).get('result_id') for check in checks if check.get('match')}
+    recoveries = getattr(registry, 'population_recovery', {})
+    populations = [recoveries[key] for key in selected if key in recoveries]
+    if not populations:
+        return 'NOT_CERTIFIED'
+    return ('COMPLETE' if all(p.get('complete') and not p.get('reason')
+                             and isinstance(p.get('recovered_records'), int)
+                             and p['recovered_records'] >= 0 for p in populations)
+            else 'PARTIAL')
+
+
+def recovered_population_claims(registry, claims):
+    """Deliver the one paged, fully recovered universe its answer never named.
+
+    The model keeps choosing the scope; the controller only refuses to let a
+    recovered population stay invisible. Restricted to exactly one paged
+    population, so competing lists still fail closed instead of being guessed.
+    """
+    from .claim_evidence import clean
+    recovered = {result_id: value for result_id, value in
+                 getattr(registry, 'population_recovery', {}).items()
+                 if value.get('complete') and value.get('pages')}
+    if len(recovered) != 1:
+        return []
+    result_id = next(iter(recovered))
+    if any(isinstance(claim, dict) and claim.get('result_id') == result_id for claim in claims):
+        return []
+    entry = getattr(registry, 'entries', {}).get(result_id)
+    if not entry or not entry[3]:
+        return []
+    manifest, _, _, visible_rows, node, _ = entry
+    groups = node.get('group_expressions') or ()
+    indexes = [index for index, expression in enumerate(node.get('select_list') or ())
+               if any(clean(expression) == clean(group) for group in groups)]
+    columns = [manifest.columns[index] for index in indexes if index < len(manifest.columns)]
+    if not columns:
+        return []
+    row_ids = list(manifest.row_ids)[:min(len(visible_rows), 10)]
+    return [dict(kind='executed_cell', result_id=result_id, column_id=column.column_id,
+                 row_id=row_id) for row_id in row_ids for column in columns]
+
+
 async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wall_seconds=1200,
               question=QUESTION, conversation=(), context=None, system=SYSTEM,
-              registry_factory=None, progress=lambda event: None, cancel=None):
+              registry_factory=None, progress=lambda event: None, cancel=None, required_measure=None,
+              allow_query_batches=False, compact_evidence_ids=False):
     start = time.monotonic()
     context = context or context_for_run()
     authorize(context)
@@ -233,12 +373,25 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                 'DuckDB memory limit is not a process RSS limit', 'attachment setup is not OS-preemptible',
                 'no historical classification or complete-month certification', 'narrative is not certified by arithmetic'])
     history = []
+    # Reserve observation headroom. Large authorized publications expose their
+    # complete index first, not an oversized schema blob on every model call.
+    progressive_catalog = False
+    if registry_factory:
+        try:
+            progressive_catalog = len(canonical(bounded_payload(
+                dict(catalog=asdict(catalog), observations=[]))).encode()) > 16384
+        except RuntimeError:
+            progressive_catalog = True
+    discovered_sources = set()
     premature_final_feedback = False
     verification_repairs = 0
     rejected_fingerprints = set()
     attempted_queries = set()
     query_attempts = 0
     execution_closed = False
+    pending_queries = []
+    verification_seconds = 0.0
+    wire_ids = EvidenceWireIds() if compact_evidence_ids else None
     save(report)
     try:
         # Minimal real API/auth/quota/model probe; no commercial rows or historical answers.
@@ -264,6 +417,7 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
         if registry_factory:
             tables, summary = {}, {'state': 'PER_RESULT_BOUNDED_REFERENCE', 'full_population_reconciled': False}
             registry = registry_factory(context)
+            registry.question = question  # Intent context only; never source authority.
         else:
             tables, summary = reconstruct(context, results)
             registry = EvidenceRegistry(context, tables, (START, END))
@@ -278,16 +432,62 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                 authorize(context)  # Includes live revocation for issued phase-B contexts.
                 progress('Analizando observaciones con Luna')
                 payload = dict(question=question, current_date=datetime.now(timezone.utc).date().isoformat(),
-                               conversation=list(conversation), catalog=asdict(catalog), observations=list(history),
-                               execution_closed=execution_closed,
+                               conversation=list(conversation), required_measure=required_measure,
+                               catalog=(discovery_catalog(catalog, discovered_sources)
+                                        if progressive_catalog else asdict(catalog)), observations=list(history),
+                               current_observed_turns=[o['turn'] for o in history if 'turn' in o],
+                               evidence_namespace='THIS investigation only; conversation contains NO reusable evidence IDs or turn numbers.',
+                               execution_closed=execution_closed, query_limits=asdict(context.effective_budget),
                                remaining_query_budget=0 if execution_closed else context.effective_budget.queries-query_attempts)
-                payload = bounded_payload(payload)
-                report.setdefault('model_input_sizes', []).append(len(canonical(payload).encode()))
-                value = await asyncio.wait_for(luna.next(payload, timeout=min(90, remaining)), remaining)
-                authorize(context)  # Model latency must not preserve a revoked scope.
-                report['model_calls'] = luna.calls
-                report['model_events'].append(value)
-                save(report)
+                if pending_queries:
+                    value = pending_queries.pop(0)
+                else:
+                    if wire_ids:
+                        payload = wire_ids.payload(payload)
+                    payload = bounded_payload(payload)
+                    report.setdefault('model_input_sizes', []).append(len(canonical(payload).encode()))
+                    value = await asyncio.wait_for(luna.next(payload, timeout=min(90, remaining)), remaining)
+                    authorize(context)  # Model latency must not preserve a revoked scope.
+                    report['model_calls'] = luna.calls
+                    report['model_events'].append(value)
+                    save(report)
+                    if value.get('action') == 'queries' and allow_query_batches:
+                        batch = value.get('queries')
+                        try:
+                            if (set(value) != {'action', 'queries'} or not isinstance(batch, list)
+                                    or not 1 <= len(batch) <= context.effective_budget.queries-query_attempts
+                                    or execution_closed):
+                                raise ValueError('invalid_query_batch')
+                            # Independent proposals only: none may cite a result
+                            # that has not been observed before this model call.
+                            for item in batch:
+                                model_proposal(item)
+                                if any(r > len(report['turns']) for r in item.get('evidence_turns', [])):
+                                    raise ValueError('unobserved_batch_dependency')
+                        except (ValueError, TypeError, KeyError):
+                            history.append(dict(status='INVALID_QUERY', reason='invalid_query_batch',
+                                guidance='Submit independent ordinary query actions; no SQL was executed.'))
+                            continue
+                        value, *pending_queries = batch
+                if value.get('action') == 'discover' and progressive_catalog:
+                    names = value.get('requested_sources')
+                    available = {t.name for t in catalog.tables}
+                    if (set(value) != {'action', 'requested_sources'} or not isinstance(names, list)
+                            or not names or any(not isinstance(n, str) or n not in available for n in names)):
+                        history.append(dict(status='INVALID_DISCOVERY', reason='request_existing_source_names'))
+                        continue
+                    selected = set(names)
+                    trial = discovery_catalog(catalog, selected)
+                    try:
+                        bounded_payload(dict(catalog=trial, observations=list(history)))
+                    except RuntimeError:
+                        history.append(dict(status='INVALID_DISCOVERY', reason='schema_byte_budget',
+                            guidance='Request fewer source schemas in this step; all sources remain available.'))
+                        continue
+                    discovered_sources = selected
+                    report.setdefault('catalog_discoveries', []).append(sorted(selected))
+                    save(report)
+                    continue
                 if value.get('action') == 'clarify':
                     text = value.get('question')
                     if not isinstance(text, str) or not 0 < len(text) <= 2000:
@@ -311,17 +511,46 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                     if not isinstance(value.get('answer'), str) or not value['answer'].strip():
                         raise RuntimeError('invalid_final_answer')
                     claims = value.get('claims', [])
-                    if not isinstance(claims, list) or len(claims) > 60:
+                    if not isinstance(claims, list):
                         raise RuntimeError('invalid_final_claims')
-                    report['model_answer'] = value['answer']
-                    report['model_conclusions'] = value.get('conclusions', [])
+                    if len(claims) > 60:
+                        feedback = dict(status='INVALID_FINAL', reason='final_claim_budget',
+                            guidance='At most 60 top-level claims. Group identities are rendered automatically; '
+                            'do not duplicate code/name dimensions. Select material amount/count cells and coverage; '
+                            'the controller pages delivery and retains full executed rows. No new SQL is needed.')
+                        history.append(feedback)
+                        report.setdefault('controller_feedback', []).append(dict(call=call+1, **feedback))
+                        save(report)
+                        continue
+                    if wire_ids:
+                        claims = wire_ids.claims(claims)
+                    report['model_answer'] = None
+                    report['model_conclusions'] = []
                     progress('Verificando afirmaciones independientemente')
+                    verification_started = time.monotonic()
+                    if registry_factory:
+                        synthesized = [claim for claim in recovered_population_claims(registry, claims)
+                                       if registry.verify(claim).get('match')]
+                        if synthesized:
+                            claims = list(claims) + synthesized
+                            report['population_claims'] = len(synthesized)
                     report['claim_verifications'] = [registry.verify(c) for c in claims]
+                    verification_seconds += time.monotonic()-verification_started
                     checks = report['claim_verifications']
                     report.setdefault('final_reviews', []).append(dict(
-                        proposed_answer=value, claim_verifications=checks))
+                        proposed_answer=value, claim_verifications=checks,
+                        proposed_answer_state='UNVERIFIED_MODEL_PROPOSAL_NOT_EVIDENCE'))
                     mismatches = [c for c in checks if not c['match']]
                     fingerprint = canonical([c['claim'] for c in mismatches])
+                    coverage_feedback = (registry.final_feedback(claims, net_required=required_measure == 'net_document')
+                        if hasattr(registry, 'final_feedback') else None)
+                    # A demonstrated scope contradiction outranks a numeric
+                    # repair: the numbers of a rejected interpretation are not
+                    # the real gap. Both messages stay in the audit history.
+                    if coverage_feedback:
+                        history.append(dict(status='BUSINESS_SCOPE_FEEDBACK', reason=coverage_feedback))
+                        report.setdefault('controller_feedback', []).append(dict(call=call+1,
+                            status='BUSINESS_SCOPE_FEEDBACK', reason=coverage_feedback))
                     if mismatches and verification_repairs < 3 and fingerprint not in rejected_fingerprints:
                         rejected_fingerprints.add(fingerprint)
                         verification_repairs += 1
@@ -331,9 +560,39 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                         save(report)
                         continue
                     complete = not registry_factory or value.get('coverage') == 'COMPLETE'
+                    # Population accounting is controller evidence, never a model label.
+                    # It does not certify the calendar or the entire business question.
+                    report['population_coverage'] = population_coverage(registry, checks)
+                    report['temporal_coverage'] = 'NOT_CERTIFIED'
+                    report['business_interpretation'] = 'NOT_INDEPENDENTLY_CERTIFIED'
+                    # PARTIAL is an honest terminal outcome, not a request to
+                    # repeat final actions until the model claims COMPLETE.
+                    # Concrete missing evidence (e.g. net components) still
+                    # receives feedback; publication/classification limits
+                    # cannot be repaired with repeated SQL or final summaries.
+                    if registry_factory and (not checks or coverage_feedback) and not execution_closed and query_attempts < context.effective_budget.queries:
+                        feedback = dict(status='INCOMPLETE_FINAL', reason=coverage_feedback or
+                            'Final lacks complete requested evidence. Continue investigation/correct SQL; discovery alone is not the requested amount.')
+                        history.append(feedback)
+                        report.setdefault('controller_feedback', []).append(dict(call=call+1, **feedback))
+                        save(report)
+                        continue
+                    complete = complete and not coverage_feedback
                     report['question_coverage'] = 'MODEL_DECLARED_COMPLETE_NOT_INDEPENDENTLY_CERTIFIED' if complete else 'PARTIAL'
-                    report['status'] = ('VERIFIED_WITH_LIMITATIONS' if checks and not mismatches and complete else 'PARTIAL')
+                    observed_only = checks and all(c['state'] == 'EXECUTOR_OBSERVED_WITH_LIMITATIONS' for c in checks)
+                    report['status'] = (('EXECUTOR_OBSERVED_WITH_LIMITATIONS' if observed_only else 'VERIFIED_WITH_LIMITATIONS')
+                        if checks and not mismatches and complete else 'PARTIAL')
+                    render_started = time.monotonic()
                     report['business_answer'] = registry.render(checks)
+                    # Preserve proposed prose only as explicitly unverified input,
+                    # never as an accepted answer/conclusion in an audit summary.
+                    report['model_answer_state'] = 'DETERMINISTIC_EVIDENCE_RENDER_NOT_MODEL_PROSE'
+                    report['model_answer'] = report['business_answer']
+                    report['model_conclusions'] = []
+                    report['presentation_pages'] = getattr(registry, 'presentation_pages', {})
+                    report['population_pages'] = getattr(registry, 'population_pages', {})
+                    report['population_recovery'] = getattr(registry, 'population_recovery', {})
+                    report['deterministic_render_seconds'] = time.monotonic()-render_started
                     if not complete:
                         report['business_answer'] += '\nLa pregunta tiene partes pendientes; las cifras anteriores son solo una respuesta parcial.'
                     report['evidence_manifests'] = [asdict(entry[0]) for entry in registry.entries.values()]
@@ -342,28 +601,42 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                     report['hypothesis_revision'] = dict(reviews=len(report['final_reviews']),
                         rejected_claims=sum(not c['match'] for review in report['final_reviews'] for c in review['claim_verifications']),
                         repeated_without_progress=bool(mismatches and fingerprint in rejected_fingerprints))
-                    report['final_observation_interpretation'] = value.get('prior_observation_interpretation')
+                    report['final_observation_interpretation'] = None
                     return
                 if execution_closed:
                     raise RuntimeError('query_phase_closed_no_further_sql')
-                query_attempts += 1
-                report['query_attempts'] = query_attempts
-                if query_attempts > context.effective_budget.queries:
-                    raise RuntimeError('query_attempt_budget_exhausted')
+                if value.get('action') not in {'query', 'final', 'clarify'}:
+                    feedback = dict(status='INVALID_ACTION', reason='explicit_action_required',
+                        guidance='Every response MUST include action. For a completed answer emit '
+                        '{"action":"final","coverage":"COMPLETE|PARTIAL","answer":"concise audit text","claims":[...]} '
+                        'with the already observed evidence IDs. A missing action is not executable. '
+                        'For SQL emit action=query with the documented query fields.')
+                    history.append(feedback)
+                    report.setdefault('controller_feedback', []).append(dict(call=call+1, **feedback))
+                    save(report)
+                    continue
                 try:
                     p = model_proposal(value)
                 except (ValueError, TypeError, KeyError) as exc:
-                    feedback = dict(status='INVALID_QUERY', reason=str(exc)[:100])
+                    feedback = dict(status='INVALID_QUERY', reason=str(exc)[:100],
+                        guidance='Query keys must be exactly action,sql,objective,justification,requested_sources,'
+                        'expected_grain,expected_result,candidate_relations,hypothesis,prior_observation_interpretation,'
+                        'hypothesis_state,evidence_turns. Remove extra top-level fields such as rationale.')
                     history.append(feedback)
                     report.setdefault('controller_feedback', []).append(dict(call=call+1, **feedback))
                     save(report)
                     continue
                 if any(r > len(report['turns']) for r in value.get('evidence_turns', [])):
-                    feedback = dict(status='INVALID_QUERY', reason='unknown_evidence_turn', available_turns=len(report['turns']))
+                    feedback = dict(status='INVALID_QUERY', reason='unknown_evidence_turn', available_turns=len(report['turns']),
+                        guidance='evidence_turns cites ONLY current_observed_turns in THIS investigation. Conversation is NOT an observation. Use evidence_turns=[] now and resubmit your query; no SQL was executed or query budget consumed.')
                     history.append(feedback)
                     report.setdefault('controller_feedback', []).append(dict(call=call+1, **feedback))
                     save(report)
                     continue
+                query_attempts += 1
+                report['query_attempts'] = query_attempts
+                if query_attempts > context.effective_budget.queries:
+                    raise RuntimeError('query_attempt_budget_exhausted')
                 decision, query = validate(p, context)
                 fingerprint = canonical((query.generated_sql, query.parameters)) if query else None
                 if fingerprint is not None and fingerprint in attempted_queries:
@@ -378,12 +651,17 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                         decision, result = executor.execute(p, context)
                     else:
                         decision, result = await asyncio.to_thread(executor.execute, p, context, cancel=cancel)
+                if result.status != 'COMPLETED' or decision.decision != Decision.ALLOW:
+                    # Return failures to the model before executing further work.
+                    pending_queries.clear()
                 relations = [profile_relation(r, tables) for r in p.candidate_relations]
                 rows = observation_rows(query, result)
                 if cancel and cancel.is_set():
                     raise RuntimeError('cancelled_by_user')
                 authorize(context)
+                verification_started = time.monotonic()
                 manifest = registry.register(query, result, rows)
+                verification_seconds += time.monotonic()-verification_started
                 if registry_factory:
                     report['independent_reference_audit'] = registry.audit
                 progress('Resultados observados; comprobando evidencia')
@@ -391,6 +669,20 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                     evidence_manifest=manifest,
                     decision=asdict(decision), schema=asdict(result)['schema'], rows=rows, status=result.status,
                     truncated=result.truncated or len(rows) < len(result.rows),
+                    observed_result_rows=result.returned_count, disclosed_rows=len(rows),
+                    ordered_prefix=bool(ordered_observation(query)),
+                    sampling_guidance=(
+                        'Exact prefix of the executed OUTER ORDER BY, applied before disclosure. '
+                        'The undisclosed tail is incomplete, but cannot outrank these rows on that ordering. '
+                        'A requested top row does not require disclosing the whole tail or repeating LIMIT 1. '
+                        'Investigate ties if relevant. This does NOT accredit source completeness, classification or business meaning. '
+                        'For metadata discovery ordered by code/name, this is only an incomplete entity prefix, NOT a ranking '
+                        'or exhaustive family. Do not use just these codes as the full product universe. '
+                        'Page by the last disclosed unique key, or inspect matching groups on the fact table; '
+                        'repeating the query or changing LIMIT alone cannot disclose the tail.'
+                        if ordered_observation(query) and (result.truncated or len(rows) < len(result.rows)) else
+                        'Only a sample is disclosed, NOT the matching universe. Narrow the query or GROUP BY the necessary non-documentary metadata dimensions to inspect remaining entities within existing limits.'
+                        if len(rows) < len(result.rows) else None),
                     publication=context.publication, snapshot=context.snapshot,
                     relationship_checks=relations,
                     independent_check='UNVERIFIED until scoped material final claims are independently reconstructed')
@@ -399,16 +691,26 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                     reason_for_next_query=p.justification, hypothesis_state=value['hypothesis_state'],
                     evidence_turns=value.get('evidence_turns', []), proposal=asdict(p),
                     authorized=asdict(query) if query else None, decision=asdict(decision),
-                    result=asdict(result), model_observation=observation, independent_relationship_checks=relations))
+                    result=asdict(result), execution_timing=getattr(executor, 'last_timing', {}),
+                    model_observation=observation, independent_relationship_checks=relations))
                 history.append(observation)
+                # Catch semantic contradictions while query budget remains,
+                # not only after a final has exhausted it. Feedback does not
+                # rewrite SQL, authorize sources or prescribe an execution.
+                intent_feedback = (registry.final_feedback([], net_required=False)
+                                   if hasattr(registry, 'final_feedback') else None)
+                if intent_feedback:
+                    feedback = dict(status='BUSINESS_SCOPE_FEEDBACK', reason=intent_feedback)
+                    history.append(feedback)
+                    report.setdefault('controller_feedback', []).append(dict(call=call+1, **feedback))
                 if result.status == 'COMPLETED' and 'time_to_first_useful_result_seconds' not in report:
                     report['time_to_first_useful_result_seconds'] = time.monotonic()-start
                 save(report)
                 if decision.decision in {Decision.DENY, Decision.RESOURCE_BLOCKED}:
                     from .authorized_foundation import binding_for
-                    if decision.reason == 'join_pair_budget' and binding_for(context) is not None:
+                    if decision.reason in {'join_pair_budget', 'query_deadline_or_cancel'} and binding_for(context) is not None and not (cancel and cancel.is_set()):
                         # A rejected composition is not an impossible business question.
-                        history.append(dict(status='REFORMULATE', reason='join_pair_budget',
+                        history.append(dict(status='REFORMULATE', reason=decision.reason,
                             guidance='Reduce or aggregate authorized inputs within the existing budget; no authority or budget change.'))
                         continue
                     if decision.reason == 'join_pair_budget':
@@ -437,7 +739,7 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
             report.clear()
             report.update(status='BLOCKED', reason='authorization_changed', business_answer='',
                           publication=context.publication, snapshot=context.snapshot)
-            if 'registry' in locals():
+            if 'registry' in locals() and hasattr(registry, 'close'):
                 registry.close()
         if not authorization_lost and registry_factory and 'registry' in locals():
             if not report.get('business_answer') and report.get('status') != 'NEEDS_CLARIFICATION':
@@ -459,10 +761,22 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
             registry.close()
         report['model_calls'] = luna.calls
         report['elapsed_seconds'] = time.monotonic()-start
+        report['timing'] = dict(
+            model_planning_seconds=sum(c.get('elapsed_seconds', 0) for c,v in zip(luna.calls, report.get('model_events', [])) if v.get('action') != 'final'),
+            model_final_seconds=sum(c.get('elapsed_seconds', 0) for c,v in zip(luna.calls, report.get('model_events', [])) if v.get('action') == 'final'),
+            executor_wall_seconds=sum(t.get('execution_timing', {}).get('total_seconds', t['result']['elapsed_seconds']) for t in report.get('turns', [])),
+            sql_seconds=sum(t.get('execution_timing', {}).get('sql_seconds', 0) for t in report.get('turns', [])),
+            iterations=len(report.get('model_events', [])), query_attempts=query_attempts,
+            corrections=len(report.get('controller_feedback', [])),
+            evidence_verification_seconds=verification_seconds,
+            deterministic_render_seconds=report.get('deterministic_render_seconds', 0.0),
+            model_preflight_seconds=sum(c.get('elapsed_seconds', 0) for c in report.get('model_preflight_calls', [])),
+            total_seconds=report['elapsed_seconds'])
         report['resources'] = dict(peak_process_rss_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
             duckdb_threads=1, concurrency=1, duckdb_memory_limit_bytes=context.effective_budget.process_memory_bytes,
-            spill_bytes=0, model_query_cap=12, reference_query_cap=context.effective_budget.queries if registry_factory else len(reference_proposals()),
-            query_timeout_seconds=120, per_phase_sql_seconds=900, observation_bytes_limit=32768,
+            spill_bytes=0, model_query_cap=context.effective_budget.queries, reference_query_cap=context.effective_budget.queries if registry_factory else len(reference_proposals()),
+            query_timeout_seconds=context.effective_budget.query_seconds,
+            per_phase_sql_seconds=context.effective_budget.total_seconds, observation_bytes_limit=32768,
             own_processes_left_running=0, unrelated_processes_terminated=0)
         report['cost'] = None  # No accredited pricing supplied; usage is retained per call.
         try:

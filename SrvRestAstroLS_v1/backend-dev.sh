@@ -87,7 +87,25 @@ fi
 # Normal remains the default, with its existing production-like preflights.
 DEV_PROFILE="${TEAM360_DEV_PROFILE:-normal}"
 
-if [[ "$DEV_PROFILE" == "messaging-only" ]]; then
+if [[ "$DEV_PROFILE" == "telchiai-only" ]]; then
+  _require_command ss
+  [[ "${TEAM360_ENV:-}" == "development" || "${TEAM360_ENV:-}" == "dev" ]] \
+    || _die "telchiai-only requires explicit DEV"
+  [[ "$BACKEND_HOST" == "127.0.0.1" ]] || _die "telchiai-only is loopback-only"
+  BACKEND_PORT="${TEAM360_TELCHIAI_PORT:-7060}"
+  [[ "$BACKEND_PORT" =~ ^[0-9]+$ ]] \
+    && (( 10#$BACKEND_PORT > 0 && 10#$BACKEND_PORT <= 65535 )) \
+    || _die "invalid TelchiAI backend port"
+  [[ -z "$(ss -H -ltn "sport = :${BACKEND_PORT}")" ]] \
+    || _die "TelchiAI port occupied; no existing process will be terminated"
+  UVICORN="$SCRIPT_DIR/backend/.venv/bin/uvicorn"
+  [[ -x "$UVICORN" ]] || _die "backend uvicorn environment is missing"
+  export PYTHONPATH="$SCRIPT_DIR/backend${PYTHONPATH:+:$PYTHONPATH}"
+  _log "TelchiAI only: startup performs configuration, PostgreSQL, CURRENT and Luna preflight"
+  _log "No Flow, Diagnosis, Evolution, Milvus or external service bootstrap"
+  exec "$UVICORN" modules.telchi.dev_app:app \
+    --host "$BACKEND_HOST" --port "$BACKEND_PORT" --no-access-log --log-level warning
+elif [[ "$DEV_PROFILE" == "messaging-only" ]]; then
   _require_command ss
   [[ "${TEAM360_ENV:-development}" == "development" || "${TEAM360_ENV:-development}" == "dev" ]] \
     || _die "messaging-only is restricted to DEV"
@@ -130,7 +148,7 @@ elif [[ "$DEV_PROFILE" == "srv05-e2e" ]]; then
   _log "TEST ONLY Srv05; scheduler delivery forbidden; pool read-only"
   exec "$SCRIPT_DIR/backend/.venv/bin/python" "$SCRIPT_DIR/backend/scripts/srv05_e2e_runtime.py"
 elif [[ "$DEV_PROFILE" != "normal" ]]; then
-  _die "unknown TEAM360_DEV_PROFILE; use normal, messaging-only or srv05-e2e"
+  _die "unknown TEAM360_DEV_PROFILE; use normal, messaging-only, telchiai-only or srv05-e2e"
 fi
 
 for command_name in timeout curl ss sed grep ps kill sleep; do

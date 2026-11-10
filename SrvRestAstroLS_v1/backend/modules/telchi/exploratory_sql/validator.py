@@ -129,6 +129,45 @@ class Visitor:
             self.columns.add(lineage)
         return f"{identifier(alias)}.{identifier(col)}", lineage
 
+    def temporal_type(self, node, scope):
+        if node.get('class') != 'COLUMN_REF':
+            return None
+        _, lineage = self.resolve(node, scope)
+        if lineage:
+            table, column = lineage
+            for source in self.context.catalog.tables:
+                if source.name == table:
+                    for field in source.columns:
+                        if field.name == column and field.sql_type in {'DATE', 'TIMESTAMP'}:
+                            return field.sql_type
+        return None
+
+    def temporal_operand(self, node, scope, depth, sql_type):
+        # Only a catalog-typed comparison may coerce a string literal/parameter.
+        # Keep values bound, validate ISO input, and never permit arbitrary casts.
+        value = None
+        if sql_type and node.get('class') == 'CONSTANT':
+            literal = node.get('value', {})
+            if literal.get('type', {}).get('id') == 'VARCHAR' and not literal.get('is_null'):
+                value = literal.get('value')
+        elif sql_type and node.get('class') == 'PARAMETER':
+            param = self.input_parameters.get(node.get('identifier'))
+            if param and param.sql_type == 'VARCHAR':
+                value = param.value
+        if value is not None:
+            from datetime import datetime
+            require(isinstance(value, str) and bool(re.fullmatch(
+                r'\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?)?', value)),
+                'invalid_temporal_parameter')
+            try:
+                datetime.fromisoformat(value)
+            except ValueError:
+                raise Rejected('invalid_temporal_parameter') from None
+            # Visit first: envelope, parameter accounting and literal limits still apply.
+            self.expr(node, scope, depth)
+            return self.parameter(value, sql_type)
+        return self.expr(node, scope, depth)
+
     def expr(self, node, scope, depth=0):
         self.visits += 1
         require(depth <= 20 and self.visits <= 1000, "ast_budget")
@@ -170,7 +209,8 @@ class Visitor:
             functions = {"count", "count_star", "sum", "min", "max", "avg", "abs", "round", "lower", "upper", "length"}
             # Narrow pure-string discovery needed by open-question DEV only.
             # Historical/synthetic and runtime catalogs keep their old subset.
-            if self.context.catalog.dataset == 'telchi_foundation_direct_ask_dev_v1':
+            if (self.context.catalog.dataset == 'telchi_foundation_direct_ask_dev_v1'
+                    or self.authorized_catalog):
                 functions.add('contains')
             require(fn in functions | arithmetic, "unauthorized_function")
             require(node["is_operator"] == (fn in arithmetic))
@@ -191,7 +231,11 @@ class Visitor:
                    "COMPARE_GREATERTHAN": ">", "COMPARE_LESSTHANOREQUALTO": "<=",
                    "COMPARE_GREATERTHANOREQUALTO": ">=", "COMPARE_NOT_DISTINCT_FROM": "IS NOT DISTINCT FROM"}
             require(typ in ops, "unsupported_comparison")
-            return f"({child(node['left'])} {ops[typ]} {child(node['right'])})"
+            left_type = self.temporal_type(node['left'], scope)
+            right_type = self.temporal_type(node['right'], scope)
+            left = self.temporal_operand(node['left'], scope, depth + 1, right_type)
+            right = self.temporal_operand(node['right'], scope, depth + 1, left_type)
+            return f"({left} {ops[typ]} {right})"
         if cls in {"CONJUNCTION", "OPERATOR"}:
             fields(node, common + "children")
             args = node["children"]
@@ -221,7 +265,10 @@ class Visitor:
         if cls == "BETWEEN":
             fields(node, common + "input lower upper")
             require(typ == "COMPARE_BETWEEN")
-            return f"({child(node['input'])} BETWEEN {child(node['lower'])} AND {child(node['upper'])})"
+            temporal = self.temporal_type(node['input'], scope)
+            lower = self.temporal_operand(node['lower'], scope, depth + 1, temporal)
+            upper = self.temporal_operand(node['upper'], scope, depth + 1, temporal)
+            return f"({child(node['input'])} BETWEEN {lower} AND {upper})"
         # Scalar/correlated subqueries, windows, casts, stars, lambdas, lists,
         # macros and unknown constructs are explicitly outside this V1 subset.
         raise Rejected("unsupported_expression")

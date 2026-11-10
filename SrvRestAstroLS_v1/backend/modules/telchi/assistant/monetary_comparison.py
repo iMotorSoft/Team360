@@ -36,6 +36,8 @@ def accredited(audit, result_id, owner):
                     metric='billed_amount', currency=result['currency'], definition=result['definition'],
                     period=deepcopy(result['period']), source=deepcopy(result['source']),
                     amount=result['rows'][0]['billed_amount'],
+                    components={k: result['rows'][0][k] for k in
+                                ('billed_amount', 'credit_amount', 'net_amount')},
                     partial=result['source']['updated_at'][:10] < (date.fromisoformat(options['date_to_exclusive'])-timedelta(days=1)).isoformat())
     except (ValueError, KeyError, TypeError, ArithmeticError):
         return None
@@ -70,10 +72,54 @@ def accredited_category(audit, result_id, owner):
         return None
 
 
+def calculate_components(ref, results, owner):
+    """Closed arithmetic over components of ONE validated monetary result.
+
+    No expressions, new queries, cross-result composition or model-supplied values.
+    The handler revalidates the original result's permission before disclosure.
+    """
+    if (not isinstance(ref['target_id'], str) or ref['target_id'] != ref['baseline_id']
+            or ref['mode'] not in {'ratio_percent', 'difference'}
+            or not isinstance(ref['target_field'], str) or not isinstance(ref['baseline_field'], str)
+            or ref['target_field'] == ref['baseline_field']):
+        raise ValueError('invalid_component_reference')
+    result = {r['result_id']: r for r in results}[ref['target_id']]
+    if (result['owner'] != owner or result['capability'] != MONETARY_OPERATION + '.v1'
+            or result['required_permission'] != MONETARY_PERMISSION):
+        raise ValueError('incompatible_component_result')
+    labels = {'billed_amount': 'facturación', 'credit_amount': 'notas de crédito', 'net_amount': 'neto documental'}
+    if ref['target_field'] not in labels or ref['baseline_field'] not in labels:
+        raise ValueError('unknown_component')
+    with localcontext() as ctx:
+        ctx.prec = 50
+        a, b = (Decimal(result['components'][ref[k]]) for k in ('target_field', 'baseline_field'))
+        if not a.is_finite() or not b.is_finite() or (ref['mode'] == 'ratio_percent' and b <= 0):
+            raise ValueError('invalid_component_amount')
+        difference = a - b
+        percent = a / b * 100 if b > 0 else None
+    ratio = ref['mode'] == 'ratio_percent'
+    record = dict(deepcopy(ref), target=deepcopy(result), baseline=deepcopy(result),
+                  difference=str(difference), percent=str(percent) if percent is not None else None,
+                  formula='target / baseline * 100' if ratio else 'target - baseline')
+    target, base = labels[ref['target_field']], labels[ref['baseline_field']]
+    value = business_money(percent) + ' %' if ratio else result['currency'] + ' ' + business_money(difference)
+    text = (f'{target.capitalize()} sobre {base}: {value}. ' if ratio else
+            f'Diferencia entre {target} y {base}: {value}. ')
+    text += (f"Base: {result['currency']} {business_money(b)}. "
+             f"Período: {business_date(result['period']['date_from'])} a "
+             f"{business_date((date.fromisoformat(result['period']['date_to_exclusive']) - timedelta(days=1)).isoformat())}. "
+             f"Reutilizo el resultado anterior autorizado, con información al {business_date(result['source']['updated_at'])}; "
+             'no hice una nueva consulta. Cobertura completa no certificada. No equivale a cobros ni saldo pendiente.')
+    if result['partial']:
+        text += ' Información parcial: no certifica cierre del período.'
+    return record, text
+
+
 def descriptors(results, previous=None):
     # No amounts or row values leave Team360.
     return dict(results=[dict({k: r[k] for k in ('result_id', 'metric', 'currency', 'period', 'partial')},
-                             **({'category': r['category']} if 'category' in r else {})) for r in results],
+                             **({'category': r['category']} if 'category' in r else {}),
+                             **({'fields': list(r['components'])} if 'components' in r else {})) for r in results],
                 previous=previous)
 
 
@@ -83,6 +129,8 @@ def calculate(proposal, results, owner):
             or proposal['clarification'] is not None):
         raise ValueError('invalid_comparison_contract')
     ref = proposal['comparison']
+    if isinstance(ref, dict) and set(ref) == {'target_id', 'baseline_id', 'mode', 'target_field', 'baseline_field'}:
+        return calculate_components(ref, results, owner)
     if (not isinstance(ref, dict) or set(ref) != {'target_id', 'baseline_id', 'mode'}
             or ref['mode'] not in {'difference', 'percent'}
             or not isinstance(ref['target_id'], str) or not isinstance(ref['baseline_id'], str)

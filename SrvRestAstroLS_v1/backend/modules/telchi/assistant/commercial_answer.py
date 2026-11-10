@@ -12,6 +12,7 @@ altered or cut in half.
 from decimal import Decimal
 
 from .business_scope import period_label, fiscal_control_accounts
+from modules.telchi.datalake.commercial_line_amount_by_query import QUANTITY_ORDER_BY
 
 
 def _money(value):
@@ -290,6 +291,79 @@ def format_physical(result):
     return text
 
 
+def _quantity(value):
+    """Documentary quantity: exact source digits, no invented precision."""
+    number = Decimal(value)
+    if not number.is_finite():
+        raise ValueError('invalid_quantity')
+    whole, _, decimals = format(number, 'f').partition('.')
+    sign = '-' if whole.startswith('-') else ''
+    grouped = f'{int(whole.lstrip("-")):,}'.translate(str.maketrans({',': '.'}))
+    decimals = decimals.rstrip('0')
+    return sign + grouped + (',' + decimals if decimals else '')
+
+
+def _ranking_rows(rows, ranking_by, shown=10):
+    lines = []
+    for index, row in enumerate(rows[:shown], 1):
+        line = f"{index}. {row['key']} · {row['label']} — Bs {_money(row['amount'])}"
+        if 'quantity' in row:
+            line += f" · {_quantity(row['quantity'])} unidades documentales"
+        lines.append(line)
+    return lines
+
+
+def _ranking_title(result, options, when, ranking_by):
+    """A ranking title that names its own criterion, never the measure by default."""
+    from .business_categories import CATEGORIES
+    filters = options.get('filters') or {}
+    criterion = 'cantidad documental' if ranking_by == 'quantity' else 'importe vendido'
+    title = f'Productos con mayor {criterion}'
+    published = result.get('focus') or {}
+    if filters.get('item_code'):
+        label = published.get('item_label')
+        title += f" — {filters['item_code']} · {label}" if label else f" — {filters['item_code']}"
+    elif filters.get('card_code'):
+        title += f" — comprados por {published.get('customer_label') or filters['card_code']}"
+    elif filters.get('category'):
+        title += f' — {CATEGORIES[filters["category"]].lower()}'
+    return f'{title} — {when}'
+
+
+def format_product_ranking(result, options, rows, total, filters, when, ranking_by):
+    """A product ranking the user asked for, with amount AND documentary quantity.
+
+    Ordered by the requested criterion (amount by default, quantity when asked)
+    and every figure comes from the accredited rows of the same guarded universe.
+    The unit of the line is not published: that gap is stated, never filled with
+    a conversion or a guessed unit.
+    """
+    shown = rows[:10]
+    text = f'{_ranking_title(result, options, when, ranking_by)}\n\n' + '\n'.join(
+        _ranking_rows(shown, ranking_by)) + '.'
+    if ranking_by == 'quantity':
+        text += '\n\nOrdenado por cantidad documental (de mayor a menor); el importe se muestra como referencia.'
+    else:
+        text += '\n\nOrdenado por importe vendido (de mayor a menor), con la cantidad documental de cada producto.'
+    if len(rows) > len(shown):
+        text += f' Se muestran {len(shown)} de {len(rows)} productos pedidos; el resto queda en auditoría.'
+    whole = Decimal(total['amount'])
+    if whole > 0:
+        if filters.get('item_code'):
+            text += f' Cobertura de datos: Bs {_money(total["amount"])} acreditados para ese producto.'
+        else:
+            text += (f' Cobertura de datos: el alcance acreditado tiene '
+                     f"{total.get('product_count')} productos y Bs {_money(total['amount'])} en total.")
+    quantity_limitation = result.get('quantity_limitation')
+    if quantity_limitation:
+        text += ' ' + quantity_limitation
+    warnings = _warnings(result, rows, 'sap_product', filters)
+    if warnings:
+        text += '\n\n' + ' '.join(warnings)
+    text += '\n\n' + _continuation(rows, 'sap_product')
+    return text
+
+
 def format_commercial(result, scope=None):
     if result['parameters']['group_by'] == 'physical_state':
         return format_physical(result)
@@ -305,17 +379,22 @@ def format_commercial(result, scope=None):
         return (f'{title}.\n\nNo encontré líneas comerciales en ese alcance y período. '
                 'Esto no acredita ventas cero fuera de la cobertura disponible.')
 
-    excluded = (scope or {}).get('excluded_product')
+    excluded = set(filter(None, [scope.get('excluded_product') if scope else None]))
+    excluded.update((scope or {}).get('excluded_products') or [])
     if excluded:
         offset = (scope or {}).get('product_offset', 0)
-        additional = [row for row in rows if row['key'] != excluded][offset:offset + 5]
-        text = title + f' — excluyendo {excluded}.\n\n'
+        additional = [row for row in rows if row['key'] not in excluded][offset:offset + 5]
+        text = title + f' — excluyendo {", ".join(sorted(excluded))}.\n\n'
         if additional:
             text += '\n'.join(_row_headline(row, group_by, None) + '.' for row in additional)
         else:
             text += 'No encontré otros productos en los resultados acreditados de este alcance.'
         text += '\n\n' + ' '.join(_warnings(result, rows, group_by, filters))
-        return text + '\n\nPuedo continuar con más productos del mismo cliente y período.'
+        count = total.get('product_count')
+        text += (f'\n\nPágina: {len(additional)} productos mostrados; {len(rows)} recuperados'
+                 + (f' de {count} encontrados' if count is not None else '; universo completo no contado')
+                 + '. Exclusión solo de presentación; los totales no cambian.')
+        return text + '\n\nPuedo continuar con más productos del mismo alcance y período.'
 
     focus = None
     if scope and scope.get('focus'):
@@ -324,6 +403,21 @@ def format_commercial(result, scope=None):
         if key:
             focus = dict(key=key, kind='card_code' if group_by == 'card_code' else 'sap_product')
     main = rows[0]
+    ranking_by = ((scope or {}).get('ranking_by')
+                  or ('quantity' if options.get('order_by') == QUANTITY_ORDER_BY else None))
+    if group_by == 'sap_product' and ranking_by:
+        return format_product_ranking(result, options, rows, total, filters, when, ranking_by)
+    if group_by == 'sap_product' and filters.get('card_code'):
+        shown = rows[:5]
+        count = total.get('product_count')
+        text = title + '\n\n' + '\n'.join(_row_headline(row, group_by, focus) + '.' for row in shown)
+        text += (f'\n\nPágina: {len(shown)} productos mostrados; {len(rows)} recuperados'
+                 + (f' de {count} encontrados' if count is not None else '; universo completo no contado')
+                 + f'. Total del alcance: Bs {_money(total["amount"])}.')
+        warnings = _warnings(result, rows, group_by, filters)
+        if warnings:
+            text += '\n\n' + ' '.join(warnings)
+        return text + '\n\nPodés pedir los siguientes productos del resultado conservado.'
     # BUSINESS ANSWER FIRST: the main result, its periods, its share, the
     # material warnings and the next step. The rest of the list is offered,
     # never dumped.

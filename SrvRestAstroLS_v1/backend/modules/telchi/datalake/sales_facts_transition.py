@@ -27,8 +27,9 @@ def uses_sealed_sales(manifest):
     """
     from .reference_compatibility import KIND as REFRESH_KIND
     from .independent_facts_succession import KIND as INDEPENDENT_KIND
+    from .foundation_manifest import EXTENSIBLE_KIND
     kind = manifest.get('candidate_kind')
-    return (kind == KIND or (kind in {REFRESH_KIND, INDEPENDENT_KIND}
+    return (kind == KIND or (kind in {REFRESH_KIND, INDEPENDENT_KIND, EXTENSIBLE_KIND}
             and isinstance(manifest.get('sales_facts_revalidation'), dict)))
 
 

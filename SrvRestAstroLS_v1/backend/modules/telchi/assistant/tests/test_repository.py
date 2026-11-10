@@ -27,7 +27,8 @@ async def test_sql_load_save_namespace_and_scope():
     repo = ConversationRepository()
     turn = await repo.load(conn, c)
     assert turn['state']['metric'] is None and not turn['history']
-    assert 'message_threads' in conn.calls[2][0] and 'FOR UPDATE' in conn.calls[2][0]
+    # Serialize conversation state without blocking inbound FK KEY SHARE locks.
+    assert 'message_threads' in conn.calls[2][0] and 'FOR NO KEY UPDATE' in conn.calls[2][0]
     assert 'message_events' in conn.calls[3][0] and 'FOR UPDATE' in conn.calls[3][0]
     assert conn.calls[2][1] == ('conversation', 'channel', 'workspace')
     assert conn.calls[3][1] == ('turn-1', 'conversation', 'channel', 'workspace')

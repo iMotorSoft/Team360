@@ -86,9 +86,12 @@ class DirectReadonlyExecutor:
             query_id=query.query_id if query else "", declared_grain=proposal.expected_grain,
             publication=context.publication, snapshot=context.snapshot, limitations=LIMITATIONS)
 
+        execution_started = None
+        self.last_timing = {}
         def stop(kind, reason):
             return SecurityDecision(kind, reason, query.query_id if query else None), replace(
-                result, limitations=LIMITATIONS + (reason,))
+                result, limitations=LIMITATIONS + (reason,),
+                elapsed_seconds=time.monotonic()-execution_started if execution_started is not None else 0.0)
 
         if query is None:
             return decision, result
@@ -104,6 +107,8 @@ class DirectReadonlyExecutor:
             _EXECUTION_LOCK.release()
             return stop(Decision.RESOURCE_BLOCKED, "research_budget_exhausted")
         started = time.monotonic()
+        execution_started = started
+        sql_started = None
         finished, interrupted = threading.Event(), threading.Event()
         watcher = None
         try:
@@ -120,6 +125,7 @@ class DirectReadonlyExecutor:
                 watcher.start()
                 try:
                     self._prepare_connection(db, context)
+                    sql_started = time.monotonic()
                     cursor = db.execute(query.generated_sql, {p.name: p.value for p in query.parameters})
                     schema = tuple(Column(str(c[0]), str(c[1]), True) for c in cursor.description)
                     rows, used, truncated = [], len(canonical(schema).encode()), False
@@ -143,14 +149,29 @@ class DirectReadonlyExecutor:
                 finally:
                     finished.set()
                     watcher.join()
-        except Exception:
+        except Exception as exc:
+            # Closed categories only: never relay exception text (SQL, paths,
+            # values or credentials). Luna can reformulate a binder/type error
+            # without learning anything beyond its authorized catalog.
+            import duckdb
+            category = ('sql_binding_error_check_catalog_types_and_grouping'
+                        if isinstance(exc, duckdb.BinderException) else
+                        'sql_conversion_error_check_operand_types'
+                        if isinstance(exc, duckdb.ConversionException) else
+                        'sql_arithmetic_error_check_zero_and_numeric_range'
+                        if isinstance(exc, (duckdb.OutOfRangeException, duckdb.InvalidInputException)) else
+                        'execution_rejected')
             return stop(Decision.RESOURCE_BLOCKED if interrupted.is_set() else Decision.INVALID_QUERY,
-                        "query_deadline_or_cancel" if interrupted.is_set() else "execution_rejected")
+                        "query_deadline_or_cancel" if interrupted.is_set() else category)
         finally:
             finished.set()
             if watcher is not None:
                 watcher.join()
-            self._execution_seconds += time.monotonic() - started
+            elapsed = time.monotonic() - started
+            self.last_timing = dict(total_seconds=elapsed,
+                setup_seconds=(sql_started or time.monotonic())-started,
+                sql_seconds=time.monotonic()-sql_started if sql_started else 0.0)
+            self._execution_seconds += elapsed
             self.budget.release()
             _EXECUTION_LOCK.release()
 

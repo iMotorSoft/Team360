@@ -18,14 +18,13 @@ from modules.telchi.runtime.config import DuckDBSafetyProfile, RuntimeConfig, op
 from modules.telchi.runtime.resource_guard import ResourceGuard, SafeAbort
 
 from .ducklake import DATA_ROOT, DuckLakeConnector
-from .foundation_publication import FoundationPublicationStore
+from .foundation_reader import FoundationReader
 from .raw import digest, write_raw
 from .source import HanaReadOnlySource
 
 GATE = "TELCHI_ATOMIC_RECEIVABLES_COLLECTIONS_V1"
 DISCOVERY_GATE = "TELCHI_RECEIVABLES_COLLECTIONS_BUSINESS_CONTRACT_AND_SOURCE_DISCOVERY_V1"
 DISCOVERY_VERDICT = DISCOVERY_GATE + "_DEGRADED"
-FOUNDATION = "foundation_417c860c216805f18341bb741ee026e3"
 HISTORY_START = date(2022, 3, 31)
 EVIDENCE_BASE = Path("/media/issajar/DEVELOP/Projects/iMotorSoft/ai/evidence/telchi")
 DISCOVERY_ROOT = EVIDENCE_BASE / DISCOVERY_GATE
@@ -450,10 +449,17 @@ def publish_segment(connection: Any, segment: Segment, rows: list[dict[str, Any]
     return {"before_rows": before, "segment_rows": len(rows), "after_rows": after, "transactional": True}
 
 
-def _foundation_current(connector: DuckLakeConnector) -> str | None:
-    store = FoundationPublicationStore(connection_factory=lambda: connector.session(read_only=True))
-    current = store.current_publication()
-    return current.foundation_publication_id if current else None
+def _foundation_approval(connector: DuckLakeConnector) -> dict[str, Any]:
+    # Canonical metadata/receipt validation: CURRENT, components and pinned
+    # snapshots must agree. Never reaccredit or repair a publication here.
+    access = FoundationReader(connector).get_current_foundation()
+    binding = access.read_binding
+    if not binding:
+        raise AtomicBuildError("approved Foundation receipt required")
+    return {key: binding[key] for key in (
+        "foundation_publication_id", "manifest_sha256", "receipt_sha256",
+        "snapshot_id", "commit_snapshot_id", "reference_version",
+    )}
 
 
 def _state_path(run_id: str) -> Path:
@@ -592,7 +598,7 @@ def _write_evidence(*, run_id: str, state: dict[str, Any], contract: dict[str, A
     except Exception:
         pass
     _write_json(EVIDENCE_ROOT / "run_state.json", state | {"verdict": verdict})
-    _write_json(EVIDENCE_ROOT / "precheck.json", {"gate": GATE, "context": {"entity": "TELCHI", "domains": ["COBRANZAS", "CRÉDITO_Y_DEUDORES"], "stage": "DEVELOPMENT", "sources": ["SAP_HANA", "DATA_LAKE"], "outputs": ["DATA_LAKE"]}, "foundation_expected": FOUNDATION})
+    _write_json(EVIDENCE_ROOT / "precheck.json", {"gate": GATE, "context": {"entity": "TELCHI", "domains": ["COBRANZAS", "CRÉDITO_Y_DEUDORES"], "stage": "DEVELOPMENT", "sources": ["SAP_HANA", "DATA_LAKE"], "outputs": ["DATA_LAKE"]}, "foundation_expected": before, "foundation_approval": state["foundation_approval"]})
     _write_json(EVIDENCE_ROOT / "worktree_precheck.json", {"branch": branch, "scope": "modules/telchi/datalake Receivables & Collections additive implementation", "git_operations": "NONE"})
     _write_json(EVIDENCE_ROOT / "resource_safety.json", {"HANA_CONCURRENCY": 1, "MAX_HEAVY_WORKERS": 1, "DUCKDB_THREADS": 1, "RESOURCE_GUARD": "ACTIVE", "MACHINE_STABILITY_OVER_THROUGHPUT": True})
     _write_json(EVIDENCE_ROOT / "sap_safety.json", {"SAP_ACCESSED": "YES", "SAP_READ_ONLY": "YES", "SAP_QUERY_COUNT": state.get("sap_query_count_total", len(source.query_log)), "SAP_QUERY_COUNT_CURRENT_INVOCATION": len(source.query_log), "SAP_WRITE_COUNT": source.sap_write_count, "current_invocation_query_log": source.query_log})
@@ -628,7 +634,7 @@ def _write_evidence(*, run_id: str, state: dict[str, Any], contract: dict[str, A
     board = {"CASH_COLLECTIONS_FACTS": "SUPPORTED", "TRANSFER_COLLECTIONS_FACTS": "SUPPORTED", "QR_COLLECTIONS_FACTS": "UNRESOLVED_SOURCE_EVIDENCE", "CHECK_COLLECTIONS_FACTS": "SUPPORTED", "CARD_COLLECTIONS_FACTS": "SUPPORTED", "OTHER_COLLECTIONS_FACTS": "PARTIAL", "UNRESOLVED_COLLECTION_METHOD_FACTS": "SUPPORTED", "COMMERCIAL_CREDIT_FACTS": "SUPPORTED", "OPEN_RECEIVABLES_FACTS": "SUPPORTED", "CURRENT_RECEIVABLES_FACTS": "SUPPORTED", "OVERDUE_RECEIVABLES_FACTS": "SUPPORTED", "AGING_FACTS": "SUPPORTED", "TIME_TO_SETTLEMENT_FACTS": "SUPPORTED", "metrics_computed": False}
     _write_json(EVIDENCE_ROOT / "board_fact_feasibility.json", board)
     _write_json(EVIDENCE_ROOT / "operational_integration.json", {"CREATE_INITIAL_ATOMIC_SUPPORT": "PASS", "UPDATE_ATOMIC_SUPPORT": "PASS", "ONE_OFF_DEPENDENCY_FOR_ATOMIC_UPDATE": "NO", "create_initial_entry": "create_initial.py --receivables-collections", "update_entry": "update.py --receivables-collections", **strategy})
-    _write_json(EVIDENCE_ROOT / "v1_regression.json", {"V1_REGRESSION": "PASS" if before == after == FOUNDATION else "FAIL", "FOUNDATION_CURRENT_BEFORE": before, "FOUNDATION_CURRENT_AFTER": after, "CURRENT_POINTER_MODIFIED": "NO", "closed_v1_components_modified": []})
+    _write_json(EVIDENCE_ROOT / "v1_regression.json", {"V1_REGRESSION": "PASS" if before is not None and before == after else "FAIL", "FOUNDATION_CURRENT_BEFORE": before, "FOUNDATION_CURRENT_AFTER": after, "CURRENT_POINTER_MODIFIED": "NO", "closed_v1_components_modified": []})
     _write_json(EVIDENCE_ROOT / "tests.json", {"status": "PENDING_EXTERNAL_COMMANDS", "focused_runtime_validations": {"local": local["status"], "gold": gold["status"], "bounded_sap": bounded["status"]}})
     _write_json(EVIDENCE_ROOT / "files_changed.json", {"repository": ["modules/telchi/datalake/receivables_collections_atomic.py", "modules/telchi/datalake/tests/test_receivables_collections_atomic.py", "modules/telchi/datalake/create_initial.py", "modules/telchi/datalake/update.py"], "data_root": [str(RAW_ROOT), str(STATE_ROOT), "DuckLake telchi.atomic additive tables"], "foundation_modified": False})
     _write_json(EVIDENCE_ROOT / "gaps.json", {"QR": "UNRESOLVED_SOURCE_EVIDENCE", "intraday_as_of": "NOT_SUPPORTED", "pre_2022_03_31_as_of": "UNAVAILABLE", "N_to_N_pairwise_counterparty": "UNRESOLVED_BY_SOURCE", "receivable_event": "TBD_NOT_IMPLEMENTED", "final_contado": "NOT_EXECUTED"})
@@ -664,7 +670,7 @@ def build_final_report(verdict: str, before: str | None, after: str | None, sour
         ("X. SAP-vs-Atomic bounded reconciliation", f"SAP_ATOMIC_BOUNDED_RECONCILIATION={bounded['status']}"),
         ("Y. CG2A settlement-fact feasibility", f"CG2A_ATOMIC_SETTLEMENT_FACTS_FEASIBILITY={'SUPPORTED' if gold['status']=='PASS' else 'PARTIAL'}\nCG2A_CONTADO_CLASSIFICATION_EXECUTED=NO"),
         ("Z. Future board-query fact feasibility", "\n".join(f"{k}={v}" for k,v in board.items())),
-        ("AA. V1 regressions", f"V1_REGRESSION={'PASS' if before == after == FOUNDATION else 'FAIL'}\nDOCUMENT_IDENTITY_CONTRACT=PASS\nATOMIC_LINEAGE_STATUS=PASS\nUNSAFE_CURRENCY_AGGREGATIONS=0\nCREDIT_APPLICATION_DOUBLE_COUNT=0\nclosed V1 datasets and Reference untouched."),
+        ("AA. V1 regressions", f"V1_REGRESSION={'PASS' if before is not None and before == after else 'FAIL'}\nDOCUMENT_IDENTITY_CONTRACT=PASS\nATOMIC_LINEAGE_STATUS=PASS\nUNSAFE_CURRENCY_AGGREGATIONS=0\nCREDIT_APPLICATION_DOUBLE_COUNT=0\nclosed V1 datasets and Reference untouched."),
         ("AB. Tests", "Focused tests and regression commands are recorded in tests.json after command execution."),
         ("AC. Files created/modified", "See files_changed.json. Physical outputs are immutable Raw captures, checkpoint manifests and additive DuckLake Atomic tables."),
         ("AD. Known gaps", "QR source evidence, intraday ordering, pre-coverage history, N:N pairwise attribution, mixed-method-to-invoice split, and TBD receivable_event remain unresolved by contract."),
@@ -673,7 +679,7 @@ def build_final_report(verdict: str, before: str | None, after: str | None, sour
     return "# TELCHI Atomic Receivables & Collections V1\n\n" + "\n\n".join(f"## {title}\n\n```text\n{body}\n```" for title, body in sections) + "\n"
 
 
-def run_atomic(*, resume: bool = False, run_id: str | None = None, plan_only: bool = False, source: HanaReadOnlySource | None = None, connector: DuckLakeConnector | None = None, history_start: date = HISTORY_START, history_end: date | None = None, bounded_reconciliation: bool = True) -> dict[str, Any]:
+def run_atomic(*, resume: bool = False, run_id: str | None = None, plan_only: bool = False, source: HanaReadOnlySource | None = None, connector: DuckLakeConnector | None = None, history_start: date = HISTORY_START, history_end: date | None = None, bounded_reconciliation: bool = True, before_segment: Any = None) -> dict[str, Any]:
     global EVIDENCE_ROOT
     contract = load_discovery_contract()
     config = RuntimeConfig.from_env()
@@ -683,16 +689,18 @@ def run_atomic(*, resume: bool = False, run_id: str | None = None, plan_only: bo
     connector = connector or DuckLakeConnector()
     guard = ResourceGuard(policy=config.resource_policy(), temp_directory=config.duckdb_temp_directory)
     guard.preflight()
-    before = _foundation_current(connector)
-    if before != FOUNDATION:
-        raise AtomicBuildError(f"Foundation CURRENT precondition failed: {before}")
+    approval = _foundation_approval(connector)
+    before = approval["foundation_publication_id"]
     source_as_of, discovered_end = _source_as_of(source)
     end = history_end or date.fromisoformat(discovered_end)
     segments = plan_segments(history_start, end)
     if plan_only:
-        return {"status": "PLAN_ONLY", "segments": [x.segment_id for x in segments], "SAP_QUERY_COUNT": len(source.query_log), "FOUNDATION_CURRENT": before, "discovery_fingerprint": contract["fingerprint"]}
+        return {"status": "PLAN_ONLY", "segments": [x.segment_id for x in segments], "SAP_QUERY_COUNT": len(source.query_log), "FOUNDATION_CURRENT": before, "foundation_approval": approval, "discovery_fingerprint": contract["fingerprint"]}
     run_id, state = _latest_resumable() if resume else (run_id or f"atomic-rc-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')}", {})
     state = state or {"run_id": run_id, "started_at": _now(), "segments": {}, "history_start": history_start.isoformat(), "history_end_exclusive": end.isoformat(), "source_as_of": source_as_of}
+    if state.get("foundation_approval", approval if not state["segments"] else None) != approval:
+        raise AtomicBuildError("Foundation approval changed or missing in resume checkpoint")
+    state["foundation_approval"] = approval
     prior_query_count = int(state.get("sap_query_count_total", 0))
     if state.get("history_end_exclusive") != end.isoformat():
         raise AtomicBuildError("resume end differs from checkpointed immutable plan")
@@ -704,6 +712,10 @@ def run_atomic(*, resume: bool = False, run_id: str | None = None, plan_only: bo
             if prior and prior.get("status") == "COMPLETED":
                 segment_evidence.append(prior)
                 continue
+            # Cooperative pacing is outside the timed segment and any source or
+            # catalog connection. The existing guard still gates every segment.
+            if before_segment is not None:
+                before_segment(segment)
             guard.begin_segment()
             try:
                 guard.checkpoint()
@@ -719,6 +731,8 @@ def run_atomic(*, resume: bool = False, run_id: str | None = None, plan_only: bo
                 validation = validate_rows(segment.entity, atomic_rows)
                 if validation["status"] != "PASS":
                     raise AtomicBuildError(f"validation failed for {segment.segment_id}: {validation}")
+                if _foundation_approval(connector) != approval:
+                    raise AtomicBuildError("Foundation approval changed during capture")
                 with connector.session(read_only=False) as connection:
                     publication = publish_segment(connection, segment, atomic_rows, profile=profile)
                 guard.checkpoint()
@@ -727,13 +741,18 @@ def run_atomic(*, resume: bool = False, run_id: str | None = None, plan_only: bo
                 state["sap_query_count_total"] = prior_query_count + len(source.query_log)
                 segment_evidence.append(completed)
                 _checkpoint(run_id, state)
+                # Do not retain a previous monthly batch during pacing/recovery.
+                del raw_rows, atomic_rows
             finally:
                 guard.end_segment()
         local = local_validations(connector)
         gold = validate_gold_cases(connector)
         bounded = bounded_sap_reconciliation(source, connector) if bounded_reconciliation else {"status": "NOT_RUN", "SAP_ATOMIC_BOUNDED_RECONCILIATION": "FAIL"}
-        after = _foundation_current(connector)
-        pass_conditions = local["status"] == gold["status"] == bounded["status"] == "PASS" and before == after == FOUNDATION and source.sap_write_count == 0
+        final_approval = _foundation_approval(connector)
+        if final_approval != approval:
+            raise AtomicBuildError("Foundation approval changed during capture")
+        after = final_approval["foundation_publication_id"]
+        pass_conditions = local["status"] == gold["status"] == bounded["status"] == "PASS" and before == after and source.sap_write_count == 0
         verdict = GATE + ("_PASS" if pass_conditions else "_FAIL")
         state.update({"status": "COMPLETED", "finished_at": _now(), "foundation_before": before, "foundation_after": after, "local_validation": local["status"], "gold_validation": gold["status"], "bounded_validation": bounded["status"], "sap_query_count_total": prior_query_count + len(source.query_log)})
         _checkpoint(run_id, state)

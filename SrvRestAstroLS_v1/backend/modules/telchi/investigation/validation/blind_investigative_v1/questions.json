@@ -1,0 +1,35 @@
+{
+  "protocol": "12 first-attempt turns; 3 two-turn conversations plus 6 independent questions; no runtime edits, retries or prompt repairs; technical assessment is not enterprise certification",
+  "cases": {
+    "A_client_concentration": [
+      "En octubre de 2026, ¿qué porcentaje del importe comercial de líneas facturadas en bolivianos concentraron las cinco cuentas SAP de clientes con mayor importe? Mostrá las cinco cuentas, sus importes, el total de todas las cuentas y el porcentaje conjunto. Excluí facturas canceladas; no restes notas de crédito.",
+      "Si excluimos solamente a la primera cuenta de ese ranking, ¿qué porcentaje del importe restante representan las otras cuatro? Conservá octubre, la moneda y la misma base comercial; indicá numerador y denominador."
+    ],
+    "B_inventory_negative": [
+      "En la última observación de inventario publicada, ¿cuántos productos tienen stock físico negativo en al menos un depósito? Contá códigos de producto distintos, no posiciones, y mostrá los primeros cinco códigos en orden alfabético. Indicá el corte; no sumes unidades entre productos.",
+      "Para esos mismos cinco productos, detallá todos sus depósitos con stock físico negativo y la cantidad en cada uno. No cambies la selección y distinguí cantidad de posiciones de cantidad de productos."
+    ],
+    "C_purchase_partial": [
+      "En las órdenes de compra publicadas, ¿cuántas líneas abiertas no canceladas tienen recepción parcial, es decir cantidad abierta mayor que cero y menor que la cantidad pedida? Mostrá las cinco primeras por clave de orden y número de línea, con proveedor, producto y ambas cantidades. Indicá cobertura y fecha de observación, sin afirmar que sea el estado actual de SAP.",
+      "Para esas mismas cinco líneas, ¿qué recepciones de mercancía publicadas las referencian? Mostrá número o clave de recepción, fecha y cantidad recibida, conservando cada línea de origen. Si falta cobertura para conciliarlas, explicitalo y no interpretes ausencia como cero."
+    ],
+    "D_customer_diversity": [
+      "En octubre de 2026, ¿cuántas cuentas SAP de clientes compraron al menos diez códigos distintos de producto en facturas activas en bolivianos? Mostrá las cinco cuentas con mayor diversidad, cantidad de productos distintos e importe comercial, desempatando por código de cuenta. No fusiones cuentas por nombre."
+    ],
+    "E_credit_incidence": [
+      "Durante octubre de 2026, ¿qué porcentaje de las cuentas SAP con facturas activas en bolivianos también tuvo al menos una nota de crédito activa en esa moneda y mes? Contá cuentas, no documentos, mostrá numerador y denominador y no asumas que la nota corresponde a una factura de octubre."
+    ],
+    "F_daily_peak": [
+      "Para octubre de 2026, identificá el día con mayor importe comercial de líneas de facturas activas en bolivianos. ¿Qué proporción del total mensual representó y cuántas cuentas SAP distintas compraron ese día? Si hay empate, mostrá todos los días empatados."
+    ],
+    "G_product_zero_amount": [
+      "En octubre de 2026, ¿cuántos códigos de producto tuvieron alguna línea de factura activa en bolivianos con cantidad positiva e importe de línea cero? Mostrá cinco ejemplos por código y el número total de líneas que cumplen esas condiciones. No los califiques como regalos sin evidencia."
+    ],
+    "H_sales_stock_cross": [
+      "¿Cuántos códigos de producto vendidos en octubre de 2026 en facturas activas en bolivianos no tienen stock físico positivo en ningún depósito en la última observación publicada? Separá los códigos sin posición de inventario de los que sí tienen posiciones pero todas son cero o negativas; mostrá cinco ejemplos de cada grupo y los cortes de ambas fuentes. No presentes el cruce como stock histórico de octubre."
+    ],
+    "I_purchase_vendor_concentration": [
+      "En las facturas de proveedores publicadas de octubre de 2026, no canceladas y denominadas en bolivianos, ¿qué proveedor concentra el mayor importe documental y qué porcentaje representa del total del mes observado? Usá el encabezado una sola vez por factura, indicá cuántos proveedores participan y el límite de cobertura. No lo confundas con órdenes de compra ni con pagos."
+    ]
+  }
+}

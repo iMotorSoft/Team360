@@ -52,6 +52,30 @@ class Budget:
 
 
 @dataclass(frozen=True)
+class DevResearchBudget(Budget):
+    """Bounded authorized DEV investigation; fast-path/F1 budgets stay unchanged."""
+    query_seconds: float = 5.0
+    total_seconds: float = 30.0
+    queries: int = 12
+    result_rows: int = 500
+    result_bytes: int = 256 * 1024
+
+    def __post_init__(self):
+        for name, field in self.__dataclass_fields__.items():
+            value = getattr(self, name)
+            if (isinstance(value, bool) or not isinstance(value, (int, float))
+                    or (name not in {'query_seconds', 'total_seconds'} and type(value) is not int)
+                    or not 0 < value <= field.default):
+                raise ValueError('invalid_dev_research_budget')
+        if self.query_seconds > self.total_seconds:
+            raise ValueError('invalid_dev_research_budget')
+
+    def intersect(self, other):
+        return DevResearchBudget(**{k: min(getattr(self, k), getattr(other, k))
+                                   for k in self.__dataclass_fields__})
+
+
+@dataclass(frozen=True)
 class TypedParameter:
     name: str
     sql_type: str

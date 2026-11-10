@@ -52,7 +52,8 @@ def stock_contract(manifest):
     if stable is not None:
         from .reference_compatibility import KIND as REFERENCE_KIND
         from .sales_facts_transition import KIND as SALES_KIND
-        if (manifest.get('candidate_kind') not in {KIND,REFERENCE_KIND,SALES_KIND}
+        from .foundation_manifest import EXTENSIBLE_KIND
+        if (manifest.get('candidate_kind') not in {KIND,REFERENCE_KIND,SALES_KIND,EXTENSIBLE_KIND}
                 or not isinstance(manifest.get('sales_facts_revalidation'),dict)
                 or not isinstance(manifest.get('independent_facts_succession'),dict)):
             fail('stock dispatch requires canonical validated succession ancestry')
@@ -230,6 +231,9 @@ def verify_files(manifest):
 def validate_transition(store, publication, base, base_components):
     m, old = publication.manifest, base.manifest
     proof = m.get('independent_facts_succession')
+    from .receivables_collections_succession import CONTRACT as CXC_CONTRACT, validate_transition as validate_cxc
+    if isinstance(proof, dict) and proof.get('contract') == CXC_CONTRACT:
+        return validate_cxc(store, publication, base, base_components)
     from .operational_domains import CONTRACT as OBSERVATIONS, validate_transition as validate_observations
     if isinstance(proof, dict) and proof.get('contract') == OBSERVATIONS:
         return validate_observations(publication, base, base_components, store.connection_factory)

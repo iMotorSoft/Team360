@@ -90,7 +90,8 @@ def test_binding_error_is_redacted():
     ctx = synthetic_context()
     with DirectReadonlyExecutor(ctx) as executor:
         decision, result = executor.execute(proposal("SELECT sum(amount), id FROM invoices"), ctx)
-        assert decision.reason == "execution_rejected" and result.status == "NOT_EXECUTED"
+        assert decision.reason == "sql_binding_error_check_catalog_types_and_grouping"
+        assert result.status == "NOT_EXECUTED"
         assert "Binder" not in str(result)
 
 

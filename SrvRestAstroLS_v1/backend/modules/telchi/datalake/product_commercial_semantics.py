@@ -204,7 +204,7 @@ def create_candidate(store: FoundationPublicationStore, *, base_id: str, compone
     return candidate.foundation_publication_id
 
 
-def read_component(component: Mapping, *, data_root: Path = DATA_ROOT) -> dict[str, list[dict]]:
+def read_component(component: Mapping, *, data_root: Path = DATA_ROOT, verify_physical: bool = True) -> dict[str, list[dict]]:
     """Pinned file/hash access, usable for an explicit candidate or CURRENT."""
     import json
     fingerprint = digest(component["stable_contract"])
@@ -220,12 +220,15 @@ def read_component(component: Mapping, *, data_root: Path = DATA_ROOT) -> dict[s
             if not paths or len(paths) != len(hashes):
                 raise ValueError("semantic files incomplete")
             for path, sha in zip(paths, hashes, strict=True):
-                if data_root.resolve() not in Path(path).resolve().parents or file_hash(Path(path)) != sha:
+                if (data_root.resolve() not in Path(path).resolve().parents
+                        or (verify_physical and file_hash(Path(path)) != sha)):
                     raise ValueError("semantic file hash/root mismatch")
             cur = db.execute("SELECT * FROM read_parquet(?, union_by_name=true)", [paths])
             names = [d[0] for d in cur.description]
             rows = [json.loads(json.dumps(dict(zip(names, r)), default=str)) for r in cur.fetchall()]
-            if len(rows) != entry["row_count"] or row_digest(rows) != entry["logical_hash"] or entry["logical_hash"] != component["stable_contract"]["dataset_hashes"][name]:
+            if (len(rows) != entry["row_count"]
+                    or (verify_physical and row_digest(rows) != entry["logical_hash"])
+                    or entry["logical_hash"] != component["stable_contract"]["dataset_hashes"][name]):
                 raise ValueError("semantic row fingerprint mismatch")
             result[name] = rows
     finally:
@@ -233,7 +236,7 @@ def read_component(component: Mapping, *, data_root: Path = DATA_ROOT) -> dict[s
     return result
 
 
-def dataset_relation(component: Mapping, dataset: str, *, data_root: Path = DATA_ROOT) -> str:
+def dataset_relation(component: Mapping, dataset: str, *, data_root: Path = DATA_ROOT, verify_physical: bool = True) -> str:
     """Hash-verified SQL relation without loading every line into Python."""
     if dataset not in DATASETS:
         raise ValueError("unknown semantic dataset")
@@ -247,7 +250,8 @@ def dataset_relation(component: Mapping, dataset: str, *, data_root: Path = DATA
     if not paths or len(paths) != len(hashes):
         raise ValueError("semantic files incomplete")
     for path, sha in zip(paths, hashes, strict=True):
-        if data_root.resolve() not in Path(path).resolve().parents or file_hash(Path(path)) != sha:
+        if (data_root.resolve() not in Path(path).resolve().parents
+                or (verify_physical and file_hash(Path(path)) != sha)):
             raise ValueError("semantic file hash/root mismatch")
     sql_files = ",".join("'" + str(p).replace("'", "''") + "'" for p in paths)
     return f"(SELECT * FROM read_parquet([{sql_files}],union_by_name=true))"

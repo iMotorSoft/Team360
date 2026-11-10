@@ -84,14 +84,32 @@ def validate_manifest(store: Any, publication: Any, *, seen: frozenset[str] = fr
     base = store.get(base_id)
     if base is None or base.status not in {"CURRENT", "SUPERSEDED"}:
         fail("Foundation extension base publication is unresolved")
-    base_components = validate_manifest(store, base, seen=seen | {identity})
+    from .operational_domains import CONTRACT as OBSERVATIONS, accredited_base_components
+    observation_revision = (kind == INDEPENDENT_KIND
+        and manifest.get('independent_facts_succession', {}).get('contract') == OBSERVATIONS
+        and bool(manifest.get('operational_observations', {}).get('overlap')))
+    if observation_revision:
+        # Immutable, publisher-accredited financial components are inherited,
+        # not rebuilt merely because an unrelated observation was updated.
+        # The domain validator below still proves the entire operational delta.
+        base_components = accredited_base_components(store, publication, base)
+    else:
+        base_components = validate_manifest(store, base, seen=seen | {identity})
     if kind == INDEPENDENT_KIND:
         from .independent_facts_succession import validate_transition
         return validate_transition(store, publication, base, base_components)
     if kind == SALES_FACTS_KIND:
         from .sales_facts_transition import validate_transition
         return validate_transition(publication, base, base_components)
-    if base.manifest.get('candidate_kind') == SALES_FACTS_KIND and kind != REFRESH_KIND:
+    if kind == EXTENSIBLE_KIND and 'sales_facts_revalidation' in base.manifest:
+        # An additive envelope may dispatch sealed facts only by retaining ALL
+        # inherited business metadata, permissions, snapshots and observations.
+        mutable = {'foundation_publication_id', 'update_run_id', 'candidate_kind',
+                   'manifest_schema_version', 'base_foundation_publication_id', 'components'}
+        if ({k:v for k,v in manifest.items() if k not in mutable} !=
+                {k:v for k,v in base.manifest.items() if k not in mutable}):
+            fail('Foundation extension changed inherited business contract or permissions')
+    if base.manifest.get('candidate_kind') == SALES_FACTS_KIND and kind not in {REFRESH_KIND, EXTENSIBLE_KIND}:
         fail('Sales facts transition inheritance requires an explicit reader-compatible adapter')
     if kind == REFRESH_KIND:
         if snapshot != base.manifest["base_snapshot_id"] or set(components) != set(base_components):

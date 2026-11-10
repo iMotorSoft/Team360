@@ -33,11 +33,19 @@ def create_telchi_app(*, policy, pool=None):
     if os.getenv('TEAM360_TELCHI_DURABLE') not in {None, '0', '1'}:
         raise ValueError('Invalid durable rollout setting')
     durable = os.getenv('TEAM360_TELCHI_DURABLE') == '1'
+    researcher = None
+    if os.getenv('TEAM360_TELCHI_FREE_ANALYSIS') == '1':
+        # Same investigator as Console, resolved in process from the already
+        # authenticated WhatsApp identity. No HTTP runtime is started here.
+        from ..console_http import load_config
+        from ..research_port import build_researcher
+        researcher = build_researcher(pool=pool, config=load_config())
     from .capabilities import SalesCapabilities
     handler = TelchiHandler(store=PostgresConversationStore(pool), authorization=BusinessAuthorization(policy),
                            concept_resolver=resolver, semantics_connection=semantics_connection,
                            turn_timeout_seconds=300 if durable else 80,
-                           capabilities=SalesCapabilities(timeout_seconds=180) if durable else None)
+                           capabilities=SalesCapabilities(timeout_seconds=180) if durable else None,
+                           researcher=researcher)
     app = create_app(messaging_handlers={'telchi': registration(handler)})
     if durable:
         if os.getenv('TEAM360_ENV') not in {'dev', 'development'}:

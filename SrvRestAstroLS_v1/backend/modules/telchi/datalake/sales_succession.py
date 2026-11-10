@@ -15,7 +15,7 @@ ROOT_SNAPSHOT = 1408
 
 
 def validate_successor(store, publication, snapshot, *, physical=False, category_legacy=False, _reader_validated=False):
-    from .foundation_manifest import validate_manifest
+    from .foundation_manifest import EXTENSIBLE_KIND, validate_manifest
     from .sales_facts_transition import KIND, verify_files
     from .reference_compatibility import KIND as REFERENCE_KIND
     from .independent_facts_succession import KIND as INDEPENDENT_KIND
@@ -42,6 +42,10 @@ def validate_successor(store, publication, snapshot, *, physical=False, category
                 raise FoundationReaderError('Commercial succession requires incremental reconciliation')
             if not _reader_validated:
                 verify_files(m)
+        elif m.get('candidate_kind') == EXTENSIBLE_KIND:
+            # Canonical validation proves the exact additive envelope, including
+            # every inherited snapshot, permission and component entry.
+            pass
         elif m.get('candidate_kind') == INDEPENDENT_KIND:
             # Canonical validation above already replayed the changed stock and
             # proved sales, Reference, permissions and classification unchanged.
@@ -98,7 +102,13 @@ def validate_successor(store, publication, snapshot, *, physical=False, category
 
 
 def admit(access, connection, *, physical=False, category_legacy=False):
-    """Use the caller's read-only catalog session and already-resolved reader."""
+    """Use publisher accreditation; never replay ancestry on a query."""
+    binding = getattr(access, 'read_binding', None)
+    if binding is not None:
+        if binding.get('commercial') is not True or (physical and binding.get('physical') is None):
+            raise FoundationReaderError('Commercial publication accreditation missing')
+        return dict(binding['physical']) if physical else None
+    # Explicit full-validation reader is reserved for publisher/tests.
     @contextmanager
     def same():
         yield connection
@@ -116,6 +126,11 @@ def admit(access, connection, *, physical=False, category_legacy=False):
 
 def physical_metadata(access):
     """Hashes of the canonical Reference, after ancestry/preservation validation."""
+    binding = getattr(access, 'read_binding', None)
+    if binding is not None:
+        if binding.get('physical') is None:
+            raise FoundationReaderError('Physical publication accreditation missing')
+        return dict(binding['physical'])
     from .ducklake import DATA_ROOT
     products = access.reference('products')
     crosswalk = DATA_ROOT/'crosswalk/_versions'/access.foundation.reference_version/'product_crosswalk/part-00000.parquet'
@@ -139,7 +154,7 @@ def source_metadata(access):
 
 
 def result_binding(source, *, physical=False):
-    """Re-resolve CURRENT for a new binding; never trust a self-attested receipt.
+    """Check catalog metadata only; never reaccredit Foundation for a result.
 
     Legacy exact bindings remain checked by each adapter. New result envelopes
     must match the canonical current publication, snapshot AND update instant.

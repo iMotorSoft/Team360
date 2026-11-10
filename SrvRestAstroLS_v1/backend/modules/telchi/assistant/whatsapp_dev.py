@@ -1,12 +1,12 @@
-"""Manual, bounded DEV Srv05 + TelchiAI + Evolution session. Never sends a probe.
+"""Manual DEV Srv05 + TelchiAI + Evolution session. Never sends a probe.
 
 preflight: read-only DB and Evolution GETs, no listener/webhook/model calls.
 start: explicit operator action; private backup before webhook mutation.
 restore: explicit recovery after hard interruption; refuses foreign configuration.
 
-The session closes when it is idle for a configurable period or when it
-reaches its maximum duration, never while a turn is in flight. The activity
-and the reason of the closure are recorded in the private session state.
+The operator decides when to stop the pilot; legacy duration/idle settings
+never close it. Security expiration, approval revocation and runtime errors
+still fail closed. Activity and closure reasons remain private evidence.
 """
 from __future__ import annotations
 
@@ -306,24 +306,21 @@ class ActivityMarker:
 
 def session_close_reason(*, elapsed, idle_elapsed, in_flight, max_duration, idle_timeout,
                          gates_expired=False):
-    """Why the owned session closes, or None while it must stay open.
+    """Only security expiration closes automatically, never pilot age/activity.
 
-    A turn in flight is never interrupted: the idle timeout only closes a
-    session that is genuinely waiting for the operator.
+    Timing arguments remain compatible with existing private controls. They
+    are not credential lifetimes and cannot override the operator's stop.
+    Approval revocation and backend failure are checked separately by start().
     """
-    if elapsed >= max_duration:
-        return 'max_duration_reached'
     if gates_expired:
         return 'gate_evidence_expired'
-    if idle_timeout and idle_elapsed >= idle_timeout and not in_flight:
-        return 'idle_timeout_reached'
     return None
 
 
 def session_timing(args):
-    """The idle timeout and the maximum duration of the owned session.
+    """Validate legacy timing inputs for compatibility, not automatic closure.
 
-    The legacy ``--duration`` remains as an alias of the maximum duration.
+    The legacy ``--duration`` remains as an alias of ``--max-duration``.
     """
     idle = getattr(args, 'idle_timeout', None)
     total = getattr(args, 'max_duration', None)
@@ -354,7 +351,7 @@ def read_activity(path):
 
 
 def session_policy(control_path, idle_timeout, max_duration):
-    """Re-read the private control to extend a running session.
+    """Re-read legacy timing metadata; it no longer controls session closure.
 
     Only the timing keys are read: the environment is never touched and
     nothing is printed.
@@ -531,19 +528,15 @@ def start(args):
         v1 = bool(os.getenv('TEAM360_TRANSPORT_V1_CONFIG'))
         try:
             if v1:
-                from .whatsapp_dev_lifecycle import prepare_v1, reaccredit_v1
+                from .whatsapp_dev_lifecycle import prepare_v1
+                diagnostics.advance('gate_validation')
+                gate_evidence(read_approval(args.approval))
                 diagnostics.advance('V1_preflight')
                 prepare_v1()
-                diagnostics.advance('V1_reaccreditation')
-                reaccredit_v1(args.approval)
             return _start(args, session, diagnostics)
         except BaseException as exc:
             diagnostics.capture(exc)
             raise
-        finally:
-            if v1:
-                from .whatsapp_dev_lifecycle import evolution_running
-                evolution_running(False)
 
 
 def _start(args, session, diagnostics):
@@ -629,9 +622,8 @@ def _start(args, session, diagnostics):
             result['status'] = 'READY_FOR_HUMAN_TEST'
             session.publish('READY', ready_at=datetime.now(timezone.utc).isoformat())
             print('READY_FOR_HUMAN_TEST: operador, enviar UNA pregunta; Ctrl-C para cerrar. No E2E_PASS.', flush=True)
-            # The session lives while it is used: it closes when it is idle,
-            # when it reaches its maximum duration, or when the operator stops
-            # it. A turn in flight is never interrupted.
+            # No idle/age cutoff: only the operator or a security/runtime
+            # failure stops the pilot. Keep activity evidence for diagnostics.
             started = time.monotonic()
             last_activity = started
             closure_reason = 'operator_stop'
@@ -732,13 +724,13 @@ def main():
             p.add_argument('--host', required=True)
             p.add_argument('--port', type=int, default=18181)
             p.add_argument('--idle-timeout', type=int, default=None,
-                           help='close the session after this many idle seconds')
+                           help='deprecated timing metadata; does not close the pilot')
             p.add_argument('--max-duration', type=int, default=None,
-                           help='maximum total duration of the session in seconds')
+                           help='deprecated timing metadata; does not close the pilot')
             p.add_argument('--duration', type=int, default=None,
                            help='legacy alias of --max-duration')
             p.add_argument('--control', type=Path, default=None,
-                           help='private control configuration re-read to extend the session')
+                           help='private control configuration with legacy timing metadata')
             p.add_argument('--container', default='evolution-api')
             p.add_argument('--output', required=True)
     p = sub.add_parser('fingerprint')
