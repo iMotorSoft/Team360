@@ -42,8 +42,8 @@ separado (secciones 5 y 8).
 | --- | --- |
 | Rama | `feature/console-backend-core` |
 | HEAD anterior | `2ff367fa9a78979cecd371f2afe7b7bba5b65990` |
-| HEAD consolidado | `dbc86d9c8093c48e92504ea4df12f733c41a9d24` |
-| Remoto | `origin` = `dbc86d9c8093c48e92504ea4df12f733c41a9d24` (idéntico) |
+| HEAD consolidado (código) | `dbc86d9c8093c48e92504ea4df12f733c41a9d24` |
+| Remoto tras el push del código | `dbc86d9c8093c48e92504ea4df12f733c41a9d24` (idéntico) |
 | Push | normal, sin `--force` |
 | Alcance | 33 archivos, `+2953 / −132` |
 | `git diff --check` | sin hallazgos |
@@ -254,11 +254,13 @@ conversación. No se procesó ningún mensaje entrante ni se emitió un envío.
 exit 0; tras `fetch`, HEAD local y `origin` idénticos. Sin `--force`, sin tocar
 otras ramas, sin desplegar PROD.
 
-## 10. Segundo commit documental
+## 10. Commit documental posterior
 
 El informe y la actualización de `SrvRestAstroLS_v1/docs/status_actual.md` y
-`modules/telchi/status_actual.md` se publican en un commit documental posterior,
-sin secretos ni datos empresariales.
+`modules/telchi/status_actual.md` se publican en el commit documental que sigue
+a `dbc86d9` en la misma rama. Ese commit no cambia código: el digest acreditado
+(`3b84888d…`) y el runtime activo siguen referidos a `dbc86d9`, y no vuelve a
+invalidar los gates.
 
 ## 11. Riesgos y pendientes
 
