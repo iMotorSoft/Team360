@@ -28,8 +28,12 @@ sales.coverage, products.search, sales.by_products o sales.commercial_line_amoun
 /limit opcional entero 1..50, para sales.latest_documents, sales.by_products,
 sales.product_line_amount_ranking o sales.commercial_line_amount_by (10 por defecto).
 /ranking_by declara el criterio de un ranking de productos: amount (importe vendido) o
-quantity (cantidad documental). Nunca se usa con un total global, sales.latest_documents
-ni sales.coverage.
+quantity (cantidad documental). SÓLO es válido con metric=sales.commercial_line_amount_by,
+/group_by=sap_product y breakdown_by=null. Nunca enviarlo con sales.source_top_items:
+esa capability legacy tiene orden fijo por cantidad y no admite /ranking_by.
+Un ranking libre por cantidad/importe de productos usa sales.commercial_line_amount_by
+con /group_by=sap_product; conservar el período solicitado. Nunca se usa con un total
+global, sales.latest_documents ni sales.coverage.
 /limit NUNCA admite null: si no se pide un límite, omitirlo o usar unset=['/limit'].
 Para un único período, omitir /periods y /period_mode o restablecerlos con unset;
 no enviar /periods=[] ni convertir defaults ausentes en valores nulos arbitrarios.
@@ -46,6 +50,18 @@ no usar entity_mention ni product_search_text para esos términos.
 Importe de ventas con canal HORIZONTAL y período conocido: sales.net_amount,
 action=EXECUTE, limit=10. El backend consulta la métrica documental y declara
 sus límites de atribución; no pedir otra fecha o entidad para habilitar el canal.
+Varios períodos con el importe de cada uno: periods=[cada período],
+period_mode=union y breakdown_by=period, action=EXECUTE. Un total de los dos
+meses NO es la respuesta a «cuánto en cada mes»: nunca consolidar un desglose
+pedido ni presentar el conjunto como si fuera un mes. Sin breakdown_by el
+conjunto se lee como un solo total y la respuesta lo declara.
+Elegir la operación que conserva TODA la pregunta: medida, canal, períodos,
+desglose y filtros. Si ninguna operación acreditada la representa completa,
+conservar la intención y usar DIRECT_UNAVAILABLE o dejar que el investigador
+responda; nunca una operación que descarte una dimensión solicitada.
+DIRECT_UNAVAILABLE declara que ninguna operación acreditada representa la
+pregunta; no se emite cuando el estado confirmado ya es ejecutable, y no se
+reemplaza una medida por otra (facturación documental ≠ líneas comerciales).
 comparison es período baseline; period conserva período objetivo.
 Conservar slots no mencionados. Reemplazo explícito sustituye; también extiende
 lista final; eliminar usa unset. NEW_QUERY independiente emite resets explícitos.
@@ -211,6 +227,27 @@ una consulta. result_context identifica la única lista referenciable, su orden
 presentado, cantidad, campos y selected_ordinal. Para resultados exploratorios también
 incluye rows (máximo 50), rows_complete, schema, question y evidence del resultado persistido autorizado.
 Si rows_complete=false, no calcules extremos de todo el universo usando ese prefijo.
+Transformación LOCAL de resultados investigativos compuestos: si evidence.continuity_cells
+publica contratos para las celdas, podés calcular u ordenar SIN RESEARCH ni SQL nuevo.
+Emití SÓLO {intent:"RESULT_REFERENCE",action:"TRANSFORM_RESULT",
+result_reference:{result_id:ID,ordinal:null,field:null},
+transformation:{operation:OPERACION,operands:[{ordinal:entero_1_based,field:campo}]},clarification:null}.
+OPERACION es subtract (A-B con signo), absolute_difference (ABS(A-B)), add,
+percent_change ((A-B)/B*100), share (A/B*100, parte del mismo total), ratio (A/B),
+sort_ascending o sort_descending. Cálculos usan exactamente dos referencias distintas;
+ordenar usa un único campo numérico (ordinal=1) y ordena TODAS las filas conservadas.
+Los operandos pueden ser columnas distintas de una fila o filas de una misma medida;
+primero/segundo puede referir productos, sucursales, períodos o canales, no sólo fechas.
+No enviar valores ni fórmulas. Usar schema, evidence, question y verified_claims para
+identificar medidas, períodos, filtros y el foco previo. Los contratos provienen del
+verificador empresarial, incluso si metric=null: no significa que los importes falten.
+Si el último cálculo verificado fue una variación y el seguimiento pide otra operación
+entre esos valores, conservar sus dos dependencias, no el total usado en otra participación.
+Si varias parejas son plausibles y no hay foco inequívoco, RESULT_REFERENCE/ASK.
+No pedir aclaración cuando los componentes ya están identificados sin ambigüedad.
+No usar MONETARY_COMPARISON para estas celdas: ese contrato describe otras capabilities.
+La aritmética y compatibilidad se verifican en el backend con precisión Decimal.
+El resultado no acredita períodos ni fuentes ausentes; en ese caso usar investigación libre.
 La paginación local puede recorrer el resultado conservado mediante next_ordinal y row_count.
 En ese caso usá esos registros (no el estado de una consulta anterior ni el texto
 recortado del canal) para resolver «esos clientes», «el último», «el de menor venta»,
@@ -269,6 +306,11 @@ monetary_context contiene sólo descriptores acreditados (IDs, métrica, moneda,
 períodos, parcial), nunca importes. Para «cuál fue la diferencia» entre dos
 períodos ya consultados emitir SÓLO {intent:"MONETARY_COMPARISON",action:"CALCULATE",
 comparison:{target_id:ID,baseline_id:ID,mode:"difference"},clarification:null}.
+El modo se elige por lo que pide la pregunta, no por costumbre: mode:"difference"
+es resta con signo (target-base), mode:"absolute_difference" es la magnitud
+abs(target-base) cuando se pide «diferencia absoluta» o «cuánto de diferencia
+hay» sin signo, y mode:"percent" es variación porcentual. Una diferencia
+absoluta nunca se responde con un importe negativo.
 No emitir state_delta, COMPARE de consultas ni ASK comparison del State Engine.
 Si hay exactamente dos períodos y no explicita orden, objetivo es el período
 cronológicamente posterior y base el anterior, independientemente del orden de
@@ -285,9 +327,11 @@ credit_amount=notas de crédito, net_amount=neto documental. Una pregunta contex
 resoluble con esos campos NO es ANALYSIS_UNAVAILABLE ni una capability nueva.
 Usá MONETARY_COMPARISON/CALCULATE con comparison={target_id:ID,baseline_id:ID,
 target_field:CAMPO,baseline_field:CAMPO,mode:"ratio_percent"} para participación
-(target/base*100), o mode:"difference" para resta (target-base). Ambos IDs deben
+(target/base*100), mode:"difference" para resta (target-base), o
+mode:"absolute_difference" para la magnitud abs(target-base). Ambos IDs deben
 ser el MISMO resultado acreditado; campos distintos de su lista fields.
-No confundir participación con variación porcentual entre períodos (mode:percent).
+No confundir participación con variación porcentual entre períodos (mode:percent),
+ni diferencia con signo con diferencia absoluta (mode:absolute_difference).
 Las referencias «esas», «lo facturado» y seguimientos heredan el resultado y
 campos de monetary_context.previous cuando sean inequívocos; cambiar el componente
 solicitado no requiere repetir período ni documentos. Si hay varios resultados

@@ -117,6 +117,12 @@ class AskRegistry(EvidenceRegistry):
         self.populations, self.audit = {}, []
         # Complete-population recovery: durable records plus their accounting.
         self.population_pages, self.population_recovery = {}, {}
+        self.continuity_manifests = {}
+
+    def manifests(self):
+        """Export issued metadata, including durable source-derived cell contracts."""
+        return [dict(asdict(entry[0]), **self.continuity_manifests.get(result_id, {}))
+                for result_id, entry in self.entries.items()]
 
     def close(self):
         self.controls.close()
@@ -133,6 +139,29 @@ class AskRegistry(EvidenceRegistry):
             # Distinguish exact execution evidence from the old metric/raw-row
             # verifier. A NULL business metric does NOT invalidate an executed
             # conditional source sum. Make that distinction visible to Luna.
+            # Small source-derived contracts, not aliases or model-authored units.
+            # Persist beside the existing manifest; no second result store.
+            from .authorized_foundation import authorize_issued
+            authorize_issued(self.context)
+            manifest['continuity_cells'] = []
+            for row_id in manifest['row_ids']:
+                for column in manifest['columns']:
+                    ref = dict(kind='executed_cell', result_id=manifest['result_id'],
+                               row_id=row_id, column_id=column['column_id'])
+                    try:
+                        issued = self._executed_cell(ref, revalidate=False)
+                        value = issued[0]
+                        from decimal import Decimal
+                        if not isinstance(value, Decimal):
+                            continue
+                        signature, predicates = self._operand_scope(ref, issued_cell=issued)
+                        manifest['continuity_cells'].append(dict(reference=ref,
+                            signature=signature, predicates=sorted(predicates)))
+                    except (ValueError, TypeError, KeyError):
+                        continue
+            authorize_issued(self.context)
+            self.continuity_manifests[manifest['result_id']] = dict(
+                continuity_cells=manifest['continuity_cells'])
             manifest['execution_accreditation'] = (
                 'executed_cell claims support direct source columns, source aggregates, and '
                 'sum(CASE WHEN condition THEN original_source_amount ELSE 0 END), and '
@@ -415,9 +444,10 @@ class AskRegistry(EvidenceRegistry):
         self.tables = self.populations[result_id]
         return super()._measure(ref)
 
-    def _executed_cell(self, ref):
+    def _executed_cell(self, ref, *, revalidate=True):
         from .authorized_foundation import authorize_issued
-        authorize_issued(self.context)
+        if revalidate:
+            authorize_issued(self.context)
         from decimal import Decimal
         m, q, result, row, node, source, index = self._cell(ref)
         if result.truncated:
@@ -460,15 +490,15 @@ class AskRegistry(EvidenceRegistry):
             raise ValueError('scalar_executed_cell_required')
         return value, (m, node, source, index, row)
 
-    def _calculation_signature(self, claim):
+    def _calculation_signature(self, claim, *, issued_cell=None):
         """Distinguish a measure from its delta; arithmetic fidelity is not intent."""
         if claim.get('kind') == 'executed_cell':
-            _, (_, node, source, index, _) = self._executed_cell(claim)
+            _, (_, node, source, index, _) = issued_cell or self._executed_cell(claim)
             expr = node['select_list'][index]
             argument = expr.get('children', [{}])[0] if expr.get('children') else expr
             if argument.get('class') == 'CASE':
                 argument = argument['case_checks'][0]['then_expr']
-            return ('source_metric', source, expr.get('function_name'), tuple(argument.get('column_names', [])[-1:]))
+            return ('source_metric', source, expr.get('function_name'), tuple(argument.get('column_names', [])[-1:]), bool(expr.get('distinct')))
         deps = claim['dependencies']
         if claim['operation'] == 'subtract' and all(d.get('kind') == 'executed_cell' for d in deps):
             try:
@@ -479,38 +509,179 @@ class AskRegistry(EvidenceRegistry):
                 pass
         return (claim['operation'], *(self._calculation_signature(d) for d in deps))
 
+    def requested_scope(self):
+        """Requested shape of the answer, beyond the quantitative operations."""
+        return {'period_separation'} if self.requires_period_separation() else set()
+
+    def requires_period_separation(self):
+        """The question wants each period's value, not one merged figure.
+
+        Generic intent guidance: it never grants scope, never replaces evidence
+        and never names a month, a channel or a measure.
+        """
+        import re
+        import unicodedata
+        question = ''.join(c for c in unicodedata.normalize('NFD', getattr(self, 'question', '').lower())
+                           if unicodedata.category(c) != 'Mn')
+        pattern = (r'\bpor separado\b|\bseparad[oa]s?\b|\bcada mes\b|\bmes a mes\b|\bmes por mes\b|'
+                   r'\bpor mes\b|\bpor cada mes\b|\bdesglos\w*\b|\bindividualmente\b|\buno por mes\b')
+        for clause in re.split(r'[.;!?\n]|\bpero\b', question):
+            for hit in re.finditer(pattern, clause):
+                if not re.search(r'\b(?:no|sin|evitar)\b[^,]*$', clause[:hit.start()]):
+                    return True
+        return False
+
+    def _manifests_of(self, claim):
+        """Evidence manifests a verified claim is bound to (never inferred)."""
+        if claim.get('kind') == 'executed_cell':
+            return [self._executed_cell(claim)[1][0]]
+        found = []
+        for dependency in claim.get('dependencies') or []:
+            if isinstance(dependency, dict):
+                found.extend(self._manifests_of(dependency))
+        return found
+
+    def requested_calculations(self):
+        """Extend the existing verifier's question-intent checks, not a router.
+
+        Intent is guidance only; every operand still needs issued, authorized
+        evidence. Negative clauses do not create a requested operation.
+        """
+        import re
+        import unicodedata
+        question = ''.join(c for c in unicodedata.normalize('NFD', getattr(self, 'question', '').lower())
+                           if unicodedata.category(c) != 'Mn')
+        patterns = {
+            'share': r'\bparticipacion\b|\bque (?:parte|porcentaje)\b|\bque proporcion\b(?! entre\b)|\bproporcion de\b|\bporcentaje (?:del|sobre|de las|de los)\b',
+            'percent_change': r'\bvariacion\b|\bcrecimiento\b|\bcambio porcentual\b|\baumento porcentual\b',
+            'subtract': r'\bdiferencia absoluta\b|\bresta\b',
+            'ratio': r'\bratio\b|\bproporcion entre\b|\brazon entre\b',
+        }
+        requested = set()
+        for clause in re.split(r'[.;!?\n]|\bpero\b', question):
+            for operation, pattern in patterns.items():
+                for hit in re.finditer(pattern, clause):
+                    if not re.search(r'\b(?:no|sin|evitar)\b[^,]*$', clause[:hit.start()]):
+                        requested.add(operation)
+        return requested
+
+    def _operand_scope(self, claim, *, issued_cell=None):
+        """Comparable metric and exact conjunctive scope from admitted AST/data.
+
+        Unknown boolean shapes fail closed for subset accreditation; aliases and
+        model-authored descriptions are never a population/measure contract.
+        """
+        from .claim_evidence import clean
+        if claim.get('kind') != 'executed_cell':
+            raise ValueError('direct_operands_required_for_subset_accreditation')
+        issued = issued_cell or self._executed_cell(claim)
+        _, (_, node, source, index, row) = issued
+        expr = node['select_list'][index]
+        def normalized(value):
+            if isinstance(value, dict):
+                return {k: ([v[-1]] if k == 'column_names' else normalized(v)) for k, v in clean(value).items()}
+            if isinstance(value, list): return [normalized(v) for v in value]
+            return value
+        def atoms(value):
+            if value is None: return set()
+            if value.get('type') == 'CONJUNCTION_AND':
+                return set().union(*(atoms(v) for v in value['children']))
+            if value.get('class') not in {'COMPARISON', 'OPERATOR'}:
+                raise ValueError('conjunctive_population_scope_required')
+            if value.get('class') == 'OPERATOR' and value.get('type') not in {'OPERATOR_IS_NULL', 'OPERATOR_IS_NOT_NULL'}:
+                raise ValueError('conjunctive_population_scope_required')
+            return {canonical(normalized(value))}
+        predicates = atoms(node.get('where_clause'))
+        argument = expr.get('children', [{}])[0] if expr.get('children') else expr
+        if argument.get('class') == 'CASE':
+            predicates |= atoms(argument['case_checks'][0]['when_expr'])
+        for group in node['group_expressions']:
+            indexes = [i for i,e in enumerate(node['select_list']) if clean(e) == clean(group)]
+            if len(indexes) != 1: raise ValueError('group_not_bound')
+            predicates.add(canonical(dict(group=normalized(group), value=row[indexes[0]])))
+        return self._calculation_signature(claim, issued_cell=issued), predicates
+
     def _calculation(self, claim, depth=0):
-        from decimal import Decimal, localcontext, ROUND_HALF_UP
+        from decimal import Decimal
         if depth > 3 or not isinstance(claim, dict):
             raise ValueError('bounded_calculation_required')
         if claim.get('kind') == 'executed_cell':
             return self._executed_cell(claim)[0]
         if claim.get('kind') != 'calculation':
             raise ValueError('unsupported_execution_claim')
+        if claim.get('operation') not in {'subtract', 'percent_change', 'share', 'ratio'}:
+            raise ValueError('unsupported_calculation')
         dependencies = claim.get('dependencies')
         if not isinstance(dependencies, list) or len(dependencies) != 2:
             raise ValueError('two_evidence_dependencies_required')
         a, b = (self._calculation(d, depth+1) for d in dependencies)
         if not isinstance(a, Decimal) or not isinstance(b, Decimal):
             raise ValueError('numeric_calculation_dependencies_required')
+        net_pair = False
         if claim.get('operation') == 'subtract' and all(d.get('kind') == 'executed_cell' for d in dependencies):
             sources = [self._executed_cell(d)[1][2] for d in dependencies]
             if sources == ['sales_document', 'credit_memo_document']:
                 if self._document_scope(dependencies[0])[1] != self._document_scope(dependencies[1])[1]:
                     raise ValueError('net_document_scopes_must_match')
+                net_pair = True
+        signatures = [self._calculation_signature(d) for d in dependencies]
+        scopes = ([self._operand_scope(d)[1] for d in dependencies]
+                  if not net_pair and all(d.get('kind') == 'executed_cell' for d in dependencies) else None)
+        return self.calculate_pair(claim.get('operation'), a, b, signatures, scopes, net_pair=net_pair)
+
+    @staticmethod
+    def calculate_pair(operation, a, b, signatures, scopes, *, net_pair=False):
+        """Same business checks for live cells and authorized durable references."""
+        from decimal import Decimal, localcontext, ROUND_HALF_UP
+        if not all(isinstance(v, Decimal) and v.is_finite() for v in (a, b)):
+            raise ValueError('finite_numeric_operands_required')
+        if operation in {'subtract', 'absolute_difference', 'add'} and not net_pair:
+            if canonical(signatures[0]) != canonical(signatures[1]):
+                raise ValueError('difference_requires_compatible_measures')
+        if scopes is not None and not net_pair:
+            units = [{p for p in predicates if any('"' + key + '"' in p
+                for key in ('currency', 'unit', 'uom', 'inventory_uom_id'))} for predicates in scopes]
+            if units[0] != units[1]:
+                raise ValueError('calculation_units_or_currency_scope_mismatch')
         with localcontext() as ctx:
             ctx.prec = 50
-            if claim.get('operation') == 'subtract':
+            if operation == 'subtract':
                 return a-b
-            if claim.get('operation') == 'percent_change':
-                if self._calculation_signature(dependencies[0]) != self._calculation_signature(dependencies[1]):
+            if operation == 'absolute_difference':
+                return abs(a-b)
+            if operation == 'add':
+                return a+b
+            if operation in {'percent_change', 'share', 'ratio'}:
+                if canonical(signatures[0]) != canonical(signatures[1]):
                     raise ValueError('percent_change_requires_comparable_measures_not_delta_and_base')
+                if b == 0:
+                    raise ValueError('nonzero_denominator_required')
+                if operation == 'share':
+                    signature = signatures[0]
+                    if signature[0] != 'source_metric' or signature[2] not in {'sum', 'count', 'count_star'}:
+                        raise ValueError('additive_part_and_total_required')
+                    if scopes is None:
+                        raise ValueError('direct_operands_required_for_subset_accreditation')
+                    numerator, denominator = scopes
+                    if not denominator <= numerator:
+                        raise ValueError('share_requires_part_within_same_scoped_total')
+                    if b <= 0 or a < 0 or a > b:
+                        raise ValueError('share_requires_nonnegative_part_and_positive_total')
+                    return (a/b*100).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                if operation == 'ratio':
+                    return a/b
                 return ((a-b)/b*100).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         raise ValueError('unsupported_calculation')
 
     def _execution_claim(self, claim):
         from decimal import Decimal, InvalidOperation
         try:
+            requested = self.requested_calculations()
+            if (claim.get('kind') == 'calculation' and requested
+                    and claim.get('operation') not in requested):
+                # Net subtraction may remain a component, not a substitute for
+                # the requested top-level share/change/ratio/difference.
+                raise ValueError('calculation_does_not_answer_requested_operation')
             value = self._calculation(claim)
             # Values are optional assertions, never the delivered source of truth.
             if 'value' in claim and (not isinstance(claim['value'], str)
@@ -561,6 +732,33 @@ class AskRegistry(EvidenceRegistry):
 
     def final_feedback(self, claims, *, net_required=False):
         """Model labels cannot replace comparable invoice/credit evidence."""
+        requested = self.requested_calculations()
+        present = {c.get('operation') for c in claims if c.get('kind') == 'calculation'
+                   and self._execution_claim(c).get('match')}
+        if claims and requested - present:
+            return ('Requested quantitative operations still missing: ' + ', '.join(sorted(requested - present))
+                    + '. share=part/total*100; percent_change=(current-base)/base*100; '
+                    'subtract=current-base; ratio=numerator/denominator. Reuse issued cells; '
+                    'do not re-query already observed components or substitute one operation for another.')
+        if claims and self.requires_period_separation():
+            # A consolidated value is not a per-period answer: the figure must be
+            # bound to its own observed scope, never to the merged window only.
+            scopes = set()
+            for claim in claims:
+                if not isinstance(claim, dict) or claim.get('kind') not in {'executed_cell', 'calculation'}:
+                    continue
+                if not self.verify(claim).get('match'):
+                    continue
+                for manifest in self._manifests_of(claim):
+                    # The executed scope of the evidence: publication window plus the
+                    # query's own filter. A merged query has one scope, never two.
+                    scopes.add(canonical([list(str(value) for value in manifest.temporal_scope),
+                                          manifest.filter_expression]))
+            if len(scopes) < 2:
+                return ('The question asks for each period shown separately. Bind every figure to its own '
+                        'period (one aggregate per period, or GROUP BY the period) and submit those cells. '
+                        'One consolidated value over the merged window does not answer a per-period request, '
+                        'and the merged total must not be presented as the periods.')
         def net_pair(claim):
             if claim.get('kind') == 'calculation':
                 deps = claim.get('dependencies', [])
@@ -766,9 +964,10 @@ class AskRegistry(EvidenceRegistry):
                 # leaf through the same authorized registry as verification.
                 value = self._calculation(ref)
                 a, b = ref['dependencies']
-                label = 'Variación porcentual' if ref['operation'] == 'percent_change' else 'Diferencia'
+                label = {'percent_change': 'Variación porcentual', 'share': 'Participación',
+                         'ratio': 'Proporción', 'subtract': 'Diferencia'}[ref['operation']]
                 return (label + ' = ' + number(value)
-                        + (' %' if ref['operation'] == 'percent_change' else '')
+                        + (' %' if ref['operation'] in {'percent_change', 'share'} else '')
                         + ' (' + cell_text(a) + '; ' + cell_text(b) + ')')
             value, (m, node, source, index, row) = self._executed_cell(ref)
             scope = scope_text(node)
@@ -803,13 +1002,14 @@ class AskRegistry(EvidenceRegistry):
                     entry['cells'].append(text)
                 continue
             dependencies = claim['dependencies']
-            label = 'Variación porcentual' if claim['operation'] == 'percent_change' else 'Diferencia'
+            label = {'percent_change': 'Variación porcentual', 'share': 'Participación',
+                     'ratio': 'Proporción', 'subtract': 'Diferencia'}[claim['operation']]
             if claim['operation'] == 'subtract' and all(d.get('kind') == 'executed_cell' for d in dependencies):
                 sources = [self._executed_cell(d)[1][2] for d in dependencies]
                 if sources == ['sales_document', 'credit_memo_document']:
                     label = 'Ventas netas documentales (facturas − notas de crédito)'
             derived.append(label+' = '+number(self._calculation(claim))
-                          +(' %' if claim['operation'] == 'percent_change' else '')
+                          +(' %' if claim['operation'] in {'percent_change', 'share'} else '')
                           +'\n  A: '+cell_text(dependencies[0])+'\n  B: '+cell_text(dependencies[1]))
         lines, numbered = [], len(rows) > 1
         for position, entry in enumerate(rows.values(), 1):

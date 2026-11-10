@@ -53,6 +53,8 @@ class DiscoveredSource:
     relation: str  # private trusted reference; never placed in model metadata
     columns: tuple[Column, ...]
     limitations: tuple[str, ...]
+    # Receipts for existing backend projections, not a second join catalog.
+    projection_contracts: tuple[dict, ...] = ()
 
 
 def discover(db, access, *, allowed_sources=None):
@@ -207,6 +209,13 @@ def classify_authorized_products(db, sources, policies, scope):
             + f' FROM {products.relation} p LEFT JOIN {crosswalk}'
             + " ON p.item_code=b.item_code AND p.source_system=b.source_system)",
         columns=products.columns + tuple(Column(f, 'VARCHAR', True) for f in fields[1:]),
+        projection_contracts=products.projection_contracts + (dict(
+            origin='classify_authorized_products',
+            version='TELCHI_PRODUCT_BUSINESS_CLASSIFICATION_V1',
+            sources=sorted(names), authority='CHECKED_BACKEND_PROJECTION_ONLY',
+            relationship='ref_products.item_code = material_supply_status.item_code; SAP_HANA products only',
+            checks=['bounded unique product evidence', 'all input sources and columns authorized'],
+            limitations=['Current published evidence, not historical classification or a general join grant.']),),
         limitations=products.limitations + (
             'product_business_type uses existing TELCHI_PRODUCT_BUSINESS_CLASSIFICATION_V1 '
             'on published SAP groups plus material_supply_status structural evidence; '
@@ -272,6 +281,19 @@ def enrich_authorized_sales_lines(db, sources, policies, scope):
         + " AND l.source_system=p._line_source_system"
         + f" LEFT JOIN {relations['c']} c ON d.card_code=c.code)")
     enriched = replace(line, relation=relation, columns=line.columns + tuple(extra),
+        projection_contracts=line.projection_contracts + (dict(
+            origin='enrich_authorized_sales_lines', version='1', sources=sorted(names),
+            authority='CHECKED_BACKEND_PROJECTION_ONLY',
+            relationships=[
+                'sales_line -> sales_document: doc_entry + source_system; INV1 -> OINV only',
+                'sales_line -> ref_products: item_code; SAP_B1_HANA -> SAP_HANA only',
+                'sales_document -> ref_customers: card_code -> code; SAP_HANA customers only'],
+            cardinality='LEFT many-to-one; right keys checked unique in this binding',
+            measure='line_total unchanged; never sum header doc_total after joining lines',
+            grain='Original sales_line population retained; missing dimensions remain NULL',
+            checks=['right-key uniqueness after source predicates', 'all input sources and columns authorized'],
+            limitations=['Use projected columns directly; not accreditation of arbitrary raw-source joins.',
+                         'No complete calendar, historical classification or net-billing accreditation.']),),
         limitations=line.limitations + (
             'Document/product/customer columns are many-to-one published SAP dimensions '
             'with checked key uniqueness; unmatched rows retain NULL dimensions. '
@@ -320,9 +342,104 @@ def binding_for(context):
     return entry[1]
 
 
+# Adapter from the existing published dimension projections to workspace meanings.
+# No definitions, grants or join rules live here; unknown mappings are withheld.
+DIMENSION_CONTRACTS = {
+    'commercial_channel': {
+        'sales_document': ('sales_channel_code', 'sales_channel_name'),
+        'credit_memo_document': ('sales_channel_code', 'sales_channel_name')},
+    'product_business_type': {
+        'ref_products': ('product_business_type', 'classification_status', 'classification_rule_id')},
+}
+
+
+def authorized_business_resolution(resolution, scope, policies, available_sources=None):
+    """Filter BEFORE interpreter/audit as well as before investigator transport."""
+    from copy import deepcopy
+    result = deepcopy(resolution or {})
+    for key in ('concepts', 'interpretation_concepts', 'context_concepts'):
+        selected = []
+        for concept in result.get(key, []):
+            if (concept.get('approval_status') != 'published'
+                    or concept.get('workspace_id') not in (None, scope.workspace)):
+                continue
+            dimension = concept.get('operational_context', {}).get('dimension')
+            contracts = DIMENSION_CONTRACTS.get(dimension, {})
+            allowed = []
+            for source, columns in contracts.items():
+                if available_sources is not None and (source not in available_sources
+                        or not set(columns) <= {c.name for c in available_sources[source].columns}):
+                    continue
+                matches = [p for p in policies if p.source == source
+                    and p.organization == scope.organization and p.workspace == scope.workspace
+                    and p.whole_dataset and p.permission in scope.permissions
+                    and (p.columns is None or set(columns) <= set(p.columns))]
+                if len(matches) == 1:
+                    allowed.append(source)
+            if not allowed:
+                continue
+            concept.pop('related_evidence', None)  # No accredited entity/rule source mapping.
+            concept['source_applicability'] = dict(dimension=dimension, sources=sorted(allowed),
+                authority='Published workspace meaning on authorized dimensions; not historical data or join accreditation')
+            selected.append(concept)
+        result[key] = selected
+    if not result.get('interpretation_concepts') and not result.get('context_concepts'):
+        result.update(status='unknown', ambiguous=False)
+    # Preserve the original veto without disclosing rejected contract identities.
+    result['semantic_guard'] = dict(requires_clarification=bool(
+        (resolution or {}).get('semantic_guard', {}).get('requires_clarification')))
+    return result
+
+
+def selected_business_knowledge(envelope, scope, publication, snapshot):
+    """Transport the EXISTING resolver's selected meanings, not a SQL authority.
+
+    The semantics repository authorizes published meanings at workspace scope.
+    Its entity/rule evidence has no SourcePolicy mapping today: withhold that
+    evidence rather than leak source-specific IDs or promote it to known joins.
+    Publication applicability must still be established by the investigator.
+    """
+    if not envelope:
+        return {}
+    receipt = envelope.get('scope', {})
+    if any(receipt.get(k) != v for k, v in (
+            ('user_id', scope.user_id), ('organization', scope.organization),
+            ('workspace', scope.workspace), ('permissions', sorted(scope.permissions)))):
+        raise Rejected('knowledge_scope_mismatch', Decision.DENY)
+    resolution = envelope.get('resolution') or {}
+    selected, seen = [], set()
+    for concept in (resolution.get('interpretation_concepts', [])
+                    + resolution.get('context_concepts', [])):
+        key = (concept.get('concept_id'), concept.get('version'))
+        if key in seen or concept.get('approval_status') != 'published':
+            continue
+        if concept.get('workspace_id') not in (None, scope.workspace):
+            raise Rejected('knowledge_scope_mismatch', Decision.DENY)
+        seen.add(key)
+        selected.append({k: concept[k] for k in (
+            'concept_id', 'semantic_code', 'version', 'canonical_name', 'definition',
+            'concept_type', 'source', 'approval_status', 'operational_context',
+            'match', 'score', 'selection_reason', 'source_applicability') if k in concept})
+        if len(selected) == 6:
+            break
+    if not selected:
+        return {}
+    result = dict(concepts=selected, publication=publication, snapshot=str(snapshot),
+        authority='Published workspace business meanings; not Foundation dataset accreditation or SQL authority.',
+        limitations=[
+            'Approximate matches remain candidates; resolve ambiguity against the question and observed data.',
+            'Entity/rule evidence withheld: no accredited SourcePolicy/column mapping in the semantic repository.',
+            'Do not infer historical validity, source coverage, measures or permitted joins from a business definition.',
+            'Exploratory findings never become permanent business rules automatically.'])
+    from .validator import canonical
+    if len(canonical(result).encode()) > 12000:
+        raise Rejected('knowledge_context_budget', Decision.DENY)
+    return result
+
+
 class ResearchBinding:
     def __init__(self, *, resolve_scope, scope, publication, snapshot, sources,
-                 policies, investigation_id, budget=None):
+                 policies, investigation_id, budget=None, business_knowledge=None):
         """resolve_scope reuses backend effective authorization on EVERY access.
 
         It must return a fresh EffectiveScope (including current identity/tenant
@@ -332,6 +449,12 @@ class ResearchBinding:
         self.resolve_scope = resolve_scope
         self.scope = scope
         self.policies = tuple(policies)
+        if business_knowledge:
+            business_knowledge = dict(business_knowledge, resolution=authorized_business_resolution(
+                business_knowledge.get('resolution'), scope, self.policies,
+                available_sources={s.name: s for s in sources}))
+        self.business_knowledge = selected_business_knowledge(
+            business_knowledge, scope, publication, snapshot)
         selected, projections = [], {}
         for source in sources:
             matches = [p for p in self.policies if p.source == source.name
@@ -349,6 +472,29 @@ class ResearchBinding:
             # scanned or join work. Derived LIMITs can prove smaller bounds.
             selected.append(LogicalTable(source.name, columns, p.permission, (), 1000000, source.limitations))
             projections[source.name] = source.relation
+        # A projection receipt may mention several sources: expose it only if
+        # EVERY dependency has one full, currently authorized SourcePolicy.
+        # Serialize on the selected table so progressive discovery supplies only
+        # relevant receipts, never unrelated source names or physical relations.
+        import hashlib
+        import inspect
+        from .validator import canonical
+        # Version the transport separately from business accreditation. Pin the
+        # actual existing projection implementation, not an invented rule version.
+        projection_versions = {f.__name__: hashlib.sha256(inspect.getsource(f).encode()).hexdigest()
+            for f in (classify_authorized_products, enrich_authorized_sales_lines)}
+        full_sources = {s.name for s in sources if len([p for p in self.policies
+            if p.source == s.name and p.organization == scope.organization
+            and p.workspace == scope.workspace and p.permission in scope.permissions
+            and p.whole_dataset and p.columns is None]) == 1}
+        source_map = {s.name: s for s in sources}
+        selected = [replace(t, semantic_constraints=t.semantic_constraints + tuple(
+            'Backend projection receipt: ' + canonical(dict(receipt,
+                publication=publication, snapshot=str(snapshot),
+                implementation_sha256=projection_versions.get(receipt['origin'])))
+            for receipt in source_map[t.name].projection_contracts
+            if t.name in full_sources and set(receipt['sources']) <= full_sources))
+            for t in selected]
         self.projections = MappingProxyType(projections)
         catalog = Catalog('telchi_authorized_foundation_dev_v1', scope.organization,
                           scope.workspace, publication, str(snapshot), tuple(selected), (), False)
@@ -453,11 +599,8 @@ def describe_authorized_dimensions(db, sources, policies, scope):
     ceiling is explicit so a truncated vocabulary never looks complete.
     """
     from .validator import canonical
-    dimensions = {
-        'sales_document': ('sales_channel_code', 'sales_channel_name'),
-        'credit_memo_document': ('sales_channel_code', 'sales_channel_name'),
-        'ref_products': ('product_business_type', 'classification_status', 'classification_rule_id'),
-    }
+    dimensions = {source: fields for contracts in DIMENSION_CONTRACTS.values()
+                  for source, fields in contracts.items()}
     described = []
     for source in sources:
         fields = dimensions.get(source.name, ())
@@ -480,7 +623,8 @@ def describe_authorized_dimensions(db, sources, policies, scope):
     return tuple(described)
 
 
-def open_binding(*, reader, resolve_scope, policies, investigation_id, budget=None):
+def open_binding(*, reader, resolve_scope, policies, investigation_id, budget=None,
+                 business_knowledge=None):
     """Resolve one publication and discover its actual schemas, guarded before I/O."""
     from .foundation import host_read_preflight
     scope = resolve_scope()
@@ -502,7 +646,8 @@ def open_binding(*, reader, resolve_scope, policies, investigation_id, budget=No
         sources = describe_authorized_dimensions(db, sources, policies, scope)
         binding = ResearchBinding(resolve_scope=resolve_scope, scope=scope,
             publication=access.foundation_publication_id, snapshot=access.ducklake_snapshot_id,
-            sources=sources, policies=policies, investigation_id=investigation_id, budget=budget)
+            sources=sources, policies=policies, investigation_id=investigation_id, budget=budget,
+            business_knowledge=business_knowledge)
     return binding, gaps
 
 

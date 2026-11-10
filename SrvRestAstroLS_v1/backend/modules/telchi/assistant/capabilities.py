@@ -33,6 +33,36 @@ class ProductResolutionError(ValueError):
         self.reason = reason
 
 
+def representation_problem(state, *, allowed_breakdowns):
+    """Whether the requested representation is executable by one operation.
+
+    Single source of truth for admission AND execution. A capability is never
+    available because it recognizes the measure while silently dropping the
+    requested breakdown, period set or granularity, and a period set is never
+    merged into one value without the caller declaring that consolidation.
+    """
+    from .state_engine import merge_periods
+    breakdown = state.get('breakdown_by')
+    if breakdown not in allowed_breakdowns:
+        return Availability(False, 'El desglose solicitado no está acreditado para esta operación; '
+                            'no lo sustituyo por un total.', 'DIMENSION_NOT_ACCREDITED')
+    periods = state.get('periods')
+    if breakdown == 'period':
+        if not periods or len(periods) < 2:
+            return Availability(False, 'El desglose por mes necesita el conjunto de períodos.', 'PERIOD_SET_UNSUPPORTED')
+        merged = merge_periods(periods)
+        if merged is None:
+            return Availability(False, 'El conjunto de períodos no es contiguo: no puedo separar meses sin '
+                                'perder o duplicar días.', 'PERIOD_SET_UNSUPPORTED')
+        if state.get('period') is not None and state['period'] != merged:
+            return Availability(False, 'El conjunto de períodos no cubre la ventana solicitada.', 'PERIOD_SET_UNSUPPORTED')
+        return None
+    if periods and merge_periods(periods) is None:
+        return Availability(False, 'El conjunto de períodos no es contiguo: no puedo consolidarlo sin perder '
+                            'o duplicar días.', 'PERIOD_SET_UNSUPPORTED')
+    return None
+
+
 class SalesCapabilities:
     def __init__(self, *, query=query_fixed_sales, sales_query=query_sales, product_query=query_products, category_query=None, ranking_query=None, commercial_query=None, timeout_seconds=60):
         from modules.telchi.datalake.category_line_amount_query import query_category_line_amount
@@ -57,6 +87,11 @@ class SalesCapabilities:
         validate(state)
         if state['pending']:
             return Availability(False, 'Todavía falta resolver una aclaración.', 'CAPABILITY_MISSING')
+        if state['metric'] is None:
+            # No measure was selected: this is incomplete interpretation, not a
+            # business unavailability and not a denied operation.
+            return Availability(False, 'La interpretación no determinó una operación de medida acreditada '
+                                'para esta consulta; no se ejecutó ningún sustituto.', 'INTENT_INCOMPLETE')
         metrics = state.get('requested_metrics') or [state['metric']]
         from modules.telchi.datalake.operational_query import OPERATIONS, SNAPSHOT_METRICS
         if state['metric'] in OPERATIONS:
@@ -117,12 +152,19 @@ class SalesCapabilities:
             if state['comparison']:
                 return Availability(False, 'Todavía no puedo calcular la diferencia entre períodos en esta conversación. '
                                     'Los importes consultados siguen disponibles; no voy a inventar una comparación.', 'COMPARISON_UNSUPPORTED')
-            if state.get('entity_mention') or state['branches'] or state['sales_channel'] not in (None, 'HORIZONTAL'):
+            if state.get('entity_mention') or state['branches']:
                 return Availability(False, 'El importe documental no admite filtros de entidad, sucursal, canal ni comparación no acreditados. No es un problema con la fecha elegida.', 'MAPPING_MISSING')
+            if state['sales_channel'] not in (None, 'HORIZONTAL'):
+                return Availability(False, 'El canal solicitado no tiene una clasificación materializada acreditada '
+                                    'para el importe documental; no lo sustituyo por otro canal ni por un total global.',
+                                    'CHANNEL_NOT_ACCREDITED')
             if state.get('temporal_reference'):
                 return Availability(False, 'La cobertura global no acredita todavía un mes monetario por entidad.', 'TEMPORAL_METADATA_MISSING')
             if not state['period']:
                 return Availability(False, 'La facturación requiere un período concreto.', 'PERIOD_UNRESOLVED')
+            problem = representation_problem(state, allowed_breakdowns={None, 'period'})
+            if problem is not None:
+                return problem
             # A single-row aggregate has no rows to limit: `/limit` belongs to the
             # row-producing operation that requested it and is not a parameter of
             # this one. It never makes the aggregate unavailable.
@@ -167,9 +209,17 @@ class SalesCapabilities:
         if state.get('comparison') and state.get('group_by') != 'physical_state':
             return Availability(False, 'Esta operación no lleva un período de comparación: la comparación entre '
                                 'meses se lee con el desglose por mes del conjunto de períodos.', 'COMPARISON_UNSUPPORTED')
-        if (metrics != ['sales.commercial_line_amount_by'] or state['branches']
-                or state['sales_channel']
-                or state.get('temporal_reference') or state.get('selected_item_codes')
+        if metrics != ['sales.commercial_line_amount_by'] or state['branches']:
+            return Availability(False, 'Esta operación comercial no admite esos filtros o métricas.', 'MAPPING_MISSING')
+        if state['sales_channel']:
+            # The accredited commercial line reader has no materialized channel
+            # classification: claiming the amount for a channel would substitute
+            # the requested dimension. Never routed to a channel-agnostic total.
+            return Availability(False, 'El importe de líneas comerciales no tiene una clasificación de canal '
+                                'acreditada; no lo sustituyo por un total sin canal. El canal horizontal sí está '
+                                'acreditado para la facturación neta documental por período.',
+                                'CHANNEL_NOT_ACCREDITED')
+        if (state.get('temporal_reference') or state.get('selected_item_codes')
                 or state.get('product_context')
                 or state.get('semantic_references')):
             return Availability(False, 'Esta operación comercial no admite esos filtros o métricas.', 'MAPPING_MISSING')
@@ -189,8 +239,9 @@ class SalesCapabilities:
             return Availability(False, 'La categoría solicitada no está acreditada.', 'CATEGORY_CAPABILITY_UNAVAILABLE')
         if not state.get('group_by'):
             return Availability(False, 'Necesito saber si agrupo el importe por producto o por cliente facturado.', 'DIMENSION_NOT_ACCREDITED')
-        if state.get('breakdown_by') == 'period' and not state.get('periods'):
-            return Availability(False, 'El desglose por mes necesita el conjunto de períodos.', 'PERIOD_SET_UNSUPPORTED')
+        problem = representation_problem(state, allowed_breakdowns={None, 'period', 'day', 'products'})
+        if problem is not None:
+            return problem
         if not state.get('period'):
             return Availability(False, 'Esta consulta comercial requiere un período concreto.', 'PERIOD_UNRESOLVED')
         from .business_plan import build, PlanError
@@ -206,6 +257,44 @@ class SalesCapabilities:
                 return Availability(False, 'El desglose por mes necesita el conjunto de períodos.', 'PERIOD_SET_UNSUPPORTED')
             return Availability(False, 'El alcance solicitado excede el contrato comercial acreditado.', 'MAPPING_MISSING')
         return Availability(True)
+
+    def verify_representation(self, state, result):
+        """Requested scope equals executed scope: measure, channel, periods, grain.
+
+        A consolidated value never satisfies a per-period breakdown, a different
+        channel is never presented as the requested one, and a period set is
+        never answered with fewer or other periods. Deterministic: no new
+        verifier and no model call.
+        """
+        from .state_engine import scope_window
+        from modules.telchi.datalake.sales_query import MONETARY_OPERATION
+        window = scope_window(state)
+        periods = [dict(p) for p in (state.get('periods') or [])]
+        breakdown = state.get('breakdown_by')
+        capability = result.get('capability')
+        if capability == MONETARY_OPERATION + '.v1':
+            window = window or {}
+            got = result.get('period') or {}
+            if ((got.get('date_from'), got.get('date_to_exclusive'))
+                    != (window.get('start'), window.get('end_exclusive'))):
+                raise ValueError('capability_scope_mismatch')
+            if state.get('sales_channel'):
+                if (result.get('sales_channel') != state['sales_channel']
+                        or result.get('channel_semantic_status') != 'CONFIRMED'):
+                    raise ValueError('capability_scope_mismatch')
+            elif result.get('sales_channel') is not None:
+                raise ValueError('capability_scope_mismatch')
+            if breakdown == 'period':
+                if ([row.get('period') for row in result.get('rows') or []] != periods
+                        or result.get('granularity') != 'per_period'):
+                    raise ValueError('capability_scope_mismatch')
+            elif periods and result.get('scope') != 'UNION_CONSOLIDATED':
+                raise ValueError('capability_scope_mismatch')
+        elif capability == 'sales.commercial_line_amount_by.v1' and breakdown == 'period':
+            got = [dict(entry.get('period') or {}) for entry in result.get('period_breakdown') or []]
+            if got != periods:
+                raise ValueError('capability_scope_mismatch')
+        return result
 
     def required_permissions(self, state):
         if state.get('analysis_categories'):
@@ -282,10 +371,19 @@ class SalesCapabilities:
                            date_to_exclusive=state['period']['end_exclusive'], currency='BS')
             if state['sales_channel']:
                 options['sales_channel'] = state['sales_channel']
+            periods = [dict(p) for p in (state.get('periods') or [])]
+            breakdown = state.get('breakdown_by')
+            if breakdown == 'period':
+                # The accredited reader aggregates each declared period on its own.
+                options['periods'] = periods
             result = await self.sales_query(MONETARY_OPERATION, options, timeout_seconds=self.timeout_seconds)
             result = validate_result(MONETARY_OPERATION, options, result)
+            if periods and breakdown != 'period':
+                # A declared union is an explicitly consolidated scope. It is
+                # declared in the result and in the answer, never silent.
+                result['scope'] = 'UNION_CONSOLIDATED'
             result['requested_metrics'] = state.get('requested_metrics') or [state['metric']]
-            return result
+            return self.verify_representation(state, result)
         if state['metric'] in PERMISSIONS:
             options = {'limit': state.get('limit', 10)} if state['metric'] == 'sales.latest_documents' else {}
             result = await self.sales_query(state['metric'], options, timeout_seconds=self.timeout_seconds)
@@ -449,6 +547,47 @@ def business_money(value):
     return f'{Decimal(value):,.2f}'.translate(str.maketrans({',': '.', '.': ','}))
 
 
+def format_monetary_breakdown(result):
+    """One accredited amount per period, each named with its own window.
+
+    The set is never presented as one merged figure, and the total is declared
+    as the sum of the periods, not as the answer to the question.
+    """
+    from .business_scope import month_label
+    rows = result['rows']
+    total = result.get('total') or {}
+    channel_label = ('Canal horizontal / DMS (venta de calle). '
+                     if result.get('sales_channel') == 'HORIZONTAL' else '')
+    money = lambda key, row: business_money(row[key])
+    lines = [f"{month_label(row['period'])}: venta neta documental Bs {money('net_amount', row)} "
+             f"(facturado Bs {money('billed_amount', row)}; notas de crédito Bs {money('credit_amount', row)})"
+             for row in rows]
+    if all(int(row['invoice_count']) == 0 and int(row['credit_count']) == 0 for row in rows):
+        return (channel_label + 'No hay documentos publicados en BS en los períodos solicitados. '
+                'No puedo acreditar una facturación de cero ni la cobertura completa de esos meses. '
+                f"Información actualizada al {business_date(result['source']['updated_at'])}.")
+    text = channel_label + 'Venta neta documental por mes, cada importe en su propio período:\n'
+    text += '\n'.join('· ' + line for line in lines)
+    text += (f"\n\nTotal de los {len(rows)} períodos (no reemplaza el desglose): Bs {money('net_amount', total)} "
+             f"(facturado Bs {money('billed_amount', total)}; notas de crédito Bs {money('credit_amount', total)}). "
+             'Facturas y notas de crédito activas en BS, por fecha documental, con impuestos y descuentos; '
+             'excluye anuladas. No son cobros ni ingreso contable. ')
+    if result.get('sales_channel') == 'HORIZONTAL':
+        text += ('Canal según series DMS materializadas; los documentos sin clasificación de canal no se atribuyen '
+                 'a ningún canal. No certifica reconciliación completa DMS/origen ni devoluciones no registradas. ')
+    text += 'Cobertura histórica completa no certificada. '
+    source = result['source']
+    last = rows[-1]['period']['end_exclusive']
+    if isinstance(source.get('updated_at'), str) and source['updated_at'][:10] < last:
+        text += 'El conjunto solicitado termina después de la actualización disponible: no es un cierre mensual completo. '
+    text += f"Información actualizada al {business_date(source['updated_at'])}. "
+    if source.get('reference_version'):
+        text += (f"Corte de ventas: {source['sales_cutoff']} (observaciones por consulta, no snapshot transaccional). "
+                 f"Cobertura capturada [{source['coverage_start']}, {source['coverage_end_exclusive']}). "
+                 f"Foundation: {source['publication_id']}; snapshot: {source['snapshot_id']}. ")
+    return text.strip()
+
+
 def format_result(result, scope=None):
     from modules.telchi.datalake.operational_query import CONTRACT as OPERATIONAL_CONTRACT
     if result.get('contract') == OPERATIONAL_CONTRACT:
@@ -547,6 +686,8 @@ def format_result(result, scope=None):
             details += f"\nHasta {period['limit']} líneas; orden fecha, DocEntry y número de línea descendentes. No son facturas completas ni cantidades físicas agregadas. Excluye anuladas y notas de crédito; no es venta neta."
             details += '\nImporte neto por producto no acreditado: LineTotal no resuelve descuentos/impuestos de cabecera y NC. No reparto DocTotal. No sumo unidades incompatibles.'
         return details + f"\nFoundation {result['source']['publication_id']}, snapshot {result['source']['snapshot_id']}."
+    if result['capability'] == MONETARY_OPERATION+'.v1' and result.get('periods'):
+        return format_monetary_breakdown(result)
     if result['capability'] == MONETARY_OPERATION+'.v1':
         row, period = rows[0], result['period']
         from datetime import date, timedelta
@@ -582,6 +723,9 @@ def format_result(result, scope=None):
             response += (f"Corte de ventas: {source['sales_cutoff']} (observaciones por consulta, no snapshot transaccional). "
                          f"Cobertura capturada [{source['coverage_start']}, {source['coverage_end_exclusive']}). "
                          f"Foundation: {source['publication_id']}; Reference: {source['reference_version']}; snapshot: {source['snapshot_id']}. ")
+        if result.get('scope') == 'UNION_CONSOLIDATED':
+            response += ('Los importes corresponden al conjunto de períodos solicitados leído como un solo total; '
+                         'no es un desglose por mes. Si querés cada mes por separado, pedime el desglose mensual. ')
         if 'sales.source_top_items' in result.get('requested_metrics', []):
             response += ('Conservo la solicitud de cantidades: el ranking disponible usa la ventana fija '
                          '01/01–15/09/2026, sin excluir anuladas ni descontar NC; '

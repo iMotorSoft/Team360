@@ -1,6 +1,7 @@
 """Category meaning must not authorize text search, product lines or global totals."""
 import asyncio
 from copy import deepcopy
+from dataclasses import replace
 import json
 
 import httpx
@@ -42,21 +43,51 @@ def test_category_blocks_every_incompatible_execution(metric, code):
             asyncio.run(catalog.execute(state))
 
 
-@pytest.mark.parametrize('action', ['EXECUTE', 'DIRECT_UNAVAILABLE'])
-def test_handler_explains_money_without_search_or_internal_details(action):
+def category_amount(options):
+    """Accredited category aggregate fixture: same contract, no Foundation read."""
+    from modules.telchi.datalake import category_line_amount_query as category
+    return dict(capability=category.CAPABILITY, parameters=options, definition=category.DEFINITION,
+        currency='BS', rows=[dict(key=None, amount='1520.00', product_count=1, line_count=2,
+            document_count=1, first_date='2026-09-10', last_date='2026-09-10')],
+        coverage=dict(first_date='2026-09-10', last_date='2026-09-10', complete=False),
+        classification=dict(version=category.CLASSIFICATION_VERSION, sha256=category.CROSSWALK_SHA256,
+            reference='fixture_reference', quality_lines={'VALIDATED': 2}),
+        source=dict(publication_id=category.PUBLICATION, snapshot_id=category.SNAPSHOT,
+            updated_at='2026-11-04T13:55:47.173006+00:00'),
+        limitations=category.LIMITATIONS, read_only=True, sap_accessed=False)
+
+
+def test_a_representable_category_request_is_executed_not_declared_unavailable():
+    """An interpreter decision is not evidence of business unavailability.
+
+    The committed scope is a complete category amount: the handler resolves it
+    through the accredited operation instead of rendering an invented gap, and
+    no internal identifier reaches the answer.
+    """
     async def run():
-        handler, store, calls, context = setup([category(action=action)])
-        result = await handler.handle(event('cuanto vendimos de materia prima en septiembre'), context)
-        assert result.classification == ('DENIED' if action == 'EXECUTE' else 'DIRECT_UNAVAILABLE')
+        handler, store, calls, context = setup([category(action='DIRECT_UNAVAILABLE')])
+        from modules.telchi.datalake.category_line_amount_query import PERMISSION
+        grant = replace(context, sender_identity=replace(context.sender_identity,
+            permissions=context.sender_identity.permissions | {PERMISSION}))
+        executed = []
+
+        async def query(options, **kwargs):
+            executed.append(options)
+            return category_amount(options)
+        handler.capabilities = SalesCapabilities(sales_query=handler.capabilities.sales_query,
+                                                 category_query=query)
+        result = await handler.handle(event('cuanto vendimos de materia prima en septiembre'), grant)
+        assert result.classification == 'DIRECT_AVAILABLE'
         audit = latest(store)
-        assert audit['committed'] and audit['capability_calls'] == 0 and not calls
+        assert audit['committed'] and audit['capability_calls'] == 1 and not calls
+        assert audit['availability_inconsistency']['proposed_action'] == 'DIRECT_UNAVAILABLE'
+        assert audit['decision'] == 'EXECUTE'
         assert audit['confirmed_state']['metric'] == 'sales.net_amount'
         assert audit['confirmed_state']['period'] == PERIOD
-        if action == 'DIRECT_UNAVAILABLE':
-            assert 'importe de ventas' in result.text and 'materia prima' in result.text
-            assert 'septiembre de 2026' in result.text
-        else:
-            assert 'permiso comercial específico' in result.text
+        assert '1.520,00' in result.text and 'septiembre de 2026' in result.text
+        assert 'todavía no está disponible' not in result.text
+        assert executed == [dict(category='RAW_MATERIAL', currency='BS',
+                                 date_from=PERIOD['start'], date_to_exclusive=PERIOD['end_exclusive'])]
         assert not any(x in result.text for x in ('MAPPING_MISSING', 'RAW_MATERIAL', 'DocTotal', 'OINV', '306', '526'))
     asyncio.run(run())
 

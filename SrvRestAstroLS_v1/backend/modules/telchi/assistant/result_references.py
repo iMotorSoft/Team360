@@ -103,8 +103,12 @@ def research_presentation(saved, owner, conversation_id):
     only a bounded unambiguous list is exposed to the selection interpreter.
     """
     full = saved.get('full_result') or {}
-    cited = {v['claim']['result_id'] for v in full.get('claim_verifications', [])
-             if v.get('match') is True and v.get('claim', {}).get('kind') == 'executed_cell'}
+    def cells(claim):
+        if claim.get('kind') == 'executed_cell':
+            return [claim]
+        return [ref for dependency in claim.get('dependencies', []) for ref in cells(dependency)]
+    verified = [v['claim'] for v in full.get('claim_verifications', []) if v.get('match') is True]
+    cited = {ref['result_id'] for claim in verified for ref in cells(claim)}
     # Coverage/COUNT singleton queries are not competing lists. Keep the one
     # cited grouped entity list even when its answer also cites coverage cells.
     manifests = [m for m in full.get('evidence_manifests', []) if m['result_id'] in cited]
@@ -157,13 +161,14 @@ def research_presentation(saved, owner, conversation_id):
     if not 0 < len(rows) <= 5000:
         return None
     delivered = set(full.get('presentation_pages', {}).get(manifest['result_id'], []))
-    # Product rows intentionally not selected by the answer may be hidden
-    # presentation references. A local page must never resurrect them. Keep
-    # their original full population in PG, not in the referencable product list.
-    if (not complete and any('item_code' in g for g in manifest.get('group_expressions', []))
+    # New manifests retain authorized executed rows omitted only for brevity.
+    # Legacy product presentations lack reusable cell contracts: preserve their
+    # original selection semantics rather than broadening old presentation scope.
+    if ('continuity_cells' not in manifest and not complete
+            and any('item_code' in g for g in manifest.get('group_expressions', []))
             and not any('card_code' in g for g in manifest.get('group_expressions', []))):
-        selected_ids = {v['claim'].get('row_id') for v in full.get('claim_verifications', [])
-                        if v.get('match') is True and v.get('claim', {}).get('result_id') == manifest['result_id']}
+        selected_ids = {ref.get('row_id') for claim in verified for ref in cells(claim)
+                        if ref.get('result_id') == manifest['result_id']}
         row_ids = manifest.get('row_ids', [])
         kept = [(i, row) for i, row in enumerate(rows, 1)
                 if i <= len(row_ids) and row_ids[i-1] in selected_ids]
@@ -179,7 +184,111 @@ def research_presentation(saved, owner, conversation_id):
                 schema=deepcopy(result['schema']), source=dict(
                     publication_id=manifest['publication'], snapshot_id=manifest['snapshot']),
                 research_receipt=deepcopy(saved['receipt']), required_permission=None,
-                question=full.get('question'), manifest=deepcopy(manifest), state={})
+                question=full.get('question'), manifest=deepcopy(manifest),
+                verified_claims=deepcopy(verified), state={})
+
+
+def transform(proposal, result, owner, conversation_id, calculator):
+    """Transform durable issued cells; the model selects references, never values.
+
+    Invocation is bounded and uses the existing AskRegistry business verifier.
+    Authorization is checked by the handler both before and after this function.
+    """
+    from decimal import Decimal
+    if not callable(calculator):
+        raise ValueError('result_calculator_unavailable')
+    if (set(proposal) != {'intent', 'action', 'result_reference', 'transformation', 'clarification'}
+            or proposal['clarification'] is not None or not result
+            or result['capability'] != 'research.executed_result'
+            or result['owner'] != owner or result['conversation_id'] != conversation_id):
+        raise ValueError('result_unavailable')
+    ref = proposal['result_reference']
+    if (not isinstance(ref, dict) or set(ref) != {'result_id', 'ordinal', 'field'}
+            or ref != dict(result_id=result['result_id'], ordinal=None, field=None)):
+        raise ValueError('invalid_transform_reference')
+    spec = proposal['transformation']
+    if not isinstance(spec, dict) or set(spec) != {'operation', 'operands'}:
+        raise ValueError('invalid_transform_contract')
+    operation, operands = spec['operation'], spec['operands']
+    if operation not in {'subtract', 'absolute_difference', 'add', 'percent_change', 'share', 'ratio', 'sort_ascending', 'sort_descending'}:
+        raise ValueError('unsupported_transform')
+    sorting = operation.startswith('sort_')
+    if not isinstance(operands, list) or len(operands) != (1 if sorting else 2):
+        raise ValueError('explicit_operands_required')
+    manifest = result['manifest']
+    row_ids = manifest['row_ids']
+    contracts = manifest.get('continuity_cells', [])
+    def cell(operand):
+        if (not isinstance(operand, dict) or set(operand) != {'ordinal', 'field'}
+                or type(operand['ordinal']) is not int
+                or not 1 <= operand['ordinal'] <= len(result['rows'])
+                or operand['field'] not in result['fields']):
+            raise ValueError('operand_unavailable')
+        position = operand['ordinal'] - 1
+        if position >= len(row_ids):
+            raise ValueError('cell_contract_not_persisted')
+        column = next(c for c in manifest['columns'] if c['alias'] == operand['field'])
+        reference = dict(kind='executed_cell', result_id=manifest['result_id'],
+                         row_id=row_ids[position], column_id=column['column_id'])
+        matches = [c for c in contracts if c['reference'] == reference]
+        if len(matches) != 1:
+            raise ValueError('cell_contract_not_persisted')
+        value = Decimal(str(result['rows'][position][operand['field']]))
+        if not value.is_finite():
+            raise ValueError('finite_operand_required')
+        return value, matches[0], column
+    if sorting:
+        if len(result['rows']) > 50:
+            raise ValueError('bounded_sort_required')
+        field = operands[0]['field']
+        values = {ordinal: cell(dict(ordinal=ordinal, field=field))
+                  for ordinal in range(1, len(result['rows']) + 1)}
+        first = values[1]
+        for candidate in values.values():
+            calculator('subtract', first[0], candidate[0],
+                [first[1]['signature'], candidate[1]['signature']],
+                [set(first[1]['predicates']), set(candidate[1]['predicates'])])
+        ordered = sorted(values,
+            key=lambda ordinal: values[ordinal][0],
+            reverse=operation == 'sort_descending')
+        lines = [f'{i}. ' + ' · '.join(f'{k}: {v}' for k, v in result['rows'][i-1].items()) for i in ordered]
+        text = '\n'.join(lines)
+        if len(text) > 3300:
+            raise ValueError('sorted_result_exceeds_channel_bound')
+        return ordered[0], text + '\nOrden del resultado conservado; no amplía su cobertura.'
+    a, b = [cell(operand) for operand in operands]
+    if operands[0] == operands[1]:
+        raise ValueError('distinct_operands_required')
+    value = calculator(operation, a[0], b[0],
+        [a[1]['signature'], b[1]['signature']],
+        [set(a[1]['predicates']), set(b[1]['predicates'])])
+    # Never label unknown currency as BS. Currency/unit come from admitted scope.
+    predicates = [json.loads(p) for p in a[1]['predicates']]
+    units = []
+    def unit_values(node):
+        if not isinstance(node, dict):
+            return
+        left, right = node.get('left', {}), node.get('right', {})
+        if (left.get('column_names', [None])[-1] in {'currency', 'unit', 'uom', 'inventory_uom_id'}
+                and node.get('type') == 'COMPARE_EQUAL' and right.get('class') == 'CONSTANT'):
+            units.append(str(right['value']['value']))
+    for predicate in predicates:
+        unit_values(predicate)
+    signature = a[1]['signature']
+    if signature[2] in {'count', 'count_star'}:
+        unit = 'documentos' if signature[3] == ['doc_entry'] or signature[3] == ('doc_entry',) else 'registros'
+    else:
+        unit = a[2].get('unit') or (' / '.join(sorted(set(units))) if set(signature[3]) <= {'doc_total', 'line_total'} else '') or 'unidad de la medida fuente'
+    if operation in {'share', 'percent_change'}:
+        unit = '%'
+    elif operation == 'ratio':
+        unit = 'adimensional'
+    labels = {'subtract': 'Diferencia con signo', 'absolute_difference': 'Diferencia absoluta',
+              'add': 'Suma', 'percent_change': 'Variación porcentual', 'share': 'Participación', 'ratio': 'Razón'}
+    descriptions = [f"fila {op['ordinal']}, {op['field']} = {entry[0]}" for op, entry in zip(operands, (a, b))]
+    text = f'{labels[operation]}: {value} {unit}\n' + '\n'.join(descriptions)
+    text += '\nSobre filas publicadas verificadas; no certifica cobertura calendario completa. Sin nueva consulta analítica.'
+    return operands[0]['ordinal'], text
 
 
 def document_selection(proposal, result, selected_ordinal, owner, conversation_id):
@@ -229,11 +338,12 @@ def interpreter_context(result, selected_ordinal=None):
         context.update(next_ordinal=result.get('next_ordinal', 1),
                        rows=deepcopy(result['rows'][:50]), rows_complete=len(result['rows']) <= 50,
                        schema=deepcopy(result['schema']),
-                       question=result['question'], evidence=deepcopy(result['manifest']))
+                       question=result['question'], evidence=deepcopy(result['manifest']),
+                       verified_claims=deepcopy(result.get('verified_claims', [])))
     return context
 
 
-def resolve(proposal, result, selected_ordinal, owner, conversation_id):
+def resolve(proposal, result, selected_ordinal, owner, conversation_id, *, calculator=None):
     """Validate the whole independent contract; no repair, query patch or LLM values."""
     if not isinstance(proposal, dict) or proposal.get('intent') != 'RESULT_REFERENCE':
         raise ValueError('invalid_reference_contract')
@@ -247,6 +357,8 @@ def resolve(proposal, result, selected_ordinal, owner, conversation_id):
             raise ValueError('invalid_reference_clarification')
         # Fixed safe question: never echo model-generated business values.
         return None, '¿A qué lista o elemento de los resultados anteriores te referís?'
+    if proposal.get('action') == 'TRANSFORM_RESULT':
+        return transform(proposal, result, owner, conversation_id, calculator)
     if (set(proposal) != {'intent', 'action', 'result_reference', 'clarification'}
             or proposal['action'] not in {'SELECT_RESULT', 'PAGE_RESULT'} or proposal['clarification'] is not None):
         raise ValueError('invalid_reference_contract')

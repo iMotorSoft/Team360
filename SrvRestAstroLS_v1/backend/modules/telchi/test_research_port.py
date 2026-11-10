@@ -49,7 +49,8 @@ class Service:
     def __init__(self, report=None):
         self.pool, self.report, self.calls = Pool(), report, []
 
-    async def ask_scope(self, resolver, question, save, *, progress=None, conversation_id):
+    async def ask_scope(self, resolver, question, save, *, progress=None, conversation_id,
+                        business_knowledge=None):
         self.calls.append((await resolver(), question, conversation_id))
         return self.report
 
@@ -72,6 +73,7 @@ def port(service, held=('telchi.read.v1',), whole=True, row=None, environment='d
 REPORT = dict(status='READY', business_answer='Respuesta acreditada', clarification='',
               publication='foundation_x', snapshot='1408', question_coverage='COMPLETE',
               reason='', model_calls=[{'model': 'luna'}], sql_executions=3,
+              observation_budget=dict(limit=32768, measured_bytes=41234), partial_verified_figures=2,
               raw_proposal='must never leak', evidence_path='/private/must/not/leak')
 
 

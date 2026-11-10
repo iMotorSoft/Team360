@@ -163,9 +163,19 @@ def configuration():
             or srv.evolution.instance != 'team360-meta-dev'
             or not settings.authorized_sender.isdigit() or not 7 <= len(settings.authorized_sender) <= 15
             or not srv.recipient or os.getenv('TEAM360_DEV_PROFILE')
-            or os.getenv('TEAM360_TELCHI_ASSISTANT_DEV_HTTP') == '1'
-            or os.getenv('TEAM360_BUSINESS_SEMANTICS') == '1'):
+            or os.getenv('TEAM360_TELCHI_ASSISTANT_DEV_HTTP') == '1'):
         raise ValueError('isolated_DEV_configuration_required')
+    semantics = os.getenv('TEAM360_BUSINESS_SEMANTICS')
+    if semantics not in {None, '0', '1'}:
+        raise ValueError('invalid_business_semantics_setting')
+    if semantics == '1':
+        # Validate the SAME restricted role and pinned DEV target used by the
+        # existing composition. Never fall back to the shared privileged pool.
+        from modules.business_semantics.runtime_connection import RestrictedSemanticsConnection
+        path = os.getenv('TEAM360_SEMANTICS_AUTH_CONFIG')
+        if not path:
+            raise ValueError('restricted_semantics_configuration_required')
+        RestrictedSemanticsConnection(path)
     if urlparse(srv.evolution.base_url).hostname not in {'127.0.0.1', 'localhost', '::1'}:
         raise ValueError('local_Evolution_required')
     return srv, settings

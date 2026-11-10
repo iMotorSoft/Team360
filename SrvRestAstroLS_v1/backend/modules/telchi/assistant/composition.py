@@ -6,8 +6,8 @@ Operator must supply an approved business policy and existing Team360 pool.
 from .handler import BusinessAuthorization, PostgresConversationStore, TelchiHandler, registration
 
 
-def create_telchi_app(*, policy, pool=None):
-    from ls_iMotorSoft_Srv05 import create_app
+def create_telchi_handler(*, policy, pool=None):
+    """One functional composition for WhatsApp and internal durable validation."""
     if pool is None:
         # Resolve after the existing Srv05 lifespan opens Team360's pool. No new pool.
         from modules.db.pool import get_pool
@@ -33,6 +33,8 @@ def create_telchi_app(*, policy, pool=None):
     if os.getenv('TEAM360_TELCHI_DURABLE') not in {None, '0', '1'}:
         raise ValueError('Invalid durable rollout setting')
     durable = os.getenv('TEAM360_TELCHI_DURABLE') == '1'
+    if durable and os.getenv('TEAM360_ENV') not in {'dev', 'development'}:
+        raise ValueError('Durable Telchi rollout is DEV only')
     researcher = None
     if os.getenv('TEAM360_TELCHI_FREE_ANALYSIS') == '1':
         # Same investigator as Console, resolved in process from the already
@@ -46,8 +48,15 @@ def create_telchi_app(*, policy, pool=None):
                            turn_timeout_seconds=300 if durable else 80,
                            capabilities=SalesCapabilities(timeout_seconds=180) if durable else None,
                            researcher=researcher)
+    return handler
+
+
+def create_telchi_app(*, policy, pool=None):
+    from ls_iMotorSoft_Srv05 import create_app
+    import os
+    handler = create_telchi_handler(policy=policy, pool=pool)
     app = create_app(messaging_handlers={'telchi': registration(handler)})
-    if durable:
+    if os.getenv('TEAM360_TELCHI_DURABLE') == '1':
         if os.getenv('TEAM360_ENV') not in {'dev', 'development'}:
             raise ValueError('Durable Telchi rollout is DEV only')
         import asyncio

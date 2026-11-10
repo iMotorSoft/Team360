@@ -135,6 +135,26 @@ class BusinessConceptResolver:
             hits=await repo.text_search(conn,organization_id,workspace_id,module,text[:4000],maximum)
             metrics['text_ms']=(perf_counter()-start)*1000
             candidates=[dict(index[h['concept_id']],match='text',score=float(h['score'])) for h in hits if h['concept_id'] in index]
+            if not candidates:
+                # The full-question FTS conjunction can miss a published meaning
+                # surrounded by dates/metrics. Reuse THIS authorized catalog,
+                # never synthesize aliases or upgrade a substring to authority.
+                label_tokens = {c['concept_id']: set(normalize(c['canonical_name']).split()) for c in catalog}
+                # Plural variants count together only to VETO a generic term
+                # (venta/ventas). This does not invent aliases or expand matches.
+                token_key = lambda token: token[:-1] if token.endswith('s') else token
+                frequency = {token: sum(any(token_key(other) == token_key(token) for other in words)
+                                       for words in label_tokens.values())
+                             for words in label_tokens.values() for token in words}
+                query_tokens = set(query.split())
+                for c in catalog:
+                    phrase = any(len(normalize(alias)) >= 4 and
+                        (' ' + normalize(alias) + ' ') in (' ' + query + ' ') for alias in c['aliases'])
+                    distinctive = {token for token in label_tokens[c['concept_id']]
+                                   if len(token) >= 5 and frequency[token] == 1} & query_tokens
+                    if phrase or distinctive:
+                        candidates.append(dict(c, match='text', score=0.0,
+                            selection_reason='published_alias_phrase' if phrase else 'distinctive_published_name_token'))
             # Text matches are not sufficient deterministic definitions. Vector retrieval can add candidates,
             # never automatically label a phrase true. No fabricated calibrated threshold in V1.
             if self.embeddings and catalog:

@@ -99,6 +99,15 @@ def model_proposal(value):
     return replace(proposal_from({k: v for k, v in value.items() if k not in QUERY_META}), requested_budget=DevBudget())
 
 
+def terminal_status(reason):
+    """Classify a terminal investigation outcome by cause.
+
+    A resource limit is a distinct state: it is not a missing capability, an
+    unauthorized source, absent data or an ambiguous question.
+    """
+    return 'RESOURCE_LIMITED' if reason == 'observation_byte_budget' else 'BLOCKED'
+
+
 def observation_rows(query, result):
     """Conservative AST-derived disclosure, never SQL regex or model-declared grain.
 
@@ -144,10 +153,44 @@ def ordered_observation(query):
     return any(m.get('type') == 'ORDER_MODIFIER' and m.get('orders') for m in node.get('modifiers', []))
 
 
-def bounded_payload(payload):
-    """Compact prior samples, never expand the byte budget or hide truncation."""
+OBSERVATION_BUDGET = 32768
+
+
+def payload_sizes(payload):
+    """Byte cost per transported component. Measurement, never truncation."""
+    size = lambda value: len(canonical(value).encode())
+    sizes = {key: size(value) for key, value in payload.items()
+             if key in {'question', 'conversation', 'observations', 'catalog',
+                        'business_knowledge', 'query_limits', 'requested_calculations',
+                        'requested_scope'}}
+    sizes['total'] = size(payload)
+    sizes['observations_detail'] = [
+        dict(turn=o.get('turn'), total=size(o), rows=size(o.get('rows')),
+             manifest=size(o.get('evidence_manifest')), schema=size(o.get('schema')),
+             evidence=bool(o.get('evidence_manifest')))
+        for o in payload.get('observations') or [] if isinstance(o, dict)]
+    return sizes
+
+
+def bounded_payload(payload, stats=None):
+    """Compact prior samples, never expand the budget or hide truncation.
+
+    `stats` (optional) receives the measured size of every compaction stage and
+    of each transported component, so a budget stop is reported with its actual
+    cause instead of being discarded downstream.
+    """
     import copy
     compact = copy.deepcopy(payload)
+    record = stats if stats is not None else {}
+    record['limit'] = OBSERVATION_BUDGET
+    sizes = lambda: len(canonical(compact).encode())
+
+    def checkpoint(stage):
+        record.setdefault('stages', {})[stage] = sizes()
+
+    checkpoint('input')
+    if sizes() > OBSERVATION_BUDGET:
+        record['components'] = payload_sizes(payload)
     if len(canonical(compact).encode()) > 32768 and 'catalog' in compact:
         # Discovery can expose many published schemas. Compact redundant field
         # labels only; do not drop sources, columns, types or semantic limits.
@@ -220,6 +263,7 @@ def bounded_payload(payload):
             observation['evidence_manifest']['row_ids'] = observation['evidence_manifest']['row_ids'][:3]
             observation['truncated'] = True
             observation['history_compacted'] = True
+    checkpoint('evidence_compacted')
     if len(canonical(compact).encode()) > 32768:
         for observation in compact['observations']:
             if not observation.get('evidence_manifest'): continue
@@ -228,8 +272,46 @@ def bounded_payload(payload):
             observation.pop('objective', None)
             if observation.get('decision', {}).get('decision') == 'ALLOW':
                 observation['decision'] = {'decision': 'ALLOW'}
+    checkpoint('rationale_compacted')
+    if len(canonical(compact).encode()) > 32768:
+        # Controller feedback is guidance that the audit already persists; it is
+        # not an operand, a population or a column. Only those entries leave the
+        # wire, and the omission is declared with its count.
+        omitted = 0
+        kept = []
+        for observation in compact['observations']:
+            if observation.get('evidence_manifest') or observation.get('turn'):
+                kept.append(observation)
+            else:
+                omitted += 1
+        if omitted:
+            compact['observations'] = kept
+            compact['omitted_feedback_entries'] = omitted
+            protocol = compact.get('compact_evidence_protocol')
+            compact['compact_evidence_protocol'] = (
+                (protocol if isinstance(protocol, str) else '') +
+                ' Controller feedback entries (already persisted in the audit, never evidence) '
+                'are summarized by omitted_feedback_entries.').strip()
+            checkpoint('feedback_summarized')
+    if len(canonical(compact).encode()) > 32768:
+        # Prior conversation prose is context, not evidence: bound it explicitly
+        # so the current question and every observation stay intact.
+        conversation = compact.get('conversation') or []
+        bounded, changed = [], False
+        for message in conversation:
+            content = message.get('content') if isinstance(message, dict) else None
+            if isinstance(content, str) and len(content) > 600:
+                message = dict(message, content=content[:600] +
+                    ' [recortado en este envío; el texto completo queda en la auditoría]')
+                changed = True
+            bounded.append(message)
+        if changed:
+            compact['conversation'] = bounded
+            compact['conversation_bounded'] = True
+            checkpoint('conversation_bounded')
     if len(canonical(compact).encode()) > 32768:
         raise RuntimeError('observation_byte_budget')
+    checkpoint('delivered')
     return compact
 
 
@@ -355,7 +437,7 @@ def recovered_population_claims(registry, claims):
 async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wall_seconds=1200,
               question=QUESTION, conversation=(), context=None, system=SYSTEM,
               registry_factory=None, progress=lambda event: None, cancel=None, required_measure=None,
-              allow_query_batches=False, compact_evidence_ids=False):
+              allow_query_batches=False, compact_evidence_ids=False, business_knowledge=None):
     start = time.monotonic()
     context = context or context_for_run()
     authorize(context)
@@ -372,6 +454,7 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
         limits=['local supervised DEV identity, not Console RBAC', 'no OS isolation accreditation',
                 'DuckDB memory limit is not a process RSS limit', 'attachment setup is not OS-preemptible',
                 'no historical classification or complete-month certification', 'narrative is not certified by arithmetic'])
+    report['business_knowledge'] = business_knowledge or {}
     history = []
     # Reserve observation headroom. Large authorized publications expose their
     # complete index first, not an oversized schema blob on every model call.
@@ -433,6 +516,11 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                 progress('Analizando observaciones con Luna')
                 payload = dict(question=question, current_date=datetime.now(timezone.utc).date().isoformat(),
                                conversation=list(conversation), required_measure=required_measure,
+                               requested_calculations=(sorted(registry.requested_calculations())
+                                   if hasattr(registry, 'requested_calculations') else []),
+                               requested_scope=(sorted(registry.requested_scope())
+                                   if hasattr(registry, 'requested_scope') else []),
+                               business_knowledge=business_knowledge or {},
                                catalog=(discovery_catalog(catalog, discovered_sources)
                                         if progressive_catalog else asdict(catalog)), observations=list(history),
                                current_observed_turns=[o['turn'] for o in history if 'turn' in o],
@@ -444,8 +532,21 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                 else:
                     if wire_ids:
                         payload = wire_ids.payload(payload)
-                    payload = bounded_payload(payload)
+                    budget = {}
+                    try:
+                        payload = bounded_payload(payload, budget)
+                    except RuntimeError:
+                        # Report the measured cause, never discard it: the exit is
+                        # a resource limit, not a business or authorization result.
+                        report['observation_budget'] = dict(
+                            limit=budget.get('limit', 32768), reason='observation_byte_budget',
+                            call=call + 1, stages=budget.get('stages'),
+                            measured_bytes=budget.get('stages', {}).get('input'),
+                            components=budget.get('components'))
+                        save(report)
+                        raise
                     report.setdefault('model_input_sizes', []).append(len(canonical(payload).encode()))
+                    report.setdefault('observation_budget_stages', []).append(budget.get('stages'))
                     value = await asyncio.wait_for(luna.next(payload, timeout=min(90, remaining)), remaining)
                     authorize(context)  # Model latency must not preserve a revoked scope.
                     report['model_calls'] = luna.calls
@@ -595,7 +696,8 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                     report['deterministic_render_seconds'] = time.monotonic()-render_started
                     if not complete:
                         report['business_answer'] += '\nLa pregunta tiene partes pendientes; las cifras anteriores son solo una respuesta parcial.'
-                    report['evidence_manifests'] = [asdict(entry[0]) for entry in registry.entries.values()]
+                    report['evidence_manifests'] = (registry.manifests() if hasattr(registry, 'manifests')
+                        else [asdict(entry[0]) for entry in registry.entries.values()])
                     report['narrative_state'] = 'RAW_MODEL_PROSE_AUDIT_ONLY; delivered facts rendered from verified evidence'
                     report['unresolved_claim_count'] = len(mismatches)
                     report['hypothesis_revision'] = dict(reviews=len(report['final_reviews']),
@@ -727,7 +829,8 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                     raise RuntimeError('execution_stopped:' + decision.reason)
             report['reason'] = 'model_call_budget_exhausted'
     except (RuntimeError, ValueError, asyncio.TimeoutError) as exc:
-        report.update(status='BLOCKED', reason=str(exc)[:180])
+        reason = str(exc)[:180]
+        report.update(status=terminal_status(reason), reason=reason)
     finally:
         authorization_lost = False
         try:
@@ -755,8 +858,12 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                                     snapshot=manifest.snapshot, temporal_scope=list(manifest.temporal_scope)))
                 checks = [registry.verify(c) for c in partial_claims[:60]]
                 report['partial_claim_verifications'] = checks
-                report['business_answer'] = 'Investigación incompleta. Resultados parciales:\n' + registry.render(checks)
-            report['evidence_manifests'] = [asdict(entry[0]) for entry in registry.entries.values()]
+                report['partial_verified_figures'] = sum(1 for c in checks if c.get('match'))
+                if checks:
+                    report['business_answer'] = ('Investigación incompleta. Resultados parciales:\n'
+                                                 + registry.render(checks))
+            report['evidence_manifests'] = (registry.manifests() if hasattr(registry, 'manifests')
+                else [asdict(entry[0]) for entry in registry.entries.values()])
             report['independent_reference_audit'] = registry.audit
             registry.close()
         report['model_calls'] = luna.calls

@@ -182,6 +182,7 @@ def owned_session(args):
 CONFIG_ENV = frozenset({
     'AUTOMATION_DIAGNOSIS_REPOSITORY', 'TEAM360_ENV', 'TEAM360_TELCHI_DURABLE',
     'TEAM360_TELCHI_FREE_ANALYSIS', 'TEAM360_TELCHI_CONSOLE_CONFIG',
+    'TEAM360_BUSINESS_SEMANTICS', 'TEAM360_SEMANTICS_AUTH_CONFIG',
     'TEAM360_SRV05_EVOLUTION_ENABLED', 'TEAM360_SRV05_MESSAGING_PROVIDER',
     'TEAM360_MESSAGING_DEV_ENABLED', 'TEAM360_MESSAGING_DISPATCH_MODE',
     'TEAM360_MESSAGING_WORKSPACE_SLUG', 'TEAM360_MESSAGING_CHANNEL_ALIAS',
@@ -208,6 +209,10 @@ def load_config(path):
     for name, value in config['env'].items():
         if name not in CONFIG_ENV or not isinstance(value, str) or '\x00' in value:
             raise ValueError('invalid_environment_entry')
+    semantics = config['env'].get('TEAM360_BUSINESS_SEMANTICS')
+    if semantics not in {None, '0', '1'} or (semantics == '1'
+            and not config['env'].get('TEAM360_SEMANTICS_AUTH_CONFIG')):
+        raise ValueError('restricted_semantics_configuration_required')
     if config['env'].get('AUTOMATION_DIAGNOSIS_REPOSITORY', 'postgres') != 'postgres':
         raise ValueError('postgres_repository_required')
     for key, low, high in (('idle_timeout', dev.MIN_IDLE_TIMEOUT, dev.MAX_IDLE_TIMEOUT),

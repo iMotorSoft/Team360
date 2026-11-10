@@ -110,7 +110,7 @@ class ConversationRepository:
         return dict(result_id=row['result_id'], analysis=audit['category_analysis'])
 
     async def load_monetary_results(self, conn, context, turn):
-        from .monetary_comparison import accredited
+        from .monetary_comparison import accredited_results
         ids = list(turn['history'])[-20:]
         if not ids:
             return []
@@ -125,9 +125,8 @@ class ConversationRepository:
              ids, context.channel.environment, ids))).fetchall()
         results, periods = [], set()
         for row in rows:
-            result = accredited(row['audit'], row['result_id'], turn['owner'])
-            if result:
-                key = (result['metric'], result.get('category'),
+            for result in accredited_results(row['audit'], row['result_id'], turn['owner']):
+                key = (result['result_id'], result['metric'], result.get('category'),
                        result['period']['date_from'], result['period']['date_to_exclusive'])
                 if key not in periods:
                     results.append(result)

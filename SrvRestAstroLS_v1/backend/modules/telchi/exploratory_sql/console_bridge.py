@@ -89,7 +89,7 @@ class ConsoleResearchService:
 
     async def ask_scope(self, scope_resolver, question, save, *,
                         progress=lambda event: None, conversation_id='default',
-                        recovery=None, checkpoint=None):
+                        recovery=None, checkpoint=None, business_knowledge=None):
         """Same investigator for ANY already-authenticated channel.
 
         scope_resolver is an async callable returning a fresh EffectiveScope. It is
@@ -137,7 +137,7 @@ class ConsoleResearchService:
                 try:
                     binding, gaps = open_binding(reader=self.reader, resolve_scope=fresh_scope,
                         policies=self.policies, investigation_id=investigation_id,
-                        budget=DevResearchBudget())
+                        budget=DevResearchBudget(), business_knowledge=business_knowledge)
                     if recovery is not None:
                         expected = recovery.get('binding')
                         actual = dict(publication=binding.context.publication,

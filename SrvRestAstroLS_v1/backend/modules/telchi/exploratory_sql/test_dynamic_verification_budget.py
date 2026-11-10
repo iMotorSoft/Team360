@@ -44,9 +44,22 @@ def test_feedback_column_reference_is_lossless_and_budgeted():
     assert payload == original
 
 
-def test_uncompressible_observation_still_fails_closed():
+def test_uncompressible_evidence_still_fails_closed():
+    # Control feedback is guidance and can be summarized; evidence cannot. A
+    # single issued column descriptor is never dropped to fit the budget.
+    column = dict(column_id='column-1', alias='alias', sql_type='DECIMAL(38,6)',
+        expression='x' * 40000, source_fields=['published.field'],
+        source_or_calculation='CALCULATION', metric=None, metric_definition=None,
+        grain='unaccredited', transformations=[], unit=None, currency=None,
+        classification='DERIVED_NOT_OFFICIAL', limitations=['not accredited'])
+    payload = dict(observations=[dict(turn=1, status='COMPLETED',
+        evidence_manifest=dict(result_id='result-1', columns=[column], row_ids=['row-1'],
+                               limitations=[]), rows=[['500']], truncated=False)])
+    stats = {}
     with pytest.raises(RuntimeError, match='observation_byte_budget'):
-        bounded_payload(dict(observations=[dict(status='ERROR', reason='x' * 32768)]))
+        bounded_payload(payload, stats)
+    assert stats['components']['observations'] > 32768
+    assert stats['stages']['input'] > 32768
 
 
 def test_missing_grain_diagnostic_reaches_claim_feedback():

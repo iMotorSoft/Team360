@@ -26,7 +26,10 @@ from .research_repository import ResearchRecoveryRepository
 # stay in the private evidence sink and PG audit, never in the channel answer.
 PRESENTATION_FIELDS = ('status', 'business_answer', 'clarification', 'publication',
                        'snapshot', 'question_coverage', 'reason',
-                       'model_calls', 'sql_executions')
+                       'model_calls', 'sql_executions',
+                       # A declared processing limit: measured budget and cause,
+                       # never SQL, prose or evidence handles.
+                       'observation_budget', 'partial_verified_figures')
 
 
 def presentation(report):
@@ -44,6 +47,8 @@ def presentation(report):
 
 
 class WhatsAppResearchPort:
+    accepts_business_knowledge = True
+
     def __init__(self, *, service, organization, workspace, policies, evidence_sink_factory,
                  identities=None, permissions=None, recovery_repository=None):
         self.service = service
@@ -123,6 +128,12 @@ class WhatsAppResearchPort:
             raise Rejected('recovery_authorization_changed', Decision.DENY)
         return True
 
+    @staticmethod
+    def calculate_result(*args, **kwargs):
+        """Expose the existing verifier through the research port, not V1 imports."""
+        from .exploratory_sql.ask_verifier import AskRegistry
+        return AskRegistry.calculate_pair(*args, **kwargs)
+
     async def result_reference(self, context, turn):
         """Recover executed records, not the channel's truncated prose."""
         if self.recovery_repository is None:
@@ -147,7 +158,15 @@ class WhatsAppResearchPort:
             async with conn.transaction():
                 return await self.recovery_repository.load(conn, scope, context) is not None
 
-    async def __call__(self, question, conversation_id, context, *, analysis_context_id=None):
+    async def filter_business_knowledge(self, resolution, context):
+        from .exploratory_sql.authorized_foundation import authorized_business_resolution
+        scope = await self._resolve_scope(context.sender_identity)
+        if not self._permitted(scope):
+            raise PermissionError('research_scope_denied')
+        return authorized_business_resolution(resolution, scope, self.policies)
+
+    async def __call__(self, question, conversation_id, context, *, analysis_context_id=None,
+                       business_knowledge=None):
         identity = context.sender_identity
         scope = await self._resolve_scope(identity)
         if not self._permitted(scope):
@@ -156,11 +175,14 @@ class WhatsAppResearchPort:
         async def resolve():
             return await self._resolve_scope(identity)
 
+        # Backend-only resolver output. Scope is issued here from live identity,
+        # not from inbound metadata or model-proposed permissions.
+        knowledge = dict(scope=self._receipt(scope), resolution=business_knowledge) if business_knowledge else None
         repo = self.recovery_repository
         if repo is None:
             report = await self.service.ask_scope(
                 resolve, question, self.evidence_sink_factory(),
-                conversation_id='whatsapp:' + str(conversation_id))
+                conversation_id='whatsapp:' + str(conversation_id), business_knowledge=knowledge)
             return presentation(report)
 
         async def read(method):
@@ -200,7 +222,7 @@ class WhatsAppResearchPort:
         recovery = dict(saved['conversation_input'], binding=saved['receipt'].get('binding'))
         report = await self.service.ask_scope(resolve, question, self.evidence_sink_factory(),
             conversation_id='whatsapp:' + str(conversation_id),
-            recovery=recovery, checkpoint=checkpoint)
+            recovery=recovery, checkpoint=checkpoint, business_knowledge=knowledge)
         result = presentation(report)
         await self.revalidate(context, saved['receipt'])
         saved.update(state='COMPLETED', result=result,
@@ -210,6 +232,7 @@ class WhatsAppResearchPort:
                          population_pages=report.get('population_pages', {}),
                          population_recovery=report.get('population_recovery', {}),
                          claim_verifications=report.get('claim_verifications', []),
+                         business_knowledge=report.get('business_knowledge', {}),
                          results=[{k: t['result'].get(k) for k in
                              ('query_id', 'schema', 'rows', 'truncated', 'status')}
                              for t in report.get('turns', []) if t.get('result')]),

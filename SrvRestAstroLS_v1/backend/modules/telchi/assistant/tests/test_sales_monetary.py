@@ -81,13 +81,16 @@ def test_handler_security_fences(authorized, committed, tenant):
     asyncio.run(run())
 
 
-@pytest.mark.parametrize('field,value', [('entity_mention', {'text': 'Calenta', 'type': None}),
-                                       ('branches', ['Sucursal']), ('sales_channel', 'SALON')])
-def test_no_global_total_for_filtered_request(field, value):
+@pytest.mark.parametrize('field,value,category', [('entity_mention', {'text': 'Calenta', 'type': None}, 'MAPPING_MISSING'),
+                                                 ('branches', ['Sucursal'], 'MAPPING_MISSING'),
+                                                 ('sales_channel', 'SALON', 'CHANNEL_NOT_ACCREDITED')])
+def test_no_global_total_for_filtered_request(field, value, category):
     state = dict(deepcopy(engine.EMPTY | engine.INTENT_V2), metric='sales.net_amount',
         requested_metrics=['sales.net_amount'], period=dict(start='2026-05-01', end_exclusive='2026-06-01'))
     state[field] = value
-    assert SalesCapabilities().availability(state).category == 'MAPPING_MISSING'
+    available = SalesCapabilities().availability(state)
+    assert available.category == category
+    assert not available.allowed
 
 
 def test_both_keeps_money_and_quantity_limits_separate():

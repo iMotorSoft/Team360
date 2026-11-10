@@ -260,6 +260,10 @@ class TelchiHandler:
             question = message.text_body
             if inherited:
                 question += '\nContexto previo confirmado (datos; solo para seguimientos, no para una consulta independiente): ' + json.dumps(inherited, ensure_ascii=False)
+            if hasattr(self.researcher, 'accepts_business_knowledge'):
+                # Reuse this turn's authorized resolver result, never retrieve a
+                # second catalog or spend another embedding/model call.
+                options['business_knowledge'] = audit.get('business_semantics')
             report = await self.researcher(question, context.conversation_id, context, **options)
         except Exception:
             if getattr(self.researcher, 'recovery_repository', None) is not None:
@@ -295,6 +299,23 @@ class TelchiHandler:
             return MessageResult('La investigación se detuvo por un límite de recursos o de ejecución. '
                                  'No tengo una respuesta completa acreditada; no es un rechazo '
                                  'por falta de una capability comercial.',
+                                 context.correlation_id, 'DIRECT_UNAVAILABLE')
+        if status == 'RESOURCE_LIMITED':
+            # A real processing limit is classified as such: never a missing
+            # capability, a denied source or an absent data period. A verified
+            # partial result is delivered with its material limitation.
+            limit = report.get('observation_budget') or {}
+            audit.update(decision='RESEARCH_RESOURCE_LIMITED', committed=False,
+                         execution_status='not_completed', required_permission=None,
+                         confirmed_state=deepcopy(turn['state']),
+                         research_limit=dict(reason=report.get('reason'), **{
+                             k: limit[k] for k in ('limit', 'measured_bytes') if k in limit}))
+            audit['bmd'] = {'category': 'RESEARCH_RESOURCE_LIMITED'}
+            limitation = ('La investigación alcanzó su límite de procesamiento por turno y no pudo completar '
+                          'la respuesta. No es un rechazo de la capability comercial, ni una fuente no autorizada, '
+                          'ni un dato inexistente.')
+            verified = text.strip()
+            return MessageResult((verified + '\n\n' if verified else '') + limitation,
                                  context.correlation_id, 'DIRECT_UNAVAILABLE')
         if status not in {'READY', 'VERIFIED_WITH_LIMITATIONS',
                           'EXECUTOR_OBSERVED_WITH_LIMITATIONS', 'PARTIAL',
@@ -356,6 +377,8 @@ class TelchiHandler:
                         # Evidence from the very connection used by retrieval,
                         # not inferred from a DSN or startup configuration.
                         semantics['connection'] = await repo.connection_identity(semantic_conn)
+                if self.researcher is not None and hasattr(self.researcher, 'filter_business_knowledge'):
+                    semantics = await self.researcher.filter_business_knowledge(semantics, context)
                 audit['business_semantics'] = semantics
                 interpretation_args['business_semantics'] = luna_context(semantics)
                 if (self.researcher is not None
@@ -432,6 +455,12 @@ class TelchiHandler:
                 audit['monetary_context_delivered'] = deepcopy(interpretation_args['monetary_context'])
             if self.researcher is not None:
                 interpretation_args['research_available'] = True
+            if reference_result is not None and reference_result.get('research_receipt'):
+                audit['research_context_delivered'] = dict(
+                    result_id=reference_result['result_id'],
+                    rows=len(interpretation_args['result_context'].get('rows', [])),
+                    context_bytes=len(json.dumps(interpretation_args['result_context'], ensure_ascii=False).encode()),
+                    continuity_cells=len(reference_result['manifest'].get('continuity_cells', [])))
             proposal = await self.interpreter.interpret(**interpretation_args)
             audit['interpretation_proposed'] = deepcopy(proposal)
             if proposal == {'intent': 'RESEARCH', 'action': 'INVESTIGATE'} and self.researcher is not None:
@@ -504,7 +533,8 @@ class TelchiHandler:
             classification = 'NEEDS_CLARIFICATION'
             try:
                 ordinal, text = result_references.resolve(proposal, reference_result, selected,
-                    turn['owner'], context.conversation_id)
+                    turn['owner'], context.conversation_id,
+                    calculator=getattr(self.researcher, 'calculate_result', None))
                 if ordinal is not None:
                     if not await self._reference_allowed(reference_result, context, turn.get('conn')):
                         classification, text = 'DENIED', 'No se pudo autorizar esta operación.'
@@ -520,6 +550,9 @@ class TelchiHandler:
                             audit.update(research_reference=True,
                                 research={'recovery': deepcopy(reference_result['research_receipt']),
                                           'sql_executions': 0})
+                        if proposal['action'] == 'TRANSFORM_RESULT':
+                            audit.update(decision='LOCAL_RESULT_TRANSFORM',
+                                         result_transformation=deepcopy(proposal['transformation']))
                         audit['reference_focus'] = 'result'
                         if reference_result['capability'] == 'sales.latest_documents.v1':
                             audit['document_reference'] = deepcopy(audit['result_reference'])
@@ -552,13 +585,31 @@ class TelchiHandler:
         else:
             state, action = processed['state_after'], processed['output']['action']
             from modules.telchi.datalake.operational_query import OPERATIONS
-            if (action == 'DIRECT_UNAVAILABLE' and state.get('metric') in OPERATIONS
-                    and self.capabilities.availability(state).allowed):
-                # The interpreter does not decide catalog availability. Only a
-                # committed, compatible request may use this route; the normal
-                # base + specific live RBAC checks still precede execution below.
-                action = 'EXECUTE'
-                audit['availability_resolution'] = 'REGISTERED_OPERATIONAL_ROUTE; NOT_AUTHORIZATION'
+            if action in {'DIRECT_UNAVAILABLE', 'ANALYSIS_UNAVAILABLE'}:
+                # D1: an interpreter decision is never evidence of business
+                # unavailability. Availability is a validated contract, not model
+                # opinion; a contradiction is audited and resolved, never rendered
+                # as an invented gap. It confers no permission either.
+                available = self.capabilities.availability(state)
+                if available.allowed:
+                    audit['availability_inconsistency'] = dict(
+                        proposed_action=action, allowed=True, metric=state.get('metric'),
+                        breakdown_by=state.get('breakdown_by'),
+                        periods=len(state.get('periods') or []),
+                        channel=state.get('sales_channel'),
+                        rule='interpreter_decision_is_not_availability_evidence')
+                    if action == 'DIRECT_UNAVAILABLE':
+                        # The committed state is fully representable: resolve it
+                        # through the accredited operation instead of declaring a gap.
+                        action = 'EXECUTE'
+                        audit['availability_resolution'] = (
+                            'AVAILABILITY_CONTRACT_CONSISTENT_EXECUTION; NOT_AUTHORIZATION')
+                    else:
+                        # No accredited operation represents an analysis; the
+                        # authorized mechanism is the investigator, not a
+                        # substitute measure.
+                        audit['availability_resolution'] = (
+                            'ANALYSIS_ROUTED_TO_AUTHORIZED_RESEARCH; NOT_AUTHORIZATION')
             audit['validated_state'] = deepcopy(state)
             audit['confirmed_state'] = deepcopy(state)  # confirmed request, NOT execution
             audit['decision'] = action
@@ -657,8 +708,20 @@ class TelchiHandler:
             elif action in {'DIRECT_UNAVAILABLE', 'ANALYSIS_UNAVAILABLE'}:
                 classification = action
                 available = self.capabilities.availability(state)
-                text = ('Esta funcionalidad de análisis todavía no está disponible. La ejecución diferida tampoco está habilitada.'
-                        if action == 'ANALYSIS_UNAVAILABLE' else unavailable_response(state, available))
+                if action == 'ANALYSIS_UNAVAILABLE' and available.allowed:
+                    # The measure is executable but the requested analysis is not
+                    # an accredited operation. Research owns it when enabled; the
+                    # text never claims the commercial data is unavailable.
+                    text = ('No tengo una operación acreditada que responda ese análisis por sí sola. '
+                            'La investigación autorizada no confirmó un resultado; no ejecuté una consulta '
+                            'sustituta ni presenté una cifra parcial como respuesta al análisis.'
+                            if self.researcher is not None else
+                            'No tengo una operación acreditada que responda ese análisis. '
+                            'Los datos comerciales del alcance sí están disponibles y puedo consultarlos '
+                            'como importe, no como explicación de la causa.')
+                else:
+                    text = ('Esta funcionalidad de análisis todavía no está disponible. La ejecución diferida tampoco está habilitada.'
+                            if action == 'ANALYSIS_UNAVAILABLE' else unavailable_response(state, available))
                 audit['bmd'] = {'category': 'ANALYSIS_REQUESTED' if action == 'ANALYSIS_UNAVAILABLE' else (available.category or 'CAPABILITY_MISSING')}
                 if semantics and semantics.get('ranking', {}).get('vector_eligible'):
                     candidate = next((c for c in semantics.get('interpretation_concepts', []) if c['match'] == 'vector'), None)
@@ -998,6 +1061,11 @@ RESEARCH_CATEGORIES = frozenset({
     'OPERATIONAL_SCOPE_UNAVAILABLE', 'DIMENSION_NOT_ACCREDITED',
     'PERIOD_SET_UNSUPPORTED', 'PERIOD_PARAMETER_UNSUPPORTED', 'COVERAGE_GAP',
     'PAGINATION_UNSUPPORTED', 'PRODUCT_AMBIGUOUS', 'PRODUCT_LOOKUP_UNRESOLVED',
+    # An incomplete interpretation, an unaccredited channel for that operation and
+    # a rejected scope correspondence are representation gaps: the original
+    # question may still be answerable by the authorized investigator.
+    'INTENT_INCOMPLETE', 'CHANNEL_NOT_ACCREDITED', 'MEASURE_SCOPE_MISMATCH',
+    'AVAILABILITY_CONTRACT_INCONSISTENCY',
 })
 _PUBLICATION_FAILURES = {
     'product_binding_changed', 'product_result_binding_mismatch',
@@ -1022,7 +1090,12 @@ _DATA_FAILURES = {
     'commercial_catalog_integrity_failed', 'category_currency_not_accredited',
     'category_unaccredited_rows_or_lineage', 'category_key_integrity_failed',
     'category_classification_provisional', 'category_classification_changed',
-    'DATA_UNAVAILABLE'}
+    'period_breakdown_not_reconciled', 'DATA_UNAVAILABLE'}
+# A technically executable result that does not correspond to the requested
+# measure, channel, period set or breakdown. It is never delivered as an answer.
+_SCOPE_FAILURES = {'capability_scope_mismatch', 'invalid_monetary_result',
+                   'invalid_monetary_period_coverage', 'invalid_monetary_channel',
+                   'unexpected_monetary_channel', 'invalid_period_reconciliation'}
 
 
 def capability_failure(exc, state):
@@ -1049,6 +1122,12 @@ def capability_failure(exc, state):
         text = ('No pude acreditar los datos de ese alcance ni presentar cifras sin verificar. '
                 'No es un problema de la fecha ni de la forma de preguntar. '
                 'Podés iniciar otra consulta con otro producto o período.')
+    elif reason in _SCOPE_FAILURES:
+        # Executable but not the requested representation: never delivered.
+        category, classification = 'MEASURE_SCOPE_MISMATCH', 'DIRECT_UNAVAILABLE'
+        text = ('La operación se ejecutó, pero el resultado no corresponde a la medida, el canal, los períodos '
+                'o el desglose solicitados, así que no lo presento como respuesta. '
+                'No es una indisponibilidad de la capability comercial ni un dato inexistente.')
     else:
         category, classification = 'EXECUTION_ERROR', 'ERROR'
         text = ('No hay un resultado Foundation verificable: la operación no se pudo completar. '
@@ -1186,7 +1265,14 @@ def unavailable_response(state, available):
         summary += f' en {when}'
     elif state.get('temporal_reference'):
         summary += ' durante el último mes registrado'
-    reason = available.reason or 'Esta consulta todavía no está disponible.'
+    reason = available.reason or ('No tengo una operación acreditada que represente exactamente esta consulta; '
+                                  'no ejecuté una consulta sustituta.')
+    if available.category == 'INTENT_INCOMPLETE':
+        reason = ('No pude determinar qué medida u operación acreditada responde esta pregunta, '
+                  'así que no ejecuté una consulta sustituta ni presenté una cifra parcial como respuesta.')
+    if available.category == 'CHANNEL_NOT_ACCREDITED':
+        reason = ('El canal que pedís no tiene una clasificación acreditada para esa operación en particular. '
+                  'No lo reemplacé por otro canal ni por un total sin canal.')
     if available.category == 'MAPPING_MISSING':
         reason = ('Todavía no puedo consultar las ventas de esa entidad con los filtros solicitados.'
                   if state.get('entity_mention') else
@@ -1199,6 +1285,9 @@ def unavailable_response(state, available):
     if available.category == 'PERIOD_SET_UNSUPPORTED':
         reason = ('No puedo desglosar por mes sin el conjunto de períodos. '
                   'El resto del alcance se conserva.')
+    if available.category == 'MEASURE_SCOPE_MISMATCH':
+        reason = ('El resultado ejecutado no coincide con la medida, el canal, los períodos o el desglose '
+                  'solicitados. No lo presento como respuesta.')
     if state.get('temporal_reference') and available.category != 'TEMPORAL_METADATA_MISSING':
         reason += ' Tampoco tengo metadata habilitada para resolver el último mes por entidad y métrica.'
     return summary + '. ' + reason + ' ' + _next_step(state, available)
@@ -1206,7 +1295,9 @@ def unavailable_response(state, available):
 
 def _next_step(state, available):
     """The next useful step: concrete, and never a query of its own."""
-    if available.category in {'PERIOD_UNRESOLVED', 'PERIOD_SET_UNSUPPORTED'}:
+    # A period that already exists in the confirmed scope is never requested again.
+    has_period = bool(state.get('period') or state.get('periods') or state.get('comparison'))
+    if available.category in {'PERIOD_UNRESOLVED', 'PERIOD_SET_UNSUPPORTED'} and not has_period:
         return 'Indicame el mes o los meses concretos y lo consulto.'
     if available.category == 'DIMENSION_NOT_ACCREDITED':
         return ('Puedo mostrar el importe por producto o por cliente facturado dentro del mismo alcance; '
@@ -1219,13 +1310,17 @@ def _next_step(state, available):
     if available.category in {'MAPPING_MISSING', 'METRIC_MISSING'}:
         return ('Decime qué información necesitás (producto, cliente, período o categoría) y consulto la parte '
                 'que sí está acreditada.')
+    if available.category == 'CHANNEL_NOT_ACCREDITED':
+        return ('Puedo consultarte la facturación neta documental por período con el canal horizontal acreditado, '
+                'o el importe de líneas comerciales por producto o por cliente sin filtro de canal; decime cuál.')
     if available.category == 'CAPABILITY_MISSING':
         # A real gap gets a concrete path that the catalog can actually run: a
         # reformulation must never send the user back to the same rejection.
         return ('Si lo que querés es un ranking por producto, puedo darte el importe vendido y la cantidad '
                 'documental de cada producto en un período concreto, ordenado por importe o por cantidad: '
                 'decime el período y el criterio.')
-    return 'Podés reformular la consulta con los datos que ya tenemos, o indicarme el período faltante.'
+    return ('Podés reformular la consulta con los datos que ya tenemos.' if has_period else
+            'Podés reformular la consulta con los datos que ya tenemos, o indicarme el período faltante.')
 
 
 def registration(handler):

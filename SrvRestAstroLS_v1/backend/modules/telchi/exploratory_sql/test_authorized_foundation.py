@@ -118,6 +118,12 @@ def test_sales_dimensions_preserve_lines_and_withhold_nonunique_or_restricted_in
         assert enrich_authorized_sales_lines(db, sources, policies[:-1], scope) == (sources, ())
         enriched, gaps = enrich_authorized_sales_lines(db, sources, policies, scope)
         assert not gaps
+        receipt = enriched[0].projection_contracts[0]
+        assert receipt['origin'] == 'enrich_authorized_sales_lines'
+        assert receipt['authority'] == 'CHECKED_BACKEND_PROJECTION_ONLY'
+        assert set(receipt['sources']) == {s.name for s in sources}
+        assert len(receipt['relationships']) == 3
+        assert 'header doc_total' in receipt['measure']
         rows = db.execute('SELECT line_total,doc_date,customer_name,product_business_type FROM '
                           + enriched[0].relation + ' ORDER BY line_total').fetchall()
         assert rows == [(10, '2026-08-01', 'Customer', 'RAW_MATERIAL'), (20, None, None, 'RAW_MATERIAL'),
